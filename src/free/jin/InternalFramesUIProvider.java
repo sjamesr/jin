@@ -49,13 +49,13 @@ public class InternalFramesUIProvider implements UIProvider{
 
 
   /**
-   * The context in which we are running.
+   * Jin's instance.
    */
-
-  private final JinContext context;
-
-
-
+   
+  private final Jin jin;
+  
+  
+  
   /**
    * The main container.
    */
@@ -131,11 +131,13 @@ public class InternalFramesUIProvider implements UIProvider{
   
   /**
    * Creates a new <code>InternalFramesUIProvider</code> with the specified
-   * context and main container.
+   * main container. The Jin instance must be passed here because this
+   * constructor is invoked from Jin's constructor, at which point Jin's
+   * instance is not yet available via <code>Jin.getInstance()</code>. 
    */
 
-  public InternalFramesUIProvider(JinContext context, TopLevelContainer mainContainer){
-    this.context = context;
+  public InternalFramesUIProvider(Jin jin, TopLevelContainer mainContainer){
+    this.jin = jin;
     this.mainContainer = mainContainer;
 
     configureDesktop(desktop = new AdvancedJDesktopPane());
@@ -147,7 +149,7 @@ public class InternalFramesUIProvider implements UIProvider{
     menubar.add(connMenu = new ConnectionMenu());
     menubar.add(lnfMenu = new LookAndFeelMenu(mainContainer.getTopMostFrame()));
     menubar.add(prefsMenu = new PreferencesMenu());
-    menubar.add(helpMenu = new HelpMenu(context));
+    menubar.add(helpMenu = new HelpMenu());
     
     frameSwitcher = new InternalFrameSwitcher(desktop);
     desktop.setDesktopManager(new DesktopManager());
@@ -165,7 +167,7 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   private void configureDesktop(AdvancedJDesktopPane desktop){
-    Preferences prefs = context.getPrefs();
+    Preferences prefs = jin.getPrefs();
 
     Color bgColor = prefs.getColor("desktop.bgcolor", null);
     String wallpaper = prefs.getString("desktop.wallpaper.filename", null);
@@ -470,7 +472,7 @@ public class InternalFramesUIProvider implements UIProvider{
 
       if (!connected && (session != null)){
         User user = session.getUser();
-        if (JinUtilities.isKnownUser(context, user) && !user.isGuest()){
+        if (jin.isKnownUser(user) && !user.isGuest()){
           recentAccounts.removeElement(user);
           recentAccounts.insertElementAt(user, 0);
           updateRecentAccountsMenuItems();
@@ -489,16 +491,16 @@ public class InternalFramesUIProvider implements UIProvider{
      */
 
     public void actionPerformed(ActionEvent evt){
-      ConnectionManager connManager = context.getConnManager();
+      ConnectionManager connManager = jin.getConnManager();
       Object source = evt.getSource();
       if (source == newConnection){
-        connManager.showNewConnectionUI();
+        connManager.displayNewConnUI();
       }
       else if (source == closeConnection){
         Object result = OptionPanel.OK;
-        Session session = context.getConnManager().getSession();
+        Session session = jin.getConnManager().getSession();
         if ((session != null) && session.isConnected()){
-          result = OptionPanel.confirm(InternalFramesUIProvider.this, "Close Session?",
+          result = OptionPanel.confirm("Close Session?",
             "Disconnect from the server and close the session?", OptionPanel.OK);
         }
 
@@ -506,12 +508,12 @@ public class InternalFramesUIProvider implements UIProvider{
           connManager.closeSession();
       }
       else if (source == exit){
-        context.quit(true);
+        jin.quit(true);
       }
       else{ // One of the recent account menu items
         int index = Utilities.indexOf(getMenuComponents(), source);
         User user = (User)recentAccounts.elementAt(index - separatorIndex - 1);
-        connManager.showLoginInformationUI(user.getServer(), user.getPreferredConnDetails());
+        connManager.displayNewConnUI(user.getServer(), user.getPreferredConnDetails());
       }
     }
 
@@ -561,18 +563,18 @@ public class InternalFramesUIProvider implements UIProvider{
 
     private Vector loadRecentAccounts(){
       Vector accounts = new Vector(MAX_RECENT_LIST);
-      Preferences prefs = context.getPrefs();
+      Preferences prefs = jin.getPrefs();
 
       int count = prefs.getInt("accounts.recent.count", 0);
       for (int i = 0; i < count; i++){
         String username = prefs.getString("accounts.recent." + i + ".username");
         String serverId = prefs.getString("accounts.recent." + i + ".serverId");
 
-        Server server = JinUtilities.getServerById(context, serverId);
+        Server server = jin.getServerById(serverId);
         if (server == null)
           continue;
 
-        User user = JinUtilities.getUser(context, server, username);
+        User user = jin.getUser(server, username);
         if (user == null)
           continue;
 
@@ -591,7 +593,7 @@ public class InternalFramesUIProvider implements UIProvider{
      */
 
     private void saveRecentAccounts(Vector accounts){
-      Preferences prefs = context.getPrefs();
+      Preferences prefs = jin.getPrefs();
 
       int count = accounts.size();
       prefs.setInt("accounts.recent.count", count);
@@ -752,7 +754,7 @@ public class InternalFramesUIProvider implements UIProvider{
      */
 
     private void showBGDialog(){
-      Preferences prefs = context.getPrefs();
+      Preferences prefs = jin.getPrefs();
       String wallpaperFilename = prefs.getString("desktop.wallpaper.filename", null);
       File currentImageFile = wallpaperFilename == null ? null : new File(wallpaperFilename);
       
@@ -902,7 +904,7 @@ public class InternalFramesUIProvider implements UIProvider{
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error(InternalFramesUIProvider.this, "Illegal Preferences",e.getMessage());
+          OptionPanel.error("Illegal Preferences",e.getMessage());
           if (e.getErrorComponent() != null)
             e.getErrorComponent().requestFocus();
         }
@@ -1307,14 +1309,14 @@ public class InternalFramesUIProvider implements UIProvider{
             break;
           case CLOSE_SESSION_ON_CLOSE:
             Object result = OptionPanel.OK;
-            Session session = context.getConnManager().getSession();
+            Session session = jin.getConnManager().getSession();
             if ((session != null) && session.isConnected()){
-              result = OptionPanel.confirm(InternalFramesUIProvider.this, "Close Session?",
+              result = OptionPanel.confirm("Close Session?",
                 "Close this window and disconnect?", OptionPanel.OK);
             }
 
             if (result == OptionPanel.OK)
-              context.getConnManager().closeSession();
+              jin.getConnManager().closeSession();
             break;
           case DO_NOTHING_ON_CLOSE:
             firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_CLOSING));
