@@ -149,40 +149,40 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
 
       String dirName = relPath+"/"+size;
 
-      pieces.put(ChessPiece.WHITE_KING, image = toolkit.createImage(c.getResource(dirName+"/wk.gif")));
+      pieces.put(ChessPiece.WHITE_KING, image = toolkit.getImage(c.getResource(dirName+"/wk.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_KING, image = toolkit.createImage(c.getResource(dirName+"/bk.gif")));
+      pieces.put(ChessPiece.BLACK_KING, image = toolkit.getImage(c.getResource(dirName+"/bk.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.WHITE_QUEEN, image = toolkit.createImage(c.getResource(dirName+"/wq.gif")));
+      pieces.put(ChessPiece.WHITE_QUEEN, image = toolkit.getImage(c.getResource(dirName+"/wq.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_QUEEN, image = toolkit.createImage(c.getResource(dirName+"/bq.gif")));
+      pieces.put(ChessPiece.BLACK_QUEEN, image = toolkit.getImage(c.getResource(dirName+"/bq.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.WHITE_ROOK, image = toolkit.createImage(c.getResource(dirName+"/wr.gif")));
+      pieces.put(ChessPiece.WHITE_ROOK, image = toolkit.getImage(c.getResource(dirName+"/wr.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_ROOK, image = toolkit.createImage(c.getResource(dirName+"/br.gif")));
+      pieces.put(ChessPiece.BLACK_ROOK, image = toolkit.getImage(c.getResource(dirName+"/br.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.WHITE_BISHOP, image = toolkit.createImage(c.getResource(dirName+"/wb.gif")));
+      pieces.put(ChessPiece.WHITE_BISHOP, image = toolkit.getImage(c.getResource(dirName+"/wb.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_BISHOP, image = toolkit.createImage(c.getResource(dirName+"/bb.gif")));
+      pieces.put(ChessPiece.BLACK_BISHOP, image = toolkit.getImage(c.getResource(dirName+"/bb.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.WHITE_KNIGHT, image = toolkit.createImage(c.getResource(dirName+"/wn.gif")));
+      pieces.put(ChessPiece.WHITE_KNIGHT, image = toolkit.getImage(c.getResource(dirName+"/wn.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_KNIGHT, image = toolkit.createImage(c.getResource(dirName+"/bn.gif")));
+      pieces.put(ChessPiece.BLACK_KNIGHT, image = toolkit.getImage(c.getResource(dirName+"/bn.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.WHITE_PAWN, image = toolkit.createImage(c.getResource(dirName+"/wp.gif")));
+      pieces.put(ChessPiece.WHITE_PAWN, image = toolkit.getImage(c.getResource(dirName+"/wp.gif")));
       tracker.addImage(image, 0);
 
-      pieces.put(ChessPiece.BLACK_PAWN, image = toolkit.createImage(c.getResource(dirName+"/bp.gif")));
+      pieces.put(ChessPiece.BLACK_PAWN, image = toolkit.getImage(c.getResource(dirName+"/bp.gif")));
       tracker.addImage(image, 0);
 
       pieceImages.put(size, pieces);
