@@ -21,20 +21,23 @@
 
 package free.jin.sound;
 
-import free.util.audio.*;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.Preferences;
 import free.jin.event.*;
-import jregex.*;
-import free.jin.*;
 import free.jin.plugin.Plugin;
-import java.util.Hashtable;
-import java.util.Enumeration;
+import free.util.audio.AudioClip;
+import free.util.models.BooleanModel;
+import free.util.models.Model;
+
 import java.io.IOException;
 import java.net.URL;
-import javax.swing.JMenu;
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButtonMenuItem;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import jregex.Matcher;
+import jregex.Pattern;
+import jregex.PatternSyntaxException;
 
 
 /**
@@ -82,7 +85,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * True when the plugin is "on", i.e. sounds are on.
    */
 
-  protected boolean isOn;
+  protected final BooleanModel soundState = new BooleanModel("Enable Sound", false);
 
 
 
@@ -109,6 +112,16 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     unregisterListeners();
     unloadSounds();
   }
+  
+  
+  
+  /**
+   * Returns a boolean model specifying whether sound is on.
+   */
+  
+  public Model [] getHotPrefs(){
+    return new Model[]{soundState};
+  }
 
 
 
@@ -120,7 +133,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void init(){
-    isOn = getPrefs().getBool("on", true);
+    soundState.set(getPrefs().getBool("on", true));
   }
 
 
@@ -133,55 +146,8 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public void saveState(){
-    getPrefs().setBool("on", isOn);
+    getPrefs().setBool("on", soundState.isOn());
   }
-
-
-
-
-  /**
-   * Creates and returns the JMenu for this plugin.
-   */
-
-  public JMenu getPluginMenu(){
-    JMenu myMenu = new JMenu(getName());
-    
-    JRadioButtonMenuItem onMenu = new JRadioButtonMenuItem("Sound On", isOn);
-    JRadioButtonMenuItem offMenu = new JRadioButtonMenuItem("Sound Off", !isOn);
-
-    onMenu.setMnemonic('S');
-    offMenu.setMnemonic('o');
-
-    ButtonGroup onOffGroup = new ButtonGroup();
-    onOffGroup.add(onMenu);
-    onOffGroup.add(offMenu);
-
-    onMenu.setActionCommand("on");
-    offMenu.setActionCommand("off");
-
-    ActionListener soundStateListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String actionCommand = evt.getActionCommand();
-
-        if ("on".equals(actionCommand))
-          isOn = true;
-        else if ("off".equals(actionCommand))
-          isOn = false;
-        else
-          throw new IllegalStateException("Unknown action command: "+actionCommand);
-      }
-    };
-
-    onMenu.addActionListener(soundStateListener);
-    offMenu.addActionListener(soundStateListener);
-
-    myMenu.add(onMenu);
-    myMenu.add(offMenu);
-
-    return myMenu;
-  }
-
-
 
 
 
@@ -514,7 +480,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public boolean isOn(){
-    return isOn;
+    return soundState.isOn();
   }
 
 
