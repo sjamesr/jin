@@ -8,6 +8,7 @@
 		<pathelement path="timestamping.jar"/>
 		<pathelement path="timesealing.jar"/>
 		<pathelement path="jregex.jar"/>
+		<pathelement path="bsh-core-1.2b7.jar"/>
 	</path>
 	
 	<target name="init">
