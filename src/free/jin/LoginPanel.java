@@ -33,6 +33,7 @@ import javax.swing.border.TitledBorder;
 import free.workarounds.FixedJTextField;
 import free.workarounds.FixedJPasswordField;
 import free.workarounds.FixedJComboBox;
+import java.util.Vector;
 
 
 /**
@@ -40,35 +41,255 @@ import free.workarounds.FixedJComboBox;
  */
 
 public class LoginPanel extends DialogPanel{
+  
+  
+  
+  /**
+   * The list of servers, in the order we put them in the serverBox.
+   */
+   
+  private Server [] servers;
+  
+  
+  
+  /**
+   * The list of users, in the order we put them in the userBox. 
+   */
+   
+  private User [] users;
+  
+  
+  
+  /**
+   * The JComboBox displaying the current server. 
+   */
+   
+  private final JComboBox serverBox;
+  
+  
+  
+  /**
+   * The JComboBox displaying the current account (User).
+   */
+   
+  private final JComboBox userBox;
+  
+   
+  
+  /**
+   * The username field.
+   */
+   
+  private final JTextField usernameField;
+  
+  
+  
+  /**
+   * The password field.
+   */
+   
+  private final JPasswordField passwordField;
+  
+  
+  
+  /**
+   * The save password checkbox.
+   */
+   
+  private final JCheckBox savePasswordCheckBox;
 
 
 
   /**
-   * The server we're to connect to.
+   * The retrieve password button.
+   */
+   
+  private final JButton retrievePasswordButton;
+
+
+
+  /**
+   * The hostname box.
+   */
+   
+  private final JComboBox hostnameBox;
+  
+  
+  
+  /**
+   * The ports field.
+   */
+   
+  private final JTextField portsField;
+  
+  
+  
+  /**
+   * The "connect" button.
+   */
+   
+  private final JButton connectButton;
+  
+  
+  
+  /**
+   * The "register" button.
+   */
+   
+  private final JButton registerButton;
+  
+  
+  
+  
+  /**
+   * Creates a new <code>LoginPanel</code> with the specified initial connection
+   * details.
    */
 
-  private final Server server;
-
-
-
+  public LoginPanel(ConnectionDetails connDetails){
+    this(connDetails.getServer(), connDetails);
+  }
+  
+  
+  
   /**
-   * The initially filled in connection details. May be null.
+   * Creates a new <code>LoginPanel</code> with the specified initial server.
    */
-
-  private final ConnectionDetails connDetails;
-
-
-
+   
+  public LoginPanel(Server server){
+    this(server, null);
+  }
+  
+  
+  
   /**
-   * Creates a new <code>LoginPanel</code> with the specified initial
+   * Creates a new <code>LoginPanel</code> with the specified server and
    * connection details.
    */
-
-  public LoginPanel(Server server, ConnectionDetails connDetails){
-    this.server = server;
-    this.connDetails = connDetails;
-
+   
+  private LoginPanel(Server server, ConnectionDetails connDetails){
+    this.serverBox = new FixedJComboBox();
+    this.userBox = new FixedJComboBox();
+    this.usernameField = new FixedJTextField();
+    this.passwordField = new FixedJPasswordField();
+    this.savePasswordCheckBox = new JCheckBox("Save password");
+    this.retrievePasswordButton = new JButton("Retrieve Password"); 
+    this.hostnameBox = new FixedJComboBox();
+    this.portsField = new FixedJTextField(7);
+    this.connectButton = new JButton("Connect");
+    this.registerButton = new JButton("Register");
+    
     createUI();
+    
+    this.servers = Jin.getInstance().getServers();
+    
+    serverBox.setModel(createServerBoxModel());
+    
+    setData(server, connDetails);
+  }
+  
+  
+  
+  /**
+   * Sets the data currently displayed by the dialog. If the connection details
+   * are <code>null</code>, it means that the user is creating a new account
+   * from scratch (only the server is known).
+   */
+   
+  private void setData(Server server, ConnectionDetails connDetails){
+    serverBox.setSelectedIndex(Utilities.indexOf(servers, server));
+    
+    users = getServerUsers(server);
+    userBox.setModel(createUserBoxModel());
+    
+    User user = connDetails == null ? null :
+      Jin.getInstance().getUser(server, connDetails.getUsername());
+    if (user == null)
+      userBox.setSelectedIndex(0);
+    else
+      userBox.setSelectedIndex(Utilities.indexOf(users, user) + 1);
+    
+    if ((connDetails == null) || connDetails.isGuest()){
+      usernameField.setText("");
+      passwordField.setText("");
+      savePasswordCheckBox.setSelected(false);
+    }
+    else{
+      usernameField.setText(connDetails.getUsername());
+      passwordField.setText(connDetails.getPassword());
+      savePasswordCheckBox.setSelected(connDetails.isSavePassword());
+    }
+    
+    hostnameBox.setModel(new DefaultComboBoxModel(server.getHosts()));
+    hostnameBox.setSelectedItem(connDetails == null ? server.getDefaultHost() : connDetails.getHost());
+    
+    int [] ports = connDetails == null ? server.getPorts() : connDetails.getPorts();
+    portsField.setText(StringEncoder.encodeIntList(ports));
+    
+    retrievePasswordButton.setVisible(server.getPasswordRetrievalPage() != null);
+    
+    registerButton.setVisible(server.getRegistrationPage() != null);
+    
+    if (!isShowing()){
+      // Set default focused component
+      if (usernameField.getText().length() == 0)
+        defaultFocusedComponent = usernameField;
+      else if (passwordField.getText().length() == 0)
+        defaultFocusedComponent = passwordField;
+      else
+        defaultFocusedComponent = connectButton;
+    }
+  }
+  
+  
+  
+  /**
+   * Creates the ComboBoxModel for the servers combo box.
+   */
+   
+  private ComboBoxModel createServerBoxModel(){
+    DefaultComboBoxModel model = new DefaultComboBoxModel();
+    for (int i = 0; i < servers.length; i++)
+      model.addElement(servers[i].getLongName());
+    
+    return model;
+  }
+  
+  
+  
+  /**
+   * Returns a list of known users on the specified server.
+   */
+   
+  private User [] getServerUsers(Server server){
+    Vector usersVec = new Vector();
+    ListModel usersList = Jin.getInstance().getUsers();
+    
+    for (int i = 0; i < usersList.getSize(); i++){
+      User user = (User)usersList.getElementAt(i);
+      if (user.getServer() == server)
+        usersVec.addElement(user);
+    }
+    
+    User [] usersArr = new User[usersVec.size()];
+    usersVec.copyInto(usersArr);
+    return usersArr;
+  }
+  
+  
+  
+  /**
+   * Creates the ComboBoxModel for the users combo box.
+   */
+   
+  private ComboBoxModel createUserBoxModel(){
+    DefaultComboBoxModel model = new DefaultComboBoxModel();
+    model.addElement("<New account>");
+    
+    for (int i = 0; i < users.length; i++)
+      model.addElement(users[i].getUsername());
+    
+    return model;
   }
 
 
@@ -90,13 +311,14 @@ public class LoginPanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return server.getLongName() + " Login";
+    return "Select Login Details";
   }
 
 
 
   /**
-   * Displays an error panel with the specified title and message.
+   * Displays an error panel with the specified title and message. Helper
+   * function.
    */
 
   private void showError(String title, String message){
@@ -104,6 +326,16 @@ public class LoginPanel extends DialogPanel{
       new Object[]{OptionPanel.OK}, OptionPanel.OK, message);
     panel.setHintParent(this);
     panel.show();
+  }
+  
+  
+  
+  /**
+   * Returns the currently selected server. Helper function.
+   */
+   
+  private Server getServer(){
+    return servers[serverBox.getSelectedIndex()];     
   }
 
 
@@ -113,30 +345,38 @@ public class LoginPanel extends DialogPanel{
    */
 
   private void createUI(){
-    boolean noConnDetailsOrGuest = (connDetails == null) || connDetails.isGuest();
-    String username = noConnDetailsOrGuest ? "" : connDetails.getUsername();
-    String password = noConnDetailsOrGuest ? "" : connDetails.getPassword();
-    boolean savePassword = noConnDetailsOrGuest ? false : connDetails.isSavePassword();
-    String [] hostnames = server.getHosts();
-    String hostname = connDetails == null ? server.getDefaultHost() : connDetails.getHost();
-    int [] ports = connDetails == null ? server.getPorts() : connDetails.getPorts();
-
-    final JTextField usernameField = new FixedJTextField(username);
-    final JPasswordField passwordField = new FixedJPasswordField(password);
-    final JComboBox hostnameBox = new FixedJComboBox(hostnames);
+    serverBox.setEditable(false);
+    serverBox.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        Server server = servers[serverBox.getSelectedIndex()];
+        User [] users = getServerUsers(server);
+        
+        // If there's only one known account, that's probably what the user wants to use
+        if (users.length == 1)   
+          setData(server, users[0].getPreferredConnDetails());
+        else
+          setData(server, null);
+      }
+    });
+    
+    userBox.setEditable(false);
+    userBox.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        if (userBox.getSelectedIndex() == 0)
+          setData(getServer(), null);
+        else
+          setData(getServer(), users[userBox.getSelectedIndex() - 1].getPreferredConnDetails());
+      }
+    });
     hostnameBox.setEditable(true);
-    hostnameBox.setSelectedItem(hostname);
-    final JTextField portsField = new FixedJTextField(StringEncoder.encodeIntList(ports), 7);
-    final JCheckBox savePasswordCheckBox = new JCheckBox("Save password", savePassword);
     
     savePasswordCheckBox.setMnemonic('S');
 
-    
-    JButton connectButton = new JButton("Connect");
     connectButton.setDefaultCapable(true);
     setDefaultButton(connectButton);
     connectButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        Server server = getServer();
         String username = usernameField.getText();
         UsernamePolicy policy = server.getUsernamePolicy();
         String invalidityReason = policy.invalidityReason(username);
@@ -148,8 +388,8 @@ public class LoginPanel extends DialogPanel{
         int [] ports = parsePorts(portsField.getText());
         if (ports == null){
           showError("Bad Ports", "The ports text field must contain a\n" +
-                                 "nonempty space separated list of ports.\n" +
-                                 "A valid port is between 0 and 65535.");
+                                 "nonempty, space separated, list of ports.\n" +
+                                 "A valid port is a number between 0 and 65535.");
           return;
         }
 
@@ -158,28 +398,30 @@ public class LoginPanel extends DialogPanel{
           password = null;       // but we want to let the user input it himself
 
         boolean savePassword = (savePasswordCheckBox != null) && savePasswordCheckBox.isSelected();
+        
+        User user = Jin.getInstance().getUser(server, username);
+        if (user == null)
+          user = new User(server, username);
+        
         ConnectionDetails result = policy.isSame(username, policy.getGuestUsername()) ?
-          ConnectionDetails.createGuest(username, (String)hostnameBox.getSelectedItem(), ports) :
-          ConnectionDetails.create(username, password, savePassword,
+          ConnectionDetails.createGuest(server, username, (String)hostnameBox.getSelectedItem(),
+            ports) :
+          ConnectionDetails.create(server, user, username, password, savePassword,
             (String)hostnameBox.getSelectedItem(), ports);
 
         close(result);
       }
     });
 
-    JButton retrievePasswordButton = null;
-    if (server.getPasswordRetrievalPage() != null){
-      retrievePasswordButton = new JButton("Retrieve Password");
-      retrievePasswordButton.setMnemonic('t');
-      retrievePasswordButton.setDefaultCapable(false);
-      retrievePasswordButton.addActionListener(new ActionListener(){
-        public void actionPerformed(ActionEvent evt){
-          String url = server.getPasswordRetrievalPage();
-          if (!BrowserControl.displayURL(url))
-            BrowserControl.showDisplayBrowserFailedDialog(url, LoginPanel.this, true);
-        }
-      });
-    }
+    retrievePasswordButton.setMnemonic('t');
+    retrievePasswordButton.setDefaultCapable(false);
+    retrievePasswordButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String url = getServer().getPasswordRetrievalPage();
+        if (!BrowserControl.displayURL(url))
+          BrowserControl.showDisplayBrowserFailedDialog(url, LoginPanel.this, true);
+      }
+    });
 
     JButton loginAsGuestButton = new JButton("Login as Guest");
     loginAsGuestButton.setMnemonic('G');
@@ -194,18 +436,18 @@ public class LoginPanel extends DialogPanel{
           return;
         }
 
-        String username = server.getUsernamePolicy().getGuestUsername();
+        String username = getServer().getUsernamePolicy().getGuestUsername();
 
-        close(ConnectionDetails.createGuest(username, (String)hostnameBox.getSelectedItem(), ports));
+        close(ConnectionDetails.createGuest(getServer(), username, 
+          (String)hostnameBox.getSelectedItem(), ports));
       }
     });
 
-    JButton registerButton = new JButton("Register");
     registerButton.setMnemonic('R');
     registerButton.setDefaultCapable(false);
     registerButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        String url = server.getRegistrationPage();
+        String url = getServer().getRegistrationPage();
         if (!BrowserControl.displayURL(url))
           BrowserControl.showDisplayBrowserFailedDialog(url, LoginPanel.this, true);
       }
@@ -220,8 +462,8 @@ public class LoginPanel extends DialogPanel{
     });
     
     if (Jin.getInstance().getPasswordSaveWarning() != null){
-      savePasswordCheckBox.addItemListener(new ItemListener(){
-        public void itemStateChanged(ItemEvent evt){
+      savePasswordCheckBox.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
           if (savePasswordCheckBox.isSelected()){
             Object result = new OptionPanel(OptionPanel.WARNING, "Save password?", 
               new Object[]{OptionPanel.YES, OptionPanel.NO}, OptionPanel.YES,
@@ -234,18 +476,10 @@ public class LoginPanel extends DialogPanel{
     }
 
 
-    // Set default focused component
-    if (username.length() == 0)
-      defaultFocusedComponent = usernameField;
-    else if (password.length() == 0)
-      defaultFocusedComponent = passwordField;
-    else
-      defaultFocusedComponent = connectButton;
-
-
 
     // Create the main panel parts
 
+    Component serverUserPanel = createServerUserPanel(serverBox, userBox);
     Component guestPanel = createGuestPanel(loginAsGuestButton, registerButton);
     Component advancedPanel = createAdvancedPanel(hostnameBox, portsField);
     Component membersPanel = createMembersPanel(usernameField, passwordField,
@@ -253,7 +487,7 @@ public class LoginPanel extends DialogPanel{
     Component cancelPanel = createCancelPanel(cancelButton);
 
     // Add the main panels and layout
-    setLayout(new BorderLayout());
+    setLayout(new BorderLayout(20, 20));
 
     Box upperPanel = new Box(BoxLayout.X_AXIS);
     Box lowerPanel = new Box(BoxLayout.X_AXIS);
@@ -271,7 +505,42 @@ public class LoginPanel extends DialogPanel{
     vpanel.add(Box.createVerticalStrut(10));
     vpanel.add(lowerPanel);
 
+    add(serverUserPanel, BorderLayout.NORTH);
     add(vpanel, BorderLayout.CENTER);
+    setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+  }
+  
+  
+  
+  /**
+   * Creates the panel which lets the user choose the current server and user.
+   */
+   
+  private Component createServerUserPanel(JComboBox serverBox, JComboBox userBox){
+    JLabel serverLabel = new JLabel("Server:");
+    serverLabel.setLabelFor(serverBox);
+    serverLabel.setDisplayedMnemonic('e');
+    
+    JLabel userLabel = new JLabel("Account:");
+    userLabel.setLabelFor(userBox);
+    userLabel.setDisplayedMnemonic('A');
+    
+    Box inPanel = Box.createHorizontalBox();
+    inPanel.add(Box.createHorizontalStrut(10));
+    inPanel.add(serverLabel);
+    inPanel.add(Box.createHorizontalStrut(5));
+    inPanel.add(serverBox);
+    inPanel.add(Box.createHorizontalStrut(20));
+    inPanel.add(userLabel);
+    inPanel.add(Box.createHorizontalStrut(5));
+    inPanel.add(userBox);
+    inPanel.add(Box.createHorizontalStrut(10));
+    
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    panel.add(BorderLayout.CENTER, inPanel);
+    panel.add(BorderLayout.SOUTH, new JSeparator());
+    
+    return panel;
   }
 
 
