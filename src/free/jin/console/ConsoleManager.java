@@ -281,6 +281,21 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
+  /**
+   * Rereads the plugin/user properties and changes the assosiated console
+   * manager's settings accordingly. This method should be called when the user
+   * changes the preferences.
+   */
+
+  public void refreshFromProperties(){
+    console.refreshFromProperties();
+
+    // TODO: finish implementing for the rest of the properties.
+  }
+
+
+
+
 
   /**
    * Closes the console.

@@ -476,6 +476,19 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
 
+  /**
+   * Refreshed the console by re-reading the plugin/user properties and
+   * adjusting the assosiated console properties accordingly. This is useful
+   * to call after a user changes the preferences.
+   */
+
+  public void refreshFromProperties(){
+    init();
+  }
+
+
+
+
 
   /**
    * Returns true if selected text will be copied into the clipboard on selection.
