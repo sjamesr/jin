@@ -142,12 +142,21 @@ public class SoughtGraph extends JComponent{
 
 
 
-
   /**
    * The background image.
    */
 
   private final Image bgImage;
+
+
+
+
+  /**
+   * A cache of images we use to draw seeks. Maps property names to Images.
+   */
+
+  private final Hashtable imageCache = new Hashtable();
+
 
 
 
@@ -344,9 +353,9 @@ public class SoughtGraph extends JComponent{
     int width = getWidth();
     int height = getHeight();
 
-    int graphX = (int)(width*(1-GRAPH_WIDTH_PERCENTAGE));
+    int graphX = (int)(width*(1-GRAPH_WIDTH_PERCENTAGE))+1;
     int graphY = 0;
-    int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE);
+    int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE)-1;
     int graphHeight = (int)(height*GRAPH_HEIGHT_PERCENTAGE);
 
     int slotWidth = graphWidth/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
@@ -357,6 +366,11 @@ public class SoughtGraph extends JComponent{
     rect.width = slotWidth;
     rect.height = slotHeight;
 
+/*    if (x >= BULLET_SLOTS)
+      rect.x++;
+    if (x >= BULLET_SLOTS + BLITZ_SLOTS)
+      rect.x++;
+*/
     return rect;
   }
 
@@ -483,8 +497,10 @@ public class SoughtGraph extends JComponent{
           continue;
 
         seekBounds = getSeekBounds(i, j, seekBounds);
-        if (seekBounds.intersects(clipRect))
+        if (seekBounds.intersects(clipRect)){
+          g.setClip(clipRect);
           drawSeek(g, seek, seekBounds);
+        }
       }
     }
   }
@@ -497,6 +513,31 @@ public class SoughtGraph extends JComponent{
    */
 
   protected void drawSeek(Graphics g, Seek seek, Rectangle seekBounds){
+    String playerType = seek.isSeekerComputer() ? "computer" : "human";
+    String ratedString = seek.isRated() ? "rated" : "unrated";
+    String imageKey = "seek-image."+ratedString+"."+playerType+"."+seek.getVariant();
+
+    Image image = (Image)imageCache.get(imageKey);
+    if (image == null){
+      String imageName = plugin.lookupProperty(imageKey);
+      if (imageName != null){
+        image = getToolkit().getImage(SoughtGraph.class.getResource(imageName));
+        try{
+          if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
+            image = null;
+        } catch (InterruptedException e){}
+      }
+    }
+
+    if (image == null){
+      g.setColor(Color.black);
+      g.drawOval(seekBounds.x, seekBounds.y, seekBounds.width-1, seekBounds.height-1);
+      return;
+    }
+
+    g.drawImage(image, seekBounds.x, seekBounds.y, null);
+
+    /*
     Color color = StringParser.parseColor(plugin.lookupProperty("color."+seek.getVariant().getName()));
     Color outlineColor = seek.isSeekerComputer() ? StringParser.parseColor(plugin.getProperty("computer-outline")) : color;
     String shape = seek.isRated() ? "oval" : "rect";
@@ -523,6 +564,7 @@ public class SoughtGraph extends JComponent{
       g.setColor(color);
       g.fillRect(seekBounds.x+xDiff, seekBounds.y+yDiff, smallWidth, smallHeight);
     }
+    */
   }
 
 
