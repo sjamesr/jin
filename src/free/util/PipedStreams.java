@@ -34,10 +34,19 @@ public class PipedStreams{
 
 
   /**
+   * The default buffer size.
+   */
+
+  private static final int DEFAULT_BUFFER_SIZE = 2048;
+
+
+
+  /**
    * The PipedInputStream.
    */
 
   private final PipedInputStream in;
+
 
 
   /**
@@ -60,7 +69,16 @@ public class PipedStreams{
    * The buffer.
    */
 
-  private final byte [] buf;
+  private byte [] buf;
+
+
+
+  /**
+   * Whether the buffer is allowed to grow.
+   */
+
+  private final boolean growBuf;
+
 
 
 
@@ -96,13 +114,11 @@ public class PipedStreams{
 
 
 
-
   /**
    * The lock protecting writing.
    */
 
   private Object writeLock = new String("Write Lock for PipedStreams");
-
 
 
 
@@ -114,26 +130,59 @@ public class PipedStreams{
 
 
 
-
   /**
-   * Creates new PipedStreams.
+   * Creates new <code>PipedStreams</code>.
    */
 
   public PipedStreams(){
-    this(2048);
+    this(2048, false);
   }
 
 
 
   /**
-   * Creates new PipedStreams with the given buffer size.
+   * Creates new <code>PipedStreams</code> with the specified buffer size. Once
+   * the specified amount of bytes have been written into the,
+   * <code>OutputStream</code> attempting to write more data will block until
+   * enough data has been read to allow writing into the buffer again.
    */
 
   public PipedStreams(int bufSize){
+    this(bufSize, false);
+  }
+
+
+
+
+  /**
+   * Creates new <code>PipedStreams</code>. If <code>growBuf</code> is
+   * <code>true</code>, the internal buffer will be grown indefinitely when more
+   * space is required for the written data. This means that writing into the
+   * <code>OutputStream</code> will never block. Note that there is currently no
+   * mechanism to cause the internal buffer to shrink.
+   */
+
+  public PipedStreams(boolean growBuf){
+    this(DEFAULT_BUFFER_SIZE, growBuf);
+  }
+
+
+
+
+  /**
+   * Creates new <code>PipedStreams</code> with the specified initial buffer
+   * size, potentially allowing the buffer to grow indefinitely.
+   */
+
+  public PipedStreams(int bufSize, boolean growBuf){
+    if (bufSize <= 0)
+      throw new IllegalArgumentException("The buffer size must be a positive integer");
+
     in = new PipedInputStream(this);
     out = new PipedOutputStream(this);
 
-    buf = new byte[bufSize];
+    this.growBuf = growBuf;
+    this.buf = new byte[bufSize];
   }
 
 
@@ -210,10 +259,10 @@ public class PipedStreams{
    */
 
   private int availableImpl(){
-    if (writeIndex>=readIndex) // On the same lap.
-      return writeIndex-readIndex;
+    if (writeIndex >= readIndex) // On the same lap.
+      return writeIndex - readIndex;
     else // On different laps.
-      return writeIndex+buf.length-readIndex;
+      return writeIndex + buf.length - readIndex;
   }
 
 
@@ -225,7 +274,22 @@ public class PipedStreams{
    */
 
   private int availableSpace(){
-    return buf.length-availableImpl()-1;
+    return buf.length - availableImpl() - 1;
+  }
+
+
+
+
+  /**
+   * Increases the size of the internal buffer by at least the specified amount
+   * of bytes. The caller must take care of proper synchronization.
+   */
+
+  private void growBuf(int minGrowSize){
+    int growSize = minGrowSize < buf.length ? buf.length : minGrowSize;
+    byte [] newBuf = new byte[buf.length + growSize];
+    System.arraycopy(buf, 0, newBuf, 0, buf.length);
+    buf = newBuf;
   }
 
 
@@ -238,21 +302,24 @@ public class PipedStreams{
 
   synchronized void write(int b) throws IOException{
     synchronized(writeLock){
-      if (readerClosed||writerClosed)
+      if (readerClosed || writerClosed)
         throw new IOException("Stream closed");
 
-      while (availableSpace()==0)
-        try{
+      while (availableSpace() == 0){
+        if (growBuf)
+          growBuf(1);
+        else try{
           wait();
         } catch (InterruptedException e){
             throw new InterruptedIOException();
           }
+      }
 
-      if (readerClosed||writerClosed)
+      if (readerClosed || writerClosed)
         throw new IOException("Stream closed");
 
       buf[writeIndex++] = (byte)(b&0xff);
-      if (writeIndex==buf.length)
+      if (writeIndex == buf.length)
         writeIndex = 0;
 
       notifyAll();
@@ -271,13 +338,17 @@ public class PipedStreams{
       if (readerClosed||writerClosed)
         throw new IOException("Stream closed");
 
-      while(length>0){
-        while (availableSpace()==0)
+      if (growBuf && (length > availableSpace()))
+        growBuf(length - availableSpace());
+
+      while(length > 0){
+        while (availableSpace() == 0){
           try{
             wait();
           } catch (InterruptedException e){
               throw new InterruptedIOException();
             }
+        }
 
         int availableSpace = availableSpace();
 
@@ -285,13 +356,13 @@ public class PipedStreams{
         int part1Size = buf.length-writeIndex >= amountToWrite ? amountToWrite : buf.length-writeIndex;
         int part2Size = amountToWrite-part1Size > 0 ? amountToWrite - part1Size : 0;
 
-        System.arraycopy(arr,offset,buf,writeIndex,part1Size);
-        System.arraycopy(arr,offset+part1Size,buf,0,part2Size);
+        System.arraycopy(arr, offset, buf, writeIndex, part1Size);
+        System.arraycopy(arr, offset + part1Size, buf, 0, part2Size);
 
         offset += amountToWrite;
         length -= amountToWrite;
 
-        writeIndex = (writeIndex+amountToWrite)%buf.length;
+        writeIndex = (writeIndex + amountToWrite) % buf.length;
 
         notifyAll();
       }
@@ -311,19 +382,19 @@ public class PipedStreams{
         throw new IOException("Stream closed");
 
       final long startedWaitingTS = System.currentTimeMillis();
-      while (available()==0){
+      while (available() == 0){
         if (writerClosed)
           return -1;
 
         long curTime = System.currentTimeMillis();
-        if ((soTimeout!=0)&&(curTime-startedWaitingTS>=soTimeout))
+        if ((soTimeout != 0) && (curTime - startedWaitingTS >= soTimeout))
           throw new InterruptedIOException();
 
         try{
-          if (soTimeout==0)
+          if (soTimeout == 0)
             wait();
           else{
-            wait(soTimeout+curTime-startedWaitingTS);
+            wait(soTimeout + curTime - startedWaitingTS);
           }
         } catch (InterruptedException e){
             throw new InterruptedIOException();
@@ -334,7 +405,7 @@ public class PipedStreams{
       }
 
       int b = buf[readIndex++];
-      if (readIndex==buf.length)
+      if (readIndex == buf.length)
         readIndex = 0;
 
       notifyAll();
@@ -357,19 +428,19 @@ public class PipedStreams{
         throw new IOException("Stream closed");
 
       final long startedWaitingTS = System.currentTimeMillis();
-      while (available()==0){
+      while (available() == 0){
         if (writerClosed)
           return -1;
 
         long curTime = System.currentTimeMillis();
-        if ((soTimeout!=0)&&(curTime-startedWaitingTS>=soTimeout))
+        if ((soTimeout != 0) && (curTime - startedWaitingTS >= soTimeout))
           throw new InterruptedIOException();
 
         try{
-          if (soTimeout==0)
+          if (soTimeout == 0)
             wait();
           else{
-            wait(soTimeout+curTime-startedWaitingTS);
+            wait(soTimeout + curTime - startedWaitingTS);
           }
         } catch (InterruptedException e){
             throw new InterruptedIOException();
@@ -383,10 +454,10 @@ public class PipedStreams{
       int part1Size = buf.length-readIndex > amountToRead ? amountToRead : buf.length-readIndex;
       int part2Size = amountToRead-part1Size > 0 ? amountToRead-part1Size : 0;
 
-      System.arraycopy(buf,readIndex,arr,offset,part1Size);
-      System.arraycopy(buf,0,arr,offset+part1Size,part2Size);
+      System.arraycopy(buf, readIndex, arr, offset, part1Size);
+      System.arraycopy(buf, 0, arr, offset + part1Size, part2Size);
 
-      readIndex = (readIndex+amountToRead)%buf.length;
+      readIndex = (readIndex + amountToRead) % buf.length;
 
       notifyAll();
 
