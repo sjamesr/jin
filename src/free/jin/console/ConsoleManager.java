@@ -265,6 +265,16 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       myMenu.add(gameListDisplayStyleMenu);
     }
 
+    JMenuItem clearMenuItem = new JMenuItem("Clear Console");
+    clearMenuItem.addActionListener(new ActionListener(){
+
+      public void actionPerformed(ActionEvent evt){
+        console.clear();
+      }
+
+    });
+    myMenu.add(clearMenuItem);
+
 
     final JCheckBoxMenuItem copyOnSelectCB = new JCheckBoxMenuItem("Copy on Select",new Boolean(getProperty("copyOnSelect","true")).booleanValue());
     copyOnSelectCB.addChangeListener(new ChangeListener(){
