@@ -25,12 +25,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.text.*;
+import java.lang.reflect.*;
 import free.util.GraphicsUtilities;
 import free.util.PlatformUtils;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.lang.reflect.*;
+import free.workarounds.FixedJTextPane;
 
 
 /**
@@ -39,12 +40,12 @@ import java.lang.reflect.*;
  * <UL>
  *   <LI> On right click, displays a popup menu which lets the user execute
  *        various commands with the current selection as the command argument.
- *   <LI> Allows marking parts of the text as Links. This allows a certain action
- *        to be performed 
+ *   <LI> Allows marking parts of the text as Links. This allows a certain
+ *        action to be performed 
  * </UL>
  */
 
-public class ConsoleTextPane extends JTextPane{
+public class ConsoleTextPane extends FixedJTextPane{
 
   
   /**
