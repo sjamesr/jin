@@ -93,6 +93,13 @@ public interface GameListener extends EventListener{
 
 
 
+  /**
+   * Gets called when an offer is made/withdrawn.
+   */
+
+  void offerChanged(OfferEvent evt);
+
+
 
   /**
    * Gets called when a game ends.
