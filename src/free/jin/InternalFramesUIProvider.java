@@ -257,12 +257,12 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   private void addPluginMenus(Plugin [] plugins){
-    int prefsMenuIndex = menubar.getComponentIndex(prefsMenu);
+    int menuIndex = menubar.getComponentIndex(prefsMenu) + 1;
     for (int i = 0; i < plugins.length; i++){
       Plugin plugin = plugins[i];
       JMenu menu = plugin.createPluginMenu();
       if (menu != null)
-        menubar.add(menu, prefsMenuIndex + i);
+        menubar.add(menu, menuIndex++);
     }
   }
 
