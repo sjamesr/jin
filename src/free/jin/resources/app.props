@@ -1,5 +1,5 @@
 app.name = Jin
-app.version = 2.11 dev
+app.version = 2.12 dev
 
 lf.extra.count = 3
 lf.extra.0.name = Kunststoff
