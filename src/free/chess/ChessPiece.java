@@ -254,7 +254,7 @@ public class ChessPiece extends Piece{
 
   /**
    * Returns a short (notational) string representing this chess piece ("N"
-   * for a white knight for example, and "p" for a black pawn).
+   * for a white knight for example, and "P" for a black pawn).
    *
    * @return a short string representing this piece.
    *
@@ -262,34 +262,18 @@ public class ChessPiece extends Piece{
    */
 
   public String toShortString(){
-    if (isWhite()){
-      if (isPawn())
-        return "P";
-      else if (isKnight())
-        return "N";
-      else if (isBishop())
-        return "B";
-      else if (isRook())
-        return "R";
-      else if (isQueen())
-        return "Q";
-      else if (isKing())
-        return "K";
-    }
-    else{
-      if (isPawn())
-        return "p";
-      else if (isKnight())
-        return "n";
-      else if (isBishop())
-        return "b";
-      else if (isRook())
-        return "r";
-      else if (isQueen())
-        return "q";
-      else if (isKing())
-        return "k";
-    }
+    if (isPawn())
+      return "P";
+    else if (isKnight())
+      return "N";
+    else if (isBishop())
+      return "B";
+    else if (isRook())
+      return "R";
+    else if (isQueen())
+      return "Q";
+    else if (isKing())
+      return "K";
 
     throw new Error("This may never happen");
   }
