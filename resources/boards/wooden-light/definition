@@ -1,0 +1,4 @@
+id = wooden-light
+name = Wooden Light
+classname = ImageBoardLoader
+servers = icc
