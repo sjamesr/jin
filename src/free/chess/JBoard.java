@@ -30,6 +30,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.Vector;
+import java.util.Hashtable;
 import free.util.PaintHook;
 import free.util.Utilities;
 import free.util.GraphicsUtilities;
@@ -344,6 +345,15 @@ public class JBoard extends JComponent{
    */
   
   private Move highlightedMove = null;
+
+
+
+
+  /**
+   * An array specifying which squares are shaded.
+   */
+
+  private boolean [][] isShaded = new boolean[8][8];
 
 
 
@@ -780,8 +790,6 @@ public class JBoard extends JComponent{
 
 
 
-
-
   /**
    * Returns the BoardPainter of this JBoard.
    */
@@ -881,9 +889,52 @@ public class JBoard extends JComponent{
 
 
 
+
   /**
-   * Returns <code>true</code> if a piece is currently being moved/dragged,
-   * <code>false</code> otherwise.
+   * Sets the shaded state of the specified square.
+   */
+
+  public void setShaded(Square square, boolean isShaded){
+    boolean oldState = this.isShaded[square.getFile()][square.getRank()];
+    this.isShaded[square.getFile()][square.getRank()] = isShaded;
+    if (oldState != isShaded)
+      repaint(squareToRect(square, null));
+  }
+
+
+
+
+  /**
+   * Sets all the squares to the unshaded state.
+   */
+
+  public void clearShaded(){
+    Rectangle helpRect = new Rectangle();
+    for (int file = 0; file < 8; file++)
+      for (int rank = 0; rank < 8; rank++){
+        boolean oldState = isShaded[file][rank];
+        isShaded[file][rank] = false;
+        if (oldState)
+          repaint(squareToRect(file, rank, helpRect));
+      }
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> iff the specified square is shaded.
+   */
+
+  public boolean isShaded(Square square){
+    return isShaded[square.getFile()][square.getRank()];
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> iff a piece is currently being moved/dragged.
    */
 
   public boolean isMovingPiece(){
@@ -990,10 +1041,10 @@ public class JBoard extends JComponent{
         if (!squareRect.intersects(clipRect))
           continue;
 
-        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
+        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect, isShaded(curSquare));
       }
 
-    // Draw move highlighting
+    // Paint move highlighting
     if ((moveHighlightingStyle != NO_MOVE_HIGHLIGHTING) && (highlightedMove != null)){
       Square from = highlightedMove.getStartingSquare();
       Square to = highlightedMove.getEndingSquare();
@@ -1016,7 +1067,7 @@ public class JBoard extends JComponent{
       getMovedPieceRect(squareRect);
       if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
         Piece piece = position.getPieceAt(movedPieceSquare);
-        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
+        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect, false);
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
         drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, getDragSquareHighlightingColor());
@@ -1034,12 +1085,17 @@ public class JBoard extends JComponent{
    * to the specified target Graphics.
    */
 
-  private static void tryCopyingRenderingHints(Graphics source, Graphics target) throws Throwable{ // Yes, yes, I know :-)
+  private static void tryCopyingRenderingHints(Graphics source, Graphics target) throws Throwable{
+                                                                            // Yes, yes, I know :-)
     Class Graphics2DClass = Class.forName("java.awt.Graphics2D");
-    if (Graphics2DClass.isInstance(source) && Graphics2DClass.isInstance(target)){ // Should be true (I think)
+    if (Graphics2DClass.isInstance(source) && Graphics2DClass.isInstance(target)){
+       // Should be true (I think)
+
       Class MapClass = Class.forName("java.util.Map");
-      java.lang.reflect.Method getRenderingHints = Graphics2DClass.getMethod("getRenderingHints", new Class[0]);
-      java.lang.reflect.Method setRenderingHints = Graphics2DClass.getMethod("setRenderingHints", new Class[]{MapClass});
+      java.lang.reflect.Method getRenderingHints = 
+        Graphics2DClass.getMethod("getRenderingHints", new Class[0]);
+      java.lang.reflect.Method setRenderingHints = 
+        Graphics2DClass.getMethod("setRenderingHints", new Class[]{MapClass});
       Object renderingHints = getRenderingHints.invoke(source, new Object[0]);
       setRenderingHints.invoke(target, new Object[]{renderingHints});
     }
