@@ -128,15 +128,6 @@ public abstract class JinAction implements ActionListener{
   
   
   
-  /**
-   * Returns the <code>UIProvider</code>.
-   */
-
-  public UIProvider getUIProvider(){
-    return context.getJinContext().getUIProvider();
-  }
-  
-  
   
   /**
    * <code>ActionListener</code> implementation. Simply forwards the call to the
