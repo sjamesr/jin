@@ -174,8 +174,10 @@ public class Jin{
 
       String savedPropsVersion = userProps.getProperty("props.version");
       if ((savedPropsVersion == null) || !savedPropsVersion.equals(propsVersion)){
-        propsFile.delete();
-        IOUtilities.rmdir(usersDir);
+        if (propsFile.exists())
+          propsFile.delete();
+        if (usersDir.isDirectory())
+          IOUtilities.rmdir(usersDir);
         userProps.clear();
         userProps.put("props.version", propsVersion);
       }
@@ -199,6 +201,8 @@ public class Jin{
       }
     }
   }
+
+
 
 
   /**
@@ -464,12 +468,13 @@ public class Jin{
       mainFrame = new JinFrame();
 
       String lnf = getProperty("default.lf");
-      if (lnf==null){
-        String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
-        if (systemLookAndFeelClassName != null)
-          UIManager.setLookAndFeel(systemLookAndFeelClassName);
-      }
-      else
+//      if (lnf==null){
+//        String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
+//        if (systemLookAndFeelClassName != null)
+//          UIManager.setLookAndFeel(systemLookAndFeelClassName);
+//      }
+//      else
+      if (lnf != null)
         UIManager.setLookAndFeel(lnf);
 
       SwingUtilities.updateComponentTreeUI(mainFrame);
