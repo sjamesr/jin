@@ -92,7 +92,7 @@ public class JinRootPane extends JRootPane{
     desktop.setWallpaperLayoutStyle(wallpaperLayout);
     desktop.setDesktopManager(new JinDesktopManager(jinFrame));
 
-    String dragMode = Jin.getProperty("desktop.dragMode","faster");
+    String dragMode = Jin.getProperty("desktop.dragMode", "outline");
     desktop.putClientProperty("JDesktopPane.dragMode", dragMode);
 
     contentPane.add(desktop, BorderLayout.CENTER);
