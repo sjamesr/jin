@@ -218,6 +218,92 @@ public class ConsoleTextPane extends JTextPane{
 
 
 
+
+  /**
+   * Are we running inside a Java 2 (or later) Virtual Machine? This is used to
+   * determine whether we need the hack that prevents the console from becoming
+   * taller than Short.MAX_VALUE pixels.
+   */
+
+  private static final boolean isJava2 =
+    System.getProperty("java.version").compareTo("1.2") >= 0;
+
+
+
+  /**
+   * Is this a Windows 95/98/Me machine?
+   */
+
+  private static final boolean isOldWindows =
+    System.getProperty("os.name").startsWith("Windows") &&
+    (System.getProperty("os.version").compareTo("5.0") < 0) &&
+    !System.getProperty("os.name").startsWith("Windows NT");
+
+
+
+
+  /**
+   * Is this a Solaris machine?
+   */
+
+  private static final boolean isSolaris =
+    System.getProperty("os.name").startsWith("Solaris") ||
+    System.getProperty("os.name").startsWith("SunOS");
+
+
+
+
+  /**
+   * Should we use the hack that prevents the text pane from becoming taller
+   * than Short.MAX_VALUE pixels?
+   */
+
+  private static final boolean shouldUse16BitGraphicsHack = 
+    !isJava2 && (isOldWindows || isSolaris);
+
+
+
+
+  /**
+   * Overrides <code>reshape(int, int, int, int)</code> to possibly prevent
+   * the text pane from becoming taller than Short.MAX_VALUE pixels tall.
+   * See bug http://developer.java.sun.com/developer/bugParade/bugs/4138673.html
+   * for details.
+   */
+
+  public void reshape(int x, int y, int width, int height){
+    if ((height > Short.MAX_VALUE) && shouldUse16BitGraphicsHack){
+      try{
+        // Remove lines until our preferred height is less than Short.MAX_VALUE
+        Document document = getDocument();
+        while (getPreferredSize().height >= Short.MAX_VALUE){
+
+          // Find the first newline
+          int documentLength = document.getLength();
+          String text = document.getText(0, Math.min(200, documentLength));
+          int newlineIndex;
+          while ((newlineIndex = text.indexOf('\n')) == -1)
+            text = document.getText(0, Math.min(text.length() * 2, documentLength));
+
+          // Remove the first line
+          document.remove(0, newlineIndex + 1);
+        }
+      } catch (BadLocationException e){e.printStackTrace();}
+
+      Container parent = getParent();
+      if (parent != null){
+        parent.invalidate();
+        parent.validate();
+        parent.doLayout();
+      }
+    }
+    else
+      super.reshape(x, y, width, height);
+  }
+
+
+
+
     
   /**
    * We override this to prevent unnecessary Toolkit.beep()s which are caused
@@ -830,7 +916,7 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   public int getScrollableUnitIncrement(Rectangle viewRect, int orientation, int direction){
-    if (orientation==SwingConstants.HORIZONTAL)
+    if (orientation == SwingConstants.HORIZONTAL)
       return super.getScrollableUnitIncrement(viewRect, orientation, direction);
 
     FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
