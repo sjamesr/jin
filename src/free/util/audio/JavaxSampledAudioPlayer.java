@@ -114,6 +114,10 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
             e.printStackTrace();
             // Ignore, nothing we can do about it...
           }
+          catch (IllegalArgumentException e){
+            e.printStackTrace();
+            // Apparently it (AudioSystem.getAudioInputStream()) can throw this too.
+          }
 
         clips.put(clip, newClip);
       }
