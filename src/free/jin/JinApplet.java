@@ -80,6 +80,7 @@ public class JinApplet extends JApplet implements ActionListener{
   
   private final String STOP_JIN_TEXT = "Stop Jin";
   
+  
 
 
   /**
@@ -148,7 +149,12 @@ public class JinApplet extends JApplet implements ActionListener{
    
   void closed(){
     context = null;
-    startStopButton.setText(START_JIN_TEXT);
+    
+    startStopButton.setEnabled(false);
+    
+    // We can't properly restart Jin because we're not using/loading the new
+    // preferences.
+    // startStopButton.setText(START_JIN_TEXT);
   }
    
   
