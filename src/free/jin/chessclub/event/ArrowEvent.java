@@ -29,10 +29,35 @@ import free.chess.Square;
 
 
 /**
- * The event fired when an arrow has been added to the board.
+ * The event fired when an arrow is added/removed to/from the board.
  */
 
 public class ArrowEvent extends GameEvent{
+  
+  
+  
+  /**
+   * The id for an arrow added event.
+   */
+   
+  public static final int ARROW_ADDED = 1;
+  
+  
+  
+  /**
+   * The id for an arrow removed event.
+   */
+   
+  public static final int ARROW_REMOVED = 2;
+  
+  
+  
+  /**
+   * The id of this event. Either {@link #ARROW_ADDED} or
+   * {@link #ARROW_REMOVED}. 
+   */
+  
+  private final int id;
 
 
 
@@ -55,13 +80,23 @@ public class ArrowEvent extends GameEvent{
 
 
   /**
-   * Creates a new ArrowEvent with the given source JinChessclubConnection,
-   * Game, square where the arrow starts and square where the arrow ends.
+   * Creates a new ArrowEvent with the specified source
+   * <code>JinChessclubConnection</code>, <code>Game</code>, id, square where
+   * the arrow starts and square where the arrow ends.
    */
   
-  public ArrowEvent(JinChessclubConnection conn, Game game, Square fromSquare, Square toSquare){
+  public ArrowEvent(JinChessclubConnection conn, Game game, int id, Square fromSquare, Square toSquare){
     super(conn, game);
-
+    
+    switch (id){
+      case ARROW_ADDED:
+      case ARROW_REMOVED:
+        break;
+      default:
+        throw new IllegalArgumentException("Unrecognized id: " + id);
+    }
+    
+    this.id = id;
     this.fromSquare = fromSquare;
     this.toSquare = toSquare;
   }
@@ -69,6 +104,18 @@ public class ArrowEvent extends GameEvent{
 
 
 
+  /**
+   * Returns the id of this event, either {@link #ARROW_ADDED} or
+   * {@link #ARROW_REMOVED}
+   */
+   
+  public int getId(){
+    return id;
+  }
+   
+   
+   
+   
   /**
    * Returns the square where the arrow starts.
    */
