@@ -22,6 +22,7 @@
 package free.jin;
 
 import javax.swing.ListModel;
+import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
 
 
@@ -44,17 +45,25 @@ public interface JinContext{
   
   
   /**
-   * Loads and returns the resources of the specified type. Resources are
-   * typically used when there is a need to allow the user (or some other
-   * 3rd party) to add his own customizations to Jin (or a plugin). For
-   * example, this mechanism is used for loading piece sets and boards by
-   * the board manager plugin. A <code>JinContext</code> implementation
-   * may then look for piece set "packs" in some predefined directories,
-   * allowing the user to add/remove piece sets simply by adding/deleting
-   * files from those directories.
+   * Loads and returns the resources of the specified type for the specified
+   * plugin. Resources are typically used when there is a need to allow the user
+   * (or some other 3rd party) to add his own customizations to Jin
+   * (or a plugin). For example, this mechanism is used for loading piece sets
+   * and boards by the board manager plugin. A <code>JinContext</code>
+   * implementation may then look for piece set "packs" in some predefined
+   * directories, allowing the user to add/remove piece sets simply by
+   * adding/deleting files from those directories.
    */
    
-  ClassLoader [] loadResources(String resourceType);
+  Resource [] getResources(String resourceType, Plugin plugin);
+  
+  
+  
+  /**
+   * Returns the resource with the specified type and id.
+   */
+  
+  Resource getResource(String resourceType, String id, Plugin plugin);
   
   
   

@@ -35,6 +35,7 @@ import java.awt.event.WindowEvent;
 import java.util.Vector;
 import free.util.zip.ZipClassLoader;
 import free.util.zip.ZipURLStreamHandler;
+import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
 
 
@@ -297,16 +298,16 @@ public class JinMain implements JinContext{
    * <code>prefsDir/resources/resType</code>.
    */
    
-  public ClassLoader [] loadResources(String resType){
+  public Resource [] getResources(String resType, Plugin plugin){
     Vector resources = new Vector();
     
-    File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
     File userResDir = new File(new File(prefsDir, "resources"), resType);
+    File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
                             
-    loadResources(jinResDir, resources);
-    loadResources(userResDir, resources);
-    
-    ClassLoader [] resArr = new ClassLoader[resources.size()];
+    loadResources(userResDir, resources, plugin);
+    loadResources(jinResDir, resources, plugin);
+     
+    Resource [] resArr = new Resource[resources.size()];
     resources.copyInto(resArr);
     
     return resArr;
@@ -319,20 +320,75 @@ public class JinMain implements JinContext{
    * specified <code>Vector</code>.
    */
    
-  private void loadResources(File dir, Vector v){
+  private void loadResources(File dir, Vector v, Plugin plugin){
     String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
     if (filenames == null)
       return;
     
     for (int i = 0; i < filenames.length; i++){
-      File resource = new File(dir, filenames[i]);
+      File resourceFile = new File(dir, filenames[i]);
       try{
-        v.addElement(new ZipClassLoader(resource));
+        Resource resource = loadResource(resourceFile, plugin);
+        
+        if (resource != null)
+          v.addElement(resource);
       } catch (IOException e){
-          System.out.println("Failed to load resource: " + resource);
+          System.out.println("Failed to load resource from " + resourceFile);
           e.printStackTrace();
         }
     }
+  }
+  
+  
+  
+  /**
+   * Returns the resource with the specified type and id.
+   */
+   
+  public Resource getResource(String type, String id, Plugin plugin){
+    File userResJar = new File(new File(new File(prefsDir, "resources"), type), id + ".jar");
+    File userResZip = new File(new File(new File(prefsDir, "resources"), type), id + ".zip");
+    File jinResJar = new File(new File(new File(JIN_DIR, "resources"), type), id + ".jar");
+    File jinResZip = new File(new File(new File(JIN_DIR, "resources"), type), id + ".zip");
+   
+    try{
+      if (userResJar.exists())
+        return loadResource(userResJar, plugin);
+      else if (userResZip.exists())
+        return loadResource(userResZip, plugin);
+      else if (jinResJar.exists())
+        return loadResource(jinResJar, plugin);
+      else if (jinResZip.exists())
+        return loadResource(jinResZip, plugin);
+    } catch (IOException e){e.printStackTrace();}
+    
+    return null;
+  }
+  
+  
+  
+  /**
+   * Loads a single resource from the specified file.
+   */
+   
+  private Resource loadResource(File file, Plugin plugin) throws IOException{
+    ZipClassLoader cl = new ZipClassLoader(file); 
+    Properties def = IOUtilities.loadProperties(cl.getResourceAsStream("definition"));
+    String classname = def.getProperty("classname");
+    if (classname == null)
+      return null;
+    
+    try{
+      // We need to load it with the plugin's classloader because the
+      // resource may be of a type which is a part of the plugin.
+      Class resourceClass = plugin.getClass().getClassLoader().loadClass(classname);
+      Resource resource = (Resource)resourceClass.newInstance();
+      resource.load(cl.getResource("/"), plugin);
+      
+      return resource;
+    } catch (ClassNotFoundException e){e.printStackTrace(); return null;}
+      catch (InstantiationException e){e.printStackTrace(); return null;}
+      catch (IllegalAccessException e){e.printStackTrace(); return null;}
   }
    
    
