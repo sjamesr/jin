@@ -81,7 +81,6 @@ public abstract class PreferencesPanel extends JPanel{
    */
 
   protected void fireStateChanged(){
-    Thread.dumpStack();
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChangeListener.class){
