@@ -174,7 +174,6 @@ public class JinFrameMenuBar extends JMenuBar{
 
     JMenuItem newConnMenuItem = new JMenuItem("New Connection...");
     newConnMenuItem.setMnemonic('N');
-    newConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
     newConnMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -183,38 +182,6 @@ public class JinFrameMenuBar extends JMenuBar{
 
     });
     connectionSensitiveMenuItems.addElement(newConnMenuItem);
-
-
-    JMenuItem openConnMenuItem = new JMenuItem("Open Connection...");
-    openConnMenuItem.setMnemonic('O');
-    openConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
-    openConnMenuItem.addActionListener(new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        JFileChooser chooser = new JFileChooser(Jin.usersDir);
-        chooser.setCurrentDirectory(Jin.usersDir);
-        Server [] servers = Jin.getServers();
-        for (int i = 0; i < servers.length; i++)
-          chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(servers[i]));
-        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
-
-        int result = chooser.showOpenDialog(jinFrame);
-        if (result != JFileChooser.APPROVE_OPTION)
-          return;
-
-        String path = chooser.getSelectedFile().getAbsolutePath();
-        User user = Jin.loadUser(path);
-        // This assumes information it's not supposed to assume - that the path
-        // is a file name, but since the whole concept of letting the user
-        // "open" a profile is specific to the way the profiles are saved,
-        // this is ok. It will, however, need to be modified if Jin starts
-        // keeping the setting files somewhere else.
-
-        jinFrame.showLoginDialog(user);
-      }
-
-    });
-    connectionSensitiveMenuItems.addElement(openConnMenuItem);
 
     JMenuItem closeConnMenuItem = new JMenuItem("Close Connection");
     closeConnMenuItem.setMnemonic('l'); 
@@ -244,7 +211,6 @@ public class JinFrameMenuBar extends JMenuBar{
     });
 
     connMenu.add(newConnMenuItem);
-    connMenu.add(openConnMenuItem);
     connMenu.add(closeConnMenuItem);
     connMenu.add(startUserConnSep);
     connMenu.add(endUserConnSep);
