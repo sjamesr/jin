@@ -471,7 +471,7 @@ public abstract class Preferences{
       writer.write(prefName);
       writer.write("=");
       writer.write(encodePreference(prefValue));
-      writer.newLine();
+      writer.write("\n");
     }
 
     writer.flush();
