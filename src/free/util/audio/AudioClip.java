@@ -142,7 +142,7 @@ public class AudioClip{
           if (!player.isSupported())
             continue;
           player.play(this);
-          System.err.println("Will now use "+classname+" to play audio clips.");
+          System.out.println("Will now use "+classname+" to play audio clips.");
           successfulPlayer = player;
         } catch (Throwable e){
             if (e instanceof ThreadDeath)
