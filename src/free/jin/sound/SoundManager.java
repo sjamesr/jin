@@ -181,7 +181,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
     for (int i=0;i<numPatterns;i++){
       try{
-        String filename = getProperty("sound-file-"+i);
+        String filename = getProperty("chat-sound-"+i);
         String pattern = getProperty("chat-pattern-"+i);
         Pattern regex = new Pattern(pattern);
         
