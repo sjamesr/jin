@@ -373,7 +373,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   protected boolean processGameInfo(GameInfoStruct data){
     unstartedGameInfo.put(new Integer(data.getGameNumber()), data);
     
-    return false;
+    return true;
   }
 
 
@@ -438,7 +438,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         flipBoard(game, oldBoardData, boardData);
     }
 
-    return false;
+    return true;
   }
 
 
@@ -828,7 +828,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
     }
     
-    return false;
+    return true;
   }
 
 
@@ -850,7 +850,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       seeks.remove(seekIndex);
     }
     
-    return false;
+    return true;
   }
 
 
@@ -879,7 +879,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       }
     }
     
-    return false;
+    return true;
   }
 
 
