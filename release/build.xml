@@ -229,15 +229,15 @@
     <antcall target="create-applet-archive">
       <param name="server.name" value="icc" />
       <param name="server.file" value="chessclub.jar" />
-      <param name="boards" value="" />
-      <param name="pieces" value="" />
+      <param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark wooden-light" />
+      <param name="pieces" value="blitzin bookup dyche1 dyche2 dyche3 eboard xboard" />
     </antcall>
 
     <antcall target="create-applet-archive">
       <param name="server.name" value="fics" />
       <param name="server.file" value="freechess.jar" />
-      <param name="boards" value="" />
-      <param name="pieces" value="" />
+      <param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
+      <param name="pieces" value="eboard xboard" />
     </antcall>
 	</target>
   
