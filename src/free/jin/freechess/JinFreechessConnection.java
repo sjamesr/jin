@@ -92,6 +92,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     setIvarState(Ivar.SHOWOWNSEEK, true);
     setIvarState(Ivar.PENDINFO, true);
     setIvarState(Ivar.MOVECASE, true);
+    // setIvarState(Ivar.COMPRESSMOVE, true); Pending DAV's bugfixing spree
     setIvarState(Ivar.LOCK, true);
   }
 
@@ -685,6 +686,143 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       updateGame(gameData, boardData);
 
     return true;
+  }
+  
+  
+  
+  /**
+   * Processes a delta-board. Instead of actually handing the delta-board, this
+   * method, instead, creates a Style12Struct object and then asks
+   * <code>processStyle12</code> to handle it.
+   */
+   
+  protected boolean processDeltaBoard(DeltaBoardStruct data){
+    Integer gameNumber = new Integer(data.getGameNumber());
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+    
+    Game game = gameData.game;
+    if (game.getVariant() != Chess.getInstance())
+      throw new IllegalStateException("delta-boards should only be sent for regular chess");
+    
+    Style12Struct lastBoardData = gameData.boardData;
+    Vector moveList = gameData.moveList;
+    
+    Position pos = game.getInitialPosition();
+    for (int i = 0; i < moveList.size(); i++)
+      pos.makeMove((Move)moveList.elementAt(i));
+    
+    ChessMove move = (ChessMove)(Move.parseWarrenSmith(data.getMoveSmith(), pos, data.getMoveAlgebraic()));
+    
+    Square startSquare = move.getStartingSquare();
+    Square endSquare = move.getEndingSquare();
+    ChessPiece movingPiece = (ChessPiece)((startSquare == null) ? null : pos.getPieceAt(startSquare));  
+    
+    pos.makeMove(move);
+    
+    
+    String boardLexigraphic = pos.getLexigraphic();
+    String currentPlayer = pos.getCurrentPlayer().isWhite() ? "W" : "B";
+    int doublePawnPushFile = (move instanceof ChessMove) ?
+      ((ChessMove)move).getDoublePawnPushFile() : -1;
+    boolean kingMoved = movingPiece.isKing();
+    boolean canWhiteCastleKingside =
+      lastBoardData.canWhiteCastleKingside() && !kingMoved && !Square.getInstance(7, 0).equals(startSquare);
+    boolean canWhiteCastleQueenside =
+      lastBoardData.canBlackCastleQueenside() && !kingMoved && !Square.getInstance(0, 0).equals(startSquare);
+    boolean canBlackCastleKingside =
+      lastBoardData.canBlackCastleKingside() && !kingMoved && !Square.getInstance(7, 7).equals(startSquare);
+    boolean canBlackCastleQueenside =
+      lastBoardData.canBlackCastleQueenside() && !kingMoved && !Square.getInstance(0, 7).equals(startSquare);
+    
+    boolean isIrreversibleMove = movingPiece.isPawn() || move.isCapture() ||
+      (canWhiteCastleKingside != lastBoardData.canWhiteCastleKingside()) ||
+      (canWhiteCastleQueenside != lastBoardData.canWhiteCastleQueenside()) ||
+      (canBlackCastleKingside != lastBoardData.canBlackCastleKingside()) ||
+      (canBlackCastleQueenside != lastBoardData.canBlackCastleQueenside());
+    int pliesSinceIrreversible = isIrreversibleMove ? 0 : lastBoardData.getPliesSinceIrreversible() + 1;
+    
+    String whiteName = lastBoardData.getWhiteName();
+    String blackName = lastBoardData.getBlackName();
+    int gameType = lastBoardData.getGameType();
+    boolean isPlayedGame = lastBoardData.isPlayedGame();
+    boolean isMyTurn = pos.getCurrentPlayer() == game.getUserPlayer();
+    int initTime = lastBoardData.getInitialTime();
+    int inc = lastBoardData.getIncrement();
+    int whiteStrength = calcStrength(pos, Player.WHITE_PLAYER);
+    int blackStrength = calcStrength(pos, Player.BLACK_PLAYER);
+    int whiteTime = pos.getCurrentPlayer().isBlack() ? data.getRemainingTime() : lastBoardData.getWhiteTime();
+    int blackTime = pos.getCurrentPlayer().isWhite() ? data.getRemainingTime() : lastBoardData.getBlackTime();
+    int nextMoveNumber = lastBoardData.getNextMoveNumber() + (pos.getCurrentPlayer().isWhite() ? 1 : 0); 
+    String moveVerbose = createVerboseMove(pos, move);
+    String moveSAN = data.getMoveAlgebraic();
+    int moveTime = data.getTakenTime();
+    boolean isBoardFlipped = lastBoardData.isBoardFlipped();
+    boolean isClockRunning = true;
+    int lag = 0; // The server doesn't currently send us this information
+    
+    Style12Struct boardData = new Style12Struct(boardLexigraphic, currentPlayer, doublePawnPushFile,
+      canWhiteCastleKingside, canWhiteCastleQueenside, canBlackCastleKingside, canBlackCastleQueenside,
+      pliesSinceIrreversible, gameNumber.intValue(), whiteName, blackName, gameType, isPlayedGame,
+      isMyTurn, initTime, inc, whiteStrength, blackStrength, whiteTime, blackTime, nextMoveNumber,
+      moveVerbose, moveSAN, moveTime, isBoardFlipped, isClockRunning, lag);
+      
+    processStyle12(boardData);
+    
+    return true; 
+  }
+  
+  
+  
+  /**
+   * Calculates the material strength of the specified player in the specified
+   * position.
+   */
+  
+  private static int calcStrength(Position pos, Player player){
+    int count = 0;
+    for (int i = 0; i < 8; i++){
+      for (int j = 0; j < 8; j++){
+        ChessPiece piece = (ChessPiece)(pos.getPieceAt(i, j));
+        if ((piece != null) && (piece.getPlayer() == player)){
+          if (piece.isPawn())
+            count += 1;
+          else if (piece.isBishop())
+            count += 3;
+          else if (piece.isKnight())
+            count += 3;
+          else if (piece.isRook())
+            count += 5;
+          else if (piece.isQueen())
+            count += 9;
+          else if (piece.isKing())
+            count += 0;
+        }
+      }
+    }
+    
+    return count;
+  }
+  
+  
+  
+  /**
+   * Creates a verbose representation of the specified move in the specified
+   * position. The move has already been made in the position.
+   */
+   
+  private static String createVerboseMove(Position pos, ChessMove move){
+    if (move.isShortCastling())
+      return "o-o";
+    else if (move.isLongCastling())
+      return "o-o-o";
+    else{
+      ChessPiece piece = (ChessPiece)pos.getPieceAt(move.getEndingSquare());
+      String moveVerbose = piece.toShortString() + "/" + move.getStartingSquare() + "-" + move.getEndingSquare();
+      if (move.isPromotion())
+        return moveVerbose + "=" + move.getPromotionTarget().toShortString();
+      else
+        return moveVerbose;
+    }
   }
 
 
