@@ -66,6 +66,31 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    */
 
   private int userPlayedGamesCount = 0;
+  
+  
+  
+  /**
+   * Creates a new <code>FreechessBoardManager</code>. Registers a listener for
+   * the moveSendingMode property to reflect its value in the premove ivar.
+   */
+   
+  public FreechessBoardManager(){
+    addPropertyChangeListener(new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        if ("moveSendingMode".equals(evt.getPropertyName())){
+          Integer oldValue = (Integer)evt.getOldValue();
+          Integer newValue = (Integer)evt.getNewValue();
+          Integer premoveValue = new Integer(PREMOVE_MOVE_SENDING_MODE);
+          
+          if (!newValue.equals(oldValue) &&
+              (premoveValue.equals(newValue) || premoveValue.equals(oldValue))){
+            JinFreechessConnection conn = (JinFreechessConnection)getConn();
+            conn.setIvarState(Ivar.PREMOVE, premoveValue.equals(newValue));
+          }
+        }
+      }
+    });
+  }
 
 
   
@@ -161,22 +186,6 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     else if ((gameType == Game.MY_GAME) && (primaryPlayedGameID == null))
       primaryPlayedGameID = gameID;
 
-    if ((gameType == Game.MY_GAME) && game.isPlayed())
-      userStartedPlayingGame();
-
-    game.addPropertyChangeListener(new PropertyChangeListener(){
-      public void propertyChange(PropertyChangeEvent evt){
-        String propertyName = evt.getPropertyName();
-        if ("played".equals(propertyName)){
-          Game game = (Game)evt.getSource();
-          if (game.isPlayed())
-            userStartedPlayingGame();
-          else
-            userStoppedPlayingGame();
-        }
-      }
-    });
-
     super.gameStarted(evt);
   }
 
@@ -197,56 +206,11 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     else if ((gameType == Game.MY_GAME) && gameID.equals(primaryPlayedGameID))
       primaryPlayedGameID = null;
 
-    if ((gameType == Game.MY_GAME) && game.isPlayed())
-      userStoppedPlayingGame();
-
     super.gameEnded(evt);
   }
 
-
-
-
-  /**
-   * Gets called when the user starts playing a game.
-   */
-
-  private void userStartedPlayingGame(){
-    userPlayedGamesCount++;
-    
-    if (userPlayedGamesCount == 1)
-      premoveRadioButton.setEnabled(false);
-  }
-
-
-
-
-  /**
-   * Gets called when the user stops playing a game.
-   */
-
-  private void userStoppedPlayingGame(){
-    userPlayedGamesCount--;
-    
-    if (userPlayedGamesCount == 0)
-      premoveRadioButton.setEnabled(true);
-  }
-
-
-
-  /**
-   * Overrides the superclass' method to set the server premove ivariable when
-   * premove is turned on.
-   */
-
-  public void setMoveSendingMode(int moveSendingMode){
-    JinFreechessConnection conn = (JinFreechessConnection)getConn();
-    conn.setIvarState(Ivar.PREMOVE, moveSendingMode == PREMOVE_MOVE_SENDING_MODE);
-
-    super.setMoveSendingMode(moveSendingMode);
-  }
   
-  
-  
+
   /**
    * <code>IvarStateChangeListener</code> implementation.
    */
