@@ -195,7 +195,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     add(outputScrollPane, BorderLayout.CENTER);
     add(inputComponent, BorderLayout.SOUTH);
 
-    outputComponent.addKeyListener(this);
+//    outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
 
@@ -1006,28 +1006,29 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   /**
    * Processes Key pressed events from the components we're registered as listeners for.
-   * The default implementation is registered to listen to the output and to the
-   * input component.
+   * The default implementation is registered to listen to the input component.
    */
 
   public void keyPressed(KeyEvent evt){
-    if ((evt.getSource()==inputComponent)/*||(evt.getSource()==outputComponent)*/){
+    if ((evt.getSource()==inputComponent)){
       if (evt.getID()==KeyEvent.KEY_PRESSED){
-        if ((evt.getModifiers()&KeyEvent.CTRL_MASK)!=0){
+        long modifiers = evt.getModifiers();
+        if ((modifiers & KeyEvent.CTRL_MASK) != 0){
           JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
           Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
+          int value = vscrollbar.getValue();
           switch (evt.getKeyCode()){
             case KeyEvent.VK_UP:
-              vscrollbar.setValue(vscrollbar.getValue() - outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL, -1));
+              vscrollbar.setValue(value - outputComponent.getScrollableUnitIncrement(viewRect, SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_DOWN:
-              vscrollbar.setValue(vscrollbar.getValue() + outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL, +1));
+              vscrollbar.setValue(value + outputComponent.getScrollableUnitIncrement(viewRect, SwingConstants.VERTICAL, +1));
               break;
             case KeyEvent.VK_PAGE_UP:
-              vscrollbar.setValue(vscrollbar.getValue() - outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL, -1));
+              vscrollbar.setValue(value - outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_PAGE_DOWN:
-              vscrollbar.setValue(vscrollbar.getValue() + outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL, -1));
+              vscrollbar.setValue(value + outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_HOME:
               vscrollbar.setValue(vscrollbar.getMinimum());
