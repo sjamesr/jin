@@ -75,6 +75,15 @@ public class ChessMove extends Move{
    */
 
   private final ChessPiece promotionTarget;
+  
+  
+  
+  /**
+   * The file of the double pawn push, or -1 if the move isn't a double pawn
+   * push.
+   */
+   
+  private final int doublePawnPushFile;
 
 
 
@@ -83,12 +92,13 @@ public class ChessMove extends Move{
    * Creates a new ChessMove with the given properties. If the move is not a
    * promotion, the promotion target should be <code>null</code>. The
    * <code>moveSAN</code> (the move in SAN format) argument may be
-   * <code>null</code>.
+   * <code>null</code>. <code>doublePawnPushFile</code> should be -1 if the move
+   * isn't a double pawn push.
    */
 
   public ChessMove(Square startingSquare, Square endingSquare, Player movingPlayer,
       boolean isEnPassant, boolean isShortCastling, boolean isLongCastling,
-      ChessPiece capturedPiece, ChessPiece promotionTarget, String moveSAN){
+      ChessPiece capturedPiece, int doublePawnPushFile, ChessPiece promotionTarget, String moveSAN){
 
     super(startingSquare, endingSquare, movingPlayer, moveSAN);
 
@@ -102,6 +112,7 @@ public class ChessMove extends Move{
     this.isShortCastling = isShortCastling;
     this.isLongCastling = isLongCastling;
     this.capturedPiece = capturedPiece;
+    this.doublePawnPushFile = doublePawnPushFile;
   }
 
 
@@ -132,12 +143,15 @@ public class ChessMove extends Move{
 
     if (pos.getPieceAt(startingSquare) == null)
       throw new IllegalArgumentException("The moving piece may not be null");
+    
+    Chess chess = Chess.getInstance();
 
     this.promotionTarget = promotionTarget;
-    this.isEnPassant = Chess.getInstance().isEnPassant(pos, startingSquare, endingSquare, promotionTarget);
-    this.isShortCastling = Chess.getInstance().isShortCastling(pos, startingSquare, endingSquare, promotionTarget);
-    this.isLongCastling = Chess.getInstance().isLongCastling(pos, startingSquare, endingSquare, promotionTarget);
-    this.capturedPiece = Chess.getInstance().getCapturedPiece(pos, startingSquare, endingSquare, promotionTarget, isEnPassant);
+    this.isEnPassant = chess.isEnPassant(pos, startingSquare, endingSquare, promotionTarget);
+    this.isShortCastling = chess.isShortCastling(pos, startingSquare, endingSquare, promotionTarget);
+    this.isLongCastling = chess.isLongCastling(pos, startingSquare, endingSquare, promotionTarget);
+    this.capturedPiece = chess.getCapturedPiece(pos, startingSquare, endingSquare, promotionTarget, isEnPassant);
+    this.doublePawnPushFile = chess.getDoublePawnPushFile(pos, startingSquare, endingSquare);
   }
 
 
@@ -281,7 +295,7 @@ public class ChessMove extends Move{
    */
 
   public boolean isPromotion(){
-    return (promotionTarget!=null);
+    return promotionTarget != null;
   }
 
 
@@ -294,6 +308,17 @@ public class ChessMove extends Move{
 
   public ChessPiece getPromotionTarget(){
     return promotionTarget;
+  }
+  
+  
+  
+  /**
+   * Returns the double pawn push file of this move, or -1 if this move isn't
+   * a double pawn push.
+   */
+   
+  public int getDoublePawnPushFile(){
+    return doublePawnPushFile;
   }
 
 
