@@ -24,6 +24,7 @@ package free.chess;
 import javax.swing.Icon;
 import java.awt.Graphics;
 import java.awt.Component;
+import java.awt.Rectangle;
 
 public class PieceIcon implements Icon{
 
@@ -100,7 +101,7 @@ public class PieceIcon implements Icon{
    */
 
   public void paintIcon(Component component, Graphics g, int x, int y){
-    piecePainter.paintPiece(piece, g, component, x, y, width, height);
+    piecePainter.paintPiece(piece, g, component, new Rectangle(x, y, width, height), false);
   }
 
 }
