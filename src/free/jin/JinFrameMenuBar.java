@@ -27,6 +27,7 @@ import free.util.*;
 import free.util.swing.LookAndFeelMenu;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
+import free.util.swing.UrlDisplayingAction;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
@@ -604,18 +605,8 @@ public class JinFrameMenuBar extends JMenuBar{
     JMenu helpMenu = new JMenu("Help");
     helpMenu.setMnemonic('h');
 
-    JMenuItem websiteMenuItem = new JMenuItem("Jin Website");
-    websiteMenuItem.setMnemonic('J');
-    websiteMenuItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String url = "http://www.jinchess.com";
-        try{
-          BrowserControl.displayURL(url);
-        } catch (java.io.IOException e){
-            JOptionPane.showMessageDialog(jinFrame, "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
-          }
-      }
-    });
+    JMenuItem websiteMenuItem = new JMenuItem("Jin Website", 'J');
+    websiteMenuItem.addActionListener(new UrlDisplayingAction(jinFrame, "http://www.jinchess.com"));
     helpMenu.add(websiteMenuItem);
 
     JMenuItem licenseMenuItem = new JMenuItem("Licensing and Copyrights...");
@@ -630,32 +621,14 @@ public class JinFrameMenuBar extends JMenuBar{
     });
     helpMenu.add(licenseMenuItem);
 
-    JMenuItem reportBugMenuItem = new JMenuItem("Report a Bug");
-    reportBugMenuItem.setMnemonic('R');
-    reportBugMenuItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String url = "https://sourceforge.net/tracker/?group_id=50386&atid=459537";
-        try{
-          BrowserControl.displayURL(url);
-        } catch (java.io.IOException e){
-            JOptionPane.showMessageDialog(jinFrame, "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
-          }
-      }
-    });
+    JMenuItem reportBugMenuItem = new JMenuItem("Report a Bug", 'R');
+    reportBugMenuItem.addActionListener(new UrlDisplayingAction(jinFrame,
+      "https://sourceforge.net/tracker/?group_id=50386&atid=459537"));
     helpMenu.add(reportBugMenuItem);
 
-    JMenuItem suggestFeatureMenuItem = new JMenuItem("Suggest a Feature");
-    suggestFeatureMenuItem.setMnemonic('S');
-    suggestFeatureMenuItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String url = "https://sourceforge.net/tracker/?group_id=50386&atid=459540";
-        try{
-          BrowserControl.displayURL(url);
-        } catch (java.io.IOException e){
-            JOptionPane.showMessageDialog(jinFrame, "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
-          }
-      }
-    });
+    JMenuItem suggestFeatureMenuItem = new JMenuItem("Suggest a Feature", 'S');
+    suggestFeatureMenuItem.addActionListener(new UrlDisplayingAction(jinFrame,
+      "https://sourceforge.net/tracker/?group_id=50386&atid=459540"));
     helpMenu.add(suggestFeatureMenuItem);
 
 
