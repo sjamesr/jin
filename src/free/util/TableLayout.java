@@ -189,6 +189,11 @@ public class TableLayout implements LayoutManager2{
       Component [] row = (Component [])rows.elementAt(i);
       for (int j = 0; j < columnCount; j++){
         Component component = row[j];
+
+        // Can only happen on the last line when all the remaining components are null as well
+        if (component == null) 
+          break;
+
         if (component.getParent() != parent)
           throw new IllegalStateException("Bad parent specified");
 
@@ -216,6 +221,11 @@ public class TableLayout implements LayoutManager2{
     for (int i = 0; i < rowCount; i++){
       for (int j = 0; j < columnCount; j++){
         Dimension prefSize = prefSizes[i][j];
+
+        // Can only happen on the last line when all the remaining components are null as well
+        if (prefSize == null)
+          break;
+
         columnWidths[j] = Math.max(columnWidths[j], prefSize.width);
         rowHeights[i] = Math.max(rowHeights[i], prefSize.height);
       }
@@ -264,6 +274,11 @@ public class TableLayout implements LayoutManager2{
         for (int j = 0; j < row.length; j++){
           int cellWidth = (columnWidths[j]*layoutSize.width)/prefLayoutSize.width;
           Component component = row[j];
+
+          // Can only happen on the last line when all the remaining components are null as well
+          if (component == null)
+            break;
+
           Dimension maxSize = component.getMaximumSize();
 
           int compWidth = Math.min(maxSize.width, cellWidth);
