@@ -284,7 +284,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createConnectAsGuestButton(){
-    return new JButton("Connect as guest");
+    JButton button = new JButton("Connect as guest");
+    button.setMnemonic('g');
+    return button;
   }
 
 
@@ -307,7 +309,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createRegisterButton(){
-    return new JButton("Register");
+    JButton button = new JButton("Register");
+    button.setMnemonic('R');
+    return button;
   }
 
  
@@ -388,7 +392,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
     JPanel hostnameLabelPanel = new JPanel(new GridLayout(3,1));
     hostnameLabelPanel.add(new JLabel("Server"));
     hostnameLabelPanel.add(new JLabel("hostname or"));
-    hostnameLabelPanel.add(new JLabel("IP number"));
+    JLabel hostnameLabel = new JLabel("IP number");
+    hostnameLabel.setDisplayedMnemonic('I');
+    hostnameLabelPanel.add(hostnameLabel);
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
@@ -402,6 +408,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     hostnameBox.setFont(UIManager.getFont("TextField.font"));
     hostnameBox.setEditable(true);
     hostnameBox.setSelectedItem(user.getProperty("login.hostname"));
+    hostnameLabel.setLabelFor(hostnameBox);
 
     hostnamePanel.add(hostnameBox);
     hostnamePanel.add(Box.createHorizontalStrut(10));
@@ -416,7 +423,10 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     portPanel.add(portField);
     portPanel.add(Box.createHorizontalStrut(10));
-    portPanel.add(new JLabel("Port number"));
+    JLabel portLabel = new JLabel("Port number");
+    portLabel.setDisplayedMnemonic('o');
+    portLabel.setLabelFor(portField);
+    portPanel.add(portLabel);
     portPanel.add(Box.createHorizontalGlue());
    
     
@@ -449,7 +459,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createForgotPasswordButton(){
-    return new JButton("Forgot your password?");
+    JButton button = new JButton("Forgot your password?");
+    button.setMnemonic('F');
+    return button;
   }
 
 
@@ -472,7 +484,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createConnectButton(){
-    return new JButton("Connect");
+    JButton button = new JButton("Connect");
+    button.setMnemonic('C');
+    return button;
   }
 
 
@@ -534,7 +548,10 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
-    usernamePanel.add(new JLabel("Handle (your login name)"));
+    JLabel handleLabel = new JLabel("Handle (your login name)");
+    handleLabel.setDisplayedMnemonic('H');
+    handleLabel.setLabelFor(usernameField);
+    usernamePanel.add(handleLabel);
     usernamePanel.add(Box.createHorizontalGlue());
     usernamePanel.add(Box.createHorizontalStrut(10));
 
@@ -546,7 +563,10 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
-    passwordInputPanel.add(new JLabel("Password"));
+    JLabel passwordLabel = new JLabel("Password");
+    passwordLabel.setDisplayedMnemonic('P');
+    passwordLabel.setLabelFor(passwordField);
+    passwordInputPanel.add(passwordLabel);
     passwordInputPanel.add(Box.createHorizontalGlue());
     passwordInputPanel.add(Box.createHorizontalStrut(10));
 
@@ -563,6 +583,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     boolean savePassword = Boolean.valueOf(user.getProperty("login.savepassword","false")).booleanValue();
     savePasswordCheckBox = new JCheckBox("Save password", savePassword);
+    savePasswordCheckBox.setMnemonic('S');
 
     JButton forgotPasswordButton = createForgotPasswordButton();
     if (forgotPasswordButton != null){
@@ -649,6 +670,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     panel.add(Box.createVerticalGlue());
 
     JButton button = new JButton("Cancel");
+    button.setMnemonic('a');
     button.setDefaultCapable(false);
     button.addActionListener(closeActionListener);
 
