@@ -146,7 +146,8 @@ public class ConsoleTextPane extends JTextPane{
 
   protected void processComponentKeyEvent(KeyEvent evt){
     if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null)){
-      evt.consume(); // Otherwise the parent scrollpane gets it and starts doing things we already do, like scrolling on PAGE_UP
+      evt.consume(); // Otherwise the parent scrollpane gets it and starts doing
+                     // things we already handle, like scrolling on PAGE_UP
       return;
     }
 
@@ -165,15 +166,18 @@ public class ConsoleTextPane extends JTextPane{
 
   protected JPopupMenu getPopupMenu(MouseEvent evt){
     String selection = getSelectedText();
+    int selectionStart = getSelectionStart();
+    int selectionEnd = getSelectionEnd();
 
-    if ((selection==null)||(selection.length()==0)){
+    if ((selection == null) || (selection.length() == 0) ||
+        !isAboveText(evt.getX(), evt.getY(), selectionStart, selectionEnd)){
       int pressedLocation = viewToModel(evt.getPoint());
       if (pressedLocation == -1)
         return null;
 
       try{
-        int wordStart =  Utilities.getWordStart(this, pressedLocation);
-        int wordEnd =  Utilities.getWordEnd(this, pressedLocation);
+        int wordStart = Utilities.getWordStart(this, pressedLocation);
+        int wordEnd = Utilities.getWordEnd(this, pressedLocation);
         select(wordStart, wordEnd);
       } catch (BadLocationException e){
           return null;
@@ -320,7 +324,7 @@ public class ConsoleTextPane extends JTextPane{
 
     if (evt.isPopupTrigger()){
       JPopupMenu popup = getPopupMenu(evt);
-      if (popup!=null){ 
+      if (popup != null){ 
         Component rootPane = SwingUtilities.getRootPane(this);
         Dimension rootPaneSize = rootPane.getSize();
         Point clickPointOnRootPane = SwingUtilities.convertPoint(this, evt.getPoint(), rootPane);
@@ -328,22 +332,22 @@ public class ConsoleTextPane extends JTextPane{
         int y = evt.getY();
         int width = popup.getWidth();
         int height = popup.getHeight();
-        if (clickPointOnRootPane.x+width>rootPaneSize.width)
-          x = x-width;
-        if (clickPointOnRootPane.y+height>rootPaneSize.height)
-          y = y-height;
+        if (clickPointOnRootPane.x + width > rootPaneSize.width)
+          x = x - width;
+        if (clickPointOnRootPane.y + height > rootPaneSize.height)
+          y = y - height;
         
         popup.setSelected(null);
         popup.show(this,x,y);
       }
     }
 
-    if (evt.getID()==MouseEvent.MOUSE_EXITED){
+    if (evt.getID() == MouseEvent.MOUSE_EXITED){
       curLink = null;
       setCursor(regCursor);
     }
 
-    if ((evt.getID()==MouseEvent.MOUSE_ENTERED)||(evt.getID()==MouseEvent.MOUSE_RELEASED)){
+    if ((evt.getID() == MouseEvent.MOUSE_ENTERED) || (evt.getID() == MouseEvent.MOUSE_RELEASED)){
       processPossibleLinkUpdate(evt);
     } 
 
@@ -383,8 +387,8 @@ public class ConsoleTextPane extends JTextPane{
   private void processPossibleLinkUpdate(MouseEvent evt){
     Link newLink = getLink(evt.getX(), evt.getY());
 
-    if (newLink==null){
-      if (curLink!=null){
+    if (newLink == null){
+      if (curLink != null){
         curLink = null;
         setCursor(regCursor, false);
       }
@@ -404,44 +408,63 @@ public class ConsoleTextPane extends JTextPane{
 
   protected Link getLink(int x, int y){
     int numLinks = links.size();
-    for (int i=0; i<numLinks; i++){
+    for (int i = 0; i < numLinks; i++){
       Link link = (Link)links.elementAt(i);
       int linkStart = link.getStartIndex();
       int linkEnd = link.getEndIndex();
-      Rectangle startCharRect, endCharRect;
-      try{
-        startCharRect = modelToView(linkStart);
-        endCharRect = modelToView(linkEnd);
-      } catch (BadLocationException e){ // Shouldn't happen
-          e.printStackTrace();
-          continue;
-        }
 
-      // Sometimes modelToView returns null, not sure why.
-      if ((startCharRect == null) || (endCharRect == null)) 
-        continue;
-
-      if (startCharRect.y+startCharRect.height<=endCharRect.y){ // Separate lines.
-        if (y>startCharRect.y){
-          if (y<=startCharRect.y+startCharRect.height){
-            if (x>startCharRect.x)
-              return link;
-          }
-          else if (y<endCharRect.y)
-            return link;
-          else if ((y<endCharRect.y+endCharRect.height)&&(x<endCharRect.x+endCharRect.width))
-            return link;
-        }
-        if ((y>startCharRect.y+startCharRect.height)&&(y<endCharRect.y))
-          return link;
-      }
-      else // Same line
-        if (startCharRect.union(endCharRect).contains(x,y))
-          return link;
+      if (isAboveText(x, y, linkStart, linkEnd))
+        return link;
     }
 
     return null;
   }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the specified location (in pixels) is on a
+   * character between the two specified positions in the text.
+   */
+
+  protected boolean isAboveText(int x, int y, int startPos, int endPos){
+    Rectangle startCharRect, endCharRect;
+    try{
+      startCharRect = modelToView(startPos);
+      endCharRect = modelToView(endPos);
+    } catch (BadLocationException e){ // Shouldn't happen
+        e.printStackTrace();
+        return false;
+      }
+
+    // Sometimes modelToView returns null, not sure why.
+    if ((startCharRect == null) || (endCharRect == null)) 
+      return false;
+
+    if (startCharRect.y + startCharRect.height <= endCharRect.y){ // Separate lines.
+      if (y > startCharRect.y){
+        if (y <= startCharRect.y + startCharRect.height){
+          if (x > startCharRect.x)
+            return true;
+        }
+        else if (y < endCharRect.y)
+          return true;
+        else if ((y < endCharRect.y+endCharRect.height) && (x < endCharRect.x+endCharRect.width))
+          return true;
+      }
+      if ((y > startCharRect.y+startCharRect.height) && (y < endCharRect.y))
+        return true;
+    }
+    else{ // Same line
+      if (startCharRect.union(endCharRect).contains(x, y))
+        return true;
+    }
+
+    return false;
+  }
+
+
 
 
   /**
