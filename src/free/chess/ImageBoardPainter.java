@@ -259,29 +259,28 @@ public class ImageBoardPainter implements BoardPainter{
           if (!drawnRect.intersects(clipRect))
             continue;
           
+          Image image;
+          int iwidth, iheight;
           if ((file+rank) % 2 == 0){
-            if (isScaled)
-              g.drawImage(scaledDark, drawnRect.x, drawnRect.y, component);
-            else{
-              g.setClip(clipRect.intersection(drawnRect));
-              int imgX = Math.max(0, file * (dwidth - drawnRect.width)/7);
-              int imgY = Math.max(0, ((7-rank)/2) * (dheight - drawnRect.height)/3);
-              for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += dwidth)
-                for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += dheight)
-                  g.drawImage(darkImage, offx - imgX, offy - imgY, component);
-            }
+            image = isScaled ? scaledDark : darkImage;
+            iwidth = dwidth;
+            iheight = dheight;
           }
           else{
-            if (isScaled)
-              g.drawImage(scaledLight, drawnRect.x, drawnRect.y, component);
-            else{
-              g.setClip(clipRect.intersection(drawnRect));
-              int imgX = Math.max(0, file * (lwidth - drawnRect.width)/7);
-              int imgY = Math.max(0, ((7-rank)/2) * (lheight - drawnRect.height)/3);
-              for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += lwidth)
-                for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += lheight)
-                  g.drawImage(lightImage, offx - imgX, offy - imgY, component);
-            }
+            image = isScaled ? scaledLight : lightImage;
+            iwidth = lwidth;
+            iheight = lheight;
+          }
+         
+          if (isScaled)
+            g.drawImage(image, drawnRect.x, drawnRect.y, component);
+          else{
+            g.setClip(clipRect.intersection(drawnRect));
+            int imgX = (file*iwidth) % drawnRect.width;
+            int imgY = ((7-rank)*iheight) % drawnRect.height;
+            for (int offx = drawnRect.x; offx - imgX < drawnRect.x+drawnRect.width; offx += iwidth)
+              for (int offy = drawnRect.y; offy - imgY < drawnRect.y+drawnRect.height; offy += iheight)
+                g.drawImage(image, offx - imgX, offy - imgY, component);
           }
         }
       }
