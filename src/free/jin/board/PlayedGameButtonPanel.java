@@ -331,8 +331,10 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     JButton button = new JButton("Resign");
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
+    button.setMnemonic('r');
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
+    
 
     return button;
   }
@@ -348,6 +350,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     JButton button = new JButton("Draw");
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
+    button.setMnemonic('d');
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -365,6 +368,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     JButton button = new JButton("Abort");
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
+    button.setMnemonic('a');
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -382,6 +386,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     JButton button = new JButton("Adjourn");
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
+    button.setMnemonic('j');
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
