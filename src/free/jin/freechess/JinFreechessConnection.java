@@ -607,8 +607,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       fromSquare = Square.parseSquare(moveVerbose.substring(2, 4));
       toSquare = Square.parseSquare(moveVerbose.substring(5, 7));
       int promotionCharIndex = moveVerbose.indexOf("=")+1;
-      if (promotionCharIndex != 0)
-        promotionPiece = variant.parsePiece(moveVerbose.substring(promotionCharIndex, promotionCharIndex + 1));
+      if (promotionCharIndex != 0){
+        String pieceString = moveVerbose.substring(promotionCharIndex, promotionCharIndex + 1);
+        if (currentPlayer.isBlack()) // The server always sends upper case characters, even for black pieces.
+          pieceString = pieceString.toLowerCase(); 
+        promotionPiece = variant.parsePiece(pieceString);
+      }
     }
 
     Move move = variant.createMove(position, fromSquare, toSquare, promotionPiece, movePretty);
