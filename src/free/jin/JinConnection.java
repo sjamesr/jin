@@ -136,10 +136,22 @@ public interface JinConnection{
 
 
   /**
-   * Connects to the server.
+   * Connects and logs in to the server.  Throws an <code>IOException</code>
+   * if couldn't connect successfully. Returns <code>true</code> if
+   * successfully logged in, <code>false</code> otherwise.
    */
 
-  void connect() throws IOException;
+  boolean connectAndLogin() throws IOException;
+
+
+
+
+  /**
+   * Returns a message describing the error that occurred during the login
+   * procedure, if any.
+   */
+
+  String getLoginErrorMessage();
 
 
 
