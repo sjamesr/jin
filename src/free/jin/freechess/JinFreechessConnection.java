@@ -146,10 +146,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     sendCommand("set bell 0");
     sendCommand("iset gameinfo 1");
     sendCommand("iset showownseek 1");
+    sendCommand("iset premove 1");
 
     filterLine("Bell off.");
     filterLine("gameinfo set.");
     filterLine("showownseek set.");
+    filterLine("premove set.");
 
     super.onLogin();
 
