@@ -54,12 +54,28 @@ public interface WildVariant{
   /**
    * Creates a Move from the 2 given squares in the given Position.
    * The created move may be illegal, the implementation must ignore this and
-   * return some Move even if it's illegal. The given stringRepresentation may be
-   * null.
+   * return some Move even if it's illegal. If the specified information is so
+   * bad that it's impossible to construct a move from it altogether, the
+   * implementation is allowed to throw an
+   * <code>IllegalArgumentException</code>. The given stringRepresentation may
+   * be null.
    */
 
   Move createMove(Position pos, Square startSquare, Square endSquare, 
-    Piece promotionTarget, String stringRepresentation);
+    Piece promotionTarget, String stringRepresentation) throws IllegalArgumentException;
+
+
+
+
+  /**
+   * Creates a <code>Move</code> object representing a move just like the
+   * specified one, but made in the specified position. If the specified
+   * information is so bad that it's impossible to construct a move from it
+   * altogether, the implementation is allowed to throw an
+   * <code>IllegalArgumentException</code>.
+   */
+
+  Move createMove(Position pos, Move move) throws IllegalArgumentException;
 
 
 
