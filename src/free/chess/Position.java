@@ -249,8 +249,8 @@ public final class Position{
    * Sets this Position to represent the position represented by 
    * the given string. The string should represent a position by specifying
    * 64 characters indicating what occupies (-PNBRQKpnbrqk) each square, in 
-   * lexigraphic order (a8 b8 ... h1). The player to move will be the player
-   * with the white pieces.
+   * lexigraphic order <code>(a8 b8 ... h1)</code>. The player to move will be
+   * the player with the white pieces.
    *
    * @param pos The string representing the position.
    *
@@ -285,7 +285,7 @@ public final class Position{
   /**
    * Returns a string representing the position by 64 characters indicating what
    * occupies (obtained by calling toShortColorString() on each piece, '-' for 
-   * no piece) each square, in lexigraphic order (a8 b8 ... h1).
+   * no piece) each square, in lexigraphic order <code>(a8 b8 ... h1)</code>.
    */
 
   public String getLexigraphic(){
