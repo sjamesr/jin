@@ -76,7 +76,7 @@ public class Scripter extends Plugin{
     registerScriptDispatcher("Game", new GameScriptDispatcher());
     registerScriptDispatcher("Seek", new SeekScriptDispatcher());
     registerScriptDispatcher("Friends", new FriendsScriptDispatcher());
-    registerScriptDispatcher("User Invoked", new UserInvokedScriptDispatcher());
+//    registerScriptDispatcher("User Invoked", new UserInvokedScriptDispatcher());
 
     menu = new JMenu("Scripter");
   }
