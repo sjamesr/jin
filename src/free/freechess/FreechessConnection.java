@@ -1223,7 +1223,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * added.
    */
 
-  private static final Pattern seekAddedPattern = new Pattern("^<s> .*");
+  private static final Pattern seekAddedPattern = new Pattern("^<sn?> .*");
 
 
 

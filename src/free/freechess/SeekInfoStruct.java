@@ -111,6 +111,8 @@ public class SeekInfoStruct extends Struct{
   /**
    * Creates a new SeekInfoStruct with the specified arguments.
    *
+   * @param canAcceptSeek <code>true</code> if the user can accept the seek,
+   * <code>false</code> otherwise.
    * @param index The seek index.
    * @param name The handle of the seeking player.
    * @param titles The titles of the player, ORed into an int. 
@@ -132,9 +134,9 @@ public class SeekInfoStruct extends Struct{
    * formula to accept the offer.
    */
 
-  public SeekInfoStruct(int index, String name, int titles, int rating, char provshow, int time,
-      int inc, boolean isRated, String matchType, char color, int minRating, int maxRating,
-      boolean isAutomaticAccept, boolean isFormulaUsed){
+  public SeekInfoStruct(boolean canAcceptSeek, int index, String name, int titles, int rating, 
+      char provshow, int time, int inc, boolean isRated, String matchType, char color,
+      int minRating, int maxRating, boolean isAutomaticAccept, boolean isFormulaUsed){
 
     if (time < 0)
       throw new IllegalArgumentException("The game's initial time ("+time+") may not be negative");
@@ -151,6 +153,7 @@ public class SeekInfoStruct extends Struct{
         throw new IllegalArgumentException("Bad color character: "+color);
     }
 
+    setBooleanProperty("CanAcceptSeek", canAcceptSeek);
     setIntegerProperty("Index", index);
     setStringProperty("Name", name);
     setIntegerProperty("Titles", titles);
@@ -175,6 +178,8 @@ public class SeekInfoStruct extends Struct{
    * object. Here's an example seekinfo line:<PRE>
    * <s> 29 w=Snaps ti=02 rt=1532  t=1 i=0 r=r tp=lightning c=? rr=0-9999 a=t f=t
    * </PRE>
+   * If the seek cannot be accepted by the user, the line identifier is "<sn>"
+   * and not "<s>".
    * More information about the format is available in the FICS iv_seekinfo
    * help file.
    */
@@ -182,8 +187,14 @@ public class SeekInfoStruct extends Struct{
   public static SeekInfoStruct parseSeekInfoLine(String line){
     StringTokenizer tokens = new StringTokenizer(line, " -=");
 
-    if (!tokens.nextToken().equals("<s>")) // Skip the <s> identifier
-      throw new IllegalArgumentException("Missing \"<s>\" identifier");
+    boolean canAcceptSeek;
+    String identifier = tokens.nextToken();
+    if (identifier.equals("<s>")) // Skip the <s> identifier
+      canAcceptSeek = true;
+    else if (identifier.equals("<sn>"))
+      canAcceptSeek = false;
+    else
+      throw new IllegalArgumentException("Missing \"<s>\" or \"<sn>\" identifier");
 
     int index = Integer.parseInt(tokens.nextToken());
 
@@ -227,9 +238,9 @@ public class SeekInfoStruct extends Struct{
     assertToken(tokens, "f"); // f=
     boolean isFormulaUsed = tokens.nextToken().equals("t");
 
-    return new SeekInfoStruct(index, name, titles, rating, provShow, time, inc,
-      isRated, matchType, requestedColor, minRating, maxRating, isAutomaticAccept,
-      isFormulaUsed);
+    return new SeekInfoStruct(canAcceptSeek, index, name, titles, rating, provShow,
+      time, inc, isRated, matchType, requestedColor, minRating, maxRating, 
+      isAutomaticAccept, isFormulaUsed);
   }
 
 
@@ -244,6 +255,18 @@ public class SeekInfoStruct extends Struct{
    String realToken = tokenizer.nextToken();
    if (!realToken.equals(token))
      throw new IllegalArgumentException("Bad token \""+realToken+"\", expected \""+token+"\" instead");
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the user account can accept the seek, returns
+   * <code>false</code> otherwise.
+   */
+
+  public boolean canAcceptSeek(){
+    return getBooleanProperty("CanAcceptSeek");
   }
 
 
