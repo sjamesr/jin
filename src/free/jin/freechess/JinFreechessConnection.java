@@ -53,6 +53,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+
   /**
    * Creates a new JinFreechessConnection with the specified hostname, port,
    * requested username and password.
@@ -141,6 +142,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void onLogin(){
     sendCommand("set bell 0");
     sendCommand("iset gameinfo 1");
+
+    filterLine("Bell off.");
+    filterLine("gameinfo set.");
 
     super.onLogin();
 
