@@ -1087,6 +1087,17 @@ public class JinApplication implements JinContext{
   
   
   /**
+   * Returns <code>true</code>. 
+   */
+  
+  public boolean isUserExtensible(){
+    return true;
+  }
+  
+  
+  
+  
+  /**
    * Stores all preferences and calls <code>System.exit(0)</code>.
    */
 

@@ -148,6 +148,15 @@ public interface JinContext{
    */
    
   String getPasswordSaveWarning();
+  
+  
+  
+  /**
+   * Returns whether this context allows the end-user to extend Jin by running
+   * extra plugins, actions, resources etc.
+   */
+   
+  boolean isUserExtensible();
 
 
 

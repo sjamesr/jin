@@ -600,6 +600,17 @@ public class Jin{
   
   
   
+  /**
+   * Returns whether the context in which Jin is running allows the end-user to
+   * extend Jin by running extra plugins, actions, resources etc.
+   */
+   
+  public boolean isUserExtensible(){
+    return context.isUserExtensible();
+  }
+  
+  
+  
   
   /**
    * Quits the application, possibly asking the user to confirm quitting first.
