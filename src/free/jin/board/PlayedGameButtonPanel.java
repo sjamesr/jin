@@ -209,6 +209,9 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
 
     public void offerUpdated(OfferEvent evt){
+      if (evt.getGame() != game)
+        return;
+
       // getUserPlayer shouldn't return null here because this panel should only
       // be used for games played by the user.
       if (evt.getPlayer().equals(game.getUserPlayer().getOpponent())){
@@ -223,6 +226,9 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     }
 
     public void gameEnded(GameEndEvent evt){
+      if (evt.getGame() != game)
+        return;
+
       plugin.getConnection().getJinListenerManager().removeGameListener(this);
 
       super.gameEnded(evt);
