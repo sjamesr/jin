@@ -44,7 +44,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
-   * Our listener manager
+   * Our listener manager.
    */
 
   private final FreechessJinListenerManager listenerManager = new FreechessJinListenerManager(this);
@@ -96,8 +96,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected java.net.Socket createSocket(String hostname, int port) throws IOException{
-    java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port);
-//    java.net.Socket sock = new java.net.Socket(hostname, port);
+    java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port); // Comment this to disable timesealing
+//    java.net.Socket sock = new java.net.Socket(hostname, port); // Comment this to enable timesealing
 
     execRunnable(new Runnable(){
 
@@ -319,7 +319,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       return Chess.getInstance();
 
     // This means it's a fake variant we're using because the server hasn't told us the real one.
-    if (categoryName.equals("unknown"))
+    if (categoryName.equals("fake-variant"))
       return Chess.getInstance();
 
     return null;
@@ -390,19 +390,34 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     if (gameInfo != null) // A new game
       game = startGame(gameInfo, boardData);
-    else if (game != null){ // Unknown game
+    else if (game != null){ // A known game
+
       // The server does that sometimes, to update clocks perhaps?
-      if (boardData.getMoveVerbose() != null){ // A move
-        
-        if (!oldBoardData.getBoardLexigraphic().equals(boardData.getBoardLexigraphic())) 
+      if (boardData.getMoveVerbose() != null){
+        int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
+
+        if (plyDifference < 0)
+          issueTakeback(game, oldBoardData, boardData);
+        else if (plyDifference == 0){
+//          changePosition(game, oldBoard, boardData);
+          System.out.println("Position changed incompatibly ("+plyDifference+")");
+          // I'm not sure this ever happens.
+        }
+        else if (plyDifference == 1)
           makeMove(game, oldBoardData, boardData);
+        else if (plyDifference > 1){
+//          changePosition(game, oldBoard, boardData);
+          System.out.println("Position changed incompatibly ("+plyDifference+")");
+          // I'm not sure this ever happens.
+        }
+
       }
     }
     else{ // Grr, the server started a game without sending us a GameInfo line.
           // Currently happens if you start examining a game (26.08.2002)
 
       // We have no choice but to fake the data, since the server simply doesn't send us this information.
-      GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(), false, "unknown", false, false, false,
+      GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(), false, "fake-variant", false, false, false,
         boardData.getInitialTime(), boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(), 0,
         -1, -1, false, false);
 
@@ -681,6 +696,18 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       unechoedGameMoves.removeAllElements();
       listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
     }
+  }
+
+
+
+
+  /**
+   * Fires an appropriate TakebackEvent.
+   */
+
+  private void issueTakeback(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
+    int takebackCount = oldBoardData.getPlayedPlyCount() - newBoardData.getPlayedPlyCount();
+    listenerManager.fireGameEvent(new TakebackEvent(this, game, takebackCount));
   }
 
 
