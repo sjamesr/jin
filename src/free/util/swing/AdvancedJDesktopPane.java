@@ -86,10 +86,8 @@ public class AdvancedJDesktopPane extends JDesktopPane{
     this.wallpaper = wallpaper;
 
     if (wallpaper!=null){
-      MediaTracker tracker = new MediaTracker(this);
-      tracker.addImage(wallpaper, 0);
       try{
-        tracker.waitForAll();
+        free.util.ImageUtilities.preload(wallpaper);
       } catch (InterruptedException e){
           e.printStackTrace();
         }
