@@ -31,15 +31,7 @@ import free.jin.*;
 public class ActionContext{
   
   
-  
-  /**
-   * The <code>JinContext</code>.
-   */
-   
-  private final JinContext jinContext;
-  
-  
-  
+
   /**
    * The connection to the server.
    */
@@ -66,25 +58,14 @@ public class ActionContext{
   
   /**
    * Creates a new <code>ActionContext</code> with the specified
-   * <code>JinContext</code>, <code>Connection</code>, <code>User</code> and the
+   * <code>Connection</code>, <code>User</code> and the
    * action's preferences.
    */
    
-  public ActionContext(JinContext jinContext, Connection conn, User user, Preferences prefs){
-    this.jinContext = jinContext;
+  public ActionContext(Connection conn, User user, Preferences prefs){
     this.conn = conn;
     this.user = user;
     this.prefs = prefs;
-  }
-  
-  
-  
-  /**
-   * Returns the <code>JinContext</code>.
-   */
-   
-  public JinContext getJinContext(){
-    return jinContext;
   }
   
   
