@@ -23,6 +23,7 @@ package free.jin.chessclub.board;
 
 import java.io.IOException;
 import free.chess.art.ResourceImagePiecePainter;
+import free.chess.art.ProxyPiecePainter;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the bookup piece
@@ -32,25 +33,29 @@ import free.chess.art.ResourceImagePiecePainter;
  * commercial or otherwise.
  */
 
-public class BookupPiecePainter extends ResourceImagePiecePainter{
+public class BookupPiecePainter extends ProxyPiecePainter{
 
+
+  /**
+   * The sole instance of the "real" bookup piece set painter.
+   */
+
+  private static final ResourceImagePiecePainter piecePainter;
 
 
 
   /**
-   * Attempt to load the image data at classload time so that if it fails,
-   * the user of the class will know immediately and also to cache the result
-   * when the class is loaded, as is usually expected.
+   * Creates the real <code>ResourceImagePiecePainter</code>.
    */
 
   static{
     try{
-      new ResourceImagePiecePainter(BookupPiecePainter.class, "bookup", "gif");
+      piecePainter =
+        ResourceImagePiecePainter.getInstance(BookupPiecePainter.class, "bookup", "gif");
     } catch (IOException e){
         throw new RuntimeException("Unable to load the bookup piece set: "+e.getMessage());
       }
   }
-
 
 
 
@@ -59,7 +64,7 @@ public class BookupPiecePainter extends ResourceImagePiecePainter{
    */
 
   public BookupPiecePainter() throws IOException{
-    super(BookupPiecePainter.class, "bookup", "gif");
+    super(piecePainter);
   }
 
 }

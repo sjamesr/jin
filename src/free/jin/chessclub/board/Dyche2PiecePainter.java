@@ -23,6 +23,7 @@ package free.jin.chessclub.board;
 
 import java.io.IOException;
 import free.chess.art.ResourceImagePiecePainter;
+import free.chess.art.ProxyPiecePainter;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the dyche2 piece
@@ -32,20 +33,26 @@ import free.chess.art.ResourceImagePiecePainter;
  * commercial or otherwise.
  */
 
-public class Dyche2PiecePainter extends ResourceImagePiecePainter{
-
+public class Dyche2PiecePainter extends ProxyPiecePainter{
 
 
 
   /**
-   * Attempt to load the image data at classload time so that if it fails,
-   * the user of the class will know immediately and also to cache the result
-   * when the class is loaded, as is usually expected.
+   * The sole instance of the "real" dyche2 piece set painter.
+   */
+
+  private static final ResourceImagePiecePainter piecePainter;
+
+
+
+  /**
+   * Creates the real <code>ResourceImagePiecePainter</code>.
    */
 
   static{
     try{
-      new ResourceImagePiecePainter(Dyche2PiecePainter.class, "dyche2", "gif");
+      piecePainter =
+        ResourceImagePiecePainter.getInstance(Dyche2PiecePainter.class, "dyche2", "gif");
     } catch (IOException e){
         throw new RuntimeException("Unable to load the dyche2 piece set: "+e.getMessage());
       }
@@ -59,7 +66,7 @@ public class Dyche2PiecePainter extends ResourceImagePiecePainter{
    */
 
   public Dyche2PiecePainter() throws IOException{
-    super(Dyche2PiecePainter.class, "dyche2", "gif");
+    super(piecePainter);
   }
 
 }

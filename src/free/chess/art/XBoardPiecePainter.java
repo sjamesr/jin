@@ -30,20 +30,26 @@ import java.io.IOException;
  * available at http://www.tim-mann.org/xboard.html.
  */
 
-public class XBoardPiecePainter extends ResourceImagePiecePainter{
-
+public class XBoardPiecePainter extends ProxyPiecePainter{
 
 
 
   /**
-   * Attempt to load the image data at classload time so that if it fails,
-   * the user of the class will know immediately and also to cache the result
-   * when the class is loaded, as is usually expected.
+   * The sole instance of the "real" xboard piece set painter.
+   */
+
+  private static final ResourceImagePiecePainter piecePainter;
+  
+
+
+  /**
+   * Creates the real <code>ResourceImagePiecePainter</code>.
    */
 
   static{
     try{
-      new ResourceImagePiecePainter(XBoardPiecePainter.class, "xboard", "gif");
+      piecePainter =
+        ResourceImagePiecePainter.getInstance(XBoardPiecePainter.class, "xboard", "gif");
     } catch (IOException e){
         throw new RuntimeException("Unable to load the xboard piece set: "+e.getMessage());
       }
@@ -53,11 +59,11 @@ public class XBoardPiecePainter extends ResourceImagePiecePainter{
 
 
   /**
-   * Creates a new XBoardPiecePainter.
+   * Creates a new <code>XBoardPiecePainter</code>.
    */
 
   public XBoardPiecePainter() throws IOException{
-    super(XBoardPiecePainter.class, "xboard", "gif");
+    super(piecePainter);
   }
 
 }
