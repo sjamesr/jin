@@ -156,11 +156,11 @@ public abstract class Plugin{
 
   public String lookupProperty(String propertyName){
     String propertyValue = getProperty(propertyName);
-    if (propertyValue==null){
+    if (propertyValue == null){
       int dotIndex = propertyName.lastIndexOf(".");
-      if (dotIndex==-1)
+      if (dotIndex == -1)
         return null;
-      return lookupProperty(propertyName.substring(0,dotIndex));
+      return lookupProperty(propertyName.substring(0, dotIndex));
     }
     else
       return propertyValue;
@@ -182,6 +182,18 @@ public abstract class Plugin{
       return;
 
     getUser().setProperty(getID()+"."+propertyName, propertyValue, userTriggered);
+  }
+
+
+
+
+  /**
+   * Sets the specified property to the specified integer value. The
+   * <code>userTriggered</code> argument specifies 
+   */
+
+  public void setIntegerProperty(String propertyName, int propertyValue, boolean userTriggered){
+    setProperty(propertyName, String.valueOf(propertyValue), userTriggered);
   }
 
 
@@ -298,6 +310,16 @@ public abstract class Plugin{
 
   public void stop(){
 
+  }
+
+
+
+  /**
+   * Returns a textual representation of this plugin.
+   */
+
+  public String toString(){
+    return getName();
   }
 
 }
