@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.applet.Applet;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.net.URLConnection;
 import java.util.Properties;
 import java.util.Hashtable;
@@ -36,6 +37,7 @@ import free.jin.plugin.PluginInfo;
 import free.jin.plugin.Plugin;
 import free.util.IOUtilities;
 import free.util.AWTUtilities;
+import free.util.BrowserControl;
 
 
 /**
@@ -116,8 +118,9 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   public void init(){
-
     try{    
+      BrowserControl.setAppletContext(getAppletContext());
+      
       // Load the server we'll be connecting to
       server = loadServer();
       
@@ -127,6 +130,11 @@ public class JinApplet extends Applet implements JinContext{
       // Load the plugins we'll be running.
       plugins = loadPlugins();
       
+      
+      // Set the background color
+      String bgColorString = getParameter("bgcolor");
+      if (bgColorString != null)
+        setBackground(new Color(0xff000000 | Integer.parseInt(bgColorString, 16)));
       
       setLayout(new FlowLayout());
       add(new UserAuthPanel());
@@ -479,7 +487,7 @@ public class JinApplet extends Applet implements JinContext{
    */
 
   private String uploadSettings() throws IOException{
-    URL savePrefsUrl = new URL(getDocumentBase(), getParameter("savePrefsURL"));
+    URL savePrefsUrl = getPrefsUploadUrl();
     URLConnection conn = savePrefsUrl.openConnection();
     conn.setDoOutput(true);
     conn.setRequestProperty("Content-type", "application/binary");
@@ -611,19 +619,35 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   public String getPasswordSaveWarning(){
-    boolean isSecure = getDocumentBase().getProtocol().equals("https");
-    
-    if (isSecure)
-      return "Your password will be stored on the server and transferred to the applet\n" +
-             "in encrypted form. This is reasonably safe, but your password will still" +
-             "be visible via the \"View Page Source\" option in your browser.\n"+
-             "Are you sure you want your password saved?";
-    else
-      return "Your password will be stored on the server and transferred to the applet\n" +
-             "as plain text HTML - anyone with access to a router or proxy between your\n" +
-             "computer and the server will be able to view your password. This is\n" +
-             "dangerous and advised against.\n" +
-             "Are you sure you want your password saved?";
+    try{
+      boolean isSecure = getPrefsDownloadUrl().getProtocol().equals("https") &&
+                         getPrefsUploadUrl().getProtocol().equals("https");
+      
+      if (isSecure)
+        return "Your password will be stored on the server and transferred to the applet\n" +
+               "in encrypted form. This is reasonably safe, but your password will still" +
+               "be visible via the \"View Page Source\" option in your browser.\n"+
+               "Are you sure you want your password saved?";
+      else
+        return "Your password will be stored on the server and transferred to the applet\n" +
+               "as plain text HTML - anyone with access to a router or proxy between your\n" +
+               "computer and the server will be able to view your password. This is\n" +
+               "dangerous and advised against.\n" +
+               "Are you sure you want your password saved?";
+    } catch (MalformedURLException e){
+        e.printStackTrace();
+        return "Your password will not be stored at all.";
+      }
+  }
+  
+  
+  
+  /**
+   * Returns <code>false</code>. 
+   */
+  
+  public boolean isUserExtensible(){
+    return false;
   }
    
    
@@ -645,6 +669,26 @@ public class JinApplet extends Applet implements JinContext{
 
     add(stackTraceArea, BorderLayout.CENTER);
     doLayout();
+  }
+  
+  
+  
+  /**
+   * Returns the URL from which we download user settings.
+   */
+   
+  private URL getPrefsDownloadUrl() throws MalformedURLException{
+    return new URL(getDocumentBase(), getParameter("loadPrefsURL"));    
+  }
+  
+
+  
+  /**
+   * Returns the URL to which we upload user settings.
+   */
+   
+  private URL getPrefsUploadUrl() throws MalformedURLException{
+    return new URL(getDocumentBase(), getParameter("savePrefsURL"));    
   }
 
 
@@ -742,32 +786,43 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     private void createUI(){
-      this.setLayout(new GridLayout(5, 1));
-      this.add(new Label("Enter your username and password or continue as guest"));
+      this.setLayout(new BorderLayout(15, 15));
+      this.add(BorderLayout.NORTH,
+        new Label("Enter your username and password or continue as guest"));
       
-      Panel usernamePanel = new Panel(new FlowLayout(FlowLayout.LEFT));
-      Label usernameLabel = new Label("Username: ");
-      usernamePanel.add(new Label("Username: "));
-      usernamePanel.add(usernameField);
-      this.add(usernamePanel);
+      Panel userInfoPanel = new Panel(new BorderLayout());
+      Panel labelsPanel = new Panel(new GridLayout(2, 1, 10, 10));
+      Panel textFieldsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       
-      Panel passwordPanel = new Panel(new FlowLayout(FlowLayout.LEFT));
-      passwordPanel.add(new Label("Password: "));
-      passwordPanel.add(passwordField);
-      this.add(passwordPanel);
+      labelsPanel.add(new Label("Username: "));
+      textFieldsPanel.add(usernameField);
+            
+      labelsPanel.add(new Label("Password: "));
+      textFieldsPanel.add(passwordField);
       
-      this.add(statusLabel);
+      userInfoPanel.add(BorderLayout.WEST, labelsPanel);
+      
+      Panel textFieldsWrapperPanel = new Panel(new BorderLayout());
+      textFieldsWrapperPanel.add(BorderLayout.WEST, textFieldsPanel);
+      userInfoPanel.add(BorderLayout.CENTER, textFieldsWrapperPanel);
+      
+      this.add(BorderLayout.CENTER, userInfoPanel);
+      
+      Panel statusAndButtonsPanel = new Panel(new GridLayout(2, 1));
+      
+      statusAndButtonsPanel.add(statusLabel);
       
       loginButton = new Button("Login");
       guestButton = new Button("Login as Guest");
       
-      Panel buttonsPanel = new Panel(new FlowLayout(FlowLayout.LEFT));
+      Panel buttonsPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
       buttonsPanel.add(loginButton);
       buttonsPanel.add(guestButton);
+      statusAndButtonsPanel.add(buttonsPanel);
       
-      this.add(buttonsPanel);
+      this.add(BorderLayout.SOUTH, statusAndButtonsPanel);
       
-      loginButton.addActionListener(new ActionListener(){
+      ActionListener loginListener = new ActionListener(){
         public void actionPerformed(ActionEvent evt){
           String username = usernameField.getText();
           String password = passwordField.getText();
@@ -787,17 +842,44 @@ public class JinApplet extends Applet implements JinContext{
             retrievePrefs(); 
           }
         }
-      });
+      };
+      loginButton.addActionListener(loginListener);
+      // We do this to imitate a "default" button
+      usernameField.addActionListener(loginListener);
+      passwordField.addActionListener(loginListener);
       
       guestButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          setStatus("Starting Jin, this may take a few moments.", Color.black);
+          setStatus("Starting Jin", Color.black);
           loginButton.setEnabled(false);
           guestButton.setEnabled(false);
           startAsGuest();
           setStatus("Do not leave this page while Jin is running!", Color.black);
         }
       });
+    }
+    
+    
+    
+    /**
+     * Have we been painted already?
+     */
+     
+    private boolean isPainted = false;
+    
+    
+    
+    /**
+     * Set focus to the username field on the first paint.
+     */
+     
+    public void paint(Graphics g){
+      super.paint(g);
+      
+      if (!isPainted){
+        isPainted = true;
+        usernameField.requestFocus();
+      }
     }
     
     
@@ -826,7 +908,7 @@ public class JinApplet extends Applet implements JinContext{
         
         setStatus("Connecting", Color.black);
         
-        URL loadPrefsUrl = new URL(getDocumentBase(), getParameter("loadPrefsURL"));
+        URL loadPrefsUrl = getPrefsDownloadUrl();
         URLConnection conn = loadPrefsUrl.openConnection();
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-type", "application/binary");
@@ -881,7 +963,7 @@ public class JinApplet extends Applet implements JinContext{
           return;
         }
 
-        setStatus("Starting Jin, this may take a few moments.", Color.black);
+        setStatus("Starting Jin", Color.black);
         
         start(prefs, guest, users, username, password);
         
@@ -917,7 +999,6 @@ public class JinApplet extends Applet implements JinContext{
     }
     
 
-    
   }
   
   
