@@ -93,9 +93,13 @@ public class FischerRandom extends ChesslikeGenericVariant{
         return false;
       else if (!endingSquare.equals("g1"))
         return false;
-      else if (startingSquare.equals("f1"))
-        return false; // This *could* be a castling, but there is currently 
-                      // no way to indicate whether it is one.
+      else if (startingSquare.equals("f1")){
+        if (takenPiece == ChessPiece.WHITE_ROOK)
+          return true;
+        else
+          return false; // This *could* be a castling, but there is currently 
+                        // no way to indicate whether it is one.
+      }
 
       int rank = startingSquare.getRank();
       int file = startingSquare.getFile()+1;
@@ -121,9 +125,13 @@ public class FischerRandom extends ChesslikeGenericVariant{
         return false;
       else if (!endingSquare.equals("g8"))
         return false;
-      else if (startingSquare.equals("f8"))
-        return false; // This *could* be a castling, but there is currently 
-                      // no way to indicate whether it is one.
+      else if (startingSquare.equals("f8")){
+        if (takenPiece == ChessPiece.BLACK_ROOK)
+          return true;
+        else
+          return false; // This *could* be a castling, but there is currently 
+                        // no way to indicate whether it is one.
+      }
 
       int rank = startingSquare.getRank();
       int file = startingSquare.getFile()+1;
@@ -171,9 +179,16 @@ public class FischerRandom extends ChesslikeGenericVariant{
         return false;
       else if (!endingSquare.equals("c1"))
         return false;
-      else if (startingSquare.equals("b1")||startingSquare.equals("d1"))
+      else if (startingSquare.equals("b1"))
         return false; // This *could* be a castling, but there is currently 
                       // no way to indicate whether it is one.
+      else if (startingSquare.equals("d1")){
+        if (takenPiece == ChessPiece.WHITE_ROOK)
+          return true;
+        else
+          return false; // This *could* be a castling, but there is currently 
+                        // no way to indicate whether it is one.
+      }
 
       int rank = startingSquare.getRank();
       int file = startingSquare.getFile()-1;
@@ -199,9 +214,16 @@ public class FischerRandom extends ChesslikeGenericVariant{
         return false;
       else if (!endingSquare.equals("c8"))
         return false;
-      else if (startingSquare.equals("b8")||startingSquare.equals("d8"))
+      else if (startingSquare.equals("b8"))
         return false; // This *could* be a castling, but there is currently 
                       // no way to indicate whether it is one.
+      else if (startingSquare.equals("d8")){
+        if (takenPiece == ChessPiece.BLACK_ROOK)
+          return true;
+        else
+          return false; // This *could* be a castling, but there is currently 
+                        // no way to indicate whether it is one.
+      }
 
       int rank = startingSquare.getRank();
       int file = startingSquare.getFile()-1;
@@ -224,6 +246,79 @@ public class FischerRandom extends ChesslikeGenericVariant{
     return false;
   }
 
+
+
+  /**
+   * Creates a short castling move for the current player in the specified
+   * position. Short castling must be legal in the specified position.
+   */
+
+  public Move createShortCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite()){
+      Square startSquare = findPieceOnRow(pos, ChessPiece.WHITE_KING, 0);
+      if (startSquare == null)
+        throw new IllegalArgumentException("Castling is not allowed in the specified position");
+
+      return new ChessMove(startSquare, Square.parseSquare("g1"), Player.WHITE_PLAYER,
+                             false, true, false, null, null, "O-O");
+    }
+    else{
+      Square startSquare = findPieceOnRow(pos, ChessPiece.BLACK_KING, 7);
+      if (startSquare == null)
+        throw new IllegalArgumentException("Castling is not allowed in the specified position");
+
+      return new ChessMove(startSquare, Square.parseSquare("g8"), Player.BLACK_PLAYER,
+                             false, true, false, null, null, "O-O");
+    }
+  }
+
+
+
+
+  /**
+   * Creates a long castling move for the current player in the specified
+   * position. Long castling must be legal in the specified position.
+   */
+
+  public Move createLongCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite()){
+      Square startSquare = findPieceOnRow(pos, ChessPiece.WHITE_KING, 0);
+      if (startSquare == null)
+        throw new IllegalArgumentException("Castling is not allowed in the specified position");
+
+      return new ChessMove(startSquare, Square.parseSquare("c1"), Player.WHITE_PLAYER,
+                             false, false, true, null, null, "O-O");
+    }
+    else{
+      Square startSquare = findPieceOnRow(pos, ChessPiece.BLACK_KING, 7);
+      if (startSquare == null)
+        throw new IllegalArgumentException("Castling is not allowed in the specified position");
+
+      return new ChessMove(startSquare, Square.parseSquare("c8"), Player.BLACK_PLAYER,
+                             false, false, true, null, null, "O-O");
+    }
+  }
+
+
+
+  /**
+   * Returns the square of the specified piece on the specified row, or null if
+   * the specified piece is not on the specified row.
+   */
+
+  private static Square findPieceOnRow(Position pos, Piece piece, int rank){
+    for (int i = 0; i < 8; i++)
+      if (piece.equals(pos.getPieceAt(i, rank)))
+        return Square.getInstance(i, rank);
+
+    return null;
+  }
 
 
 
@@ -345,8 +440,6 @@ public class FischerRandom extends ChesslikeGenericVariant{
 
 
 
-
-
   /**
    * Makes the given ChessMove on the given position.
    */
@@ -375,11 +468,11 @@ public class FischerRandom extends ChesslikeGenericVariant{
           else
             break;
         }
-        file--;
+        file+=dir;
       }
 
       int rookStartFile = file;
-      int rookEndFile = cmove.isShortCastling() ? 2 : 4;
+      int rookEndFile = cmove.isShortCastling() ? 5 : 3;
 
       Square rookStartingSquare = Square.getInstance(rookStartFile, startingSquare.getRank());
       Square rookEndingSquare = Square.getInstance(rookEndFile, startingSquare.getRank());

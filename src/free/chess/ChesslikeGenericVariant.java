@@ -63,6 +63,45 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
 
+  /**
+   * A white short castling move.
+   */
+
+  public static final ChessMove WHITE_SHORT_CASTLING = 
+    new ChessMove(Square.parseSquare("e1"), Square.parseSquare("g1"), Player.WHITE_PLAYER,
+    false, true, false, null, null, "O-O");
+
+
+
+  /**
+   * A white long castling move.
+   */
+
+  public static final ChessMove WHITE_LONG_CASTLING = 
+    new ChessMove(Square.parseSquare("e1"), Square.parseSquare("c1"), Player.WHITE_PLAYER,
+    false, false, true, null, null, "O-O-O");
+
+
+
+  /**
+   * A black short castling move.
+   */
+
+  public static final ChessMove BLACK_SHORT_CASTLING = 
+    new ChessMove(Square.parseSquare("e8"), Square.parseSquare("g8"), Player.BLACK_PLAYER,
+    false, true, false, null, null, "O-O");
+
+
+
+  /**
+   * A black long castling move.
+   */
+
+  public static final ChessMove BLACK_LONG_CASTLING = 
+    new ChessMove(Square.parseSquare("e8"), Square.parseSquare("c8"), Player.BLACK_PLAYER,
+    false, false, true, null, null, "O-O-O");
+
+
 
 
   /**
@@ -424,6 +463,41 @@ public class ChesslikeGenericVariant implements WildVariant{
       isLongCastling, capturedPiece, promotionChessTarget, moveSAN);
   }
 
+
+
+
+  /**
+   * Creates a short castling move for the current player in the specified
+   * position.
+   */
+
+  public Move createShortCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite())
+      return WHITE_SHORT_CASTLING;
+    else
+      return BLACK_SHORT_CASTLING;
+  }
+
+
+
+
+  /**
+   * Creates a long castling move for the current player in the specified
+   * position.
+   */
+
+  public Move createLongCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite())
+      return WHITE_LONG_CASTLING;
+    else
+      return BLACK_LONG_CASTLING;
+  }
 
 
 

@@ -21,10 +21,7 @@
 
 package free.chess.variants;
 
-import free.chess.ChesslikeGenericVariant;
-import free.chess.Position;
-import free.chess.ChessPiece;
-import free.chess.Square;
+import free.chess.*;
 
 
 /**
@@ -73,6 +70,26 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
     return false;
   }
 
+
+
+  /**
+   * Always throws <code>UnsupportedOperationException</code>.
+   */
+
+  public Move createShortCastling(Position pos){
+    throw new free.util.UnsupportedOperationException("Can't castle");
+  }
+
+
+
+
+  /**
+   * Always throws <code>UnsupportedOperationException</code>.
+   */
+
+  public Move createLongCastling(Position pos){
+    throw new free.util.UnsupportedOperationException("Can't castle");
+  }
 
 
 }

@@ -197,4 +197,64 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
       super.makeMove(move, pos, modifier);
   }
 
+
+
+  /**
+   * Creates a short castling move for the current player in the specified
+   * position.
+   */
+
+  public Move createShortCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite()){
+      if (pos.getPieceAt(Square.parseSquare("e1")) == ChessPiece.WHITE_KING)
+        return WHITE_SHORT_CASTLING;
+      else if (pos.getPieceAt(Square.parseSquare("d1")) == ChessPiece.WHITE_KING)
+        return new ChessMove(Square.parseSquare("d1"), Square.parseSquare("b1"), Player.WHITE_PLAYER,
+                             false, true, false, null, null, "O-O");
+      else throw new IllegalArgumentException("Castling is not allowed in the specified position");
+    }
+    else{
+      if (pos.getPieceAt(Square.parseSquare("e8")) == ChessPiece.BLACK_KING)
+        return BLACK_SHORT_CASTLING;
+      else if (pos.getPieceAt(Square.parseSquare("d8")) == ChessPiece.BLACK_KING)
+        return new ChessMove(Square.parseSquare("d8"), Square.parseSquare("b8"), Player.BLACK_PLAYER,
+                             false, true, false, null, null, "O-O");
+      else throw new IllegalArgumentException("Castling is not allowed in the specified position");
+    }
+  }
+
+
+
+
+  /**
+   * Creates a long castling move for the current player in the specified
+   * position.
+   */
+
+  public Move createLongCastling(Position pos){
+    checkPosition(pos);
+
+    Player currentPlayer = pos.getCurrentPlayer();
+    if (currentPlayer.isWhite()){
+      if (pos.getPieceAt(Square.parseSquare("e1")) == ChessPiece.WHITE_KING)
+        return WHITE_LONG_CASTLING;
+      else if (pos.getPieceAt(Square.parseSquare("d1")) == ChessPiece.WHITE_KING)
+        return new ChessMove(Square.parseSquare("d1"), Square.parseSquare("f1"), Player.WHITE_PLAYER,
+                             false, false, true, null, null, "O-O-O");
+      else throw new IllegalArgumentException("Castling is not allowed in the specified position");
+    }
+    else{
+      if (pos.getPieceAt(Square.parseSquare("e8")) == ChessPiece.BLACK_KING)
+        return BLACK_LONG_CASTLING;
+      else if (pos.getPieceAt(Square.parseSquare("d8")) == ChessPiece.BLACK_KING)
+        return new ChessMove(Square.parseSquare("d8"), Square.parseSquare("f8"), Player.BLACK_PLAYER,
+                             false, false, true, null, null, "O-O-O");
+      else throw new IllegalArgumentException("Castling is not allowed in the specified position");
+    }
+  }
+
+
 }
