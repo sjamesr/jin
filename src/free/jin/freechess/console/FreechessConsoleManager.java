@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -77,35 +77,37 @@ public class FreechessConsoleManager extends ConsoleManager{
 
     // Tells
     if (type.equals("tell"))
-      return sender+title+" tells you: "+message;
+      return sender + title + " tells you: " + message;
     else if (type.equals("say"))
-      return sender+title+" says: "+message;
+      return sender + title + " says: " + message;
     else if (type.equals("ptell"))
-      return sender+title+" (your partner) tells you: "+message;
+      return sender + title + " (your partner) tells you: " + message;
     else if (type.equals("qtell"))
-      return ":"+message;
+      return ":" + message;
+    else if (type.equals("qtell.tourney"))
+      return ":" + sender + title + "(T" + forum + "): " + message;
 
     // Channel tells
     else if (type.equals("channel-tell"))
-      return sender+title+"("+forum+"): "+message;
+      return sender + title + "("+forum+"): " + message;
 
     // Kibitzes and whispers
     else if (type.equals("kibitz"))
-      return sender+title+"("+rating+")["+forum+"] kibitzes: "+message;
+      return sender + title + "(" + rating + ")[" + forum + "] kibitzes: " + message;
     else if (type.equals("whisper"))
-      return sender+title+"("+rating+")["+forum+"] whispers: "+message;
+      return sender + title + "(" + rating + ")[" + forum + "] whispers: " + message;
 
     // Shouts
     else if (type.equals("shout"))
-      return sender+title+" shouts: "+message;
+      return sender + title + " shouts: " + message;
     else if (type.equals("ishout"))
-      return "--> "+sender+title+" "+message;
+      return "--> " + sender + title + " " + message;
     else if (type.equals("tshout"))
-      return ":"+sender+title+" t-shouts: "+message;
+      return ":" + sender + title + " t-shouts: " + message;
     else if (type.equals("cshout"))
-      return sender+title+" c-shouts: "+message;
+      return sender + title + " c-shouts: " + message;
     else if (type.equals("announcement"))
-      return "    **ANNOUNCEMENT** from "+sender+": "+message; 
+      return "    **ANNOUNCEMENT** from " + sender + ": " + message; 
 
     return evt.toString();
   }
