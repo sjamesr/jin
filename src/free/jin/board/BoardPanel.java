@@ -954,9 +954,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void gameStarted(GameStartEvent evt){
     if (evt.getGame() != game)
       return;
-
-    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
-      playSound("GameStart");
   }
 
 
@@ -1069,8 +1066,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (evt.getGame()!=game)
       return;
 
-    playSound("IllegalMove");
-
     isMoveEnRoute = false;
     queuedMove = null;
 
@@ -1148,9 +1143,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void gameEnded(GameEndEvent evt){
     if (evt.getGame()!=game)
       return;
-
-    if ((game.getGameType()==Game.MY_GAME)&&(game.isPlayed()))
-      playSound("GameEnd");
 
     setInactive();
   }

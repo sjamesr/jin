@@ -22,13 +22,11 @@
 package free.jin.sound;
 
 import free.util.audio.*;
-import free.jin.plugin.Plugin;
-import free.jin.event.ChatListener;
-import free.jin.event.ChatEvent;
-import free.jin.event.ConnectionListener;
-import free.jin.event.ConnectionEvent;
-import free.jin.JinConnection;
+import free.jin.event.*;
 import jregex.*;
+import free.jin.plugin.Plugin;
+import free.jin.JinConnection;
+import free.jin.Game;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.io.InputStream;
@@ -44,7 +42,7 @@ import javax.swing.event.ChangeListener;
  * The plugin responsible for producing sound on all the relevant events.
  */
 
-public class SoundManager extends Plugin implements ChatListener, ConnectionListener{
+public class SoundManager extends Plugin implements ChatListener, ConnectionListener, GameListener{
 
 
   /**
@@ -179,7 +177,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    */
 
   protected void loadSounds(){
-    int numPatterns = Integer.parseInt(getProperty("num-sound-patterns"));
+    int numPatterns = Integer.parseInt(getProperty("num-chat-patterns"));
 
     for (int i=0;i<numPatterns;i++){
       try{
@@ -322,6 +320,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    *   <LI> Capture - A capture move is made.
    *   <LI> Castling - A castling move is made.
    *   <LI> IllegalMove - An illegal move was attempted.
+   *   <LI> GameStart - A game started.
    *   <LI> GameEnd - A game ended.
    * </UL>
    * Returns true if the given event is recognized, false otherwise. Note that
@@ -371,6 +370,87 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
   public void connectionLost(ConnectionEvent evt){
     playEventSound("OnDisconnect");
+  }
+
+
+
+  
+  /**
+   * Plays the sound mapped to the "GameStart" event.
+   */
+
+  public void gameStarted(GameStartEvent evt){
+    Game game = evt.getGame();
+    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
+      playEventSound("GameStart");
+  }
+
+
+
+  /**
+   * Currently, does nothing.
+   */
+
+  public void moveMade(MoveMadeEvent evt){}
+
+
+
+
+  /**
+   * Currently does nothing.
+   */
+
+  public void positionChanged(PositionChangedEvent evt){}
+
+
+
+
+  /**
+   * Currently does nothing.
+   */
+
+  public void takebackOccurred(TakebackEvent evt){}
+
+
+
+
+  /**
+   * Plays the sound mapped to the "IllegalMove" event.
+   */
+
+  public void illegalMoveAttempted(IllegalMoveEvent evt){
+    playEventSound("IllegalMove");
+  }
+
+
+
+
+  /**
+   * Currently does nothing.
+   */
+
+  public void clockAdjusted(ClockAdjustmentEvent evt){}
+
+
+
+
+  /**
+   * Currently does nothing.
+   */
+
+  public void boardFlipped(BoardFlipEvent evt){}
+
+
+
+
+  /**
+   * Plays the sound mapped to the "GameEnd" event.
+   */
+
+  public void gameEnded(GameEndEvent evt){
+    Game game = evt.getGame();
+    if ((game.getGameType()==Game.MY_GAME)&&(game.isPlayed()))
+      playEventSound("GameEnd");
   }
 
 
