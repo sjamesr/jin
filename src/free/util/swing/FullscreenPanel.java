@@ -168,7 +168,7 @@ public class FullscreenPanel extends FixedJPanel{
   private void makeFullscreen(){
     remove(target);
 
-    if (IS_FULLSCREEN_API_AVAILABLE)
+    if (IS_FULLSCREEN_API_AVAILABLE && securityManagerAllowsFullscreen())
       fullscreenWindow = setRealFullscreen();
     else
       fullscreenWindow = setFakeFullscreen();
@@ -176,6 +176,40 @@ public class FullscreenPanel extends FixedJPanel{
     fullscreenWindow.getContentPane().setLayout(new BorderLayout());
     fullscreenWindow.getContentPane().add(target, BorderLayout.CENTER);
     fullscreenWindow.getContentPane().validate();
+  }
+  
+  
+  
+  /**
+   * Returns whether the security manager allows fullscreen mode.
+   */
+   
+  private static boolean securityManagerAllowsFullscreen(){
+    SecurityManager sm = System.getSecurityManager();
+    if (sm == null)
+      return true;
+    
+    try{
+      Class awtPermissionClass = Class.forName("java.awt.AWTPermission");
+      Constructor awtPermissionCtor = awtPermissionClass.getConstructor(new Class[]{String.class});
+      Object fullscreenExclusivePermission = awtPermissionCtor.newInstance(new Object[]{"fullScreenExclusive"});
+      Class permissionClass = Class.forName("java.security.Permission");
+      Method checkPermissionMethod = SecurityManager.class.getMethod("checkPermission", new Class[]{permissionClass});
+      try{
+        checkPermissionMethod.invoke(sm, new Object[]{fullscreenExclusivePermission});
+      } catch (InvocationTargetException e){
+          if (e.getTargetException() instanceof SecurityException)
+            return false;
+          else
+            e.printStackTrace();
+        }
+    } catch (ClassNotFoundException e){e.printStackTrace();}
+      catch (NoSuchMethodException e){e.printStackTrace();}
+      catch (InstantiationException e){e.printStackTrace();}
+      catch (IllegalAccessException e){e.printStackTrace();}
+      catch (InvocationTargetException e){e.printStackTrace();}
+      
+    return true;
   }
 
 
@@ -256,7 +290,7 @@ public class FullscreenPanel extends FixedJPanel{
   private void makeNormal(){
     fullscreenWindow.getContentPane().remove(target);
 
-    if (IS_FULLSCREEN_API_AVAILABLE)
+    if (IS_FULLSCREEN_API_AVAILABLE && securityManagerAllowsFullscreen())
       makeRealNormal();
     else
       makeFakeNormal();
