@@ -66,7 +66,7 @@ public class Bot extends ChessclubConnection{
 
     try{
       Bot bot = new Bot(hostname, port, username, password);
-      bot.connect();
+      bot.connectAndLogin();
     } catch (IOException e){
         e.printStackTrace();
         System.exit(0);
