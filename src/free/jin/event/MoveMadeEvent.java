@@ -45,19 +45,33 @@ public class MoveMadeEvent extends GameEvent{
 
 
 
-
   /**
-   * Creates a new MoveMadeEvent with the given source JinConnection, Move and 
-   * the Game in which the move was made.
+   * Is this is a "new" move? See the <code>isNew()</code> method for a
+   * description on what "new" means.
    */
 
-  public MoveMadeEvent(JinConnection conn, Game game, Move move){
+  private final boolean isNew;
+
+
+
+
+  /**
+   * Creates a new <code>MoveMadeEvent</code>.
+   *
+   * @param conn The <code>JinConnection</code>.
+   * @param game The game in which the move was made.
+   * @param move The made move.
+   * @param isNew Is this is a "new" move.
+   */
+
+  public MoveMadeEvent(JinConnection conn, Game game, Move move, boolean isNew){
     super(conn, game);
 
     if ((conn instanceof PGNJinConnection) && (move instanceof ChessMove) && (((ChessMove)move).getSAN() == null))
       throw new IllegalStateException("The source JinConnection implements PGNJinConnection, but did not provide a SAN representation of the move");
 
     this.move = move;
+    this.isNew = isNew;
   } 
 
 
@@ -69,6 +83,21 @@ public class MoveMadeEvent extends GameEvent{
 
   public Move getMove(){
     return move;
+  }                    
+
+
+
+
+  /**
+   * Returns <code>true</code> if the move was sent as a direct response to
+   * a move by a player. Returns false<code></code> if, for example, this is a
+   * move that was actually done a while ago but we're only getting it now
+   * because we've just started observing the game, making the move "old".
+   */
+
+  public boolean isNew(){
+    return isNew;
   }
+
 
 }
