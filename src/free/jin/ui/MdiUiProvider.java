@@ -793,6 +793,15 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     public void setIconImpl(Image image){
+      // InternalFrames don't seem to scale their icons properly on their own
+      Icon defaultIcon = UIManager.getIcon("InternalFrame.icon");
+      if (defaultIcon != null){
+        int w = defaultIcon.getIconWidth();
+        int h = defaultIcon.getIconHeight();
+        if ((image.getWidth(null) != w) || (image.getHeight(null) != h))
+          image = image.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+      }
+      
       frame.setFrameIcon(new ImageIcon(image));
     }
 
