@@ -80,14 +80,6 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
 
-  /**
-   * The "Plugins" menu.
-   */
-
-  private JMenu pluginsMenu = null;
-
-
-
 
   /**
    * Holds a list of all the plugin menus we've added.
@@ -267,6 +259,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
   public JMenu createPreferencesMenu(){
     final JMenu prefsMenu = new JMenu("Preferences");
+    prefsMenu.setMnemonic('p');
 
     JMenuItem backgroundMenuItem = new JMenuItem("Background");
     backgroundMenuItem.addActionListener(new ActionListener(){
@@ -496,17 +489,11 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
   /**
-   * Adds the give JMenu as the plugin's menu.
+   * Adds the given JMenu as a plugin's menu.
    */
 
   private void addPluginMenu(JMenu menu){
-    if (pluginsMenu == null){
-      pluginsMenu = new JMenu("Plugins");
-      pluginsMenu.setMnemonic(KeyEvent.VK_P);
-      add(pluginsMenu);
-    }
-
-    pluginsMenu.add(menu);
+    add(menu);
     pluginMenus.addElement(menu);
   }
 
@@ -522,12 +509,9 @@ public class JinFrameMenuBar extends JMenuBar{
     while (index >= 0){
       JMenu menu = (JMenu)pluginMenus.elementAt(index);
       pluginMenus.removeElementAt(index);
-      pluginsMenu.remove(menu);
+      remove(menu);
       index--;
     }
-
-    remove(pluginsMenu);
-    pluginsMenu = null;
   }
 
   
