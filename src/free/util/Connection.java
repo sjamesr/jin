@@ -98,6 +98,16 @@ public abstract class Connection{
 
 
 
+
+  /**
+   * The login error message.
+   */
+
+  private volatile String loginErrorMessage;
+
+
+
+
   /**
    * The socket to the server.
    */
@@ -141,22 +151,29 @@ public abstract class Connection{
 
 
   /**
-   * Connects to the server.  Note that this method blocks until the connection
-   * is established and the login procedure is finished. Also note that since
-   * communication with the reader thread is done via the execRunnable(Runnable)
-   * method, and in order to complete the login procedure, communication with it
-   * *is* required, this method should NOT be called in the same thread
-   * execRunnable(Runnable) executes the runnable. Doing that will cause this 
-   * method to never return.
+   * Connects and logs in to the server. Returns <code>true</code> if the
+   * procedure finished successfully, <code>false</code> otherwise. The reason
+   * for login failure may be obtained via the
+   * <code>getLoginErrorMessage()</code> method. Note that this method blocks
+   * until the connection is established and the login procedure is finished.
+   * Also note that since communication with the reader thread is done via the
+   * <code>execRunnable(Runnable)</code> method, and in order to complete the 
+   * login procedure, communication with it <strong>is<strong> required, this
+   * method should NOT be called in the same thread
+   * <code>execRunnable(Runnable)</code> executes the runnable. Doing that will
+   * cause this method to never return.
    *
    * @throws IOException if an I/O error occured when connecting to the server.
    * @throws IllegalStateException If a connection was already established.
+   *
+   * @return True if the connection and login procedure finished successfully,
+   * false otherwise.
    *
    * @see #isConnected()
    * @see #disconnect()
    */
 
-  public void connect() throws IOException{
+  public boolean connectAndLogin() throws IOException{
     synchronized(this){
       if (isConnected())
         throw new IllegalStateException();
@@ -168,28 +185,34 @@ public abstract class Connection{
     readerThread = createReaderThread();
     readerThread.start();
 
-    login();
-    if (getUsername()==null)
-      throw new Error("The login() method MUST assign a username");
-    isLoggedIn = true;
+    isLoggedIn = login();
+
+    if (!isLoggedIn)
+      return false;
+    else if (getUsername() == null)
+      throw new Error("The login() method MUST set the username if the login procedure finishes successfully");
 
     execRunnable(new Runnable(){
       public void run(){
         onLogin();
       }
     });
+
+    return true;
   }
 
 
 
 
   /**
-   * Goes through the login procedure. This method is responsible for setting 
-   * the username assigned by the server.
+   * Goes through the login procedure and returns <code>true</code> if it's
+   * successful, false otherwise. This method is responsible for setting 
+   * the username assigned by the server or the login error message via the
+   * <code>setUsername(String)</code> and <code>setLoginErrorMessage</code>
+   * methods respectively.
    */
 
-  protected abstract void login() throws IOException;
-
+  protected abstract boolean login() throws IOException;
 
 
 
@@ -259,11 +282,50 @@ public abstract class Connection{
    */
 
   protected synchronized final void setUsername(String username){
-    if (this.username!=null)
+    if (this.username != null)
       throw new IllegalStateException("A username may only be assigned once");
 
     this.username = username;
   }
+
+
+
+
+  /**
+   * Returns the login error message. Note that this may return null even if the
+   * login failed.
+   *
+   * @throws IllegalStateException if a connection hasn't been established yet
+   * or the login did not fail.
+   */
+
+  public String getLoginErrorMessage(){
+    if (!isConnected())
+      throw new IllegalStateException("Not connected yet");
+    if (isLoggedIn())
+      throw new IllegalStateException("The login did not fail");
+
+    return loginErrorMessage;
+  }
+
+
+
+
+  /**
+   * Sets the login error message to the specified string.
+   */
+
+  protected final void setLoginErrorMessage(String message){
+    if (loginErrorMessage != null)
+      throw new IllegalStateException("The login error message may only be assigned once");
+    if (!isConnected())
+      throw new IllegalStateException("Must be connected in order to assign login error message");
+    if (isLoggedIn())
+      throw new IllegalStateException("Must not be logged in in order to assign login error message");
+
+    this.loginErrorMessage = message;
+  }
+
 
 
 
