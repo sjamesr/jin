@@ -38,8 +38,8 @@ import free.util.GraphicsUtilities;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 
 
@@ -84,16 +84,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   private JRadioButtonMenuItem nonVisibleRB;
-
-
-
-
-  /**
-   * We set this to true when we modify the visibility of the graph to avoid
-   * handling echo events.
-   */
-
-  private boolean changingGraphVisibility = false;
 
 
 
@@ -165,7 +155,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       bounds = StringParser.parseRectangle(boundsString);
 
     if (bounds==null){
-      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
+      soughtGraphFrame.setBounds(desktopBounds.width/2, desktopBounds.height/2, desktopBounds.width/2, desktopBounds.height/2);
 //      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
     }
     else
@@ -272,16 +262,12 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (soughtGraphFrame.isVisible())
       return;
 
-    changingGraphVisibility = true;
-
     soughtGraphFrame.setVisible(true);
 
     if ((visibleRB != null) && (!visibleRB.isSelected())) // It may be null if the graph is shown before it's created.
       visibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().addSeekListener(SoughtGraphPlugin.this);
-
-    changingGraphVisibility = false;
   }
 
 
@@ -299,8 +285,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (!soughtGraphFrame.isVisible())
       return;
 
-    changingGraphVisibility = true;
-
     soughtGraphFrame.setVisible(false);
     soughtGraph.removeAllSeeks();
 
@@ -308,8 +292,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       nonVisibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().removeSeekListener(SoughtGraphPlugin.this);
-
-    changingGraphVisibility = false;
   }
 
 
@@ -373,28 +355,34 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
-    visibleRB = new JRadioButtonMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
-    visibleRB.setMnemonic('s');
-    visibleRB.addChangeListener(new ChangeListener(){
-      
-      public void stateChanged(ChangeEvent evt){
-        if (changingGraphVisibility)
-          return;
-
-        if (visibleRB.isSelected())
-          showSoughtGraphFrame();
-        else
-          hideSoughtGraphFrame();
-      }
-  
-    });
-
+    visibleRB = new JRadioButtonMenuItem("Graph shown", new Boolean(getProperty("visible", "true")).booleanValue());
     nonVisibleRB = new JRadioButtonMenuItem("Graph hidden", !visibleRB.isSelected());
+
+    visibleRB.setMnemonic('s');
     nonVisibleRB.setMnemonic('h');
 
     ButtonGroup visibilityGroup = new ButtonGroup();
     visibilityGroup.add(visibleRB);
     visibilityGroup.add(nonVisibleRB);
+
+    visibleRB.setActionCommand("visible");
+    nonVisibleRB.setActionCommand("hidden");
+
+    ActionListener visibilityListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String actionCommand = evt.getActionCommand();
+
+        if ("visible".equals(actionCommand))
+          showSoughtGraphFrame();
+        else if ("hidden".equals(actionCommand))
+          hideSoughtGraphFrame();
+        else
+          throw new IllegalStateException("Unknown action command: "+actionCommand);
+      }
+    };
+
+    visibleRB.addActionListener(visibilityListener);
+    nonVisibleRB.addActionListener(visibilityListener);
 
     myMenu.add(visibleRB);
     myMenu.add(nonVisibleRB);
