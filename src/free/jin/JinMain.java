@@ -462,11 +462,17 @@ public class JinMain implements JinContext{
 
     File userDir = dirForUser(user);
 
-    if (!(userDir.isDirectory() || userDir.mkdirs())){
-      OptionPanel.error(uiProvider, "Saving Account Error",
-          "Unable to create directory:\n" + userDir);
-      return false;
-    }
+    try{    
+      if (!(userDir.isDirectory() || userDir.mkdirs())){
+        OptionPanel.error(uiProvider, "Saving Account Error",
+            "Unable to create directory:\n" + userDir);
+        return false;
+      }
+    } catch (SecurityException e){
+        OptionPanel.error(uiProvider, "Saving Account Error",
+            "Security manager doesn't allow creating directory:\n" + userDir);
+        return false;
+      }
 
     Properties props = new Properties();
     props.put("serverId", user.getServer().getId());
@@ -482,6 +488,11 @@ public class JinMain implements JinContext{
             "Error writing user properties to file :\n" + propsFile);
         return false;
       }
+      catch (SecurityException e){
+        OptionPanel.error(uiProvider, "Saving Account Error",
+            "Security manager doesn't allow writing to file :\n" + propsFile);
+        return false;
+      }
 
     File prefsFile = new File(userDir, "preferences");
     try{
@@ -493,6 +504,11 @@ public class JinMain implements JinContext{
             "Error writing user preferences to file :\n" + prefsFile);
         return false;
       }
+      catch (SecurityException e){
+        OptionPanel.error(uiProvider, "Saving Account Error",
+            "Security manager doesn't allow writing to file :\n" + prefsFile);
+        return false;
+      }
 
     File filesFile = new File(userDir, "files"); 
     try{
@@ -500,6 +516,11 @@ public class JinMain implements JinContext{
     } catch (IOException e){
         OptionPanel.error(uiProvider, "Saving Account Error",
             "Error writing user files to file :\n" + filesFile);
+        return false;
+      }
+      catch (SecurityException e){
+        OptionPanel.error(uiProvider, "Saving Account Error",
+            "Security manager doesn't allow writing to file :\n" + filesFile);
         return false;
       }
 
@@ -1052,9 +1073,18 @@ public class JinMain implements JinContext{
 
   private void storeUserPrefs(){
     File userPrefsFile = new File(prefsDir, "user.prefs");
+    
     try{
-      userPrefs.save(userPrefsFile);
-    } catch (IOException e){
+      if (userPrefsFile.canWrite())
+        userPrefs.save(userPrefsFile);
+      else
+        OptionPanel.error(uiProvider, "Saving Preferences Error",
+          "You don't have permissions to write:\n" + userPrefsFile);
+    } catch (SecurityException e){
+        OptionPanel.error(uiProvider, "Saving Preferences Error",
+          "The security manager doesn't allow writing:\n" + userPrefsFile);
+      }
+      catch (IOException e){
         OptionPanel.error(uiProvider, "Saving Preferences Error",
           "Unable to save preferences into:\n" + userPrefsFile);
       }
