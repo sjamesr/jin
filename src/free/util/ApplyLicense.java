@@ -1,22 +1,22 @@
 /**
- * Jin - a chess client for internet chess servers.
- * More information is available at http://www.hightemplar.com/jin/.
+ * The utillib library.
+ * More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002 Alexander Maryanovsky.
  * All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * The utillib library is free software; you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The utillib library is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Foobar; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 package free.util;
@@ -53,6 +53,7 @@ public class ApplyLicense{
     }
 
     boolean recurse = false;
+    boolean undo = false;
     String backupDirName = null;
 
     int argIndex = 0;
@@ -60,9 +61,11 @@ public class ApplyLicense{
       String arg = args[argIndex];
       if (arg.equals("-r"))
         recurse = true;
-      else if (arg.equals("-b")){
+      else if (arg.equals("-b"))
         backupDirName = args[++argIndex];
-      }
+      else if (arg.equals("-u"))
+        undo = true;
+
       argIndex++;
     }
 
@@ -95,7 +98,7 @@ public class ApplyLicense{
       System.exit(0);
     }
 
-    if (backupDir!=null){
+    if (backupDir != null){
       if (!backupDir.exists()){
         System.out.print("Creating backup directory "+backupDirName+" ");
         if (!backupDir.mkdirs()){
@@ -117,7 +120,10 @@ public class ApplyLicense{
 
     try{
       String license = IOUtilities.loadTextFile(licenseFile);
-      applyLicense(license, new ExtensionFilenameFilter("."+extension), dir, recurse);
+      if (undo)
+        removeLicense(license, new ExtensionFilenameFilter("."+extension), dir, recurse);
+      else
+        applyLicense(license, new ExtensionFilenameFilter("."+extension), dir, recurse);
     } catch (IOException e){
         e.printStackTrace();
         System.exit(0);
@@ -151,7 +157,8 @@ public class ApplyLicense{
     System.out.println();
     System.out.println("Use: java free.util.ApplyLicense [-r][-b backupDir] licenseFile extension dir");
     System.out.println();
-    System.out.println("-r              apply recursively into subdirectories");
+    System.out.println("-r              Apply recursively into subdirectories");
+    System.out.println("-u              Undo applying the license");
     System.out.println("-b backupDir    Backup files into the given directory before applying license");
     System.out.println();
     System.out.println("Version 1.00 - 05 Oct. 2001");
@@ -177,7 +184,7 @@ public class ApplyLicense{
       throw new IllegalArgumentException(dir.toString()+" is a file, not a directory");
 
     String [] filenames = dir.list();
-    for (int i=0; i<filenames.length; i++){
+    for (int i = 0; i < filenames.length; i++){
       String filename = filenames[i];
       File file = new File(dir, filename);
       if (file.isDirectory()){
@@ -215,13 +222,96 @@ public class ApplyLicense{
       in = new FileInputStream(tmpFile);
       IOUtilities.pump(in, out);
     } finally{
-        if (in!=null)
+        if (in != null)
           in.close();
-        if (out!=null)
+        if (out != null)
           out.close();
       }
     if (!tmpFile.delete())
       throw new IOException("Unable to delete "+tmpFile);
   }
+
+
+
+
+
+  /**
+   * Removes the given license string from the beginning of every file in the
+   * given directory, optionally recursing into subdirectories, which passes
+   * the given FilenameFilter.
+   *
+   * @throws IOException If an I/O error occurs during the processing of the
+   * file(s).
+   */
+
+  public static void removeLicense(String license, FilenameFilter filter, File dir, boolean recurse) throws IOException{
+    if (!dir.exists())
+      throw new IllegalArgumentException("The directory "+dir+" does not exist");
+
+    if (!dir.isDirectory())
+      throw new IllegalArgumentException(dir.toString()+" is a file, not a directory");
+
+    String [] filenames = dir.list();
+    for (int i = 0; i < filenames.length; i++){
+      String filename = filenames[i];
+      File file = new File(dir, filename);
+      if (file.isDirectory()){
+        if (recurse)
+          removeLicense(license, filter, file, true);
+      }
+      else if (filter.accept(dir, filename)){
+        System.out.print("Removing license text from: "+file);
+        deleteLicense(license, file);
+        System.out.println(" done");
+      }
+    }
+  }
+
+
+
+
+  /**
+   * Prepends the specified text from the beginning of the given file. Returns
+   * <code>true</code> if the file indeed started with the specified text,
+   * false otherwise.
+   */
+
+  private static boolean deleteLicense(String license, File file) throws IOException{
+    File tmpFile = new File(file.getAbsolutePath()+".tmp");
+    if (!file.renameTo(tmpFile))
+      throw new IOException("Unable to rename "+file+" into "+tmpFile);
+
+    OutputStream out = null;
+    InputStream in = null;
+
+    try{
+      in = new FileInputStream(tmpFile);
+      int i = 0, b;
+      while (i < license.length()){
+        b = in.read();
+        if ((b==-1) || ((byte)b != license.charAt(i++))){
+          in.close();
+          in = null;
+          if (!tmpFile.renameTo(file))
+            throw new IOException("Unable to rename "+tmpFile+" into "+file);
+          return false;
+        }
+      }
+      out = new FileOutputStream(file); 
+      Writer writer = new BufferedWriter(new OutputStreamWriter(out));
+      IOUtilities.pump(in, out);
+    } finally{
+        if (in != null)
+          in.close();
+        if (out != null)
+          out.close();
+      }
+    if (!tmpFile.delete())
+      throw new IOException("Unable to delete "+tmpFile);
+
+    return true;
+  }
+
+
 
 }
