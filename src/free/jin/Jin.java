@@ -62,7 +62,7 @@ public class Jin{
    * deleted/ignored.
    */
 
-  private static final String propsVersion = "1";
+  private static final String propsVersion = "2";
   
 
 
