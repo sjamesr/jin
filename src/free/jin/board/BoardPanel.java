@@ -919,12 +919,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void updateClockActiveness(){
     if (board.getPosition().getCurrentPlayer().equals(Player.WHITE_PLAYER)){
-      System.out.println("Setting white's clock active");
       whiteClock.setActive(true);
       blackClock.setActive(false);
     }
     else{
-      System.out.println("Setting black's clock active");
       blackClock.setActive(true);
       whiteClock.setActive(false);
     }
