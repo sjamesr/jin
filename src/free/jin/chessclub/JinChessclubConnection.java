@@ -1744,8 +1744,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     sendCommand("forward 9999");
   }
-
-
+  
+  
+  
+  /**
+   * Sends the "help" command to the server. 
+   */
+   
+  public void showServerHelp(){
+    sendCommand("help");
+  }
+  
+  
+  
+  /**
+   * Sends the specified question string to channel 1.
+   */
+   
+  public void sendHelpQuestion(String question){
+    sendCommand("tell 1 * " + question);    
+  }
+  
 
 
   /**

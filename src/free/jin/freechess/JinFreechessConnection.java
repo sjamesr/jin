@@ -2302,6 +2302,26 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if ((game.getGameType() != Game.MY_GAME)||game.isPlayed())
       throw new IllegalArgumentException("The given game must be of type Game.MY_GAME and an examined one");
   }
+  
+  
+  
+  /**
+   * Sends the "help" command to the server. 
+   */
+   
+  public void showServerHelp(){
+    sendCommand("help");
+  }
+  
+  
+  
+  /**
+   * Sends the specified question string to channel 1.
+   */
+   
+  public void sendHelpQuestion(String question){
+    sendCommand("tell 1 * " + question);    
+  }
 
 
 
