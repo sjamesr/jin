@@ -23,6 +23,7 @@ package free.jin;
 
 import javax.swing.JApplet;
 import free.util.BrowserControl;
+import free.util.audio.AppletContextAudioPlayer;
 
 
 
@@ -62,6 +63,8 @@ public class JinApplet extends JApplet{
     
     try{
       BrowserControl.setAppletContext(getAppletContext());
+      AppletContextAudioPlayer.setAppletContext(getAppletContext());
+      
       context = new AppletJinContext(this);
     } catch (Throwable t){
         contextCreationError = t;
