@@ -27,6 +27,7 @@ import java.awt.event.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Keymap;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Utilities;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.net.URL;
@@ -156,18 +157,33 @@ public class ConsoleTextPane extends JTextPane{
 
 
   /**
-   * Returns a JPopupMenu for the given selection. This method is called each
+   * Returns a JPopupMenu for the given mouse event. This method is called each
    * time the right mouse button is clicked over the ConsoleTextPane, if it
-   * returns null, no popup is shown. The default implementation returns null
-   * if there is no selection and uses properties to determine which commands to
-   * display in the popup if there is a selection.
+   * returns null, no popup is shown. The default implementation returns obtains
+   * the popup items from the plugin properties.
    */
 
-  protected JPopupMenu getPopupMenu(String selection){
-    if ((selection==null)||(selection.length()==0))
-      return null;
+  protected JPopupMenu getPopupMenu(MouseEvent evt){
+    String selection = getSelectedText();
+
+    if ((selection==null)||(selection.length()==0)){
+      int pressedLocation = viewToModel(evt.getPoint());
+      if (pressedLocation == -1)
+        return null;
+
+      try{
+        int wordStart =  Utilities.getWordStart(this, pressedLocation);
+        int wordEnd =  Utilities.getWordEnd(this, pressedLocation);
+        select(wordStart, wordEnd);
+      } catch (BadLocationException e){
+          return null;
+        }
+
+      selection = getSelectedText();
+    }
+
     if (defaultPopupMenu==null){
-      int numCommands = Integer.parseInt(console.getProperty("output-popup.num-commands","0"));
+      int numCommands = Integer.parseInt(console.getProperty("output-popup.num-commands", "0"));
       if (numCommands == 0)
         return null;
 
@@ -303,7 +319,7 @@ public class ConsoleTextPane extends JTextPane{
     super.processMouseEvent(evt);
 
     if (evt.isPopupTrigger()){
-      JPopupMenu popup = getPopupMenu(getSelectedText());
+      JPopupMenu popup = getPopupMenu(evt);
       if (popup!=null){ 
         Component rootPane = SwingUtilities.getRootPane(this);
         Dimension rootPaneSize = rootPane.getSize();
