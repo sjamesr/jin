@@ -22,9 +22,13 @@
 package free.util.audio;
 
 import javax.sound.sampled.*;
-import java.util.Hashtable;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
 import free.util.BlockingQueue;
 import free.util.PlatformUtils;
+import free.util.IOUtilities;
 
 
 /**
@@ -33,6 +37,7 @@ import free.util.PlatformUtils;
  */
 
 public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
+
 
 
   /**
@@ -44,31 +49,20 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
 
   /**
-   * Maps free.util.audio.AudioClip instances to javax.sound.sampled.Clip
-   * instances.
-   */
-
-  private final Hashtable clips = new Hashtable();
-
-
-
-  /**
-   * A BlockingQueue of queued AudioClips.
+   * A BlockingQueue of AudioClips queued for playing.
    */
 
   private final BlockingQueue clipQueue = new BlockingQueue();
 
 
 
-
   /**
-   * Returns true if we're running under Java 1.3 or later.
+   * Returns whether we're running under Java 1.3 or later.
    */
 
   public boolean isSupported(){
     return PlatformUtils.isJavaBetterThan("1.3");
   }
-
 
 
 
@@ -95,90 +89,99 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
   public void run(){
     while (true){
-      AudioClip clip;
       try{
-        clip = (AudioClip)clipQueue.pop();
-      } catch (InterruptedException e){
+        AudioClip audioClip;
+        try{
+          audioClip = (AudioClip)clipQueue.pop();
+        } catch (InterruptedException e){
           e.printStackTrace();
           return;
         }
+        long time = System.currentTimeMillis();
 
-      Clip newClip = (Clip)clips.get(clip);
-      if (newClip == null){
-        try{
-          newClip = createClip(clip.getData());
-        } catch (LineUnavailableException e){
-            e.printStackTrace();
-            // Ignore, will try again later.
-          }
-          catch (UnsupportedAudioFileException e){
-            e.printStackTrace();
-            // Ignore, nothing we can do about it...
-          }
-          catch (IllegalArgumentException e){
-            e.printStackTrace();
-            // Apparently it (AudioSystem.getAudioInputStream()) can throw this too.
-          }
-
-        clips.put(clip, newClip);
+        Clip clip = createClip(audioClip);
+        clip.setFramePosition(0);
+        clip.start();
+        System.out.println(System.currentTimeMillis() - time);
+      } catch (IOException e){
+        e.printStackTrace();
+      } catch (UnsupportedAudioFileException e){
+        e.printStackTrace();
+      } catch (LineUnavailableException e){
+        e.printStackTrace();
+      } catch (IllegalArgumentException e){
+        e.printStackTrace();
       }
-
-      if (newClip != null)
-        startPlaying(newClip);
     }
   }
 
 
 
-
   /**
-   * Actually starts playing the given Clip.
+   * Creates a Clip from the specified AudioClip.
    */
 
-  private void startPlaying(Clip clip){
-    clip.setFramePosition(0);
-    clip.start();
+  private static Clip createClip(AudioClip audioClip)
+      throws LineUnavailableException, UnsupportedAudioFileException,
+      IOException{
+
+    System.out.println("1");
+    byte [] data = audioClip.getData();
+    System.out.println("2");
+    AudioFormat format = getFormatForPlaying(data);
+    System.out.println("3");
+    data = convertAudioData(data, format);
+    System.out.println("4");
+    DataLine.Info info = new DataLine.Info(Clip.class, format);
+    System.out.println("5");
+    Clip clip = (Clip)AudioSystem.getLine(info);
+    System.out.println("6");
+    clip.open(format, data, 0, data.length);
+    System.out.println("7");
+
+    return clip;
   }
 
 
 
-
   /**
-   * Creates and loads a Clip from the given audio data.
+   * Finds and returns the AudioFormat appropriate for playing the specified
+   * audio data.
    */
 
-  private static Clip createClip(byte [] data) throws LineUnavailableException, UnsupportedAudioFileException{
-    try{
-      AudioInputStream stream = AudioSystem.getAudioInputStream(new java.io.ByteArrayInputStream(data));
+  private static AudioFormat getFormatForPlaying(byte [] audioData)
+      throws UnsupportedAudioFileException, IOException{
+    AudioFormat format = AudioSystem.getAudioFileFormat(
+        new ByteArrayInputStream(audioData)).getFormat();
 
-      // At present, ALAW and ULAW encodings must be converted
-      // to PCM_SIGNED before it can be played
-      AudioFormat format = stream.getFormat();
-      if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
-        format = new AudioFormat(
-                AudioFormat.Encoding.PCM_SIGNED,
-                format.getSampleRate(),
-                format.getSampleSizeInBits()*2,
-                format.getChannels(),
-                format.getFrameSize()*2,
-                format.getFrameRate(),
-                true);        // big endian
-        stream = AudioSystem.getAudioInputStream(format, stream);
-      }
-
-      // Create the clip
-      DataLine.Info info = new DataLine.Info(Clip.class, stream.getFormat(), ((int)stream.getFrameLength()*format.getFrameSize()));
-      Clip clip = (Clip)AudioSystem.getLine(info);
-
-      if (!clip.isOpen())
-        clip.open(stream);
-
-      return clip;
-    } catch (java.io.IOException e){
-        throw new InternalError("java.io.IOException thrown when reading from ByteArrayInputStream");
-      }
+    // At present, ALAW and ULAW encodings must be converted
+    // to PCM_SIGNED before it can be played
+    if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED)
+      return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+          format.getSampleRate(), format.getSampleSizeInBits() * 2,
+          format.getChannels(), format.getFrameSize() * 2,
+          format.getFrameRate(), true);
+    else
+      return format;
   }
 
+
+
+  /**
+   * Converts the specified audio data to the specified format. 
+   */
+
+  private static byte [] convertAudioData(byte [] audioData, AudioFormat format)
+      throws UnsupportedAudioFileException, IOException{
+    AudioInputStream stream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(
+        audioData));
+
+    if (format.matches(stream.getFormat()))
+      return audioData;
+
+    stream = AudioSystem.getAudioInputStream(format, stream);
+
+    return IOUtilities.readToEnd(stream);
+  }
 
 }
-
