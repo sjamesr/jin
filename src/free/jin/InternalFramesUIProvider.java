@@ -98,14 +98,6 @@ public class InternalFramesUIProvider implements UIProvider{
   
   
   /**
-   * The look and feel menu.
-   */
-   
-  private final LookAndFeelMenu lnfMenu;
-
-
-
-  /**
    * The preferences menu.
    */
 
@@ -147,7 +139,6 @@ public class InternalFramesUIProvider implements UIProvider{
     mainContainer.setMenuBar(menubar);
 
     menubar.add(connMenu = new ConnectionMenu());
-    menubar.add(lnfMenu = new LookAndFeelMenu(mainContainer.getTopMostFrame()));
     menubar.add(prefsMenu = new PreferencesMenu());
     menubar.add(helpMenu = new HelpMenu());
     
@@ -279,7 +270,6 @@ public class InternalFramesUIProvider implements UIProvider{
     menubar.removeAll();
     
     menubar.add(connMenu);
-    menubar.add(lnfMenu);
     menubar.add(prefsMenu);
     
     for (int i = 0; i < plugins.length; i++){
@@ -302,7 +292,6 @@ public class InternalFramesUIProvider implements UIProvider{
     menubar.removeAll();
     
     menubar.add(connMenu);
-    menubar.add(lnfMenu);
     menubar.add(prefsMenu);
     menubar.add(helpMenu);
   }
@@ -628,6 +617,14 @@ public class InternalFramesUIProvider implements UIProvider{
      */
 
     private final JMenuItem bgMenu;
+    
+    
+    
+    /**
+     * The "Look and Feel" menu item.
+     */
+     
+    private final JMenuItem lnfMenu;
 
 
 
@@ -664,8 +661,10 @@ public class InternalFramesUIProvider implements UIProvider{
       setMnemonic('P');
 
       add(bgMenu = new JMenuItem("Background", 'B'));
+      add(lnfMenu = new JMenuItem("Look and Feel", 'L'));
 
       bgMenu.addActionListener(this);
+      lnfMenu.addActionListener(this);
     }
 
 
@@ -738,10 +737,18 @@ public class InternalFramesUIProvider implements UIProvider{
 
       if (source == bgMenu)
         showBGDialog();
+      else if (source == lnfMenu){
+        Frame topMostFrame = mainContainer.getTopMostFrame();
+        JDialog dialog = new PrefsDialog(topMostFrame, "Look and Feel Selection", 
+          new LookAndFeelPrefPanel(new Component[]{topMostFrame}));
+        AWTUtilities.centerWindow(dialog, topMostFrame);
+        dialog.setVisible(true);
+      }
       else{
         int pluginIndex = Integer.parseInt(actionCommand);
         Plugin plugin = plugins[pluginIndex];
-        JDialog dialog = new PrefsDialog(mainContainer.getTopMostFrame(), plugin);
+        JDialog dialog = new PrefsDialog(mainContainer.getTopMostFrame(), 
+          plugin.getName() + " Preferences", plugin.getPreferencesUI());
         AWTUtilities.centerWindow(dialog, mainContainer.getTopMostFrame());
         dialog.setVisible(true);
       }
@@ -824,14 +831,14 @@ public class InternalFramesUIProvider implements UIProvider{
 
 
     /**
-     * Creates a new <code>PrefsDialog</code> with the specified parent frame
-     * and for the specified plugin.
+     * Creates a new <code>PrefsDialog</code> with the specified parent frame,
+     * title and preferences panel.
      */
 
-    public PrefsDialog(Frame parent, Plugin plugin){
-      super(parent, plugin.getName() + " Preferences", true);
+    public PrefsDialog(Frame parent, String title, PreferencesPanel prefsPanel){
+      super(parent, title, true);
 
-      this.prefsPanel = plugin.getPreferencesUI();
+      this.prefsPanel = prefsPanel;
       this.applyButton = new JButton("Apply");
       this.okButton = new JButton("OK");
       this.cancelButton = new JButton("Cancel");
@@ -904,7 +911,7 @@ public class InternalFramesUIProvider implements UIProvider{
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error("Illegal Preferences",e.getMessage());
+          OptionPanel.error("Error Setting Preference(s)", e.getMessage());
           if (e.getErrorComponent() != null)
             e.getErrorComponent().requestFocus();
         }
