@@ -28,6 +28,9 @@ import javax.swing.event.InternalFrameEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
 import free.jin.Game;
+import free.jin.JinConnection;
+import free.jin.event.GameStartEvent;
+import free.jin.event.GameEndEvent;
 
 
 /**
@@ -35,6 +38,16 @@ import free.jin.Game;
  */
 
 public class ChessclubBoardManager extends BoardManager{
+
+
+
+  /**
+   * The amount of games of type MY_GAME.
+   */
+
+  private int myGamesCount = 0;
+
+
 
 
   /**
@@ -57,11 +70,47 @@ public class ChessclubBoardManager extends BoardManager{
     BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
 
     Game game = boardPanel.getGame();
-    if (boardPanel.isActive())
-      getConnection().sendCommand("primary "+game.getID());
+    if (boardPanel.isActive()){
+      int gameType = game.getGameType();
+      Object gameID = game.getID();
+      JinConnection conn = getConnection();
+
+      if ((myGamesCount > 1) && (gameType == Game.MY_GAME))
+        conn.sendCommand("goto "+gameID);
+      else
+        conn.sendCommand("primary "+gameID);
+    }
 
     super.internalFrameActivated(e);
   }
+
+
+
+
+  /**
+   * Overrides the superclass' method to increment <code>myGamesCount</code>.
+   */
+
+  public void gameStarted(GameStartEvent evt){
+    if (evt.getGame().getGameType() == Game.MY_GAME)
+      myGamesCount++;
+
+    super.gameStarted(evt);
+  }
+
+
+
+  /**
+   * Overrides the superclass' method to decrement <code>myGamesCount</code>.
+   */
+
+  public void gameEnded(GameEndEvent evt){
+    if (evt.getGame().getGameType() == Game.MY_GAME)
+      myGamesCount--;
+
+    super.gameEnded(evt);
+  }
+
 
 
 }
