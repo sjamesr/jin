@@ -65,6 +65,26 @@ public interface WildVariant{
 
 
   /**
+   * Creates a short castling move for the current player in the specified
+   * position. Short castling must be legal in the specified position.
+   */
+
+  Move createShortCastling(Position pos);
+
+
+
+
+  /**
+   * Creates a long castling move for the current player in the specified
+   * position. Long castling must be legal in the specified position.
+   */
+
+  Move createLongCastling(Position pos);
+
+
+
+
+  /**
    * Makes the given Move in the given Position. This method shoudln't 
    * (and can't) be called directly - call Position.makeMove(Move) instead.
    * Implementations of this method should only modify the Position via the
