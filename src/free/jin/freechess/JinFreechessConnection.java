@@ -496,11 +496,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
           issueTakeback(gameData, boardData);
       }
       else if (plyDifference == 0){
-//          changePosition(game, oldBoardData, boardData);
+        if (!gameData.game.isPlayed()) // Examined
+          changePosition(gameData, boardData);
         // This happens if you:
         // 1. Issue "refresh".
         // 2. Make an illegal move, because the server will re-send us the board
         //    (although we don't need it)
+        // 3. Issue board setup commands.
       }
       else if (plyDifference == 1){
         if (boardData.getMoveVerbose() != null)
