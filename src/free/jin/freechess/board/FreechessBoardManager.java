@@ -26,6 +26,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
+import free.jin.freechess.JinFreechessConnection;
 import free.jin.Game;
 import free.jin.event.GameStartEvent;
 
@@ -90,5 +91,23 @@ public class FreechessBoardManager extends BoardManager{
 
     super.gameStarted(evt);
   }
+
+
+
+
+  /**
+   * Overrides the superclass' method to set the server premove ivariable when
+   * premove is turned on.
+   */
+
+  public void setMoveSendingMode(int moveSendingMode){
+    JinFreechessConnection conn = (JinFreechessConnection)getConnection();
+    conn.setPremove(moveSendingMode == PREMOVE_MOVE_SENDING_MODE);
+
+    super.setMoveSendingMode(moveSendingMode);
+  }
+
+
+
 
 }
