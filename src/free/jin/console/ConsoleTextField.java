@@ -104,7 +104,6 @@ public class ConsoleTextField extends FixedJTextField{
 
     if (tellLastTellerKeyStrokeString != null){
       KeyStroke tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
-      System.out.println("Adding keyboard action for tell-last-teller-keystroke: "+tellLastTellerKeyStroke);
       registerKeyboardAction(new TellLastTellerAction(), tellLastTellerKeyStroke, WHEN_FOCUSED);
     }
 
