@@ -1,7 +1,7 @@
 /**
  * The freechess.org connection library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The freechess.org connection library is free software; you can redistribute
@@ -58,7 +58,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * A regular expression string matching a FICS username.
    */
 
-  private static final String usernameRegex = "[A-z]{3,17}";
+  protected static final String usernameRegex = "[A-z]{3,17}";
 
 
 
@@ -66,7 +66,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * A regular expression string for matching FICS titles.
    */
 
-  private static final String titlesRegex = "\\([A-Z\\*\\(\\)]*\\)";
+  protected static final String titlesRegex = "\\([A-Z\\*\\(\\)]*\\)";
 
 
 
