@@ -1,7 +1,7 @@
 /**
  * The chessclub.com connection library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002-2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The chessclub.com connection library is free software; you can redistribute
@@ -499,7 +499,7 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public ChessclubConnection(String hostname, int port, String username, String password, PrintStream echoStream){
-    super(hostname,port,username,password);
+    super(hostname, port, username, password);
 
     this.echoStream = echoStream;
 
@@ -703,7 +703,12 @@ public class ChessclubConnection extends free.util.Connection{
       sendCommand(buf.toString());
     }
 
-    sendCommand(getRequestedUsername()+" "+getPassword());
+    String requestedUsername = getRequestedUsername();
+    String password = getPassword();
+    if ((password == null) || (password.length() == 0))
+      sendCommand(requestedUsername);
+    else
+      sendCommand(requestedUsername+" "+password);
     synchronized(loginLock){
       try{
         loginLock.wait(); // Wait until we receive DG_WHO_AM_I
