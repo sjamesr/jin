@@ -151,12 +151,19 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
 
+  /**
+   * The "hint" user that was given to us.
+   */
+
+  protected final User hintUser;
+
+
 
   /**
    * The <code>User</code> we're going to return.
    */
 
-  protected User user = null;
+  protected User resultUser = null;
 
 
 
@@ -167,11 +174,11 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * dialog fields.
    */
 
-  public StandardLoginDialog(String title, User user){
+  public StandardLoginDialog(String title, User hintUser){
     this.title = title;
-    this.props = getUserProperties(user);
-    this.user = user;
-    this.server = user.getServer();
+    this.props = getUserProperties(hintUser);
+    this.hintUser = hintUser;
+    this.server = hintUser.getServer();
   }
 
 
@@ -186,6 +193,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
   public StandardLoginDialog(String title, Server server){
     this.title = title;
     this.props = getServerProperties(server);
+    this.hintUser = null;
     this.server = server;
   }
 
@@ -269,7 +277,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected boolean shouldCreateNewUser(){
-    return (user == null) || !usernameField.getText().equalsIgnoreCase(user.getUsername()); 
+    return (hintUser == null) || !usernameField.getText().equalsIgnoreCase(hintUser.getUsername()); 
   }
 
 
@@ -378,16 +386,23 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected void connectAsGuestActionPerformed(){
-    usernameField.setText("guest");
-    passwordField.setText("");
-
-    String inputIllegalityReason = findInputIllegalityReason();
-    if (inputIllegalityReason!=null){
+    String inputIllegalityReason = findInputIllegalityReason(false);
+    if (inputIllegalityReason != null){
       JOptionPane.showMessageDialog(dialog, inputIllegalityReason, "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
       return;
     }
 
-    user = server.createGuest();
+    if ((hintUser == null) || !server.isGuest(hintUser)){
+      System.out.println("Creating guest");
+      resultUser = server.createGuest();
+    }
+    else{
+      System.out.println("Reusing guest");
+      resultUser = hintUser;
+    }
+
+    resultUser.setProperty("login.hostname", (String)hostnameBox.getSelectedItem());
+    resultUser.setProperty("login.port", portField.getText());
 
     proceed();
   }
@@ -590,7 +605,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected void connectActionPerformed(){
-    String inputIllegalityReason = findInputIllegalityReason();
+    String inputIllegalityReason = findInputIllegalityReason(true);
     if (inputIllegalityReason != null){
       JOptionPane.showMessageDialog(dialog, inputIllegalityReason,
         "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
@@ -608,13 +623,15 @@ public abstract class StandardLoginDialog implements LoginDialog{
     props.put("login.savepassword", String.valueOf(savePassword));
 
     if (shouldCreateNewUser())
-      user = server.createUser(props);
+      resultUser = server.createUser(props);
     else{
+      resultUser = hintUser;
+
       Enumeration propsEnum = props.keys();
       while (propsEnum.hasMoreElements()){
         String key = (String)propsEnum.nextElement();
         String value = props.getProperty(key);
-        user.setProperty(key, value);
+        resultUser.setProperty(key, value);
       }
     }
 
@@ -767,11 +784,12 @@ public abstract class StandardLoginDialog implements LoginDialog{
   /**
    * Determines whether the currently specified user details are valid. If so,
    * returns <code>null</code>. Otherwise returns a string specifying what's
-   * invalid about them.
+   * invalid about them. The <code>checkUsernameAndPassword</code> argument
+   * specifies whether the username and password fields should be checked.
    * The default implementation checks that the port value is a valid port.
    */
 
-  public String findInputIllegalityReason(){
+  public String findInputIllegalityReason(boolean checkUsernameAndPassword){
     String portString = portField.getText();
     try{
       Integer.parseInt(portString);
@@ -802,7 +820,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   public User getUser(){
-    return user;
+    return resultUser;
   }
 
 
