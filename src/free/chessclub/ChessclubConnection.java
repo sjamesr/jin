@@ -533,10 +533,11 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Sets the given level2 datagram on or off. If the ChessclubConnection is already
-   * logged in, then the "set-2 [DG number] [0/1]" string is sent to the
-   * server, otherwise the setting is saved, and and in the login procedure all 
-   * the level2 settings are sent on the login line in the "level2settings=0011011011..." format.
+   * Sets the given level2 datagram on or off. If the ChessclubConnection is
+   * already logged in, then the <code>set-2 [DG number] [0/1]</code> string
+   * is sent to the server, otherwise the setting is saved, and in the login
+   * procedure all the level2 settings are sent on the login line in the
+   * <code>level2settings=0011011011...</code> format.
    * Note that some datagrams are necessary for the correct behaviour of this
    * class, and cannot be turned off (DG_WHO_AM_I and DG_SET2 for example).
    *
@@ -563,7 +564,7 @@ public class ChessclubConnection extends free.util.Connection{
     if (level2SettingsSent){
       if (isLoggedIn())
         sendCommand("set-2 "+dgNumber+" "+(state ? "1" : "0"));
-      // Otherwise, we will set it onLogin(). We don't do it here because it's
+      // Otherwise, we will fix it in onLogin(). We don't do it here because it's
       // not a good idea to send anything in the middle of the login procedure.
     }
     else{
@@ -760,15 +761,19 @@ public class ChessclubConnection extends free.util.Connection{
   protected void onLogin(){
     super.onLogin();
 
-    for (int i = 0; i < requestedLevel2Settings.size(); i++){
-      boolean state = requestedLevel2Settings.get(i);
-      if (state != level2Settings.get(i))
-        sendCommand("set-2 "+i+" "+(state ? "1" : "0"));
-    }
+    synchronized(this){
+      // Apply any level2 changes which might have occurred when we were waiting
+      // for login.
+      for (int i = 0; i < requestedLevel2Settings.size(); i++){
+        boolean state = requestedLevel2Settings.get(i);
+        if (state != level2Settings.get(i))
+          sendCommand("set-2 "+i+" "+(state ? "1" : "0"));
+      }
 
-    sendCommand("set-quietly prompt 0");
-    sendCommand("set-quietly style "+style);
-    sendCommand("set-quietly interface "+interfaceVar);
+      sendCommand("set-quietly prompt 0");
+      sendCommand("set-quietly style "+style);
+      sendCommand("set-quietly interface "+interfaceVar);
+    }
   }
 
 
