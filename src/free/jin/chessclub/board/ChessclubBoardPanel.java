@@ -179,18 +179,16 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener,
   }
 
 
+
   /**
-   * Overrides BoardPanel.createWhiteLabel(Game) to return a chessclub.com
+   * Overrides BoardPanel.createWhiteLabelText(Game) to return a chessclub.com
    * specific version.
    */
 
-  protected JLabel createWhiteLabel(Game game){
-    JLabel label = super.createWhiteLabel(game);
+  protected String createWhiteLabelText(Game game){
     int rating = game.getWhiteRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
-    label.setText(game.getWhiteName()+game.getWhiteTitles()+ratingString);
-
-    return label;
+    return game.getWhiteName() + game.getWhiteTitles() + ratingString;
   }
 
 
@@ -201,30 +199,25 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener,
    * specific version.
    */
 
-  protected JLabel createBlackLabel(Game game){
-    JLabel label = super.createBlackLabel(game);
+  protected String createBlackLabelText(Game game){
     int rating = game.getBlackRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
-    label.setText(game.getBlackName()+game.getBlackTitles()+ratingString);
-
-    return label;
+    return game.getBlackName() + game.getBlackTitles() + ratingString;
   }
 
 
 
 
   /**
-   * Overrides BoardPanel.createGameLabel(Game) to return a chessclub.com
+   * Overrides BoardPanel.createGameLabelText(Game) to return a chessclub.com
    * specific version.
    */
 
-  protected JLabel createGameLabel(Game game){
-    JLabel label = super.createGameLabel(game);
+  protected String createGameLabelText(Game game){
     free.chess.WildVariant variant = game.getVariant();
-    String category = variant.equals(free.chess.Chess.getInstance()) ? game.getRatingCategoryString() : variant.getName();
-    label.setText((game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + category);
-
-    return label;
+    String category = variant.equals(free.chess.Chess.getInstance()) ?
+      game.getRatingCategoryString() : variant.getName();
+    return (game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + category;
   }
 
 
