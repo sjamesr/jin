@@ -164,8 +164,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (boundsString!=null)
       bounds = StringParser.parseRectangle(boundsString);
 
-    if (bounds==null)
-      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
+    if (bounds==null){
+//      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
+      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 460);
+    }
     else
       soughtGraphFrame.setBounds(bounds);
 
@@ -244,14 +246,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected JInternalFrame createSoughtGraphFrame(){
-    JInternalFrame frame = new JInternalFrame("Seek graph", true, true, true, true);
+    JInternalFrame frame = new JInternalFrame("Seek graph", false, true, false, true);
 
     String iconImageName = getProperty("icon-image");
     if (iconImageName != null){
       URL iconImageURL = SoughtGraphPlugin.class.getResource(iconImageName);
       if (iconImageURL!= null)
         frame.setFrameIcon(new ImageIcon(iconImageURL));
-    } 
+    }
 
     return frame;
   }
