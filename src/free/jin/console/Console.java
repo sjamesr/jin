@@ -334,17 +334,20 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     private boolean settingViewSize = false;
 
 
+    // This makes sure that when the viewport is resized, the last visible line
+    // (or character) remains the same after the resize.
     public void reshape(int x, int y, int width, int height){
       Dimension viewSize = getViewSize();
       Dimension viewportSize = getExtentSize();
+      JTextComponent view = (JTextComponent)getView();
+      String text = view.getText();
 
       if ((viewSize.height <= viewportSize.height) || (viewportSize.height < 0) 
-          || settingViewSize){
+          || settingViewSize || (text == null) || (text.length() == 0)){
         super.reshape(x, y, width, height);
         return;
       }
 
-      JTextComponent view = (JTextComponent)getView();
       Point viewPosition = getViewPosition();
       Point viewCoords = 
         new Point(viewportSize.width + viewPosition.x, viewportSize.height + viewPosition.y);
