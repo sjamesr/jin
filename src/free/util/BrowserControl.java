@@ -252,12 +252,10 @@ public class BrowserControl{
   
   
   /** 
-   * Tries to determine whether this application is running under MacOS 
-   * by examing the "os.name" property. Returns <code>true</code> if the value
-   * of the "os.name" property starts (case insensitively) with the string
-   * "mac".
+   * Tries to determine whether this application is running under MacOS X 
+   * by examing the "os.name" property.
    * 
-   * @return true if this application is running under MacOS .
+   * @return true if this application is running under MacOS X.
    */ 
 
   public static boolean isMacOSX(){ 
