@@ -206,6 +206,8 @@
     <mkdir dir="${src-archive-dir}" />
     <copy todir="${src-archive-dir}">
       <fileset dir="${jin.dir}" includes="src/** resources/** build.xml manifest.txt" />
+      <fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+      <fileset dir="src" includes="COMPILING" />
     </copy>
 		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-src.tar" />
 		<property name="src-gz" value="${src-tar}.gz" />
