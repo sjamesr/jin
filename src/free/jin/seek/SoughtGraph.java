@@ -358,19 +358,19 @@ public class SoughtGraph extends JComponent{
     int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE)-1;
     int graphHeight = (int)(height*GRAPH_HEIGHT_PERCENTAGE);
 
-    int slotWidth = graphWidth/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
-    int slotHeight = graphHeight/RATING_SLOTS;
+    double slotWidth = ((double)graphWidth)/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
+    double slotHeight = ((double)graphHeight)/RATING_SLOTS;
 
-    rect.x = graphX+x*slotWidth;
-    rect.y = graphY+graphHeight-(y+1)*slotHeight;
-    rect.width = slotWidth;
-    rect.height = slotHeight;
+    rect.x = (int)(graphX+x*slotWidth);
+    rect.y = (int)(graphY+graphHeight-(y+1)*slotHeight);
+    rect.width = (int)slotWidth;
+    rect.height = (int)slotHeight;
 
-/*    if (x >= BULLET_SLOTS)
+    if (x >= BULLET_SLOTS)
       rect.x++;
     if (x >= BULLET_SLOTS + BLITZ_SLOTS)
       rect.x++;
-*/
+
     return rect;
   }
 
