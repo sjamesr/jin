@@ -539,7 +539,6 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     useRulesPanel.add(rulePropertiesPanel, BorderLayout.SOUTH);
     
 
-
     add(modeButtonsPanel, BorderLayout.NORTH);
     add(useRulesPanel, BorderLayout.CENTER);
 
@@ -568,11 +567,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       Component child = children[i];
       if (child instanceof JTextComponent)
         ((JTextComponent)child).setEditable(enabled);
-      else{
-        child.setEnabled(enabled);
-        if (child instanceof Container)
-          setContainerEnabled((Container)child, enabled);
-      }
+      child.setEnabled(enabled);
+      if (child instanceof Container)
+        setContainerEnabled((Container)child, enabled);
     }
   }
 
