@@ -25,11 +25,11 @@ package free.jin.chessclub.board;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
-import free.chess.JBoard;
 import free.chess.Position;
 import free.chess.Square;
 import free.util.PaintHook;
 import free.jin.chessclub.board.event.ArrowCircleListener;
+import free.jin.board.JinBoard;
 
 
 
@@ -38,7 +38,7 @@ import free.jin.chessclub.board.event.ArrowCircleListener;
  * such as arrows, circles and (in the future) others.
  */
 
-public class ChessclubJBoard extends JBoard implements PaintHook{
+public class ChessclubJBoard extends JinBoard implements PaintHook{
 
 
   
