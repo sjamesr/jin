@@ -49,6 +49,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 
 
 /**
@@ -573,13 +574,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Creates and configures a JInternalFrame to be used for displaying the given
-   * BoardPanel. This method also adds the given BoardPanel to the returned
-   * JInternalFrame.
+   * Creates a JInternalFrame to be used for displaying the given
+   * BoardPanel. 
    */
 
   protected JInternalFrame createBoardFrame(BoardPanel boardPanel){
     JInternalFrame boardFrame = new JInternalFrame();
+
     boardFrame.setResizable(true);
     boardFrame.setClosable(true);
     boardFrame.setMaximizable(true);
@@ -587,6 +588,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     return boardFrame;
   }
+
 
 
 
@@ -632,6 +634,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       Rectangle iconBounds = StringParser.parseRectangle(iconBoundsString);
       icon.setBounds(iconBounds);
     }
+
+    String iconImageName = getProperty("icon-image");
+    if (iconImageName != null){
+      URL iconImageURL = BoardManager.class.getResource(iconImageName);
+      if (iconImageURL!= null)
+        boardFrame.setFrameIcon(new ImageIcon(iconImageURL));
+    } 
   }
 
 
