@@ -148,6 +148,26 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
+   * Given the title of a player determines whether he's an unrated (guest)
+   * player. The title must consist of single title strings separated by spaces.
+   * Example: "WGM C *".
+   */
+
+  public static boolean isUnrated(String title){
+    StringTokenizer tokenizer = new StringTokenizer(title," ");
+    while (tokenizer.hasMoreTokens()){
+      String token = tokenizer.nextToken();
+      if (token.equals("U"))
+        return true;
+    }
+
+    return false;
+  }
+
+
+
+
+  /**
    * Adds the given ConnectionListener to the list of listeners receiving notifications
    * when the connection to the server is established/lost.
    */
@@ -1977,13 +1997,14 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     else
       player = null;
 
-    boolean isRegistered = (rating!=0);
+    boolean isRegistered = (rating != 0);
+    boolean isSeekerRated = !isUnrated(titles);
     boolean isComputer = isComputer(titles);
     boolean isRatingLimited = ((minRating!=0)||(maxRating!=9999));
 
     String title = displayableTitle(titles);
 
-    Seek seek = new Seek(String.valueOf(index), name, title, rating, isProvisional, isRegistered, isComputer, variant,
+    Seek seek = new Seek(String.valueOf(index), name, title, rating, isProvisional, isRegistered, isSeekerRated, isComputer, variant,
       ratingCategoryString, time*60*1000, inc*1000, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
 
     seeks.put(new Integer(index), seek);
