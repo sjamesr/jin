@@ -46,6 +46,14 @@ public abstract class Move{
 
 
   /**
+   * The player making the move.
+   */
+
+  protected final Player player;
+
+
+
+  /**
    * The string representation of this move. This may be null.
    */
 
@@ -55,15 +63,17 @@ public abstract class Move{
 
 
   /**
-   * Creates a new Move from the given starting Square to the given ending Square.
-   * The given stringRepresentation will be the string returned from the toString()
-   * method. It may be null, in which case a string constructed from the move data
-   * will be returned by toString().
+   * Creates a new Move from the given starting Square to the given ending
+   * Square, with the given moving Player. The given stringRepresentation will
+   * be the string returned from the toString() method. It may be null, in which
+   * case a string constructed from the move data will be returned by
+   * toString().
    */
 
-  public Move(Square startingSquare, Square endingSquare, String stringRepresentation){
+  public Move(Square startingSquare, Square endingSquare, Player player, String stringRepresentation){
     this.startingSquare = startingSquare;
     this.endingSquare = endingSquare;
+    this.player = player;
     this.stringRepresentation = stringRepresentation;
   }
 
@@ -86,6 +96,16 @@ public abstract class Move{
 
   public Square getEndingSquare(){
     return endingSquare;
+  }
+
+
+
+  /**
+   * Returns the Player making the move.
+   */
+
+  public Player getPlayer(){
+    return player;
   }
 
 
