@@ -158,7 +158,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Creates and returns the JMenu for this plugin.
    */
 
-  public JMenu createPluginMenu(){
+  public JMenu getPluginMenu(){
     JMenu myMenu = new JMenu("Console");
 
     if (getConn() instanceof GameListConnection){
