@@ -42,19 +42,10 @@ public class ChessEventEvent extends JinEvent{
 
 
   /**
-   * The id for events when a chess event's information is updated.
-   */
-
-  public static final int EVENT_UPDATED = 2;
-
-
-
-
-  /**
    * The id for events when a chess event is removed.
    */
 
-  public static final int EVENT_REMOVED = 3;
+  public static final int EVENT_REMOVED = 2;
 
 
 
@@ -87,7 +78,6 @@ public class ChessEventEvent extends JinEvent{
 
     switch(id){
       case EVENT_ADDED:
-      case EVENT_UPDATED:
       case EVENT_REMOVED:
         break;
       default:

@@ -41,16 +41,6 @@ public interface ChessEventListener extends EventListener{
 
 
 
-
-  /**
-   * Called when a ChessEvent is updated.
-   */
-
-  void chessEventUpdated(ChessEventEvent evt);
-
-
-
-
   /**
    * Called when a ChessEvent is removed.
    */

@@ -108,9 +108,9 @@ public class ChessEvent{
 
     this.id = id;
     this.description = description;
-    this.joinCommands = (joinCommands==null ? null : (String [])joinCommands.clone());
-    this.watchCommands = (watchCommands==null ? null : (String [])watchCommands.clone());
-    this.infoCommands = (infoCommands==null ? null : (String [])infoCommands.clone());
+    this.joinCommands = (joinCommands == null ? null : (String [])joinCommands.clone());
+    this.watchCommands = (watchCommands == null ? null : (String [])watchCommands.clone());
+    this.infoCommands = (infoCommands == null ? null : (String [])infoCommands.clone());
     this.confirmText = confirmText;
   }
 
@@ -146,7 +146,7 @@ public class ChessEvent{
    */
 
   public String [] getJoinCommands(){
-    return (joinCommands==null ? null : (String [])joinCommands.clone());
+    return (joinCommands == null ? null : (String [])joinCommands.clone());
   }
 
 
@@ -157,7 +157,7 @@ public class ChessEvent{
    */
 
   public boolean canJoin(){
-    return joinCommands!=null;
+    return joinCommands != null;
   }
 
 
@@ -169,7 +169,7 @@ public class ChessEvent{
    */
 
   public String [] getWatchCommands(){
-    return (watchCommands==null ? null : (String [])watchCommands.clone());
+    return (watchCommands == null ? null : (String [])watchCommands.clone());
   }
 
 
@@ -180,7 +180,7 @@ public class ChessEvent{
    */
 
   public boolean canWatch(){
-    return watchCommands!=null;
+    return watchCommands != null;
   }
 
 
@@ -192,7 +192,7 @@ public class ChessEvent{
    */
 
   public String [] getInformationCommands(){
-    return (infoCommands==null ? null : (String [])infoCommands.clone());
+    return (infoCommands == null ? null : (String [])infoCommands.clone());
   }
 
 
@@ -203,7 +203,7 @@ public class ChessEvent{
    */
 
   public boolean hasInformation(){
-    return infoCommands!=null;
+    return infoCommands != null;
   }
 
 
@@ -228,6 +228,18 @@ public class ChessEvent{
 
   public boolean isConfirmationNeeded(){
     return confirmText!=null;
+  }
+
+
+
+
+
+  /**
+   * Returns a textual representation of this ChessEvent.
+   */
+  
+  public String toString(){
+    return getDescription();
   }
 
 
