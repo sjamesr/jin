@@ -44,7 +44,7 @@ public class GraphicsUtilities{
 
   /**
    * Calculates the largest size of the given font for which the given string 
-   * will fit into the given size. This method uses the default toolkit.
+   * will fit into the given size.
    */
 
   public static int getMaxFittingFontSize(Graphics g, Font font, String string, int width, int height){
@@ -55,7 +55,7 @@ public class GraphicsUtilities{
     while (maxSize - minSize > 2){
       FontMetrics fm = g.getFontMetrics(new Font(font.getName(), font.getStyle(), curSize));
       int fontWidth = fm.stringWidth(string);
-      int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
+      int fontHeight = fm.getLeading() + fm.getMaxAscent() + fm.getMaxDescent();
 
       if ((fontWidth > width) || (fontHeight > height)){
         maxSize = curSize;
