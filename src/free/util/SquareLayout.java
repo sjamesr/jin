@@ -33,14 +33,30 @@ import java.awt.Dimension;
  */
 
 public class SquareLayout implements LayoutManager{
+  
 
-
+  
   /**
    * Creates a new SquareLayout.
    */
 
   public SquareLayout(){
 
+  }
+  
+  
+  
+  /**
+   * Creates a new Container with SquareLayout which will contain the specified
+   * component.
+   */
+   
+  public static Container createSquareContainer(Component child){
+    Container container = new Container();
+    container.setLayout(new SquareLayout());
+    container.add(child);
+    
+    return container;
   }
 
 
@@ -50,8 +66,37 @@ public class SquareLayout implements LayoutManager{
    */
 
   public void addLayoutComponent(String name, Component component){
-
+    
   }
+  
+  
+
+  /**
+   * Removes the specified component from the layout. 
+   */
+
+  public void removeLayoutComponent(Component component){
+    
+  }
+  
+  
+  
+  /**
+   * Returns the sole child of the specified container, or <code>null</code> if
+   * none. Throws an <code>IllegalStateException</code> if there is more than
+   * one child.
+   */
+   
+  private Component getChild(Container c){
+    int childCount = c.getComponentCount();
+    if (childCount > 1)
+      throw new IllegalStateException("May not layout more than one component");
+    else if (childCount == 0)
+      return null;
+    else
+      return c.getComponent(childCount - 1);
+  }
+
 
 
   /**
@@ -59,7 +104,10 @@ public class SquareLayout implements LayoutManager{
    */
 
   public void layoutContainer(Container container){
-    Component child = container.getComponent(container.getComponentCount()-1);
+    Component child = getChild(container);
+    if (child == null)
+      return;
+    
     Dimension parentSize = container.getSize();
     int minSize = parentSize.width < parentSize.height ? parentSize.width : parentSize.height;
     child.setBounds(0, 0, minSize, minSize);
@@ -73,7 +121,10 @@ public class SquareLayout implements LayoutManager{
    */
 
   public Dimension minimumLayoutSize(Container container){
-    Component child = container.getComponent(container.getComponentCount()-1);
+    Component child = getChild(container);
+    if (child == null)
+      return new Dimension(0, 0);
+    
     Dimension childMinSize = child.getMinimumSize();
     int maxSize = childMinSize.width > childMinSize.height ? childMinSize.width : childMinSize.height;
     return new Dimension(maxSize, maxSize);
@@ -88,23 +139,15 @@ public class SquareLayout implements LayoutManager{
    */
 
   public Dimension preferredLayoutSize(Container container){
-    Component child = container.getComponent(container.getComponentCount()-1);
+    Component child = getChild(container);
+    if (child == null)
+      return new Dimension(0, 0);
+    
     Dimension childPrefSize = child.getPreferredSize();
     int maxSize = childPrefSize.width > childPrefSize.height ? childPrefSize.width : childPrefSize.height;
     return new Dimension(maxSize, maxSize);
   }
 
 
-
-
-  /**
-   * Removes the specified component from the layout. 
-   */
-
-  public void removeLayoutComponent(Component component){
-
-  }
-
-
-
+  
 }
