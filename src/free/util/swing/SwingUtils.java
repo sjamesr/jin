@@ -81,7 +81,35 @@ public class SwingUtils{
 
     return null;
   }
+  
+  
+  
+  /**
+   * Creates and returns a <code>JPanel</code> with x-axis
+   * <code>BoxLayout</code>. 
+   */
+   
+  public static JPanel createHorizontalBox(){
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+    
+    return panel;
+  }
 
 
 
+  /**
+   * Creates and returns a <code>JPanel</code> with y-axis
+   * <code>BoxLayout</code>. 
+   */
+   
+  public static JPanel createVerticalBox(){
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    
+    return panel;
+  }
+
+
+  
 }
