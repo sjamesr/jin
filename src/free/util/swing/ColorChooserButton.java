@@ -207,5 +207,80 @@ public class ColorChooserButton extends JComponent implements ActionListener{
     if (newColor != null)
       setColor(newColor);
   }
+  
+  
+  
+  // Which sizes have been set?
+  private boolean minSizeSet = false;  
+  private boolean prefSizeSet = false;  
+  private boolean maxSizeSet = false;
+
+
+  
+  /**
+   * Returns the minimum size of the button, by default.
+   */
+   
+  public Dimension getMinimumSize(){
+    return minSizeSet ? super.getMinimumSize() : button.getMinimumSize();
+  }
+  
+
+  
+  /**
+   * Returns the preferred size of the button, by default.
+   */
+   
+  public Dimension getPreferredSize(){
+    return prefSizeSet ? super.getPreferredSize() : button.getPreferredSize();
+  }
+  
+
+
+  /**
+   * Returns the maximum size of the button, by default.
+   */
+   
+  public Dimension getMaximumSize(){
+    return maxSizeSet ? super.getMaximumSize() : button.getMaximumSize();
+  }
+  
+  
+  
+  /**
+   * Sets the minimum size.
+   */
+   
+  public void setMinimumSize(Dimension size){
+    super.setMinimumSize(size);
+    
+    minSizeSet = true;
+  }
+  
+  
+  
+  /**
+   * Sets the preferred size.
+   */
+   
+  public void setPreferredSize(Dimension size){
+    super.setPreferredSize(size);
+    
+    prefSizeSet = true;
+  }
+  
+  
+  
+  /**
+   * Sets the maximum size.
+   */
+   
+  public void setMaximumSize(Dimension size){
+    super.setMaximumSize(size);
+    
+    maxSizeSet = true;
+  }
+  
+  
 
 }
