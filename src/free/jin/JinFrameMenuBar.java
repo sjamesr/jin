@@ -631,7 +631,6 @@ public class JinFrameMenuBar extends JMenuBar{
       public void actionPerformed(ActionEvent evt){
         JDialog aboutDialog = new AboutDialog(jinFrame);
         AWTUtilities.centerWindow(aboutDialog, jinFrame);
-        aboutDialog.setResizable(false);
         aboutDialog.setVisible(true);
       }
     });
