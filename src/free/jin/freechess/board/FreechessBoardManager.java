@@ -61,41 +61,34 @@ public class FreechessBoardManager extends BoardManager{
 
 
   /**
-   * Gets called when a game starts. Creates a new BoardPanel and a
-   * JInternalFrame to put it in and displays it.
+   * Overrides the superclass' method to set the primary game properly.
    */
 
-  public void gameStarted(GameStartEvent evt){
-    primaryGameID = evt.getGame().getID();
+  public void internalFrameActivated(InternalFrameEvent e){
+    BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
+    Game game = boardPanel.getGame();
+    if (game.getGameType() != Game.ISOLATED_BOARD){
+      Object gameID = game.getID();
+      if (!gameID.equals(primaryGameID)){
+        getConnection().sendCommand("primary "+gameID);
+        primaryGameID = gameID;
+      }
+    }
 
-    super.gameStarted(evt);
+    super.internalFrameActivated(e);
   }
 
 
-
-
   /**
-   * Creates a JInternalFrame to be used for displaying the given
-   * BoardPanel. Overrides the superclass' method to register a listener so that
-   * we can set the primary game appropriately.
+   * Overrides the superclass' method to set <code>primaryGameID</code>
+   * properly.
    */
 
-  protected JInternalFrame createBoardFrame(final BoardPanel boardPanel){
-    JInternalFrame boardFrame = super.createBoardFrame(boardPanel);
+  public void gameStarted(GameStartEvent evt){
+    if (evt.getGame().getGameType() != Game.ISOLATED_BOARD)
+      primaryGameID = evt.getGame().getID();
 
-    if (boardPanel.getGame().getGameType() != Game.ISOLATED_BOARD){
-      boardFrame.addInternalFrameListener(new InternalFrameAdapter(){
-        public void internalFrameActivated(InternalFrameEvent evt){
-          Object gameID = boardPanel.getGame().getID();
-          if (!gameID.equals(primaryGameID)){
-            getConnection().sendCommand("primary "+gameID);
-            primaryGameID = gameID;
-          }
-        }
-      });
-    }
-
-    return boardFrame;
+    super.gameStarted(evt);
   }
 
 }

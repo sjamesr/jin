@@ -50,24 +50,16 @@ public class ChessclubBoardManager extends BoardManager{
 
 
   /**
-   * Creates a JInternalFrame to be used for displaying the given
-   * BoardPanel. Overrides the superclass' method to register a listener so that
-   * we can set the primary game appropriately.
+   * Overrides the superclass' method to set the primary game properly.
    */
 
-  protected JInternalFrame createBoardFrame(final BoardPanel boardPanel){
-    JInternalFrame boardFrame = super.createBoardFrame(boardPanel);
+  public void internalFrameActivated(InternalFrameEvent e){
+    BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
 
-    if (boardPanel.getGame().getGameType() != Game.ISOLATED_BOARD){
-      boardFrame.addInternalFrameListener(new InternalFrameAdapter(){
-        public void internalFrameActivated(InternalFrameEvent evt){
-          Game game = boardPanel.getGame();
-          getConnection().sendCommand("primary "+game.getID());
-        }
-      });
-    }
+    Game game = boardPanel.getGame();
+    getConnection().sendCommand("primary "+game.getID());
 
-    return boardFrame;
+    super.internalFrameActivated(e);
   }
 
 
