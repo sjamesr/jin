@@ -21,10 +21,8 @@
 
 package free.util.swing;
 
+import java.awt.*;
 import javax.swing.JDesktopPane;
-import java.awt.Image;
-import java.awt.Graphics;
-import java.awt.Dimension;
 
 
 /**
@@ -79,12 +77,26 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
 
 
+
   /**
    * Sets the wallpaper.
    */
 
   public void setWallpaper(Image wallpaper){
     this.wallpaper = wallpaper;
+
+    if (wallpaper!=null){
+      MediaTracker tracker = new MediaTracker(this);
+      tracker.addImage(wallpaper, 0);
+      try{
+        tracker.waitForAll();
+      } catch (InterruptedException e){
+          e.printStackTrace();
+        }
+      if ((wallpaper.getWidth(null) <= 0) || (wallpaper.getHeight(null) <= 0))
+        wallpaper = null;
+    }
+
     repaint();
   }
 
@@ -132,24 +144,27 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
 
   public void paintComponent(Graphics g){
+    super.paintComponent(g);
+
     Dimension size = this.getSize();
 
-    if (wallpaper!=null){
-      if (wallpaperLayoutStyle==STRETCH)
-        g.drawImage(wallpaper,0,0,size.width,size.height,this);
-      else if (wallpaperLayoutStyle==CENTER){
-        int imageWidth = wallpaper.getWidth(this);
-        int imageHeight = wallpaper.getHeight(this);
-        int x = (size.width-imageWidth)/2;
-        int y = (size.height-imageHeight)/2;
-        g.drawImage(wallpaper,x,y,this);
+    if (wallpaper != null){
+      int imageWidth = wallpaper.getWidth(this);
+      int imageHeight = wallpaper.getHeight(this);
+
+      if ((imageWidth == -1) || (imageHeight == -1))
+        return;
+      else if (wallpaperLayoutStyle == STRETCH)
+        g.drawImage(wallpaper, 0, 0, size.width, size.height, this);
+      else if (wallpaperLayoutStyle == CENTER){
+        int x = (size.width - imageWidth) / 2;
+        int y = (size.height - imageHeight)/2;
+        g.drawImage(wallpaper, x, y, this);
       }
       else if (wallpaperLayoutStyle==TILE){
-        int imageWidth = wallpaper.getWidth(this);
-        int imageHeight = wallpaper.getHeight(this);
-        for (int x=0;x<size.width;x+=imageWidth)
-          for (int y=0;y<size.height;y+=imageHeight)
-            g.drawImage(wallpaper,x,y,this);
+        for (int x = 0; x < size.width; x += imageWidth)
+          for (int y = 0; y < size.height; y += imageHeight)
+            g.drawImage(wallpaper, x, y, this);
       }
     }
   }
