@@ -142,6 +142,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     JMenu myMenu = new JMenu(getName());
     
     JRadioButtonMenuItem onMenu = new JRadioButtonMenuItem("Sound on", isOn);
+    onMenu.setMnemonic('S');
     onMenu.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
@@ -151,6 +152,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     });
 
     JRadioButtonMenuItem offMenu = new JRadioButtonMenuItem("Sound off", !isOn);
+    offMenu.setMnemonic('o');
     offMenu.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){

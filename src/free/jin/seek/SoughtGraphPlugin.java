@@ -71,19 +71,19 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
-   * The JCheckBoxMenuItem indicating whether the sought graph is visible.
+   * The JRadioButtonMenuItem indicating whether the sought graph is visible.
    */
 
-  private JRadioButtonMenuItem visibleCB; 
+  private JRadioButtonMenuItem visibleRB; 
 
 
 
 
   /**
-   * The JCheckBoxMenuItem indicating whether the sought graph is invisible.
+   * The JRadioButtonMenuItem indicating whether the sought graph is invisible.
    */
 
-  private JRadioButtonMenuItem nonVisibleCB;
+  private JRadioButtonMenuItem nonVisibleRB;
 
 
 
@@ -276,8 +276,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     soughtGraphFrame.setVisible(true);
 
-    if ((visibleCB!=null)&&(!visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
-      visibleCB.setSelected(true);
+    if ((visibleRB != null) && (!visibleRB.isSelected())) // It may be null if the graph is shown before it's created.
+      visibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().addSeekListener(SoughtGraphPlugin.this);
 
@@ -304,8 +304,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     soughtGraphFrame.setVisible(false);
     soughtGraph.removeAllSeeks();
 
-    if ((visibleCB!=null)&&(visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
-      nonVisibleCB.setSelected(true);
+    if ((visibleRB != null) && (visibleRB.isSelected())) // It may be null if the graph is shown before it's created.
+      nonVisibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().removeSeekListener(SoughtGraphPlugin.this);
 
@@ -373,14 +373,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
-    visibleCB = new JRadioButtonMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
-    visibleCB.addChangeListener(new ChangeListener(){
+    visibleRB = new JRadioButtonMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
+    visibleRB.setMnemonic('s');
+    visibleRB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
         if (changingGraphVisibility)
           return;
 
-        if (visibleCB.isSelected())
+        if (visibleRB.isSelected())
           showSoughtGraphFrame();
         else
           hideSoughtGraphFrame();
@@ -388,14 +389,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
     });
 
-    nonVisibleCB = new JRadioButtonMenuItem("Graph hidden", !visibleCB.isSelected());
+    nonVisibleRB = new JRadioButtonMenuItem("Graph hidden", !visibleRB.isSelected());
+    nonVisibleRB.setMnemonic('h');
 
     ButtonGroup visibilityGroup = new ButtonGroup();
-    visibilityGroup.add(visibleCB);
-    visibilityGroup.add(nonVisibleCB);
+    visibilityGroup.add(visibleRB);
+    visibilityGroup.add(nonVisibleRB);
 
-    myMenu.add(visibleCB);
-    myMenu.add(nonVisibleCB);
+    myMenu.add(visibleRB);
+    myMenu.add(nonVisibleRB);
 
     return myMenu;
   }
