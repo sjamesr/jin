@@ -101,6 +101,13 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       }
 
     });
+
+    // Hack, currently, the server has a bug which causes it not to send us
+    // the current event list even if we have turned DG_TOURNEY on at the login
+    // line. Remove when Bert fixes it.
+    if (isDGOn(Datagram.DG_TOURNEY)){
+      sendCommand("set-2 "+Datagram.DG_TOURNEY+" 1");
+    }
   }
 
 
@@ -2490,13 +2497,14 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     boolean makeNewWindowOnInfo, String description, String [] joinCommands, String [] watchCommands, String [] infoCommands,
     String confirmText){
 
-    ChessEvent newEvent = new ChessEvent(id, description, joinCommands, watchCommands, infoCommands, confirmText);
+    ChessEvent newEvent = new ChessEvent(id, description, joinCommands.length == 0 ? null : joinCommands, 
+      watchCommands.length == 0 ? null : watchCommands, infoCommands.length == 0 ? null : infoCommands, confirmText);
     ChessEvent existingEvent = (ChessEvent)chessEvents.put(new Integer(id), newEvent);
 
     if (existingEvent != null)
-      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_UPDATED, newEvent));
-    else
-      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
+      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, existingEvent));
+
+    fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
   }
 
 
@@ -2530,9 +2538,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         switch (evt.getID()){
           case ChessEventEvent.EVENT_ADDED:
             listener.chessEventAdded(evt);
-            break;
-          case ChessEventEvent.EVENT_UPDATED:
-            listener.chessEventUpdated(evt);
             break;
           case ChessEventEvent.EVENT_REMOVED:
             listener.chessEventRemoved(evt);
