@@ -92,6 +92,11 @@ public class ChessMove extends Move{
 
     super(startingSquare, endingSquare, movingPlayer, moveSAN);
 
+    if (startingSquare == null)
+      throw new IllegalArgumentException("Starting square may not be null");
+    if (endingSquare == null)
+      throw new IllegalArgumentException("Ending square may not be null");
+
     this.promotionTarget = promotionTarget;
     this.isEnPassant = isEnPassant;
     this.isShortCastling = isShortCastling;
@@ -118,6 +123,12 @@ public class ChessMove extends Move{
       ChessPiece promotionTarget, String moveSAN){
     
     super(startingSquare, endingSquare, pos.getCurrentPlayer(), moveSAN);
+
+    if (startingSquare == null)
+      throw new IllegalArgumentException("The starting square may not be null");
+
+    if (endingSquare == null)
+      throw new IllegalArgumentException("The ending square may not be null");
 
     if (pos.getPieceAt(startingSquare) == null)
       throw new IllegalArgumentException("The moving piece may not be null");
@@ -298,7 +309,7 @@ public class ChessMove extends Move{
     else if (isLongCastling())
       return "O-O-O";
     else{
-      String moveString = getStartingSquare().toString()+getEndingSquare().toString();
+      String moveString = getStartingSquare().toString() + getEndingSquare().toString();
       if (isPromotion())
         return moveString+"="+getPromotionTarget().toShortString();
       else
