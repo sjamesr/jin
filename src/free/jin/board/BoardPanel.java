@@ -658,13 +658,32 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (game.getGameType() != Game.MY_GAME)
       return null;
     else if (game.isPlayed())
-      buttonPanel = new PlayedGameButtonPanel(boardManager, game, this);
+      buttonPanel = createPlayedGameButtonPanel(game); 
     else
-      buttonPanel = new ExaminedGameButtonPanel(boardManager, game);
+      buttonPanel = createExaminedGameButtonPanel(game);
 
     return buttonPanel;
   }
 
+
+
+  /**
+   * Creates the button panel for a game played by the user.
+   */
+
+  protected JPanel createPlayedGameButtonPanel(Game game){
+    return new PlayedGameButtonPanel(boardManager, game, this);
+  }
+
+
+
+  /**
+   * Creates the button panel for a game examined by the user.
+   */
+
+  protected JPanel createExaminedGameButtonPanel(Game game){
+    return new ExaminedGameButtonPanel(boardManager, game);
+  }
 
 
 
