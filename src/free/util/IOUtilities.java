@@ -388,12 +388,20 @@ public class IOUtilities{
 
   /**
    * Creates and returns a new <code>java.util.Properties</code> object loaded
-   * from the specified <code>InputStream</code>.
+   * from the specified <code>InputStream</code>. <strong>Important:</strong>
+   * this method closes the specified input stream after reading from it.
    */
 
   public static Properties loadProperties(InputStream in) throws IOException{
+    if (in == null)
+      return null;
+    
     Properties props = new Properties();
-    props.load(in);
+    try{
+      props.load(in);
+    } finally {
+        in.close();
+      }
     return props;
   }
 
@@ -406,11 +414,7 @@ public class IOUtilities{
 
   public static Properties loadProperties(File file) throws IOException{
     InputStream in = new FileInputStream(file);
-    try{
-      return loadProperties(in);
-    } finally{
-        in.close();
-      }
+    return loadProperties(in);
   }
 
 
@@ -422,12 +426,9 @@ public class IOUtilities{
 
   public static Properties loadProperties(URL url) throws IOException{
     InputStream in = url.openStream();
-    try{
-      return loadProperties(in);
-    } finally{
-        in.close();
-      }
+    return loadProperties(in);
   }
 
 
+  
 }
