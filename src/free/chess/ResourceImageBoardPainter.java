@@ -111,7 +111,7 @@ public class ResourceImageBoardPainter extends ImageBoardPainter{
       def = new Properties();
 
     String type = def.getProperty("type", "light-dark");     
-    String ext = def.getProperty("image.type", "gif");
+    String ext = def.getProperty("ext", "gif");
     
     Toolkit toolkit = Toolkit.getDefaultToolkit();    
     

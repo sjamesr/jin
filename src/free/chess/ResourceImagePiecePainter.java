@@ -104,7 +104,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
     if (def == null)
       throw new IOException("Unable to load " + defFile + " with classloader: " + cl);
     
-    String ext = def.getProperty("image.type", "gif");
+    String ext = def.getProperty("ext", "gif");
     int sizeInt = Integer.parseInt(def.getProperty("size.pref"));
     int [] sizes = TextUtilities.parseIntList(def.getProperty("size.list"), " ");
     
