@@ -111,7 +111,7 @@ public class BrowserControl{
         int urlIndex = browser.indexOf("%s");
         String commandline;
         if (urlIndex != -1)
-          commandline = browser.substring(0, urlIndex)+url+browser.substring(urlIndex+3);
+          commandline = browser.substring(0, urlIndex)+url+browser.substring(urlIndex+2);
         else
           commandline = browser+" "+url;
         Runtime.getRuntime().exec(commandline);
