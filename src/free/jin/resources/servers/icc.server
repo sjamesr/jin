@@ -1,8 +1,8 @@
 
 classname = free.jin.chessclub.ChessclubServer
 
-name = icc
-name.short = icc
+id = icc
+name = ICC
 name.long = Internet Chess Club
 
 login.hosts = chessclub.com;queen.chessclub.com;rook.chessclub.com;special.chessclub.com

@@ -1,8 +1,8 @@
 
 classname = free.jin.freechess.FreechessServer
 
-name = fics
-name.short = fics
+id = fics
+name = FICS
 name.long = Free Internet Chess Server
 
 login.hosts = freechess.org
