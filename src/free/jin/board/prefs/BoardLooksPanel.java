@@ -288,7 +288,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     // Bubble sort by name
     for (int i = 0; i < resources.length; i++){
-      for (int j = i; j < resources.length - 1; j++){
+      for (int j = 0; j < resources.length - (i + 1); j++){
         String name1 = pieceSets[j].getName();
         String name2 = pieceSets[j+1].getName();
         
@@ -318,7 +318,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     // Bubble sort by name
     for (int i = 0; i < resources.length; i++){
-      for (int j = i; j < resources.length - 1; j++){
+      for (int j = 0; j < resources.length - (i + 1); j++){
         String name1 = boardPatterns[j].getName();
         String name2 = boardPatterns[j+1].getName();
         
