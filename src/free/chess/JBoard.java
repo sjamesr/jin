@@ -1091,7 +1091,7 @@ public class JBoard extends JComponent{
       int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/12);
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == BOTH_SQUARES_MOVE_HIGHLIGHTING){
-          drawSquare(g, from, highlightSize - Math.max(1, highlightSize/4), getMoveHighlightingColor());
+          drawSquare(g, from, highlightSize - Math.max(1, highlightSize/3), getMoveHighlightingColor());
           drawSquare(g, to, highlightSize, getMoveHighlightingColor());
         }
         else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING){
