@@ -144,7 +144,9 @@ public abstract class Piece{
 
   /**
    * Returns a short (notational) string representing this chess piece ("N"
-   * for a knight for example).
+   * for a knight for example). Black and white pieces should be represented
+   * by the same string. To differentiate between black and white pieces, use
+   * the <code>toShortColorString</code> method.
    *
    * @return a short string representing this piece.
    */
