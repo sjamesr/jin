@@ -142,10 +142,8 @@ public class ConnectionManager{
       new LoginThread(session).start();
 
     } catch (PluginStartException e){
-        Exception reason = e.getReason();
-        if (reason != null)
-          reason.printStackTrace();
         e.printStackTrace();
+        Exception reason = e.getReason();
 
         String errorMessage = e.getMessage() + "\n" + 
           (reason == null ? "" : reason.getClass().getName() + ": " + reason.getMessage());
