@@ -67,6 +67,8 @@ public class BeanShellScript extends Script{
     addImports(bsh);
     addVariables(bsh, context);
     addMethods(bsh, context);
+    
+    bsh.eval("void runScript(){"+code+"}");
   }
 
 
@@ -154,13 +156,24 @@ public class BeanShellScript extends Script{
     try{
       bsh.set("event", event);
       bsh.set("eventSubtype", eventSubtype);
+
+      // Set the variables
       for (int i = 0; i < vars.length; i++){
         Object [] var = vars[i];
         String varName = (String)(var[0]);
         Object varValue = var[1];
         bsh.set(varName, varValue);
       }
-      bsh.eval(code);
+
+      bsh.eval("runScript();");
+
+      // Unset the variables so that they're not there the next time the script is run.
+      for (int i = 0; i < vars.length; i++){
+        Object [] var = vars[i];
+        String varName = (String)(var[0]);
+        bsh.unset(varName);
+      }
+
     } catch (EvalError e){
         // Shouldn't happen
         e.printStackTrace();
