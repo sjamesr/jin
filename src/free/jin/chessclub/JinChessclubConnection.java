@@ -39,6 +39,7 @@ import free.util.EventListenerList;
 import free.jin.chessclub.event.CircleEvent;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessclubGameListener;
+import free.jin.chessclub.event.ChessEventEvent;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.Array;
@@ -51,15 +52,16 @@ import java.lang.reflect.Array;
  * TODO: document the tell types.
  */
 
-public class JinChessclubConnection extends ChessclubConnection implements JinConnection, SeekJinConnection, GameListJinConnection, ChessEventJinConnection, FriendsJinConnection{
+public class JinChessclubConnection extends ChessclubConnection implements JinConnection, 
+    SeekJinConnection, GameListJinConnection, FriendsJinConnection{
 
 
 
   /**
-   * The EventListenerList where we put all the listeners.
+   * Our listener manager
    */
 
-  protected final EventListenerList listenerList = new EventListenerList();
+  private final ChessclubJinListenerManager listenerManager = new ChessclubJinListenerManager(this);
 
 
 
@@ -84,6 +86,28 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
+  /**
+   * Returns the ChessclubJinListenerManager.
+   */
+
+  public ChessclubJinListenerManager getChessclubJinListenerManager(){
+    return listenerManager;
+  }
+
+
+
+
+  /**
+   * Returns the JinListenerManager.
+   */
+
+  public JinListenerManager getJinListenerManager(){
+    return getChessclubJinListenerManager();
+  }
+
+
+
+
 
   /**
    * Current functionality includes:
@@ -97,7 +121,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void onLogin(){
     super.onLogin();
 
-    fireLoggedIn();
+    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN));
 
     sendCommand("set-quietly wrap 0");
 
@@ -168,30 +192,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Adds the given ConnectionListener to the list of listeners receiving notifications
-   * when the connection to the server is established/lost.
-   */
-
-  public void addConnectionListener(ConnectionListener listener){
-    listenerList.add(ConnectionListener.class, listener);
-  }
-
-
-
-
-  /**
-   * Removes the given ConnectionListener from the list of listeners receiving
-   * notifications when the connection to the server is established/lost.
-   */
-
-  public void removeConnectionListener(ConnectionListener listener){
-    listenerList.remove(ConnectionListener.class, listener);
-  }
-
-
-
-
-  /**
    * Overrides createSocket() to fire a ConnectionEvent specifying that the connection
    * was established when super.createSocket() returns (in the Event dispatching
    * thread of course).
@@ -203,7 +203,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     execRunnable(new Runnable(){
 
       public void run(){
-        fireConnectionEstablished();
+        listenerManager.fireConnectionEvent(new ConnectionEvent(JinChessclubConnection.this, ConnectionEvent.ESTABLISHED));
       }
 
     });
@@ -222,7 +222,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   private WildVariant getVariant(int variantNumber){
     String variantName = getVariantName(variantNumber);
-    if (variantName == null)        // Defend against the server not doing its
+    if (variantName == null)           // Defend against the server not doing its
       variantName = "w"+variantNumber; // job properly (not sending the variant name).
 
     switch(variantNumber){
@@ -323,93 +323,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processDisconnection(){
-    fireConnectionLost();
+    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOST));
   }
 
-
-
-  /**
-   * Notifies all registered ConnectionListeners that the connection to the server
-   * has been established.
-   */
-
-  private void fireConnectionEstablished(){
-    ConnectionEvent evt = new ConnectionEvent(this, ConnectionEvent.ESTABLISHED);
-
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==ConnectionListener.class){
-        ConnectionListener listener = (ConnectionListener)listenerList[i+1];
-        listener.connectionEstablished(evt);
-      }
-    }
-  }
-
-
-
-  /**
-   * Notifies all registered ConnectionListeners that the login procedure is done.
-   */
-
-  private void fireLoggedIn(){
-    ConnectionEvent evt = new ConnectionEvent(this, ConnectionEvent.LOGGED_IN);
-
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==ConnectionListener.class){
-        ConnectionListener listener = (ConnectionListener)listenerList[i+1];
-        listener.connectionLoggedIn(evt);
-      }
-    }
-  }
-
-
-
-  /**
-   * Notifies all registered ConnectionListeners that the connection to the server
-   * has been lost.
-   */
-
-  private void fireConnectionLost(){
-    ConnectionEvent evt = new ConnectionEvent(this, ConnectionEvent.LOST);
-
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==ConnectionListener.class){
-        ConnectionListener listener = (ConnectionListener)listenerList[i+1];
-        listener.connectionLost(evt);
-      }
-    }
-  }
-
-
-
-
-
-  /**
-   * Adds the given PlainTextListener to receive notification when a line of plain 
-   * text arrives from the chessclub.com server. Note that the line may be a tell,
-   * shout or any other recognized type, but if no listeners have been
-   * registered for that type, it is sent as plain text. This behaviour, however
-   * is not guaranteed - if you want to receive all messages, you must listen to
-   * all the types.
-   */
-
-  public void addPlainTextListener(PlainTextListener listener){
-    listenerList.add(PlainTextListener.class, listener);
-  }
-
-
-
-  /**
-   * Removes the given PlainTextListener from the list of PlainTextListeners
-   * receiving notification when a line of plain text arrives from the
-   * chessclub.com server.
-   */
-
-  public void removePlainTextListener(PlainTextListener listener){
-    listenerList.remove(PlainTextListener.class, listener);
-  }
 
 
 
@@ -419,7 +335,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processLine(String line){
-    firePlainTextReceived(line);
+    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
 
 
     // HACK until Bert implements a way for us to know about real arrivals/departs
@@ -431,88 +347,19 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
           int secondSpaceIndex = line.indexOf(" ", firstSpaceIndex+1);
           String playerName = line.substring(firstSpaceIndex+1, secondSpaceIndex);
           if ((playerName.length() > 0) && (playerName.length() <= 15))
-            fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, playerName));
+            listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, playerName));
         }
         else if (line.endsWith(" has departed.")){
           int firstSpaceIndex = line.indexOf(" ");
           int secondSpaceIndex = line.indexOf(" ", firstSpaceIndex+1);
           String playerName = line.substring(firstSpaceIndex+1, secondSpaceIndex);
           if ((playerName.length() > 0) && (playerName.length() <= 15))
-            fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
+            listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
         }
       }
     }
     // END HACK 
 
-  }
-
-
-
-
-
-  /**
-   * Dispatched an appropriate PlainTextEvent to all registered PlaintTextListeners.
-   */
-
-  protected void firePlainTextReceived(String line){
-    PlainTextEvent evt = new PlainTextEvent(this,line);
-    
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==PlainTextListener.class){
-        PlainTextListener listener = (PlainTextListener)listenerList[i+1];
-        listener.plainTextArrived(evt);
-      }
-    }
-  }
-
-
-
-
-
-
-  /**
-   * Adds the given ChatListener to receive notification when one of the
-   * following datagrams arrive:
-   * <UL>
-   *   <LI> DG_PERSONAL_TELL
-   *   <LI> DG_SHOUT
-   *   <LI> DG_CHANNEL_TELL
-   *   <LI> DG_KIBITZ
-   * </UL>
-   */
-
-  public void addChatListener(ChatListener listener){
-    if (listenerList.getListenerCount(ChatListener.class)==0){
-      setDGState(Datagram.DG_PERSONAL_TELL, true);
-      setDGState(Datagram.DG_PERSONAL_QTELL, true);
-      setDGState(Datagram.DG_SHOUT, true);
-      setDGState(Datagram.DG_CHANNEL_TELL, true);
-      setDGState(Datagram.DG_CHANNEL_QTELL, true);
-      setDGState(Datagram.DG_KIBITZ, true);
-    }
-
-    listenerList.add(ChatListener.class, listener);
-  }
-
-
-
-  /**
-   * Removes the given ChatListener from the list of ChatListeners receiving
-   * notification when chat related messages arrive from the server.
-   */
-
-  public void removeChatListener(ChatListener listener){
-    listenerList.remove(ChatListener.class, listener);
-
-    if (listenerList.getListenerCount(ChatListener.class)==0){
-      setDGState(Datagram.DG_PERSONAL_TELL, false);
-      setDGState(Datagram.DG_PERSONAL_QTELL, false);
-      setDGState(Datagram.DG_SHOUT, false);
-      setDGState(Datagram.DG_CHANNEL_TELL, false);
-      setDGState(Datagram.DG_CHANNEL_QTELL, true);
-      setDGState(Datagram.DG_KIBITZ, false);
-    }
   }
 
 
@@ -538,7 +385,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, playername, title, message, null);
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
@@ -551,7 +398,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   protected void processPersonalQTell(String name, String titles, String message){
     ChatEvent evt = new ChatEvent(this, "qtell", name, displayableTitle(titles), message, null);
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
@@ -578,7 +425,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, null);
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
@@ -603,7 +450,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, new Integer(channel));
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
@@ -616,7 +463,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   protected void processChannelQTell(int channel, String name, String titles, String message){
     ChatEvent evt = new ChatEvent(this, "channel-qtell", name, displayableTitle(titles), message, new Integer(channel));
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
@@ -633,101 +480,22 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, new Integer(gameNumber));
-    fireChatMessageArrived(evt);
+    listenerManager.fireChatEvent(evt);
   }
 
 
 
 
 
-  /**
-   * Dispatches the given ChatEvent to all registered listeners.
-   */
-
-  protected void fireChatMessageArrived(ChatEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==ChatListener.class){
-        ChatListener listener = (ChatListener)listenerList[i+1];
-        listener.chatMessageArrived(evt);
-      }
-    }
-  }
-
-
-
-
 
   /**
-   * Adds the given GameListener to the list of listeners receiving
-   * notifications of GameEvents. This method will accept and handle properly 
-   * ChessclubGameListeners (by calling the chessclub specific methods in that
-   * interface when needed).
+   * This method is called by ChessclubJinListenerManager when the last
+   * GameListener is removed.
    */
 
-  public void addGameListener(GameListener listener){
-    listenerList.add(GameListener.class, listener);
-
-    if (listenerList.getListenerCount(GameListener.class)==1){
-      setDGState(Datagram.DG_MY_GAME_STARTED, true);
-      setDGState(Datagram.DG_STARTED_OBSERVING, true);
-      setDGState(Datagram.DG_ISOLATED_BOARD, true);
-      setDGState(Datagram.DG_MY_GAME_CHANGE, true);
-      setDGState(Datagram.DG_MY_GAME_RESULT, true);
-      setDGState(Datagram.DG_POSITION_BEGIN, true);
-      setDGState(Datagram.DG_MY_RELATION_TO_GAME, true);
-      setDGState(Datagram.DG_SEND_MOVES, true);
-      setDGState(Datagram.DG_MOVE_SMITH, true);
-      setDGState(Datagram.DG_MOVE_ALGEBRAIC, true);
-      setDGState(Datagram.DG_BACKWARD, true);
-      setDGState(Datagram.DG_TAKEBACK, true);
-      setDGState(Datagram.DG_ILLEGAL_MOVE, true);
-      setDGState(Datagram.DG_MSEC, true);
-      setDGState(Datagram.DG_MORETIME, true);
-      setDGState(Datagram.DG_FLIP, true);
-      setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, true);
-      setDGState(Datagram.DG_ARROW, true);
-      setDGState(Datagram.DG_CIRCLE, true);
-      setStyle(13);
-    }
-  }
-
-
-
-
-  /**
-   * Removes the given GameListener from the list of listeners receiving 
-   * notifications of GameEvents. This method can be also used to remove
-   * ChessclubGameListeners added via the addGameListener(GameListener) method.
-   */
-
-  public void removeGameListener(GameListener listener){
-    listenerList.remove(GameListener.class, listener);
-    if (listenerList.getListenerCount(GameListener.class)==0){
-      setDGState(Datagram.DG_MY_GAME_STARTED, false);
-      setDGState(Datagram.DG_STARTED_OBSERVING, false);
-      setDGState(Datagram.DG_ISOLATED_BOARD, false);
-      setDGState(Datagram.DG_MY_GAME_CHANGE, false);
-      setDGState(Datagram.DG_MY_GAME_RESULT, false);
-      setDGState(Datagram.DG_POSITION_BEGIN, false);
-      setDGState(Datagram.DG_MY_RELATION_TO_GAME, false);
-      setDGState(Datagram.DG_SEND_MOVES, false);
-      setDGState(Datagram.DG_MOVE_SMITH, false);
-      setDGState(Datagram.DG_MOVE_ALGEBRAIC, false);
-      setDGState(Datagram.DG_BACKWARD, false);
-      setDGState(Datagram.DG_TAKEBACK, false);
-      setDGState(Datagram.DG_ILLEGAL_MOVE, false);
-      setDGState(Datagram.DG_MSEC, false);
-      setDGState(Datagram.DG_MORETIME, false);
-      setDGState(Datagram.DG_FLIP, false);
-      setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, false);
-      setDGState(Datagram.DG_ARROW, false);
-      setDGState(Datagram.DG_CIRCLE, false);
-      setStyle(1);
-
-      gameNumbersToGameInfo.clear();
-      nonStartedGames.clear();
-    }
+  void lastGameListenerRemoved(){
+    gameNumbersToGameInfo.clear();
+    nonStartedGames.clear();
   }
 
 
@@ -1484,39 +1252,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * Dispatches the given GameEvent to all interested GameListeners.
    */
   
-  protected void fireGameEvent(GameEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i = 0; i < listenerList.length; i += 2){
-      if (listenerList[i]==GameListener.class){
-        GameListener listener = (GameListener)listenerList[i+1];
-        if (evt instanceof GameStartEvent)
-          listener.gameStarted((GameStartEvent)evt);
-        else if (evt instanceof GameEndEvent)
-          listener.gameEnded((GameEndEvent)evt);
-        else if (evt instanceof MoveMadeEvent)
-          listener.moveMade((MoveMadeEvent)evt);
-        else if (evt instanceof PositionChangedEvent)
-          listener.positionChanged((PositionChangedEvent)evt);  
-        else if (evt instanceof TakebackEvent)
-          listener.takebackOccurred((TakebackEvent)evt);
-        else if (evt instanceof IllegalMoveEvent)
-          listener.illegalMoveAttempted((IllegalMoveEvent)evt);
-        else if (evt instanceof ClockAdjustmentEvent)
-          listener.clockAdjusted((ClockAdjustmentEvent)evt);
-        else if (evt instanceof BoardFlipEvent)
-          listener.boardFlipped((BoardFlipEvent)evt);
-        else if (evt instanceof CircleEvent){ 
-          if (listener instanceof ChessclubGameListener) 
-            ((ChessclubGameListener)listener).circleAdded((CircleEvent)evt);
-        }
-        else if (evt instanceof ArrowEvent){
-          if (listener instanceof ChessclubGameListener)
-            ((ChessclubGameListener)listener).arrowAdded((ArrowEvent)evt);
-        }
-        else
-          throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
-      }
-    }
+  private void fireGameEvent(GameEvent evt){
+    listenerManager.fireGameEvent(evt);
   }
 
 
@@ -1934,44 +1671,45 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Adds the given SeekListener to the list of listeners receiving notification
-   * of SeekEvents.
+   * Returns the SeekJinListenerManager via which you can register and
+   * unregister SeekListeners.
    */
 
-  public void addSeekListener(SeekListener listener){
-    listenerList.add(SeekListener.class, listener);
+  public SeekJinListenerManager getSeekJinListenerManager(){
+    return getChessclubJinListenerManager();
+  }
 
-    if (listenerList.getListenerCount(SeekListener.class)==1){
-      setDGState(Datagram.DG_SEEK, true);
-      setDGState(Datagram.DG_SEEK_REMOVED, true);
-    }
-    else{
-      Enumeration seeksEnum = seeks.elements();
-      while (seeksEnum.hasMoreElements()){
-        Seek seek = (Seek)seeksEnum.nextElement();
-        SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
-        listener.seekAdded(evt);
-      }
+
+
+  /**
+   * This method is called by our ChessclubJinListenerManager when a new
+   * SeekListener is added and we already had registered listeners (meaning that
+   * DG_SEEK was already on, so we need to notify the new listeners of all
+   * existing seeks as well).
+   */
+
+  void notFirstListenerAdded(SeekListener listener){
+    Enumeration seeksEnum = seeks.elements();
+    while (seeksEnum.hasMoreElements()){
+      Seek seek = (Seek)seeksEnum.nextElement();
+      SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
+      listener.seekAdded(evt);
     }
   }
+
 
 
 
 
   /**
-   * Removes the given SeekListener from the list of listeners receiving 
-   * notification of SeekEvents.
+   * This method is called by our ChessclubJinListenerManager when the last
+   * SeekListener is removed.
    */
 
-  public void removeSeekListener(SeekListener listener){
-    listenerList.remove(SeekListener.class, listener);
-
-    if (listenerList.getListenerCount(SeekListener.class)==0){
-      setDGState(Datagram.DG_SEEK, false);
-      setDGState(Datagram.DG_SEEK_REMOVED, false);
-      seeks.clear();
-    }
+  void lastSeekListenerRemoved(){
+    seeks.clear();
   }
+
 
 
 
@@ -2009,7 +1747,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     seeks.put(new Integer(index), seek);
 
-    fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
+    listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
   }
 
 
@@ -2026,7 +1764,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (seek==null)
       return;
 
-    fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));    
+    listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));    
   }
 
 
@@ -2044,29 +1782,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-  /**
-   * Fires the given SeekEvent to all interested SeekListeners.
-   */
-
-  protected void fireSeekEvent(SeekEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==SeekListener.class){
-        SeekListener listener = (SeekListener)listenerList[i+1];
-        switch(evt.getID()){
-          case SeekEvent.SEEK_ADDED:
-            listener.seekAdded(evt);
-            break;
-          case SeekEvent.SEEK_REMOVED:
-            listener.seekRemoved(evt);
-            break;
-        }
-      }
-    }
-  }
-
-
-
 
   /**
    * The GameListInfo for the list we're currently reading. I'm not holding
@@ -2079,33 +1794,12 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Adds the given GameListListener to receive notifications of GameListEvents.
+   * Returns the GameListJinListenerManager via which you can register and
+   * unregister GameListListeners.
    */
 
-  public void addGameListListener(GameListListener listener){
-    listenerList.add(GameListListener.class, listener);
-
-    if (listenerList.getListenerCount(GameListListener.class)==1){
-      setDGState(Datagram.DG_GAMELIST_BEGIN, true);
-      setDGState(Datagram.DG_GAMELIST_ITEM, true);
-    }
-  }
-
-
-
-
-  /**
-   * Removes the given GameListListener from the list of listeners receiving
-   * notifications of GameListEvents.
-   */
-
-  public void removeGameListListener(GameListListener listener){
-    listenerList.remove(GameListListener.class, listener);
-
-    if (listenerList.getListenerCount(GameListListener.class)==0){
-      setDGState(Datagram.DG_GAMELIST_BEGIN, false);
-      setDGState(Datagram.DG_GAMELIST_ITEM, false);
-    }
+  public GameListJinListenerManager getGameListJinListenerManager(){
+    return getChessclubJinListenerManager();
   }
 
 
@@ -2241,7 +1935,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       String title = curGameListInfo.summary+" ("+curGameListInfo.command+" "+curGameListInfo.args+")";
       GameListEvent evt = new GameListEvent(this, curGameListInfo.gameListEventID, curGameListInfo.gameList, 
         title, curGameListInfo.totalNumItems, curGameListInfo.firstIndex, curGameListInfo.lastIndex);
-      fireGameListEvent(evt);
+      listenerManager.fireGameListEvent(evt);
 
       curGameListInfo = null;
     }
@@ -2439,21 +2133,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-  /**
-   * Fires the given GameListEvent to all interested GameListListeners.
-   */
-
-  protected void fireGameListEvent(GameListEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==GameListListener.class){
-        GameListListener listener = (GameListListener)listenerList[i+1];
-        listener.gameListArrived(evt);
-      }
-    }
-  }
-
-
 
 
   private static class GameListInfo{
@@ -2588,37 +2267,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-  /**
-   * Adds the given ChessEventListener to the list of listeners receiving
-   * notifications when an event is added.
-   */
-
-  public void addChessEventListener(ChessEventListener listener){
-    listenerList.add(ChessEventListener.class, listener);
-
-    if (listenerList.getListenerCount(ChessEventListener.class)==1){
-      setDGState(Datagram.DG_TOURNEY, true);
-      setDGState(Datagram.DG_REMOVE_TOURNEY, true);
-    }
-  }
-
-
-
-  /**
-   * Removes the given ChessEventListener from the list of listeners receiving
-   * notifications when an event is added.
-   */
-
-  public void removeChessEventListener(ChessEventListener listener){
-    listenerList.remove(ChessEventListener.class, listener);
-
-    if (listenerList.getListenerCount(ChessEventListener.class)==0){
-      setDGState(Datagram.DG_TOURNEY, false);
-      setDGState(Datagram.DG_REMOVE_TOURNEY, false);
-    }
-  }
-
-
 
 
   /**
@@ -2635,9 +2283,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     ChessEvent existingEvent = (ChessEvent)chessEvents.put(new Integer(id), newEvent);
 
     if (existingEvent != null)
-      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, existingEvent));
+      listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, existingEvent));
 
-    fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
+    listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
   }
 
 
@@ -2653,31 +2301,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (evt == null) // Ignore DG_REMOVE_TOURNEY for events we didn't get a DG_TOURNEY for.
       return;
 
-    fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, evt));
-  }
-
-
-
-
-  /**
-   * Dispatches the given ChessEventEvent to all interested listeners.
-   */
-
-  protected void fireChessEventEvent(ChessEventEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i = 0; i < listenerList.length; i += 2){
-      if (listenerList[i]==ChessEventListener.class){
-        ChessEventListener listener = (ChessEventListener)listenerList[i+1];
-        switch (evt.getID()){
-          case ChessEventEvent.EVENT_ADDED:
-            listener.chessEventAdded(evt);
-            break;
-          case ChessEventEvent.EVENT_REMOVED:
-            listener.chessEventRemoved(evt);
-            break;
-        }
-      }
-    }
+    listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, evt));
   }
 
 
@@ -2713,42 +2337,41 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Adds the given FriendsListener to the list of listeners receiving
-   * notifications about friends.
+   * Returns the FriendsJinListenerManager which allows registering and
+   * unregistering FriendsListeners.
    */
 
-  public void addFriendsListener(FriendsListener listener){
-    listenerList.add(FriendsListener.class, listener);
-
-    if (!handlingFriends){
-//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
-//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
-//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-
-      handlingFriends = true;
-    }
+  public FriendsJinListenerManager getFriendsJinListenerManager(){
+    return getChessclubJinListenerManager();
   }
+
+
 
 
 
   /**
-   * Removes the given FriendsListener from the list of listeners receiving
-   * notifications about friends.
+   * This method is called by the ChessclubJinManagerListener when the first
+   * FriendsListener is added.
    */
 
-  public void removeFriendsListener(FriendsListener listener){
-    listenerList.remove(FriendsListener.class, listener);
-
-    if (listenerList.getListenerCount(FriendsListener.class)==0){
-//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
-//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
-//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-
-      handlingFriends = false;
-      friends.removeAllElements();
-      onlineFriends.removeAllElements();
-    }
+  void firstFriendsListenerAdded(){
+    handlingFriends = true;
   }
+  
+
+
+
+  /**
+   * This method is called by the ChessclubJinManagerListener when the first
+   * FriendsListener is removed.
+   */
+
+  void lastFriendsListenerRemoved(){
+    handlingFriends = false;
+    friends.removeAllElements();
+    onlineFriends.removeAllElements();
+  } 
+
 
 
 
@@ -2766,7 +2389,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       return;
 
     onlineFriends.addElement(playerName);
-    fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ONLINE, playerName));
+    listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ONLINE, playerName));
   }
 
 
@@ -2786,7 +2409,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     onlineFriends.removeElement(playerName);
 
     // As a temporary hack, we do this from processLine(String line)
-//    fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
+//    listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
   }
 
 
@@ -2805,7 +2428,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         return;
 
       friends.addElement(playerName);
-      fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, playerName));
+      listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, playerName));
 
       setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
     }
@@ -2814,7 +2437,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         return;
 
       friends.removeElement(playerName);
-      fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, playerName));
+      listenerManager.fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, playerName));
     }
   }
 
@@ -2892,41 +2515,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   }
 
 
-
-
-
-  /**
-   * Dispatches the given FriendsEvent to all interested listeners.
-   */
-
-  protected void fireFriendsEvent(FriendsEvent evt){
-    Object [] listenerList = this.listenerList.getListenerList();
-    for (int i = 0; i < listenerList.length; i += 2){
-      if (listenerList[i] == FriendsListener.class){
-        FriendsListener listener = (FriendsListener)listenerList[i+1];
-        switch (evt.getID()){
-          case FriendsEvent.FRIEND_CONNECTED:
-            listener.friendConnected(evt);
-            break;
-          case FriendsEvent.FRIEND_DISCONNECTED:
-            listener.friendDisconnected(evt);
-            break;
-          case FriendsEvent.FRIEND_ADDED:
-            listener.friendAdded(evt);
-            break;
-          case FriendsEvent.FRIEND_REMOVED:
-            listener.friendRemoved(evt);
-            break;
-          case FriendsEvent.FRIEND_ONLINE:
-            listener.friendOnline(evt);
-            break;
-        }
-      }
-    }
-  }
-
-  
-  
   
   
   /**
