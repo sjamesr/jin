@@ -1133,7 +1133,7 @@ public class JBoard extends JComponent{
    * actual drawing though.
    */
    
-  private static final Font COORDS_FONT = new Font("Monospaced", Font.BOLD, 10); 
+  private static final Font COORDS_FONT = new Font("Monospaced", Font.PLAIN, 10); 
                                                    
                                                    
   
@@ -1165,12 +1165,12 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    int textWidth = squareWidth/5;
-    int textHeight = squareHeight/5;
+    int textWidth = squareWidth/4;
+    int textHeight = squareHeight/4;
     
     int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 10);
-    Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
+        new Dimension(textWidth, textHeight)), 8);
+    Font font = new Font(COORDS_FONT.getName(), Font.BOLD, fontSize);
     g.setFont(font);
     
     FontMetrics fm = g.getFontMetrics(font);
@@ -1208,11 +1208,12 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    int textWidth = squareWidth/4;
-    int textHeight = squareHeight/4;
+    // If you modify this, you need to modify getBoardRect too
+    int textWidth = squareWidth/3;
+    int textHeight = squareHeight/3;
     
     int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 10);
+        new Dimension(textWidth, textHeight)), 8);
     Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
     g.setFont(font);
     
@@ -1252,27 +1253,28 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    int textWidth = squareWidth/4;
-    int textHeight = squareHeight/4;
+    int textWidth = squareWidth/5;
+    int textHeight = squareHeight/5;
     
     int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 10);
+        new Dimension(textWidth, textHeight)), 8);
     Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
     g.setFont(font);
     
     FontMetrics fm = g.getFontMetrics(font);
     int fontWidth = fm.stringWidth("a");
+    int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
 
-    int dx = (squareWidth - fm.stringWidth("a8"))/2;
-    int dy = (squareHeight + fm.getAscent())/2;
-    
     int dir = isFlipped() ? 1 : -1;
     char row = isFlipped() ? '1' : '8';    
     for (int i = 0; i < 8; i++){
       char col = isFlipped() ? 'h' : 'a';      
       for (int j = 0; j < 8; j++){
         g.drawString(String.valueOf(col) + String.valueOf(row),
-          boardRect.x + j*squareWidth + dx, boardRect.y + i*squareHeight + dy);
+          boardRect.x + j*squareWidth + 3, boardRect.y + i*squareHeight + fontHeight);
+        
+        // g.drawString(String.valueOf(col) + String.valueOf(row),
+        //   boardRect.x + j*squareWidth + dx, boardRect.y + i*squareHeight + dy);
         col -= dir;
       }
       row += dir;
@@ -1393,8 +1395,8 @@ public class JBoard extends JComponent{
     rect.height = getHeight() - insets.top - insets.bottom;
     
     if (getCoordsDisplayStyle() == OUTSIDE_COORDS){
-      int w = rect.width/40;
-      int h = rect.height/40;
+      int w = rect.width/30;
+      int h = rect.height/30;
       
       rect.x += w;
       rect.width -= w;
