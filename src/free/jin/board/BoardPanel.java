@@ -741,6 +741,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     button.setIcon(new ImageIcon(BoardPanel.class.getResource("images/fullscreen.gif")));
     button.setRequestFocusEnabled(false);
     button.setMargin(new Insets(0, 0, 0, 0));
+    button.setToolTipText("Toggle fullscreen mode");
 
     return button;
   }
