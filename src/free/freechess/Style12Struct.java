@@ -229,7 +229,7 @@ public class Style12Struct extends Struct{
     switch (myRelation){
       case -3:
         gameType = ISOLATED_BOARD;
-        isPlayedGame = true;
+        isPlayedGame = false;
         break;
       case -2:
         gameType = OBSERVED_GAME;
