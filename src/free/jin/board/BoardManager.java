@@ -1387,7 +1387,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     containers.addElement(boardContainer);
 
-    URL iconImageURL = BoardManager.class.getResource("icon.gif");
+    URL iconImageURL = BoardManager.class.getResource("board.gif");
     if (iconImageURL!= null)
       boardContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
 
