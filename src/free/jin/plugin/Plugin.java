@@ -22,10 +22,13 @@
 package free.jin.plugin;
 
 import free.jin.*;
-import javax.swing.JMenu;
-import javax.swing.ListModel;
-import free.util.MemoryFile;
 import free.jin.action.JinAction;
+import free.jin.ui.PreferencesPanel;
+import free.jin.ui.UIProvider;
+import free.util.MemoryFile;
+import free.util.models.Model;
+
+import javax.swing.ListModel;
 
 
 /**
@@ -132,12 +135,12 @@ public abstract class Plugin{
 
   /**
    * Creates a UI container with the specified id for this plugin. See
-   * {@link UIProvider#createPluginUIContainer(Plugin, String)} for more
+   * {@link UIProvider#createPluginUIContainer(Plugin, String, int)} for more
    * information.
    */
 
-  public PluginUIContainer createContainer(String id){
-    return Jin.getInstance().getUIProvider().createPluginUIContainer(this, id);
+  public PluginUIContainer createContainer(String id, int mode){
+    return Jin.getInstance().getUIProvider().createPluginUIContainer(this, id, mode);
   }
 
 
@@ -296,16 +299,22 @@ public abstract class Plugin{
   public PreferencesPanel getPreferencesUI(){
     throw new IllegalStateException("This plugin has no preferences ui");
   }
-
-
-
+  
+  
+  
   /**
-   * Returns a menu for this plugin. Returns <code>null</code> to indicate that
-   * the plugin doesn't have a menu. The actual placing of the menu is handled
-   * by the context. The default implementation returns <code>null</code>.
+   * Returns a list of "hot" preferences, which should be made more accessible
+   * to the user than the normal preferences specified by
+   * <code>getPreferencesUI</code>. The preferences are specified as
+   * <code>Models</code> and its up to the <code>UIProvider</code> to display
+   * appropriate UI that allows the user to modify the model. Currently only
+   * <code>BooleanModel</code> is supported - support for other models will be
+   * added as necessary.
+   * The default implementation returns <code>null</code> to indicate that no
+   * hot preferences are speicified for this plugin. 
    */
-
-  public JMenu getPluginMenu(){
+  
+  public Model [] getHotPrefs(){
     return null;
   }
 
