@@ -31,8 +31,6 @@ import free.jin.plugin.UnsupportedContextException;
 import free.util.ArrayEnumeration;
 import java.io.*;
 import java.util.*;
-import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 
 
 /**
@@ -127,62 +125,7 @@ public class JinFrame extends JFrame{
 
 
 
-
-  /**
-   * We set this to true if turning off the expensive RenderingHints failed
-   * (because it's a JDK1.1 system for example) so that we know not to try it
-   * again.
-   */
-
-  private static boolean clearingExpensiveRenderingHintsFailed = false;
-
-
-
   
-  /**
-   * Disables all antialiasing, dithering and other expensive settings from the
-   * returned Graphics object. This is hackish as it obviously doesn't work with
-   * double buffering (since then the Graphics object is that of the offscreen
-   * Image), but it's only (currently) useful on Mac OS X where we disable swing
-   * double buffering anyway, because OS X does double buffering by itself.
-   */
-
-  public Graphics getGraphics(){
-    Graphics g = super.getGraphics();
-
-    if (clearingExpensiveRenderingHintsFailed)
-      return g;
-
-    try{
-      Class graphics2DClass = Class.forName("java.awt.Graphics2D");
-      Class rhClass = Class.forName("java.awt.RenderingHints");
-      Class rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
-      Method setRenderingHintMethod = graphics2DClass.getMethod("setRenderingHint", new Class[]{rhKeyClass, Object.class});
-      Object [][] renderingHintsKeyValue = new Object[][]{
-        {rhClass.getField("KEY_ALPHA_INTERPOLATION").get(null), rhClass.getField("VALUE_ALPHA_INTERPOLATION_SPEED").get(null)},
-        {rhClass.getField("KEY_ANTIALIASING").get(null), rhClass.getField("VALUE_ANTIALIAS_OFF").get(null)},
-        {rhClass.getField("KEY_COLOR_RENDERING").get(null), rhClass.getField("VALUE_COLOR_RENDER_SPEED").get(null)},
-        {rhClass.getField("KEY_DITHERING").get(null), rhClass.getField("VALUE_DITHER_DISABLE").get(null)},
-        {rhClass.getField("KEY_INTERPOLATION").get(null), rhClass.getField("VALUE_INTERPOLATION_NEAREST_NEIGHBOR").get(null)},
-        {rhClass.getField("KEY_RENDERING").get(null), rhClass.getField("VALUE_RENDER_SPEED").get(null)},
-        {rhClass.getField("KEY_TEXT_ANTIALIASING").get(null), rhClass.getField("VALUE_TEXT_ANTIALIAS_OFF").get(null)},
-        {rhClass.getField("KEY_FRACTIONALMETRICS").get(null), rhClass.getField("VALUE_FRACTIONALMETRICS_OFF").get(null)}
-      };
-
-      for (int i = 0; i < renderingHintsKeyValue.length; i++)
-        setRenderingHintMethod.invoke(g, renderingHintsKeyValue[i]);
-    } catch (Exception e){
-        if (e instanceof RuntimeException)
-          throw (RuntimeException)e;
-        System.err.println("Turning expensive rendering hints off failed due to: "+e.getClass().getName()+": "+e.getMessage());
-        clearingExpensiveRenderingHintsFailed = true;
-      }
-
-    return g;
-  }
-
-
-
 
   /**
    * Creates the initial JMenuBar used by Jin's main frame.
