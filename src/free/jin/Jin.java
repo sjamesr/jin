@@ -134,7 +134,7 @@ public class Jin{
 
 
   /**
-   * Create the jin settings directory.
+   * Creates the jin settings directory.
    */
 
   static{
@@ -150,7 +150,7 @@ public class Jin{
 
 
   /**
-   * Loads the Jin and the user properties.
+   * Loads the Jin and user properties.
    */
 
   static{
@@ -296,7 +296,7 @@ public class Jin{
   /**
    * Same as <code>Jin.getProperty(String)</code> but if neither a user
    * property nor the Jin property with the given name is found, returns
-   * the given default value.
+   * the specified default value.
    */
 
   public static String getProperty(String propertyName, String defaultValue){
