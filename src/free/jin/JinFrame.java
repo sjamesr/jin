@@ -311,7 +311,7 @@ public class JinFrame extends JFrame{
     String pluginsString = user.getProperty("plugins", "");
     Hashtable pluginsToProperties = new Hashtable();
     Hashtable pluginNamesToPlugins = new Hashtable();
-    StringTokenizer pluginsTokenizer = new StringTokenizer(pluginsString, ";");
+    StringTokenizer pluginsTokenizer = new StringTokenizer(pluginsString, "; ");
     if (pluginsTokenizer.countTokens() == 0){ // No plugins
       System.err.println("There are no plugins assosiated with "+user+" - will not be connecting");
       return;
@@ -347,23 +347,41 @@ public class JinFrame extends JFrame{
       try{
         plugin.setContext(context);
       } catch (UnsupportedContextException e){
-          System.out.println("The plugin \""+plugin.getID()+"\" doesn't support the given server or connection implementation, reason: "+e.getMessage());
+          System.out.println("The plugin \""+plugin+"\" doesn't support the given server or connection implementation ("+e.getMessage()+")");
+          plugins[i] = null;
         }
         catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
           e.printStackTrace();
+          plugins[i] = null;
         }
     }
 
 
+    int startedPluginsCount = 0;
 
     // Phase 3 - start the plugins
     for (int i = 0; i < plugins.length; i++){
       try{
-        plugins[i].start();
+        if (plugins[i] != null){
+          plugins[i].start();
+          startedPluginsCount++;
+        }
       } catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
           e.printStackTrace();
         }
     }
+
+
+
+    // Delete the plugins that failed to initialize
+    Plugin [] startedPlugins = new Plugin[startedPluginsCount];
+    for (int i = 0; i < plugins.length; i++){
+      if (plugins[i] != null){
+        startedPlugins[startedPlugins.length - startedPluginsCount] = plugins[i];
+        startedPluginsCount--;
+      }
+    }
+    plugins = startedPlugins;
 
 
 
