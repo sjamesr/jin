@@ -140,6 +140,8 @@ public class AudioClip{
         try{
           Class playerClass = Class.forName(classname);
           AudioPlayer player = (AudioPlayer)playerClass.newInstance();
+          if (!player.isSupported())
+            continue;
           player.play(this);
           System.err.println("Will now use "+classname+" to play audio clips.");
           successfulPlayer = player;
