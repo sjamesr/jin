@@ -70,9 +70,9 @@ public abstract class AbstractServer implements Server{
 
   protected AbstractServer(){
     try{
-      props = IOUtilities.loadProperties(getClass().getResource("/properties"));
+      props = IOUtilities.loadProperties(getClass().getResource("properties"));
     } catch (IOException e){
-        throw new IllegalStateException("No /properties file found");
+        throw new IllegalStateException("No properties file found");
       }
 
     usernamePolicy = createUsernamePolicy();
@@ -132,9 +132,9 @@ public abstract class AbstractServer implements Server{
   public String getDefaultHost(){
     return props.getProperty("defaultHost");
   }
-
-
-
+  
+  
+  
   /**
    * Returns the list of hostnames for the hosts of this server. The property
    * name is <code>hosts</code> and the property value is a space delimited
@@ -148,6 +148,17 @@ public abstract class AbstractServer implements Server{
 
 
   /**
+   * Sets the host to connect to.
+   */
+   
+  public void setHost(String host){
+    props.put("defaultHost", host);
+    props.put("hosts", host);
+  }
+
+
+
+  /**
    * Returns a list of the ports on which the server is listening. The property
    * name is <code>ports</code> and the property value is a space delimited list
    * of valid port values.
@@ -155,6 +166,16 @@ public abstract class AbstractServer implements Server{
 
   public int [] getPorts(){
     return TextUtilities.parseIntList(props.getProperty("ports"), " ");
+  }
+  
+  
+  
+  /**
+   * Sets the port to connect on.
+   */
+   
+  public void setPort(int port){
+    props.put("ports", String.valueOf(port));
   }
 
 
