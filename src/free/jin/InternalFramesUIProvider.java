@@ -35,6 +35,7 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.io.File;
 import free.workarounds.FixedJInternalFrame;
+import free.util.PlatformUtils;
 
 
 /**
@@ -148,17 +149,6 @@ public class InternalFramesUIProvider implements UIProvider{
     menubar.add(prefsMenu = new PreferencesMenu());
     menubar.add(helpMenu = new HelpMenu(context));
     
-    // Workaround for an OS X bug
-    mainContainer.getTopMostFrame().addWindowListener(new WindowAdapter(){
-      public void windowActivated(WindowEvent evt){
-        for (int i = 0; i < menubar.getMenuCount(); i++){
-          JMenu menu = menubar.getMenu(i);
-          menu.setEnabled(false);
-          menu.setEnabled(true);
-        }
-      }
-    });
-
     frameSwitcher = new InternalFrameSwitcher(desktop);
     desktop.setDesktopManager(new DesktopManager());
     FocusManager.setCurrentManager(new FocusManager());
@@ -267,8 +257,10 @@ public class InternalFramesUIProvider implements UIProvider{
       mainContainer.setTitle("");
     }
 
-    if (!isConnected)            // Bugfix - otherwise activating the menu via
-      menubar.requestFocus();    // keyboard stops working.
+    // Bugfix - otherwise activating the menu via keyboard stops working.
+    // On OS X, with native menubar, this actually breaks things.
+    if (!isConnected && !PlatformUtils.isMacOSX())
+      menubar.requestFocus();
   }
 
 
@@ -307,13 +299,6 @@ public class InternalFramesUIProvider implements UIProvider{
     menubar.add(lnfMenu);
     menubar.add(prefsMenu);
     menubar.add(helpMenu);
-
-    // OS X workaround.
-    for (int i = 0; i < menubar.getMenuCount(); i++){
-      JMenu menu = menubar.getMenu(i);
-      menu.setEnabled(false);
-      menu.setEnabled(true);
-    }
   }
 
 
@@ -451,10 +436,12 @@ public class InternalFramesUIProvider implements UIProvider{
       // see http://developer.java.sun.com/developer/bugParade/bugs/4213634.html
       add(closeConnection = new JMenuItem("Close Connection", 'l'));
       separatorIndex = getItemCount();
+
       addSeparator();
       add(exit = new JMenuItem("Exit", 'x'));
-
-      exit.setAccelerator(KeyStroke.getKeyStroke("control Q"));
+      
+      exit.setAccelerator(
+        KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
       newConnection.addActionListener(this);
       closeConnection.addActionListener(this);
@@ -515,11 +502,7 @@ public class InternalFramesUIProvider implements UIProvider{
           connManager.closeSession();
       }
       else if (source == exit){
-        Object result = OptionPanel.confirm(InternalFramesUIProvider.this, "Really Close?",
-          "Close Jin?", OptionPanel.OK);
-
-        if (result == OptionPanel.OK)
-          context.shutdown();
+        context.quit(true);
       }
       else{ // One of the recent account menu items
         int index = Utilities.indexOf(getMenuComponents(), source);
