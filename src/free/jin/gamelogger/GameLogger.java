@@ -441,7 +441,7 @@ public class GameLogger extends Plugin implements GameListener{
       String blackRatingString = (blackRating < 0) ? "-" : String.valueOf(blackRating);
 
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)));
-      writeTag(out, "Event", "Casual Game");
+      writeTag(out, "Event", (game.isRated() ? "rated " : "unrated ") + game.getRatingCategoryString() + " game");
       writeTag(out, "Site", getUser().getServer().getLongName());
       writeTag(out, "Date", DATE_FORMAT.format(gameInfo.gameStartDate));
       writeTag(out, "Round", "-");
