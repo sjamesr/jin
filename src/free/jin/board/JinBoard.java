@@ -45,24 +45,19 @@ public class JinBoard extends JBoard implements PaintHook{
 
 
 
-
   /**
-   * A Vector holding triplets of [fromSquare], [toSquare], [Color] for every
-   * arrow on the board.
+   * A Vector holding the arrows of the board (instances of Arrow).
    */
 
   private final Vector arrows = new Vector(3);
 
 
 
-
   /**
-   * A Vector holding couples of [circleSquare], [Color] for every circle on
-   * the board.
+   * A Vector holding the circles of the board (instances of Circle).
    */
 
   private final Vector circles = new Vector(2);
-
 
 
 
@@ -71,7 +66,6 @@ public class JinBoard extends JBoard implements PaintHook{
    */
 
   private Color defaultArrowColor = Color.lightGray;
-  
 
 
 
@@ -83,13 +77,11 @@ public class JinBoard extends JBoard implements PaintHook{
 
 
 
-
   /**
    * Is the arrow/circle adding functionality enabled (for the user).
    */
 
   private boolean isArrowCircleEnabled = true;
-
 
 
 
@@ -202,12 +194,12 @@ public class JinBoard extends JBoard implements PaintHook{
    * Notifies all registered ArrowCircleListeners that an arrow has been added.
    */
 
-  protected void fireArrowAdded(Square from, Square to){
+  protected void fireArrowAdded(Arrow arrow){
    Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
-      if (listeners[i]==ArrowCircleListener.class){
+      if (listeners[i] == ArrowCircleListener.class){
         ArrowCircleListener listener = (ArrowCircleListener)listeners[i+1];
-        listener.arrowAdded(this, from, to);
+        listener.arrowAdded(this, arrow);
       }
     }
   }
@@ -219,12 +211,12 @@ public class JinBoard extends JBoard implements PaintHook{
    * Notifies all registered ArrowCircleListeners that a circle has been added.
    */
 
-  protected void fireCircleAdded(Square circleSquare){
+  protected void fireCircleAdded(Circle circle){
    Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i]==ArrowCircleListener.class){
         ArrowCircleListener listener = (ArrowCircleListener)listeners[i+1];
-        listener.circleAdded(this, circleSquare);
+        listener.circleAdded(this, circle);
       }
     }
   }
@@ -237,12 +229,12 @@ public class JinBoard extends JBoard implements PaintHook{
    * removed.
    */
 
-  protected void fireArrowRemoved(Square from, Square to){
+  protected void fireArrowRemoved(Arrow arrow){
    Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i]==ArrowCircleListener.class){
         ArrowCircleListener listener = (ArrowCircleListener)listeners[i+1];
-        listener.arrowRemoved(this, from, to);
+        listener.arrowRemoved(this, arrow);
       }
     }
   }
@@ -255,12 +247,12 @@ public class JinBoard extends JBoard implements PaintHook{
    * removed.
    */
 
-  protected void fireCircleRemoved(Square circleSquare){
+  protected void fireCircleRemoved(Circle circle){
    Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i]==ArrowCircleListener.class){
         ArrowCircleListener listener = (ArrowCircleListener)listeners[i+1];
-        listener.circleRemoved(this, circleSquare);
+        listener.circleRemoved(this, circle);
       }
     }
   }
@@ -303,29 +295,30 @@ public class JinBoard extends JBoard implements PaintHook{
     int arrowSize = calcArrowSize(rect.width, rect.height);
     int circleSize = calcCircleSize(rect.width, rect.height);
 
-    int arrowCount = arrows.size()/3;
-    
-    for (int i = 0; i < arrowCount; i++)
-      drawArrow(g, (Square)arrows.elementAt(i*3), (Square)arrows.elementAt(i*3+1), arrowSize, (Color)arrows.elementAt(i*3+2));
+    int arrowCount = arrows.size();
+    for (int i = 0; i < arrowCount; i++){
+      Arrow arrow = (Arrow)arrows.elementAt(i); 
+      drawArrow(g, arrow.getFrom(), arrow.getTo(), arrowSize, arrow.getColor());
+    }
 
-    int circleCount = circles.size()/2;
-    for (int i = 0; i < circleCount; i++)
-      drawSquare(g, (Square)circles.elementAt(i*2), circleSize, (Color)circles.elementAt(i*2+1));
+    int circleCount = circles.size();
+    for (int i = 0; i < circleCount; i++){
+      Circle circle = (Circle)circles.elementAt(i);
+      drawSquare(g, circle.getSquare(), circleSize, circle.getColor());
+    }
   }
 
 
 
 
   /**
-   * Adds an arrow with the given color to the board.
+   * Adds the specified arrow to the board.
    */
 
-  public void addArrow(Square from, Square to, Color color){
-    arrows.addElement(from);
-    arrows.addElement(to);
-    arrows.addElement(color);
-
-    fireArrowAdded(from, to);
+  public void addArrow(Arrow arrow){
+    arrows.addElement(arrow);
+    
+    fireArrowAdded(arrow);
 
     repaint();
   }
@@ -334,29 +327,37 @@ public class JinBoard extends JBoard implements PaintHook{
 
 
   /**
-   * Removes the specified arrow (or arrows if there's more than one) from the
-   * board.
+   * Removes all the arrows from the specified square to the specified square.
    */
 
-  public void removeArrow(Square from, Square to){
-    for (int i = 0; i < arrows.size()/3; i++){
-      Square fromSquare = (Square)arrows.elementAt(i*3);
-      Square toSquare = (Square)arrows.elementAt(i*3+1);
+  public void removeArrowsAt(Square from, Square to){
+    for (int i = arrows.size() - 1; i >= 0; i--){
+      Arrow arrow = (Arrow)arrows.elementAt(i);
 
-      if (from.equals(fromSquare) && to.equals(toSquare)){
-        arrows.removeElementAt(i*3+2);
-        arrows.removeElementAt(i*3+1);
-        arrows.removeElementAt(i*3);
-        i--;
+      if (arrow.getFrom().equals(from) && arrow.getTo().equals(to)){
+        arrows.removeElementAt(i);
+        fireArrowRemoved(arrow);
       }
     }
 
-    fireArrowRemoved(from, to);
-
     repaint();
   }
-
-
+  
+  
+  
+  /**
+   * Returns whether there are any arrows at the specified coordinates.
+   */
+   
+  public boolean areArrowsAt(Square from, Square to){
+    for (int i = 0; i < arrows.size(); i++){
+      Arrow arrow = (Arrow)arrows.elementAt(i);
+      if (arrow.getFrom().equals(from) && arrow.getTo().equals(to))
+        return true;
+    }
+    
+    return false;
+  }
 
 
 
@@ -365,15 +366,10 @@ public class JinBoard extends JBoard implements PaintHook{
    */
 
   public void removeAllArrows(){
-    for (int i = arrows.size() - 3; i >= 0; i -= 3){
-      Square from = (Square)arrows.elementAt(i);
-      Square to = (Square)arrows.elementAt(i+1);
-      
-      arrows.removeElementAt(i+2);
-      arrows.removeElementAt(i+1);
+    for (int i = arrows.size() - 1; i >= 0; i--){
+      Arrow arrow = (Arrow)arrows.elementAt(i);
       arrows.removeElementAt(i);
-
-      fireArrowRemoved(from, to);
+      fireArrowRemoved(arrow);
     }
 
     repaint();
@@ -383,14 +379,12 @@ public class JinBoard extends JBoard implements PaintHook{
 
 
   /**
-   * Adds a circle with the given color to the board.
+   * Adds the specified circle to the board.
    */
 
-  public void addCircle(Square circleSquare, Color color){
-    circles.addElement(circleSquare);
-    circles.addElement(color);
-
-    fireCircleAdded(circleSquare);
+  public void addCircle(Circle circle){
+    circles.addElement(circle);
+    fireCircleAdded(circle);
 
     repaint();
   }
@@ -403,23 +397,34 @@ public class JinBoard extends JBoard implements PaintHook{
    * the board.
    */
 
-  public void removeCircle(Square circleSquare){
-    for (int i = 0; i < circles.size()/2; i++){
-      Square square = (Square)circles.elementAt(i*2);
+  public void removeCirclesAt(Square circleSquare){
+    for (int i = circles.size() - 1; i >= 0; i--){
+      Circle circle = (Circle)circles.elementAt(i);
 
-      if (square.equals(circleSquare)){
-        circles.removeElementAt(i*2+1);
-        circles.removeElementAt(i*2);
-        i--;
+      if (circle.getSquare().equals(circleSquare)){
+        circles.removeElementAt(i);
+        fireCircleRemoved(circle);
       }
     }
-
-    fireCircleRemoved(circleSquare);
-
+    
     repaint();
   }
-
-
+  
+  
+  
+  /**
+   * Returns whether there are any circles at the specified coordinate.
+   */
+   
+  public boolean areCirclesAt(Square square){
+    for (int i = 0; i < circles.size(); i++){
+      Circle circle = (Circle)circles.elementAt(i);
+      if (circle.getSquare().equals(square))
+        return true;
+    }
+    
+    return false;
+  }
 
 
 
@@ -428,13 +433,10 @@ public class JinBoard extends JBoard implements PaintHook{
    */
 
   public void removeAllCircles(){
-    for (int i = circles.size() - 2; i >= 0; i -= 2){
-      Square square = (Square)circles.elementAt(i);
-      
-      circles.removeElementAt(i+1);
+    for (int i = circles.size() - 1; i >= 0; i--){
+      Circle circle = (Circle)circles.elementAt(i);
       circles.removeElementAt(i);
-
-      fireCircleRemoved(square);
+      fireCircleRemoved(circle);
     }
   }
 
