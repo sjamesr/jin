@@ -1282,7 +1282,7 @@ public class JBoard extends JComponent{
     Square square = locationToSquare(x,y);
 
     if (square == null){
-      if (evtID == MouseEvent.MOUSE_RELEASED)
+      if ((evtID == MouseEvent.MOUSE_RELEASED) && isMovingPiece())
         cancelMovingPiece();
       return;
     }
