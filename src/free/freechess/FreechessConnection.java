@@ -418,6 +418,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleWhisper(line))
       return;
+    if (handleQTell(line))
+      return;
 
     if (linesToFilter.remove(line) == null)
       processLine(line);
@@ -747,6 +749,47 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){return false;}
+
+
+
+
+  /**
+   * The regular expression matching qtells.
+   */
+
+  private static final Pattern qtellPattern = 
+    new Pattern("^:(.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a qtell and
+   * to further process it if it is.
+   */
+
+  private boolean handleQTell(String line){
+    Matcher matcher = qtellPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String message = matcher.group(1);
+
+    if (!processQTell(message))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a qtell is received.
+   */
+
+  protected boolean processQTell(String message){return false;}
+
 
 
 
