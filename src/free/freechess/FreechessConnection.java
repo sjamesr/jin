@@ -25,6 +25,7 @@ package free.freechess;
 import java.io.*;
 import jregex.*;
 import java.util.StringTokenizer;
+import java.util.Hashtable;
 
 
 /**
@@ -104,6 +105,16 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * A Hashtable of Strings specifying lines that need to be filtered out.
+   */
+
+  private final Hashtable linesToFilter = new Hashtable();
+
+
+
+
+
+  /**
    * The value we're supposed to assign to the interface variable during login.
    */
 
@@ -136,6 +147,20 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * Adds the specified String to the list of lines that will be filtered.
+   * The next time this string is received (as a line), it will not be sent to
+   * the <code>processLine</code> method. Note that this only works for the
+   * first occurrance of the specified string.
+   */
+
+  public void filterLine(String line){
+    linesToFilter.put(line, line);
+  }
+
+
+
+
+  /**
    * Sets the style. If the ChessclubConnection is already logged in, then
    * a "set style <style>" command is send immediately, otherwise, the setting
    * is saved and sent immediately after logging in.
@@ -143,8 +168,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   public synchronized final void setStyle(int style){
     this.style = style;
-    if (isLoggedIn())
+    if (isLoggedIn()){
       sendCommand("set style "+style);
+      filterLine("Style "+style+" set.");
+    }
   }
 
 
@@ -184,6 +211,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (isLoggedIn()){
       sendCommand("iset seekinfo " + (seekInfoOn ? "1" : "0"));
       sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0")); // This is not really needed, but "help iv_seekinfo" says it is.
+
+      filterLine("seekinfo "+(seekInfoOn ? "" : "un")+"set.");
+      filterLine("seekremove "+(seekInfoOn ? "" : "un")+"set.");
     }
   }
 
@@ -230,7 +260,18 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       sendCommand("iset seekinfo 1");
       sendCommand("iset seekremove 1"); // This is not really needed, but "help iv_seekinfo" says it is, so we'll do it :-)
     }
-//    sendCommand("iset lock 1");
+    sendCommand("iset lock 1");
+
+    filterLine("Style "+style+" set.");
+    filterLine("Your prompt will now not show the time.");
+    filterLine("defprompt set.");
+    filterLine("nowrap set.");
+    filterLine("ms set.");
+    if (seekInfoOn){
+      filterLine("seekinfo set.");
+      filterLine("seekremove set.");
+    }
+
   }
 
 
@@ -356,7 +397,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (handleWhisper(line))
       return;
 
-    processLine(line);
+    if (linesToFilter.remove(line) == null)
+      processLine(line);
   }
 
 
