@@ -193,10 +193,10 @@ public class Scripter extends Plugin{
 
 
   /**
-   * Stops this plugin.
+   * Calls <code>saveScripts</code>.
    */
 
-  public void stop(){
+  public void saveState(){
     saveScripts();
   }
 

@@ -193,7 +193,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void stop(){
     unregisterConnListeners();
     removeBoards();
-    savePreferences();
   }
 
 
@@ -1524,7 +1523,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Saves the user preferences.
    */
 
-  protected void savePreferences(){
+  public void saveState(){
     setProperty("piece-painter-class-name", getPiecePainter().getClass().getName());    
 
     setProperty("board-painter-class-name", getBoardPainter().getClass().getName());

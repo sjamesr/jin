@@ -106,7 +106,6 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public void stop(){
-    saveState();
     unregisterListeners();
     unloadSounds();
   }
@@ -133,7 +132,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * is called from the start method of the plugin.
    */
 
-  protected void saveState(){
+  public void saveState(){
     setProperty("on", isOn ? "true" : "false");
   }
 
