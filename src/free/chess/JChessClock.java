@@ -167,7 +167,7 @@ public class JChessClock extends AbstractChessClock{
    */
 
   public Color getInactiveBackground(){
-    return inactiveBG == null ? getParent().getBackground() : inactiveBG;
+    return inactiveBG;
   }
 
 
@@ -268,7 +268,7 @@ public class JChessClock extends AbstractChessClock{
     String text = createTimeString(getTime());
     int width = getWidth();
     int height = getHeight();
-    if ((width!=lastSize.width)||(height!=lastSize.height)){
+    if ((width != lastSize.width) || (height != lastSize.height)){
       lastSize.width = getWidth();
       lastSize.height = getHeight();
 
@@ -276,14 +276,18 @@ public class JChessClock extends AbstractChessClock{
       lastFontMetrics = g.getFontMetrics(lastFont);
     }
 
-    g.setColor(isActive() ? getActiveBackground() : getInactiveBackground());
-    g.fillRect(0, 0, width, height);
+    Color bgColor = isActive() ? getActiveBackground() : getInactiveBackground();
+    if (bgColor != null){
+      g.setColor(bgColor);
+      g.fillRect(0, 0, width, height);
+    }
 
-    g.setColor(isActive() ? getActiveForeground() : getInactiveForeground());
+    Color fgColor = isActive() ? getActiveForeground() : getInactiveForeground();
+    g.setColor(fgColor);
     g.setFont(lastFont);
     int x = 0;
     int y = lastFontMetrics.getMaxAscent();
-    g.drawString(text,x,y);
+    g.drawString(text, x, y);
   }
 
 
