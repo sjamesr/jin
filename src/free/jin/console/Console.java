@@ -555,7 +555,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
           verticalScrollModel.setValue(verticalScrollModel.getMaximum());
           didScrollToBottom = true;
           outputScrollPane.getViewport().putClientProperty("EnableWindowBlit",Boolean.TRUE); // Enable blitting again
-          outputComponent.repaint();
+//          outputComponent.repaint(); Not sure why this is needed
         }
         else{
           curNumCalls = numAddToOutputCalls;
