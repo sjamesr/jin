@@ -29,10 +29,35 @@ import free.chess.Square;
 
 
 /**
- * The event fired when a circle has been added to the board.
+ * The event fired when a circle has been added/removed to/from the board.
  */
 
 public class CircleEvent extends GameEvent{
+  
+  
+  
+  /**
+   * The id for a circle added event.
+   */
+   
+  public static final int CIRCLE_ADDED = 1;
+  
+  
+  
+  /**
+   * The id for a circle removed event.
+   */
+   
+  public static final int CIRCLE_REMOVED = 2;
+  
+  
+  
+  /**
+   * The id of this event. Either {@link #CIRCLE_ADDED} or
+   * {@link #CIRCLE_REMOVED}. 
+   */
+   
+  private final int id;
 
 
 
@@ -47,19 +72,39 @@ public class CircleEvent extends GameEvent{
 
 
   /**
-   * Creates a new ArrowEvent with the given source JinChessclubConnection,
-   * Game and the Square of the circle.
+   * Creates a new ArrowEvent with the specified source
+   * <code>JinChessclubConnection</code>, <code>Game</code>, id and the square
+   * of the circle.
    */
   
-  public CircleEvent(JinChessclubConnection conn, Game game, Square circleSquare){
+  public CircleEvent(JinChessclubConnection conn, Game game, int id, Square circleSquare){
     super(conn, game);
+    
+    switch(id){
+      case CIRCLE_ADDED:
+      case CIRCLE_REMOVED:
+        break;
+      default:
+        throw new IllegalArgumentException("Unrecognized id: " + id);
+    }
 
+    this.id = id;
     this.circleSquare = circleSquare;
   }
 
 
 
-
+  /**
+   * Returns the id of this event, either {@link #CIRCLE_ADDED} or
+   * {@link #CIRCLE_REMOVED}.  
+   */
+   
+  public int getId(){
+    return id;
+  }
+  
+  
+  
   /**
    * Returns the square of the circle.
    */
