@@ -710,7 +710,7 @@ public class ChessclubConnection extends free.util.Connection{
       try{
         loginLock.wait(); // Wait until we receive DG_WHO_AM_I
       } catch (InterruptedException e){
-          e.printStackTrace();
+          throw new InterruptedIOException(e.getMessage());
         } 
     }
   }
@@ -767,7 +767,7 @@ public class ChessclubConnection extends free.util.Connection{
     }
 
     if (!isConnected())
-      throw new IllegalStateException();
+      throw new IllegalStateException("Not connected");
     try{
       out.write(command.getBytes());
       out.write('\n');
@@ -3375,7 +3375,7 @@ public class ChessclubConnection extends free.util.Connection{
    * is terminated.
    */
 
-  public synchronized final void handleDisconnection(){
+  synchronized final void handleDisconnection(){
     if (echoStream!=null)
       echoStream.println("DISCONNECTED");
 
