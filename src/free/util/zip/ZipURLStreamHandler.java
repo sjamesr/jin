@@ -64,7 +64,16 @@ public class ZipURLStreamHandler extends URLStreamHandler{
    */
 
   protected void parseURL(URL url, String spec, int start, int limit){
-    setURL(url, url.getProtocol(), "", -1, spec.substring(start, limit), null);
+    String urlFile = url.getFile();
+    int barIndex = urlFile.indexOf("|");
+    
+    String fileName = barIndex == -1 ? urlFile : urlFile.substring(0, barIndex);
+    String entryName = barIndex == -1 ? "" : urlFile.substring(barIndex + 1);
+    
+    int lastSlashIndex = entryName.lastIndexOf("/");
+    String newEntryName = entryName.substring(0, lastSlashIndex + 1) + spec.substring(start, limit);
+    
+    setURL(url, url.getProtocol(), "", -1, fileName + "|" + newEntryName, null);
   }
 
 
