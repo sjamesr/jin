@@ -47,6 +47,15 @@ public abstract class JinAction implements ActionListener{
   private ActionContext context;
   
   
+  
+  /**
+   * The <code>Preferences</code> object this action uses to store its
+   * preferences.
+   */
+  
+  private Preferences prefs;
+  
+  
 
   /**
    * Sets the action's context. Returns whether the context is supported.
@@ -108,7 +117,13 @@ public abstract class JinAction implements ActionListener{
    */
    
   public Preferences getPrefs(){
-    return context.getPreferences();
+    if (prefs == null){
+      Preferences actionPrefs = context.getPreferences();
+      Preferences userPrefs = getUser().getPrefs();
+      prefs = Preferences.createBackedUp(Preferences.createWrapped(userPrefs, "action." + getId() + "."), actionPrefs);
+    }
+
+    return prefs;
   }
   
   
