@@ -338,7 +338,7 @@ public class JinMain implements JinContext{
    
    
   /**
-   * Quits the application, possible asking the user to confirm quitting first.
+   * Quits the application, possibly asking the user to confirm quitting first.
    */
 
   public void quit(boolean askToConfirm){
@@ -711,7 +711,7 @@ public class JinMain implements JinContext{
    * plugin classes for that server.
    */
 
-  private Hashtable loadPlugins() throws IOException{
+  private Hashtable loadPlugins() throws IOException, ClassNotFoundException{
     Hashtable plugins = new Hashtable();
     for (int i = 0; i < servers.length; i++)
       plugins.put(servers[i], new Vector());
@@ -743,7 +743,8 @@ public class JinMain implements JinContext{
    * Loads plugins from the specified directory into the specified hashtable.
    */
 
-  private void loadPlugins(Hashtable plugins, File dir) throws IOException{
+  private void loadPlugins(Hashtable plugins, File dir) throws IOException,
+      ClassNotFoundException{
     if (!dir.isDirectory())
       return;
 
@@ -788,7 +789,8 @@ public class JinMain implements JinContext{
    * <code>null</code> if unable to load the plugin.
    */
 
-  private PluginInfo loadPluginInfo(File jar) throws IOException{
+  private PluginInfo loadPluginInfo(File jar) throws IOException,
+      ClassNotFoundException{
     if (!jar.isFile())
       return null;
 
@@ -806,19 +808,16 @@ public class JinMain implements JinContext{
       System.out.println("The plugin definition file in " + jar + " does not contain a classname property");
       return null;
     }
+    
+    Class pluginClass = loader.loadClass(classname);
 
-    InputStream pluginPrefsIn = loader.getResourceAsStream("preferences");
+    InputStream pluginPrefsIn = pluginClass.getResourceAsStream("preferences");
     Preferences pluginPrefs = (pluginPrefsIn == null ? Preferences.createNew() : Preferences.load(pluginPrefsIn));
 
     if (pluginPrefsIn != null)
       pluginPrefsIn.close();
 
-    try{
-      return new PluginInfo(loader.loadClass(classname), pluginPrefs);
-    } catch (ClassNotFoundException e){
-        e.printStackTrace();
-        return null;
-      }
+    return new PluginInfo(pluginClass, pluginPrefs);
   }
 
   
