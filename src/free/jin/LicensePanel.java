@@ -319,7 +319,7 @@ public class LicensePanel extends DialogPanel{
 
     JPanel kunststoffPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     kunststoffPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel kunststoffWebsiteLabel = new LinkLabel("Kunststoff Look And Feel");
+    LinkLabel kunststoffWebsiteLabel = new LinkLabel("Kunststoff Look and Feel");
     kunststoffWebsiteLabel.setToolTipText("http://www.incors.org/");
     kunststoffWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.incors.org/"));
     kunststoffPanel.add(kunststoffWebsiteLabel);
@@ -331,19 +331,19 @@ public class LicensePanel extends DialogPanel{
     add(kunststoffPanel);
     add(Box.createVerticalStrut(5));
 
-    JPanel threeDlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    threeDlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel threeDlfWebsiteLabel = new LinkLabel("3D Look And Feel");
-    threeDlfWebsiteLabel.setToolTipText("http://www.markus-hillenbrand.de/3dlf/index.html");
-    threeDlfWebsiteLabel.addActionListener(
-      new UrlDisplayingAction("http://www.markus-hillenbrand.de/3dlf/index.html"));
-    threeDlfPanel.add(threeDlfWebsiteLabel);
-    threeDlfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel threeDlfLicenseLabel = new LinkLabel("GNU General Public License");
-    threeDlfLicenseLabel.addActionListener(gplActionListener);
-    threeDlfPanel.add(threeDlfLicenseLabel);
-    threeDlfPanel.add(new JLabel("<html>.</html>"));
-    add(threeDlfPanel);
+    JPanel metouialfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    metouialfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+    LinkLabel metouialfWebsiteLabel = new LinkLabel("Metouia Look and Feel");
+    metouialfWebsiteLabel.setToolTipText("http://mlf.sourceforge.net/");
+    metouialfWebsiteLabel.addActionListener(
+      new UrlDisplayingAction("http://mlf.sourceforge.net/"));
+    metouialfPanel.add(metouialfWebsiteLabel);
+    metouialfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel metouialfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    metouialfLicenseLabel.addActionListener(lgplActionListener);
+    metouialfPanel.add(metouialfLicenseLabel);
+    metouialfPanel.add(new JLabel("<html>.</html>"));
+    add(metouialfPanel);
     add(Box.createVerticalStrut(5));
 
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
