@@ -22,10 +22,11 @@
 package free.jin.console;
 
 import free.workarounds.FixedJTextField;
-import java.awt.event.KeyEvent;
-import java.awt.event.FocusEvent;
+import free.workarounds.FixUtils;
+import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.Vector;
+import javax.swing.KeyStroke;
 
 
 /**
@@ -80,6 +81,14 @@ public class ConsoleTextField extends FixedJTextField{
 
 
 
+  /**
+   * The index of the current teller, or -1 if none.
+   */
+
+  private int tellerIndex = -1;
+
+
+
 
   /**
    * Creates a new ConsoleTextField for the given Console.
@@ -89,7 +98,22 @@ public class ConsoleTextField extends FixedJTextField{
     this.console = console;
 
     enableEvents(KeyEvent.KEY_EVENT_MASK|FocusEvent.FOCUS_EVENT_MASK);
+
+    String tellLastTellerKeyStrokeString = console.getProperty("tell-last-teller-keystroke");
+    String tellNextTellerKeyStrokeString = console.getProperty("tell-next-teller-keystroke");
+
+    if (tellLastTellerKeyStrokeString != null){
+      KeyStroke tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
+      System.out.println("Adding keyboard action for tell-last-teller-keystroke: "+tellLastTellerKeyStroke);
+      registerKeyboardAction(new TellLastTellerAction(), tellLastTellerKeyStroke, WHEN_FOCUSED);
+    }
+
+    if (tellNextTellerKeyStrokeString != null){
+      KeyStroke tellNextTellerKeyStroke = KeyStroke.getKeyStroke(tellNextTellerKeyStrokeString);
+      registerKeyboardAction(new TellNextTellerAction(), tellNextTellerKeyStroke, WHEN_FOCUSED);
+    }
   }
+
 
 
 
@@ -188,7 +212,11 @@ public class ConsoleTextField extends FixedJTextField{
             setSelectionStart(selectionStart);
             setSelectionEnd(selectionEnd);
           }
+          break;
       }
+
+      if (evt.getKeyChar() != FixUtils.CHAR_UNDEFINED)
+        tellerIndex = -1;
     }
   }
 
@@ -240,6 +268,60 @@ public class ConsoleTextField extends FixedJTextField{
     super.paste();
 
     clipboard.setContents(content,null);
+  }
+
+
+
+
+  /**
+   * Sets the textfield to be ready to send a tell to the given player.
+   * The default implementation does nothing.
+   */
+
+  protected void setTellPersonState(String playerName){}
+
+
+
+
+  /**
+   * The ActionListener setting the current console textfield text to something
+   * that will send a tell to the last player who told us something.
+   */
+
+  private class TellLastTellerAction implements ActionListener{
+
+    public void actionPerformed(ActionEvent evt){
+      int traversedTellerCount = console.getTellerRingSize();
+
+      tellerIndex++;
+      if ((tellerIndex == console.getTellerCount()) || (tellerIndex == traversedTellerCount))
+        tellerIndex = 0;
+
+      setTellPersonState(console.getTeller(tellerIndex));
+    }
+
+  }
+
+
+
+  /**
+   * The ActionListener setting the current console textfield text to something
+   * that will send a tell to the next player who told us something.
+   */
+
+  private class TellNextTellerAction implements ActionListener{
+
+    public void actionPerformed(ActionEvent evt){
+      System.out.println("nextTellerAction");
+      int traversedTellerCount = console.getTellerRingSize();
+
+      tellerIndex--;
+      if (tellerIndex < 0)
+        tellerIndex = Math.min(traversedTellerCount, console.getTellerCount()) - 1;
+
+      setTellPersonState(console.getTeller(tellerIndex));
+    }
+
   }
 
 }
