@@ -384,6 +384,31 @@ public class AppletJinContext implements JinContext{
         if ((mainFrame.getJMenuBar() != null) && !PlatformUtils.isMacOSX())
           mainFrame.getJMenuBar().requestFocus();
         
+        if ("true".equals(applet.getParameter("autologin"))){
+          boolean isGuest = "true".equals(applet.getParameter("isGuest"));
+          String username = applet.getParameter("username");
+          String password = applet.getParameter("password");
+          
+          User user;
+          ConnectionDetails connDetails;
+          
+          if (isGuest){
+            user = server.getGuest();
+            connDetails = ConnectionDetails.createGuest(user.getUsername(), server.getDefaultHost(), server.getPorts());
+          }
+          else{
+            connDetails = ConnectionDetails.create(username, password, false, server.getDefaultHost(), server.getPorts());
+            
+            user = JinUtilities.getUser(AppletJinContext.this, server, username);
+            if (user == null) // New user
+              user = new User(server, connDetails.getUsername());
+            
+          }
+            
+          connManager.login(user, connDetails);
+          return;
+        }
+        
         connManager.start();
       }
     });
@@ -725,13 +750,6 @@ public class AppletJinContext implements JinContext{
   
   
   
-  /**
-   * The cookieKey.
-   */
-   
-  private String cookieKey = null;
-  
-  
 
   /**
    * Stores the user preferences. Returns whether successful.
@@ -744,17 +762,11 @@ public class AppletJinContext implements JinContext{
     if (uploadThread != null)
       return;
     
-    // Get the cookieKey
-    if (cookieKey == null){
-      cookieKey = applet.getParameter("cookieKey");
+    final String prefsSaveKey = applet.getParameter("prefsSaveKey");
       
-      if (cookieKey == null)
-        cookieKey = new AskCookieKeyDialogPanel().askKey();
+    if (prefsSaveKey == null)
+      return;
       
-      if ((cookieKey == null) || "".equals(cookieKey))
-        return;
-    }
-    
     userPrefsUploadResult = null;
     
     final OptionPanel infoPanel = new OptionPanel(OptionPanel.INFO, "Uploading Preferences", 
@@ -788,7 +800,7 @@ public class AppletJinContext implements JinContext{
           conn.setRequestProperty("Content-type", "application/binary");
           
           DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-          out.writeBytes(cookieKey + "\n");
+          out.writeBytes(prefsSaveKey + "\n");
           out.writeBytes("user\n");
           userPrefs.save(out);
           
@@ -839,126 +851,6 @@ public class AppletJinContext implements JinContext{
     }
   }
   
-  
-  
-  /**
-   * A <code>DialogPanel</code> which asks the user to go to the
-   * <code>reserveSpaceUrl</code> and paste his cookieKey.
-   */
-   
-  private class AskCookieKeyDialogPanel extends DialogPanel implements ActionListener{
-    
-    
-    /**
-     * The cookie key text field.
-     */
-     
-    private final TextField cookieKeyTF;
-    
-    
-    
-    /**
-     * The url for reserving space.
-     */
-     
-    private final String reserveSpaceUrl;
-    
-    
-    
-    /**
-     * Creates the <code>AskCookieKeyDialogPanel</code>.
-     */
-     
-    public AskCookieKeyDialogPanel(){
-      setLayout(new BorderLayout(10, 10));
 
-      String url = null;      
-      try{
-        url = new URL(applet.getDocumentBase(), applet.getParameter("reserveSpaceUrl")).toString();
-      } catch (MalformedURLException e){
-          e.printStackTrace();
-          url = "MalformedURLException";
-        }
-        
-      reserveSpaceUrl = url;
-        
-      cookieKeyTF = new TextField();
-      
-      Panel textPanel = new Panel(new GridLayout(4, 1)); 
-      textPanel.add(new Label("To be able to save your preferences, you must "));  
-      textPanel.add(new Label("first reserve space for them on the server."));
-      textPanel.add(new Label("Please visit " + reserveSpaceUrl));
-      textPanel.add(new Label("(by clicking the \"Go to URL\" button) and copy the key:"));
-      
-      add(textPanel, BorderLayout.NORTH);
-      
-      Panel tfPanel = new Panel(new BorderLayout(10, 10));
-      tfPanel.add(new JLabel("Key: "), BorderLayout.WEST);
-      tfPanel.add(cookieKeyTF, BorderLayout.CENTER);
-      
-      add(tfPanel, BorderLayout.CENTER);
-      
-      Button gotoUrl = new Button("Go to URL");
-      Button ok = new Button("OK");
-      Button cancel = new Button("Cancel");
-      
-      Panel buttonPanel = new Panel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-      buttonPanel.add(gotoUrl);
-      buttonPanel.add(ok);
-      buttonPanel.add(cancel);
-      
-      add(buttonPanel, BorderLayout.SOUTH);
-      
-      gotoUrl.addActionListener(this);
-      ok.addActionListener(this);
-      cancel.addActionListener(this);
-      
-      gotoUrl.setActionCommand("url");
-      ok.setActionCommand("ok");
-      cancel.setActionCommand("cancel");
-    }
-    
-    
-    
-    /**
-     * <code>ActionListener</code> implementation.
-     */
-     
-    public void actionPerformed(ActionEvent evt){
-      String actionCommand = evt.getActionCommand();
-      
-      if ("ok".equals(actionCommand))
-        close(cookieKeyTF.getText()); 
-      else if ("url".equals(actionCommand))
-        BrowserControl.displayURL(reserveSpaceUrl);
-      else if ("cancel".equals(actionCommand))
-        close(null);
-      else
-        throw new IllegalArgumentException("Unknown actionCommand: " + actionCommand);
-    }
-    
-    
-    
-    /**
-     * Returns the title of this panel.
-     */
-     
-    public String getTitle(){
-      return "Specify Key";
-    }
-    
-    
-    
-    /**
-     * Displays the dialog, asks the user for the cookie key and returns it.
-     */
-     
-    public String askKey(){
-      return (String)askResult(uiProvider);
-    }
-    
-    
-  }
-  
    
 }
