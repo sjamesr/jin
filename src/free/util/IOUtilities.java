@@ -162,7 +162,7 @@ public class IOUtilities{
    */
 
   public static int pump(InputStream in, OutputStream out, int amount) throws IOException{ 
-    return pump(in, out, new byte[2048]);
+    return pump(in, out, amount, new byte[2048]);
   }
 
 
