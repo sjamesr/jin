@@ -152,6 +152,21 @@ public class PluginContext{
 
     return null;
   }
+  
+  
+  
+  /**
+   * Returns a list of all the plugins within this context.
+   */
+   
+  public Plugin [] getPlugins(){
+    Plugin [] plugins = new Plugin[this.plugins.length];
+    
+    for (int i = 0; i < plugins.length; i++)
+      plugins[i] = this.plugins[i];
+    
+    return plugins;
+  }
 
 
 
