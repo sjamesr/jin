@@ -36,6 +36,9 @@ import free.chessclub.ChessclubConnection;
 import free.chessclub.MoveStruct;
 import free.chessclub.level2.Datagram;
 import free.util.EventListenerList;
+import free.jin.chessclub.event.CircleEvent;
+import free.jin.chessclub.event.ArrowEvent;
+import free.jin.chessclub.event.ChessclubGameListener;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.Array;
@@ -586,8 +589,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Adds the given GameListener to the list of listeners receiving notifications
-   * of GameEvents.
+   * Adds the given GameListener to the list of listeners receiving
+   * notifications of GameEvents. This method will accept and handle properly 
+   * ChessclubGameListeners (by calling the chessclub specific methods in that
+   * interface when needed).
    */
 
   public void addGameListener(GameListener listener){
@@ -611,6 +616,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       setDGState(Datagram.DG_MORETIME, true);
       setDGState(Datagram.DG_FLIP, true);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, true);
+      setDGState(Datagram.DG_ARROW, true);
+      setDGState(Datagram.DG_CIRCLE, true);
       setStyle(13);
     }
   }
@@ -619,8 +626,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Removes the given GameListener from the list of listeners receiving notifications
-   * of GameEvents.
+   * Removes the given GameListener from the list of listeners receiving 
+   * notifications of GameEvents. This method can be also used to remove
+   * ChessclubGameListeners added via the addGameListener(GameListener) method.
    */
 
   public void removeGameListener(GameListener listener){
@@ -643,6 +651,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       setDGState(Datagram.DG_MORETIME, false);
       setDGState(Datagram.DG_FLIP, false);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, false);
+      setDGState(Datagram.DG_ARROW, false);
+      setDGState(Datagram.DG_CIRCLE, false);
       setStyle(1);
 
       gameNumbersToGameInfo.clear();
@@ -1362,6 +1372,42 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
+  /**
+   * Gets called when a DG_CIRCLE datagram arrives. Fires a CircleEvent to all
+   * registered ChessclubGameListeners.
+   */
+
+  protected void processCircle(int gameNumber, String examiner, String coordinate){
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
+
+      Square circleSquare = Square.parseSquare(coordinate);
+
+      fireGameEvent(new CircleEvent(this, game, circleSquare));
+    } catch (NoSuchGameException e){}
+  }
+
+
+
+
+  /**
+   * Gets called when a DG_ARROW datagram arrives.
+   */
+
+  protected void processArrow(int gameNumber, String examiner, String origin, String destination){
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
+
+      Square fromSquare = Square.parseSquare(origin);
+      Square toSquare = Square.parseSquare(destination);
+
+      fireGameEvent(new ArrowEvent(this, game, fromSquare, toSquare));
+    } catch (NoSuchGameException e){}
+  }
+
+
 
 
   /**
@@ -1370,7 +1416,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   
   protected void fireGameEvent(GameEvent evt){
     Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
+    for (int i = 0; i < listenerList.length; i += 2){
       if (listenerList[i]==GameListener.class){
         GameListener listener = (GameListener)listenerList[i+1];
         if (evt instanceof GameStartEvent)
@@ -1389,6 +1435,14 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
           listener.clockAdjusted((ClockAdjustmentEvent)evt);
         else if (evt instanceof BoardFlipEvent)
           listener.boardFlipped((BoardFlipEvent)evt);
+        else if (evt instanceof CircleEvent){ 
+          if (listener instanceof ChessclubGameListener) 
+            ((ChessclubGameListener)listener).circleAdded((CircleEvent)evt);
+        }
+        else if (evt instanceof ArrowEvent){
+          if (listener instanceof ChessclubGameListener)
+            ((ChessclubGameListener)listener).arrowAdded((ArrowEvent)evt);
+        }
         else
           throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
       }
