@@ -638,7 +638,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         
         textStyleChooser = new TextStyleChooserPanel(font, fg, bg, antialias, false, false);
         this.setLayout(new BorderLayout());
-        add(textStyleChooser, BorderLayout.CENTER);
+        this.add(textStyleChooser, BorderLayout.CENTER);
       }
     }
 

@@ -439,7 +439,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
         private Dimension prefSize = null;
         public Dimension getPreferredSize(){
           if (prefSize == null){
-            FontMetrics metrics = this.getFontMetrics(getFont());
+            FontMetrics metrics = this.getFontMetrics(this.getFont());
             int width = 0;
             int height = 0;
             for (int i = 0; i < expTexts.length; i++){
