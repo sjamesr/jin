@@ -119,7 +119,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     whiteColorChooser.setMnemonic('W');
     blackColorChooser.setMnemonic('B');
-    whiteOutlineChooser.setMnemonic('h');
+    whiteOutlineChooser.setMnemonic('p');
     blackOutlineChooser.setMnemonic('k');
 
     lightColorChooser = new ColorChooserButton("Light squares", getColorProperty("light-square-color", new Color(255,207,144)));

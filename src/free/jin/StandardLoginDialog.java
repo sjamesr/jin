@@ -398,7 +398,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
-    StringTokenizer hosts = new StringTokenizer(user.getProperty("login.hosts",""),";");
+    StringTokenizer hosts = new StringTokenizer(user.getProperty("login.hosts", ""), ";");
     Object [] items = new String[hosts.countTokens()];
     int i = 0;
     while (hosts.hasMoreTokens())
@@ -424,7 +424,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     portPanel.add(portField);
     portPanel.add(Box.createHorizontalStrut(10));
     JLabel portLabel = new JLabel("Port number");
-    portLabel.setDisplayedMnemonic('o');
+    portLabel.setDisplayedMnemonic('n');
     portLabel.setLabelFor(portField);
     portPanel.add(portLabel);
     portPanel.add(Box.createHorizontalGlue());

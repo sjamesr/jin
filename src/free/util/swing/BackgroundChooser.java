@@ -143,7 +143,7 @@ public class BackgroundChooser extends JDialog{
     JButton pickImage = new JButton("Pick image");
     JButton useDefault = new JButton("Use default");
 
-    pickColor.setMnemonic('c');
+    pickColor.setMnemonic('P');
     pickImage.setMnemonic('i');
     useDefault.setMnemonic('d');
 
@@ -171,7 +171,7 @@ public class BackgroundChooser extends JDialog{
     boxesPanel.add(centerButton);
 
     JButton closeButton = new JButton("Close");
-    closeButton.setMnemonic('l');
+    closeButton.setMnemonic('C');
 
     mainPanel.add(pickColor);
     mainPanel.add(pickImage);
