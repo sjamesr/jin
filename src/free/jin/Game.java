@@ -507,6 +507,18 @@ public class Game extends Struct{
 
 
 
+  /**
+   * Returns the player with the specified name.
+   */
+
+  public Player getPlayerNamed(String playerName){
+    if (getWhiteName().equals(playerName))
+      return Player.WHITE_PLAYER;
+    else if (getBlackName().equals(playerName))
+      return Player.BLACK_PLAYER;
+    else
+      return null;
+  }
 
   /**
    * Returns true if the user is allowed to move the pieces of the given Player.
