@@ -82,9 +82,6 @@ public class CommandScript extends Script{
 
     bsh = new Interpreter();
     addImports(bsh);
-    bsh.set("context", context);
-    bsh.set("connection", context.getConnection());
-    bsh.eval("void sendCommand(String command){connection.sendCommand(command);}");
   }
 
 
