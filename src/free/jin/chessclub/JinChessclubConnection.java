@@ -242,14 +242,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
      /*
-       We can use the classic position to initialize all the variants which only differ from classic chess
-       by their initial position because we know the server will have to send us the real initial position
-       in a DG_POSITION_BEGIN datagram and then we'll use it to *really* initialize the position. The server
-       *has* to send it because for most of these variants the initial position is somehow randomized so
-       if the server won't tell us, we won't know the position. The server sends the initial position
-       on non randomized variants too, according to the protocol (except for w0 of course). On a side note,
-       the server may, according to the protocol documentation, send an empty FEN string in DG_POSITION_BEGIN,
-       in which case we have to initialize the position to the classic initial position even if wild!=0.
+       We can use the classic position to initialize all the variants which only
+       differ from classic chess by their initial position because we know the
+       server will have to send us the real initial position in a
+       DG_POSITION_BEGIN datagram and then we'll use it to *really* initialize
+       the position. The server *has* to send it because for most of these
+       variants the initial position is somehow randomized so if the server
+       won't tell us, we won't know the position. The server sends the initial
+       position on non randomized variants too, according to the protocol
+       (except for w0 of course). On a side note, the server may, according to
+       the protocol documentation, send an empty FEN string in
+       DG_POSITION_BEGIN, in which case we have to initialize the position to
+       the classic initial position even if wild!=0.
      */
 
       case 2: // Shuffle mirror
@@ -813,6 +817,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
 
+      // We should really change all the parameters of the existing Game object instead,
+      // but since BoardPanel doesn't currently support modifying them all...
       updateGame(game.getGameType(), gameNumber, whiteName, blackName, ratingCategoryString,
         isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement,
         isPlayedGame, whiteRating, blackRating, String.valueOf(gameID), whiteTitles, blackTitles);
@@ -972,7 +978,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         Position newInitPos = new Position(game.getVariant());
         newInitPos.setFEN(initFEN);
 
-        game.setInitialPosition(newInitPos, 0);
+        game.setInitialPosition(newInitPos);
+        game.setPliesSinceStart(0);
         gameInfo.moves.removeAllElements();
         gameInfo.position.copyFrom(game.getInitialPosition());
         gameInfo.numMovesToFollow = numMovesToFollow;
