@@ -84,8 +84,11 @@ public class TextStyleChooserPanel extends JPanel{
   public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor, boolean allowBackgroundSelection){
     fontSelector = new FontSelectorPanel();
     foregroundChooser = new ColorChooserButton("Foreground", initForegroundColor);
-    if (allowBackgroundSelection)
+    foregroundChooser.setMnemonic('F');
+    if (allowBackgroundSelection){
       backgroundChooser = new ColorChooserButton("Background", initBackgroundColor);
+      backgroundChooser.setMnemonic('k');
+    }
     else
       backgroundChooser = null;
 

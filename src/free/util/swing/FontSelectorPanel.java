@@ -77,7 +77,7 @@ public class FontSelectorPanel extends JPanel{
    * The checkbox for choosing whether the font is bold or not.
    */
 
-  private final JCheckBox boldCheckBox = new JCheckBox("Bold");
+  private final JCheckBox boldCheckBox;
 
 
 
@@ -86,7 +86,7 @@ public class FontSelectorPanel extends JPanel{
    * The checkbox for choosing whether the font is italic or not.
    */
 
-  private final JCheckBox italicCheckBox = new JCheckBox("Italic");
+  private final JCheckBox italicCheckBox;
 
 
 
@@ -145,6 +145,12 @@ public class FontSelectorPanel extends JPanel{
     fontNamesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     fontSizesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+    boldCheckBox = new JCheckBox("Bold");
+    italicCheckBox = new JCheckBox("Italic");
+
+    boldCheckBox.setMnemonic('B');
+    italicCheckBox.setMnemonic('I');
+
     previewPanelHolder = new JPanel(new BorderLayout());
     Border outsideBorder = new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED);
     Border insideBorder = new EmptyBorder(10, 10, 10, 10);
@@ -198,7 +204,10 @@ public class FontSelectorPanel extends JPanel{
     JPanel fontNamePanel = new JPanel(new BorderLayout());
     JScrollPane fontNamesListScrollPane = new JScrollPane(fontNamesList);
     JPanel fontNameLabelAndField = new JPanel(new BorderLayout());
-    fontNameLabelAndField.add(BorderLayout.NORTH, new JLabel("Font name", JLabel.CENTER));
+    JLabel fontNameLabel = new JLabel("Font name", JLabel.CENTER);
+    fontNameLabel.setDisplayedMnemonic('n');
+    fontNameLabel.setLabelFor(fontNameField);
+    fontNameLabelAndField.add(BorderLayout.NORTH, fontNameLabel);
     fontNameLabelAndField.add(BorderLayout.SOUTH, fontNameField);
     fontNamePanel.add(BorderLayout.NORTH, fontNameLabelAndField);
     fontNamePanel.add(BorderLayout.CENTER, fontNamesListScrollPane);
@@ -206,7 +215,10 @@ public class FontSelectorPanel extends JPanel{
     JPanel fontSizePanel = new JPanel(new BorderLayout());
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
     JPanel fontSizeLabelAndField = new JPanel(new BorderLayout());
-    fontSizeLabelAndField.add(BorderLayout.NORTH, new JLabel("Font size", JLabel.CENTER));
+    JLabel fontSizeLabel = new JLabel("Font size", JLabel.CENTER);
+    fontSizeLabel.setDisplayedMnemonic('s');
+    fontSizeLabel.setLabelFor(fontSizeField);
+    fontSizeLabelAndField.add(BorderLayout.NORTH, fontSizeLabel);
     fontSizeLabelAndField.add(BorderLayout.SOUTH, fontSizeField);
     fontSizePanel.add(BorderLayout.NORTH, fontSizeLabelAndField);
     fontSizePanel.add(BorderLayout.CENTER, fontSizesListScrollPane);

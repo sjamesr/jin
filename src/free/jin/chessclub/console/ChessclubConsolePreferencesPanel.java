@@ -194,6 +194,9 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     selectionChooserButton = new ColorChooserButton("Selection", selectionColor);
     selectedChooserButton = new ColorChooserButton("Selected text", selectedColor);
 
+    selectionChooserButton.setMnemonic('l');
+    selectedChooserButton.setMnemonic('e');
+
     addCategory("", new String[]{""}, bgColor);
     addCategory("channel-tell", new String[]{"channel-tell", "channel-atell"}, bgColor);
     addCategory("tell", new String[]{"tell"}, bgColor);
@@ -363,7 +366,10 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     JScrollPane scrollPane = new JScrollPane(categoryList);
 
     JPanel listPanel = new JPanel(new BorderLayout());
-    listPanel.add(BorderLayout.NORTH, new JLabel("Text type", JLabel.CENTER));
+    JLabel textTypeLabel = new JLabel("Text type", JLabel.CENTER);
+    textTypeLabel.setDisplayedMnemonic('t');
+    textTypeLabel.setLabelFor(categoryList);
+    listPanel.add(BorderLayout.NORTH, textTypeLabel);
     listPanel.add(BorderLayout.CENTER, scrollPane);
 
     categoryList.addListSelectionListener(new ListSelectionListener(){
