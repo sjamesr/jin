@@ -1,7 +1,7 @@
 <?php
 	$submit = $_POST['submit'];
 	if ($submit){
-		if (!(mysql_connect("localhost", "root") && mysql_select_db("@database_name@"))){
+		if (!(mysql_connect("localhost", "jin", "@db_pass@") && mysql_select_db("@db_name@"))){
 			echo "Couldn't connect to MySQL or select database<br>";
 			echo mysql_error();
 			return;	
@@ -28,9 +28,8 @@
 		
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		// Check username/password here.
 		
-		$authenticated = true;
+		@auth_code@ 		
 		
 		$username = strtolower($username);
 		
