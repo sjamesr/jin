@@ -75,7 +75,7 @@
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/jin-${release.version}" />
 		<mkdir dir="${unix-dir-to-tar}" />
 		<copy todir="${unix-dir-to-tar}">
-			<fileset dir="${build.dir}" excludes="libs/swingall.jar" />
+			<fileset dir="${build.dir}" excludes="libs/swingall.jar lnfs/jgoodies-windows.jar" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="unix" includes="README" />
 		</copy>
