@@ -27,6 +27,7 @@ import free.util.swing.*;
 import free.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 
 
@@ -279,33 +280,42 @@ public class LicensePanel extends DialogPanel{
     add(jregexPanel);
     add(Box.createVerticalStrut(5));
 
-    JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    beanshellPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-    LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
-    beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
-    beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
-    beanshellPanel.add(beanshellWebsiteLabel);
-    beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel beanshellLicenseLabel = new LinkLabel("LGPL and Sun licenses");
-    beanshellLicenseLabel.addActionListener(beanshellActionListener);
-    beanshellPanel.add(beanshellLicenseLabel);
-    beanshellPanel.add(new JLabel("<html>.</html>"));
-    add(beanshellPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      // Throws ClassNotFoundException if not found
+      Class.forName("bsh.EvalError"); 
+      
+      JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      beanshellPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
+      LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
+      beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
+      beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
+      beanshellPanel.add(beanshellWebsiteLabel);
+      beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+      LinkLabel beanshellLicenseLabel = new LinkLabel("LGPL and Sun licenses");
+      beanshellLicenseLabel.addActionListener(beanshellActionListener);
+      beanshellPanel.add(beanshellLicenseLabel);
+      beanshellPanel.add(new JLabel("<html>.</html>"));
+      add(beanshellPanel);
+      add(Box.createVerticalStrut(5));
+    } catch (ClassNotFoundException e){}
 
-    JPanel soxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    soxPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-    LinkLabel soxWebsiteLabel = new LinkLabel("SoX - Sound eXchange commandline utility");
-    soxWebsiteLabel.setToolTipText("http://sox.sourceforge.net");
-    soxWebsiteLabel.addActionListener(new UrlDisplayingAction("http://sox.sourceforge.net"));
-    soxPanel.add(soxWebsiteLabel);
-    soxPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel soxLicenseLabel = new LinkLabel("GNU Lesser General Public License");
-    soxLicenseLabel.addActionListener(lgplActionListener);
-    soxPanel.add(soxLicenseLabel);
-    soxPanel.add(new JLabel("<html>.</html>"));
-    add(soxPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      if (new File("./sox").exists()){
+        JPanel soxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        soxPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
+        LinkLabel soxWebsiteLabel = new LinkLabel("SoX - Sound eXchange commandline utility");
+        soxWebsiteLabel.setToolTipText("http://sox.sourceforge.net");
+        soxWebsiteLabel.addActionListener(new UrlDisplayingAction("http://sox.sourceforge.net"));
+        soxPanel.add(soxWebsiteLabel);
+        soxPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+        LinkLabel soxLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+        soxLicenseLabel.addActionListener(lgplActionListener);
+        soxPanel.add(soxLicenseLabel);
+        soxPanel.add(new JLabel("<html>.</html>"));
+        add(soxPanel);
+        add(Box.createVerticalStrut(5));
+      }
+    } catch (SecurityException e){}
     
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     xboardPanel.add(new JLabel("<html>Jin contains a piece set from&nbsp</html>"));
@@ -336,73 +346,93 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(5));
 
     JPanel blitzinPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    blitzinPanel.add(new JLabel("<html>Jin includes piece sets, boards and sounds from&nbsp</html>"));
-    LinkLabel blitzinWebsiteLabel = new LinkLabel("Internet Chess Club's Blitzin");
-    blitzinWebsiteLabel.setToolTipText("http://www.chessclub.com/interface/download_w32.html");
-    blitzinWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.chessclub.com/interface/download_w32.html"));
+    blitzinPanel.add(new JLabel("<html>Jin includes piece sets, boards and sounds owned by the &nbsp</html>"));
+    LinkLabel blitzinWebsiteLabel = new LinkLabel("Internet Chess Club");
+    blitzinWebsiteLabel.setToolTipText("http://www.chessclub.com");
+    blitzinWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.chessclub.com"));
     blitzinPanel.add(blitzinWebsiteLabel);
     blitzinPanel.add(new JLabel("<html>, used with permission.</html>"));
     add(blitzinPanel);
     add(Box.createVerticalStrut(5));
 
-    JPanel kunststoffPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    kunststoffPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel kunststoffWebsiteLabel = new LinkLabel("Kunststoff Look and Feel");
-    kunststoffWebsiteLabel.setToolTipText("http://www.incors.org/");
-    kunststoffWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.incors.org/"));
-    kunststoffPanel.add(kunststoffWebsiteLabel);
-    kunststoffPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel kunststoffLicenseLabel = new LinkLabel("GNU Lesser General Public License");
-    kunststoffLicenseLabel.addActionListener(lgplActionListener);
-    kunststoffPanel.add(kunststoffLicenseLabel);
-    kunststoffPanel.add(new JLabel("<html>.</html>"));
-    add(kunststoffPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      // Throws ClassNotFoundException if not found
+      Class.forName("com.incors.plaf.kunststoff.KunststoffLookAndFeel");
+      
+      JPanel kunststoffPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      kunststoffPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+      LinkLabel kunststoffWebsiteLabel = new LinkLabel("Kunststoff Look and Feel");
+      kunststoffWebsiteLabel.setToolTipText("http://www.incors.org/");
+      kunststoffWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.incors.org/"));
+      kunststoffPanel.add(kunststoffWebsiteLabel);
+      kunststoffPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+      LinkLabel kunststoffLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+      kunststoffLicenseLabel.addActionListener(lgplActionListener);
+      kunststoffPanel.add(kunststoffLicenseLabel);
+      kunststoffPanel.add(new JLabel("<html>.</html>"));
+      add(kunststoffPanel);
+      add(Box.createVerticalStrut(5));
+    } catch (ClassNotFoundException e){}
 
-    JPanel metouialfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    metouialfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel metouialfWebsiteLabel = new LinkLabel("Metouia Look and Feel");
-    metouialfWebsiteLabel.setToolTipText("http://mlf.sourceforge.net/");
-    metouialfWebsiteLabel.addActionListener(
-      new UrlDisplayingAction("http://mlf.sourceforge.net/"));
-    metouialfPanel.add(metouialfWebsiteLabel);
-    metouialfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel metouialfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
-    metouialfLicenseLabel.addActionListener(lgplActionListener);
-    metouialfPanel.add(metouialfLicenseLabel);
-    metouialfPanel.add(new JLabel("<html>.</html>"));
-    add(metouialfPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      // Throws ClassNotFoundException if not found
+      Class.forName("net.sourceforge.mlf.metouia.MetouiaLookAndFeel");
+      
+      JPanel metouialfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      metouialfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+      LinkLabel metouialfWebsiteLabel = new LinkLabel("Metouia Look and Feel");
+      metouialfWebsiteLabel.setToolTipText("http://mlf.sourceforge.net/");
+      metouialfWebsiteLabel.addActionListener(
+        new UrlDisplayingAction("http://mlf.sourceforge.net/"));
+      metouialfPanel.add(metouialfWebsiteLabel);
+      metouialfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+      LinkLabel metouialfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+      metouialfLicenseLabel.addActionListener(lgplActionListener);
+      metouialfPanel.add(metouialfLicenseLabel);
+      metouialfPanel.add(new JLabel("<html>.</html>"));
+      add(metouialfPanel);
+      add(Box.createVerticalStrut(5));
+    } catch (ClassNotFoundException e){}
     
-    JPanel liquidlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    liquidlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel liquidlfWebsiteLabel = new LinkLabel("Liquid Look and Feel");
-    liquidlfWebsiteLabel.setToolTipText("http://liquidlnf.sourceforge.net/");
-    liquidlfWebsiteLabel.addActionListener(
-      new UrlDisplayingAction("http://liquidlnf.sourceforge.net/"));
-    liquidlfPanel.add(liquidlfWebsiteLabel);
-    liquidlfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel liquidlfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
-    liquidlfLicenseLabel.addActionListener(lgplActionListener);
-    liquidlfPanel.add(liquidlfLicenseLabel);
-    liquidlfPanel.add(new JLabel("<html>.</html>"));
-    add(liquidlfPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      // Throws ClassNotFoundException if not found
+      Class.forName("com.birosoft.liquid.LiquidLookAndFeel");
+      
+      JPanel liquidlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      liquidlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+      LinkLabel liquidlfWebsiteLabel = new LinkLabel("Liquid Look and Feel");
+      liquidlfWebsiteLabel.setToolTipText("http://liquidlnf.sourceforge.net/");
+      liquidlfWebsiteLabel.addActionListener(
+        new UrlDisplayingAction("http://liquidlnf.sourceforge.net/"));
+      liquidlfPanel.add(liquidlfWebsiteLabel);
+      liquidlfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+      LinkLabel liquidlfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+      liquidlfLicenseLabel.addActionListener(lgplActionListener);
+      liquidlfPanel.add(liquidlfLicenseLabel);
+      liquidlfPanel.add(new JLabel("<html>.</html>"));
+      add(liquidlfPanel);
+      add(Box.createVerticalStrut(5));
+    } catch (ClassNotFoundException e){}
     
-    JPanel jgoodieslfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    jgoodieslfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
-    LinkLabel jgoodieslfWebsiteLabel = new LinkLabel("JGoodies Looks");
-    jgoodieslfWebsiteLabel.setToolTipText("http://jgoodies.dev.java.net");
-    jgoodieslfWebsiteLabel.addActionListener(
-      new UrlDisplayingAction("http://jgoodies.dev.java.net"));
-    jgoodieslfPanel.add(jgoodieslfWebsiteLabel);
-    jgoodieslfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel jgoodieslfLicenseLabel = new LinkLabel("BSD License");
-    jgoodieslfLicenseLabel.addActionListener(jgoodiesActionListener);
-    jgoodieslfPanel.add(jgoodieslfLicenseLabel);
-    jgoodieslfPanel.add(new JLabel("<html>.</html>"));
-    add(jgoodieslfPanel);
-    add(Box.createVerticalStrut(5));
+    try{
+      // Throws ClassNotFoundException if not found
+      Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
+      
+      JPanel jgoodieslfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      jgoodieslfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+      LinkLabel jgoodieslfWebsiteLabel = new LinkLabel("JGoodies Looks");
+      jgoodieslfWebsiteLabel.setToolTipText("http://jgoodies.dev.java.net");
+      jgoodieslfWebsiteLabel.addActionListener(
+        new UrlDisplayingAction("http://jgoodies.dev.java.net"));
+      jgoodieslfPanel.add(jgoodieslfWebsiteLabel);
+      jgoodieslfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+      LinkLabel jgoodieslfLicenseLabel = new LinkLabel("BSD License");
+      jgoodieslfLicenseLabel.addActionListener(jgoodiesActionListener);
+      jgoodieslfPanel.add(jgoodieslfLicenseLabel);
+      jgoodieslfPanel.add(new JLabel("<html>.</html>"));
+      add(jgoodieslfPanel);
+      add(Box.createVerticalStrut(5));
+    } catch (ClassNotFoundException e){}
     
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by&nbsp</html>"));
@@ -419,7 +449,7 @@ public class LicensePanel extends DialogPanel{
     add(denisDesLauriersPanel);
     
 
-    add(Box.createVerticalStrut(15));
+    add(Box.createVerticalStrut(30));
 
     JButton okButton = new JButton("OK");
     okButton.addActionListener(new ClosingListener(null));
