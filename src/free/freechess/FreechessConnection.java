@@ -23,7 +23,6 @@ package free.freechess;
 
 import java.io.*;
 import jregex.*;
-import free.chess.Player;
 import java.util.StringTokenizer;
 
 
@@ -188,22 +187,6 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   }
 
 
-
-
-  /**
-   * Returns a Player object corresponding to the specified string. If the
-   * string is "W", returns <code>Player.WHITE</code>. If it's "B", returns
-   * <code>Player.BLACK</code>. Otherwise, throws an IllegalArgumentException.
-   */
-
-  public static Player playerForString(String s){
-    if (s.equals("B"))
-      return Player.BLACK_PLAYER;
-    else if (s.equals("W"))
-      return Player.WHITE_PLAYER;
-    else
-      throw new IllegalArgumentException("Bad player string: "+s);
-  }
 
 
 
