@@ -403,7 +403,7 @@
 		</jar>
 		
 
-		<!-- Extensions -->
+		<!-- Resources -->
 		<mkdir dir="${resources.dir}" />
 
 		
@@ -416,12 +416,21 @@
 			<fileset dir="${res.dir}/pieces/blitzin"
 			         excludes="**.java" />
 		</jar>
+    <antcall target="extractResource">
+      <param name="resource.file" value="${resources.dir}/pieces/blitzin.jar" />
+      <param name="resource.name" value="blitzin" />
+    </antcall>
+
 		
 		<!-- Eboard Vector - this one is special because it's the default set --> 
 		<jar jarfile="${resources.dir}/pieces/eboard.jar" compress="false">
 			<fileset dir="${res.dir}/pieces/eboard"
 			         excludes="**.java" />
 		</jar>
+    <antcall target="extractResource">
+      <param name="resource.file" value="${resources.dir}/pieces/eboard.jar" />
+      <param name="resource.name" value="eboard" />
+    </antcall>
 
 		
 		<!-- Xboard -->
@@ -454,9 +463,14 @@
 		<mkdir dir="${resources.dir}/boards" />
 
 		<!-- Plain Color -->		
-		<jar jarfile="${resources.dir}/boards/plain.jar" compress="false">
+		<zip destfile="${resources.dir}/boards/plain.zip" compress="false">
 			<fileset dir="${res.dir}/boards/plain" />
-		</jar>
+		</zip>
+    <antcall target="extractResource">
+      <param name="resource.file" value="${resources.dir}/boards/plain.zip" />
+      <param name="resource.name" value="plain" />
+    </antcall>
+    
 		
 		<!-- Dark Wood -->
 		<antcall target="buildBoardPattern">
@@ -507,21 +521,41 @@
 	
 	<!-- Builds a single piece set -->
 	<target name="buildImagePieceSet">
-		<jar jarfile="${resources.dir}/pieces/${piece-set-id}.jar" compress="false">
+    <property name="resource.file" value="${resources.dir}/pieces/${piece-set-id}.zip" />
+		<zip destfile="${resource.file}" compress="false">
 			<fileset dir="${classes.dir}/pieces" includes="ImagePieceSetLoader*.class" />
 			<fileset dir="${res.dir}/pieces/${piece-set-id}" />
-		</jar>
+		</zip>
+    <antcall target="extractResource">
+      <param name="resource.file" value="${resource.file}" />
+      <param name="resource.name" value="${piece-set-id}" />
+    </antcall>
 	</target>
 	
 	
 	<!-- Builds a single board pattern -->
 	<target name="buildBoardPattern">
-		<jar jarfile="${resources.dir}/boards/${board-pattern-id}.jar" compress="false">
+    <property name="resource.file" value="${resources.dir}/boards/${board-pattern-id}.zip" /> 
+		<zip destfile="${resource.file}" compress="false">
 			<fileset dir="${classes.dir}/boards" includes="ImageBoardLoader*.class" />
 			<fileset dir="${res.dir}/boards/${board-pattern-id}" />
-		</jar>
+		</zip>
+    <antcall target="extractResource">
+      <param name="resource.file" value="${resource.file}" />
+      <param name="resource.name" value="${board-pattern-id}" />
+    </antcall>
 	</target>
-	
+  
+  
+  <!-- If the runDoAppletStuff property is set, extracts the file specified by
+       the resource.file property into a directory specified by the resource.name
+       property and then deletes the file -->
+  <target name="extractResource" if="runDoAppletStuff">
+    <dirname file="${resource.file}" property="base-dir" />
+    <unzip src="${resource.file}" dest="${base-dir}/${resource.name}" />
+    <delete file="${resource.file}" />
+  </target>
+  
 	
 	<!-- If the property runDoUnixStuff is set, does things required for Unix -->
 	<target name="doUnixStuff" if="runDoUnixStuff">
