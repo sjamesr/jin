@@ -74,7 +74,7 @@ public class Kriegspiel implements WildVariant{
 
 
   /**
-   * Creates a new Kriegspiel object. This constructor is private and there i
+   * Creates a new Kriegspiel object. This constructor is private and there is
    * only one instance of this class.
    */
 
@@ -202,6 +202,22 @@ public class Kriegspiel implements WildVariant{
 
   public Piece parsePiece(String piece) throws IllegalArgumentException{
     return ChesslikeGenericVariant.parseChessPiece(piece);
+  }
+
+
+
+
+  /**
+   * Returns a String corresponding to the given Piece. See
+   * {@link free.chess.ChesslikeGenericVariant#chessPieceToString(String)} for
+   * more details.
+   */
+
+  public String pieceToString(Piece piece){
+    if (!(piece instanceof ChessPiece))
+      throw new IllegalArgumentException("The given Piece must be an instance of ChessPiece.");
+
+    return ChesslikeGenericVariant.chessPieceToString((ChessPiece)piece);
   }
 
 

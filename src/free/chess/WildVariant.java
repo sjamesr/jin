@@ -92,6 +92,20 @@ public interface WildVariant{
 
 
 
+
+  /**
+   * Returns a string for the specified Piece. The piece must be one that was
+   * created by this WildVariant and the returned value must be compatible
+   * with the <code>parsePiece</code> method of this WildVariant.
+   *
+   * @throws IllegalArgumentException if the piece couldn't have been produced
+   * by this WildVariant.
+   */
+
+  String pieceToString(Piece piece) throws IllegalArgumentException;
+
+
+
   
   /**
    * Creates and returns a default PiecePainter for this WildVariant.
