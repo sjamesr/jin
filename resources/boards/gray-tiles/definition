@@ -1,0 +1,4 @@
+id = gray-tiles
+name = Gray Tiles
+classname = ImageBoardLoader
+scaleSquares = true

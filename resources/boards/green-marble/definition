@@ -1,0 +1,4 @@
+id = green-marble
+name = Green Marble
+classname = ImageBoardLoader
+scaleSquares = true
