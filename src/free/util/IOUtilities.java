@@ -176,9 +176,9 @@ public class IOUtilities{
       throw new IllegalArgumentException("Cannot use a 0 length buffer");
 
     int amountRead = 0;
-    while (amount>0){
-      int amountToRead = amount>buf.length ? buf.length : amount;
-      int count = in.read(buf,0,amountToRead);
+    while (amount > 0){
+      int amountToRead = amount > buf.length ? buf.length : amount;
+      int count = in.read(buf, 0, amountToRead);
       if (count==-1)
         break;
 
@@ -192,6 +192,34 @@ public class IOUtilities{
 
 
 
+
+
+  /**
+   * Reads from the given InputStream until its end and returns a byte array
+   * of the contents.
+   */
+
+  public static byte [] readToEnd(InputStream in) throws IOException{
+    byte [] buf = new byte[2048];
+
+    int amountToRead = buf.length;
+    int amountRead = 0;
+    int count = 0;
+    while ((count = in.read(buf, count, amountToRead)) > 0){
+      amountRead += count;
+      amountToRead -= count;
+
+      if (amountRead == buf.length){
+        byte [] oldBuf = buf;
+        buf = new byte[oldBuf.length*2];
+        System.arraycopy(oldBuf, 0, buf, 0, amountRead);
+      }
+    }
+
+    byte [] arr = new byte[amountRead];
+    System.arraycopy(buf, 0, arr, 0, amountRead);
+    return arr;
+  }
 
 
   /**
