@@ -64,7 +64,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    */
 
   private FischerRandom(){
-    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Fischer Random");
+    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Fischer random");
   }
 
 
