@@ -19,6 +19,7 @@
 		<javac srcdir="${source.dir}"
 		       destdir="${build.dir}"
 		       includes="free/**"
+		       debug="yes"
 			   classpathref="compile.class.path"
 		/>
 	</target>
@@ -32,7 +33,7 @@
 		</copy>
 		<jar jarfile="${output.jar}"
 		     basedir="${build.dir}"
-			 compress="false"
+			 compress="no"
 			 manifest="manifest.txt"
 		/>
 	</target>
