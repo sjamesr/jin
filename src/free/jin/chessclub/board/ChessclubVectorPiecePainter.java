@@ -19,9 +19,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package free.chess.art;
+package free.jin.chessclub.board;
 
 import java.awt.*;
+import free.chess.art.VectorPiecePainter;
 
 
 /**
