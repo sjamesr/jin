@@ -147,6 +147,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go to the beginning of the game");
     button.addActionListener(this);
+    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt HOME"), WHEN_IN_FOCUSED_WINDOW);    
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -165,6 +166,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go to the end of the game");
     button.addActionListener(this);
+    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt END"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -183,6 +185,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go one ply backward");
     button.addActionListener(this);
+    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt LEFT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -200,6 +203,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go one ply forward");
     button.addActionListener(this);
+    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt RIGHT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
