@@ -226,7 +226,7 @@ public class JinFrame extends JFrame{
    * part is done asynchronously because JinConnection.connect() blocks.
    */
 
-  private void startConnection(JinConnection conn, User user){
+  private void startConnection(JinConnection conn, final User user){
     this.connection = conn;
     this.user = user;
 
@@ -326,19 +326,36 @@ public class JinFrame extends JFrame{
 
 
     // Phase 5 - connect.
-    new Thread(){
+    new Thread("Login thread"){
 
       public void run(){
         try{
           JinConnection connection = getConnection();
           if (connection != null){
-            if (!connection.isConnected())
-              getConnection().connect();
+            if (!connection.isConnected()){
+              boolean success = getConnection().connectAndLogin();
+              if (!success){
+                SwingUtilities.invokeLater(new Runnable(){
+                  public void run(){
+                    JOptionPane.showMessageDialog(JinFrame.this, "Error logging in:\n"+
+                      getConnection().getLoginErrorMessage(), "Error Logging in", JOptionPane.ERROR_MESSAGE);
+                    closeConnection();
+                    showLoginDialog(user.getServer(), user);
+                  }
+                });
+              }
+            }
           }
-        } catch (IOException e){
+        } catch (final IOException e){
             synchronized(System.err){
               System.err.println("Unable to connect to server");
               e.printStackTrace();
+                SwingUtilities.invokeLater(new Runnable(){
+                  public void run(){
+                    JOptionPane.showMessageDialog(JinFrame.this, "Error connecting to server:\n"+
+                      e.getMessage(), "Error Connecting", JOptionPane.ERROR_MESSAGE);
+                  }
+                });
             }
           }
       }
