@@ -95,7 +95,7 @@ public class Square{
    */
 
   public static Square getInstance(int file, int rank) throws SquareFormatException{
-    if ((file<0)||(file>7)||(rank<0)||(file>7))
+    if ((file<0) || (file>7) || (rank<0) || (rank > 7))
       throw new SquareFormatException("file and rank must be in the range [0-7] (file:"+file+" rank:"+rank+")");
     if (pool[file][rank] == null)
       pool[file][rank] = new Square(file,rank);
