@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key><string>English</string>
+  <key>CFBundleExecutable</key><string>JavaApplicationStub</string>
+  <key>CFBundleGetInfoString</key><string>@VERSION@, Copyright 2004 Alexander Maryanovsky. Distributed under the General Public License.</string>
+  <key>CFBundleIconFile</key><string>icon.icns</string>
+  <key>CFBundleIdentifier</key><string>jin-@VERSION@</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>Jin</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>@VERSION@</string>
+  <key>CFBundleSignature</key><string>JINC</string>
+  <key>CFBundleVersion</key><string>@VERSION@</string>
+  <key>Java</key>
+    <dict>
+      <key>JVMVersion</key><string>1.4+</string>
+      <key>ClassPath</key><string>$JAVAROOT/jin.jar</string>
+      <key>MainClass</key><string>free.jin.JinMain</string>
+      <key>Properties</key>
+        <dict>
+          <key>apple.laf.useScreenMenuBar</key><string>true</string>
+          <key>apple.awt.fakefullscreen</key><string>false</string>
+        </dict>
+      <key>WorkingDirectory</key><string>$JAVAROOT</string>
+    </dict>
+  <key>NSHumanReadableCopyright</key><string>Copyright 2004 Alexander Maryanovsky. Distributed under the General Public License.</string>
+</dict>
+</plist>

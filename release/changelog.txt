@@ -1,0 +1,651 @@
+2.12
+
+* Jin now allows the user to add custom piece sets and board patterns. The
+  specific details are documented at http://www.jinchess.com/docs/customart/.
+* Implemented a hack to get specially layed out text like in "finger Live" on
+  ICC to display properly.
+* Both framed and embedded game lists display styles were fairly broken (on
+  ICC). Now fixed.
+* Fixed the console preferences dialog taking forever to display.
+* Fixed focus problems in the console under JDK 1.4 and later.
+* Implemented square coordinates for the board, in 3 styles:
+  "On the Rim" (like xboard), "Outside the Board" and "In Every Square".
+  You can also change the text color of the coordinates.
+* The clock now has three modes:
+  1. With more than 20 minutes, the clock displays "hours:minutes".
+  2. With less than 20 minutes but more than 10 seconds displays
+     "minutes.seconds"
+  3. With less than 10 seconds displays "00.seconds.tenths"
+* Now parsing out bughouse holdings lines like
+  <b1> game 175 white [NNBQ] black [PPNBQ]
+  instead of dumping them to the console (on FICS).
+* Added alt+(RIGHT,LEFT,HOME,END) shortcuts to move through an examined game.
+* Added mnemonics to the Abort, Adjourn, Draw and Resign buttons on a played
+  board panel.
+* Added two new buttons to the board panel - "Takeback" and "Takeback 2".
+  The "2" changes to the appropriate number if you offer or are offered a
+  takeback with a different amount of plies.
+* All the offer buttons on a played game board panel now become disabled once
+  you make the offer.
+* The console input text field now uses a monospaced font.
+* Somewhat improved sound under Linux although it's still very fragile and
+  doesn't always work.
+* Fixed sluggishness in the sought graph.
+* The size of move highlighting (arrows, circles) is now proportional to the
+  size of the board.
+* Added a move highlighting mode where only the target square is highlighted.
+* The arrow in arrow move highlighting mode is now a bit shorter so that the
+  target piece isn't obscured by it.
+* Wrote a completely new board preferences selection GUI, available under
+  Preferences->Chess Board. Removed the old, menu based, one.
+* Added several new board patterns.
+* Fixed a bug causing things to break if a game was started when the board was
+  already in fullscreen mode (for example by matching someone or seeking a game,
+  then starting an examine board before the game started).
+* Added a context menu (right-click popup) for the console text field with
+  cut, copy and paste menu items.
+* Added a hack which halts the console (no text is added) during the time the
+  user is making a move on the board. This is done to prevent jerkiness when
+  dragging a piece on the board.
+* On login, the title of Jin's main frame now changes to reflect the username
+  and server with which the user logged in.
+* The promotion piece selection dialog is now displayed near the mouse cursor,
+  with the default promotion piece (queen, usually) appearing right under the
+  mouse cursor, so that it can be selected quickly.
+* Removed the 3D look and feel and added the Liquid look and feel. Removed all
+  extra look and feels from the OS X version.
+* Fixed a bug where scrolling to some position in the middle of an examined game
+  and then using forward/backward broke the position scrollbar - it would stop
+  changing the current position.
+  
+  
+
+2.11
+
+* Added audio notification for draw, abort, adjourn and takeback offers.
+* Added visual notification for draw, abort and adjourn offers by setting a
+  green border around the appropriate button on the board.
+* Now setting the movecase var on by xivarmy's request. It shouldn't change
+  anything currently, but might even be required in the future (for example to
+  unambiguate pgn uploads).
+* Added parsing and coloring of tourney tells on FICS. Tourney tells are qtells
+  that look like this:
+  :AlexTheGreat(T9): Hello World!
+* wname and bname on FICS will now work properly.
+* The radio button setting the sending mode to premove is now disabled when the
+  user is playing a game on FICS.
+* Fixed a bug causing an en-passant premove to be recognized as such one move
+  after it was made.
+* Implemented very primitive legality checking for premoves. It currently only
+  checks if the piece with which you're trying to move still exists (hasn't been
+  taken yet). If the move is illegal, it won't be sent to the server at all, to
+  save time.
+* Implemented fullscreen mode for the board. You can enter/exit the mode with
+  a new button on the board panel, or by pressing alt+enter when the board is
+  selected.
+* Added the Metouia look and feel (works only if you're running Java 2).
+* Reimplemented all of the startup and plugin management framework. Plugins can
+  now be added simply by dropping them into the appropriate directory. A lot of
+  code has changed with very few visible changes to the user, but quite a few
+  bugs were probably introduced by this change.
+* Jin will now try to connect on additional ports if the default port doesn't
+  work (useful for people who are behind a firewall that blocks the regular
+  chess server port(s) but allows connections on port 23).
+
+
+
+2.1u1 (applies to all nonstable releases starting with 2.11 as well)
+
+* Fixed a bug causing the scripter to fail to run game event scripts for games
+  not played by the user.
+* Fixed the scripter not setting the type of the player variable properly when
+  creating in a "Clock Update" script (the type was Player instead of a String).
+* Fixed kibitzes/whispers from unrated players which appeared like this:
+  GuestMZLW(U)(-1)[52] kibitzes: foo
+* Fixed a bug which caused the board window to break (display wrong title,
+  become unclosable and other problems) if a minimized board window was being
+  reused as a new game started.
+* Fixed a bug which (sometimes) caused the board to break if you were giving a
+  simul and attempted to make an illegal move.
+* Fixed a bug causing the board to break if you made several moves in bsetup
+  mode and then set the position with "bsetup fen ...".
+* Fixed a bug causing the seek graph plugin to fail the next time if you closed
+  it when it was maximized.
+* Fixed a bug causing a board to become blank and unclosable if you closed it
+  when it was maximized.
+
+
+2.1
+
+* Worked around the server timeseal problem where premoved moves would take more
+  than minmove time (usually 0.1s).
+* The internal windows will now defend themselves against users doing 
+  stupid/hostile things to them, such as making them larger than the main window
+  or moving them out of the screen.
+
+
+2.07rc4
+
+* Changed the default piece set on FICS to the eboard vector pieces - they paint
+  faster than the xboard pieces.
+* Changed the default move sending mode to "predrag", since the previous
+  default, "legal chess" seems confusing (you can't start dragging your piece
+  when it's not your turn).
+* bsetup mode on FICS seemed to be completely broken - fixed now.
+* FischerRandom and other variants with nonstandard castling rules were broken.
+  They are now fixed, and as long as the castling move isn't ambiguous, you
+  can make it on the board instead of typing it in. Thanks to xivarmy for
+  noticing the bug and assisting with testing the fix.
+ 
+
+2.07rc3:
+
+* Fixed a bug causing the seek graph plugin to fail starting the next time if
+  you closed a session when the seek graph was minimized (iconified).
+* Fixed a bug which broke auto-scroll sometimes if you minimized the console.
+* Added Atomic support on FICS.
+* Observing a game of an unsupported variant should no longer cause a board to
+  be displayed when a move is made.
+* Choosing a new move highlighting color for the board didn't properly 
+  change/save it.
+
+
+2.07rc2:
+
+* Fixed a bug which prevented users from resuming adjourned games on FICS.
+* Kriegspiel support was broken - fixed now.
+* Fixed blanking/special commands - hitting shift+enter on the console
+  "commandline" will now hide your command and not add it to history,
+  ctrl+enter issues "special" (interface) commands, such as "cls".
+* Changed the internal window resize/drag mode to "outline" (where only the
+  outline of the resized/dragged window is shown), now that Sun have fixed the
+  bug that caused slow XORed drawing in JDK 1.4.2. If you're bothered by this
+  problem, download the latest Java version from
+  http://java.sun.com/j2se/downloads.html
+
+
+2.07rc1:
+
+* Worked around a server bug causing "ghost" seeks (seeks that are shown after
+  they've actually been removed).
+* Fixed a bug which would sometimes cause the wrong clock to be "highlighted"
+  on the board.
+* Fixed a bug which caused the seek graph plugin to fail to start on some
+  systems.
+* Hopefully finally nailed the premove bug (which was completely unrelated to
+  the premove code). The problem was that sometimes commands would not be sent
+  to the server due to synchronization issues in timeseal, so this might have
+  fixed a lot of other bugs. This bug couldn't have been fixed without the
+  generous help of Alexandre Smadja - many thanks to him.
+* Added keybindings so that ctrl+tab, ctrl+backquote (the key above the tab key
+  on most keyboards) and ctrl+F6 switch to next internal frame. Holding down
+  shift when using the above keybindings will switch to the previous internal
+  frame instead.
+* Fixed a bug which caused the board to lock if you made a move, then quickly
+  made a premove and hit ESCAPE before the first move got echoed to you.
+* Only left clicking a console "link" will activate it now (right and middle
+  clicking disabled).
+* Right clicking (or double left-clicking) in the console was awfully slow the
+  first time (especially under Linux). This is now fixed.
+* Fixed triple clicking in the console under MS VM (triple clicking selects the
+  whole line, or several lines if the original line is wrapped).
+* Fixed the console flashing when it's being resized. It used to momentarily
+  show the text at its very top (the server's ASCII logo, usually).
+* The Game Logger will now log ratings too.
+* Qtells are now parsed on FICS too. They are also available as Chat Event
+  subtype in the scripter.
+* There are now 3 move sending modes:
+  - Legal Chess: You can't touch or move pieces when it's not your move.
+  - Predrag:     You are allowed to make moves when it's not your turn to move,
+                 but they are sent to the server immediately after you drop the
+                 piece.
+  - Premove:     A move made when it isn't your turn is saved and is sent when 
+                 it becomes your turn to move.
+  The premove variable on FICS is set to 1 in premove mode and to 0 otherwise.
+* Added credits for Denis DesLauriers, who designed the Jin logo in 
+  Help->Licensing and Copyrights...
+* The move number in the move list will now be correct even if Jin doesn't have
+  the entire move list. This only applies to FICS - on ICC Jin always has the
+  complete move list.
+* Playing a simul now works.
+* Now doing "iset nohighlight 1" on login for FICS. This is needed to work
+  properly on accounts with highlight set to 1.
+* Fixed a bug where sometimes closing an internal frame didn't cause a different
+  one to pick up the focus.
+* Shift+Insert will now paste into the console's textfield as well.
+* Seems like most wilds didn't work due to a typo in Jin's code.
+* Command-C, Command-V and Command-X now work on Macs for all Look and Feels.
+* Fixed the bug that made the console break (background becomes gray and the
+  text becomes garbled) when it became taller than 32767 pixels under
+  Windows 95, Windows 98 and Solaris with Java 1.1.
+* Fixed a bug causing the link to be run if you right clicked the console and
+  then clicked on one of the items in the popup while the mouse was directly
+  over a link.
+
+
+2.07b2:
+
+* Fixed a bug where flipping the board would only make the board itself flip,
+  not the nicknames or clocks.
+* Fixed a bug where the password wouldn't be sent to the server unless you chose
+  the "Save Password" option.
+* Fixed the sought games graph so that it doesn't respond to right clicks.
+* The cursor will now change to "hand cursor" when over a seek in the sought
+  games graph.
+* Most of the "examine foo bar" forms are now "linked" as well.
+* Guest preferences are now *properly* saved and the login dialog uses those
+  preferences properly.
+* The overhead of running BeanShell scripts has been significantly reduced.
+* Jin will now properly handle and report login errors.
+* Fixed a datagram setting problem which (for example) caused seeks not to be
+  shown if you made the sought games graph visible while Jin was logging in to
+  the server.
+* The primary game is now set to the game of the most recent active board frame.
+* The move list for examined games on FICS is now also displayed, as far as is
+  possible with the information sent by the server.
+* The click'n'click move input style was broken under all Java versions except
+  Microsoft VM.
+* Hitting ESCAPE while dragging/moving a piece now cancels the drag/move and
+  puts the piece to its original square.
+* Hitting ESCAPE after making a "pre"-move will now cancel it and bring the
+  moved piece back to its original square.
+* The piece of the queued (premove) move is now shaded (a little grayed out)
+  until the move is sent to the server.
+* Significantly reduced the time it takes the board to display when you start
+  playing or observing a game.
+* Removed the custom board image caching. This should speed up board painting on
+  Java 1.2 and later versions.
+* Fixed a bug which caused the board to break (specifically, the move list
+  became out-of-date, but could've caused other problems as well) if the board
+  changed drastically during a game, for example by using the "loadfen" command.
+* Fixed a bug where selecting a script type (in the script type selector dialog)
+  and then closing the dialog with the 'X' button would do the same thing as if
+  you selected the script type and hit "Next".
+* Added a "Server's Website" button on the server choice dialog. The button displays
+  the website of the currently selected server in a browser window.
+* Fixed the syncing between moves and move sounds.
+  Note: this works on my (Windows 2000) system but might still be broken under
+  Windows 98. At least now Jin doesn't itself contribute to the delay.
+* Fixed a bug which would sometime make the board disabled during an examined
+  game (it wouldn't allow making any moves).
+
+
+2.07b:
+
+* Fixed a bug which caused a thread to be leaked for each FICS connection. This
+  might have caused a significant memory leak if you kept connecting and
+  disconnecting from the server.
+* There is now a "Close Connection" menu item on the "Connection" menu.
+* Fixed a small bug causing the console textfield not to get focus immediately 
+  when the console internal frame gets selected (you had to click it again)
+  under J2SE 1.4.
+* Fixed a small bug causing the selected image to be used for the background
+  even if you pressed the "Cancel" button on the image file chooser dialog
+  (in Preferences->Background->Pick Image).
+* On FICS, the annoying messages telling you what variables and ivariables Jin
+  sets on logon will no longer be showed.
+* Fixed a problem which caused arrows/circles to appear on all open boards when
+  they were added to one of them (on ICC).
+* Right clicking (or whatever your popup trigger is) on non selected text will
+  now move the selection to the clicked word and then show the popup.
+  Previously, if some text was already selected, the selection would stay until
+  you unselected it.
+* Fixed a bug which caused the board to become corrupted if moves were made on
+  it while it was obscured by some other component.
+* Fixed a bug which caused the empty area of a multiline link to be clickable.
+  For example, "help intro" can span over two lines if the line ends before the
+  word "intro" can be fit. The bug would then cause the area between the word
+  "help" and the end of the line to be clickable.
+* Fixed a bug which caused the queued (premoved) move to be sent when the server
+  echoed our own last move, instead of the opponent's move. This happened if you
+  tried to premove before the server echoed your last move to you.
+* Implemented a game logging plugin. You can now have Jin log your games in PGN
+  format. You can also specify rules which will tell Jin which games should be
+  logged into which files (and which games shouldn't be logged).
+* The dragging mode for internal frames is now "live" and not "outline" to work
+  around the Sun's JDK1.4 bug which causes the outline to be drawn very slowly.
+* Potentially expensive antialiasing and dithering rendering hints are no longer
+  disabled for OS X.
+* Added the option to enable/disable text antialiasing for the console. 
+* Fixed a bug which would make Jin not recognize the next move after a castling
+  in Fischer Random.
+* Most of the FICS wild variants are now supported, except for Bughouse and
+  Crazyhouse.
+* Fixed the problem that caused many move sounds to be played when you started
+  observing an ongoing game or forwarded.
+* Removed the "Open Connection" menu item under the "Connection" menu since it
+  didn't make sense and wasn't very useful anyway.
+* Pressing Page Up or Page Down in the console will now scroll the text as
+  expected. To scroll a single line, use Ctrl+PageUp or Ctrl+PageDown. To scroll
+  to the beginning or the end of the console, use Ctrl+Home and Ctrl+End
+  respectively.
+* Fixed a lock-up on-login problem on some Linux distros. See
+  https://sourceforge.net/tracker/index.php?func=detail&aid=670523&group_id=5038
+  6&atid=459537 for details.
+* Fixed a bug which caused the board to break if you started observing a game
+  and then a takeback would occur which took back more moves than you received
+  while observing the game (Reported by PCM at FICS).
+* Fixed a bug where the player making a move was determined by the current
+  player of the board instead of the color of the piece - I don't know of any
+  specific problems it caused but it certainly could create a lot of them.
+* Implemented a scripter plugin which allows writing small scripts that are run
+  when a specified event occurs (such as a game start/end, tells etc.)
+* Untimed games on FICS are now supported.
+* Changed the login and disconnect sounds.
+* Added support for properly laying out the board panel even when its width is
+  smaller than its height.
+* Guest's preferences are now saved as well.
+
+
+2.06b:
+
+* Fixed a bug where unused boards didn't change the board or piece style when
+  you changed those from the board menu.
+* Fixed a bug where when the clock went negative, starting the clock would throw
+  an IllegalArgumentException since when setting the initial delay of the Timer
+  to time%delay, I forgot to check whether time is positive.
+* Disabled swing double buffering for Mac OS X, since it does it by itself.
+* Explicitly disabled all the expensive Java2D rendering hints (only under
+  Java 2).
+* Fixed a bug which caused NPEs to be thrown in the paintComponent() method of
+  the board causing Jin to stop repainting normally and generally break. The
+  problem would manifest itself if you tried to make an illegal move, then
+  immediately picked up the piece again and waited for the server to tell you
+  it was illegal. Since now the piece that was being dragged is gone, the board
+  would get confused.
+* Fixed a bug which made copying from the console when "copy-on-select" is
+  disabled impossible. The focus was being transferred to the input text field
+  too soon.
+* Fixed a bug where the move list on the board window would display black moves
+  in the white column and vice versa if the first move was made by black (by
+  using "tomove black" for example).
+* Fixed the login dialog so that the widths of the username and password fields
+  are the same under all look and feels.
+* The keystroke used to traverse the teller ring in reverse order is now 
+  shift+F9 instead of alt+F9.
+* The label describing the game will now display the rating category if the wild
+  variant is w0. Otherwise, it will display the wild variant name.
+* Fixed a bug where bad things could happen if the user attempted to enter
+  illegal moves manually.
+* Fixed some inefficiencies in the board (re)painting.
+* Added a label to the board preferences panel warning about the fact that the
+  color preferences only affect vector pieces and the solid board.
+* When you create a new user, the wording of the question asking you whether you
+  want to keep it is now "Would you like to save your "username" profile?".
+  It was "Would you like to create a new user named "username"?" before.
+* Fixed a bug which caused embedded and framed lists to be a little too small,
+  making the list completely invisible if it was of length 1.
+  The bug and fix are described at https://sourceforge.net/tracker/index.php?fun
+  c=detail&aid=602496&group_id=50386&atid=459537.
+* If the currently displayed position is not the last position in a game and a
+  new move is made, the displayed position will no longer jump to the latest
+  position. The bug/feature request is described at https://sourceforge.net/trac
+  ker/index.php?func=detail&aid=609686&group_id=50386&atid=459537.
+* Fixed a small bug which made it sometimes impossible to go to the current
+  (last) position in a game by dragging the position scrollbar to its rightmost
+  position.
+* Right clicking inside the console when there is no selection will now select
+  the word under the mouse cursor and then display an appropriate popup.
+* Fixed a bug which caused the "Auto Queen" check box menu item not to be
+  selected on startup even if you previously selected it. Note that the option
+  itself would still be on, but the check box wouldn't reflect it.
+* Fixed a bug where BoardPanel.positionChanged(PositionChangedEvent) didn't
+  check that the event it got is for its game (as opposed to some other game).
+  This caused a bug where if you observed a game that had changed drastically
+  (with the "loadfen" command, for example), all the other boards would get that
+  same position. The bug was reported at https://sourceforge.net/tracker/?func=d
+  etail&atid=459537&aid=630511&group_id=50386.
+* When closing the game window, you will no longer get asked for a confirmation
+  for observed games. For your games, the question is now worded better (making
+  it clear that for played games, clicking "yes" resigns the game).
+* Jin now supports FICS - the Free Internet Chess Server 
+  at http://www.freechess.org.
+			  
+
+2.05b:
+
+* Jin now implements "smart" history. If you type a string and hit up/down, only
+  history items starting with the typed string will be traversed.
+* F9 now traverses between the last n people who told something to the user
+  (n is 5 by default). So now if you hit F9 a second time, your command line
+  will be set to tell to the 2nd last person who told you something.
+* The main console used to jump to weird locations in the text when you resized
+  it. This is now fixed - it continues to show the same location. The anchor is
+  the last visible character before the resize operation.
+* Jin now uses a different regular expressions library,
+  http://jregex.sourceforge.net/ published under the BSD license.  
+  The one Jin used before (http://www.javaregex.com/) was proprietary at the 
+  time of the switch, although it is now LGPL, thanks to the responsiveness of
+  the author to my request.
+* Dragging pieces should be somewhat smoother now, especially in the case where
+  the board obscures the console, when the latter keeps being repainted because
+  text is added to it. The change is to force painting after each mouse event.
+* Changed the text in the "Auto Promote" menu item to "Auto Queen".
+* Fixed a bug where the result explanation string in all the game lists
+  (history, liblist, etc.) would show up wrong if black won (or it was black's
+  action that ended the game).
+* Previously if a sound were to be played before an already playing sound
+  finished playing, the 2nd play request would be dropped. This caused problems
+  when two sounds are supposed to be played very close to each other, such as
+  in the case of an illegal move (move sound and then illegal move sound) or
+  a checkmate (move and then a game-end sound). This has now been fixed by
+  queueing up to two sounds before starting to drop play requests.
+* Jin now makes a fitebell sound when a game starts.
+* Jin now supports chessclub.com arrows and circles on the board.
+* Jin now has a user interface to select the main frame's background color,
+  image and image layout style (center, tile or stretch).
+* Replaced the coffee cup frame icons in the console, board and seek graph
+  internal frames with pretty, meaningful icons.
+* Fixed a bug: when you closed the seek graph, it wouldn't remove all the
+  seeks. But since when you reopen it, you get all the seeks again, you would
+  get duplicate seeks.
+* DG_QTELL and DG_CHANNEL_QTELL were disabled and not handled for some reason.
+  They are now enabled and handled properly. The visible effect is that channel
+  qtells will now start with the channel number, for example 
+  "46>Tomato whitewasp(2326) v DavidBarnsley(1859) 1-0" and personal qtells
+  will start with ":", for example
+  ":Tomato 'jinclient' doesn't match any players".
+* Jin will no longer ask you whether you want to save your settings when you
+  close the connection. I think it was useless in the first place.
+* Added a panel which allows modifying the main console's settings, such as
+  fonts and colors for the various text types.
+* Jin will now try to include the Kunststoff and 3D look and feels in the look
+  and feel menu, if it finds them (and it will, since I will create downloads 
+  with them included).
+* Added a panel which allows modifying the board's settings, such as the colors
+  of the pieces and the board.
+* Removed the useless "Save settings" button from the chessclub.com connection
+  dialog.
+* Added the xboard piece set.
+* Added all the non 3D piece sets from blitzin (bookup, dyche1, dyche2, dyche3),
+  with permission from Daniel Sleator (Darooha).
+* Added 4 boards, wooden2 and marble from blitzin and two more (a wooden one and
+  a slate one) I've made myself.
+* Worked around the IBM JDK 1.3.1 bug, so now Jin will work under it as well.
+* Jin will now produce sounds when "friends" (on your notify list) log on and
+  off the server.
+* Added a background image and pretty seek images for the sought graph. Yay, I
+  can now actually look at it without disqust. The graph, however, is no longer
+  resizeable.
+* The zero rating will no longer be showed on examine boards.
+* The clock on the board used to continue running even after you
+  unobserved/unexamined a game - no more.
+* Jin no longer asks new users where to save their settings file.
+* Added a "Clear Console" menu item to the console menu.
+* Added a "Help" menu with 3 items - "Jin Website", "Licensing and Copyright",
+  and "About".
+* The plugin menus no longer sit inside a "Plugins" menu, they now reside
+  directly on the menubar.
+* Jin will now use the metal look and feel by default instead of the system
+  look and feel.
+* Added a JDK1_2AudioPlayer, which uses the 1.2 Applet.newAudioClip(URL) API to
+  play audio clips. This should solve various sound problems on newer JDKs.
+* Fixed a bug where I forgot to call super.processFocusEvent(FocusEvent) from
+  JinFrame.processFocusEvent(FocusEvent) this might have caused many problems,
+  including the console locking bug.
+
+2.04b:
+
+* If there was more than one "clickable" item in a single message (tell, channel
+  tell etc.), when clicking on any of them, the command that was executed was
+  always the command of the first item. This problem didn't exist for clickable
+  URLs or emails, only things like "finger AlexTheGreat".
+* Fixed the email address detecting regular expression to exclude trailing
+  commas and periods.
+* Fixed a bug which caused the first character you type to be ignored if the
+  output area has the focus under JDK 1.4.
+* Modified the readme file for the unix installation to list more JRE downloads
+  and to better explain the difference between JRE 1.1.x and later ones.
+* Jin no longer throws NullPointerExceptions if you try to play/observe/examine
+  an unsupported wild variant. You will instead receive a message in the console
+  informing you that your version of Jin doesn't support the wild variant.
+* Fixed a small bug which caused part of the piece not to be drawn if you
+  pressed (without moving) in the top or left half of a square with a piece
+  (which you can move).
+* Fixed the datagram parser to handle datagrams containing strings with curly
+  braces properly. The last fix (in 2.03) broke it for strings like "a {b} a".
+* Implemented most of the chess variants supported by chessclub.com, except
+  Bughouse, Crazyhouse and Shatranj.
+* The various internal frames (console, seek graph, board) will now revert to 
+  their default location when a new connection is started if they don't fit
+  into the main frame. This can happen either if the user moves them out of the
+  screen himself or if the resolution of the screen is lowered.
+* Fixed a bug which caused wild seeks on the sought graph to appear as regular
+  ones. They now properly appear in red.
+* Fixed starting up maximized internal frames. The effect of the bug was that
+  if the board internal frame(s) was saved as "maximized", creating it would 
+  throw an exception and it would not come up. In the case of the main frame and
+  the seek graph frame, it did come up but then restoring it to normal state 
+  made it dissapear. I believe this was the effect people saw in the 
+  "the board doesn't come up" bug (needs verification).
+* Fixed starting up minimized internal frames. The effect of the bug was that
+  if a frame was saved as "minimized" and then created again trying to restore
+  it to normal state, would cause it to dissapear. Note that the current 
+  behaviour is still not perfect in the sense that the location of the minimized
+  internal frame is not always restored correctly.
+* Fixed the method that compares User objects for equality. It would previously
+  throw a NullPointerException if you tried to compare a guest (null username)
+  with some other User objects. At least one way in which this bug was visible
+  was that if you had at least one "saved" account and then logged on as a guest
+  via Connection->New Connection->Connect as guest, Jin would not close after
+  that (The closing connection method would fail with a NPE and then the exiting
+  method would try closing it again, obviously failing to stop already stopped
+  plugins).
+* Fixed a bug which caused Jin to think you were logged in as the user suggested
+  in the login dialog (the one whose username appears in the text field on
+  startup or if you choose Connection->[username]) even if you pressed the
+  "Connect as guest" button. You would still login as guest, but inherit all
+  the settings of that user and if you modified them, Jin would ask you whether
+  you wanted to save them.
+* Jin no longer prints an exception on a normal (user invoked) disconnection.
+* Fixed a very bad bug in the timestamping handshake. It used to read a packet
+  up to 16 bytes instead of exactly 16 bytes. This fails when the 16 byte packet
+  sent by the server gets broken on the way. Although this is quite unlikely to
+  happen, it's a serious bug nonetheless.
+* Made Jin more unix friendly. It no longer requires to be run when the current
+  directory is the Jin directory. It also writes all user settings files under
+  the user home directory instead of into the current directory.
+* SoundManager now has a menu item to allow enabling/disabling sound.
+* Fixed a bug where the connection was marked as connected only after the reader
+  thread was started. If the reader thread started too quickly it would see that
+  the connection is not connected and quietly die.
+* The title of the board frame and the label describing the game on the game
+  panel (the one just below the opponent's clock) will now display the name of
+  the wild variant instead of the rating type which the game affects.
+* The console will now display tooltips for non obvious links (such as the ones
+  displayed on the output of a 'tell tomato games' command).
+* The first time Jin starts, it will no longer size itself to take the entire
+  screen, but 3/4 of it instead, centered.
+* On Linux, Jin now tries to use the BROWSER environment variable to determine
+  which executable to use to run the user's default browser. If you don't have
+  this set properly, Jin will not be able to open URLs when you click them.
+  Type "man 5 environ" for information about these environment variables.
+  Likewise, Jin will try to use the value of the MAILER environment variable
+  to determine which mailer to run when you click an email address in Jin.
+
+
+2.03_1b:
+
+* Email addresses are now also links, which under Windows open the default
+  mailer when clicked and under unix/MacOS try to use the netscape mailer.
+* The new datagram parser code was broken in Sun's JDK 1.3 because they fixed
+  a bug in StringTokenizer which made it backwards incompatible. I have now
+  modified the datagram parser code not to rely on the bug or the fix. See
+  http://developer.java.sun.com/developer/bugParade/bugs/4338282.html for
+  details on the bug.
+* Fixed a bug where if someone "mexamined" a Jin user, Jin would not recognize 
+  that the user is now in examine mode. 
+
+
+2.03b:
+
+* Implemented a "target drag style", where no piece is shown during a piece
+  move/drag, instead the cursor changes to "crosshair" and a blue rectangle
+  surrounds the square over which the mouse cursor is.
+* Added "history", "liblist" and "stored" commands to the console popup menu.
+* Removed "finger -c" from the console popup menu.
+* Added the value of the system property "os.version" to the interface var.
+* Reimplemented timestamping to be more readable and more importantly, solved
+  the TCP_NODELAY issue, making Jin's timestamping work even faster than
+  blitzin. You can expect 'ping' responses to be as fast as in blitzin and maybe
+  even slightly faster.
+* If you try to observe/examine/play a game of a wild variant not supported by
+  Jin, you will now get a message informing you of that. Previously, Jin
+  silently ignored it.
+* Changed the "info" style (the red bold italic text saying "Trying to connect
+  to chessclub.com on port 5000..." at the beginning of a session) not to be
+  italic because it breaks (making ALL the text italic) when you try to use
+  some weird font like FixedsysTTF.
+* Added an "exit" menu item under the "Connection" menu.
+* Reimplemented the datagram parser to be more robust - it used to break on
+  weird datagrams like DG_DUMMY_RESPONSE or if the server put in extra spaces
+  between datagram arguments.
+* Added support for multiple piece sets, and added the "eboard" piece set.
+* Popups should now work on MacOS too, where you only have one mouse button and
+  the popup trigger is not right-click.
+* Changed the format of how you specify popup commands in
+  /plugins/ChessclubConsoleManager.plugin
+* Fixed a bug where if you spositioned a game in which no moves were made, Jin
+  would display it as an observed game.
+* Fixed a bug where you could get the console popup to display partially out of
+  the screen if you right-clicked at the bottom of the console when the console
+  was scrolled up at least the size of the popup.
+* Implemented game lists embedded in the text console.
+
+
+2.02b:
+
+* Fixed a bug which caused Jin whenever you logged off as a guest to ask you
+  whether you want to save the settings under "null".
+* Added a button in the picture frame (for ICC) which opens the browser on the
+  page where you can upload your picture.
+* Changed the url recognizing regular expression which determines the strings
+  that are considered a URL link to recognize "www..." and "https://" links 
+  too.
+* Added "observe" and "follow" to the console popup.
+* Changed the url recognizing regular expression to stop at the following
+  characters too: <>"
+* The "Join ICC" button on the login dialog now sends you to
+  http://www.chessclub.com/from/AlexTheGreat instead of logging on with the
+  handle "register".
+* Fixed a bug where if you changed a setting from within Jin and then chose 
+  not to save it, Jin would continue to bug you about saving it every time 
+  you closed a connection until you restarted Jin.
+* Added menu check boxes (and a user property) to control the move input
+  style (drag'n'drop or click'n'click).
+* Implemented "Auto Promote" - promotes to the default promotion piece (queen
+  usually) without prompting the user (Equivalent to "Auto Queen" in blitzin).
+* In some builds of MS JVM, adding to a BorderLayout without specifying a
+  constraint, causes the layout not to work. Added specifying a constraint
+  explicitly throughout the code.
+* Implemented a workaround for a very weird bug where Jikes would create invalid
+  bytecode (and MS VM would crash on it, instead of throwing a VerifierError,
+  like Sun's VM).
+* a1, the square, was light, sigh.
+* The board that appears on "spos" now correctly considers the game "ended" once
+  all the moves have been made. processSendMoves fires a GameEndEvent if the
+  game is of type ISOLATED_BOARD and numMovesToFollow is 0.
+* The board no longer breaks when in drag'n'drop mode you try to drag an empty
+  square into a piece.
+* Jin used to show "Examining <game>" in the title of the board frame if you
+  observed an examined game - fixed.

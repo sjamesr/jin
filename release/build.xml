@@ -1,0 +1,223 @@
+<!--
+
+  This file is not meant to be used by anyone who isn't the official source of
+  Jin releases. It depends on a specific environment and will not work without
+  it. If you have a strong urge to build Jin releases, I suggest a cold shower.
+  If nevertheless you decide to ignore this wise advice (and have tried
+  the shower solution), here is a partial list of things you need to know:
+
+  1. Until the bug described at  
+     http://www-124.ibm.com/developerworks/bugs/?func=detailbug&bug_id=3099&group_id=10
+     is resolved, the only Java compiler that produces bytecode Microsoft VM
+     doesn't implode on is Jikes-1.15. Debug information must not be included
+     for this to work. No other compiler will work, trust me. Target flags don't
+     help either. Good luck installing and running jikes-1.15. *Evil grin* 
+  2. For windows releases, this buildfile uses the NSIS installer compiler from
+     http://nsis.sourceforge.net/. This currently (version 2.0) does not build
+     as-is under Linux, but the author promised to fix it sometime soon. In the
+     meanwhile you can get the extra required files from
+     http://sourceforge.net/tracker/download.php?group_id=22049&atid=373085&file_id=85769&aid=945832.
+  3. The SourceForge OS X compile server is used to create the OS X install, so
+     you will need to be a developer in some project if you want to use this
+     file to make OS X releases.
+  4. The scp and sshexec tasks are used for connecting to the SourceForge
+     compile farm (for the OS X release), which in turn require the JSch library.
+     See ant documentation for further details.
+
+-->
+
+<project name="Jin Release" default="release">
+
+	<target name="init">
+		<dirname property="jin.dir" file="." />
+		<property name="build.dir" value="${jin.dir}/build" />
+		<property name="build.compiler" value="jikes" />
+		<property name="debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->    
+		<property name="source.dir" value="${jin.dir}/src" />
+		<property name="win.setup.maker" value="makensis.exe" />
+    <property name="cf.host" value="cf-shell.sourceforge.net" />
+	</target>
+
+
+	<!-- Builds for a specific platform -->
+	<target name="build" depends="init">
+	  <ant target="clean" dir="${jin.dir}" />
+		<echo message="Building Jin for ${release.platform}" />
+		<ant target="build" dir="${jin.dir}">
+    
+			<property name="release.platform" value="${release.platform}" />
+		</ant>
+	</target>
+
+	
+	<!-- Makes releases for windows, unix and os x -->
+	<target name="release" depends="init">
+
+	  <!-- Ask for Jin version and update app.props -->
+		<input message="Please specify the release version:" addproperty="release.version" />
+		<echo message="Changing version in app.props to ${release.version}" /> 
+		<propertyfile file="${source.dir}/free/jin/resources/app.props">
+			<entry key="app.version" value="${release.version}" />
+		</propertyfile>
+    
+    <!-- Ask for SourceForge Compile Farm username and private key passphrase, then test them -->
+    <input message="Please specify ${cf.host} username:" addproperty="cf.username" />
+    <input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
+    <echo message="Testing connection to Compile Farm, please wait" />
+    <sshexec host="${cf.host}"
+             username="${cf.username}"
+             keyfile="${user.home}/.ssh/id_dsa"
+             passphrase="${cf.passphrase}"
+             command="echo works"
+    />
+
+
+		<!-- Specifies where the release directories are -->
+		<property name="release.dir" value="jin-${release.version}" />
+		<property name="release.unix.dir" value="${release.dir}/unix" />
+		<property name="release.win.dir" value="${release.dir}/win" />
+		<property name="release.osx.dir" value="${release.dir}/osx" />
+		<property name="release.src.dir" value="${release.dir}/src" />
+
+		<!-- Creates the release directories -->
+		<delete dir="${release.dir}" />
+		<mkdir dir="${release.dir}" />
+		<mkdir dir="${release.unix.dir}" />
+		<mkdir dir="${release.win.dir}" />
+		<mkdir dir="${release.osx.dir}" />
+		<mkdir dir="${release.src.dir}" />
+
+
+		<!-- Unix release. Resulting file is ${unix-archive} -->
+		<echo message="Creating unix/linux release" />
+		<antcall target="build">
+			<param name="release.platform" value="unix" />
+		</antcall>
+		<property name="unix-dir-to-tar" value="${release.unix.dir}/jin-${release.version}" />
+		<mkdir dir="${unix-dir-to-tar}" />
+		<copy todir="${unix-dir-to-tar}">
+			<fileset dir="${build.dir}" excludes="libs/swingall.jar" />
+			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+			<fileset dir="unix" includes="README" />
+		</copy>
+		<property name="unix-tar" value="${release.unix.dir}/jin-${release.version}-unix.tar" />
+		<property name="unix-gz" value="${unix-tar}.gz" />
+		<tar destfile="${unix-tar}">
+			<tarfileset dir="${release.unix.dir}" excludes="*/sox */play */jin" />
+			<tarfileset dir="${release.unix.dir}" includes="*/sox */play */jin" mode="755" />
+		</tar>
+		<gzip src="${unix-tar}" zipfile="${unix-gz}" />
+		<delete dir="${unix-dir-to-tar}" />
+		<delete file="${unix-tar}" />
+    <property name="unix-archive" value="${unix-gz}" />
+   
+    
+    <!-- Windows release. Resulting files are ${win-install} and ${win-archive} -->
+		<echo message="Creating windows release" />
+		<antcall target="build">
+			<param name="release.platform" value="windows" />
+		</antcall>
+    <property name="dir-to-inst" value="${release.win.dir}/files" />
+    <mkdir dir="${dir-to-inst}" />
+    <copy todir="${dir-to-inst}">
+      <fileset dir="${build.dir}" />
+      <fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+      <fileset dir="win" includes="readme.txt" />
+    </copy>
+    <property name="exe" value="${release.win.dir}/jin-${release.version}-win.exe" />
+		<exec dir="." executable="${win.setup.maker}" failonerror="yes">
+			<arg value="/NOCD" /> <!-- Don't change into the .nsi file's directory -->
+      <arg value="/V2" /> <!-- Low verbosity --> 
+			<arg value="/Ddir=${dir-to-inst}${file.separator}" /> <!-- The directory whose contents to install -->
+			<arg value="/Dfile=${exe}" /> <!-- The installer file -->
+			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
+			<arg value="win/installer.nsi" />
+		</exec>
+    <property name="zip" value="${release.win.dir}/jin-${release.version}-win.zip" />
+    <zip destfile="${zip}" basedir="${dir-to-inst}" />
+    <delete dir="${dir-to-inst}" />
+    <property name="win-install" value="${exe}" />
+    <property name="win-archive" value="${zip}" />
+    
+    
+    <!-- OS X release. Resulting file is ${osx-install} -->
+    <echo message="Creating Mac OS X release" />
+    <antcall target="build">
+      <param name="release.platform" value="macosx" />
+    </antcall>
+    <property name="app-dir.name" value="Jin-${release.version}.app" />
+    <property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
+    <mkdir dir="${app-dir}/Contents/Resources/Java" />
+    <mkdir dir="${app-dir}/Contents/MacOS" />
+    <copy todir="${release.osx.dir}">
+      <fileset dir="osx" includes="mkdmg" />
+      <filterset>
+        <filter token="VERSION" value="${release.version}" />
+        <filter token="APPDIRNAME" value="${app-dir.name}" />
+      </filterset>
+    </copy>
+    <copy todir="${app-dir}">
+      <fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+    </copy>
+    <copy todir="${app-dir}/Contents">
+      <fileset dir="osx" includes="Info.plist PkgInfo" />
+      <filterset>
+        <filter token="VERSION" value="${release.version}" />
+      </filterset>
+    </copy>
+    <copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
+    <copy todir="${app-dir}/Contents/Resources/Java">
+      <fileset dir="${build.dir}" excludes="libs/swingall.jar lnfs/**" />
+    </copy>
+    <zip destfile="${release.osx.dir}/bundle.zip" basedir="${release.osx.dir}" />
+    <scp keyfile="${user.home}/.ssh/id_dsa"
+         passphrase="${cf.passphrase}"
+         file="${release.osx.dir}/bundle.zip" 
+         todir="${cf.username}@cf-shell.sourceforge.net:~"         
+    />
+    <sshexec host="${cf.host}"
+             username="${cf.username}"
+             keyfile="${user.home}/.ssh/id_dsa"
+             passphrase="${cf.passphrase}"
+             command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; cp /System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub ${app-dir.name}/Contents/MacOS/ &amp;&amp;  /Developer/Tools/SetFile -a B ${app-dir.name} &amp;&amp; chmod u+x mkdmg &amp;&amp; ./mkdmg&quot;"
+    />
+    <scp keyfile="${user.home}/.ssh/id_dsa"
+         passphrase="${cf.passphrase}"
+         file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}.dmg" 
+         todir="${release.osx.dir}"         
+    />
+    <sshexec host="${cf.host}"
+             username="${cf.username}"
+             keyfile="${user.home}/.ssh/id_dsa"
+             passphrase="${cf.passphrase}"
+             command="rm -rf bundle.zip ${app-dir.name} mkdmg jin-${release.version}.dmg"
+    />
+    <delete file="${release.osx.dir}/bundle.zip" />
+    <delete file="${release.osx.dir}/mkdmg" />
+    <delete dir="${app-dir}" />
+    <delete dir="${app-dir}" />
+    <property name="osx-install" value="jin-${release.version}.dmg" />
+    
+    
+    <!-- Source. Resulting file is ${src-archive} -->
+    <echo message="Creating Source release" />
+    <property name="src-archive-dir.name" value="jin-${release.version}" />
+    <property name="src-archive-dir" value="${release.src.dir}/${src-archive-dir.name}" />
+    <mkdir dir="${src-archive-dir}" />
+    <copy todir="${src-archive-dir}">
+      <fileset dir="${jin.dir}" includes="src/** resources/** build.xml manifest.txt" />
+    </copy>
+		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-src.tar" />
+		<property name="src-gz" value="${src-tar}.gz" />
+		<tar destfile="${src-tar}">
+			<tarfileset dir="${release.src.dir}" includes="${src-archive-dir.name}/**" />
+		</tar>
+		<gzip src="${src-tar}" zipfile="${src-gz}" />
+		<delete dir="${src-archive-dir}" />
+		<delete file="${src-tar}" />
+    <property name="src-archive" value="${src-gz}" />
+    
+    
+	</target>
+	
+</project>
