@@ -114,7 +114,7 @@ public abstract class Plugin{
    */
    
   public Resource [] getResources(String resourceType){
-    return context.getJinContext().getResources(resourceType, this); 
+    return Jin.getInstance().getResources(resourceType, this); 
   }
   
   
@@ -125,17 +125,7 @@ public abstract class Plugin{
    */
    
   public Resource getResource(String resourceType, String resourceId){
-    return context.getJinContext().getResource(resourceType, resourceId, this);
-  }
-
-
-
-  /**
-   * Returns the <code>UIProvider</code>.
-   */
-
-  public UIProvider getUIProvider(){
-    return context.getJinContext().getUIProvider();
+    return Jin.getInstance().getResource(resourceType, resourceId, this);
   }
 
 
@@ -147,7 +137,7 @@ public abstract class Plugin{
    */
 
   public PluginUIContainer createContainer(String id){
-    return getUIProvider().createPluginUIContainer(this, id);
+    return Jin.getInstance().getUIProvider().createPluginUIContainer(this, id);
   }
 
 
