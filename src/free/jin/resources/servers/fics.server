@@ -1,0 +1,7 @@
+
+default.user = resources/servers/default_user.fics
+name = fics
+name.short = fics
+name.long = Free Internet Chess Server
+
+login.dialog.classname = free.jin.freechess.FreechessLoginDialog

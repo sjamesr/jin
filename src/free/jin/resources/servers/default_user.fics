@@ -1,0 +1,8 @@
+
+server = fics
+
+login.hosts = freechess.org
+login.hostname = freechess.org
+login.port = 5000
+
+plugins=FreechessConsoleManager
