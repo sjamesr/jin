@@ -351,6 +351,11 @@ public class JinFrame extends JFrame{
           plugins[i] = null;
         }
         catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
+          String message = "The plugin \""+plugin+"\" failed to start.";
+          String errorMessage = e.getMessage();
+          String [] errorMessages = errorMessage == null ? new String[]{message} : new String[]{message,
+                                   "Error message: "+errorMessage};
+          JOptionPane.showMessageDialog(this, errorMessages, "Error", JOptionPane.ERROR_MESSAGE);
           e.printStackTrace();
           plugins[i] = null;
         }
@@ -361,14 +366,21 @@ public class JinFrame extends JFrame{
 
     // Phase 3 - start the plugins
     for (int i = 0; i < plugins.length; i++){
-      try{
-        if (plugins[i] != null){
-          plugins[i].start();
+      Plugin plugin = plugins[i];
+      if (plugin != null){
+        try{
+          plugin.start();
           startedPluginsCount++;
-        }
-      } catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
-          e.printStackTrace();
-        }
+        } catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
+            String message = "The plugin \""+plugin+"\" failed to start.";
+            String errorMessage = e.getMessage();
+            String [] errorMessages = errorMessage == null ? new String[]{message} : new String[]{message,
+                                     "Error message: "+errorMessage};
+            JOptionPane.showMessageDialog(this, errorMessages, "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            plugins[i] = null;
+          }
+      }
     }
 
 
