@@ -203,6 +203,12 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     loadEventAudioClip("IllegalMove");
     loadEventAudioClip("GameEnd");
     loadEventAudioClip("GameStart");
+
+    loadEventAudioClip("DrawOffer");
+    loadEventAudioClip("AbortOffer");
+    loadEventAudioClip("AdjournOffer");
+    loadEventAudioClip("TakebackOffer");
+
   }
 
 
@@ -469,15 +475,27 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
 
 
+  /**
+   * Plays the "DrawOffer", "AbortOffer" or "AdjournOffer" sounds if needed.
+   */
+
+  public void offerUpdated(OfferEvent evt){
+    if (evt.isOffered()){
+      switch (evt.getOfferId()){
+        case OfferEvent.DRAW_OFFER: playEventSound("DrawOffer"); break;
+        case OfferEvent.ABORT_OFFER: playEventSound("AbortOffer"); break;
+        case OfferEvent.ADJOURN_OFFER: playEventSound("AdjournOffer"); break;
+        case OfferEvent.TAKEBACK_OFFER: playEventSound("TakebackOffer"); break;
+      }
+    }
+  }
+
 
   public void moveMade(MoveMadeEvent evt){}
   public void positionChanged(PositionChangedEvent evt){}
   public void takebackOccurred(TakebackEvent evt){}
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
-  public void offerChanged(OfferEvent evt){}
-
-
 
 
 
