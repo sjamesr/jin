@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2004 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,13 +21,20 @@
 
 package free.jin.board;
 
+import free.jin.board.prefs.*;
 import javax.swing.*;
-import java.awt.*;
-import javax.swing.border.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.border.TitledBorder;
 import free.jin.plugin.PreferencesPanel;
-import free.util.swing.ColorChooserButton;
+import free.jin.plugin.BadChangesException;
+import free.util.SquareLayout;
+import free.chess.Position;
 
 
 /**
@@ -37,228 +44,199 @@ import free.util.swing.ColorChooserButton;
 public class BoardPreferencesPanel extends PreferencesPanel{
 
 
-  
+
   /**
    * The BoardManager whose preferences panel this BoardPreferencesPanel is.
    */
 
-  private final BoardManager boardManager;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the white pieces.
-   */
-
-  private final ColorChooserButton whiteColorChooser;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the black pieces.
-   */
-
-  private final ColorChooserButton blackColorChooser;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the outline for white
-   * pieces.
-   */
-
-  private final ColorChooserButton whiteOutlineChooser;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the outline for black
-   * pieces.
-   */
-
-  private final ColorChooserButton blackOutlineChooser;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the light squares.
-   */
-
-  private final ColorChooserButton lightColorChooser;
-
-
-
-
-  /**
-   * The ColorChooserButton for selecting the color of the dark squares.
-   */
-
-  private final ColorChooserButton darkColorChooser;
-
-
-
-  /**
-   * The ColorChooserButton for selecting the move highlighting color.
-   */
-
-  private final ColorChooserButton moveHighlightingColorChooser;
-
-
-
-  /**
-   * The ColorChooserButton for selecting the drag square highlighting color.
-   */
-
-  private final ColorChooserButton dragSquareHighlightingColorChooser;
-
-
-
-  /**
-   * The ColorChooserButton for selecting the coordinates display color.
-   */
-
-  private final ColorChooserButton coordsDisplayColorChooser;
+  protected final BoardManager boardManager;
   
   
+  
+  /**
+   * The preview board.
+   */
+   
+  protected final JinBoard previewBoard;
+  
+  
+  
+  /**
+   * The "Board Looks" panel.
+   */
+   
+  protected final BoardModifyingPrefsPanel boardLooksPanel;
+  
+  
+  
+  /**
+   * The "Move Input" panel.
+   */
+   
+  protected final BoardModifyingPrefsPanel moveInputPanel;
+  
+  
+  
+  /**
+   * The "Move Highlighting" panel.
+   */
+   
+  protected final BoardModifyingPrefsPanel moveHighlightingPanel;
+  
+  
+  
+  /**
+   * The "Square Coordinates" panel.
+   */
+   
+  protected final BoardModifyingPrefsPanel squareCoordsPanel;
+
+
 
   /**
-   * Creates a new BoardPreferencesPanel with the given BoardManager.
+   * Creates a new BoardPreferencesPanel for the specified board manager. 
    */
-
+   
   public BoardPreferencesPanel(BoardManager boardManager){
     this.boardManager = boardManager;
-
-    whiteColorChooser = new ColorChooserButton("White Pieces", boardManager.getWhitePieceColor());
-    blackColorChooser = new ColorChooserButton("Black Pieces", boardManager.getBlackPieceColor());
-    whiteOutlineChooser = new ColorChooserButton("White Pieces' Outline",
-      boardManager.getWhiteOutlineColor());
-    blackOutlineChooser = new ColorChooserButton("Black Pieces' Outline",
-      boardManager.getBlackOutlineColor());
-
-    whiteColorChooser.setMnemonic('W');
-    blackColorChooser.setMnemonic('B');
-    whiteOutlineChooser.setMnemonic('P');
-    blackOutlineChooser.setMnemonic('k');
-
-
-    lightColorChooser = new ColorChooserButton("Light Squares", boardManager.getLightSquareColor());
-    darkColorChooser = new ColorChooserButton("Dark Squares", boardManager.getDarkSquareColor());
-
-    lightColorChooser.setMnemonic('L');
-    darkColorChooser.setMnemonic('D');
-
-
-    moveHighlightingColorChooser = new ColorChooserButton("Move Highlighting",
-      boardManager.getMoveHighlightingColor());
-    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag Square Highlighting",
-      boardManager.getDragSquareHighlightingColor());
-
-    moveHighlightingColorChooser.setMnemonic('M');
-    dragSquareHighlightingColorChooser.setMnemonic('S');
+    this.previewBoard = createPreviewBoard();
     
-    coordsDisplayColorChooser = new ColorChooserButton("Square Coordinates",
-      boardManager.getCoordsDisplayColor());
-      
-    coordsDisplayColorChooser.setMnemonic('C');
-
-
-    ChangeListener changeNotifyListener = new ChangeListener(){
+    boardLooksPanel = createBoardLooksPanel();
+    moveInputPanel = createMoveInputPanel();
+    moveHighlightingPanel = createMoveHighlightingPanel();
+    squareCoordsPanel = createSquareCoordsPanel();
+    
+    initPreviewBoard();
+    
+    JTabbedPane tabs = new JTabbedPane();
+    tabs.addTab("Board Looks", boardLooksPanel);
+    tabs.addTab("Move Input", moveInputPanel);
+    tabs.addTab("Move Highlighting", moveHighlightingPanel);
+    tabs.addTab("Coordinates", squareCoordsPanel);
+    
+    ChangeListener changeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         fireStateChanged();
       }
     };
+    
+    boardLooksPanel.addChangeListener(changeListener);
+    moveInputPanel.addChangeListener(changeListener);
+    moveHighlightingPanel.addChangeListener(changeListener);
+    squareCoordsPanel.addChangeListener(changeListener);
+    
+    JPanel squarePanel = new JPanel(new SquareLayout());
+    squarePanel.add(previewBoard);
+    previewBoard.setAlignmentX(Component.CENTER_ALIGNMENT);
+    previewBoard.setAlignmentY(Component.CENTER_ALIGNMENT);
+    previewBoard.setPreferredSize(new Dimension(320, 320));
+    
+    JButton resetPosition = new JButton("Reset Position");
+    resetPosition.setMnemonic('R');
+    resetPosition.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        initPreviewBoard();
+      }
+    });
+    
+    JPanel boardPanel = new JPanel();
+    boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
+    boardPanel.setBorder(BorderFactory.createCompoundBorder(
+      BorderFactory.createTitledBorder(null,  "Testing Board",
+        TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION),
+      BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+    
+    squarePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    resetPosition.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+    boardPanel.add(squarePanel);
+    boardPanel.add(Box.createVerticalStrut(7));
+    boardPanel.add(resetPosition);
+    
+    setLayout(new BorderLayout(5, 0));
+    add(tabs, BorderLayout.WEST);
+    add(boardPanel, BorderLayout.CENTER);
+  }
+  
+  
+  
+  /**
+   * Creates the preview board.
+   */
+   
+  protected JinBoard createPreviewBoard(){
+    return new JinBoard(new Position());
+  }
+  
+  
+  
+  /**
+   * Sets the initial state of the board.
+   */
+   
+  protected void initPreviewBoard(){
+    Position pos = previewBoard.getPosition();
+    pos.setLexigraphic("rn-qkbnrPPP-pppp-------------b---------------------PPPPPRNBQKBNR");
+    
+    boardLooksPanel.initPreviewBoard();
+    moveInputPanel.initPreviewBoard();
+    moveHighlightingPanel.initPreviewBoard();
+    squareCoordsPanel.initPreviewBoard();
+  }
+  
+  
+  
+  /**
+   * Applies any changes the user has made.
+   */
+   
+  public void applyChanges() throws BadChangesException{
+    boardLooksPanel.applyChanges();
+    moveInputPanel.applyChanges();
+    moveHighlightingPanel.applyChanges();
+    squareCoordsPanel.applyChanges();
+  }
+  
+  
+  
+  /**
+   * Creates the "Board Looks" panel.
+   */
+   
+  protected BoardModifyingPrefsPanel createBoardLooksPanel(){
+    return new BoardLooksPanel(boardManager, previewBoard);
+  }
+   
 
-    whiteColorChooser.addChangeListener(changeNotifyListener);
-    blackColorChooser.addChangeListener(changeNotifyListener);
-    whiteOutlineChooser.addChangeListener(changeNotifyListener);
-    blackOutlineChooser.addChangeListener(changeNotifyListener);
-    lightColorChooser.addChangeListener(changeNotifyListener);
-    darkColorChooser.addChangeListener(changeNotifyListener);
-    moveHighlightingColorChooser.addChangeListener(changeNotifyListener);
-    dragSquareHighlightingColorChooser.addChangeListener(changeNotifyListener);
-    coordsDisplayColorChooser.addChangeListener(changeNotifyListener);
-
-    createUI();
+  
+  /**
+   * Creates the "Move Input" panel.
+   */
+   
+  protected BoardModifyingPrefsPanel createMoveInputPanel(){
+    return new MoveInputPanel(boardManager, previewBoard);
   }
 
 
 
   /**
-   * Creates the UI.
+   * Creates the "Move Highlighting" panel.
    */
-
-  private void createUI(){
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-    JPanel piecesPanel = new JPanel(new GridLayout(2, 2, 5, 5));
-    piecesPanel.add(whiteColorChooser);
-    piecesPanel.add(blackColorChooser);
-    piecesPanel.add(whiteOutlineChooser);
-    piecesPanel.add(blackOutlineChooser);
-    Border innerBorder = new EmptyBorder(5, 5, 5, 5);
-    Border outerBorder = new TitledBorder(" Piece colors* ");
-    piecesPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
-
-    JPanel boardPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-    boardPanel.add(lightColorChooser);
-    boardPanel.add(darkColorChooser);
-    innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder(" Board colors* ");
-    boardPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
-
-    JPanel highlightPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-    highlightPanel.add(moveHighlightingColorChooser);
-    highlightPanel.add(dragSquareHighlightingColorChooser);
-    innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder(" Highlighting colors ");
-    highlightPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
-    
-    JPanel miscPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-    miscPanel.add(coordsDisplayColorChooser);
-    innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder(" Other colors ");
-    miscPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
-
-    JPanel notePanel = new JPanel(new BorderLayout());
-    notePanel.add(new JLabel("* - Color preferences only affect vector pieces and the solid color board"), BorderLayout.CENTER);
-
-    add(piecesPanel);
-    add(Box.createVerticalStrut(10));
-    add(boardPanel);
-    add(Box.createVerticalStrut(10));
-    add(highlightPanel);
-    add(Box.createVerticalStrut(10));
-    add(miscPanel);
-    add(Box.createVerticalStrut(10));
-    add(notePanel);
+   
+  protected BoardModifyingPrefsPanel createMoveHighlightingPanel(){
+    return new MoveHighlightPanel(boardManager, previewBoard);
   }
-
 
 
 
   /**
-   * Applies the changes done by the user.
+   * Creates the "Square Coordinates" panel.
    */
-
-  public void applyChanges(){
-    boardManager.setWhitePieceColor(whiteColorChooser.getColor());
-    boardManager.setBlackPieceColor(blackColorChooser.getColor());
-    boardManager.setWhiteOutlineColor(whiteOutlineChooser.getColor());
-    boardManager.setBlackOutlineColor(blackOutlineChooser.getColor());
-
-    boardManager.setLightSquareColor(lightColorChooser.getColor());
-    boardManager.setDarkSquareColor(darkColorChooser.getColor());
-
-    boardManager.setMoveHighlightingColor(moveHighlightingColorChooser.getColor());
-    boardManager.setDragSquareHighlightingColor(dragSquareHighlightingColorChooser.getColor());
-    
-    boardManager.setCoordsDisplayColor(coordsDisplayColorChooser.getColor());
+   
+  protected BoardModifyingPrefsPanel createSquareCoordsPanel(){
+    return new SquareCoordinatesPanel(boardManager, previewBoard);
   }
 
+  
 
 }
