@@ -31,6 +31,7 @@ import javax.swing.event.ChangeListener;
 import java.util.Vector;
 import free.util.PaintHook;
 import free.util.Utilities;
+import free.util.GraphicsUtilities;
 
 
 /**
@@ -296,10 +297,14 @@ public class JBoard extends JComponent{
 
 
   /**
-   * True when we can use the cache image when painting, false when we cannot.
+   * <code>null</code> when we can use the cache image when painting, the
+   * rectangle that needs to be repainted otherwise. We would use
+   * RepaintManager.currentManager(this).getDirtyRegion(this), but at the time
+   * the paintComponent method is called, the RepaintManager already considers
+   * it completely clean.
    */
 
-  private boolean cacheImageUsable = false;
+  private Rectangle dirtyRect = null;
 
 
 
@@ -621,9 +626,13 @@ public class JBoard extends JComponent{
    */
 
   public void paintComponent(Graphics componentGraphics){
-    if (cacheImageUsable){
-      componentGraphics.drawImage(cacheImage, 0, 0, null);
-      return;
+    Rectangle clipRect = componentGraphics.getClipBounds();
+
+    if (cacheImage != null){
+      if ((dirtyRect == null) || !GraphicsUtilities.contains(clipRect, dirtyRect)){
+        componentGraphics.drawImage(cacheImage, 0, 0, null);
+        return;
+      }
     }
 
     Dimension size = getSize();
@@ -635,7 +644,6 @@ public class JBoard extends JComponent{
     }
 
     Graphics cacheGraphics = cacheImage.getGraphics();
-    Rectangle clipRect = componentGraphics.getClipBounds();
     cacheGraphics.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 
     super.paintComponent(cacheGraphics);
@@ -701,7 +709,7 @@ public class JBoard extends JComponent{
     }
 
     componentGraphics.drawImage(cacheImage, 0, 0, null);
-    cacheImageUsable = true;
+    dirtyRect = null;
   }
 
 
@@ -728,8 +736,10 @@ public class JBoard extends JComponent{
    */
 
   public void repaint(long time, int x, int y, int width, int height){
-    cacheImageUsable = false;
     super.repaint(time, x, y, width, height);
+
+    dirtyRect = RepaintManager.currentManager(this).getDirtyRegion(this);
+    dirtyRect = dirtyRect.intersection(new Rectangle(getSize()));
   }
 
 
@@ -811,11 +821,14 @@ public class JBoard extends JComponent{
    */
 
   public Square locationToSquare(int x, int y){
+    if ((x < 0) || (y < 0))
+      return null;
+
     int squareWidth = getWidth()/8;
     int squareHeight = getHeight()/8;
     int file = x/squareWidth;
     int rank = 7-(y/squareHeight);
-    if ((file>7)||(file<0)||(rank>7)||(rank<0))
+    if ((file > 7) || (rank > 7))
       return null;
 
     if (isFlipped())
@@ -1006,7 +1019,7 @@ public class JBoard extends JComponent{
     // method.
 
     int inputStyle = getMoveInputStyle();
-    if (movedPieceSquare==null)
+    if (movedPieceSquare == null)
       return;
 
     int evtID = evt.getID();
@@ -1018,7 +1031,7 @@ public class JBoard extends JComponent{
     int y = evt.getY();
     Square square = locationToSquare(x,y);
 
-    if (square==null)
+    if (square == null)
       return;
 
     Rectangle helpRect = null;
