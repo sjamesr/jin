@@ -11,4 +11,4 @@ fi
 cd `dirname $filename`
 
 # Run Jin
-java -Xmx128M -Xms16M -jar jin.jar
+java -jar jin.jar
