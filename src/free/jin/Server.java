@@ -29,19 +29,17 @@ import java.io.FileInputStream;
 
 
 /**
- * This class encapsulates the various properties of a chess server. I haven't
- * yet decided whether it should be solely used as is and backed up by a 
- * properties file or subclassed by various server specific implementations.
+ * This class encapsulates the various properties of a chess server.
  */
 
-public class Server{
+public abstract class Server{
 
   
   /**
    * The properties of this server.
    */
 
-  private final Properties props = new Properties();
+  private Properties props;
 
 
 
@@ -61,34 +59,14 @@ public class Server{
    */
 
   public static Server load(InputStream serverIn) throws IOException{
-    Server server = new Server();
-    server.props.load(serverIn);
+    Properties props = new Properties();
+    props.load(serverIn);
 
-    return server;
-  }
-
-
-
-
-  /**
-   * Returns a copy of the default user for this server.
-   */
-
-  public User createDefaultUser(){
-    return new User(this);
-  }
-
-
-
-
-  /**
-   * Creats and returns a new LoginDialog for this Server.
-   */
-
-  public LoginDialog createLoginDialog(){
     try{
-      String dialogClassname = getProperty("login.dialog.classname");
-      return (LoginDialog)Class.forName(dialogClassname).newInstance();
+      String classname = props.getProperty("classname");
+      Server server = (Server)Class.forName(classname).newInstance();
+      server.props = props;
+      return server;
     } catch (InstantiationException e){
         e.printStackTrace();
       }
@@ -98,15 +76,58 @@ public class Server{
       catch (ClassNotFoundException e){
         e.printStackTrace();
       }
+
     return null;
-  } 
+  }
 
 
 
 
   /**
-   * Returns this server's property with the given name or null if no such
-   * property exists for this server.
+   * Returns a <code>User</code> for this Server with the specified
+   * <code>Properties</code>.
+   */
+
+  public User createUser(Properties props){
+    return new User(this, props);
+  }
+
+
+
+  /**
+   * Creates a guest <code>User</code>.
+   */
+
+  public User createGuest(){
+    return new User(this, new Properties());
+  }
+
+
+
+
+  /**
+   * Creates and returns a new <code>LoginDialog</code> for this
+   * <code>Server</code>.
+   */
+
+  public abstract LoginDialog createLoginDialog();
+
+
+
+  /**
+   * Creates and returns a new <code>LoginDialog</code> for this
+   * <code>Server</code> using the specified <code>User</code> for the dialog
+   * default.
+   */
+
+  public abstract LoginDialog createLoginDialog(User user);
+
+
+
+
+  /**
+   * Returns this server's property with the given name or <code>null</code> if
+   * no such property exists for this server.
    */
 
   public String getProperty(String propertyName){

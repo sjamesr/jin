@@ -24,6 +24,8 @@ package free.jin.chessclub;
 import javax.swing.*;
 import free.jin.StandardLoginDialog;
 import free.jin.JinConnection;
+import free.jin.Server;
+import free.jin.User;
 import free.util.BrowserControl;
 
 
@@ -39,30 +41,18 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
    * Creates a new ChessclubLoginDialog.
    */
 
-  public ChessclubLoginDialog(){
-    super("Chessclub.com Login Information");
+  public ChessclubLoginDialog(Server server){
+    super("Chessclub.com Login Information", server);
   }
 
 
 
-
   /**
-   * Logs in as a guest.
+   * Creates a new ChessclubLoginDialog.
    */
 
-  protected void connectAsGuestActionPerformed(){
-    usernameField.setText("guest");
-    passwordField.setText("");
-
-    String inputIllegalityReason = findInputIllegalityReason();
-    if (inputIllegalityReason!=null){
-      JOptionPane.showMessageDialog(dialog, inputIllegalityReason, "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
-      return;
-    }
-
-    user = user.getServer().createDefaultUser();
-
-    proceed();
+  public ChessclubLoginDialog(User user){
+    super("Chessclub.com Login Information", user);
   }
 
 

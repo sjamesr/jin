@@ -120,7 +120,7 @@ public class JinFrameMenuBar extends JMenuBar{
       if (user == null)
         return;
 
-      jinFrame.showLoginDialog(user);
+      jinFrame.showLoginDialog(user.getServer(), user);
     }
 
   };

@@ -195,8 +195,7 @@ public class JinFrame extends JFrame{
     else
       chosenServer = servers[0];
 
-    User defaultUser = chosenServer.createDefaultUser();
-    showLoginDialog(defaultUser);
+    showLoginDialog(chosenServer, null);
   }
 
 
@@ -204,13 +203,12 @@ public class JinFrame extends JFrame{
 
 
   /**
-   * Shows the LoginDialog for the given User.
+   * Shows the LoginDialog for the specified <code>Server</code> and
+   * <code>User</code>. The <code>User</code> object may be null.
    */
 
-  public void showLoginDialog(User user){
-    Server server = user.getServer();
-    LoginDialog loginDialog = server.createLoginDialog();
-    loginDialog.setHintUser(user);
+  public void showLoginDialog(Server server, User user){
+    LoginDialog loginDialog = user == null ? server.createLoginDialog() : server.createLoginDialog(user);
     loginDialog.show(this);
     if (loginDialog.isCanceled())
       return;
@@ -440,7 +438,7 @@ public class JinFrame extends JFrame{
       if (lastUserPath != null){
         User user = Jin.loadUser(lastUserPath);
         if (user != null)
-          showLoginDialog(user);
+          showLoginDialog(user.getServer(), user);
         return;
       }
       showConnectionCreationUI();

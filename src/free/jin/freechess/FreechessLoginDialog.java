@@ -24,6 +24,8 @@ package free.jin.freechess;
 import javax.swing.*;
 import free.jin.StandardLoginDialog;
 import free.jin.JinConnection;
+import free.jin.Server;
+import free.jin.User;
 import free.util.BrowserControl;
 
 
@@ -39,30 +41,18 @@ public class FreechessLoginDialog extends StandardLoginDialog{
    * Creates a new FreechessLoginDialog.
    */
 
-  public FreechessLoginDialog(){
-    super("FICS login Information");
+  public FreechessLoginDialog(Server server){
+    super("FICS login Information", server);
   }
 
 
 
-
   /**
-   * Logs in as a guest.
+   * Creates a new FreechessLoginDialog.
    */
 
-  protected void connectAsGuestActionPerformed(){
-    usernameField.setText("guest");
-    passwordField.setText("");
-
-    String inputIllegalityReason = findInputIllegalityReason();
-    if (inputIllegalityReason!=null){
-      JOptionPane.showMessageDialog(dialog, inputIllegalityReason, "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
-      return;
-    }
-
-    user = user.getServer().createDefaultUser();
-
-    proceed();
+  public FreechessLoginDialog(User user){
+    super("FICS login Information", user);
   }
 
 

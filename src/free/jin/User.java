@@ -21,10 +21,9 @@
 
 package free.jin;
 
-import java.util.Properties;
 import java.io.*;
+import java.util.Properties;
 import free.util.Utilities;
-
 
 
 /**
@@ -65,39 +64,18 @@ public class User{
 
 
   /**
-   * Creates a new <code>User</code> with no properties and the specified
-   * <code>Server</code>.
-   */
-  
-  public User(Server server){
-    this(server, new Properties());
-  }
-
-
-
-
-  /**
    * Creates a new <code>User</code> with the specified <code>Server</code> and
    * properties.
    */
 
-  private User(Server server, Properties props){
+  User(Server server, Properties props){
     if (server == null)
       throw new IllegalArgumentException("The specified Server object may not be null");
+    if (props == null)
+      throw new IllegalArgumentException("The specified Properties object may not be null");
 
     this.server = server;
     this.props = props;
-  }
-
-
-
-
-  /**
-   * Creates a new User which is exactly like the given User.
-   */
-
-  public User(User source){
-    this(source.server, (Properties)source.props.clone());
   }
 
 

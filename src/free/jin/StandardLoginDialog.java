@@ -29,8 +29,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Enumeration;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.BrowserControl;
+import free.util.Utilities;
 
 
 
@@ -52,10 +54,19 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * The User that wants to log on using this LoginDialog.
+   * The <code>Properties</code> we use as default values for the various fields
+   * in this dialog.
    */
 
-  protected User user;
+  protected final Properties props;
+
+
+
+  /**
+   * The <code>Server</code> we're trying to login to.
+   */
+
+  protected final Server server;
 
 
 
@@ -142,11 +153,82 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * Creates a new StandardLoginDialog with the specified title.
+   * The <code>User</code> we're going to return.
    */
 
-  public StandardLoginDialog(String title){
+  protected User user = null;
+
+
+
+
+  /**
+   * Creates a new <code>StandardLoginDialog</code> with the specified title and
+   * <code>User</code> whose properties will be used as default values for the
+   * dialog fields.
+   */
+
+  public StandardLoginDialog(String title, User user){
     this.title = title;
+    this.props = getUserProperties(user);
+    this.user = user;
+    this.server = user.getServer();
+  }
+
+
+
+
+  /**
+   * Creates a new <code>StandardLoginDialog</code> with the specified title and
+   * <code>Server</code> whose properties will be used as default values for the
+   * dialog fields.
+   */
+
+  public StandardLoginDialog(String title, Server server){
+    this.title = title;
+    this.props = getServerProperties(server);
+    this.server = server;
+  }
+
+
+
+
+  /**
+   * Grabs the properties needed to be used as default values for this login
+   * dialog from the specified <code>User</code>, puts them into a
+   * <code>Properties</code> object and returns it.
+   */
+
+  protected Properties getUserProperties(User user){
+    Properties props = new Properties();
+    Utilities.put(props, "login.hostname", user.getProperty("login.hostname"));
+    Utilities.put(props, "login.port", user.getProperty("login.port"));
+    Utilities.put(props, "login.username", user.getProperty("login.username"));
+    Utilities.put(props, "login.password", user.getProperty("login.password"));
+    Utilities.put(props, "login.hosts", user.getProperty("login.hosts"));
+    Utilities.put(props, "login.savepassword", user.getProperty("login.savepassword"));
+
+    return props;
+  }
+
+
+
+
+  /**
+   * Grabs the properties needed to be used as default values for this login
+   * dialog from the specified <code>Server</code>, puts them into a
+   * <code>Properties</code> object and returns it.
+   */
+
+  protected Properties getServerProperties(Server server){
+    Properties props = new Properties();
+    Utilities.put(props, "login.hostname", server.getProperty("login.hostname"));
+    Utilities.put(props, "login.port", server.getProperty("login.port"));
+    Utilities.put(props, "login.username", server.getProperty("login.username"));
+    Utilities.put(props, "login.password", server.getProperty("login.password"));
+    Utilities.put(props, "login.hosts", server.getProperty("login.hosts"));
+    Utilities.put(props, "login.savepassword", server.getProperty("login.savepassword"));
+
+    return props;
   }
 
 
@@ -170,8 +252,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * <code>isCanceled</code> method returning <code>false</code>.
    */
   
-  public void proceed(){
+  protected void proceed(){
     isCanceled = false;
+
     dialog.dispose();
   }
 
@@ -179,24 +262,19 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * Uses the following properties from the given user:
-   * <UL>
-   *   <LI> "login.hostname" - The hostname or the IP of the server.
-   *   <LI> "login.port" - The port to connect on to the server.
-   *   <LI> "login.username" - The username of the account to log on.
-   *   <LI> "login.password" - The password of the account.
-   *   <LI> "login.hosts" - A list of ICC servers' hostnames (or IPs), separated by ";". 
-   *   <LI> "login.savepassword" - Whether to save the password entered by the user,
-   *        either "true" or "false".
-   * </UL>
+   * This method determines whether the currently specified user details are
+   * sufficiently different from the details of the hint user so as to warrant
+   * the creation of a new User object. The default implementation checks
+   * whether the usernames are different (case insensitively).
    */
 
-  public void setHintUser(User user){
-    this.user = user;
+  protected boolean shouldCreateNewUser(){
+    return (user == null) || !usernameField.getText().equalsIgnoreCase(user.getUsername()); 
   }
 
 
 
+ 
 
   /**
    * Shows the user the login dialog and waits for the user to either ok or
@@ -294,10 +372,25 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
   /**
    * This method is called when the "connect as guest" button is pressed or an
-   * equivalent action is taken by the user.
+   * equivalent action is taken by the user. The default implementation sets the
+   * username field to "guest", clears the password field, creates a guest
+   * <code>User</code> and calls <code>proceed()</code>.
    */
 
-  protected abstract void connectAsGuestActionPerformed();
+  protected void connectAsGuestActionPerformed(){
+    usernameField.setText("guest");
+    passwordField.setText("");
+
+    String inputIllegalityReason = findInputIllegalityReason();
+    if (inputIllegalityReason!=null){
+      JOptionPane.showMessageDialog(dialog, inputIllegalityReason, "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    user = server.createGuest();
+
+    proceed();
+  }
 
 
 
@@ -398,7 +491,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
-    StringTokenizer hosts = new StringTokenizer(user.getProperty("login.hosts", ""), ";");
+    StringTokenizer hosts = new StringTokenizer(props.getProperty("login.hosts", ""), ";");
     Object [] items = new String[hosts.countTokens()];
     int i = 0;
     while (hosts.hasMoreTokens())
@@ -407,7 +500,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     hostnameBox = new FixedJComboBox(items);
     hostnameBox.setFont(UIManager.getFont("TextField.font"));
     hostnameBox.setEditable(true);
-    hostnameBox.setSelectedItem(user.getProperty("login.hostname"));
+    hostnameBox.setSelectedItem(props.getProperty("login.hostname"));
     hostnameLabel.setLabelFor(hostnameBox);
 
     hostnamePanel.add(hostnameBox);
@@ -418,7 +511,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     Box portPanel = new Box(BoxLayout.X_AXIS);
 
     Document portDocument = new IntegerStrictPlainDocument(0,65535,10);
-    portField = new FixedJTextField(portDocument,String.valueOf(user.getProperty("login.port")),5);
+    portField = new FixedJTextField(portDocument,String.valueOf(props.getProperty("login.port")),5);
     portField.setMaximumSize(portField.getPreferredSize());
 
     portPanel.add(portField);
@@ -494,40 +587,39 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
   /**
    * This method is called when the connect button is pressed or an equivalent
-   * action is taken by the user. The default implementation consults with
-   * <code>shouldCreateNewUser</code>, then fills the user's details and
-   * disposes of the dialog.
+   * action is taken by the user.
    */
 
   protected void connectActionPerformed(){
-    if (shouldCreateNewUser())
-      user = new User(user);
+    String inputIllegalityReason = findInputIllegalityReason();
+    if (inputIllegalityReason != null){
+      JOptionPane.showMessageDialog(dialog, inputIllegalityReason,
+        "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
-    user.setProperty("login.username", usernameField.getText(), true);
+    props.put("login.username", usernameField.getText());
     boolean savePassword = savePasswordCheckBox.isSelected();
     if (savePassword)
-      user.setProperty("login.password", new String(passwordField.getPassword()), true);
+      props.put("login.password", new String(passwordField.getPassword()));
     else
-      user.setProperty("login.password", "", true);
-    user.setProperty("login.hostname", (String)hostnameBox.getSelectedItem(), true);
-    user.setProperty("login.port", portField.getText(),true);
-    user.setProperty("login.savepassword", String.valueOf(savePassword), true);
+      props.put("login.password", "");
+    props.put("login.hostname", (String)hostnameBox.getSelectedItem());
+    props.put("login.port", portField.getText());
+    props.put("login.savepassword", String.valueOf(savePassword));
+
+    if (shouldCreateNewUser())
+      user = server.createUser(props);
+    else{
+      Enumeration propsEnum = props.keys();
+      while (propsEnum.hasMoreElements()){
+        String key = (String)propsEnum.nextElement();
+        String value = props.getProperty(key);
+        user.setProperty(key, value, true);
+      }
+    }
 
     proceed();
-  }
-
-
-
-
-  /**
-   * This method determines whether the currently specified user details are
-   * sufficiently different from the details of the hint user so as to warrant
-   * the creation of a new User object. The default implementation checks
-   * whether the usernames are different (case insensitively).
-   */
-
-  protected boolean shouldCreateNewUser(){
-    return !usernameField.getText().equalsIgnoreCase(user.getProperty("login.username")); 
   }
 
 
@@ -544,7 +636,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     Box usernamePanel = new Box(BoxLayout.X_AXIS);
 
     usernameField = new FixedJTextField(15);
-    usernameField.setText(user.getProperty("login.username"));
+    usernameField.setText(props.getProperty("login.username"));
 
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
@@ -559,7 +651,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     Box passwordInputPanel = new Box(BoxLayout.X_AXIS);
 
     passwordField = new FixedJPasswordField(15);
-    passwordField.setText(user.getProperty("login.password"));
+    passwordField.setText(props.getProperty("login.password"));
 
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
@@ -581,7 +673,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
 
-    boolean savePassword = Boolean.valueOf(user.getProperty("login.savepassword","false")).booleanValue();
+    boolean savePassword = Boolean.valueOf(props.getProperty("login.savepassword", "false")).booleanValue();
     savePasswordCheckBox = new JCheckBox("Save password", savePassword);
     savePasswordCheckBox.setMnemonic('S');
 
@@ -612,13 +704,6 @@ public abstract class StandardLoginDialog implements LoginDialog{
     connectButton.addActionListener(new ActionListener(){
       
       public void actionPerformed(ActionEvent evt){
-        String inputIllegalityReason = findInputIllegalityReason();
-        if (inputIllegalityReason!=null){
-          JOptionPane.showMessageDialog(parentDialog,inputIllegalityReason,
-            "Wrong Connection Settings",JOptionPane.ERROR_MESSAGE);
-          return;
-        }
-
         connectActionPerformed();
       }
 

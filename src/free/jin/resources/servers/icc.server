@@ -1,9 +1,9 @@
 
+classname = free.jin.chessclub.ChessclubServer
+
 name = icc
 name.short = icc
 name.long = Internet Chess Club
-
-login.dialog.classname = free.jin.chessclub.ChessclubLoginDialog
 
 login.hosts = chessclub.com;queen.chessclub.com;rook.chessclub.com;special.chessclub.com
 login.hostname = chessclub.com
