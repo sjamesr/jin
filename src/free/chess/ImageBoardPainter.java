@@ -22,7 +22,11 @@
 package free.chess;
 
 import java.awt.*;
+import java.net.URL;
+import java.io.IOException;
+import java.util.Properties;
 import free.util.ImageUtilities;
+import free.util.IOUtilities;
 
 
 /**
@@ -30,7 +34,7 @@ import free.util.ImageUtilities;
  * light squares and one for dark) to draw the board.
  */
 
-public class ImageBoardPainter implements BoardPainter{
+public class ImageBoardPainter implements ResourceBoardPainter{
 
 
   /**
@@ -38,7 +42,7 @@ public class ImageBoardPainter implements BoardPainter{
    * images.
    */
 
-  private final Image boardImage;
+  private Image boardImage;
 
 
 
@@ -56,7 +60,7 @@ public class ImageBoardPainter implements BoardPainter{
    * image for the entire board.
    */
 
-  private final Image lightImage;
+  private Image lightImage;
 
 
 
@@ -66,7 +70,7 @@ public class ImageBoardPainter implements BoardPainter{
    * image for the entire board.
    */
 
-  private final Image darkImage;
+  private Image darkImage;
 
 
 
@@ -94,9 +98,19 @@ public class ImageBoardPainter implements BoardPainter{
    * Only relevant if boardImage is null.
    */
 
-  private final boolean isScaled;
+  private boolean isScaled;
 
 
+  
+  
+  /**
+   * A no-arg constructor so that this <code>ImageBoardPainter</code> can be
+   * used as a <code>ResourceBoardPainter</code>.
+   */
+   
+  public ImageBoardPainter(){
+     
+  }
 
 
 
@@ -142,18 +156,64 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
-   * Preloads the given image and returns it. This method is here to make it
-   * easier to create specific subclasses with no-args constructors and allowing
-   * them to preload images.
+   * Loads the board images from the specified URL. The structure at the
+   * specified url is described below.
+   * A properties file named "definition" must be located at the base URL.
+   * That file should contain the following two properties:
+   * <ul>
+   *   <li><code>type</code>: The value is either "single" or "light-dark". This
+   *       specifies whether there is a single image of the entire board or two
+   *       pattern images for the light and dark squares. If this is omitted,
+   *       "light-dark" is assumed.
+   *   <li><code>image.type</code>: Specifies the extension (type) of the
+   *       image(s) - gif, png, etc. If this is omitted, "gif" is assumed.
+   * </ul>
+   * If the value of <code>type</code> is "single", the image will be loaded
+   * from a file named "board.gif" (assuming <code>image.type</code> is "gif").
+   * If the value of <code>type</code> is "light-dark", the images will be
+   * loaded from "light.gif" and "dark.gif". In this case, the definition file
+   * must contain the boolean property <code>scaleSquares</code>. This property
+   * specifies whether the square images specify an exact image of each square
+   * or a general pattern to be used for the squares. In effect, if the value
+   * of <code>scaleSquares</code> is "true", the light and dark square images
+   * will be stretched to fill each square on the board. If it is "false", the
+   * images will be sliced and tiled to fill each square. The default value is
+   * "false". In the first case all the squares will look the same - in the 2nd
+   * they may not look the same if the patterns are bigger than the squares. If
+   * all your desired values are the default ones, you may omit the definition
+   * file altogether.
    */
+   
+  public void load(URL url) throws IOException{
+    URL defURL = new URL(url, "definition");
 
-  // protected static Image preload(Image image){
-  //   try{
-  //     ImageUtilities.preload(image);
-  //   } catch (InterruptedException e){}
-  //   return image;
-  // }
+    Properties def = IOUtilities.loadProperties(defURL);
+    if (def == null)
+      def = new Properties();
 
+    String type = def.getProperty("type", "light-dark");     
+    String ext = def.getProperty("ext", "gif");
+    
+    Toolkit toolkit = Toolkit.getDefaultToolkit();    
+    
+    if ("single".equals(type)){
+      Image boardImage = toolkit.getImage(new URL(url, "board." + ext));
+      
+      this.boardImage = boardImage;
+    }
+    else if ("light-dark".equals(type)){
+      Image lightImage = toolkit.getImage(new URL(url, "light." + ext));
+      Image darkImage = toolkit.getImage(new URL(url, "dark." + ext));
+
+      boolean isScaled = def.getProperty("scaleSquares", "false").equalsIgnoreCase("true");
+      
+      this.lightImage = lightImage;
+      this.darkImage = darkImage;
+      this.isScaled = isScaled; 
+    }
+    else
+      throw new IOException("Unrecognized type value: " + type); 
+  }
 
 
 
@@ -241,6 +301,14 @@ public class ImageBoardPainter implements BoardPainter{
    */
 
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
+    // Preload if necessary
+    if (boardImage == null){
+      ImageUtilities.preload(lightImage); 
+      ImageUtilities.preload(darkImage); 
+    }
+    else
+      ImageUtilities.preload(boardImage);
+    
     scaleImages(width, height);
 
     if (boardImage == null){
