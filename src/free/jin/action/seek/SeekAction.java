@@ -183,6 +183,12 @@ public class SeekAction extends JinAction{
       manualAcceptBox.setSelected(prefs.getBool("manualAccept", false));
       useFormulaBox.setSelected(prefs.getBool("useFormula", true));
       
+      // Disable isRated for guests
+      if (getUser().isGuest()){
+        isRatedBox.setSelected(false);
+        isRatedBox.setEnabled(false);
+      }
+      
       createUI();
     }
     
