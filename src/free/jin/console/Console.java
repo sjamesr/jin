@@ -232,15 +232,31 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       }
 
       private boolean dragging = false;
+      private boolean realDrag = false;
 
       public void mousePressed(MouseEvent e){
         dragging = true;
+        realDrag = false;
         super.mousePressed(e);
       }
 
       public void mouseReleased(MouseEvent e){
         dragging = false;
         super.mouseReleased(e);
+        if (realDrag&&isCopyOnSelect())
+          requestDefaultFocus();
+      }
+
+      public void mouseDragged(MouseEvent e){
+        realDrag = true;
+        super.mouseDragged(e);
+      }
+
+      public void mouseClicked(MouseEvent e){
+        System.out.println(e.getClickCount());
+        super.mouseClicked(e);
+        if (isCopyOnSelect())
+          requestDefaultFocus();
       }
 
       protected void moveCaret(MouseEvent e){
@@ -942,7 +958,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   public void keyPressed(KeyEvent evt){
-    if ((evt.getSource()==inputComponent)||(evt.getSource()==outputComponent)){
+    if ((evt.getSource()==inputComponent)/*||(evt.getSource()==outputComponent)*/){
       if (evt.getID()==KeyEvent.KEY_PRESSED){
         if ((evt.getModifiers()&KeyEvent.CTRL_MASK)!=0){
           JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
@@ -982,9 +998,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * input component.
    */
 
-  public void keyReleased(KeyEvent evt){
-
-  }
+  public void keyReleased(KeyEvent evt){}
 
 
 
@@ -1001,6 +1015,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       // because Sun changed the value of CHAR_UNDEFINED somewhere between
       // JDK 1.1 and JDK 1.3
       try{
+
         if (evt.getKeyChar() != KeyEvent.class.getField("CHAR_UNDEFINED").getChar(null)){
 
           // We request the focus in invokeLater because we want the key event
@@ -1011,6 +1026,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
             }
           });
 
+
           KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
           Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
 
@@ -1020,6 +1036,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
           KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
           Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
         }
+
       } catch (IllegalAccessException e){e.printStackTrace();}
         catch (NoSuchFieldException e){e.printStackTrace();}
     }
