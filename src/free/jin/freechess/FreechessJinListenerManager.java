@@ -21,6 +21,7 @@
 
 package free.jin.freechess;
 
+import free.freechess.Ivar;
 import free.jin.event.BasicJinListenerManager;
 import free.jin.event.SeekListener;
 
@@ -66,7 +67,7 @@ public class FreechessJinListenerManager extends BasicJinListenerManager{
     super.addSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 1)
-      source.setSeekInfo(true);
+      source.setIvarState(Ivar.SEEKINFO, true);
     else
       source.notFirstListenerAdded(listener);
   }
@@ -83,7 +84,7 @@ public class FreechessJinListenerManager extends BasicJinListenerManager{
     super.removeSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 0){
-      source.setSeekInfo(false);
+      source.setIvarState(Ivar.SEEKINFO, false);
 
       source.lastSeekListenerRemoved();
     }
