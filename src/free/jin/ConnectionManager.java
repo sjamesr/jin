@@ -145,7 +145,7 @@ public class ConnectionManager{
 
         String errorMessage = e.getMessage() + "\n" + 
           (reason == null ? "" : reason.getClass().getName() + ": " + reason.getMessage());
-        OptionPanel.error(context.getUIProvider(), "PluginError", errorMessage);
+        OptionPanel.error(context.getUIProvider(), "Plugin Error", errorMessage);
       }
   }
 
