@@ -25,11 +25,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Properties;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
 import free.util.PlatformUtils;
 import free.util.IOUtilities;
@@ -358,8 +360,66 @@ public class AppletJinContext implements JinContext{
    * TODO: Implement this.
    */
 
-  public ClassLoader [] loadResources(String resourceType){
-    return new ClassLoader[0];
+  public Resource [] getResources(String resourceType, Plugin plugin){
+    String resourcesArg = applet.getParameter("resources." + resourceType);
+    if (resourcesArg == null)
+      return new Resource[0];
+    
+    StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
+    Resource [] resources = new Resource[resourceNames.countTokens()];
+    for (int i = 0; i < resources.length; i++){
+      try{
+        URL resourceURL = new URL(applet.getCodeBase(), "resources/" + resourceType + "/" 
+          + resourceNames.nextToken() + "/");
+        resources[i] = loadResource(resourceURL, plugin);
+      } catch (IOException e){e.printStackTrace();}
+    }
+    
+    return resources;
+  }
+  
+  
+  
+  /**
+   * Returns the resource with the specified type and id.
+   */
+   
+  public Resource getResource(String type, String id, Plugin plugin){
+    try{
+      URL resourceURL = new URL(applet.getCodeBase(), "resources/" + type + "/" + id + "/");
+      return loadResource(resourceURL, plugin);
+    } catch (IOException e){e.printStackTrace();}
+    
+    return null;
+  }
+  
+  
+  
+  
+  /**
+   * Loads a single resource from the specified URL.
+   */
+   
+  private Resource loadResource(URL url, Plugin plugin) throws IOException{
+    URL defURL = new URL(url, "definition");
+    IOUtilities.cacheURL(defURL);
+    
+    Properties def = IOUtilities.loadProperties(defURL);
+    String classname = def.getProperty("classname");
+    if (classname == null)
+      return null;
+    
+    try{
+      // We need to load it with the plugin's classloader because the
+      // resource may be of a type which is a part of the plugin.
+      Class resourceClass = plugin.getClass().getClassLoader().loadClass(classname);
+      Resource resource = (Resource)resourceClass.newInstance();
+      resource.load(url, plugin);
+      
+      return resource;
+    } catch (ClassNotFoundException e){e.printStackTrace(); return null;}
+      catch (InstantiationException e){e.printStackTrace(); return null;}
+      catch (IllegalAccessException e){e.printStackTrace(); return null;}
   }
   
   
