@@ -23,8 +23,7 @@ package free.jin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.border.EmptyBorder;
@@ -126,6 +125,16 @@ public class ServerChoiceDialog extends JDialog{
       public void actionPerformed(ActionEvent evt){
         server = (Server)list.getSelectedValue();
         dispose();
+      }
+    });
+
+    list.addMouseListener(new MouseAdapter(){
+      public void mouseClicked(MouseEvent evt){
+        if ((evt.getClickCount() == 2) && (evt.getModifiers() == KeyEvent.BUTTON1_MASK)){
+          server = (Server)list.getSelectedValue();
+          if (server != null)
+            dispose();
+        }
       }
     });
 
