@@ -27,6 +27,8 @@ import java.awt.event.MouseEvent;
 import free.chess.Position;
 import free.chess.Square;
 import free.jin.board.JinBoard;
+import free.jin.board.Arrow;
+import free.jin.board.Circle;
 
 
 /**
@@ -81,7 +83,7 @@ public class ChessclubJBoard extends JinBoard{
     int arrowSize = calcArrowSize(rect.width, rect.height);
     int circleSize = calcCircleSize(rect.width, rect.height);
 
-    if ((tmpArrowFrom != null)&&(tmpArrowTo != null)&&!tmpArrowFrom.equals(tmpArrowTo))
+    if ((tmpArrowFrom != null) && (tmpArrowTo != null) && !tmpArrowFrom.equals(tmpArrowTo))
       drawArrow(g, tmpArrowFrom, tmpArrowTo, arrowSize, getDefaultArrowColor());
   }
 
@@ -110,13 +112,21 @@ public class ChessclubJBoard extends JinBoard{
 
     Square square = locationToSquare(x, y);
 
-    if (evt.getID() == MouseEvent.MOUSE_CLICKED)
-      addCircle(square, getDefaultCircleColor());
+    if (evt.getID() == MouseEvent.MOUSE_CLICKED){
+      if (areCirclesAt(square))
+        removeCirclesAt(square);
+      else
+        addCircle(new Circle(square, getDefaultCircleColor()));
+    }
     else if (evt.getID() == MouseEvent.MOUSE_PRESSED)
       tmpArrowFrom = square;
     else if (evt.getID() == MouseEvent.MOUSE_RELEASED){
-      if ((tmpArrowFrom != null) && (tmpArrowTo != null) && !tmpArrowFrom.equals(tmpArrowTo))
-        addArrow(tmpArrowFrom, tmpArrowTo, getDefaultArrowColor());
+      if ((tmpArrowFrom != null) && (tmpArrowTo != null) && !tmpArrowFrom.equals(tmpArrowTo)){
+        if (areArrowsAt(tmpArrowFrom, tmpArrowTo))
+          removeArrowsAt(tmpArrowFrom, tmpArrowTo);
+        else
+          addArrow(new Arrow(tmpArrowFrom, tmpArrowTo, getDefaultArrowColor()));
+      }
       tmpArrowFrom = null;
       tmpArrowTo = null;
     }
