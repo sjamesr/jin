@@ -531,7 +531,7 @@ public class Game{
    * Sets the id of this game.
    */
 
-  private void setId(Object id){
+  public void setId(Object id){
     props.setProperty("id", id);
   }
 
