@@ -1090,6 +1090,8 @@ public class JBoard extends JComponent{
   public void paintComponent(Graphics graphics){
     super.paintComponent(graphics);
     
+    Rectangle originalClip = graphics.getClipBounds();
+    
     // The documentation of JComponent#paintComponent(Graphics) says we
     // shouldn't make permanent changes to the Graphics object, but we want to
     // clip it.
@@ -1151,11 +1153,14 @@ public class JBoard extends JComponent{
         drawSquare(g, to, highlightSize, getMoveHighlightingColor());
       }
     }
-    
-    // Paint the coordinates. It needs the original graphics because of the
+
+    // Paint the coordinates. Reset the original clip because of
     // OUTSIDE_COORDS mode, where the coordinates are drawn outside of our
     // usual clip rectangle.
+    rect = g.getClipBounds();
+    g.setClip(originalClip);
     drawCoords(graphics);
+    g.setClip(rect);
     
     // Allow PaintHooks to paint
     callPaintHooks(g);
@@ -1184,7 +1189,7 @@ public class JBoard extends JComponent{
    * actual drawing though.
    */
    
-  private static final Font COORDS_FONT = new Font("Monospaced", Font.PLAIN, 10); 
+  private static final Font COORDS_FONT = new Font("Monospaced", Font.BOLD, 10); 
                                                    
                                                    
   
