@@ -21,16 +21,17 @@
 
 package free.jin.seek;
 
-import java.awt.*;
-import javax.swing.*;
-import free.jin.plugin.*;
 import free.jin.SeekConnection;
-import free.jin.event.SeekListener;
 import free.jin.event.SeekEvent;
-import free.jin.seek.event.SeekSelectionListener;
+import free.jin.event.SeekListener;
+import free.jin.plugin.*;
 import free.jin.seek.event.SeekSelectionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import free.jin.seek.event.SeekSelectionListener;
+import free.jin.ui.UIProvider;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Toolkit;
 import java.net.URL;
 
 
@@ -61,24 +62,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
-  /**
-   * The JRadioButtonMenuItem indicating whether the sought graph is visible.
-   */
-
-  private JRadioButtonMenuItem visibleRB; 
-
-
-
-
-  /**
-   * The JRadioButtonMenuItem indicating whether the sought graph is invisible.
-   */
-
-  private JRadioButtonMenuItem nonVisibleRB;
-
-
-
   /**
    * Sets the plugin context - if the connection is not an instance of
    * SeekJinConnection, this method throws an UnsupportedContextException.
@@ -104,8 +87,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
-
   /**
    * Stops this plugin.
    */
@@ -116,15 +97,12 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
-
   /**
    * Initializes the sought graph.
    */
 
   protected void initSoughtGraph(){
-    soughtGraphContainer = createContainer("");
-    soughtGraphContainer.setCloseOperation(PluginUIContainer.HIDE_ON_CLOSE);
+    soughtGraphContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
     soughtGraphContainer.setTitle("Seek Graph");
 
     URL iconImageURL = SoughtGraphPlugin.class.getResource("icon.gif");
@@ -139,9 +117,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     Container content = soughtGraphContainer.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(soughtGraph, BorderLayout.CENTER);
-
-    if (getPrefs().getBool("isVisible", true))
-      soughtGraphContainer.setVisible(true);
   }
 
 
@@ -161,10 +136,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void pluginUIShown(PluginUIEvent evt){
-    // It may be null if the graph is shown before it's created.
-    if ((visibleRB != null) && (!visibleRB.isSelected())) 
-      visibleRB.setSelected(true);
-
     SeekConnection conn = (SeekConnection)getConn();
     conn.getSeekListenerManager().addSeekListener(this);
   }
@@ -178,10 +149,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void pluginUIHidden(PluginUIEvent evt){
     soughtGraph.removeAllSeeks();
 
-    // It may be null if the graph is shown before it's created.
-    if ((visibleRB != null) && (visibleRB.isSelected())) 
-      nonVisibleRB.setSelected(true);
-
     SeekConnection conn = (SeekConnection)getConn();
     conn.getSeekListenerManager().removeSeekListener(this);
   }
@@ -191,17 +158,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void pluginUIClosing(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
-
-
-
-  /**
-   * Saves the state of this plugin into the user's properties.
-   */
-
-  public void saveState(){
-    boolean isVisible = soughtGraphContainer.isVisible();
-    getPrefs().setBool("isVisible", isVisible);
-  }
 
 
 
@@ -230,48 +186,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
-  /**
-   * Creates and returns the JMenu for this plugin.
-   */
-
-  public JMenu getPluginMenu(){
-    JMenu myMenu = new JMenu(getName());
-
-    visibleRB = new JRadioButtonMenuItem("Graph Shown", getPrefs().getBool("isVisible", true));
-    nonVisibleRB = new JRadioButtonMenuItem("Graph Hidden", !visibleRB.isSelected());
-
-    visibleRB.setMnemonic('s');
-    nonVisibleRB.setMnemonic('h');
-
-    ButtonGroup visibilityGroup = new ButtonGroup();
-    visibilityGroup.add(visibleRB);
-    visibilityGroup.add(nonVisibleRB);
-
-    visibleRB.setActionCommand("show");
-    nonVisibleRB.setActionCommand("hide");
-
-    ActionListener visibilityListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String actionCommand = evt.getActionCommand();
-        boolean isVisible = "show".equals(actionCommand);
-        soughtGraphContainer.setVisible(isVisible);
-        getPrefs().setBool("isVisible", isVisible);
-      }
-    };
-
-    visibleRB.addActionListener(visibilityListener);
-    nonVisibleRB.addActionListener(visibilityListener);
-
-    myMenu.add(visibleRB);
-    myMenu.add(nonVisibleRB);
-
-    return myMenu;
-  }
-
-
-
-
   /**
    * SeekListener implementation. Gets called when a seek is added.
    */
@@ -282,7 +196,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
   /**
    * SeekListener implementation. Gets called when a seek is removed.
    */
@@ -290,7 +203,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void seekRemoved(SeekEvent evt){
     soughtGraph.removeSeek(evt.getSeek());
   }
-
 
 
 
