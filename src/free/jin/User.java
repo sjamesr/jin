@@ -165,24 +165,11 @@ public class User{
 
   /**
    * Returns the username of this user - the value of the "login.username"
-   * property, or the string "guest" if the user is a guest.
+   * property.
    */
 
   public String getUsername(){
-    String username = getProperty("login.username");
-    return username == null ? "guest" : username;
-  }
-
-
-
-
-  /**
-   * Returns <code>true</code> if this <code>User</code> object represents a
-   * guest.
-   */
-
-  public boolean isGuest(){
-    return (getProperty("login.username") == null);
+    return getProperty("login.username");
   }
 
 
@@ -217,7 +204,7 @@ public class User{
    */
 
   public String toString(){
-    return "User[server=\""+getServer()+"\",login.username="+getUsername()+"]";
+    return "User[server=\""+getServer().getLongName()+"\",login.username=\""+getUsername()+"\"]";
   } 
 
 }
