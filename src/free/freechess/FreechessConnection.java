@@ -260,7 +260,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       sendCommand("iset seekinfo 1");
       sendCommand("iset seekremove 1"); // This is not really needed, but "help iv_seekinfo" says it is, so we'll do it :-)
     }
-    sendCommand("iset lock 1");
+//    sendCommand("iset lock 1"); // Don't do this, otherwise we can't set seekinfo and seekremove
 
     filterLine("Style "+style+" set.");
     filterLine("Your prompt will now not show the time.");
@@ -271,7 +271,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       filterLine("seekinfo set.");
       filterLine("seekremove set.");
     }
-    filterLine("lock set.");
+//    filterLine("lock set.");
   }
 
 
