@@ -198,6 +198,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     loadEventAudioClip("Castling");
     loadEventAudioClip("IllegalMove");
     loadEventAudioClip("GameEnd");
+    loadEventAudioClip("GameStart");
   }
 
 

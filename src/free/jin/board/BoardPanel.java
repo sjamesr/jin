@@ -939,14 +939,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * GameListener implementation. Note that this method is never actually called
-   * because this BoardPanel is registered as a GameListener only after the game
-   * actually starts.
+   * GameListener implementation. 
    */
 
   public void gameStarted(GameStartEvent evt){
     if (evt.getGame()!=game)
       return;
+
+    if ((game.getGameType()==Game.MY_GAME) && game.isPlayed())
+      playSound("GameStart");
   }
 
 
