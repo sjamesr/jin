@@ -69,11 +69,13 @@ public class AudioClip{
 
         Vector tempVec = new Vector();
         String line;
-        while ((line = reader.readLine())!=null)
+        while ((line = reader.readLine()) != null)
           tempVec.addElement(line);
 
+        reader.close();
+
         classnames = new String[tempVec.size()];
-        for (int i=0;i<classnames.length;i++)
+        for (int i = 0; i < classnames.length; i++)
           classnames[i] = (String)tempVec.elementAt(i);
       } catch (IOException e){
           e.printStackTrace();

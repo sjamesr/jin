@@ -112,7 +112,7 @@ public class Struct{
    */
 
   protected final void setBooleanProperty(String propertyName, boolean propertyValue){
-    setProperty(propertyName, new Boolean(propertyValue));
+    setProperty(propertyName, propertyValue ? Boolean.TRUE : Boolean.FALSE);
   }
 
 
