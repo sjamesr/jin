@@ -211,7 +211,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     JMenuItem clearMenuItem = new JMenuItem("Clear Console");
     clearMenuItem.setMnemonic('l');
     clearMenuItem.setAccelerator(
-      KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+      KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     clearMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
