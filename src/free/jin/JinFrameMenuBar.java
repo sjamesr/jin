@@ -115,8 +115,12 @@ public class JinFrameMenuBar extends JMenuBar{
   private final ActionListener userConnectionListener = new ActionListener(){
 
     public void actionPerformed(ActionEvent evt){
-      User chosenUser = ((UserMenuItem)evt.getSource()).getUser();
-      jinFrame.showLoginDialog(chosenUser);
+      String path = ((UserMenuItem)evt.getSource()).getPath();
+      User user = Jin.loadUser(path);
+      if (user == null)
+        return;
+
+      jinFrame.showLoginDialog(user);
     }
 
   };
@@ -166,10 +170,10 @@ public class JinFrameMenuBar extends JMenuBar{
 
   public JMenu createConnectionMenu(){
     final JMenu connMenu = new JMenu("Connection");
-    connMenu.setMnemonic(KeyEvent.VK_C);
+    connMenu.setMnemonic('C');
 
     JMenuItem newConnMenuItem = new JMenuItem("New Connection...");
-    newConnMenuItem.setMnemonic(KeyEvent.VK_N);
+    newConnMenuItem.setMnemonic('N');
     newConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
     newConnMenuItem.addActionListener(new ActionListener(){
 
@@ -182,26 +186,31 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
     JMenuItem openConnMenuItem = new JMenuItem("Open Connection...");
-    openConnMenuItem.setMnemonic(KeyEvent.VK_O);
+    openConnMenuItem.setMnemonic('O');
     openConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
     openConnMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
         JFileChooser chooser = new JFileChooser(Jin.usersDir);
         chooser.setCurrentDirectory(Jin.usersDir);
-        Enumeration servers = Jin.getServers();
-        while (servers.hasMoreElements()){
-          Server server = (Server)servers.nextElement();
-          chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(server));
-        }
+        Server [] servers = Jin.getServers();
+        for (int i = 0; i < servers.length; i++)
+          chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(servers[i]));
         chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
 
         int result = chooser.showOpenDialog(jinFrame);
-        if (result!=JFileChooser.APPROVE_OPTION)
+        if (result != JFileChooser.APPROVE_OPTION)
           return;
 
-        User chosenUser = Jin.getUserByFilename(chooser.getSelectedFile().getName());
-        jinFrame.showLoginDialog(chosenUser);
+        String path = chooser.getSelectedFile().getAbsolutePath();
+        User user = Jin.loadUser(path);
+        // This assumes information it's not supposed to assume - that the path
+        // is a file name, but since the whole concept of letting the user
+        // "open" a profile is specific to the way the profiles are saved,
+        // this is ok. It will, however, need to be modified if Jin starts
+        // keeping the setting files somewhere else.
+
+        jinFrame.showLoginDialog(user);
       }
 
     });
@@ -239,24 +248,8 @@ public class JinFrameMenuBar extends JMenuBar{
     connMenu.add(closeConnMenuItem);
     connMenu.add(startUserConnSep);
     connMenu.add(endUserConnSep);
-    update(connMenu);
+    updateConnectionMenu(connMenu);
     connMenu.add(exitMenuItem);
-
-    Jin.getUsers().addListDataListener(new ListDataListener(){
-
-      public void intervalAdded(ListDataEvent evt){
-        update(connMenu);
-      }
-
-      public void intervalRemoved(ListDataEvent evt){
-        update(connMenu);
-      }
-
-      public void contentsChanged(ListDataEvent evt){
-        update(connMenu);
-      }
-
-    });
 
     return connMenu;
   } 
@@ -323,11 +316,13 @@ public class JinFrameMenuBar extends JMenuBar{
    * performes whatever necessary modifications to the menubar, such as
    * adding certain menus.
    *
-   * @param conn The JinConnection about to be established.
-   * @param plugins An Enumeration of all the plugins for the connection.
+   * @param conn The <code>JinConnection</code> about to be established.
+   * @param user The connecting <code>User</code>.
+   * @param plugins An <code>Enumeration</code> of all the plugins for the
+   * connection.
    */
 
-  void connecting(JinConnection conn, Enumeration plugins){
+  void connecting(JinConnection conn, User user, Enumeration plugins){
     while (plugins.hasMoreElements()){
       Plugin plugin = (Plugin)plugins.nextElement();
 
@@ -360,7 +355,36 @@ public class JinFrameMenuBar extends JMenuBar{
    * <code>connecting(JinConnection, Enumeration)</code> was called.
    */
 
-  void disconnected(JinConnection conn){
+  void disconnected(JinConnection conn, User user){
+    String userPath = Jin.getSettingsPath(user);
+    if (userPath != null){
+      // Update the recent user properties
+      int recentUsersCount = Integer.parseInt(Jin.getProperty("recent.users.count", "0"));
+      int existingUserIndex = recentUsersCount + 2;
+      for (int i = 1; i <= recentUsersCount; i++){
+        String path = Jin.getProperty("recent.users."+i+".path");
+        if (path.equals(userPath)){
+          existingUserIndex = i;
+          break;
+        }
+      }
+
+      for (int i = existingUserIndex; i > 1; i--){
+        String description = Jin.getProperty("recent.users."+(i-1)+".description");
+        String path = Jin.getProperty("recent.users."+(i-1)+".path");
+        Jin.setProperty("recent.users."+i+".description", description);
+        Jin.setProperty("recent.users."+i+".path", path);
+      }
+      Jin.setProperty("recent.users.1.description", descriptionForUser(user));
+      Jin.setProperty("recent.users.1.path", userPath);
+
+      if (existingUserIndex == recentUsersCount + 2)
+        Jin.setProperty("recent.users.count", String.valueOf(recentUsersCount + 1));
+
+      updateConnectionMenu(connectionMenu);
+    }
+
+
     removePluginMenus();
     removePluginPreferenceUIMenuItems();
 
@@ -370,6 +394,20 @@ public class JinFrameMenuBar extends JMenuBar{
       menuItem.setEnabled(!menuItem.isEnabled());
     }
   }
+
+
+
+
+  /**
+   * Returns the string that will be used as a description of a
+   * <code>User</code> object for the user.
+   */
+
+  private static String descriptionForUser(User user){
+    return user.getUsername()+"."+user.getServer().getName();
+  } 
+
+
 
 
 
@@ -558,11 +596,11 @@ public class JinFrameMenuBar extends JMenuBar{
    * JSeparator and endUserConn JSeparator.
    */
 
-  private void update(JMenu connMenu){
+  private void updateConnectionMenu(JMenu connMenu){
     int startSeparatorIndex = -1;
     int menuItemCount = connMenu.getMenuComponentCount();
-    for (int i=0;i<menuItemCount;i++){
-      if (connMenu.getMenuComponent(i)==startUserConnSep){
+    for (int i = 0 ; i < menuItemCount; i++){
+      if (connMenu.getMenuComponent(i) == startUserConnSep){
         startSeparatorIndex = i;
         break;
       }
@@ -579,17 +617,18 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
     boolean areMenuItemsEnabled = (jinFrame.getConnection() == null);
-    ListModel users = Jin.getUsers();
-    int usersCount = users.getSize();
-    for (int i=0;i<usersCount;i++){
-      User user = (User)users.getElementAt(i);
-      JMenuItem menuItem = new UserMenuItem(user);
-      menuItem.setText(String.valueOf(usersCount-i)+" "+menuItem.getText());
+    
+    int recentUsersCount = Integer.parseInt(Jin.getProperty("recent.users.count", "0"));
+    for (int i = recentUsersCount ; i >= 1; i--){
+      String description = Jin.getProperty("recent.users."+i+".description");
+      String path = Jin.getProperty("recent.users."+i+".path");
+      String label = i+" "+description;
+      JMenuItem menuItem = new UserMenuItem(label, path);
       menuItem.addActionListener(userConnectionListener);
-      if (usersCount - i <= 9)
-        menuItem.setMnemonic(Character.forDigit(usersCount - i,10));
+      if (i <= 9)
+        menuItem.setMnemonic(Character.forDigit(i, 10));
       menuItem.setEnabled(areMenuItemsEnabled);
-      connMenu.insert(menuItem, startSeparatorIndex+1);
+      connMenu.insert(menuItem, startSeparatorIndex + 1);
       connectionSensitiveMenuItems.addElement(menuItem);
     }
   }
@@ -679,17 +718,17 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
   /**
-   * A JMenuItem representing a User.
+   * A JMenuItem representing an account on the recently user accounts list.
    */
 
   private class UserMenuItem extends JMenuItem{
 
 
     /**
-     * The User represented by this UserMenuItem.
+     * The path of the settings file of the User.
      */
 
-    private final User user;
+    private final String path;
 
 
 
@@ -697,19 +736,19 @@ public class JinFrameMenuBar extends JMenuBar{
      * Creates a new UserMenuItem which represents the given User.
      */
 
-    public UserMenuItem(User user){
-      super(user.getFilename());
-      this.user = user;
+    public UserMenuItem(String label, String path){
+      super(label);
+      this.path = path;
     }
 
 
 
     /**
-     * Returns the User represented by this UserMenuItem.
+     * Returns the path of the settings file of the user.
      */
 
-    public User getUser(){
-      return user;
+    public String getPath(){
+      return path;
     }
 
 

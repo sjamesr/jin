@@ -42,15 +42,6 @@ public class JinFrame extends JFrame{
 
   
   /**
-   * An array containing all the servers known by Jin.
-   */
-
-  private final Server [] knownServers;
-
-
-
-
-  /**
    * Our current JinConnection, or <code>null</code> if no open connections
    * exist.
    */
@@ -80,19 +71,11 @@ public class JinFrame extends JFrame{
 
 
 
-
   /**
    * Creates a new JinFrame.
    */
 
   public JinFrame(){
-    Vector servers = new Vector();
-    Enumeration serverEnum = Jin.getServers();
-    while (serverEnum.hasMoreElements())
-      servers.addElement(serverEnum.nextElement());
-    knownServers = new Server[servers.size()];
-    servers.copyInto(knownServers);
-
     setJMenuBar(createJMenuBar());
 
 //    getToolkit().getSystemEventQueue().push(new EventQueue(){
@@ -109,7 +92,7 @@ public class JinFrame extends JFrame{
 //
 //    });
 
-    enableEvents(AWTEvent.WINDOW_EVENT_MASK|AWTEvent.FOCUS_EVENT_MASK);
+    enableEvents(AWTEvent.WINDOW_EVENT_MASK);
   }
 
 
@@ -194,22 +177,23 @@ public class JinFrame extends JFrame{
   public void showConnectionCreationUI(){
     Server chosenServer;
 
-    if (knownServers.length>1){
+    Server [] servers = Jin.getServers();
+    if (servers.length > 1){
       Object result = JOptionPane.showInputDialog(this,"Choose a server to connect to",
-        "Choose server",JOptionPane.QUESTION_MESSAGE,null,knownServers,null);
+        "Choose server", JOptionPane.QUESTION_MESSAGE, null, servers, null);
 
-      if (result==null)
+      if (result == null)
         return;
 
       chosenServer = (Server)result;
     }
-    else if (knownServers.length==0){
+    else if (servers.length == 0){
       JOptionPane.showMessageDialog(this, "No defined servers, will exit.");
       System.exit(0);
       return; // Silly compiler
     }
     else
-      chosenServer = knownServers[0];
+      chosenServer = servers[0];
 
     User defaultUser = chosenServer.createDefaultUser();
     showLoginDialog(defaultUser);
@@ -232,8 +216,7 @@ public class JinFrame extends JFrame{
       return;
 
     JinConnection conn = loginDialog.createConnection();
-    user = loginDialog.getUser();
-    startConnection(conn, user);
+    startConnection(conn, loginDialog.getUser());
   }
 
 
@@ -342,7 +325,7 @@ public class JinFrame extends JFrame{
 
     // Phase 4 - Tell JinFrameMenuBar to add the required menus on-connect.
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    menubar.connecting(conn, new ArrayEnumeration(plugins));
+    menubar.connecting(conn, user, new ArrayEnumeration(plugins));
 
 
     // Phase 5 - connect.
@@ -376,7 +359,7 @@ public class JinFrame extends JFrame{
    */
 
   public void closeConnection(){
-    for (int i = 0; i < plugins.length; i++)
+    for (int i = 0; i < plugins.length; i++){
       try{
         Plugin plugin = plugins[i];
         if (plugin!=null){
@@ -389,46 +372,17 @@ public class JinFrame extends JFrame{
             e.printStackTrace();
           }
         }
+    }
 
-    if (Jin.isKnownUser(user)){
-      /*
-      if (user.isUserModified()){
-        System.out.println("Querying user about saving settings");
-        int result = JOptionPane.showConfirmDialog(this,"Save "+user.getUsername()+"'s settings into "+user.getFilename()+"?","Save settings?",JOptionPane.YES_NO_OPTION);
-        if (result==JOptionPane.YES_OPTION){
-          System.out.println("Saving user settings");
-          Jin.save(user);
-        }
-        else{
-          System.out.println("Restoring user's original settings");
-          user.restore();
-        }
-      }
-      else{
-        System.out.println("Saving user's implicit settings");
-        Jin.save(user);
-      }
-      */
-
-      // Isn't it stupid to ask the user whether he wants to save his settings?
+    if (!user.isGuest()){
       System.out.println("Saving user settings");
       Jin.save(user);
-    }
-    else{
-      if (user.getUsername() != null){ // Null means a guest.
-        System.out.println("Querying user about creating a new account");
-        int result = JOptionPane.showConfirmDialog(this,"Would you like to save your \""+user.getUsername()+"\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
-        if (result==JOptionPane.YES_OPTION){
-          System.out.println("Creating new user, named "+user.getUsername());
-          Jin.save(user);
-        }
-      }
-    }
 
-    String userFilename = user.getFilename();
-    if (userFilename != null){
+      String userPath = Jin.getSettingsPath(user);
+      // The returned value can't be null because we've just saved the user
+
       System.out.println("Saving last user information");
-      Jin.setProperty("last.user", userFilename);
+      Jin.setProperty("last.user.path", userPath);
     }
 
     System.out.println("Closing connection");
@@ -446,7 +400,7 @@ public class JinFrame extends JFrame{
     
     System.out.println("Modifying menubar");
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    menubar.disconnected(connection);
+    menubar.disconnected(connection, user);
 
     this.connection = null;
     this.user = null;
@@ -482,31 +436,17 @@ public class JinFrame extends JFrame{
   protected void processWindowEvent(WindowEvent evt){
     super.processWindowEvent(evt);
     if (evt.getID() == WindowEvent.WINDOW_OPENED){
-      String lastUserFilename = Jin.getProperty("last.user");
-      if (lastUserFilename!=null){
-        User user = Jin.getUserByFilename(lastUserFilename);
-        if (user != null){
+      String lastUserPath = Jin.getProperty("last.user.path");
+      if (lastUserPath != null){
+        User user = Jin.loadUser(lastUserPath);
+        if (user != null)
           showLoginDialog(user);
-          return;
-        }
+        return;
       }
       showConnectionCreationUI();
     }
   }
 
 
-
-
-  /**
-   * Calls requestDefaultFocus() on the Desktop to make sure the focus goes to
-   * the component that wants it.
-   */
-
-  protected void processFocusEvent(FocusEvent evt){
-    super.processFocusEvent(evt);
-    if (evt.getID() == FocusEvent.FOCUS_GAINED){
-      getDesktop().requestDefaultFocus();
-    }
-  }
 
 }

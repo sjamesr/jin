@@ -42,7 +42,7 @@ public class Jin{
 
 
   /**
-   * Invokes Class.forName("free.workarounds.SwingFix").
+   * Causes the <code>free.workarounds.SwingFix</code> class to be loaded.
    */
 
   static{
@@ -111,17 +111,6 @@ public class Jin{
 
   
 
-
-
-  /**
-   * A list of Users known to Jin.
-   */
-
-  private static final DefaultListModel users = new DefaultListModel();
-
-
-
-
   /**
    * Maps server names to supported servers.
    */
@@ -129,6 +118,13 @@ public class Jin{
   private static final Hashtable servers = new Hashtable();
 
 
+
+  /**
+   * Maps <code>User</code> object to files from which they were loaded by the
+   * <code>loadUser(String)</code> method.
+   */
+
+  private static final Hashtable userFiles = new Hashtable();
 
 
 
@@ -140,7 +136,7 @@ public class Jin{
   static{
     if (!jinUserHome.exists()){
       if (!jinUserHome.mkdirs()){
-        System.err.println("Failed to create directory "+jinUserHome.getAbsolutePath());
+        System.err.println("Unable to create directory "+jinUserHome.getAbsolutePath());
         System.exit(1);
       }
     }
@@ -203,7 +199,7 @@ public class Jin{
       while (serversTokenizer.hasMoreTokens()){
         String serverResourceName = serversTokenizer.nextToken();
         Server server = Server.load(Jin.class.getResourceAsStream(serverResourceName));
-        servers.put(server.getName(),server);
+        servers.put(server.getName(), server);
       }
     } catch (IOException e){
         System.err.println("Unable to load the server list:");
@@ -226,40 +222,11 @@ public class Jin{
   static{
     if (!usersDir.exists()){
       if (!usersDir.mkdirs()){
-        System.err.println("Failed to create directory "+usersDir.getAbsolutePath());
+        System.err.println("Unable to create directory "+usersDir.getAbsolutePath());
         System.exit(1);
       }
     }
   }
-
-
-
-
-  /**
-   * Loads the users.
-   */
-
-  static{
-    try{
-      String [] userFilenames = usersDir.list();
-      for (int i = 0 ; i < userFilenames.length; i++){
-        String userFilename = userFilenames[i];
-        File userFile = new File(usersDir, userFilename);
-        if (userFile.isDirectory())
-          continue;
-        
-        User user = new User(userFile);
-        users.addElement(user);
-      }
-    } catch (IOException e){
-        System.err.println("Unable to load the user list:");
-        e.printStackTrace();
-      }
-      catch (RuntimeException e){
-        e.printStackTrace();
-      }
-  }
-
 
 
 
@@ -277,14 +244,14 @@ public class Jin{
 
 
   /**
-   * The operating system user's property with the given name. If no such
+   * The OS user's property with the given name. If no such
    * property exists, Jin's property with the given name, is returned.
    */
 
   public static String getProperty(String propertyName){
     String val = userProps.getProperty(propertyName);
 
-    if (val==null)
+    if (val == null)
       return jinProps.getProperty(propertyName);
     else
       return val;
@@ -323,50 +290,62 @@ public class Jin{
 
 
   /**
-   * Returns the ListModel containing all the Users known to Jin. Note that this
-   * returns the actual ListMode, not a copy, so it's possible to get notified
-   * about changes to the known user list by registering listeners with the
-   * returned ListModel.
+   * Returns the path where the settings for the specified User are kept.
+   * Returns <code>null</code> if the specified <code>User</code> is new and his
+   * settings weren't saved yet.
    */
 
-  public static ListModel getUsers(){
-    return users;
+  public static String getSettingsPath(User user){
+    File file = (File)userFiles.get(user);
+    return file == null ? null : file.getAbsolutePath();
+    // Not 100% sure we should use the absolute path...
   }
 
 
 
 
   /**
-   * Returns the User loaded from the file with the given filename. Returns null
-   * if no User whose filename matches the given value.
+   * Loads a <code>User</code> from the specified path. The path is not
+   * guaranteed to be local - it may be a URL to a remote location. Returns
+   * <code>null</code> if unable to load from the specified path.
    */
 
-  public static User getUserByFilename(String filename){
-    int userCount = users.getSize();
-    for (int i=0;i<userCount;i++){
-      User user = (User)users.getElementAt(i);
-      if (user.getFilename().equals(filename))
-        return user;
-    }
-    return null;
-  }
+  public static User loadUser(String path){
+    if (path == null)
+      throw new IllegalArgumentException("Path may not be null");
 
+    File file = new File(path);
+    try{
+      if (!file.exists())
+        throw new FileNotFoundException(file.toString());
 
+      String filename = file.getName();
 
+      int dotIndex = filename.lastIndexOf(".");
+      if (dotIndex == -1)
+        throw new IllegalArgumentException("Bad path");
 
-  /**
-   * Returns true if the given User is a known User.
-   */
+      String username = filename.substring(0, dotIndex);
+      String serverName = filename.substring(dotIndex+1);
 
-  public static boolean isKnownUser(User user){
-    int userCount = users.getSize();
-    for (int i=0;i<userCount;i++){
-      User curUser = (User)users.getElementAt(i);
-      if (user.equals(curUser))
-        return true;
-    }
+      Server server = getServer(serverName);
+      if (server == null){
+        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+file+
+         "\nBecause "+serverName+" is not a known server", "Error", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
 
-    return false;
+      InputStream in = new BufferedInputStream(new FileInputStream(file));
+      User user = User.read(server, in);
+      in.close();
+
+      userFiles.put(user, file);
+
+      return user;
+    } catch (IOException e){
+        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+file, "Error", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
   }
 
 
@@ -374,52 +353,37 @@ public class Jin{
 
   /**
    * Saves the given User. If this is yet an unknown User and the user doesn't
-   * abort the save, it is added to the list of known users.
+   * abort the save, it is added to the list of known users. Returns
+   * <code>true</code> if the <code>User</code> was successfully saved,
+   * <code>false</code> otherwise.
    *
    * @throws IOException if an I/O error occurs while saving the user's
    * settings.
    */
 
   public static boolean save(User user){
-    File userFile;
-    String filename = user.getFilename();
-    if (filename==null){
-      String username = user.getProperty("login.username");
-      String serverShortName = user.getServer().getProperty("name.short");
-      userFile = new File(usersDir, username+"."+serverShortName);
+    File file = (File)userFiles.get(user);
+    if (file == null){
+      System.out.println("Querying user about creating a new account");
+      int result = JOptionPane.showConfirmDialog(getMainFrame(), "Would you like to save your \"" + user.getUsername() + "\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
+      if (result == JOptionPane.YES_OPTION){
+        System.out.println("Creating new user, named "+user.getUsername());
+        file = new File(usersDir, user.getUsername()+"."+user.getServer().getName());
+      }
+      else
+        return false;
     }
-    else
-      userFile = new File(usersDir, filename);
-
-    /* I don't think you really need to ask the user where he wants his settings file. */
-//    if ((filename==null)||!userFile.exists()){
-//      JFileChooser chooser = new JFileChooser(usersDir);
-//      chooser.setSelectedFile(userFile);
-//      chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(user.getServer()));
-//      chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
-//
-//      int result = chooser.showSaveDialog(mainFrame);
-//      if (result==JFileChooser.CANCEL_OPTION)
-//        return false;
-//      userFile = chooser.getSelectedFile();
-//
-//      // TODO: Add checking whether the file already exists if JFileChooser doesn't
-//      // do it automatically.
-//      }
 
     try{
-      user.save(userFile);
+      OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+      user.write(out);
+      out.close();
+
+      userFiles.put(user, file);
     } catch (IOException e){
-        JOptionPane.showMessageDialog(mainFrame, "Unable to save your user file, your home directory or user file aren't writeable", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(mainFrame, "Unable to save user file into:\n"+file, "Error", JOptionPane.ERROR_MESSAGE);
         return false;
       }
-
-    if (!users.contains(user))
-      users.addElement(user);
-    else{                         
-      users.removeElement(user);  // Replace, this may look like stupid code, but remember Users 
-      users.addElement(user);     // can be equal but different (User overrides equals(Object)).
-    }
 
     return true;
   }
@@ -429,11 +393,16 @@ public class Jin{
 
 
   /**
-   * Returns an Enumeration of all the supported servers.
+   * Returns an array containing all the supported servers.
    */
 
-  public static Enumeration getServers(){
-    return servers.elements();
+  public static Server [] getServers(){
+    Enumeration serversEnum = servers.elements();
+    Server [] arr = new Server[servers.size()];
+    for (int i = 0; i < arr.length; i++)
+      arr[i] = (Server)serversEnum.nextElement();
+
+    return arr;
   }
 
 
@@ -458,6 +427,7 @@ public class Jin{
   public static String getInterfaceName(){
     return getProperty("name")+" "+getProperty("version")+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")";
   }
+
 
 
 
