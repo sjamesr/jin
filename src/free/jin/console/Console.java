@@ -136,7 +136,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting emails.
    */
 
-  private static final Pattern emailRegex = new Pattern("[^\\s()<>\"]+@[^\\s()<>\"]+\\.[^\\s.,()<>\"]+");
+  private static final Pattern emailRegex = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"]+");
 
 
   
