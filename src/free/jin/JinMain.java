@@ -22,7 +22,6 @@
 package free.jin;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import free.util.*;
 import java.net.URL;
@@ -248,7 +247,7 @@ public class JinMain implements JinContext{
     mainFrame = createMainFrame();
     
     // Restore the main frame geometry
-    restoreMainFrameGeometry();
+    JinUtilities.restoreFrameGeometry(mainFrame, userPrefs, "frame");
 
     // Create the UI manager
     uiProvider = new InternalFramesUIProvider(this, TopLevelContainer.getFor(mainFrame, mainFrame.getTitle()));
@@ -359,7 +358,7 @@ public class JinMain implements JinContext{
 
   public void shutdown(){
     connManager.closeSession();
-    saveMainFrameGeometry();
+    JinUtilities.saveFrameGeometry(mainFrame, userPrefs, "frame");
     saveLookAndFeel();
     
     storeUserPrefs();
@@ -830,31 +829,28 @@ public class JinMain implements JinContext{
 
   private DefaultListModel loadUsers() throws IOException{
     File usersDir = new File(prefsDir, "accounts");
-    if (!usersDir.exists())
-      return new DefaultListModel();
-
-    Vector usersVector = new Vector();
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
-      File serverSpecificUserDir = new File(usersDir, server.getId());
-      if (!serverSpecificUserDir.exists())
-        continue;
-
-      UsernamePolicy policy = server.getUsernamePolicy();
-      String [] userDirs = serverSpecificUserDir.list();
-      for (int j = 0; j < userDirs.length; j++){
-        File userDir = new File(serverSpecificUserDir, userDirs[j]);
-        User user = loadUser(userDir, null);
-
-        // Skip if the user wasn't loaded or is a guest
-        if ((user != null) && !policy.isSame(policy.getGuestUsername(), user.getUsername()))
-          usersVector.addElement(user);
+    
+    DefaultListModel users = new DefaultListModel();
+    
+    if (usersDir.exists()){
+      for (int i = 0; i < servers.length; i++){
+        Server server = servers[i];
+        File serverSpecificUserDir = new File(usersDir, server.getId());
+        if (!serverSpecificUserDir.exists())
+          continue;
+  
+        UsernamePolicy policy = server.getUsernamePolicy();
+        String [] userDirs = serverSpecificUserDir.list();
+        for (int j = 0; j < userDirs.length; j++){
+          File userDir = new File(serverSpecificUserDir, userDirs[j]);
+          User user = loadUser(userDir, null);
+  
+          // Skip if the user wasn't loaded or is a guest
+          if ((user != null) && !policy.isSame(policy.getGuestUsername(), user.getUsername()))
+            users.addElement(user);
+        }
       }
     }
-
-    DefaultListModel users = new DefaultListModel();
-    for (int i = 0; i < usersVector.size(); i++)
-      users.addElement(usersVector.elementAt(i));
 
     return users;
   }
@@ -950,82 +946,6 @@ public class JinMain implements JinContext{
 
 
   
-  /**
-   * Returns <code>true</code> if the specified frame bounds are reasonably
-   * placed on a screen of the specified dimensions. This is used to avoid
-   * situations where a frame is displayed outside of the screen where the user
-   * can't change its size and/or move it (can happen for example if the
-   * resolution is changed between runs).
-   */
-
-  private boolean frameBoundsOk(Dimension screenSize, Rectangle frameBounds){
-    if (frameBounds.x + frameBounds.width < 50)
-      return false;
-    if (frameBounds.y < -10)
-      return false;
-    if (frameBounds.width < 30)
-      return false;
-    if (frameBounds.height < 40)
-      return false;
-    if (frameBounds.x > screenSize.width - 10)
-      return false;
-    if (frameBounds.y > screenSize.height - 20)
-      return false;
-
-    return true;
-  }
-
-
-  
-  /**
-   * Saves the main frame geometry into user preferences.
-   */
-
-  private void saveMainFrameGeometry(){
-    // Save bounds on screen
-    Point mainFrameLocation = mainFrame.getLocationOnScreen();
-    Dimension mainFrameSize = mainFrame.getSize();
-    userPrefs.setRect("frame.bounds", new Rectangle(mainFrameLocation, mainFrameSize));
-    
-    // Save maximized state
-    int state = AWTUtilities.getExtendedFrameState(mainFrame);
-    userPrefs.setBool("frame.maximized.vert", (state & Frame.MAXIMIZED_VERT) != 0);
-    userPrefs.setBool("frame.maximized.horiz", (state & Frame.MAXIMIZED_HORIZ) != 0);
-  }
-  
-  
-  
-  /**
-   * Restores the main frame geometry from user preferences.
-   */
-   
-  private void restoreMainFrameGeometry(){
-    Dimension screenSize = mainFrame.getToolkit().getScreenSize();
-    Rectangle defaultFrameBounds = new Rectangle(
-      screenSize.width/16, screenSize.height/16, screenSize.width*7/8, screenSize.height*7/8);
-    
-      
-    // Restore bounds      
-    Rectangle frameBounds = userPrefs.getRect("frame.bounds", defaultFrameBounds);
-    frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
-    mainFrame.setBounds(frameBounds);
-
-    
-    // Restore maximized state 
-    boolean vertMaximized = userPrefs.getBool("frame.maximized.vert", false);
-    boolean horizMaximized = userPrefs.getBool("frame.maximized.horiz", false);
-
-    // Bugfix for Java bug 4464714 - setExtendedState only works once the
-    // the window is realized.
-    if (mainFrame.getPeer() == null)
-      mainFrame.addNotify();
-   
-    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
-    AWTUtilities.setExtendedFrameState(mainFrame, state);
-  }
-
-
-
   /**
    * Installs any extra look and feels Jin is using.
    */
