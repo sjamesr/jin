@@ -143,7 +143,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Creates and returns the JMenu for this plugin.
    */
 
-  public JMenu createPluginMenu(){
+  public JMenu getPluginMenu(){
     JMenu myMenu = new JMenu(getName());
     
     JRadioButtonMenuItem onMenu = new JRadioButtonMenuItem("Sound On", isOn);

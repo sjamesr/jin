@@ -204,7 +204,7 @@ public class Scripter extends Plugin{
    * Returns the menu for this plugin.
    */
   
-  public JMenu createPluginMenu(){
+  public JMenu getPluginMenu(){
     return menu;
   }
 

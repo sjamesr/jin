@@ -235,7 +235,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Creates and returns the JMenu for this plugin.
    */
 
-  public JMenu createPluginMenu(){
+  public JMenu getPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
     visibleRB = new JRadioButtonMenuItem("Graph Shown", getPrefs().getBool("isVisible", true));
