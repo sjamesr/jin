@@ -93,12 +93,12 @@ public abstract class TopLevelContainer{
   /**
    * Returns a <code>TopLevelContainer</code> for the specified
    * <code>JFrame</code> with the specified title. The title will be used as a
-   * constant prefix for the real title (as set via the <code>setTitle</code>
+   * constant postfix for the real title (as set via the <code>setTitle</code>
    * method).
    */
 
-  public static TopLevelContainer getFor(final JFrame frame, String titlePrefix){
-    return new JFrameTopLevelContainer(frame, titlePrefix);
+  public static TopLevelContainer getFor(final JFrame frame, String titlePostfix){
+    return new JFrameTopLevelContainer(frame, titlePostfix);
   }
   
   
@@ -119,22 +119,22 @@ public abstract class TopLevelContainer{
     
     
     /**
-     * The title prefix. We use this to set the title to
-     * <code>[original title] - [requested title]</code> when
+     * The title postfix. We use this to set the title to
+     * <code>[requested title] - [postfix title]</code> when
      * <code>setTitle</code> is called. 
      */
      
-    private final String titlePrefix;
+    private final String titlePostfix;
     
     
     /**
      * Creates a new <code>FrameTopLevelContainer</code> for the specified
-     * <code>JFrame</code> and title.
+     * <code>JFrame</code> and title postfix.
      */
      
-    public JFrameTopLevelContainer(JFrame frame, String titlePrefix){
+    public JFrameTopLevelContainer(JFrame frame, String titlePostfix){
       this.frame = frame;
-      this.titlePrefix = titlePrefix;
+      this.titlePostfix = titlePostfix;
     }
     
     
@@ -143,9 +143,9 @@ public abstract class TopLevelContainer{
 
     public void setTitle(String title){
       if ((title == null) || "".equals(title))
-        frame.setTitle(titlePrefix);
+        frame.setTitle(titlePostfix);
       else
-        frame.setTitle(titlePrefix + " - " + title);
+        frame.setTitle(title + " - " + titlePostfix);
     }    
     public void setMenuBar(JMenuBar menubar){frame.setJMenuBar(menubar);}
     public JMenuBar getMenuBar(){return frame.getJMenuBar();}
