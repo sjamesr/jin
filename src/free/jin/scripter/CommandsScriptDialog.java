@@ -98,7 +98,7 @@ class CommandsScriptDialog extends ScriptDialog{
     String defaultCondition = (templateScript == null ? "" : templateScript.getCondition());
     String [] defaultCommands = (templateScript == null ? new String[0] : templateScript.getCommands());
 
-    conditionField = new FixedJTextField(defaultCondition);
+    conditionField = new FixedJTextField(defaultCondition, 40);
     conditionField.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
     commandsArea = new FixedJTextArea(5, 40);
