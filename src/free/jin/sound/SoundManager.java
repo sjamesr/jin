@@ -43,15 +43,22 @@ import javax.swing.event.ChangeListener;
  * The plugin responsible for producing sound on all the relevant events.
  */
 
-public class SoundManager extends Plugin implements ChatListener, ConnectionListener, GameListener, FriendsListener{
+public class SoundManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListener{
 
 
   /**
-   * Maps chat message patterns to filenames containing the sound data.
+   * Maps chat patterns to filenames containing the sound data.
    */
 
-  protected final Hashtable patToFilenames = new Hashtable();
+  protected final Hashtable chatPatternsToFilenames = new Hashtable();
 
+
+
+  /**
+   * Maps text patterns to filenames containing the sound data.
+   */
+
+  protected final Hashtable textPatternsToFilenames = new Hashtable();
 
 
 
@@ -180,29 +187,8 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    */
 
   protected void loadSounds(){
-    int numPatterns = Integer.parseInt(getProperty("num-chat-patterns"));
-
-    for (int i=0;i<numPatterns;i++){
-      try{
-        String filename = getProperty("chat-sound-"+i);
-        String pattern = getProperty("chat-pattern-"+i);
-        Pattern regex = new Pattern(pattern);
-        
-        if (!filenamesToAudioClips.containsKey(filename)){
-          URL url = getClass().getResource(filename);
-          if (url == null)
-            continue;
-          filenamesToAudioClips.put(filename, new AudioClip(url));
-        }
-
-        patToFilenames.put(regex, filename);
-      } catch (IOException e){
-          e.printStackTrace();
-        }
-        catch (PatternSyntaxException e){
-          e.printStackTrace();
-        }
-    }
+    loadPatternSounds("chat", chatPatternsToFilenames);
+    loadPatternSounds("text", textPatternsToFilenames);
 
     loadEventAudioClip("OnConnect");
     loadEventAudioClip("OnLogin");
@@ -214,9 +200,40 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     loadEventAudioClip("IllegalMove");
     loadEventAudioClip("GameEnd");
     loadEventAudioClip("GameStart");
+  }
 
-    loadEventAudioClip("FriendConnected");
-    loadEventAudioClip("FriendDisconnected");
+
+
+
+  /**
+   * Loads patterns and their corresponding sounds of the given type, mapping
+   * the patterns to sound filenames in the given Hashtable.
+   */
+
+  private void loadPatternSounds(String type, Hashtable map){
+    int numPatterns = Integer.parseInt(getProperty("num-"+type+"-patterns"));
+
+    for (int i = 0; i < numPatterns; i++){
+      try{
+        String filename = getProperty(type+"-sound-"+i);
+        String pattern = getProperty(type+"-pattern-"+i);
+        Pattern regex = new Pattern(pattern);
+        
+        if (!filenamesToAudioClips.containsKey(filename)){
+          URL url = getClass().getResource(filename);
+          if (url == null)
+            continue;
+          filenamesToAudioClips.put(filename, new AudioClip(url));
+        }
+
+        map.put(regex, filename);
+      } catch (IOException e){
+          e.printStackTrace();
+        }
+        catch (PatternSyntaxException e){
+          e.printStackTrace();
+        }
+    }
   }
 
 
@@ -253,11 +270,10 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     JinConnection conn = getConnection();
     JinListenerManager listenerManager = conn.getJinListenerManager();
 
+    listenerManager.addPlainTextListener(this);
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
     listenerManager.addGameListener(this);
-    if (conn instanceof FriendsJinConnection)
-      ((FriendsJinConnection)conn).getFriendsJinListenerManager().addFriendsListener(this);
   }
 
 
@@ -272,11 +288,10 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     JinConnection conn = getConnection();
     JinListenerManager listenerManager = conn.getJinListenerManager();
 
+    listenerManager.removePlainTextListener(this);
     listenerManager.removeChatListener(this);
     listenerManager.removeConnectionListener(this);
     listenerManager.removeGameListener(this);
-    if (conn instanceof FriendsJinConnection)
-      ((FriendsJinConnection)conn).getFriendsJinListenerManager().removeFriendsListener(this);
   }
 
 
@@ -287,7 +302,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    */
 
   protected void unloadSounds(){
-    patToFilenames.clear();
+    chatPatternsToFilenames.clear();
     filenamesToAudioClips.clear();
   }
 
@@ -307,17 +322,43 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     String sender = evt.getSender();
     String chatMessageType = type+"."+(forum == null ? "" : forum.toString())+"."+sender;
 
-    Enumeration enum = patToFilenames.keys();
+    Enumeration enum = chatPatternsToFilenames.keys();
     while (enum.hasMoreElements()){
       Pattern regex = (Pattern)enum.nextElement();
       Matcher matcher = regex.matcher(chatMessageType);
       if (matcher.find()){
-        String filename = (String)patToFilenames.get(regex);
+        String filename = (String)chatPatternsToFilenames.get(regex);
         AudioClip clip = (AudioClip)filenamesToAudioClips.get(filename);
         clip.play();
       }
     } 
   }
+
+
+
+
+  /**
+   * Listens to PlainTextEvents and makes appropriate sounds.
+   */
+
+  public void plainTextReceived(PlainTextEvent evt){
+    if (!isOn())
+      return;
+
+    String line = evt.getText();
+
+    Enumeration enum = textPatternsToFilenames.keys();
+    while (enum.hasMoreElements()){
+      Pattern regex = (Pattern)enum.nextElement();
+      Matcher matcher = regex.matcher(line);
+      if (matcher.find()){
+        String filename = (String)textPatternsToFilenames.get(regex);
+        AudioClip clip = (AudioClip)filenamesToAudioClips.get(filename);
+        clip.play();
+      }
+    } 
+  }
+
 
 
 
@@ -336,8 +377,6 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    *   <LI> IllegalMove - An illegal move was attempted.
    *   <LI> GameStart - A game started.
    *   <LI> GameEnd - A game ended.
-   *   <LI> FriendConnected - A friend logged on.
-   *   <LI> FriendDisconnected - A friend logged off.
    * </UL>
    * Returns true if the given event is recognized, false otherwise. Note that
    * for various reasons (like the user disabling sounds), the sound may not
@@ -434,37 +473,6 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
 
-
-
-
-
-  /**
-   * Called when a friend logs on to the server.
-   */
-
-  public void friendConnected(FriendsEvent evt){
-    playEventSound("FriendConnected");
-  }
-
-
-
-
-
-  /**
-   * Called when a friend logs out from the server.
-   */
-
-  public void friendDisconnected(FriendsEvent evt){
-    playEventSound("FriendDisconnected");
-  }
-
-
-
-
-
-  public void friendOnline(FriendsEvent evt){}
-  public void friendAdded(FriendsEvent evt){}
-  public void friendRemoved(FriendsEvent evt){}
 
 
 
