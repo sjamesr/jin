@@ -22,10 +22,11 @@
 package free.jin.board;
 
 import javax.swing.*;
-import free.jin.event.*;
-import free.chess.*;
-import java.awt.*;
 import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
+import free.chess.*;
+import free.jin.event.*;
 import free.jin.Game;
 import free.jin.plugin.Plugin;
 import free.jin.board.event.UserMoveEvent;
@@ -36,10 +37,6 @@ import free.chess.event.MoveEvent;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.AdjustmentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.border.EmptyBorder;
@@ -289,10 +286,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * True when we've fired a UserMadeMove and it hasn't been echoed to us yet.
+   * The move made when we've fired a UserMadeMove and it hasn't been echoed to
+   * us yet. Null if none.
    */
 
-  private boolean isMoveEnRoute = false;
+  private Move moveEnRoute = null;
 
 
 
@@ -489,6 +487,40 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (isFlipped())
       board.setFlipped(true);
+
+
+    ActionListener escapeListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        JBoard board = BoardPanel.this.board;
+        System.out.println("Invoked");
+        if (board.isMovingPiece())
+          board.cancelMovingPiece();
+        else if (queuedMove != null){
+
+          queuedMove = null;
+          board.getPosition().copyFrom(realPosition);
+          if (isMoveEnRoute())
+            board.getPosition().makeMove(moveEnRoute);
+          if (!board.isEditable())
+            board.setEditable(true);
+        }
+      }
+    };
+
+    // We have no choice but to use WHEN_FOCUSED and to give the focus to the
+    // JBoard when it is pressed because WHEN_IN_FOCUSED_WINDOW doesn't work
+    // in MS VM.
+    board.registerKeyboardAction(escapeListener,
+      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_FOCUSED);
+    board.registerKeyboardAction(escapeListener, 
+      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_FOCUSED);
+
+    board.addMouseListener(new MouseAdapter(){
+      public void mousePressed(MouseEvent evt){
+        if (!BoardPanel.this.board.hasFocus())
+          BoardPanel.this.board.requestFocus();
+      }
+    });
   }
 
 
@@ -1163,6 +1195,18 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Returns if there is currently a move enRoute. This simply checks that the
+   * <code>moveInRoute</code> variable is non-null.
+   */
+
+  private boolean isMoveEnRoute(){
+    return moveEnRoute != null;
+  }
+
+
+
+
+  /**
    * GameListener implementation. 
    */
 
@@ -1194,7 +1238,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     madeMoves.addElement(move);
     realPosition.makeMove(move);
 
-    if (!isMoveEnRoute){ // This is not the server echoeing our own move
+    if (!isMoveEnRoute()){ // This is not the server echoeing our own move
       if (evt.isNew())
         playAudioClipForMove(move);
 
@@ -1207,7 +1251,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (shouldUpdateBoard){
       displayedMoveNumber = madeMoves.size();
-      updateMoveHighlighting(isMoveEnRoute);
+      updateMoveHighlighting(isMoveEnRoute());
     }
 
     // queuedMove.getPlayer() == realPosition.getCurrentPlayer() makes sure
@@ -1218,15 +1262,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.getPosition().copyFrom(realPosition);
       board.getPosition().makeMove(queuedMove);
       isBoardPositionUpdating = false;
+      moveEnRoute = queuedMove;
       queuedMove = null;
       fireUserMadeMove(evt2);
-      isMoveEnRoute = true;
     }
     else
-      isMoveEnRoute = false;
+      moveEnRoute = null;
 
-    if (!board.isEnabled())
-      board.setEnabled(true);
+    if (!board.isEditable())
+      board.setEditable(true);
+
     timer.stop();
     updateClockActiveness();
     addMoveToListTable(move);
@@ -1255,10 +1300,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     updateMoveHighlighting(false);
 
-    isMoveEnRoute = false; // We shouldn't keep state between 
+    moveEnRoute = null;    // We shouldn't keep state between 
     queuedMove = null;     // such drastic position changes
-    if (!board.isEnabled())
-      board.setEnabled(true);
+
+    if (!board.isEditable())
+      board.setEditable(true);
 
     updateClockActiveness();
     updateMoveListTable();
@@ -1286,7 +1332,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     for (int i = 0; i < numMadeMoves; i++)
       realPosition.makeMove((Move)madeMoves.elementAt(i));
 
-    isMoveEnRoute = false;
+    moveEnRoute = null;
     queuedMove = null;
 
     // Try not to change the board if possible. If, however we were displaying the position
@@ -1299,8 +1345,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       updateMoveHighlighting(false);
     }
 
-    if (!board.isEnabled())
-      board.setEnabled(true);
+    if (!board.isEditable())
+      board.setEditable(true);
 
     updateClockActiveness();
     updateMoveListTable();
@@ -1319,17 +1365,18 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (evt.getGame() != game)
       return;
 
-    if (!isMoveEnRoute) // We didn't make this move.
-      return;
+    if (!isMoveEnRoute()) // We didn't make this move. 
+      return;             // It could've been sent by one of the other plugins.
 
-    isMoveEnRoute = false;
+    moveEnRoute = null;
     queuedMove = null;
 
     isBoardPositionUpdating = true;
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
-    if (!board.isEnabled())
-      board.setEnabled(true);
+
+    if (!board.isEditable())
+      board.setEditable(true);
 
     updateClockActiveness();
     displayedMoveNumber = madeMoves.size();
@@ -1449,14 +1496,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (source == board.getPosition()){
       playAudioClipForMove(move);
-      if (isMoveEnRoute||(!isUserTurn())){
+      if (isMoveEnRoute() || !isUserTurn()){
         queuedMove = move;
-        board.setEnabled(false);
+        board.setEditable(false);
       }
       else{
         UserMoveEvent evt2 = new UserMoveEvent(this, evt.getMove());
         fireUserMadeMove(evt2);
-        isMoveEnRoute = true;
+        moveEnRoute = evt.getMove();
         timer.stop();
         updateClockActiveness();
       }
@@ -1500,7 +1547,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void actionPerformed(ActionEvent evt){
     Object source = evt.getSource();
 
-    if (source==timer){
+    if (source == timer){
       if (!timer.isRunning())
         return; // These are residue from invokeLater calls done by the Timer before it was stopped :-)
       Player curPlayer = realPosition.getCurrentPlayer();
@@ -1556,7 +1603,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(pos);
     isBoardPositionUpdating = false;
     displayedMoveNumber = moveNum;
-    board.setEnabled(displayedMoveNumber == madeMoves.size());
+    board.setEditable(displayedMoveNumber == madeMoves.size());
 
     updateMoveHighlighting(false);
 
@@ -1589,7 +1636,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.getPosition().copyFrom(pos);
       isBoardPositionUpdating = false;
       displayedMoveNumber = moveNum;
-      board.setEnabled(displayedMoveNumber == madeMoves.size());
+      board.setEditable(displayedMoveNumber == madeMoves.size());
 
       updateMoveHighlighting(false);
 
