@@ -30,6 +30,7 @@ import javax.swing.event.ChangeListener;
 import java.util.Vector;
 import free.util.PaintHook;
 import free.util.Utilities;
+import free.util.GraphicsUtilities;
 
 
 /**
@@ -41,6 +42,31 @@ import free.util.Utilities;
 public class JBoard extends JComponent{
 
 
+  
+  /**
+   * The default move highlighting color.
+   */
+   
+  private static final Color DEFAULT_MOVE_HIGHLIGHTING_COLOR = Color.cyan.darker();
+  
+
+
+  /**
+   * The default coordinate display color.
+   */
+   
+  private static final Color DEFAULT_COORDS_DISPLAY_COLOR = Color.blue.darker();
+  
+  
+  
+  /**
+   * The default drag-square highlighting color.
+   */
+   
+  private static final Color DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR = Color.blue;
+   
+  
+   
   /**
    * The constant for drag'n'drop move input style.
    */
@@ -57,14 +83,12 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for move input mode which doesn't let the user move any of the
    * pieces.
    */
 
   public static final int NO_PIECES_MOVE = 0;
-
 
 
 
@@ -76,13 +100,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for move input mode which only lets the user move black pieces.
    */
 
   public static final int BLACK_PIECES_MOVE = 2;
-
 
 
 
@@ -95,7 +117,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for move input mode which only lets the user move the pieces
    * of the player to move.
@@ -105,13 +126,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for regular dragged piece style (the piece is being dragged).
    */
 
   public static final int NORMAL_DRAGGED_PIECE = 0;
-
 
 
 
@@ -124,13 +143,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for no move highlighting.
    */
 
   public static final int NO_MOVE_HIGHLIGHTING = 0;
-
 
 
 
@@ -143,7 +160,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The constant for move highlighting done by drawing an arrow from the source
    * square to the target square.
@@ -151,8 +167,41 @@ public class JBoard extends JComponent{
 
   public static final int ARROW_MOVE_HIGHLIGHTING = 2;
 
+  
+  
+  /**
+   * The constant for not displaying coordinates at all.
+   */
+   
+  public static final int NO_COORDS = 0;
+  
+  
+  
+  /**
+   * The constant for displaying row and column coordinates on the outer rim
+   * of the board, xboard style.
+   */
+   
+  public static final int RIM_COORDS = 1;
+  
 
 
+  /**
+   * The constant for displaying row and column coordinates outside of the
+   * actual board.
+   */
+   
+  public static final int OUTSIDE_COORDS = 2;
+   
+  
+  
+  /**
+   * The constant for displaying square coordinates in each square.
+   */
+   
+  public static final int EVERY_SQUARE_COORDS = 3;
+  
+  
 
   /**
    * The Position on the board.
@@ -168,7 +217,6 @@ public class JBoard extends JComponent{
    */
 
   private Position positionCopy;
-
 
 
 
@@ -229,13 +277,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The PiecePainter painting the pieces.
    */
 
   private PiecePainter piecePainter;
-
 
 
 
@@ -247,13 +293,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The current move input style.
    */
 
   private int moveInputStyle = DRAG_N_DROP;
-
 
 
 
@@ -265,7 +309,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The current dragged piece style.
    */
@@ -274,12 +317,19 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The current move highlighting style.
    */
 
   private int moveHighlightingStyle = NO_MOVE_HIGHLIGHTING;
+  
+  
+  
+  /**
+   * The current coordinates display style.
+   */
+   
+  private int coordsDisplayStyle = NO_COORDS; 
 
 
 
@@ -291,13 +341,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Is the board flipped?
    */
 
   private boolean isFlipped = false;
-
 
 
 
@@ -313,17 +361,24 @@ public class JBoard extends JComponent{
    * The color used for move highlighting.
    */
 
-  private Color moveHighlightingColor = Color.cyan.darker();
-
-
+  private Color moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHTING_COLOR;
+  
+  
+  
+  /**
+   * The color used for coordinate display. <code>null</code> means the default
+   * label color is used.
+   */
+   
+  private Color coordsDisplayColor = DEFAULT_COORDS_DISPLAY_COLOR;
+   
 
 
   /**
    * The color used for highlighting the square when dragging a piece.
    */
 
-  private Color dragSquareHighlightingColor = Color.blue;
-
+  private Color dragSquareHighlightingColor = DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR;
 
 
 
@@ -335,7 +390,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * An array specifying which squares are shaded.
    */
@@ -344,13 +398,11 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * The square of the currently moved/dragged piece, or null if none.
    */
 
   private Square movedPieceSquare = null;
-
 
 
 
@@ -363,8 +415,6 @@ public class JBoard extends JComponent{
 
 
 
-
-
   /**
    * A boolean telling us whether we're currently showing the promotion target
    * selection dialog. This is needed to workaround the bug which keeps sending
@@ -373,8 +423,6 @@ public class JBoard extends JComponent{
    */
 
   private boolean isShowingModalDialog = false;
-
-
 
 
 
@@ -402,7 +450,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Creates a new JBoard with the given position set on it.
    */
@@ -413,7 +460,6 @@ public class JBoard extends JComponent{
   
 
 
-
   /**
    * Creates a new JBoard with the initial position set on it.
    */
@@ -421,7 +467,6 @@ public class JBoard extends JComponent{
   public JBoard(){
     this(new Position());
   }
-
 
 
 
@@ -439,7 +484,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Removes the given PaintHook from the list of PaintHooks which are called
    * during the painting of this JBoard.
@@ -454,7 +498,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the Position on this JBoard.
    */
@@ -462,7 +505,6 @@ public class JBoard extends JComponent{
   public Position getPosition(){
     return position;
   }
-
 
 
 
@@ -492,7 +534,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Sets the move input style of this JBoard to the given style. Possible values
    * are {@link #DRAG_N_DROP} and {@link #CLICK_N_CLICK}.
@@ -513,7 +554,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the current move input style for this JBoard.
    */
@@ -521,8 +561,6 @@ public class JBoard extends JComponent{
   public int getMoveInputStyle(){
     return moveInputStyle;
   }
-
-
 
 
 
@@ -550,8 +588,6 @@ public class JBoard extends JComponent{
   
 
 
-
-
   /**
    * Returns the current move input mode for this JBoard.
    */
@@ -559,7 +595,6 @@ public class JBoard extends JComponent{
   public int getMoveInputMode(){
     return moveInputMode;
   }
-
 
 
 
@@ -575,7 +610,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns <code>true</code> if the board is editable, i.e. the pieces can at
    * all be moved.
@@ -584,7 +618,6 @@ public class JBoard extends JComponent{
   public boolean isEditable(){
     return isEditable;
   }
-
 
 
 
@@ -609,7 +642,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the current dragged piece style.
    */
@@ -617,7 +649,6 @@ public class JBoard extends JComponent{
   public int getDraggedPieceStyle(){
     return draggedPieceStyle;
   }
-
 
 
 
@@ -632,7 +663,7 @@ public class JBoard extends JComponent{
       case ARROW_MOVE_HIGHLIGHTING:
         break;
       default:
-        throw new IllegalArgumentException("Illegal move highlighting style value: "+newStyle);
+        throw new IllegalArgumentException("Illegal move highlighting style value: " + newStyle);
     }
 
     int oldStyle = moveHighlightingStyle;
@@ -644,7 +675,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the move highlighting style.
    */
@@ -652,7 +682,6 @@ public class JBoard extends JComponent{
   public int getMoveHighlightingStyle(){
     return moveHighlightingStyle;
   }
-
 
 
 
@@ -668,7 +697,6 @@ public class JBoard extends JComponent{
 
     repaintHighlighting();
   }
-
 
 
 
@@ -695,8 +723,41 @@ public class JBoard extends JComponent{
     else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
       repaint(squareToRect(from, null).union(squareToRect(to, null)));
   }
-
-
+  
+  
+  
+  /**
+   * Sets the coordinate display style. Possible values are {@link #NO_COORDS},
+   * {@link #RIM_COORDS}, {@link #OUTSIDE_COORDS} and
+   * {@link #EVERY_SQUARE_COORDS}.
+   */
+   
+  public void setCoordsDisplayStyle(int newStyle){
+    switch (newStyle){
+      case NO_COORDS:
+      case RIM_COORDS:
+      case OUTSIDE_COORDS:
+      case EVERY_SQUARE_COORDS:
+        break;
+      default:
+        throw new IllegalArgumentException("Illegal coordinates display style value: " + newStyle);
+    }
+    
+    int oldStyle = coordsDisplayStyle;
+    this.coordsDisplayStyle = newStyle;
+    repaint();
+    firePropertyChange("coordsDisplayStyle", oldStyle, newStyle);
+  }
+  
+  
+  
+  /**
+   * Returns the current coordinates display style.
+   */
+   
+  public int getCoordsDisplayStyle(){
+    return coordsDisplayStyle;
+  }
 
 
 
@@ -714,8 +775,6 @@ public class JBoard extends JComponent{
 
 
 
-
-
   /**
    * Returns true if the JBoard is flipped, false otherwise.
    */
@@ -723,7 +782,6 @@ public class JBoard extends JComponent{
   public boolean isFlipped(){
     return isFlipped;
   }
-
 
 
 
@@ -740,7 +798,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns true if on a promotion move, the user will be prompted which piece
    * he wants to promote to, returns false if the default promotion piece
@@ -750,7 +807,6 @@ public class JBoard extends JComponent{
   public boolean isManualPromote(){
     return isManualPromote;
   }
-
 
 
 
@@ -764,7 +820,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the PiecePainter of this JBoard.
    */
@@ -775,12 +830,16 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
-   * Sets the BoardPainter for this JBoard.
+   * Sets the BoardPainter for this JBoard. Passing <code>null</code> is
+   * equivalent to setting the board painter to the default one specified by the
+   * current position's variant.
    */
 
   public void setBoardPainter(BoardPainter boardPainter){
+    if (boardPainter == null)
+      boardPainter = position.getVariant().createDefaultBoardPainter();
+    
     Object oldBoardPainter = this.boardPainter;
     this.boardPainter = boardPainter;
     repaint();
@@ -790,10 +849,15 @@ public class JBoard extends JComponent{
 
 
   /**
-   * Sets the PiecePainter for this JBoard.
+   * Sets the PiecePainter for this JBoard. Passing <code>null</code> is
+   * equivalent to setting the piece painter to the default one specified by the
+   * current position's variant.
    */
 
   public void setPiecePainter(PiecePainter piecePainter){
+    if (piecePainter == null)
+      piecePainter = position.getVariant().createDefaultPiecePainter();
+    
     Object oldPiecePainter = this.piecePainter;
     this.piecePainter = piecePainter;
     repaint();
@@ -802,18 +866,20 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
-   * Sets the color used for move highlighting to the specified color.
+   * Sets the color used for move highlighting to the specified color. Passing
+   * <code>null</code> is equivalent to setting the color to the default one.
    */
 
   public void setMoveHighlightingColor(Color moveHighlightingColor){
+    if (moveHighlightingColor == null)
+      moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHTING_COLOR;
+    
     Object oldColor = this.moveHighlightingColor;
     this.moveHighlightingColor = moveHighlightingColor;
     repaint();
     firePropertyChange("moveHighlightingColor", oldColor, moveHighlightingColor);
   }
-
 
 
 
@@ -824,16 +890,46 @@ public class JBoard extends JComponent{
   public Color getMoveHighlightingColor(){
     return moveHighlightingColor;
   }
+  
+  
+  
+  /**
+   * Sets the color used for coordinate display. Passing <code>null</code> is
+   * equivalent to setting the color to the default one.
+   */
+
+  public void setCoordsDisplayColor(Color coordsDisplayColor){
+    if (coordsDisplayColor == null)
+      coordsDisplayColor = DEFAULT_COORDS_DISPLAY_COLOR;
+    
+    Object oldColor = this.coordsDisplayColor;
+    this.coordsDisplayColor = coordsDisplayColor;
+    repaint();
+    firePropertyChange("coordsDisplayColor", oldColor, coordsDisplayColor);
+  }
 
 
+
+  /**
+   * Returns the color used for coordinate display.
+   */
+
+  public Color getCoordsDisplayColor(){
+    return coordsDisplayColor;
+  }
+  
 
 
   /**
    * Sets the color used for square highlighting when dragging a piece (such as
    * what occurs when in CROSSHAIR_DRAGGED_PIECE mode) to the specified color.
+   * Passing <code>null</code> is equivalent to setting it to the default color.
    */
 
   public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
+    if (dragSquareHighlightingColor == null)
+      dragSquareHighlightingColor = DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR;
+    
     Object oldColor = this.dragSquareHighlightingColor;
     this.dragSquareHighlightingColor = dragSquareHighlightingColor;
     repaint();
@@ -841,7 +937,7 @@ public class JBoard extends JComponent{
   }
 
 
-
+  
   /**
    * Returns the color used for square highlighting when dragging a piece (such
    * as what occurs when in CROSSHAIR_DRAGGED_PIECE mode).
@@ -850,7 +946,6 @@ public class JBoard extends JComponent{
   public Color getDragSquareHighlightingColor(){
     return dragSquareHighlightingColor;
   }
-
 
 
 
@@ -864,7 +959,6 @@ public class JBoard extends JComponent{
     if (oldState != isShaded)
       repaint(squareToRect(square, null));
   }
-
 
 
 
@@ -885,7 +979,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns <code>true</code> iff the specified square is shaded.
    */
@@ -893,7 +986,6 @@ public class JBoard extends JComponent{
   public boolean isShaded(Square square){
     return isShaded[square.getFile()][square.getRank()];
   }
-
 
 
 
@@ -905,7 +997,7 @@ public class JBoard extends JComponent{
     return movedPieceSquare != null;
   }
 
-
+  
 
   /**
    * If a piece is currently being moved/dragged, the moving/dragging is
@@ -927,26 +1019,25 @@ public class JBoard extends JComponent{
   }
 
 
-
   
   /**
    * Paints this JBoard on the given Graphics object.
    */
 
-  public void paintComponent(Graphics g){
-    super.paintComponent(g);
-
-    Rectangle clipRect = g.getClipBounds();
-    Dimension size = getSize();
-
-    // Fill the borders outside the actual board.
+  public void paintComponent(Graphics graphics){
+    super.paintComponent(graphics);
+    
+    // The documentation of JComponent#paintComponent(Graphics) says we
+    // shouldn't make permanent changes to the Graphics object, but we want to
+    // clip it.
+    Graphics g = graphics.create();
+    
     g.setColor(getBackground());
-    g.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
-    g.fillRect(0, size.height - size.height%8, size.width, size.height%8);
+    g.fillRect(0, 0, getWidth(), getHeight());
 
-    Rectangle squareRect = new Rectangle(0, 0, size.width/8, size.height/8);
-    g.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
-    clipRect = g.getClipBounds();
+    Rectangle rect = getBoardRect(null);
+    g.clipRect(rect.x, rect.y, rect.width, rect.height);
+    Rectangle clipRect = g.getClipBounds();
 
     Position position = getPosition();
     BoardPainter boardPainter = getBoardPainter();
@@ -956,7 +1047,7 @@ public class JBoard extends JComponent{
     int moveHighlightingStyle = getMoveHighlightingStyle();
 
     // Paint the board
-    boardPainter.paintBoard(g, this, 0, 0, size.width, size.height);
+    boardPainter.paintBoard(g, this, rect.x, rect.y, rect.width, rect.height);
 
     // Paint the stationary pieces
     for (int file = 0; file < 8; file++)
@@ -970,11 +1061,11 @@ public class JBoard extends JComponent{
         if (piece == null)
           continue;
 
-        squareRect = squareToRect(curSquare, squareRect);
-        if (!squareRect.intersects(clipRect))
+        squareToRect(curSquare, rect);
+        if (!rect.intersects(clipRect))
           continue;
 
-        piecePainter.paintPiece(piece, g, this, squareRect, isShaded(curSquare));
+        piecePainter.paintPiece(piece, g, this, rect, isShaded(curSquare));
       }
 
     // Paint move highlighting
@@ -990,23 +1081,180 @@ public class JBoard extends JComponent{
           drawArrow(g, from, to, 6, getMoveHighlightingColor());
       }
     }
-
+    
+    // Paint the coordinates. It needs the original graphics because of the
+    // OUTSIDE_COORDS mode, where the coordinates are drawn outside of our
+    // usual clip rectangle.
+    drawCoords(graphics);
     
     // Allow PaintHooks to paint
     callPaintHooks(g);
 
     // Paint the currently moved piece, or highlighted square
     if (movedPieceSquare != null){
-      getMovedPieceRect(squareRect);
+      getMovedPieceRect(rect);
       if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
         Piece piece = position.getPieceAt(movedPieceSquare);
-        piecePainter.paintPiece(piece, g, this, squareRect, false);
+        piecePainter.paintPiece(piece, g, this, rect, false);
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE){
-        Square square = locationToSquare(squareRect.x, squareRect.y);
-        if (square != null) // Maybe be null if mouse is dragged out of the board
+        Square square = locationToSquare(rect.x, rect.y);
+        if (square != null) // May be null if mouse is dragged out of the board
           drawSquare(g, square, 2, getDragSquareHighlightingColor());
       }
+    }
+  }
+  
+
+
+  /**
+   * The font we use for drawing coordinates. The size might be different in the
+   * actual drawing though.
+   */
+   
+  private static final Font COORDS_FONT = new Font("Monospaced", Font.BOLD, 10); 
+                                                   
+                                                   
+  
+  /**
+   * Draws the coordinates.
+   */
+   
+  private void drawCoords(Graphics g){
+    g.setColor(getCoordsDisplayColor());
+    
+    switch (getCoordsDisplayStyle()){
+      case NO_COORDS: break;
+      case RIM_COORDS: drawRimCoords(g); break;
+      case OUTSIDE_COORDS: drawOutsideCoords(g); break;
+      case EVERY_SQUARE_COORDS: drawEverySquareCoords(g); break;
+      default:
+        throw new IllegalStateException("Unknown coordinates display style value: " + getCoordsDisplayStyle());
+    }
+  }
+  
+  
+  
+  /**
+   * Draws the coordinates for <code>RIM_COORDS</code> style. 
+   */
+   
+  private void drawRimCoords(Graphics g){
+    Rectangle boardRect = getBoardRect(null);
+    int squareWidth = boardRect.width/8;
+    int squareHeight = boardRect.height/8;
+    
+    int textWidth = squareWidth/5;
+    int textHeight = squareHeight/5;
+    
+    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
+        new Dimension(textWidth, textHeight)), 10);
+    Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
+    g.setFont(font);
+    
+    FontMetrics fm = g.getFontMetrics(font);
+    int fontWidth = fm.stringWidth("a");
+    int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
+
+    int dir = isFlipped() ? 1 : -1;
+    
+    // Row coordinates
+    char row = isFlipped() ? '1' : '8';
+    for (int i = 0; i < 8; i++){
+      g.drawString(String.valueOf(row),
+        boardRect.x + 3, boardRect.y + i*squareHeight + fontHeight);
+      row += dir;
+    }
+    
+    // Column coordinates
+    char col = isFlipped() ? 'h' : 'a';
+    for (int i = 0; i < 8; i++){
+      g.drawString(String.valueOf(col),
+        boardRect.x + (i+1)*squareWidth - fontWidth - 3, boardRect.y + boardRect.height - 3);
+      col -= dir;
+    }
+  }
+  
+  
+  
+  /**
+   * Draws the coordinates for <code>OUTSIDE_COORDS</code> style.
+   */
+   
+  private void drawOutsideCoords(Graphics g){
+    Insets insets = getInsets();    
+    Rectangle boardRect = getBoardRect(null);
+    int squareWidth = boardRect.width/8;
+    int squareHeight = boardRect.height/8;
+    
+    int textWidth = squareWidth/4;
+    int textHeight = squareHeight/4;
+    
+    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
+        new Dimension(textWidth, textHeight)), 10);
+    Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
+    g.setFont(font);
+    
+    FontMetrics fm = g.getFontMetrics(font);
+    int fontWidth = fm.stringWidth("a");
+
+    int dir = isFlipped() ? 1 : -1;
+    
+    // Row coordinates
+    char row = isFlipped() ? '1' : '8';
+    for (int i = 0; i < 8; i++){
+      g.drawString(String.valueOf(row),
+        insets.left + (boardRect.x - insets.left - fontWidth + 1)/2,
+        boardRect.y + i*squareHeight + (squareHeight + fm.getAscent())/2 - 1);
+      row += dir;
+    }
+    
+    // Column coordinates
+    int bottomBorderHeight = getHeight() - boardRect.y - boardRect.height - insets.bottom; 
+    char col = isFlipped() ? 'h' : 'a';
+    for (int i = 0; i < 8; i++){
+      g.drawString(String.valueOf(col),
+        boardRect.x + i*squareWidth + (squareWidth - fontWidth)/2,
+        boardRect.y + boardRect.height + (bottomBorderHeight + fm.getAscent())/2 - 1); 
+      col -= dir;
+    }
+  }
+  
+  
+  
+  /**
+   * Draws the coordinates for <code>EVERY_SQUARE_COORDS</code> style.
+   */
+   
+  private void drawEverySquareCoords(Graphics g){
+    Rectangle boardRect = getBoardRect(null);
+    int squareWidth = boardRect.width/8;
+    int squareHeight = boardRect.height/8;
+    
+    int textWidth = squareWidth/4;
+    int textHeight = squareHeight/4;
+    
+    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
+        new Dimension(textWidth, textHeight)), 10);
+    Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
+    g.setFont(font);
+    
+    FontMetrics fm = g.getFontMetrics(font);
+    int fontWidth = fm.stringWidth("a");
+
+    int dx = (squareWidth - fm.stringWidth("a8"))/2;
+    int dy = (squareHeight + fm.getAscent())/2;
+    
+    int dir = isFlipped() ? 1 : -1;
+    char row = isFlipped() ? '1' : '8';    
+    for (int i = 0; i < 8; i++){
+      char col = isFlipped() ? 'h' : 'a';      
+      for (int j = 0; j < 8; j++){
+        g.drawString(String.valueOf(col) + String.valueOf(row),
+          boardRect.x + j*squareWidth + dx, boardRect.y + i*squareHeight + dy);
+        col -= dir;
+      }
+      row += dir;
     }
   }
 
@@ -1065,7 +1313,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Draws an outline of a square of the given size at the specified square on
    * the given <code>Graphics</code> object with the specific color. The size
@@ -1094,7 +1341,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Calls all the registered PaintHooks.
    */
@@ -1106,8 +1352,41 @@ public class JBoard extends JComponent{
       hook.paint(this, g);
     }
   }
+  
+  
+  
+  /**
+   * Returns the rectangle actually occupied by the board, without the borders
+   * or anything else that surrounds the board.
+   */
+   
+  public Rectangle getBoardRect(Rectangle rect){
+    if (rect == null)
+      rect = new Rectangle();
+    
+    Insets insets = getInsets();
+   
+    rect.x = insets.left;
+    rect.y = insets.top;
+    rect.width = getWidth() - insets.left - insets.right;
+    rect.height = getHeight() - insets.top - insets.bottom;
+    
+    if (getCoordsDisplayStyle() == OUTSIDE_COORDS){
+      int w = rect.width/40;
+      int h = rect.height/40;
+      
+      rect.x += w;
+      rect.width -= w;
+      rect.height -= h;
+    }
+    
+    rect.width -= rect.width%8;
+    rect.height -= rect.height%8;
+    
+    return rect;
+  }
 
-
+  
 
   /**
    * Returns the rectangle (in pixels) of the given square.
@@ -1119,24 +1398,23 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the rectangle (in pixels) of the given square.
    */
 
   public Rectangle squareToRect(int file, int rank, Rectangle squareRect){
-    if (squareRect == null)
-      squareRect = new Rectangle();
+    squareRect = getBoardRect(squareRect);
 
-    squareRect.width = getWidth()/8;
-    squareRect.height = getHeight()/8;
+    squareRect.width /= 8;
+    squareRect.height /= 8;
+    
     if (isFlipped()){
-      squareRect.x = (7-file)*squareRect.width;
-      squareRect.y = rank*squareRect.height;
+      squareRect.x += (7-file)*squareRect.width;
+      squareRect.y += rank*squareRect.height;
     }
     else{
-      squareRect.x = file*squareRect.width;
-      squareRect.y = (7-rank)*squareRect.height;
+      squareRect.x += file*squareRect.width;
+      squareRect.y += (7-rank)*squareRect.height;
     }
 
     return squareRect;
@@ -1144,32 +1422,38 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
-   * Returns a Rectangle (in pixels) of the piece currently being dragged, or
-   * <code>null</code> if no piece is currently being dragged. The resulting
-   * value is put in the specified Rectangle (unless the resulting value is
-   * <code>null</code>, or the specified Rectangle is).
+   * Returns a rectangle (in pixels) which completely contains the piece
+   * currently being moved. Returns <code>null</code> if no piece is currently
+   * being dragged.
    */
 
   public Rectangle getMovedPieceRect(Rectangle rect){
     if (movedPieceLoc == null)
       return null;
 
-    if (rect == null)
-      rect = new Rectangle();
-
-    int squareWidth = getWidth()/8;
-    int squareHeight = getHeight()/8;
+    rect = getBoardRect(rect);
+    int squareWidth = rect.width/8;
+    int squareHeight = rect.height/8;
 
     if (getDraggedPieceStyle() == NORMAL_DRAGGED_PIECE){
       rect.x = movedPieceLoc.x - squareWidth/2;
       rect.y = movedPieceLoc.y - squareHeight/2;
     }
-    else{
-      rect.x = movedPieceLoc.x - movedPieceLoc.x%squareWidth;
-      rect.y = movedPieceLoc.y - movedPieceLoc.y%squareHeight;
+    else if (getDraggedPieceStyle() == CROSSHAIR_DRAGGED_PIECE){
+      rect.x = movedPieceLoc.x - (movedPieceLoc.x - rect.x)%squareWidth;
+      rect.y = movedPieceLoc.y - (movedPieceLoc.y - rect.y)%squareHeight;
+      
+      // This is needed because the way we do rounding, it gets rounded towards
+      // zero, which is not what we want for negative values.
+      if (movedPieceLoc.x < 0)
+        rect.x -= squareWidth;
+      if (movedPieceLoc.y < 0)
+        rect.y -= squareHeight;
     }
+    else
+      throw new IllegalStateException("Unknown dragged piece style value: " + getDraggedPieceStyle());
+    
     rect.width = squareWidth;
     rect.height = squareHeight;
 
@@ -1177,19 +1461,22 @@ public class JBoard extends JComponent{
   }
 
 
-
-
+  
   /**
    * Returns the square corresponding to the given coordinate (in pixels).
    * Returns null if the given location is not on the visible board.
    */
 
   public Square locationToSquare(int x, int y){
+    Rectangle boardRect = getBoardRect(null);
+    x -= boardRect.x;
+    y -= boardRect.y;
+    
     if ((x < 0) || (y < 0))
       return null;
 
-    int squareWidth = getWidth()/8;
-    int squareHeight = getHeight()/8;
+    int squareWidth = boardRect.width/8;
+    int squareHeight = boardRect.height/8;
     int file = x/squareWidth;
     int rank = 7-(y/squareHeight);
     if ((file > 7) || (rank < 0))
@@ -1203,7 +1490,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the square corresponding to the given coordinate (in pixels).
    */
@@ -1212,8 +1498,6 @@ public class JBoard extends JComponent{
     return locationToSquare(p.x, p.y);
   }
   
-
-
 
 
   /**
@@ -1225,8 +1509,6 @@ public class JBoard extends JComponent{
     if (!isShowingModalDialog)
       super.processEvent(evt);
   }
-
-
 
 
 
@@ -1254,8 +1536,6 @@ public class JBoard extends JComponent{
 
 
 
-
-
   /**
    * Processes a mouse event.
    */
@@ -1275,6 +1555,18 @@ public class JBoard extends JComponent{
     int x = evt.getX();
     int y = evt.getY();
     int draggedPieceStyle = getDraggedPieceStyle();
+    
+    Rectangle helpRect = null;
+
+    if ((evtID == MouseEvent.MOUSE_EXITED) && (inputStyle == CLICK_N_CLICK)){
+      if (movedPieceSquare != null){ // Fake the piece being at its original location
+        repaint(helpRect = getMovedPieceRect(helpRect));
+        squareToRect(movedPieceSquare, helpRect);
+        movedPieceLoc.x = helpRect.x + helpRect.width/2;
+        movedPieceLoc.y = helpRect.y + helpRect.height/2;
+        repaint(getMovedPieceRect(helpRect));
+      }
+    }
 
     Square square = locationToSquare(x,y);
 
@@ -1283,8 +1575,6 @@ public class JBoard extends JComponent{
         cancelMovingPiece();
       return;
     }
-
-    Rectangle helpRect = null;
 
     if (isLeftMouseButton && ((evtID == MouseEvent.MOUSE_PRESSED) ||
        ((evtID == MouseEvent.MOUSE_RELEASED) && (inputStyle == DRAG_N_DROP)))){
@@ -1309,22 +1599,8 @@ public class JBoard extends JComponent{
         repaint(helpRect = squareToRect(square, helpRect));
         if (draggedPieceStyle == NORMAL_DRAGGED_PIECE)
           repaint(helpRect = getMovedPieceRect(helpRect));
-
-        // 17/02/2002 I can't see why this is needed, as "repaint(squareToRect(square, null))" already repaints the exact same area
-        //            this call does.
-//        else if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE)
-//          repaint(movedPieceLoc.x-movedPieceLoc.x%squareWidth, movedPieceLoc.y-movedPieceLoc.y%squareHeight, squareWidth, squareHeight);
-
       }
       else{
-        // We don't need to modify the location of the piece on a non motion
-        // mouse event, do we? I commented it out because it causes a bug if you
-        // drop a piece while quickly moving the mouse. The location of the piece
-        // is updated without the old position being repainted, which creates
-        // garbage on the screen.
-//        movedPieceLoc.x = x; 
-//        movedPieceLoc.y = y;
-
         if (!square.equals(movedPieceSquare)){
           WildVariant variant = position.getVariant();
           Piece [] promotionTargets = variant.getPromotionTargets(position, movedPieceSquare, square);
@@ -1346,7 +1622,7 @@ public class JBoard extends JComponent{
 
           position.makeMove(madeMove);
         }
-        else{ // Picked up the piece and left it immediately.
+        else{ // Picked up the piece and dropped it immediately.
           repaint(helpRect = getMovedPieceRect(helpRect));
           repaint(helpRect = squareToRect(movedPieceSquare, helpRect));
         }
@@ -1356,7 +1632,6 @@ public class JBoard extends JComponent{
       }
     }
   }
-
 
 
 
@@ -1387,12 +1662,20 @@ public class JBoard extends JComponent{
     if ((evtID == MouseEvent.MOUSE_DRAGGED) ||
        ((evtID == MouseEvent.MOUSE_MOVED) && (inputStyle == CLICK_N_CLICK))){
       repaint(helpRect = getMovedPieceRect(helpRect));
-      movedPieceLoc.x = x;
-      movedPieceLoc.y = y;
+      
+      if ((locationToSquare(x, y) == null) && (inputStyle == CLICK_N_CLICK)){
+        // Fake the piece being at its original location
+        squareToRect(movedPieceSquare, helpRect);
+        movedPieceLoc.x = helpRect.x + helpRect.width/2;
+        movedPieceLoc.y = helpRect.y + helpRect.height/2;
+      }
+      else{
+        movedPieceLoc.x = x;
+        movedPieceLoc.y = y;
+      }
       repaint(helpRect = getMovedPieceRect(helpRect));
     }
   }
-
 
 
 
@@ -1417,7 +1700,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * Returns the minimum size of this JBoard. This method returns the minimum
    * reasonable size of a chess board - about 80x80.
@@ -1426,8 +1708,7 @@ public class JBoard extends JComponent{
   public Dimension getMinimumSize(){
     return new Dimension(80,80);
   }
-
-
+  
 
 
   /**
@@ -1439,10 +1720,16 @@ public class JBoard extends JComponent{
     frame.addWindowListener(new free.util.AppKiller());
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
+    board.setBorder(new javax.swing.border.MatteBorder(30, 40, 50, 60, Color.red));
+    // board.setDraggedPieceStyle(CROSSHAIR_DRAGGED_PIECE);
+    board.setMoveInputStyle(CLICK_N_CLICK);
+    board.setFlipped(true);
+    board.setCoordsDisplayStyle(RIM_COORDS);
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
     frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);
   }
 
 
+  
 }
