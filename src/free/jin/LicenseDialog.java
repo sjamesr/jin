@@ -85,7 +85,7 @@ public class LicenseDialog extends JDialog{
    */
 
   public LicenseDialog(Frame parent){
-    super(parent, "Licensing and Copyrights in Jin", true);
+    super(parent, "Credits and Copyrights in Jin", true);
 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -310,7 +310,8 @@ public class LicenseDialog extends JDialog{
     threeDlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
     LinkLabel threeDlfWebsiteLabel = new LinkLabel("3D Look And Feel");
     threeDlfWebsiteLabel.setToolTipText("http://www.markus-hillenbrand.de/3dlf/index.html");
-    threeDlfWebsiteLabel.addActionListener(new URLActionListener("http://www.markus-hillenbrand.de/3dlf/index.html"));
+    threeDlfWebsiteLabel.addActionListener(
+      new URLActionListener("http://www.markus-hillenbrand.de/3dlf/index.html"));
     threeDlfPanel.add(threeDlfWebsiteLabel);
     threeDlfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
     LinkLabel threeDlfLicenseLabel = new LinkLabel("GNU General Public License");
@@ -321,7 +322,13 @@ public class LicenseDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by Denis DesLauriers, licensed under the&nbsp</html>"));
+    denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by&nbsp</html>"));
+    LinkLabel denisDesLauriersWebsiteLabel = new LinkLabel("Denis DesLauriers");
+    denisDesLauriersWebsiteLabel.setToolTipText("http://www.chess-art.com");
+    denisDesLauriersWebsiteLabel.addActionListener(
+      new URLActionListener("http://www.chess-art.com"));
+    denisDesLauriersPanel.add(denisDesLauriersWebsiteLabel);
+    denisDesLauriersPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
     LinkLabel logoLicenseLabel = new LinkLabel("GNU General Public License");
     logoLicenseLabel.addActionListener(gplActionListener);
     denisDesLauriersPanel.add(logoLicenseLabel);
