@@ -204,14 +204,14 @@ public class FullscreenPanel extends FixedJPanel{
       Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
       Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
       Method getGraphicsConfiguration = 
-        windowClass.getDeclaredMethod("getGraphicsConfiguration", null);
-      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", null);
+        windowClass.getDeclaredMethod("getGraphicsConfiguration", (Class[])null);
+      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", new Class[0]);
       Method setFullScreenWindow =
         graphicsDeviceClass.getDeclaredMethod("setFullScreenWindow", new Class[]{Window.class});
 
       Object graphicsConfiguration = 
-        getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), null);
-      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, null);
+        getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), new Object[0]);
+      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
       
       if (originalFrame != null){
         Method getExtState = Frame.class.getDeclaredMethod("getExtendedState", new Class[0]);
@@ -281,13 +281,13 @@ public class FullscreenPanel extends FixedJPanel{
       Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
       Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
       Method getGraphicsConfiguration = 
-        windowClass.getDeclaredMethod("getGraphicsConfiguration", null);
-      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", null);
+        windowClass.getDeclaredMethod("getGraphicsConfiguration", new Class[0]);
+      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", new Class[0]);
       Method setFullScreenWindow =
         graphicsDeviceClass.getDeclaredMethod("setFullScreenWindow", new Class[]{Window.class});
 
-      Object graphicsConfiguration = getGraphicsConfiguration.invoke(frame, null);
-      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, null);
+      Object graphicsConfiguration = getGraphicsConfiguration.invoke(frame, new Object[0]);
+      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{null});
 
       frame.dispose();

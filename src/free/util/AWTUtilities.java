@@ -105,9 +105,9 @@ public class AWTUtilities{
       try{
         // The equivalent of "return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();"
         Class geClass = Class.forName("java.awt.GraphicsEnvironment");
-        Method getLocalGraphicsEnvironmentMethod = geClass.getMethod("getLocalGraphicsEnvironment", null);
+        Method getLocalGraphicsEnvironmentMethod = geClass.getMethod("getLocalGraphicsEnvironment", new Class[0]);
         Object localGE = getLocalGraphicsEnvironmentMethod.invoke(null, new Object[0]);
-        Method getAvailableFontFamilyNamesMethod = geClass.getMethod("getAvailableFontFamilyNames", null);
+        Method getAvailableFontFamilyNamesMethod = geClass.getMethod("getAvailableFontFamilyNames", new Class[0]);
         String [] fontNames = (String [])getAvailableFontFamilyNamesMethod.invoke(localGE, new Object[0]);
         return fontNames;
       } catch (ClassNotFoundException e){e.printStackTrace();}
@@ -133,7 +133,7 @@ public class AWTUtilities{
     if (PlatformUtils.isJavaBetterThan("1.4")){
       try{
         Class frameClass = Class.forName("java.awt.Frame");
-        Method getExtendedStateMethod = frameClass.getMethod("getExtendedState", null);
+        Method getExtendedStateMethod = frameClass.getMethod("getExtendedState", new Class[0]);
         Integer state = (Integer)getExtendedStateMethod.invoke(frame, new Object[0]);
         return state.intValue();
       } catch (ClassNotFoundException e){e.printStackTrace();}
