@@ -1510,6 +1510,21 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
 
 
+	/**
+	 * Override processOffer to always return true, since we don't want the
+	 * user to ever see these messages.
+	 */
+		
+
+	protected boolean processOffer(boolean toUser, String offerType, int offerIndex,
+		String oppName, String offerParams){
+
+		super.processOffer(toUser, offerType, offerIndex, oppName, offerParams);
+		return true;
+	}
+
+
+	
   /**
    * Overrides the superclass' method only to return true.
    */
