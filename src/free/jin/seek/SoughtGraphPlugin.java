@@ -139,14 +139,12 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   protected void initSoughtGraph(){
     soughtGraph = createSoughtGraph();
     soughtGraphFrame = createSoughtGraphFrame();
-    soughtGraphFrame.setVisible(false); // To make sure it's initially invisible even in 1.1/1.2
 
     Container content = soughtGraphFrame.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(soughtGraph, BorderLayout.CENTER);
 
     JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-    desktop.add(soughtGraphFrame);
 
     Rectangle desktopBounds = new Rectangle(desktop.getSize());
     String boundsString = getProperty("frame-bounds");
@@ -154,7 +152,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (boundsString!=null)
       bounds = StringParser.parseRectangle(boundsString);
 
-    if (bounds==null){
+    if (bounds == null){
       soughtGraphFrame.setBounds(desktopBounds.width/2, desktopBounds.height/2, desktopBounds.width/2, desktopBounds.height/2);
 //      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
     }
@@ -192,6 +190,9 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     soughtGraphFrame.addVetoableChangeListener(new VetoableChangeListener(){
 
       public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
+        if (closingFrame) // Ignore our own close frame calls
+          return;
+
         if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
             pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
 
@@ -259,12 +260,24 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void showSoughtGraphFrame(){
-    if (soughtGraphFrame.isVisible())
+    if (soughtGraphFrame.getParent() != null)
       return;
 
+    getPluginContext().getMainFrame().getDesktop().add(soughtGraphFrame);
     soughtGraphFrame.setVisible(true);
+    soughtGraphFrame.toFront();
 
-    if ((visibleRB != null) && (!visibleRB.isSelected())) // It may be null if the graph is shown before it's created.
+    try{ 
+      // The documentation of JInternalFrame recommends not to do this,
+      // but this seems to be the only way to get the isClosed flag of a JInternalFrame
+      // set to false.
+      soughtGraphFrame.setClosed(false);
+
+      soughtGraphFrame.setSelected(true);
+    } catch (PropertyVetoException e){}
+
+    // It may be null if the graph is shown before it's created.
+    if ((visibleRB != null) && (!visibleRB.isSelected())) 
       visibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().addSeekListener(SoughtGraphPlugin.this);
@@ -272,23 +285,40 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
+  /**
+   * This is used to avoid recursion when closing the frame.
+   * The recursion results from the VetoableChangeListener being invoked when
+   * the frame is being closed which in turn invokes hideSoughtGraphFrame.
+   */
+
+  private boolean closingFrame = false;
+
+
+
 
   /**
    * Hides the sought graph frame. Hiding the sought graph frame should only be
-   *
-   done through this method, since it also unregisters this SoughtGraphPlugin as
-   * a SeekListener. I haven't used a ComponentListener to automatically 
+   * done through this method, since it also unregisters this SoughtGraphPlugin
+   * as a SeekListener. I haven't used a ComponentListener to automatically 
    * unregister the listener because it seems to be broken in JDK 1.1
    */
 
   protected void hideSoughtGraphFrame(){
-    if (!soughtGraphFrame.isVisible())
+    if (soughtGraphFrame.getParent() == null)
       return;
 
-    soughtGraphFrame.setVisible(false);
+    try{ 
+      closingFrame = true;
+      soughtGraphFrame.setClosed(true);
+    } catch (PropertyVetoException e){}
+      finally{
+        closingFrame = false;
+      }
+
     soughtGraph.removeAllSeeks();
 
-    if ((visibleRB != null) && (visibleRB.isSelected())) // It may be null if the graph is shown before it's created.
+    // It may be null if the graph is shown before it's created.
+    if ((visibleRB != null) && (visibleRB.isSelected())) 
       nonVisibleRB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.getSeekJinListenerManager().removeSeekListener(SoughtGraphPlugin.this);
@@ -316,7 +346,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     boolean isIconified = soughtGraphFrame.isIcon();
     user.setProperty(prefix+"iconified", String.valueOf(isIconified));
 
-    boolean isVisible = soughtGraphFrame.isVisible();
+    boolean isVisible = (soughtGraphFrame.getParent() != null);
     user.setProperty(prefix+"visible", String.valueOf(isVisible));
   }
 
