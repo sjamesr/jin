@@ -2,14 +2,16 @@
 
 	<property name="source.dir" value="src" />
 	<property name="classes.dir" value="classes" />	
-	<property name="build.dir" value="build" />	
+	<property name="build.dir" value="build" />
+	<property name="res.dir" value="resources" />	
 	<property name="libs.dir" value="${build.dir}/libs" />	
 	<property name="servers.dir" value="${build.dir}/servers" />	
-	<property name="plugins.dir" value="${build.dir}/plugins" />	
+	<property name="plugins.dir" value="${build.dir}/plugins" />
+	<property name="extensions.dir" value="${build.dir}/extensions" />	
 	<property name="debug" value="no" />
 	
 	<path id="compile.class.path">
-		<fileset dir="libs">
+		<fileset dir="resources/libs">
 			<include name="*.jar"/>
 		</fileset>
 	</path>
@@ -18,11 +20,51 @@
 	<!-- This is just to compile everything, without jarring
 	     or placing things at appropriate locations -->
 	<target name="compile">
-		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${classes.dir}" />
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
 			   classpathref="compile.class.path"
+			   debug="${debug}"
+		/>
+
+		<!-- Piece sets -->		
+		<mkdir dir="${classes.dir}/pieces" />
+		
+		<javac srcdir="${res.dir}/pieces"
+			   destdir="${classes.dir}/pieces"
+			   includes="*.java"
+			   classpath="${classes.dir}"
+			   debug="${debug}"
+		/>
+		
+		<antcall target="compilePieceSet">
+			<param name="piece-set-id" value="blitzin"/>
+		</antcall>
+		
+		<antcall target="compilePieceSet">
+			<param name="piece-set-id" value="eboard"/>
+		</antcall>
+		
+		<!-- Boards -->
+		<mkdir dir="${classes.dir}/boards" />
+		
+		<javac srcdir="${res.dir}/boards"
+			   destdir="${classes.dir}/boards"
+			   includes="*.java"
+			   classpath="${classes.dir}"
+			   debug="${debug}"
+		/>
+		
+	</target>
+	
+	<!-- Compiles a single piece set -->
+	<target name="compilePieceSet">
+		<mkdir dir="${classes.dir}/pieces/${piece-set-id}" />
+		<javac srcdir="${res.dir}/pieces/${piece-set-id}"
+			   destdir="${classes.dir}/pieces/${piece-set-id}"
+			   includes="**"
+			   classpath="${classes.dir}"
 			   debug="${debug}"
 		/>
 	</target>
@@ -30,16 +72,16 @@
 	<!-- After compiling, this jars everything properly
 	     and puts it where it belongs. -->
 	<target name="build" depends="compile">
-		<mkdir dir="${build.dir}"/>
-		<mkdir dir="${libs.dir}"/>
-		<mkdir dir="${servers.dir}"/>
-		<mkdir dir="${plugins.dir}"/>
-		<mkdir dir="${plugins.dir}/fics"/>
-		<mkdir dir="${plugins.dir}/icc"/>
-
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${libs.dir}" />
+		<mkdir dir="${servers.dir}" />
+		<mkdir dir="${plugins.dir}" />
+		<mkdir dir="${plugins.dir}/fics" />
+		<mkdir dir="${plugins.dir}/icc" />
+		
 		<!-- Copy libs -->
 		<copy todir="${libs.dir}">
-			<fileset dir="libs" />
+			<fileset dir="resources/libs" />
 		</copy>
 
 		<copy todir="${classes.dir}">
@@ -230,12 +272,104 @@
 			<fileset dir="${classes.dir}/free/jin/scripter/fics"
 			         includes="definition preferences" />
 		</jar>
+		
 
+		<!-- Extensions -->
+		<mkdir dir="${extensions.dir}" />
+
+		
+		<!-- Piece sets -->
+		<mkdir dir="${extensions.dir}/pieces" />
+		
+		<!-- Blitzin Vector -->
+		<jar jarfile="${extensions.dir}/pieces/blitzin.jar" compress="false">
+			<fileset dir="${classes.dir}/pieces/blitzin" includes="**" />
+			<fileset dir="${res.dir}/pieces/blitzin"
+					 excludes="**.java" />
+		</jar>
+		
+		<!-- Eboard Vector - this one is special because it's the default set --> 
+		<jar jarfile="${extensions.dir}/pieces/eboard.jar" compress="false">
+			<fileset dir="${res.dir}/pieces/eboard"
+					 excludes="**.java" />
+		</jar>
+		
+		<!-- Xboard -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="xboard" />
+		</antcall>
+
+		<!-- Bookup -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="bookup" />
+		</antcall>
+
+		<!-- Dyche Gray -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="dyche1" />
+		</antcall>
+
+		<!-- Dyche Color -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="dyche2" />
+		</antcall>
+		
+		<!-- Dyche Standard -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="dyche3" />
+		</antcall>
+		
+		
+		<!-- Board patterns -->
+		<mkdir dir="${extensions.dir}/boards" />
+
+		<!-- Plain Color -->		
+		<jar jarfile="${extensions.dir}/boards/plain.jar" compress="false">
+			<fileset dir="${res.dir}/boards/plain" />
+		</jar>
+		
+		<!-- Wooden Dark -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="wooden-dark" />
+		</antcall>
+		
+		<!-- Wooden Light -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="wooden-light" />
+		</antcall>
+		
+		<!-- Marble -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="marble" />
+		</antcall>
+
+		<!-- Slate -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="slate" />
+		</antcall>
+		
+	</target>
+	
+	<!-- Builds a single piece set -->
+	<target name="buildImagePieceSet">
+		<jar jarfile="${extensions.dir}/pieces/${piece-set-id}.jar" compress="false">
+			<fileset dir="${classes.dir}/pieces" includes="ImagePieceSetLoader*.class" />
+			<fileset dir="${res.dir}/pieces/${piece-set-id}" />
+		</jar>
 	</target>
 	
 	<target name="clean">
 		<delete dir="${classes.dir}" />
 		<delete dir="${build.dir}" />
+	</target>
+	
+	
+	<!-- Builds a single board pattern -->
+	<target name="buildBoardPattern">
+		<jar jarfile="${extensions.dir}/boards/${board-pattern-id}.jar" compress="false">
+			<fileset dir="${classes.dir}/boards" includes="ImageBoardLoader*.class" />
+			<fileset dir="${res.dir}/boards/${board-pattern-id}" />
+		</jar>
 	</target>
 
 
