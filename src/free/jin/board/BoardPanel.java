@@ -1062,8 +1062,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     madeMoves.addElement(move);
     realPosition.makeMove(move);
 
-    if (!isMoveEnRoute){ // This is not the server echoeing our own move, so play sound.
-      playAudioClipForMove(move);
+    if (!isMoveEnRoute){ // This is not the server echoeing our own move
+      if (evt.isNew())
+        playAudioClipForMove(move);
 
       if (shouldUpdateBoard){
         isBoardPositionUpdating = true;
@@ -1281,7 +1282,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Plays the audio clip appropriate for the given Move.
+   * Plays the audio clip appropriate for the given <code>Move</code>.
    */
 
   protected void playAudioClipForMove(Move move){
