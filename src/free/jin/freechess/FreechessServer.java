@@ -72,8 +72,8 @@ public class FreechessServer extends AbstractServer{
    * Creates and returns a new <code>JinFreechessConnection</code>.
    */
 
-  public Connection createConnection(JinContext context, String username, String password){
-    return new JinFreechessConnection(context, username, password);
+  public Connection createConnection(String username, String password){
+    return new JinFreechessConnection(username, password);
   }
 
 
