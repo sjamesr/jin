@@ -185,7 +185,14 @@ public class LookAndFeelMenu extends JMenu{
         updateComponents();
         JOptionPane.showMessageDialog(null, "It is advisable to restart the application\n"+
           "for the look and feel to take full effect.", "Look and Feel change", JOptionPane.INFORMATION_MESSAGE);
-      } catch (Exception e){
+      } catch (UnsupportedLookAndFeelException e){
+          JOptionPane.showMessageDialog(null, "This Look and Feel is not supported on your platform",
+            "Error setting Look and Feel", JOptionPane.ERROR_MESSAGE); 
+          System.err.println("Unable to set look and feel:");
+          e.printStackTrace();
+        }
+        catch (Exception e){
+          JOptionPane.showMessageDialog(null, e.getMessage(), "Error setting Look and Feel", JOptionPane.ERROR_MESSAGE); 
           System.err.println("Unable to set look and feel:");
           e.printStackTrace();
         }
