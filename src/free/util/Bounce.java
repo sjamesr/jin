@@ -73,21 +73,20 @@ public class Bounce{
 
     try{
       ServerSocket ssock = new ServerSocket(localPort);
-      Socket incomingSock = ssock.accept();
-      System.out.println("Connection accepted");
-      Socket outgoingSock = new Socket(hostname, remotePort);
+      while (true){
+        Socket incomingSock = ssock.accept();
+        Socket outgoingSock = new Socket(hostname, remotePort);
 
-      InputStream incomingIn = incomingSock.getInputStream();
-      OutputStream incomingOut = incomingSock.getOutputStream();
-      InputStream outgoingIn = outgoingSock.getInputStream();
-      OutputStream outgoingOut = outgoingSock.getOutputStream();
+        InputStream incomingIn = incomingSock.getInputStream();
+        OutputStream incomingOut = incomingSock.getOutputStream();
+        InputStream outgoingIn = outgoingSock.getInputStream();
+        OutputStream outgoingOut = outgoingSock.getOutputStream();
 
-      PumpThread t1 = new PumpThread(incomingIn, outgoingOut);
-      PumpThread t2 = new PumpThread(outgoingIn, incomingOut);
-      t1.start();
-      t2.start();
-      new ProcessKillerThread(t1).start();
-      new ProcessKillerThread(t2).start();
+        PumpThread t1 = new PumpThread(incomingIn, outgoingOut);
+        PumpThread t2 = new PumpThread(outgoingIn, incomingOut);
+        t1.start();
+        t2.start();
+      }
     } catch (IOException e){
         e.printStackTrace();
         System.exit(3);
@@ -106,62 +105,9 @@ public class Bounce{
     System.err.println();
     System.err.println("Usage: java free.util.Bounce localPort hostname remotePort");
     System.out.println();
-    System.out.println("Version 1.00 - 18 Aug. 2002");
+    System.out.println("Version 1.01 - 31 Nov. 2002");
   }
 
-
-
-
-  /**
-   * A thread which waits for the given thread to die and then calls System.exit(0);
-   */
-
-  private static class ProcessKillerThread extends Thread{
-
-
-
-    /**
-     * The thread we're to wait on.
-     */
-
-    private final Thread target;
-
-
-
-
-    /**
-     * Creates a new ProcessKillerThread with the given Thread to wait on.
-     */
-
-    public ProcessKillerThread(Thread target){
-      super("ProcessKillerThread("+target.getName()+")");
-
-      this.target = target;
-
-      setDaemon(true);
-    }
-
-
-
-
-    /**
-     * Waits for the target thread to die, prints a message and calls
-     * <code>System.exit(0)</code>
-     */
-
-    public void run(){
-      try{
-        target.join();
-      } catch (InterruptedException e){
-          e.printStackTrace();
-        }
-
-      System.err.println("Connection died");
-      System.exit(0);
-    }
-
-
-  }
 
 
 }
