@@ -198,7 +198,7 @@ public class SoughtGraph extends JComponent{
 
   protected Point mapSeek(Seek seek){
     int etimeM3 = 3*seek.getTime()/(60*1000)+2*seek.getInc()/1000;
-    int rating = seek.isSeekerRegistered() ? seek.getSeekerRating() : 0;
+    int rating = seek.isSeekerRated() ? seek.getSeekerRating() : 0;
 
     int x,y;
 
@@ -365,11 +365,6 @@ public class SoughtGraph extends JComponent{
     rect.y = (int)(graphY+graphHeight-(y+1)*slotHeight);
     rect.width = (int)slotWidth;
     rect.height = (int)slotHeight;
-
-//    if (x >= BULLET_SLOTS)
-//      rect.x++;
-//    if (x >= BULLET_SLOTS + BLITZ_SLOTS)
-//      rect.x++;
 
     return rect;
   }
@@ -639,15 +634,15 @@ public class SoughtGraph extends JComponent{
     double slotWidth = ((double)graphWidth)/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
     double slotHeight = ((double)graphHeight)/RATING_SLOTS;
 
-//    if (x - graphX >= graphWidth * BULLET_SLOTS)
-//      x--;
-//    if (x - graphX >= graphWidth * (BULLET_SLOTS + BLITZ_SLOTS))
-//      x--;
+    if (x < graphX)
+      return null;
+    if (graphY + graphHeight < y)
+      return null;
 
     int i = (int)((x-graphX)/slotWidth);
     int j = (int)((graphY+graphHeight-y)/slotHeight);
 
-    if ((i<0)||(i>=seekMatrix.length)||(j<0)||(j>=seekMatrix[i].length))
+    if ((i < 0) || (i >= seekMatrix.length) || (j < 0) || (j >= seekMatrix[i].length))
       return null;
 
     return seekMatrix[i][j];
