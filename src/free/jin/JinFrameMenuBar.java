@@ -21,12 +21,15 @@
 
 package free.jin;
 
+import javax.swing.*;
 import free.util.swing.LookAndFeelMenu;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
+import free.util.WindowDisposingActionListener;
 import free.util.StringEncoder;
 import free.util.AWTUtilities;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PreferencesPanel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -35,8 +38,9 @@ import javax.swing.event.ListDataEvent;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.BorderLayout;
-import javax.swing.*;
+import java.awt.FlowLayout;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.border.EmptyBorder;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.io.File;
@@ -402,10 +406,54 @@ public class JinFrameMenuBar extends JMenuBar{
     }
 
     public void actionPerformed(ActionEvent evt){
-      JDialog dialog = new JDialog(jinFrame, targetPlugin.getName()+" preferences", true);
+      final JDialog dialog = new JDialog(jinFrame, targetPlugin.getName()+" preferences", true);
       dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+      KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+      ActionListener closer = new WindowDisposingActionListener(dialog);
+      dialog.getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+
       dialog.getContentPane().setLayout(new BorderLayout());
-      dialog.getContentPane().add(targetPlugin.getPreferencesUI());
+
+      final PreferencesPanel prefPanel = targetPlugin.getPreferencesUI();
+      JPanel prefWrapperPanel = new JPanel(new BorderLayout());
+      prefWrapperPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+      prefWrapperPanel.add(BorderLayout.CENTER, prefPanel);
+      dialog.getContentPane().add(BorderLayout.CENTER, prefWrapperPanel);
+
+      JPanel bottomPanel = new JPanel(new BorderLayout());
+      bottomPanel.add(BorderLayout.CENTER, new JSeparator(JSeparator.HORIZONTAL));
+      JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+      JButton okButton = new JButton("OK");
+      JButton cancelButton = new JButton("Cancel");
+      JButton applyButton = new JButton("Apply");
+      buttonPanel.add(okButton);
+      buttonPanel.add(cancelButton);
+      buttonPanel.add(applyButton);
+      bottomPanel.add(BorderLayout.SOUTH, buttonPanel);
+
+      okButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          prefPanel.applyChanges();
+          dialog.dispose();
+        }
+      });
+
+      cancelButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          dialog.dispose();
+        }
+      });
+
+      applyButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          prefPanel.applyChanges();
+        }
+      });
+
+      dialog.getContentPane().add(BorderLayout.SOUTH, bottomPanel);
+      dialog.getRootPane().setDefaultButton(okButton);
 
       AWTUtilities.centerWindow(dialog, jinFrame);
 
@@ -419,8 +467,8 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
   /**
-   * Removes the menus added via the <code>addPluginPreferenceUIMenuItem(Plugin)</code>
-   * method.
+   * Removes the menus added via the 
+   * <code>addPluginPreferenceUIMenuItem(Plugin)</code> method.
    */
 
   private void removePluginPreferenceUIMenuItems(){
