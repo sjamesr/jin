@@ -37,7 +37,8 @@ public class AWTUtilities{
   /**
    * Packs and centers the given window relative to the given component. The
    * specified component may be <code>null</code>, in which case the window will
-   * be centered on the screen.
+   * be centered on the screen. The method also makes sure that the target
+   * window is fully visible by calling <code>forceToScreen</code>.
    */
 
   public static void centerWindow(Window target, Component parent){
@@ -49,6 +50,27 @@ public class AWTUtilities{
       new Rectangle(parent.getLocationOnScreen(), parent.getSize());
 
     target.setLocation(parentBounds.x + (parentBounds.width - size.width)/2, parentBounds.y + (parentBounds.height - size.height)/2);
+    
+    forceToScreen(target);
+  }
+  
+  
+  
+  /**
+   * Reposition the specified window so that it necessarily fits on the screen,
+   * while trying to minimize changes.
+   */
+   
+  public static void forceToScreen(Window window){
+    Dimension screenSize = window.getToolkit().getScreenSize();
+    Rectangle bounds = window.getBounds();
+    
+    bounds.width = Math.min(bounds.width, screenSize.width);
+    bounds.height = Math.min(bounds.height, screenSize.height);
+    bounds.x = Math.min(Math.max(bounds.x, 0), screenSize.width - bounds.width);    
+    bounds.y = Math.min(Math.max(bounds.y, 0), screenSize.height - bounds.height);
+
+    window.setBounds(bounds);    
   }
 
 
