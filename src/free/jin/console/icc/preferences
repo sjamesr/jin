@@ -5,7 +5,7 @@ game-list-display-style = string;embedded
 
 # Output properties
 #output-selection = color;000080
-output-selected = color;ffffff
+#output-selected = color;ffffff
 
 output-popup.num-commands = integer;16
 output-popup.command-0 = string;finger !@
