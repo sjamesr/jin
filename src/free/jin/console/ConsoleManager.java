@@ -93,7 +93,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void stop(){
-    saveState();
     unregisterConnListeners();
     closeConsole();
   }
@@ -166,24 +165,42 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     if (boundsString!=null)
       bounds = StringParser.parseRectangle(boundsString);
 
-    if (bounds==null)
+    if (bounds == null)
       consoleFrame.setBounds(0, 0, desktopBounds.width*3/4, desktopBounds.height*3/4);
     else
       consoleFrame.setBounds(bounds);
 
-    boolean isMaximized = Boolean.valueOf(getProperty("maximized","false")).booleanValue();
+
+    boolean isMaximized = Boolean.valueOf(getProperty("maximized", "false")).booleanValue();
     if (isMaximized){
       try{
         consoleFrame.setMaximum(true);
       } catch (java.beans.PropertyVetoException e){}
     }
 
-    boolean isIconified = Boolean.valueOf(getProperty("iconified","false")).booleanValue();
+
+    boolean isIconified = Boolean.valueOf(getProperty("iconified", "false")).booleanValue();
     if (isIconified){
       try{
         consoleFrame.setIcon(true);
       } catch (java.beans.PropertyVetoException e){}
     }
+
+
+    boolean isSelected = Boolean.valueOf(getProperty("selected", "false")).booleanValue();
+    if (Boolean.valueOf(getProperty("selected", "true")).booleanValue()){
+      // We can't do this immediately because if some other plugin adds another frame
+      // afterwards, our frame will lose selection.
+      SwingUtilities.invokeLater(new Runnable(){
+        public void run(){
+          try{
+            consoleFrame.toFront();
+            consoleFrame.setSelected(true);
+          } catch (PropertyVetoException e){}
+        }
+      });
+    }
+
 
     JComponent icon = consoleFrame.getDesktopIcon();
     String iconBoundsString = getProperty("frame-icon-bounds");
@@ -539,12 +556,15 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Saves the current state into the user file.
    */
 
-  protected void saveState(){
+  public void saveState(){
     boolean isMaximized = consoleFrame.isMaximum();
     setProperty("maximized", String.valueOf(isMaximized));
 
     boolean isIconified = consoleFrame.isIcon();
     setProperty("iconified", String.valueOf(isIconified));
+
+    boolean isSelected = consoleFrame.isSelected();
+    setProperty("selected", String.valueOf(isSelected));
 
     // This is the only way to retrieve the "normal" bounds of the frame under
     // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
