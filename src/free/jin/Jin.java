@@ -423,6 +423,11 @@ public class Jin{
 
   public static void main(String [] args){
     try{
+      try{
+        Class.forName("com.incors.plaf.kunststoff.KunststoffLookAndFeel");
+        UIManager.installLookAndFeel("Kunststoff", "com.incors.plaf.kunststoff.KunststoffLookAndFeel");
+      } catch (ClassNotFoundException e){}
+
       mainFrame = new JinFrame();
 
       String lnf = getProperty("default.lf");
