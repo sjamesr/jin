@@ -820,7 +820,9 @@ public class JinMain implements JinContext{
 
     InputStream pluginPrefsIn = loader.getResourceAsStream("preferences");
     Preferences pluginPrefs = (pluginPrefsIn == null ? Preferences.createNew() : Preferences.load(pluginPrefsIn));
-    pluginPrefsIn.close();
+
+    if (pluginPrefsIn != null)
+      pluginPrefsIn.close();
 
     try{
       return new PluginInfo(loader.loadClass(classname), pluginPrefs);
