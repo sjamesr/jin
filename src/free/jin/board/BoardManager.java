@@ -249,7 +249,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       StringParser.parseColor(getProperty("move-highlight.color", "00b2b2")));
 
     setDragSquareHighlightingColor(
-      StringParser.parseColor(getProperty("drag-square-highlighting-color", "0000ff")));
+      StringParser.parseColor(getProperty("drag-square-highlighting.color", "0000ff")));
 
     String moveSendingModeString = getProperty("move-sending-mode", "legal-chess");
     if ("legal-chess".equals(moveSendingModeString))
@@ -259,9 +259,29 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else
       setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
 
+    
+    setWhitePieceColor(parseColor(getProperty("white-piece-color")));
+    setBlackPieceColor(parseColor(getProperty("black-piece-color")));
+    setWhiteOutlineColor(parseColor(getProperty("white-outline-color")));
+    setBlackOutlineColor(parseColor(getProperty("black-outline-color")));
+
+    setLightSquareColor(parseColor(getProperty("light-square-color")));
+    setDarkSquareColor(parseColor(getProperty("dark-square-color")));
+
 
     setPiecePainter(getProperty("piece-painter-class-name"));
     setBoardPainter(getProperty("board-painter-class-name"));
+  }
+
+
+
+  /**
+   * Returns null if the specified <code>String</code> is <code>null</code>,
+   * otherwise parses it as a color and returns the resulting color.
+   */
+
+  private static Color parseColor(String color){
+    return color == null ? null : StringParser.parseColor(color);
   }
 
 
@@ -336,19 +356,19 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (piecePainter instanceof ColoredPiecePainter){
       ColoredPiecePainter coloredPiecePainter = (ColoredPiecePainter)piecePainter;
 
-      String whiteColor = getProperty("white-piece-color"); 
-      String blackColor = getProperty("black-piece-color"); 
-      String whiteOutline = getProperty("white-outline-color"); 
-      String blackOutline = getProperty("black-outline-color"); 
+      Color whiteColor = getWhitePieceColor(); 
+      Color blackColor = getBlackPieceColor(); 
+      Color whiteOutline = getWhiteOutlineColor();
+      Color blackOutline = getBlackOutlineColor();
 
       if (whiteColor != null)
-        coloredPiecePainter.setWhiteColor(StringParser.parseColor(whiteColor));
+        coloredPiecePainter.setWhiteColor(whiteColor);
       if (blackColor != null)
-        coloredPiecePainter.setBlackColor(StringParser.parseColor(blackColor));
+        coloredPiecePainter.setBlackColor(blackColor);
       if (whiteOutline != null)
-        coloredPiecePainter.setWhiteOutline(StringParser.parseColor(whiteOutline));
+        coloredPiecePainter.setWhiteOutline(whiteOutline);
       if (blackOutline != null)
-        coloredPiecePainter.setBlackOutline(StringParser.parseColor(blackOutline));
+        coloredPiecePainter.setBlackOutline(blackOutline);
     }
   }
 
@@ -404,16 +424,142 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (boardPainter instanceof ColoredBoardPainter){
       ColoredBoardPainter coloredBoardPainter = (ColoredBoardPainter)boardPainter;
 
-      String lightColor = getProperty("light-square-color");
-      String darkColor = getProperty("dark-square-color");
+      Color lightColor = getLightSquareColor();
+      Color darkColor = getDarkSquareColor();
 
       if (lightColor != null)
-        coloredBoardPainter.setLightColor(StringParser.parseColor(lightColor));
+        coloredBoardPainter.setLightColor(lightColor);
       if (darkColor != null)
-        coloredBoardPainter.setDarkColor(StringParser.parseColor(darkColor));
+        coloredBoardPainter.setDarkColor(darkColor);
     }
   }
 
+
+
+
+  /**
+   * Returns the current white pieces color.
+   */
+
+  public Color getWhitePieceColor(){
+    return (Color)props.getProperty("whitePieceColor");
+  }
+
+
+
+  /**
+   * Sets the white piece color to the specified value.
+   */
+
+  public void setWhitePieceColor(Color color){
+    props.setProperty("whitePieceColor", color);
+    configurePiecePainter(getPiecePainter());
+  }
+
+
+
+  /**
+   * Returns the current black pieces color.
+   */
+
+  public Color getBlackPieceColor(){
+    return (Color)props.getProperty("blackPieceColor");
+  }
+
+
+
+  /**
+   * Sets the black piece color to the specified value.
+   */
+
+  public void setBlackPieceColor(Color color){
+    props.setProperty("blackPieceColor", color);
+    configurePiecePainter(getPiecePainter());
+  }
+
+
+
+  /**
+   * Returns the current white pieces outline color.
+   */
+
+  public Color getWhiteOutlineColor(){
+    return (Color)props.getProperty("whiteOutlineColor");
+  }
+
+
+
+  /**
+   * Sets the white piece outline color to the specified value.
+   */
+
+  public void setWhiteOutlineColor(Color color){
+    props.setProperty("whiteOutlineColor", color);
+    configurePiecePainter(getPiecePainter());
+  }
+
+
+
+  /**
+   * Returns the current black pieces outline color.
+   */
+
+  public Color getBlackOutlineColor(){
+    return (Color)props.getProperty("blackOutlineColor");
+  }
+
+
+
+  /**
+   * Sets the black piece outline color to the specified value.
+   */
+
+  public void setBlackOutlineColor(Color color){
+    props.setProperty("blackOutlineColor", color);
+    configurePiecePainter(getPiecePainter());
+  }
+
+
+
+  /**
+   * Returns the current light squares color.
+   */
+
+  public Color getLightSquareColor(){
+    return (Color)props.getProperty("lightSquareColor");
+  }
+
+
+
+  /**
+   * Sets the light squares color to the specified value.
+   */
+
+  public void setLightSquareColor(Color color){
+    props.setProperty("lightSquareColor", color);
+    configureBoardPainter(getBoardPainter());
+  }
+
+
+
+  /**
+   * Returns the current dark squares color.
+   */
+
+  public Color getDarkSquareColor(){
+    return (Color)props.getProperty("darkSquareColor");
+  }
+
+
+
+  /**
+   * Sets the dark squares color to the specified value.
+   */
+
+  public void setDarkSquareColor(Color color){
+    props.setProperty("darkSquareColor", color);
+    configureBoardPainter(getBoardPainter());
+  }
 
 
 
@@ -1047,20 +1193,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-
-  /**
-   * Rereads the plugin/user properties and changes the assosiated board
-   * manager's settings accordingly. This method should be called when the user
-   * changes the preferences.
-   */
-
-  public void refreshFromProperties(){
-    initPreferences();
-  }
-
-
-
-
   /**
    * Unregisters all the necessary listeners from the Connection. 
    */
@@ -1548,9 +1680,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     setProperty("move-highlight.highlight-own", String.valueOf(isHighlightingOwnMoves()));
 
-    setProperty("move-highlighting-color", StringEncoder.encodeColor(getMoveHighlightingColor()));
+    setProperty("move-highlight.color", StringEncoder.encodeColor(getMoveHighlightingColor()));
 
-    setProperty("drag-square-highlighting-color",
+    setProperty("drag-square-highlighting.color",
       StringEncoder.encodeColor(getDragSquareHighlightingColor()));
 
     int moveSendingMode = getMoveSendingMode();
@@ -1562,6 +1694,28 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else // if (moveSendingMode == PREMOVE_MOVE_SENDING_MODE)
       moveSendingModeString = "premove";
     setProperty("move-sending-mode", moveSendingModeString);
+
+    setProperty("white-piece-color", encodeColor(getWhitePieceColor()));
+    setProperty("black-piece-color", encodeColor(getBlackPieceColor()));
+    setProperty("white-outline-color", encodeColor(getWhiteOutlineColor()));
+    setProperty("black-outline-color", encodeColor(getBlackOutlineColor()));
+
+    setProperty("light-square-color", encodeColor(getLightSquareColor()));
+    setProperty("dark-square-color", encodeColor(getDarkSquareColor()));
+  }
+
+
+
+  /**
+   * If the specified color is null, returns null. Otherwise encodes it and
+   * returns the resulting string.
+   */
+
+  private static String encodeColor(Color color){
+    if (color == null)
+      return null;
+    else
+      return StringEncoder.encodeColor(color);
   }
 
 
