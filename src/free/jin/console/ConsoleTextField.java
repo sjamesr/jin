@@ -341,7 +341,9 @@ public class ConsoleTextField extends FixedJTextField{
       if ((tellerIndex == console.getTellerCount()) || (tellerIndex == traversedTellerCount))
         tellerIndex = 0;
 
-      setTellPersonState(console.getTeller(tellerIndex));
+      String teller = console.getTeller(tellerIndex);
+      if (teller != null)
+        setTellPersonState(teller);
     }
 
   }
@@ -362,7 +364,9 @@ public class ConsoleTextField extends FixedJTextField{
       if (tellerIndex < 0)
         tellerIndex = Math.min(traversedTellerCount, console.getTellerCount()) - 1;
 
-      setTellPersonState(console.getTeller(tellerIndex));
+      String teller = console.getTeller(tellerIndex);
+      if (teller != null)
+        setTellPersonState(teller);
     }
 
   }

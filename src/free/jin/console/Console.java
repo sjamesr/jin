@@ -838,12 +838,15 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   /**
    * Returns the nth (from the end) person who told us something via "tell",
-   * "say" or "atell"  which went into this console. The index is 0 based. 
-   * Sorry about the name of the method but I didn't think getColocutor()
-   * was much better :-)
+   * "say" or "atell"  which went into this console. Returns <code>null</code>
+   * if no such person exists. The index is 0 based.  Sorry about the name of 
+   * the method but I didn't think getColocutor() was much better :-)
    */
 
   public String getTeller(int n){
+    if ((n < 0) || (n >= tellers.size()))
+      return null;
+
     return (String)tellers.elementAt(n);
   }
 
