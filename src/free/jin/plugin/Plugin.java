@@ -29,7 +29,7 @@ import free.util.MemoryFile;
 
 /**
  * The superclass of all Plugins. Usually, a plugin only needs to override the
- * start() and stop() methods.
+ * start(), saveState() and stop() methods.
  */
 
 
@@ -340,8 +340,20 @@ public abstract class Plugin{
 
 
   /**
-   * Tells the Plugin it should stop doing whatever it's doing and cleanup.
-   * The default implementation does nothing.
+   * Tells the plugin to save its state into user variables. The default
+   * implementation does nothing.
+   */
+
+  public void saveState(){
+
+  }
+
+
+
+
+  /**
+   * Tells the <code>Plugin</code> it should stop doing whatever it's doing and
+   * cleanup. The default implementation does nothing.
    */
 
   public void stop(){
