@@ -284,7 +284,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
   public void show(Component parentComponent){
     Frame parentFrame = parentComponent instanceof Frame ?
       (Frame)parentComponent :
-      (Frame)SwingUtilities.getAncestorOfClass(Frame.class,parentComponent);
+      (Frame)SwingUtilities.getAncestorOfClass(Frame.class, parentComponent);
 
     dialog = new JDialog(parentFrame, title ,true){
 
@@ -294,9 +294,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
                                      // because nothing else seems to work.
         if (!painted){
           painted = true;
-          if (usernameField.getText().length()==0)
+          if (usernameField.getText().length() == 0)
             usernameField.requestFocus();
-          else if (passwordField.getPassword().length==0)
+          else if (passwordField.getPassword().length == 0)
             passwordField.requestFocus();
           else
             defaultButton.requestFocus();
@@ -578,7 +578,6 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
   protected JButton createConnectButton(){
     JButton button = new JButton("Connect");
-    button.setMnemonic('C');
     return button;
   }
 
@@ -755,7 +754,6 @@ public abstract class StandardLoginDialog implements LoginDialog{
     panel.add(Box.createVerticalGlue());
 
     JButton button = new JButton("Cancel");
-    button.setMnemonic('a');
     button.setDefaultCapable(false);
     button.addActionListener(closeActionListener);
 
