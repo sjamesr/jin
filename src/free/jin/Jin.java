@@ -21,19 +21,20 @@
 
 package free.jin;
 
-import java.awt.*;
-import java.io.IOException;
-import java.util.Properties;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import javax.swing.ListModel;
-import javax.swing.DefaultListModel;
+import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.jin.action.ActionInfo;
+import free.jin.ui.MdiUiProvider;
+import free.jin.ui.OptionPanel;
+import free.jin.ui.SdiUiProvider;
+import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
-import free.util.AWTUtilities;
+import java.io.IOException;
+import java.util.Properties;
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
 
 
 
@@ -124,7 +125,7 @@ public class Jin{
     fixSwing();
 
     // Create the UI manager
-    uiProvider = new MdiUiProvider();
+    uiProvider = createUiProvider();
 
     // Create the connection manager
     connManager = new ConnectionManager();
@@ -197,24 +198,17 @@ public class Jin{
    */
 
   private void restoreLookAndFeel(){
-    String lfClassName = context.getPrefs().getString("lf.default", UIManager.getSystemLookAndFeelClassName());
+    String lfClassName = getPrefs().getString("lookAndFeel.classname", UIManager.getSystemLookAndFeelClassName());
     try{
       UIManager.setLookAndFeel(lfClassName);
     } catch (Exception e){}
+    
+    // lnf selection UI needs to know this, if we're using the default one 
+    getPrefs().setString("lookAndFeel.classname", UIManager.getLookAndFeel().getClass().getName()); 
   }
   
 
-
-  /**
-   * Saves the currently used look and feel into user preferences.
-   */
-
-  private void saveLookAndFeel(){
-    context.getPrefs().setString("lf.default", UIManager.getLookAndFeel().getClass().getName());
-  }
-
-
-
+  
   /**
    * Applies various swing fixes.
    */
@@ -229,87 +223,24 @@ public class Jin{
   
   
   
-  
   /**
-   * Restores the geometry of the specified frame from the preferences.
-   * This is a helper method for the various UIProviders. 
+   * Creates the UIProvider based on user preferences.
    */
-   
-  void restoreFrameGeometry(JFrame frame, String prefNamePrefix){
-    Preferences prefs = context.getPrefs();
+  
+  private UIProvider createUiProvider(){
+    String uiProviderClassname = PlatformUtils.isMacOS() ? 
+        SdiUiProvider.class.getName() : MdiUiProvider.class.getName();
+    uiProviderClassname = getPrefs().getString("uiProvider.classname", uiProviderClassname);
     
-    Dimension screenSize = frame.getToolkit().getScreenSize();
-    Rectangle defaultFrameBounds = new Rectangle(
-      screenSize.width/16, screenSize.height/16, screenSize.width*7/8, screenSize.height*7/8);
+    // ui provider selection UI needs to know this, if we're using the default one
+    getPrefs().setString("uiProvider.classname", uiProviderClassname);
     
-      
-    // Restore bounds      
-    Rectangle frameBounds = prefs.getRect(prefNamePrefix + ".bounds", defaultFrameBounds);
-    frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
-    frame.setBounds(frameBounds);
-
-    
-    // Restore maximized state 
-    boolean vertMaximized = prefs.getBool(prefNamePrefix + ".maximized.vert", false);
-    boolean horizMaximized = prefs.getBool(prefNamePrefix + ".maximized.horiz", false);
-
-    // Bugfix for Java bug 4464714 - setExtendedState only works once the
-    // the window is realized.
-    if (frame.getPeer() == null)
-      frame.addNotify();
-   
-    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
-    AWTUtilities.setExtendedFrameState(frame, state);
-  }
-  
-  
-  
-  
-  /**
-   * Saves the geometry of the specified frame into the preferences
-   * with preference names prefixed with the specified string. This is a helper
-   * method for the various UIProviders.
-   */
-
-  void saveFrameGeometry(JFrame frame, String prefNamePrefix){
-    Preferences prefs = context.getPrefs();
-    
-    // Save bounds on screen
-    Point frameLocation = frame.isVisible() ? frame.getLocationOnScreen() : frame.getLocation();
-    Dimension frameSize = frame.getSize();
-    prefs.setRect(prefNamePrefix + ".bounds", new Rectangle(frameLocation, frameSize));
-    
-    // Save maximized state
-    int state = AWTUtilities.getExtendedFrameState(frame);
-    prefs.setBool(prefNamePrefix + ".maximized.vert", (state & Frame.MAXIMIZED_VERT) != 0);
-    prefs.setBool(prefNamePrefix + ".maximized.horiz", (state & Frame.MAXIMIZED_HORIZ) != 0);
-  }
-  
-  
-
-  /**
-   * Returns whether the specified frame bounds are reasonably placed on a
-   * screen of the specified dimensions. This is used to avoid situations where
-   * a frame is displayed outside of the screen where the user can't change its
-   * size and/or move it (can happen for example if the resolution is changed
-   * between runs).
-   */
-
-  private static boolean frameBoundsOk(Dimension screenSize, Rectangle frameBounds){
-    if (frameBounds.x + frameBounds.width < 50)
-      return false;
-    if (frameBounds.y < -10)
-      return false;
-    if (frameBounds.width < 30)
-      return false;
-    if (frameBounds.height < 40)
-      return false;
-    if (frameBounds.x > screenSize.width - 10)
-      return false;
-    if (frameBounds.y > screenSize.height - 20)
-      return false;
-
-    return true;
+    try{
+      return (UIProvider)Class.forName(uiProviderClassname).newInstance();
+    } catch (Exception e){
+        e.printStackTrace();
+        throw new IllegalStateException("Unable to instantiate UIProvider");
+      }
   }
   
 
@@ -573,7 +504,6 @@ public class Jin{
     
     if (result == OptionPanel.OK){
       connManager.closeSession();
-      saveLookAndFeel();
       uiProvider.stop();
       
       User [] usersArr = new User[users.size()];
