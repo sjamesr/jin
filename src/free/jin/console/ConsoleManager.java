@@ -482,11 +482,22 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     }
 
     String title = "  "+evt.getListTitle()+".  Displaying items "+evt.getFirstIndex()+"-"+evt.getLastIndex()+" out of "+evt.getItemCount()+"  ";
+
+    // Otherwise, the table header is not created on time for the layout to take account of it
+    // and size the scrollpane properly.
+    // See bug https://sourceforge.net/tracker/index.php?func=detail&aid=602496&group_id=50386&atid=459537
+    scrollPane.setColumnHeaderView(table.getTableHeader());
+
     if (gameListDisplayStyle.equals("embedded")){
       scrollPane.setBorder(new TitledBorder(title));
       int maxHeight = (console.getOutputArea().height-40)*2/3;
       if (scrollPane.getPreferredSize().height>maxHeight)
         scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width, maxHeight));
+
+      // This is stupid, but fixes the bug in the embedded case case described at
+      // https://sourceforge.net/tracker/index.php?func=detail&aid=602496&group_id=50386&atid=459537 for JDK1.4
+      scrollPane.setPreferredSize(scrollPane.getPreferredSize());
+
       console.addToOutput(scrollPane);
     }
     else{
