@@ -97,6 +97,17 @@ public class Struct{
 
 
   /**
+   * Sets a character property.
+   */
+
+  protected final void setCharProperty(String propertyName, char propertyValue){
+    setProperty(propertyName, new Character(propertyValue));
+  }
+
+
+
+
+  /**
    * Sets a boolean property.
    */
 
@@ -135,6 +146,18 @@ public class Struct{
   protected final int getIntegerProperty(Object property){
     return ((Integer)getProperty(property)).intValue();
   }
+
+
+
+
+  /**
+   * Returns the value of the given character property.
+   */
+
+  protected final char getCharProperty(Object property){
+    return ((Character)getProperty(property)).charValue();
+  }
+
 
 
 
