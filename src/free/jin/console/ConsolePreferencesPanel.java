@@ -231,8 +231,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected void updatePanels(){
-    selectionColorButton.setColor(prefs.getColor("output-selection"));
-    selectedColorButton.setColor(prefs.getColor("output-selected"));
+    selectionColorButton.setColor(prefs.getColor("output-selection", UIManager.getColor("textHighlight")));
+    selectedColorButton.setColor(prefs.getColor("output-selected", UIManager.getColor("textHighlightText")));
 
     Color background = prefs.getColor("background");
     boolean antialias = prefs.getBool("output-text.antialias", false);
