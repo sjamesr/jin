@@ -97,12 +97,10 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
           e.printStackTrace();
           return;
         }
-        long time = System.currentTimeMillis();
 
         Clip clip = createClip(audioClip);
         clip.setFramePosition(0);
         clip.start();
-        System.out.println(System.currentTimeMillis() - time);
       } catch (IOException e){
         e.printStackTrace();
       } catch (UnsupportedAudioFileException e){
@@ -125,19 +123,12 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
       throws LineUnavailableException, UnsupportedAudioFileException,
       IOException{
 
-    System.out.println("1");
     byte [] data = audioClip.getData();
-    System.out.println("2");
     AudioFormat format = getFormatForPlaying(data);
-    System.out.println("3");
     data = convertAudioData(data, format);
-    System.out.println("4");
     DataLine.Info info = new DataLine.Info(Clip.class, format);
-    System.out.println("5");
     Clip clip = (Clip)AudioSystem.getLine(info);
-    System.out.println("6");
     clip.open(format, data, 0, data.length);
-    System.out.println("7");
 
     return clip;
   }
