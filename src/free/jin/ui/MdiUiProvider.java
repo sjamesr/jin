@@ -693,6 +693,8 @@ public class MdiUiProvider extends AbstractUiProvider{
       frame.addInternalFrameListener(this);
 
       frame.setVisible(false); // internal frames are initially visible in 1.1
+      
+      setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
     }
     
     

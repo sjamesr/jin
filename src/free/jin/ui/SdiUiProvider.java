@@ -156,7 +156,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       super(plugin, id, mode);
       
       this.frame = new JFrame("");
-
+      
       frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       frame.addWindowListener(this);
 
@@ -174,6 +174,8 @@ public class SdiUiProvider extends AbstractUiProvider{
       menubar.add(new HelpMenu());
       
       frame.setJMenuBar(menubar);
+      
+      setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
     }
     
     
