@@ -26,6 +26,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import free.util.WindowDisposingActionListener;
+import free.util.swing.SwingUtils;
 import free.util.IOUtilities;
 import java.util.StringTokenizer;
 
@@ -47,9 +48,7 @@ public class AboutDialog extends JDialog{
 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    ActionListener closer = new WindowDisposingActionListener(this);
-    getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(this);
 
     createUI();
   }

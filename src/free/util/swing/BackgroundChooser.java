@@ -118,9 +118,7 @@ public class BackgroundChooser extends JDialog{
 
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    ActionListener closer = new WindowDisposingActionListener(this);
-    getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(this);
   }
 
 
