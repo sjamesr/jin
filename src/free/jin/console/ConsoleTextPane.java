@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -29,6 +29,10 @@ import javax.swing.text.Keymap;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Utilities;
 import java.util.Vector;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import bsh.Interpreter;
+import bsh.EvalError;
 
 
 /**
@@ -72,7 +76,6 @@ public class ConsoleTextPane extends JTextPane{
 
 
 
-
   /**
    * Our regular cursor (our real cursor might be hand while over a link).
    */
@@ -88,6 +91,25 @@ public class ConsoleTextPane extends JTextPane{
 
   private Link curLink = null;
 
+
+
+
+  /**
+   * A Hashtable mapping <code>RenderingHints$Key</code> objects (as strings,
+   * so that they can be used via BeanShell to their current values (again, as
+   * strings).
+   */
+
+  private Hashtable renderingHints = null;
+
+
+
+  /**
+   * This is set to <code>false</code> if we find out that we're not running
+   * under a Java2D capable JVM.
+   */
+
+  private boolean renderingHintsSupported = true;
 
 
 
@@ -116,6 +138,60 @@ public class ConsoleTextPane extends JTextPane{
     keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), copyAction);
 
     enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+  }
+
+
+
+
+  /**
+   * Re-reads all the plugin properties used by this instance and/or clears any
+   * cached values of such properties.
+   */
+
+  public void refreshFromProperties(){
+    defaultPopupMenu = null;
+    renderingHints = null;
+    repaint();
+  }
+
+
+
+
+  /**
+   * Overrides <code>paintComponent</code> to enable/disable antialiasing and
+   * perhaps other expensive rendering hints.
+   */
+
+  protected void paintComponent(Graphics g){
+    if (renderingHints == null){
+      renderingHints = new Hashtable(10, 0.1f);
+      boolean antialias = new Boolean(console.getProperty("output-text.antialias")).booleanValue();
+//      String fractionalMetrics = console.getProperty("output-text.fractionalMetrics");
+
+      String textAntialiasValue = "RenderingHints.VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
+      renderingHints.put("RenderingHints.KEY_TEXT_ANTIALIASING", textAntialiasValue);
+//      if (fractionalMetrics != null)
+//        renderingHints.put("RenderingHints.KEY_FRACTIONALMETRICS", fractionalMetrics);
+    }
+
+    if (renderingHintsSupported && !renderingHints.isEmpty()){
+      try{
+        Interpreter bsh = new Interpreter();
+        bsh.set("g", g);
+        bsh.eval("g2 = (Graphics2D)g");
+        Enumeration renderingHintsEnum = renderingHints.keys();
+        while (renderingHintsEnum.hasMoreElements()){
+          String key = (String)renderingHintsEnum.nextElement();
+          String value = (String)renderingHints.get(key);
+          bsh.eval("g2.setRenderingHint(" + key + ", " + value + ")");
+        }
+      } catch (EvalError e){
+          System.err.println("Failed to set rendering hints. Probably not running under a Java2D capable JVM.");
+          renderingHintsSupported = false;
+        }
+    }
+
+    super.paintComponent(g);
   }
 
 
