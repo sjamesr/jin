@@ -251,11 +251,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   protected void onLogin(){
     super.onLogin();
 
+    sendCommand("iset nowrap 1");
     sendCommand("set style "+style);
     sendCommand("set interface "+interfaceVar);
     sendCommand("set ptime 0");
     sendCommand("iset defprompt"); // Sets it to the default, which we filter out.
-    sendCommand("iset nowrap 1");
     sendCommand("iset ms 1");
     if (seekInfoOn){
       sendCommand("iset seekinfo 1");
