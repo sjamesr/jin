@@ -787,7 +787,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       if (conn.isConnected())
         conn.sendCommand(commandString);
       else
-        addToOutput("Unable to issue command, not connected yet", "info");
+        addToOutput("Unable to issue command - not connected to the server.", "info");
     }
   }
 
