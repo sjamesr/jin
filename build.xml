@@ -31,8 +31,8 @@
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
-			   classpathref="compile.class.path"
-			   debug="${debug}">
+		       classpathref="compile.class.path"
+		       debug="${debug}">
          
       <!-- <compilerarg compiler="jikes" value="+Pnaming-convention" /> -->
       <compilerarg compiler="jikes" value="+Punused-type-imports" />
@@ -44,10 +44,10 @@
 		<mkdir dir="${classes.dir}/pieces" />
 		
 		<javac srcdir="${res.dir}/pieces"
-			   destdir="${classes.dir}/pieces"
-			   includes="*.java"
-			   classpath="${classes.dir}"
-			   debug="${debug}"
+		       destdir="${classes.dir}/pieces"
+		       includes="*.java"
+		       classpath="${classes.dir}"
+		       debug="${debug}"
 		/>
 		
 		<antcall target="compilePieceSet">
@@ -62,10 +62,10 @@
 		<mkdir dir="${classes.dir}/boards" />
 		
 		<javac srcdir="${res.dir}/boards"
-			   destdir="${classes.dir}/boards"
-			   includes="*.java"
-			   classpath="${classes.dir}"
-			   debug="${debug}"
+		       destdir="${classes.dir}/boards"
+		       includes="*.java"
+		       classpath="${classes.dir}"
+		       debug="${debug}"
 		/>
 		
 	</target>
@@ -74,10 +74,10 @@
 	<target name="compilePieceSet">
 		<mkdir dir="${classes.dir}/pieces/${piece-set-id}" />
 		<javac srcdir="${res.dir}/pieces/${piece-set-id}"
-			   destdir="${classes.dir}/pieces/${piece-set-id}"
-			   includes="**"
-			   classpath="${classes.dir}"
-			   debug="${debug}"
+		       destdir="${classes.dir}/pieces/${piece-set-id}"
+		       includes="**"
+		       classpath="${classes.dir}"
+		       debug="${debug}"
 		/>
 	</target>
 
@@ -139,45 +139,48 @@
 		<!-- Utility library: free.util.* and free.workarounds.* -->
 		<jar jarfile="${libs.dir}/util.jar"
 		     basedir="${classes.dir}"
-			 includes="free/util/** free/workarounds/**"
-			 compress="false"
+		     includes="free/util/** free/workarounds/**"
+		     compress="false"
 		/>
 
 
 		<!-- Chess library: free.chess.* -->
 		<jar jarfile="${libs.dir}/chess.jar"
 		     basedir="${classes.dir}"
-			 includes="free/chess/**"
-			 compress="false"
+		     includes="free/chess/**"
+		     compress="false"
 		/>
 
+
+		<!-- Fix CRLF in manifest.txt (for windows) -->
+		<fixcrlf srcdir="${user.dir}" includes="manifest.txt" />
 
 		<!-- Jin classes -->
 		<jar jarfile="${build.dir}/jin.jar"
 		     basedir="${classes.dir}"
-			 includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/resources/**"
-			 compress="false"
-			 manifest="manifest.txt"
+		     includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/resources/**"
+		     compress="false"
+		     manifest="manifest.txt"
 		/>
 
 
 		<!-- Free Internet Chess Server support -->
 		<jar jarfile="${servers.dir}/freechess.jar" compress="false">
 			<fileset dir="${classes.dir}"
-					 includes="free/jin/freechess/** free/freechess/**"
-					 excludes="free/jin/freechess/definition free/jin/freechess/properties" />
+			         includes="free/jin/freechess/** free/freechess/**"
+			         excludes="free/jin/freechess/definition free/jin/freechess/properties" />
 			<fileset dir="${classes.dir}/free/jin/freechess"
-					 includes="definition properties" />
+			         includes="definition properties" />
 		</jar>
 
 
 		<!-- Internet Chess Club support -->
 		<jar jarfile="${servers.dir}/chessclub.jar" compress="false">
 			<fileset dir="${classes.dir}"
-					 includes="free/jin/chessclub/** free/chessclub/**" 
-					 excludes="free/jin/chessclub/definition free/jin/chessclub/properties" />
+			         includes="free/jin/chessclub/** free/chessclub/**" 
+			         excludes="free/jin/chessclub/definition free/jin/chessclub/properties" />
 			<fileset dir="${classes.dir}/free/jin/chessclub"
-					 includes="definition properties" />
+			         includes="definition properties" />
 		</jar>
 
 
@@ -185,14 +188,14 @@
 		<jar jarfile="${libs.dir}/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/console/**"
-					 excludes="free/jin/console/icc/** free/jin/console/fics/**" />
+			         excludes="free/jin/console/icc/** free/jin/console/fics/**" />
 		</jar>
 
 		<!-- Console plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/console/icc/**"
-					 excludes="free/jin/console/icc/definition free/jin/console/icc/preferences" />
+			         excludes="free/jin/console/icc/definition free/jin/console/icc/preferences" />
 			<fileset dir="${classes.dir}/free/jin/console/icc"
 			         includes="definition preferences" />
 		</jar>
@@ -201,7 +204,7 @@
 		<jar jarfile="${plugins.dir}/fics/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/console/fics/**"
-					 excludes="free/jin/console/fics/definition free/jin/console/fics/preferences" />
+			         excludes="free/jin/console/fics/definition free/jin/console/fics/preferences" />
 			<fileset dir="${classes.dir}/free/jin/console/fics"
 			         includes="definition preferences" />
 		</jar>
@@ -211,14 +214,14 @@
 		<jar jarfile="${libs.dir}/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/sound/**"
-					 excludes="free/jin/sound/icc/** free/jin/sound/fics/**" />
+			         excludes="free/jin/sound/icc/** free/jin/sound/fics/**" />
 		</jar>
 
 		<!-- Sound plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/sound/icc/**"
-					 excludes="free/jin/sound/icc/definition free/jin/sound/icc/preferences" />
+			         excludes="free/jin/sound/icc/definition free/jin/sound/icc/preferences" />
 			<fileset dir="${classes.dir}/free/jin/sound/icc"
 			         includes="definition preferences" />
 		</jar>
@@ -227,7 +230,7 @@
 		<jar jarfile="${plugins.dir}/fics/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/sound/fics/**"
-					 excludes="free/jin/sound/fics/definition free/jin/sound/fics/preferences" />
+			         excludes="free/jin/sound/fics/definition free/jin/sound/fics/preferences" />
 			<fileset dir="${classes.dir}/free/jin/sound/fics"
 			         includes="definition preferences" />
 		</jar>
@@ -237,14 +240,14 @@
 		<jar jarfile="${libs.dir}/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/seek/**"
-					 excludes="free/jin/seek/icc/** free/jin/seek/fics/**" />
+			         excludes="free/jin/seek/icc/** free/jin/seek/fics/**" />
 		</jar>
 
 		<!-- Seek Graph plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/seek/icc/**"
-					 excludes="free/jin/seek/icc/definition free/jin/seek/icc/preferences" />
+			         excludes="free/jin/seek/icc/definition free/jin/seek/icc/preferences" />
 			<fileset dir="${classes.dir}/free/jin/seek/icc"
 			         includes="definition preferences" />
 		</jar>
@@ -253,7 +256,7 @@
 		<jar jarfile="${plugins.dir}/fics/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/seek/fics/**"
-					 excludes="free/jin/seek/fics/definition free/jin/seek/fics/preferences" />
+			         excludes="free/jin/seek/fics/definition free/jin/seek/fics/preferences" />
 			<fileset dir="${classes.dir}/free/jin/seek/fics"
 			         includes="definition preferences" />
 		</jar>
@@ -263,14 +266,14 @@
 		<jar jarfile="${libs.dir}/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/board/**"
-					 excludes="free/jin/board/icc/** free/jin/board/fics/**" />
+			         excludes="free/jin/board/icc/** free/jin/board/fics/**" />
 		</jar>
 
 		<!-- Board plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/board/icc/**"
-					 excludes="free/jin/board/icc/definition free/jin/board/icc/preferences" />
+			         excludes="free/jin/board/icc/definition free/jin/board/icc/preferences" />
 			<fileset dir="${classes.dir}/free/jin/board/icc"
 			         includes="definition preferences" />
 		</jar>
@@ -279,7 +282,7 @@
 		<jar jarfile="${plugins.dir}/fics/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/board/fics/**"
-					 excludes="free/jin/board/fics/definition free/jin/board/fics/preferences" />
+			         excludes="free/jin/board/fics/definition free/jin/board/fics/preferences" />
 			<fileset dir="${classes.dir}/free/jin/board/fics"
 			         includes="definition preferences" />
 		</jar>
@@ -289,7 +292,7 @@
 		<jar jarfile="${plugins.dir}/gamelogger.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/gamelogger/**"
-					 excludes="free/jin/gamelogger/definition free/jin/gamelogger/preferences" />
+			         excludes="free/jin/gamelogger/definition free/jin/gamelogger/preferences" />
 			<fileset dir="${classes.dir}/free/jin/gamelogger"
 			         includes="definition preferences" />
 		</jar>
@@ -299,14 +302,14 @@
 		<jar jarfile="${libs.dir}/scripter.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/scripter/**"
-					 excludes="free/jin/scripter/icc/** free/jin/scripter/fics/**" />
+			         excludes="free/jin/scripter/icc/** free/jin/scripter/fics/**" />
 		</jar>
 
 		<!-- Scripter plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/scripter.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/scripter/icc/**"
-					 excludes="free/jin/scripter/icc/definition free/jin/scripter/icc/preferences" />
+			         excludes="free/jin/scripter/icc/definition free/jin/scripter/icc/preferences" />
 			<fileset dir="${classes.dir}/free/jin/scripter/icc"
 			         includes="definition preferences" />
 		</jar>
@@ -315,7 +318,7 @@
 		<jar jarfile="${plugins.dir}/fics/scripter.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/scripter/fics/**"
-					 excludes="free/jin/scripter/fics/definition free/jin/scripter/fics/preferences" />
+			         excludes="free/jin/scripter/fics/definition free/jin/scripter/fics/preferences" />
 			<fileset dir="${classes.dir}/free/jin/scripter/fics"
 			         includes="definition preferences" />
 		</jar>
@@ -332,13 +335,13 @@
 		<jar jarfile="${resources.dir}/pieces/blitzin.jar" compress="false">
 			<fileset dir="${classes.dir}/pieces/blitzin" includes="**" />
 			<fileset dir="${res.dir}/pieces/blitzin"
-					 excludes="**.java" />
+			         excludes="**.java" />
 		</jar>
 		
 		<!-- Eboard Vector - this one is special because it's the default set --> 
 		<jar jarfile="${resources.dir}/pieces/eboard.jar" compress="false">
 			<fileset dir="${res.dir}/pieces/eboard"
-					 excludes="**.java" />
+			         excludes="**.java" />
 		</jar>
 		
 		<!-- Xboard -->
@@ -447,7 +450,6 @@
     <chmod file="${build.dir}/sox" perm="a+x" />
     <chmod file="${build.dir}/play" perm="a+x" />
   </target>
-
 
 
 </project>
