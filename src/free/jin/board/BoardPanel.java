@@ -579,8 +579,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.setFlipped(true);
 
     board.setMoveInputMode(calcMoveInputMode(game));
-    board.setPiecePainter(boardManager.getPiecePainter());
-    board.setBoardPainter(boardManager.getBoardPainter());
+    board.setPiecePainter(boardManager.getPieceSet().getPiecePainter());
+    board.setBoardPainter(boardManager.getBoardPattern().getBoardPainter());
     board.setMoveInputStyle(boardManager.getMoveInputStyle());
     board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
     board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
@@ -1946,10 +1946,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Object src = evt.getSource();
     String propertyName = evt.getPropertyName();
     if (src == boardManager){
-      if ("piecePainter".equals(propertyName))
-        board.setPiecePainter(boardManager.getPiecePainter());
-      else if ("boardPainter".equals(propertyName))
-        board.setBoardPainter(boardManager.getBoardPainter());
+      if ("pieceSet".equals(propertyName))
+        board.setPiecePainter(boardManager.getPieceSet().getPiecePainter());
+      else if ("boardPattern".equals(propertyName))
+        board.setBoardPainter(boardManager.getBoardPattern().getBoardPainter());
       else if ("moveInputStyle".equals(propertyName))
         board.setMoveInputStyle(boardManager.getMoveInputStyle());
       else if ("draggedPieceStyle".equals(propertyName))
