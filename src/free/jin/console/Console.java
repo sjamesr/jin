@@ -949,52 +949,28 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
           Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
           switch (evt.getKeyCode()){
             case KeyEvent.VK_UP:
-              vscrollbar.setValue(vscrollbar.getValue()-outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL,-1));
+              vscrollbar.setValue(vscrollbar.getValue() - outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_DOWN:
-              vscrollbar.setValue(vscrollbar.getValue()+outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL,+1));
+              vscrollbar.setValue(vscrollbar.getValue() + outputComponent.getScrollableUnitIncrement(viewRect,SwingConstants.VERTICAL, +1));
               break;
             case KeyEvent.VK_PAGE_UP:
-              vscrollbar.setValue(vscrollbar.getValue()-outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL,-1));
+              vscrollbar.setValue(vscrollbar.getValue() - outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_PAGE_DOWN:
-              vscrollbar.setValue(vscrollbar.getValue()+outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL,-1));
+              vscrollbar.setValue(vscrollbar.getValue() + outputComponent.getScrollableBlockIncrement(viewRect,SwingConstants.VERTICAL, -1));
               break;
             case KeyEvent.VK_HOME:
               vscrollbar.setValue(vscrollbar.getMinimum());
               break;
             case KeyEvent.VK_END:
-              vscrollbar.setValue(vscrollbar.getMaximum()-vscrollbar.getVisibleAmount());
+              vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
               break;
           }
         }
       }
     }
 
-    if (SwingUtilities.isDescendingFrom(evt.getComponent(),outputComponent)&&(evt.getID() == KeyEvent.KEY_PRESSED)){
-      KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-      Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
-
-      // We do the weird KeyEvent.class.getField("CHAR_UNDEFINED").getChar() call
-      // because Sun changed the value of CHAR_UNDEFINED somewhere between
-      // JDK 1.1 and JDK 1.3
-      try{
-        if (evt.getKeyChar() != KeyEvent.class.getField("CHAR_UNDEFINED").getChar(null)){
-          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
-        }
-      } catch (IllegalAccessException e){e.printStackTrace();}
-        catch (NoSuchFieldException e){e.printStackTrace();}
-
-      // We request the focus in invokeLater because otherwise the KEY_RELEASED event is sent
-      // to the input component and 1.0-1.3 handles it by adding a KEY_TYPED event while 1.4
-      // does not.
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run(){
-          requestDefaultFocus();
-        }
-      });
-    }
   }
 
 
@@ -1020,7 +996,33 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   public void keyTyped(KeyEvent evt){
+    if (SwingUtilities.isDescendingFrom(evt.getComponent(), outputComponent)){
+      // We do the weird KeyEvent.class.getField("CHAR_UNDEFINED").getChar() call
+      // because Sun changed the value of CHAR_UNDEFINED somewhere between
+      // JDK 1.1 and JDK 1.3
+      try{
+        if (evt.getKeyChar() != KeyEvent.class.getField("CHAR_UNDEFINED").getChar(null)){
 
+          // We request the focus in invokeLater because we want the key event
+          // processing to finish while the correct component still has focus.
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              requestDefaultFocus();
+            }
+          });
+
+          KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
+
+          KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
+
+          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
+        }
+      } catch (IllegalAccessException e){e.printStackTrace();}
+        catch (NoSuchFieldException e){e.printStackTrace();}
+    }
   }
 
 
