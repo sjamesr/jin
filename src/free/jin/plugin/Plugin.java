@@ -111,7 +111,6 @@ public abstract class Plugin{
 
 
 
-
   /**
    * Returns the value of the user property with a name equal to the plugin 
    * id plus "." plus the given string. If such a property does not exist,
@@ -124,6 +123,21 @@ public abstract class Plugin{
     String val = getProperty(propertyName);
     return val == null ? defaultValue : val;
   }
+
+
+
+
+  /**
+   * Invokes the <code>getProperty</code> method and returns its value after
+   * converting it to an int. The specified default value is returned used if 
+   * <code>getProperty</code> returns <code>null</code>.
+   */
+
+  public int getIntegerProperty(String propertyName, int defaultValue){
+    String propertyValue = getProperty(propertyName);
+    return propertyValue == null ? defaultValue : Integer.parseInt(propertyValue);
+  }
+
 
 
 
