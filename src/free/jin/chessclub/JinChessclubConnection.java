@@ -53,7 +53,7 @@ import java.lang.reflect.Array;
  */
 
 public class JinChessclubConnection extends ChessclubConnection implements JinConnection, 
-    SeekJinConnection, GameListJinConnection{
+    SeekJinConnection, GameListJinConnection, PGNJinConnection{
 
 
 
@@ -258,7 +258,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       case 3: // Random mirror
       case 4: // Random shuffle (castling not allowed according to Kiebitz)
       case 5: // Reversed 
-        return new NoCastlingVariant(Chess.INITIAL_POSITION_LEXIGRAPHIC, variantName);
+        return new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, variantName);
 
       case 6: // Empty board
       case 7: // KPPP vs KPPP
@@ -276,7 +276,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       case 20: // Loadgame
       case 21: // Thematic
       case 25: // Three checks
-        return new ChesslikeGenericVariant(Chess.INITIAL_POSITION_LEXIGRAPHIC, variantName);
+        return new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, variantName);
     }
 
     return null;
@@ -786,24 +786,41 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * Gets called when a DG_MY_GAME_RESULT datagram arrives. This method checks
    * if becomesExamined is true and if so, calls updateGame with the game 
    * properties of the ended game, except for the "isPlayedGame" property, 
-   * which now becomes false.
+   * which now becomes false. Also sets the result of the game on the
+   * <code>Game</code> object.
    */
 
   protected void processMyGameResult(int gameNumber, boolean becomesExamined,
       String gameResultCode, String scoreString, String descriptionString){
 
-    if (becomesExamined){
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
+
       try{
-        GameInfo gameInfo = getGameInfo(gameNumber);
+        int result;
+        if ("1-0".equals(scoreString))
+          result = Game.WHITE_WINS;
+        else if ("0-1".equals(scoreString))
+          result = Game.BLACK_WINS;
+        else if ("1/2-1/2".equals(scoreString))
+          result = Game.DRAW;
+        else
+          result = Game.UNKNOWN_RESULT;
 
-        Game game = gameInfo.game;
+        game.setResult(result);
 
-        updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(), game.getRatingCategoryString(),
-          game.isRated(), game.getWhiteTime(), game.getWhiteInc(), game.getBlackTime(),
-          game.getBlackInc(), false, game.getWhiteRating(), game.getBlackRating(), game.getID(),
-          game.getWhiteTitles(), game.getBlackTitles());
-      } catch (NoSuchGameException e){}
-    }
+        if (becomesExamined){
+          updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(), game.getRatingCategoryString(),
+            game.isRated(), game.getWhiteTime(), game.getWhiteInc(), game.getBlackTime(),
+            game.getBlackInc(), false, game.getWhiteRating(), game.getBlackRating(), game.getID(),
+            game.getWhiteTitles(), game.getBlackTitles());
+        }
+
+      } catch (IllegalStateException e){
+          e.printStackTrace();
+        }
+    } catch (NoSuchGameException e){}
   }
 
 
@@ -827,7 +844,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
     Game game = gameInfo.game;
 
-    fireGameEvent(new GameEndEvent(this, game));
+    int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+    fireGameEvent(new GameEndEvent(this, game, result));
 
     Game newGame = new Game(gameType, game.getInitialPosition(), whiteName, blackName,
       whiteInitial, whiteIncrement, blackInitial, blackIncrement, whiteRating, blackRating,
@@ -889,8 +907,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       fireGameEvent(new GameStartEvent(this, newGame));
 
       // We need to do this because if numMovesToFollow is already 0, we won't get any DG_SEND_MOVES datagrams.
-      if ((gameInfo.numMovesToFollow==0)&&(gameInfo.game.getGameType()==Game.ISOLATED_BOARD)){
-        fireGameEvent(new GameEndEvent(this, newGame));
+      if ((gameInfo.numMovesToFollow == 0) && (gameInfo.game.getGameType() == Game.ISOLATED_BOARD)){
+        fireGameEvent(new GameEndEvent(this, newGame, Game.UNKNOWN_RESULT));
       }
     }
     else{ // This can happen during an examined game on a "p@a2", "clearboard" and "loadgame" for example.
@@ -924,7 +942,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processMyRelationToGame(int gameNumber, int playerState){
-    if (playerState==DOING_NOTHING){
+    if (playerState == DOING_NOTHING){
 
       GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
 
@@ -934,10 +952,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       Game game = gameInfo.game;
       unechoedMoves.remove(game);
 
-      fireGameEvent(new GameEndEvent(this, game));
+      int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+      fireGameEvent(new GameEndEvent(this, game, result));
     }
     else{
-      int newGameType = (playerState==OBSERVING) ? Game.OBSERVED_GAME : Game.MY_GAME;
+      int newGameType = (playerState == OBSERVING) ? Game.OBSERVED_GAME : Game.MY_GAME;
 
       if (gameExists(gameNumber)){
         try{
@@ -966,7 +985,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-
   /**
    * Fires the appropriate MoveEvent to all interested GameListeners.
    */
@@ -987,7 +1005,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
         if ((gameInfo.numMovesToFollow == 0) && (gameInfo.game.getGameType() == Game.ISOLATED_BOARD)){
-          fireGameEvent(new GameEndEvent(this, game));
+          int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+          fireGameEvent(new GameEndEvent(this, game, result));
         }
       }
       else{
@@ -1011,29 +1030,29 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * TODO: Add support for the extended format (ala chessclub.com), like P@f7 or ? or ?xb1.
    */
 
-  private Move parseWarrenSmith(String moveString, Position position, WildVariant variant, String prettyString){
-    if (variant.equals(Kriegspiel.getInstance())&&(moveString.indexOf("?")!=-1)){
+  private Move parseWarrenSmith(String moveString, Position position, WildVariant variant, String moveSAN){
+    if (variant.equals(Kriegspiel.getInstance()) && (moveString.indexOf("?") != -1)){
       if (moveString.equals("?")){ // Completely hidden
-        return variant.createMove(position, null, null, null, prettyString);
+        return variant.createMove(position, null, null, null, moveSAN);
       }
       else{
-        Square endSquare = Square.parseSquare(moveString.substring(2,4));
-        return variant.createMove(position, null, endSquare, null, prettyString);
+        Square endSquare = Square.parseSquare(moveString.substring(2, 4));
+        return variant.createMove(position, null, endSquare, null, moveSAN);
       }
     }
     else{
-      Square startSquare = Square.parseSquare(moveString.substring(0,2));
-      Square endSquare = Square.parseSquare(moveString.substring(2,4));
+      Square startSquare = Square.parseSquare(moveString.substring(0, 2));
+      Square endSquare = Square.parseSquare(moveString.substring(2, 4));
       Piece promotionTarget = null;
-      if ("NBRQK".indexOf(moveString.charAt(moveString.length()-1))!=-1){
+      if ("NBRQK".indexOf(moveString.charAt(moveString.length() - 1)) != -1){
         // The 'K' can happen in Giveaway, where you can promote to a king
-        String promotionTargetString = String.valueOf(moveString.charAt(moveString.length()-1));
+        String promotionTargetString = String.valueOf(moveString.charAt(moveString.length() - 1));
         if (position.getCurrentPlayer().isBlack())
           promotionTargetString = promotionTargetString.toLowerCase();
         promotionTarget = variant.parsePiece(promotionTargetString);
       }
 
-      return variant.createMove(position, startSquare, endSquare, promotionTarget, prettyString);
+      return variant.createMove(position, startSquare, endSquare, promotionTarget, moveSAN);
     }
   }
 
@@ -1052,11 +1071,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       Vector moves = gameInfo.moves;
 
       int numMadeMoves = moves.size()-backwardCount;
-      for (int i=moves.size()-1; i>=numMadeMoves; i--)
+      for (int i=moves.size() - 1; i >= numMadeMoves; i--)
         moves.removeElementAt(i);
 
       pos.copyFrom(game.getInitialPosition());
-      for (int i=0; i<numMadeMoves; i++)
+      for (int i = 0; i < numMadeMoves; i++)
         pos.makeMove((Move)moves.elementAt(i));
 
       fireGameEvent(new TakebackEvent(this, game, backwardCount));
@@ -1078,12 +1097,12 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       Position pos = gameInfo.position;
       Vector moves = gameInfo.moves;
 
-      int numMadeMoves = moves.size()-takebackCount;
-      for (int i=moves.size()-1; i>=numMadeMoves; i--)
+      int numMadeMoves = moves.size() - takebackCount;
+      for (int i = moves.size() - 1; i >= numMadeMoves; i--)
         moves.removeElementAt(i);
 
       pos.copyFrom(game.getInitialPosition());
-      for (int i=0; i<numMadeMoves; i++)
+      for (int i = 0; i < numMadeMoves; i++)
         pos.makeMove((Move)moves.elementAt(i));
 
       fireGameEvent(new TakebackEvent(this, game, takebackCount));
