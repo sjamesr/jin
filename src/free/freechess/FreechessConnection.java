@@ -277,6 +277,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     sendCommand("set ptime 0");
     sendCommand("iset defprompt"); // Sets it to the default, which we filter out.
     sendCommand("iset ms 1");
+    sendCommand("iset nohighlight 1");
     if (seekInfoOn){
       sendCommand("iset seekinfo 1");
 //      sendCommand("iset seekremove 1"); 
@@ -289,6 +290,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     filterLine("defprompt set.");
     filterLine("nowrap set.");
     filterLine("ms set.");
+    filterLine("nohighlight set.");
     if (seekInfoOn){
       filterLine("seekinfo set.");
 //      filterLine("seekremove set.");
