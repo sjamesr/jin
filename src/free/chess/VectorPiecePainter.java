@@ -176,7 +176,7 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * the given Graphics.
    */
 
-  public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
+  public final void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean isShaded){
 
     Color pieceColor = getPieceColor(piece, isShaded);
@@ -194,6 +194,12 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
 
     ChessPiece cPiece = (ChessPiece)piece;
 
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height)){
+      clearPieceCache();
+      cachedPieceSize.width = width;
+      cachedPieceSize.height = height;
+    }
+    
     if (cPiece.isKing())
       drawKingImage(g, width, height, pieceColor, outlineColor);
     else if (cPiece.isQueen())
@@ -217,20 +223,11 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawKingImage(Graphics g, int width, int height,
+  protected void drawKingImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
-        
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
-        (kingPolygon == null)){
-          
-      if (kingPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    
+    if (kingPolygon == null)
       kingPolygon = createKingPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(kingPolygon);
@@ -249,20 +246,11 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawQueenImage(Graphics g, int width, int height,
+  protected void drawQueenImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
         
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
-        (queenPolygon == null)){
-          
-      if (queenPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    if (queenPolygon == null)
       queenPolygon = createQueenPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(queenPolygon);
@@ -274,28 +262,16 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
 
 
 
-
-
-
   /**
    * Paints an image of a rook of the given size with the given color and
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawRookImage(Graphics g, int width, int height,
+  protected void drawRookImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
         
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
-        (rookPolygon == null)){
-          
-      if (rookPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    if (rookPolygon == null)
       rookPolygon = createRookPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(rookPolygon);
@@ -314,19 +290,11 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawBishopImage(Graphics g, int width, int height,
+  protected void drawBishopImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) || 
-        (bishopPolygon==null)){
-          
-      if (bishopPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    
+    if (bishopPolygon == null)
       bishopPolygon = createBishopPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(bishopPolygon);
@@ -345,19 +313,11 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawKnightImage(Graphics g, int width, int height,
+  protected void drawKnightImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
         
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
-        (knightPolygon == null)){
-      if (knightPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    if (knightPolygon == null)
       knightPolygon = createKnightPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(knightPolygon);
@@ -374,17 +334,11 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected synchronized void drawPawnImage(Graphics g, int width, int height,
+  protected void drawPawnImage(Graphics g, int width, int height,
       Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) || (pawnPolygon == null)){
-      if (pawnPolygon != null){
-        cachedPieceSize.width = width;
-        cachedPieceSize.height = height;
-        clearPieceCache();
-      }
-
+    
+    if (pawnPolygon == null)
       pawnPolygon = createPawnPolygon(width, height);
-    }
 
     g.setColor(pieceColor);
     g.fillPolygon(pawnPolygon);
