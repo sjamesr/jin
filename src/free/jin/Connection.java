@@ -369,6 +369,23 @@ public interface Connection{
    */
 
   void goToEnd(Game game);
+  
+  
+  
+  /**
+   * Displays help about the server. 
+   */
+   
+  void showServerHelp();
+  
+  
+  
+  /**
+   * Sends the specified question string to the server's help channel.
+   */
+   
+  void sendHelpQuestion(String question);
+  
 
     
 }
