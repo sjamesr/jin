@@ -328,6 +328,7 @@ public class ConnectionManager{
       }
       else{
         user.markDirty();
+        saveLastUser(user);
       }
     }
 
