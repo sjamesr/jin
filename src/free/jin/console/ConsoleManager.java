@@ -365,6 +365,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
+  /**
+   * Adds the specified line of text to the console.
+   */
+
+  public void addSpecialLine(String line){
+    console.addToOutput(line, "special");
+  }
+
 
   /**
    * Listens to plain text and adds it to the console.
