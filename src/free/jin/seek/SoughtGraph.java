@@ -536,7 +536,6 @@ public class SoughtGraph extends JComponent{
    */
 
   private Image getSeekImage(Rectangle seekBounds, Seek seek){
-    System.out.println(seekBounds);
     int size = Math.min(seekBounds.width, seekBounds.height);
     if (size <= 0)
       throw new IllegalArgumentException("Seek bounds size must be positive");
@@ -566,8 +565,6 @@ public class SoughtGraph extends JComponent{
 
     if (index == -1)
       throw new IllegalStateException("Couldn't find suitable seek images");
-
-    System.out.println(index);
 
     Hashtable sizeImages = seekImageCache[index];
 
