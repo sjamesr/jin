@@ -162,7 +162,19 @@ public class BeanShellScript extends Script{
         Object [] var = vars[i];
         String varName = (String)(var[0]);
         Object varValue = var[1];
-        bsh.set(varName, varValue);
+
+        if (varValue instanceof Integer)
+          bsh.set(varName, ((Integer)varValue).intValue());
+        else if (varValue instanceof Long)
+          bsh.set(varName, ((Long)varValue).longValue());
+        else if (varValue instanceof Double)
+          bsh.set(varName, ((Double)varValue).doubleValue());
+        else if (varValue instanceof Float)
+          bsh.set(varName, ((Float)varValue).floatValue());
+        else if (varValue instanceof Boolean)
+          bsh.set(varName, ((Boolean)varValue).booleanValue());
+        else
+          bsh.set(varName, varValue);
       }
 
       bsh.eval("runScript();");
