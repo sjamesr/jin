@@ -1657,11 +1657,60 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MY_NOTIFY_LIST datagram arrives. "arrived" is true when
+   * Gets called when a player on our notify list arrives. The player field
+   * contains the same optional fields like in
+   * <code>processPlayerArrived</code>.
+   */
+
+  protected void processNotifyArrived(Player player){
+
+  }
+
+
+
+
+  /**
+   * Gets called when a player on our notify list departs.
+   */
+
+  protected void processNotifyLeft(String playerName){
+
+  }
+
+
+
+
+
+  /**
+   * Gets called when the open state of someone on your notify list changes.
+   */
+
+  protected void processNotifyOpen(String playerName, boolean isOpenNow){
+    
+  }
+
+
+
+
+  /**
+   * Gets called when a DG_NOTIFY_STATE datagram arrives. Possible player state
+   * values are {@link #DOING_NOTHING}, {@link #PLAYING}, {@link #EXAMINING}
+   * and {@link #PLAYING_SIMUL}.
+   */
+
+  protected void processNotifyState(String username, int newPlayerState, int gameNumber){
+
+  }
+
+
+
+
+  /**
+   * Gets called when a DG_MY_NOTIFY_LIST datagram arrives. "added" is true when
    * the player was added to the list and false when he was removed.
    */
 
-  protected void processMyNotifyList(String name, boolean arrived){
+  protected void processMyNotifyList(String name, boolean added){
 
   }
 
@@ -2734,15 +2783,77 @@ public class ChessclubConnection extends free.util.Connection{
         break;
       }
       case Datagram.DG_NOTIFY_ARRIVED:{
+        int i=0;
+        String username = datagram.getString(i++);
+
+        int [] ratings = new int[RATING_CATEGORIES_COUNT];
+        int [] ratingTypes = new int[RATING_CATEGORIES_COUNT];
+
+        if (isDGOn(Datagram.DG_BULLET)){
+          ratings[BULLET] = datagram.getInteger(i++);
+          ratingTypes[BULLET] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        if (isDGOn(Datagram.DG_BLITZ)){
+          ratings[BLITZ] = datagram.getInteger(i++);
+          ratingTypes[BLITZ] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        if (isDGOn(Datagram.DG_STANDARD)){
+          ratings[STANDARD] = datagram.getInteger(i++);
+          ratingTypes[STANDARD] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        if (isDGOn(Datagram.DG_WILD)){
+          ratings[WILD] = datagram.getInteger(i++);
+          ratingTypes[WILD] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        if (isDGOn(Datagram.DG_BUGHOUSE)){
+          ratings[BUGHOUSE] = datagram.getInteger(i++);
+          ratingTypes[BULLET] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        if (isDGOn(Datagram.DG_LOSERS)){
+          ratings[LOSERS] = datagram.getInteger(i++);
+          ratingTypes[LOSERS] = convertRatingType(datagram.getInteger(i++));
+        }
+
+        int timestampClientNumber = -1;
+        if (isDGOn(Datagram.DG_TIMESTAMP)){
+          timestampClientNumber = datagram.getInteger(i++);
+        }
+
+        String titles = null;
+        if (isDGOn(Datagram.DG_TITLES)){
+          titles = datagram.getString(i++);
+        }
+
+        boolean isOpen = false;
+        if (isDGOn(Datagram.DG_OPEN)){
+          isOpen = datagram.getBoolean(i++);
+        }
+
+        int playerState = -1;
+        int gameNumber = -1;
+        if (isDGOn(Datagram.DG_STATE)){
+          playerState = convertPlayerState(datagram.getString(i++));
+          gameNumber = datagram.getInteger(i++);
+        }
+
+        processNotifyArrived(new Player(username, titles, ratings, ratingTypes, timestampClientNumber, isOpen, playerState, gameNumber));
         break;
       }
       case Datagram.DG_NOTIFY_LEFT:{
+        processNotifyLeft(datagram.getString(0));
         break;
       }
       case Datagram.DG_NOTIFY_OPEN:{
+        processNotifyOpen(datagram.getString(0), datagram.getBoolean(1));
         break;
       }
       case Datagram.DG_NOTIFY_STATE:{
+        processNotifyState(datagram.getString(0),convertPlayerState(datagram.getString(1)),datagram.getInteger(2));
         break;
       }
       case Datagram.DG_MY_NOTIFY_LIST:{
