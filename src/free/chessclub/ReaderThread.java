@@ -25,6 +25,7 @@ package free.chessclub;
 import java.io.*;
 import free.chessclub.level2.*;
 import free.util.SafeRunnable;
+import java.util.Vector;
 
 
 /**
@@ -88,13 +89,13 @@ public class ReaderThread extends Thread{
    */
 
   public ReaderThread(InputStream in, ChessclubConnection handler){
-    super("ReaderThread-"+(threadCount++));
-    if (in==null)
+    super("ReaderThread-" + (threadCount++));
+    if (in == null)
       throw new IllegalArgumentException("Null InputStream");
-    if (handler==null)
+    if (handler == null)
       throw new IllegalArgumentException("Null handler");
 
-    this.in = new PushbackInputStream(in);
+    this.in = new PushbackInputStream(new BufferedInputStream(in));
     this.handler = handler;
   }
 
@@ -111,12 +112,16 @@ public class ReaderThread extends Thread{
   public void run(){
     StringBuffer buf = new StringBuffer();
     StringBuffer dgBuf = new StringBuffer();
+    Vector data = new Vector(); // Lines and datagrams.
     try{
       outerLoop: while (handler.isConnected()){
         buf.setLength(0);
         int b;
+
+        maybeFireData(data, in);
         while ((b = in.read()) != '\n'){
           if (b == '\r'){ // Ignore '\r' if followed by '\n'
+            maybeFireData(data, in);
             b = in.read();
             if (b != '\n') // Eat the next '\n', if possible
               in.unread(b);
@@ -124,41 +129,32 @@ public class ReaderThread extends Thread{
           }
 
           if (b < 0){
-            handler.execRunnable(new SafeRunnable(){
-              public void safeRun(){
-                handler.handleDisconnection();
-              }
-            });
+            fireData(data);
+            fireDisconnection();
             return;
           }
           buf.append((char)b);
 
-
           // Level2 parsing.
-          if (b==Datagram.DG_DELIM){
+          if (b == Datagram.DG_DELIM){
             dgBuf.setLength(0);
             dgBuf.append((char)b);
-            buf.setLength(buf.length()-1);
+            buf.setLength(buf.length() - 1);
             while (true){
+              maybeFireData(data, in);
               b = in.read();
-              if (b<0){
-                handler.execRunnable(new SafeRunnable(){
-                  public void safeRun(){
-                    handler.handleDisconnection();
-                  }
-                });
+              if (b < 0){
+                fireData(data);
+                fireDisconnection();
                 return;
               }
-              if (b==Datagram.DG_DELIM){
+              if (b == Datagram.DG_DELIM){
+                maybeFireData(data, in);
                 int c = in.read();
-                if (Datagram.DG_END.equals(""+(char)b+(char)c)){
+                if (Datagram.DG_END.equals("" + (char)b + (char)c)){
                   dgBuf.append(Datagram.DG_END);
-                  final Datagram dg = Datagram.parseDatagram(dgBuf.toString());
-                  handler.execRunnable(new SafeRunnable(){
-                    public void safeRun(){
-                      handler.handleDatagram(dg);
-                    }
-                  });
+                  Datagram dg = Datagram.parseDatagram(dgBuf.toString());
+                  data.addElement(dg);
                   break;
                 }
                 else{
@@ -171,28 +167,84 @@ public class ReaderThread extends Thread{
           else{
             // Ignore the prompt, remove this line if it's possible to disable it
             if (buf.toString().equals("aics% ")) 
-              continue outerLoop;
+              buf.setLength(0);
           }
+
+          maybeFireData(data, in);
         }
 
-        final String line = buf.toString();
-        handler.execRunnable(new SafeRunnable(){
-          public void safeRun(){
-            handler.handleLine(line);
-          }
-        });
-
+        data.addElement(buf.toString());
       }
     } catch (IOException e){
         if (handler.isConnected())
           e.printStackTrace();
-        handler.execRunnable(new SafeRunnable(){
-          public void safeRun(){
-            handler.handleDisconnection();
-          }
-        });
-         
+        fireDisconnection();
       }
   }
 
+
+
+  /**
+   * If the specified data vector is not empty and the specified stream has no
+   * available bytes to read, calls <code>fireData</code> with the data and
+   * clears the data vector.
+   */
+
+  private void maybeFireData(Vector data, InputStream in) throws IOException{
+                            // <= 1 and not == 0 because of a bug in MS VM which 
+                            // returns 1 and then blocks the next read() call.
+    if ((data.size() > 50) || ((in.available() <= 1) && !data.isEmpty())){
+      fireData(data);
+      data.removeAllElements();
+    }
+  }
+
+
+
+
+  /**
+   * Notifies the handler of a disconnection.
+   */
+
+  private void fireDisconnection(){
+    handler.execRunnable(new SafeRunnable(){
+      public void safeRun(){
+        handler.handleDisconnection();
+      }
+    });
+    return;
+  }
+
+
+
+  /**
+   * Notifies the handler of the arrival of the specified data. The vector
+   * contains lines of text (Strings) and datagrams
+   * (free.chessclub.level2.Datagram).
+   */
+
+  private void fireData(Vector data){
+    int dataLength = data.size();
+    final Vector dataCopy = new Vector(dataLength);
+    for (int i = 0; i < dataLength; i++)
+      dataCopy.addElement(data.elementAt(i));
+
+    handler.execRunnable(new SafeRunnable(){
+      public void safeRun(){
+        Vector localData = dataCopy;
+        int dataLength = localData.size();
+        for (int i = 0; i < dataLength; i++){
+          Object dataInstance = localData.elementAt(i);
+          if (dataInstance instanceof Datagram)
+            handler.handleDatagram((Datagram)dataInstance);
+          else if (dataInstance instanceof String)
+            handler.handleLine((String)dataInstance);
+          else
+            throw new IllegalArgumentException("Unrecognized data type: "+dataInstance.getClass());
+        }
+      }
+    });
+  }
+
 }
+
