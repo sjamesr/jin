@@ -90,6 +90,19 @@ public class PluginStartException extends Exception{
   public Exception getReason(){
     return cause;
   }
+  
+  
+  
+  /**
+   * Prints the stack trace of the cause and then of this exception.
+   */
+   
+  public void printStackTrace(){
+    if (cause != null)
+      cause.printStackTrace();
+    
+    super.printStackTrace();
+  }
 
 
 
