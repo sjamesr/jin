@@ -44,6 +44,15 @@ import java.awt.event.ActionEvent;
 public class SoundManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListener{
 
 
+  
+  /**
+   * Maps sound filenames to AudioClips loaded from those filenames.
+   */
+
+  protected final static Hashtable filenamesToAudioClips = new Hashtable();
+
+
+  
   /**
    * Maps chat patterns to filenames containing the sound data.
    */
@@ -57,14 +66,6 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected final Hashtable textPatternsToFilenames = new Hashtable();
-
-
-
-  /**
-   * Maps sound filenames to AudioClips loaded from those filenames.
-   */
-
-  protected final Hashtable filenamesToAudioClips = new Hashtable();
 
 
 
