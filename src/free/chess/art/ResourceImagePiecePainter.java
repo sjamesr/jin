@@ -30,7 +30,7 @@ import free.chess.ImagePiecePainter;
 import free.chess.PiecePainter;
 import free.chess.ChessPiece;
 import free.util.IOUtilities;
-import free.util.PairKey;
+import free.util.Pair;
 
 
 /**
@@ -94,7 +94,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
    */
 
   private static synchronized Dimension getPrefSize(Class c, String relPath, String extension) throws IOException{
-    PairKey pk = new PairKey(c, new PairKey(relPath, extension));
+    Pair pk = new Pair(c, new Pair(relPath, extension));
     Object [] cached = (Object [])cache.get(pk);
     if (cached != null)
       return (Dimension)cached[0];
@@ -113,7 +113,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
    */
 
   private static synchronized Hashtable getImages(Class c, String relPath, String extension) throws IOException{
-    PairKey pk = new PairKey(c, new PairKey(relPath, extension));
+    Pair pk = new Pair(c, new Pair(relPath, extension));
     Object [] cached = (Object [])cache.get(pk);
     if (cached != null)
       return (Hashtable)cached[1];
@@ -194,7 +194,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
         }
     }
 
-    cache.put(new PairKey(c, new PairKey(relPath, extension)), new Object[]{prefSize, pieceImages});
+    cache.put(new Pair(c, new Pair(relPath, extension)), new Object[]{prefSize, pieceImages});
   }
 
 
