@@ -184,7 +184,9 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
   protected JLabel createWhiteLabel(Game game){
     JLabel label = super.createWhiteLabel(game);
-    label.setText(game.getWhiteName()+game.getWhiteTitles()+" "+game.getWhiteRating());
+    int rating = game.getWhiteRating();
+    String ratingString = (rating > 0) ? (" "+rating) : "";
+    label.setText(game.getWhiteName()+game.getWhiteTitles()+ratingString);
 
     return label;
   }
@@ -200,7 +202,9 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
   protected JLabel createBlackLabel(Game game){
     JLabel label = super.createBlackLabel(game);
-    label.setText(game.getBlackName()+game.getBlackTitles()+" "+game.getBlackRating());
+    int rating = game.getBlackRating();
+    String ratingString = (rating > 0) ? (" "+rating) : "";
+    label.setText(game.getBlackName()+game.getBlackTitles()+ratingString);
 
     return label;
   }
