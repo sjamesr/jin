@@ -279,6 +279,12 @@ public class JinMain implements JinContext{
     mainFrame.addWindowListener(new WindowAdapter(){
       public void windowOpened(WindowEvent evt){
         mainFrame.removeWindowListener(this);
+        
+        // Workaround - otherwise menu activation shortcuts don't work
+        // immediately
+        if (mainFrame.getJMenuBar() != null)
+          mainFrame.getJMenuBar().requestFocus();
+        
         connManager.start();
       }
     });
