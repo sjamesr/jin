@@ -1573,11 +1573,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Returns <code>true</code> if the specified move is legal and
-   * <code>false</code>. for some illegal moves. Note that this method doesn't
-   * currently fully check move legality. Instead, it only detects some
-   * obviously illegal moves so that they can be rejected immediately, instead
-   * of wasting time by sending them to the server.
+   * If the specified move is legal in the specified position, this method
+   * returns <code>true</code>. If the specified move is illegal, it may return
+   * <code>false</code>. It's not meant as a complete move legality check,
+   * instead, it (currently) only detects some obviously illegal moves so that
+   * they can be rejected immediately, instead of wasting time by sending them
+   * to the server. With time, more complex (and eventually complete) move
+   * legality checking will be added. 
    */
 
   protected boolean checkLegality(Position pos, Move move){
@@ -1802,23 +1804,39 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
            (isMoveEnRoute() || !isUserTurn()))
         setQueuedMove(move);
       else{
-        UserMoveEvent evt2 = new UserMoveEvent(this, move);
-        fireUserMadeMove(evt2);
-        moveEnRoute = evt.getMove();
-        
-        // Stop the clock of the player who moved
-        getClockForPlayer(move.getPlayer()).setRunning(false);
-        
-        // Remember the time when it was stopped because if the move is illegal
-        // we will need to restart the clock with the correct amount of time
-        // (including the time the move spent in transit).
-        sentMoveTimestamp = System.currentTimeMillis();
-        
-        // Update clock activeness
-        updateClockActiveness();
-
-        if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
-          board.setEditable(false);
+        if (checkLegality(realPosition, move)){
+          UserMoveEvent evt2 = new UserMoveEvent(this, move);
+          fireUserMadeMove(evt2);
+          moveEnRoute = evt.getMove();
+          
+          // Stop the clock of the player who moved
+          getClockForPlayer(move.getPlayer()).setRunning(false);
+          
+          // Remember the time when it was stopped because if the move is illegal
+          // we will need to restart the clock with the correct amount of time
+          // (including the time the move spent in transit).
+          sentMoveTimestamp = System.currentTimeMillis();
+          
+          // Update clock activeness
+          updateClockActiveness();
+  
+          if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
+            board.setEditable(false);
+        }
+        else{ // Illegal move attempted
+          
+          // We do this in invokeLater because moveMade is called already in response
+          // to a position update, and updating it during an update breaks things
+          // (like the board's ability to know which pieces to repaint).
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              isBoardPositionUpdating = true;
+              board.getPosition().copyFrom(realPosition);
+              isBoardPositionUpdating = false;
+              playSound("IllegalMove");
+            }
+          });
+        }
       }
     }
   }
