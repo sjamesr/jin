@@ -93,7 +93,7 @@ public class ColorChooserButton extends JComponent implements ActionListener{
    */
 
   public ColorChooserButton(String text, Color initialColor){
-    button = new JButton(text, new SolidColorIcon(iconSize, initialColor));
+    button = new JButton(text, new SolidColorRectangleIcon(iconSize, initialColor));
 
     setLayout(new BorderLayout());
     add(button, BorderLayout.CENTER);
@@ -190,7 +190,7 @@ public class ColorChooserButton extends JComponent implements ActionListener{
 
   public void setColor(Color color){
     this.color = color;
-    button.setIcon(new SolidColorIcon(iconSize, color));
+    button.setIcon(new SolidColorRectangleIcon(iconSize, color));
     fireStateChanged();
   }
 
