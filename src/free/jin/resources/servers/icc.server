@@ -1,7 +1,12 @@
 
-default.user = resources/servers/default_user.icc
 name = icc
 name.short = icc
 name.long = Internet Chess Club
 
 login.dialog.classname = free.jin.chessclub.ChessclubLoginDialog
+
+login.hosts = chessclub.com;queen.chessclub.com;rook.chessclub.com;special.chessclub.com
+login.hostname = chessclub.com
+login.port = 5000
+
+plugins = ChessclubConsoleManager;ChessclubSoundManager;ChessclubBoardManager;ChessclubSoughtGraphPlugin
