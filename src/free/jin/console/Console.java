@@ -330,29 +330,17 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   protected class OutputComponentViewport extends JViewport{
 
-    private int lastVisibleIndex = -1;
+    // Used to avoid endless recursion
+    private boolean settingViewSize = false;
 
 
-//    public void reshape(int x, int y, int width, int height){
-//      JTextComponent view = (JTextComponent)getView();
-//      Dimension curSize = this.getSize();
-//      if ((view != null)&&(lastVisibleIndex==-1)&&((curSize.width!=width)||(curSize.height!=height))){
-//        Dimension viewHoleSize = getExtentSize();
-//        Point viewLocation = view.getLocation();
-//        Point bottomRightPoint = new Point(viewHoleSize.width-viewLocation.x, viewHoleSize.height-viewLocation.y-1);
-//        lastVisibleIndex = view.viewToModel(bottomRightPoint);
-//      }
-//
-//      super.reshape(x, y, width, height);
-//    }
-
-
-    public void setViewSize(Dimension newSize){
+    public void reshape(int x, int y, int width, int height){
       Dimension viewSize = getViewSize();
       Dimension viewportSize = getExtentSize();
 
-      if ((viewSize.width == newSize.width) || (viewportSize.height > viewSize.height)){
-        super.setViewSize(newSize);
+      if ((viewSize.height <= viewportSize.height) || (viewportSize.height < 0) 
+          || settingViewSize){
+        super.reshape(x, y, width, height);
         return;
       }
 
@@ -362,8 +350,12 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         new Point(viewportSize.width + viewPosition.x, viewportSize.height + viewPosition.y);
       int lastVisibleIndex = view.viewToModel(viewCoords);
 
-      super.setViewSize(newSize);
+      super.reshape(x, y, width, height);
+
+      settingViewSize = true;
       this.doLayout();
+      this.validate();
+      settingViewSize = false;
       // Otherwise the viewport doesn't update what it thinks about the size of
       // the view and may thus scroll to the wrong location.
       
