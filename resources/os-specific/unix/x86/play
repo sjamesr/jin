@@ -1,0 +1,23 @@
+#!/bin/sh
+# Shell script to let Jin play audio on Linux.
+
+arch=`uname -s`
+
+if [ "$arch" = "SunOS" ]; then
+
+# Use below for newer Sun audio hardware that supports stereo linear
+  ./sox -t .au /dev/stdin -t sunau -w -s /dev/audio $@
+
+# Use below for older Sun audio hardware
+#  sox $fopts -t sunau -U -c 1 /dev/audio $@
+
+else
+  if [ "$arch" = "Linux" ]; then
+  
+    if [ `/sbin/pidof -s artsd` ] ; then
+        artsdsp ./sox -t .au /dev/stdin -t ossdsp -w -c 2 -s /dev/dsp $@
+    else
+        ./sox -t .au /dev/stdin -t ossdsp -w -c 2 -s /dev/dsp $@
+    fi
+  fi
+fi
