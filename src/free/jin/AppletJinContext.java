@@ -357,7 +357,7 @@ public class AppletJinContext implements JinContext{
   
 
   /**
-   * TODO: Implement this.
+   * Returns all the resources of the specified type.
    */
 
   public Resource [] getResources(String resourceType, Plugin plugin){
@@ -386,8 +386,20 @@ public class AppletJinContext implements JinContext{
    
   public Resource getResource(String type, String id, Plugin plugin){
     try{
-      URL resourceURL = new URL(applet.getCodeBase(), "resources/" + type + "/" + id + "/");
-      return loadResource(resourceURL, plugin);
+      String resourcesArg = applet.getParameter("resources." + type);
+      if (resourcesArg == null)
+        return null;
+      
+      StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
+      while (resourceNames.hasMoreTokens()){
+        String resource = resourceNames.nextToken();
+        int slashIndex = resource.indexOf("/");
+        String resourceId = slashIndex == -1 ? resource : resource.substring(slashIndex + 1);
+        if (id.equals(resourceId)){
+          URL resourceURL = new URL(applet.getCodeBase(), "resources/" + type + "/" + resource + "/");
+          return loadResource(resourceURL, plugin);
+        }
+      }
     } catch (IOException e){e.printStackTrace();}
     
     return null;

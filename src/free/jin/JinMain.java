@@ -293,19 +293,24 @@ public class JinMain implements JinContext{
   
   /**
    * Returns all the resources for the specified resource type. Resources are
-   * assumed to be zip or jar files and are looked up in two directories:
-   * <code>JIN_DIR/resources/resType</code> and
+   * assumed to be zip or jar files and are looked up in three directories:
+   * <code>JIN_DIR/resources/resType</code>,
+   * <code>JIN_DIR/resources/resType/serverId</code> and
    * <code>prefsDir/resources/resType</code>.
    */
    
   public Resource [] getResources(String resType, Plugin plugin){
     Vector resources = new Vector();
     
+    String serverId = plugin.getServer().getId();
+    
     File userResDir = new File(new File(prefsDir, "resources"), resType);
     File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
+    File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), resType), serverId);
                             
     loadResources(userResDir, resources, plugin);
     loadResources(jinResDir, resources, plugin);
+    loadResources(jinServerResDir, resources, plugin);
      
     Resource [] resArr = new Resource[resources.size()];
     resources.copyInto(resArr);
@@ -321,6 +326,9 @@ public class JinMain implements JinContext{
    */
    
   private void loadResources(File dir, Vector v, Plugin plugin){
+    if (!dir.exists() || !dir.isDirectory())
+      return;
+    
     String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
     if (filenames == null)
       return;
@@ -346,21 +354,26 @@ public class JinMain implements JinContext{
    */
    
   public Resource getResource(String type, String id, Plugin plugin){
-    File userResJar = new File(new File(new File(prefsDir, "resources"), type), id + ".jar");
-    File userResZip = new File(new File(new File(prefsDir, "resources"), type), id + ".zip");
-    File jinResJar = new File(new File(new File(JIN_DIR, "resources"), type), id + ".jar");
-    File jinResZip = new File(new File(new File(JIN_DIR, "resources"), type), id + ".zip");
+    String serverId = plugin.getServer().getId();
+
+    File userResDir = new File(new File(prefsDir, "resources"), type);
+    File jinResDir = new File(new File(JIN_DIR, "resources"), type);
+    File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), type), serverId);
+    
+    File [] files = new File[]{
+      new File(userResDir, id + ".jar"), new File(userResDir, id + ".zip"),
+      new File(jinServerResDir, id + ".jar"), new File(jinServerResDir, id + ".zip"),
+      new File(jinResDir, id + ".jar"), new File(jinResDir, id + ".zip")
+    };
+      
    
-    try{
-      if (userResJar.exists())
-        return loadResource(userResJar, plugin);
-      else if (userResZip.exists())
-        return loadResource(userResZip, plugin);
-      else if (jinResJar.exists())
-        return loadResource(jinResJar, plugin);
-      else if (jinResZip.exists())
-        return loadResource(jinResZip, plugin);
-    } catch (IOException e){e.printStackTrace();}
+    for (int i = 0; i < files.length; i++){
+      try{
+        File file = files[0];
+        if (file.exists())
+          return loadResource(file, plugin);
+      } catch (IOException e){e.printStackTrace();}
+    }
     
     return null;
   }
