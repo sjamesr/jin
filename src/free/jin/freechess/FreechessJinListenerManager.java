@@ -22,6 +22,7 @@
 package free.jin.freechess;
 
 import free.jin.event.BasicJinListenerManager;
+import free.jin.event.SeekListener;
 
 
 /**
@@ -52,5 +53,41 @@ public class FreechessJinListenerManager extends BasicJinListenerManager{
 
     this.source = source;
   }
+
+
+
+
+  /**
+   * Adds the given SeekListener to the list of listeners receiving notification
+   * of SeekEvents.
+   */
+
+  public void addSeekListener(SeekListener listener){
+    super.addSeekListener(listener);
+
+    if (listenerList.getListenerCount(SeekListener.class) == 1)
+      source.setSeekInfoState(true);
+    else
+      source.notFirstListenerAdded(listener);
+  }
+
+
+
+
+  /**
+   * Removes the given SeekListener from the list of listeners receiving 
+   * notification of SeekEvents.
+   */
+
+  public void removeSeekListener(SeekListener listener){
+    super.removeSeekListener(listener);
+
+    if (listenerList.getListenerCount(SeekListener.class) == 0){
+      source.setSeekInfoState(false);
+
+      source.lastSeekListenerRemoved();
+    }
+  }
+
 
 }
