@@ -1,20 +1,24 @@
 <?php
+   $page_title = "Jin Applet";
+   include("begin.php");
+?>
+ 
+<H1>
+	<img src="/images/bullet.gif" align="absmiddle" width="12" height="12" border="1">
+	<?php echo $page_title; ?>
+</H1>
+
+
+<?php
 	require_once 'jin_server.php';
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-<TITLE> Jin Applet </TITLE>
-</HEAD>
 
-<BODY<?php if ($_REQUEST['oldjava']) echo " onLoad='javascript:clearWaitMessage()'" ?>>
 
 <CENTER>
-
 <P>
 <APPLET CODE="free.jin.JinApplet"
         ARCHIVE="jin.jar, <?php if ($_REQUEST['oldjava']) echo "libs/swingall.jar," ?>libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/icc/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
-		WIDTH="450" HEIGHT="350">
+		WIDTH="450" HEIGHT="250">
 	
 	<PARAM NAME="prefsProtocol" VALUE="http<?php if (isSSLPrefs()) echo "s"?>">
 	<PARAM NAME="loadPrefsURL" VALUE="prefs.php?loadPrefs">
@@ -60,6 +64,11 @@
 <?php
 	}
 ?>
+
+<H3><A HREF="http://www.jinchess.com">The Jin website</A></H3>
 </CENTER>
 
-</BODY>
+
+<?php
+  include("end.php");
+?>
