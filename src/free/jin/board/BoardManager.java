@@ -29,13 +29,14 @@ import free.jin.plugin.*;
 import free.jin.*;
 import free.jin.board.event.UserMoveListener;
 import free.jin.board.event.UserMoveEvent;
-import free.jin.sound.SoundManager;
 import free.util.BeanProperties;
 import free.util.IOUtilities;
 import free.util.TextUtilities;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -82,7 +83,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * A reference to the sound manager, if one exists.
    */
 
-  private SoundManager soundManager = null;
+  private Plugin soundManager = null;
 
 
 
@@ -211,17 +212,41 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   private void obtainSoundManager(){
-    soundManager = (SoundManager)getPlugin("sound");
+    soundManager = getPlugin("sound");
   }
 
 
 
   /**
-   * Returns the <code>SoundManager</code>, or <code>null</code> if none exists.
+   * Plays the sound for the given event name.
    */
 
-  public SoundManager getSoundManager(){
-    return soundManager;
+  public void playSound(String eventName){
+    if (soundManager != null)
+      playSoundImpl(eventName);
+    else
+      Toolkit.getDefaultToolkit().beep();
+  }
+  
+  
+  
+  /**
+   * Actually plays the sound for the specified event name. This is (or should
+   * be only called if a sound manager exists).
+   */
+   
+  protected void playSoundImpl(String eventName){
+    try{
+      Class soundManagerClass = Class.forName("free.jin.sound.SoundManager");
+      Method playEventSoundMethod = soundManagerClass.getMethod("playEventSound",
+        new Class[]{String.class});
+        
+      playEventSoundMethod.invoke(soundManager, new Object[]{eventName});
+    } catch (ClassNotFoundException e){e.printStackTrace();}
+      catch (NoSuchMethodException e){e.printStackTrace();}
+      catch (IllegalAccessException e){e.printStackTrace();}
+      catch (InvocationTargetException e){e.printStackTrace();}
+    
   }
 
 

@@ -31,7 +31,6 @@ import free.jin.event.*;
 import free.jin.Game;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
-import free.jin.sound.SoundManager;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
@@ -68,19 +67,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * A reference to the sound manager, if one exists.
-   */
-
-  private final SoundManager soundManager;
-
-
-
-  /**
    * The Game this BoardPanel is displaying.
    */
 
   protected final Game game;
-
 
 
 
@@ -377,8 +367,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     this.fullscreenPanel = new FullscreenPanel(contentPanel);
 
     init(game);
-
-    soundManager = boardManager.getSoundManager();
 
     setLayout(new BorderLayout());
     add(fullscreenPanel, BorderLayout.CENTER);
@@ -1411,17 +1399,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     curClock.setActive(true);
     oppClock.setActive(false);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Plays the sound for the given event name.
+   * Plays the sound corresponding to the specified event.
    */
-
-  protected void playSound(String eventName){
-    if (soundManager != null)
-      soundManager.playEventSound(eventName);
+   
+  public void playSound(String eventName){
+    boardManager.playSound(eventName);
   }
 
 
