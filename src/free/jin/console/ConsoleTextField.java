@@ -283,12 +283,14 @@ public class ConsoleTextField extends FixedJTextField{
           if (isControlDown){ // Watauba feature :-)
             String curText = getText();
             String selectedText = getSelectedText();
-            String reversedSelectedText = new StringBuffer(selectedText).reverse().toString();
-            int selectionStart = getSelectionStart();
-            int selectionEnd = getSelectionEnd();
-            setText(curText.substring(0,selectionStart)+reversedSelectedText+curText.substring(selectionEnd));
-            setSelectionStart(selectionStart);
-            setSelectionEnd(selectionEnd);
+            if (selectedText != null){
+              String reversedSelectedText = new StringBuffer(selectedText).reverse().toString();
+              int selectionStart = getSelectionStart();
+              int selectionEnd = getSelectionEnd();
+              setText(curText.substring(0,selectionStart)+reversedSelectedText+curText.substring(selectionEnd));
+              setSelectionStart(selectionStart);
+              setSelectionEnd(selectionEnd);
+            }
           }
           break;
       }
