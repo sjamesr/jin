@@ -314,16 +314,6 @@ public class JChessClock extends AbstractChessClock{
 
 
 
- /**
-  * Returns the maximum size of this JChessClock.
-  */
-
-  public Dimension getMaximumSize(){
-    return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
-  }
-
-
-
   /**
    * Returns the preferred size of this JChessClock.
    */
