@@ -30,6 +30,9 @@ import free.jin.Game;
 import free.jin.Connection;
 import free.jin.event.GameStartEvent;
 import free.jin.event.GameEndEvent;
+import free.jin.freechess.FreechessListenerManager;
+import free.jin.freechess.event.IvarStateChangeListener;
+import free.jin.freechess.event.IvarStateChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
@@ -38,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * A freechess.org specific extension of the BoardManager plugin.
  */
 
-public class FreechessBoardManager extends BoardManager{
+public class FreechessBoardManager extends BoardManager implements IvarStateChangeListener{
 
 
 
@@ -65,7 +68,38 @@ public class FreechessBoardManager extends BoardManager{
   private int userPlayedGamesCount = 0;
 
 
+  
+  /**
+   * Registers our own listeners.
+   */
 
+  protected void registerConnListeners(){
+    super.registerConnListeners();
+    
+    FreechessListenerManager listenerManager = 
+      ((JinFreechessConnection)getConn()).getFreechessListenerManager();
+
+    listenerManager.addIvarStateChangeListener(this);
+  }
+
+
+  
+  /**
+   * Unregisters the listeners we've registered in
+   * <code>registerConnListeners</code>.
+   */
+
+  protected void unregisterConnListeners(){
+    super.unregisterConnListeners();
+    
+    FreechessListenerManager listenerManager = 
+      ((JinFreechessConnection)getConn()).getFreechessListenerManager();
+
+    listenerManager.removeIvarStateChangeListener(this);
+  }
+  
+
+  
   /**
    * Overrides BoardManager.createBoardPanel() to return a FreechessBoardPanel.
    */
@@ -178,7 +212,7 @@ public class FreechessBoardManager extends BoardManager{
 
   private void userStartedPlayingGame(){
     userPlayedGamesCount++;
-
+    
     if (userPlayedGamesCount == 1)
       premoveRadioButton.setEnabled(false);
   }
@@ -192,7 +226,7 @@ public class FreechessBoardManager extends BoardManager{
 
   private void userStoppedPlayingGame(){
     userPlayedGamesCount--;
-
+    
     if (userPlayedGamesCount == 0)
       premoveRadioButton.setEnabled(true);
   }
@@ -210,6 +244,23 @@ public class FreechessBoardManager extends BoardManager{
 
     super.setMoveSendingMode(moveSendingMode);
   }
+  
+  
+  
+  /**
+   * <code>IvarStateChangeListener</code> implementation.
+   */
+   
+  public void ivarStateChanged(IvarStateChangeEvent evt){
+    // Did the user try to set iv_premove manually to false?
+    if ((evt.getIvar() == Ivar.PREMOVE) && (evt.getState() == false) &&
+      (getMoveSendingMode() == PREMOVE_MOVE_SENDING_MODE)){
+
+      setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
+    }
+      // Punish the bastard ;-)
+  }
 
 
+  
 }
