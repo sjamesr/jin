@@ -30,6 +30,8 @@ import free.chess.WildVariant;
 import free.chess.Player;
 import free.jin.action.JinAction;
 import free.jin.action.ActionContext;
+import free.jin.ui.DialogPanel;
+import free.jin.ui.OptionPanel;
 import free.util.TableLayout;
 import free.util.AWTUtilities;
 import free.util.swing.SwingUtils;
