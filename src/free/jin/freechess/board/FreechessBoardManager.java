@@ -67,7 +67,7 @@ public class FreechessBoardManager extends BoardManager{
   public void internalFrameActivated(InternalFrameEvent e){
     BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
     Game game = boardPanel.getGame();
-    if (game.getGameType() != Game.ISOLATED_BOARD){
+    if ((game.getGameType() != Game.ISOLATED_BOARD) && boardPanel.isActive()){
       Object gameID = game.getID();
       if (!gameID.equals(primaryGameID)){
         getConnection().sendCommand("primary "+gameID);
