@@ -267,6 +267,8 @@ public class JBoard extends JPanel{
     if (position==null)
       throw new IllegalArgumentException("Null position");
 
+    setOpaque(true);
+
     this.position = position;
     this.boardPainter = position.getVariant().createDefaultBoardPainter();
     this.piecePainter = position.getVariant().createDefaultPiecePainter();

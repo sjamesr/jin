@@ -168,6 +168,7 @@ public class SoughtGraph extends JComponent{
   public SoughtGraph(Plugin plugin){
     this.plugin = plugin;
 
+    setOpaque(true);
     setBackground(StringParser.parseColor(plugin.getProperty("background-color", "ffffff")));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
 
