@@ -276,11 +276,15 @@ public class Jin{
 
 
   /**
-   * Sets the given user property to have the given value.
+   * Sets the given user property to have the given value. If the given value is
+   * <code>null</code>, the property is removed.
    */
 
   public static void setProperty(String propertyName, String propertyValue){
-    userProps.put(propertyName, propertyValue);
+    if (propertyValue == null)
+      userProps.remove(propertyName);
+    else
+      userProps.put(propertyName, propertyValue);
   }
 
 
