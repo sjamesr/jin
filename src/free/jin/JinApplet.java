@@ -25,9 +25,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.util.BrowserControl;
+import free.util.PlatformUtils;
 import free.util.audio.AppletContextAudioPlayer;
 
 
@@ -78,7 +81,7 @@ public class JinApplet extends JApplet implements ActionListener{
    * The text on the start/stop button when it starts Jin. 
    */
   
-  private final String START_JIN_TEXT = "Start Jin";
+  private final String START_JIN_TEXT = "Start JinApplet";
   
   
   
@@ -86,7 +89,7 @@ public class JinApplet extends JApplet implements ActionListener{
    * The text on the start/stop button when it stops Jin. 
    */
   
-  private final String STOP_JIN_TEXT = "Stop Jin";
+  private final String STOP_JIN_TEXT = "Stop JinApplet";
   
   
 
@@ -162,8 +165,19 @@ public class JinApplet extends JApplet implements ActionListener{
     context = null;
     
     startStopButton.setEnabled(false);
+   
+    // Reload the webpage, avoiding cache.
+    // try{
+    //   String documentBase = getDocumentBase().toExternalForm();
+    //   int qIndex = documentBase.lastIndexOf("?");  
+    //   if ((qIndex != -1) && documentBase.substring(qIndex).startsWith("?rnd="))
+    //     documentBase = documentBase.substring(0, qIndex);
+      
+    //   String url = documentBase + "?rnd=" + Math.random();
+    //   getAppletContext().showDocument(new URL(url), "_self");
+    // } catch (MalformedURLException e){e.printStackTrace();}
     
-    getAppletContext().showDocument(getDocumentBase(), "_self"); // Reload webpage
+    getAppletContext().showDocument(getDocumentBase(), "_self");
     
     // We can't properly restart Jin because we're not using/loading the new
     // preferences.
@@ -182,26 +196,39 @@ public class JinApplet extends JApplet implements ActionListener{
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     
     JLabel label1 = new JLabel("Do not leave this page or close the browser while");
-    JLabel label2 = new JLabel("Jin is running - doing so will cause it to be closed");
-    JLabel label3 = new JLabel("immediately, losing all information within.");
+    JLabel label2 = new JLabel("JinApplet is running - doing so will cause it to");
+    JLabel label3 = new JLabel("be closed immediately, losing all information within.");
     
     label1.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     label2.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     label3.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
+    JPanel labelsBox = new JPanel();
+    labelsBox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    labelsBox.setLayout(new BoxLayout(labelsBox, BoxLayout.Y_AXIS));
+    labelsBox.add(label1);
+    labelsBox.add(label2);
+    labelsBox.add(label3);
+    
     contentPane.add(Box.createVerticalGlue());
-    contentPane.add(label1);
-    contentPane.add(label2);
-    contentPane.add(label3);
+    contentPane.add(labelsBox);
     contentPane.add(Box.createVerticalStrut(30));
     
-    JPanel buttonPanel = new JPanel(new FlowLayout());
-    buttonPanel.add(startStopButton);
+    startStopButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    contentPane.add(startStopButton);
     
-    contentPane.add(buttonPanel);
+    startingLabel1.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    startingLabel2.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    
+    JPanel startingLabelBox = new JPanel();
+    startingLabelBox.setLayout(new BoxLayout(startingLabelBox, BoxLayout.Y_AXIS));
+    startingLabelBox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    startingLabelBox.add(startingLabel1);
+    startingLabelBox.add(startingLabel2);
+    
+    
     contentPane.add(Box.createVerticalStrut(30));
-    contentPane.add(startingLabel1);
-    contentPane.add(startingLabel2);
+    contentPane.add(startingLabelBox);
     contentPane.add(Box.createVerticalGlue());
     
     setContentPane(contentPane);
