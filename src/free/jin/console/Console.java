@@ -191,15 +191,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     configureOutputComponent(outputComponent);
     this.outputScrollPane = createOutputScrollPane(outputComponent);
     this.inputComponent = createInputComponent();
-
+    
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
     add(inputComponent, BorderLayout.SOUTH);
     
-    // Hack
-    if (System.getProperty("java.version").compareTo("1.4") >= 0)
-      fixFocus(); 
-
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
@@ -239,6 +235,12 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   protected void configureOutputComponent(final ConsoleTextPane textPane){
     // Seriously hack the caret for our own purposes (desired scrolling and selecting).
     Caret caret = new DefaultCaret(){
+      
+      public void focusGained(FocusEvent evt){
+        super.focusGained(evt);
+        if (!dragging)
+          requestDefaultFocus();
+      }
       public void focusLost(FocusEvent e){
         this.setVisible(false);
       }
@@ -1086,29 +1088,5 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     }
   }
   
-  
-  
-  /**
-   * Fixes the focus via an ugly hack.
-   */
-   
-  private void fixFocus(){
-    try{
-      
-      // The following is equivalent to:
-      // outputScrollPane.setFocusCycleRoot(true)
-      // which has the side effect that the scrollpane or its children don't
-      // get the focus by default. We are interested in the side effect only.
-      Class containerClass = Container.class;
-      Method setFocusCycleRoot =
-        containerClass.getDeclaredMethod("setFocusCycleRoot", new Class[]{boolean.class});
-      setFocusCycleRoot.invoke(outputScrollPane, new Object[]{Boolean.TRUE});
-      
-    } catch (IllegalAccessException e){e.printStackTrace();}
-      catch (IllegalArgumentException e){e.printStackTrace();}
-      catch (InvocationTargetException e){e.printStackTrace();}
-      catch (NoSuchMethodException e){e.printStackTrace();}
-  }
-
 
 }
