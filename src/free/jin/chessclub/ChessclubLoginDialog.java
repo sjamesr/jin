@@ -453,28 +453,7 @@ public class ChessclubLoginDialog implements LoginDialog{
 
     defaultButton = connectButton;
 
-
-    JButton saveButton = new JButton("Save settings");
-    saveButton.setDefaultCapable(false);
-    saveButton.addActionListener(new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        String inputIllegalityReason = findInputIllegalityReason();
-        if (inputIllegalityReason!=null){
-          JOptionPane.showMessageDialog(parentDialog,inputIllegalityReason,
-            "Wrong Connection Settings",JOptionPane.ERROR_MESSAGE);
-          return;
-        }
-
-        updateUser();
-        Jin.save(user);
-      }
-
-    });
-
     decisionPanel.add(connectButton);
-    decisionPanel.add(Box.createHorizontalStrut(10));
-    decisionPanel.add(saveButton);
     decisionPanel.add(Box.createHorizontalGlue());
 
 
