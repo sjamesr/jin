@@ -1147,7 +1147,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       Object result = OptionPanel.OK;
       if (shouldAsk)
-        result = OptionPanel.confirm(getUIProvider(), "Select an option", question, OptionPanel.OK);
+        result = OptionPanel.confirm("Select an option", question, OptionPanel.OK);
 
       if (result == OptionPanel.OK){
         getConn().quitGame(game);
