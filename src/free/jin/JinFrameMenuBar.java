@@ -596,14 +596,13 @@ public class JinFrameMenuBar extends JMenuBar{
 
   protected JMenu createHelpMenu(){
     JMenu helpMenu = new JMenu("Help");
-    helpMenu.setMnemonic('h');
+    helpMenu.setMnemonic('H');
 
     JMenuItem websiteMenuItem = new JMenuItem("Jin Website", 'J');
     websiteMenuItem.addActionListener(new UrlDisplayingAction(jinFrame, "http://www.jinchess.com"));
     helpMenu.add(websiteMenuItem);
 
-    JMenuItem licenseMenuItem = new JMenuItem("Licensing and Copyrights...");
-    licenseMenuItem.setMnemonic('L');
+    JMenuItem licenseMenuItem = new JMenuItem("Credits and Copyrights...", 'C');
     licenseMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         JDialog licenseDialog = new LicenseDialog(jinFrame);
@@ -625,8 +624,7 @@ public class JinFrameMenuBar extends JMenuBar{
     helpMenu.add(suggestFeatureMenuItem);
 
 
-    JMenuItem aboutMenuItem = new JMenuItem("About Jin...");
-    aboutMenuItem.setMnemonic('A');
+    JMenuItem aboutMenuItem = new JMenuItem("About Jin...", 'A');
     aboutMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         JDialog aboutDialog = new AboutDialog(jinFrame);
