@@ -23,6 +23,7 @@ package free.jin.chessclub.console;
 
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
+import free.jin.console.ConsoleTextPane;
 import free.jin.plugin.Plugin;
 
 
@@ -45,13 +46,26 @@ public class ChessclubConsole extends Console{
 
 
   /**
-   * Creates the JTextField in which the user can input commands to be sent to
-   * the server. Overrides Console.createInputComponent() since we need a special
-   * JTextField for ICC.
+   * Creates the <code>ConsoleTextField</code> in which the user can input
+   * commands to be sent to the server. Overrides
+   * <code>Console.createInputComponent()</code> since we need a
+   * special <code>ConsoleTextField</code> for ICC.
    */
 
   protected ConsoleTextField createInputComponent(){
     return new ChessclubConsoleTextField(this);
+  }
+
+
+
+
+  /**
+   * Overrides <code>Console.createOutputComponent()</code> since we need a
+   * special <code>ConsoleTextPane</code> for ICC.
+   */
+
+  protected ConsoleTextPane createOutputComponent(){
+    return new ChessclubConsoleTextPane(this);
   }
 
 
