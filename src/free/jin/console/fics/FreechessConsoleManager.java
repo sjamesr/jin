@@ -54,6 +54,9 @@ public class FreechessConsoleManager extends ConsoleManager{
   public void chatMessageReceived(ChatEvent evt){
     super.chatMessageReceived(evt);
 
+    if (isPaused())
+      return;
+    
     String type = evt.getType();
     if (type.equals("tell") || type.equals("say") || type.equals("ptell"))
       console.tellReceived(evt.getSender());
