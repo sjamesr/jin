@@ -22,10 +22,8 @@
 package free.jin.board.icc;
 
 import free.jin.event.*;
+import free.jin.board.*;
 import java.awt.Color;
-import free.jin.board.BoardPanel;
-import free.jin.board.BoardManager;
-import free.jin.board.JinBoard;
 import free.jin.Game;
 import free.chess.Square;
 import free.jin.chessclub.event.ChessclubGameListener;
@@ -89,7 +87,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
       board.setArrowCircleEnabled(true);
     }
     else
-      ((ChessclubJBoard)board).setArrowCircleEnabled(false);
+      board.setArrowCircleEnabled(false);
   }
 
 
@@ -105,8 +103,8 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
-    ((ChessclubJBoard)board).removeAllArrows();
-    ((ChessclubJBoard)board).removeAllCircles();
+    board.removeAllArrows();
+    board.removeAllCircles();
   }
 
 
@@ -123,8 +121,8 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
-    ((ChessclubJBoard)board).removeAllArrows();
-    ((ChessclubJBoard)board).removeAllCircles();
+    board.removeAllArrows();
+    board.removeAllCircles();
   }
 
 
@@ -142,8 +140,8 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
-    ((ChessclubJBoard)board).removeAllArrows();
-    ((ChessclubJBoard)board).removeAllCircles();
+    board.removeAllArrows();
+    board.removeAllCircles();
   }
 
 
@@ -161,8 +159,8 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
-    ((ChessclubJBoard)board).removeAllArrows();
-    ((ChessclubJBoard)board).removeAllCircles();
+    board.removeAllArrows();
+    board.removeAllCircles();
   }
 
 
@@ -218,9 +216,26 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
+    Arrow arrow = new Arrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
+    
     handlingArrowCircleEvent = true;
-    ((ChessclubJBoard)board).removeArrow(evt.getFromSquare(), evt.getToSquare());
-    ((ChessclubJBoard)board).addArrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
+    board.removeArrowsAt(evt.getFromSquare(), evt.getToSquare());
+    board.addArrow(arrow);
+    handlingArrowCircleEvent = false;
+  }
+  
+  
+  
+  /**
+   * Gets called when an arrow is removed from the board (by the server).
+   */
+   
+  public void arrowRemoved(ArrowEvent evt){
+    if (evt.getGame() != game)
+      return;
+    
+    handlingArrowCircleEvent = true;
+    board.removeArrowsAt(evt.getFromSquare(), evt.getToSquare());
     handlingArrowCircleEvent = false;
   }
 
@@ -235,9 +250,25 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     if (evt.getGame() != game)
       return;
 
+    Circle circle = new Circle(evt.getCircleSquare(), Color.blue);
     handlingArrowCircleEvent = true;
-    ((ChessclubJBoard)board).removeCircle(evt.getCircleSquare());
-    ((ChessclubJBoard)board).addCircle(evt.getCircleSquare(), Color.blue);
+    board.removeCirclesAt(evt.getCircleSquare());
+    board.addCircle(circle);
+    handlingArrowCircleEvent = false;
+  }
+  
+  
+  
+  /**
+   * Gets called when a circle is removed from the board (by the server).
+   */
+   
+  public void circleRemoved(CircleEvent evt){
+    if (evt.getGame() != game)
+      return;
+    
+    handlingArrowCircleEvent = true;
+    board.removeCirclesAt(evt.getCircleSquare());
     handlingArrowCircleEvent = false;
   }
 
@@ -248,11 +279,11 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when an arrow is added on the board (on the client, not server). 
    */
 
-  public void arrowAdded(JinBoard board, Square fromSquare, Square toSquare){
+  public void arrowAdded(JinBoard board, Arrow arrow){
     if (handlingArrowCircleEvent)
       return;
 
-    boardManager.getConn().sendCommand("arrow " + fromSquare + " " + toSquare);
+    boardManager.getConn().sendCommand("arrow " + arrow.getFrom() + " " + arrow.getTo());
   }
 
 
@@ -262,8 +293,12 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * server.
    */
 
-  public void arrowRemoved(JinBoard board, Square fromSquare, Square toSquare){}
-
+  public void arrowRemoved(JinBoard board, Arrow arrow){
+    if (handlingArrowCircleEvent)
+      return;
+    
+    boardManager.getConn().sendCommand("unarrow " + arrow.getFrom() + " " + arrow.getTo());
+  }
 
 
 
@@ -271,11 +306,11 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is added (on the client, not the server).
    */
 
-  public void circleAdded(JinBoard board, Square circleSquare){
+  public void circleAdded(JinBoard board, Circle circle){
     if (handlingArrowCircleEvent)
       return;
 
-    boardManager.getConn().sendCommand("circle " + circleSquare);
+    boardManager.getConn().sendCommand("circle " + circle.getSquare());
   }
 
 
@@ -284,7 +319,12 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is removed (on the client, not the server).
    */
 
-  public void circleRemoved(JinBoard board, Square circleSquare){}
+  public void circleRemoved(JinBoard board, Circle circle){
+    if (handlingArrowCircleEvent)
+      return;
+    
+    boardManager.getConn().sendCommand("uncircle " + circle.getSquare());
+  }
 
 
 
