@@ -63,21 +63,55 @@ public class Utilities{
   /**
    * Returns <code>true</code> if the specified object is an element of the
    * specified array. The specified array may not be <code>null</code>. The
-   * specified object may be null, in which case this method will return true if
-   * one of the indices in the array is empty (contains <code>null</code>).
+   * specified object may be <code>null</code>, in which case this method will
+   * return <code>true</code> iff one of the indices in the array is empty 
+   * (contains <code>null</code>).
    */
 
   public static boolean isElementOf(Object [] array, Object item){
+    return (indexOf(array, item) != -1);
+  }
+
+
+
+  /**
+   * Returns the index of the first occurrance of specified object in the
+   * specified array, or -1 if the specified object is not an element of the
+   * specified array. The specified object may be <code>null</code> in which
+   * case the returned index will be the index of the first <code>null</code>
+   * in the array.
+   */
+
+  public static int indexOf(Object [] array, Object item){
     if (array == null)
       throw new IllegalArgumentException("The specified array may not be null");
 
     for (int i = 0; i < array.length; i++)
       if (areEqual(item, array[i]))
-        return true;
+        return i;
 
-    return false;
+    return -1;
   }
 
+
+
+
+  /**
+   * Converts the specified array into a string by appending all its elements
+   * separated by a semicolon.
+   */
+
+  public static String arrayToString(Object [] arr){
+    StringBuffer buf = new StringBuffer();
+    for (int i = 0; i < arr.length; i++){
+      buf.append(arr[i]);
+      buf.append("; ");
+    }
+    if (arr.length > 0)
+      buf.setLength(buf.length() - 2); // get rid of the extra "; "
+
+    return buf.toString();
+  }
 
 
 }
