@@ -28,8 +28,7 @@ import javax.swing.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;
-import free.jin.event.ConnectionListener;
-import free.jin.event.ConnectionEvent;
+import free.util.ArrayEnumeration;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.Method;
@@ -40,7 +39,7 @@ import java.lang.reflect.Field;
  * Jin's main frame.
  */
 
-public class JinFrame extends JFrame implements ConnectionListener{
+public class JinFrame extends JFrame{
 
 
   
@@ -54,19 +53,33 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
 
   /**
-   * Maps Connections to arrays of plugins for those connections.
+   * Our current JinConnection, or <code>null</code> if no open connections
+   * exist.
    */
 
-  private final Hashtable connsToPlugins = new Hashtable();
+  private JinConnection connection = null;
 
 
 
 
   /**
-   * Maps Connections to Users assosiated with those connections.
+   * The User object representing the user using the current connection, or
+   * <code>null</code> if no open connections exist.
    */
 
-  private final Hashtable connsToUsers = new Hashtable();
+  private User user = null;
+
+
+
+
+  /**
+   * An array containing all the Plugins running with the current connection,
+   * or <code>null<code> if no open connections exist.
+   */
+
+  private Plugin [] plugins = null;
+
+
 
 
 
@@ -184,6 +197,19 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
 
   /**
+   * Returns the current connection, or <code>null</code> if no connections are
+   * currently open.
+   */
+
+  public JinConnection getConnection(){
+    return connection;
+  }
+
+
+
+
+
+  /**
    * Returns Jin's desktop, where all the JInternalFrames reside.
    */
 
@@ -277,18 +303,21 @@ public class JinFrame extends JFrame implements ConnectionListener{
    * part is done asynchronously because JinConnection.connect() blocks.
    */
 
-  private void startConnection(final JinConnection conn, User user){
+  private void startConnection(JinConnection conn, User user){
+    this.connection = conn;
+    this.user = user;
 
     // Phase 1 - initialize the plugins
-    String pluginsString = user.getProperty("plugins","");
-    Hashtable plugins = new Hashtable();
+    String pluginsString = user.getProperty("plugins", "");
     Hashtable pluginsToProperties = new Hashtable();
-    StringTokenizer pluginsTokenizer = new StringTokenizer(pluginsString,";");
-    if (pluginsTokenizer.countTokens()==0){ // No plugins
+    Hashtable pluginNamesToPlugins = new Hashtable();
+    StringTokenizer pluginsTokenizer = new StringTokenizer(pluginsString, ";");
+    if (pluginsTokenizer.countTokens() == 0){ // No plugins
       System.err.println("There are no plugins assosiated with "+user+" - will not be connecting");
       return;
     }
-    Plugin [] pluginsArr = new Plugin[pluginsTokenizer.countTokens()];
+    plugins = new Plugin[pluginsTokenizer.countTokens()];
+    int pluginCount = 0;
     while (pluginsTokenizer.hasMoreTokens()){
       String pluginName = pluginsTokenizer.nextToken();
       try{
@@ -299,9 +328,9 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
         Class pluginClass = Class.forName(pluginProperties.getProperty("class"));
         Plugin plugin = (Plugin)pluginClass.newInstance();
-        plugins.put(pluginName,plugin);
-        pluginsToProperties.put(plugin,pluginProperties);
-        pluginsArr[plugins.size()-1] = plugin;
+        plugins[pluginCount++] = plugin;
+        pluginsToProperties.put(plugin, pluginProperties);
+        pluginNamesToPlugins.put(pluginName, plugin);
       } catch (Exception e){                                         
           synchronized(System.err){
             System.err.println("Unable to load plugin "+pluginName);
@@ -312,10 +341,9 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
 
     // Phase 2 - set the plugins' context
-    Enumeration pluginsEnum = plugins.elements();
-    while (pluginsEnum.hasMoreElements()){
-      Plugin plugin = (Plugin)pluginsEnum.nextElement();
-      PluginContext context = new PluginContext(user,conn,this,(Properties)pluginsToProperties.get(plugin),plugins);
+    for (int i = 0; i < plugins.length; i++){
+      Plugin plugin = plugins[i];
+      PluginContext context = new PluginContext(user, conn, this, (Properties)pluginsToProperties.get(plugin), pluginNamesToPlugins);
       try{
         plugin.setContext(context);
       } catch (UnsupportedContextException e){
@@ -329,11 +357,9 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
 
     // Phase 3 - start the plugins
-    pluginsEnum = plugins.elements();
-    while (pluginsEnum.hasMoreElements()){
-      Plugin plugin = (Plugin)pluginsEnum.nextElement();
+    for (int i = 0; i < plugins.length; i++){
       try{
-        plugin.start();
+        plugins[i].start();
       } catch (RuntimeException e){ // Make sure that one bad plugin doesn't spoil for the rest.
           e.printStackTrace();
         }
@@ -343,8 +369,7 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
     // Phase 4 - Tell JinFrameMenuBar to add the required menus on-connect.
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    pluginsEnum = plugins.elements();
-    menubar.connecting(conn, pluginsEnum);
+    menubar.connecting(conn, new ArrayEnumeration(plugins));
 
 
     // Phase 5 - connect.
@@ -352,7 +377,11 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
       public void run(){
         try{
-          conn.connect();
+          JinConnection connection = getConnection();
+          if (connection != null){
+            if (!connection.isConnected())
+              getConnection().connect();
+          }
         } catch (IOException e){
             synchronized(System.err){
               System.err.println("Unable to connect to server");
@@ -362,34 +391,6 @@ public class JinFrame extends JFrame implements ConnectionListener{
       }
 
     }.start();
-
-
-    // Map the connection to the plugins.
-    connsToPlugins.put(conn, pluginsArr);
-
-    // Map the connection to the user.
-    connsToUsers.put(conn, user);
-
-    conn.getJinListenerManager().addConnectionListener(this);
-  }
-
-
-
-
-  /**
-   * ConnectionListener implementation.
-   */
-
-  public void connectionEstablished(ConnectionEvent evt){}
-  public void connectionLoggedIn(ConnectionEvent evt){}
-
-
-  /**
-   * Gets called when the connection to the server is lost.
-   */
-
-  public void connectionLost(ConnectionEvent evt){
-    closeConnection(evt.getConnection());
   }
 
 
@@ -397,13 +398,12 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
 
   /**
-   * Stops the given JinConnection by stopping all its plugins and closing the
-   * JinConnection.
+   * Closes the current Connection by stopping all its plugins and shutting down
+   * the JinConnection.
    */
 
-  public void closeConnection(JinConnection conn){
-    Plugin [] plugins = (Plugin [])connsToPlugins.get(conn);
-    for (int i=0;i<plugins.length;i++)
+  public void closeConnection(){
+    for (int i = 0; i < plugins.length; i++)
       try{
         Plugin plugin = plugins[i];
         if (plugin!=null){
@@ -416,8 +416,6 @@ public class JinFrame extends JFrame implements ConnectionListener{
             e.printStackTrace();
           }
         }
-
-    User user = (User)connsToUsers.get(conn);
 
     if (Jin.isKnownUser(user)){
       /*
@@ -444,7 +442,7 @@ public class JinFrame extends JFrame implements ConnectionListener{
       Jin.save(user);
     }
     else{
-      if (user.getUsername()!=null){ // Null means a guest.
+      if (user.getUsername() != null){ // Null means a guest.
         System.out.println("Querying user about creating a new account");
         int result = JOptionPane.showConfirmDialog(this,"Would you like to save your \""+user.getUsername()+"\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
         if (result==JOptionPane.YES_OPTION){
@@ -455,33 +453,31 @@ public class JinFrame extends JFrame implements ConnectionListener{
     }
 
     String userFilename = user.getFilename();
-    if (userFilename!=null){
+    if (userFilename != null){
       System.out.println("Saving last user information");
       Jin.setProperty("last.user", userFilename);
     }
 
     System.out.println("Closing connection");
     try{
-      if (conn.isConnected()){
-        conn.exit();
-        conn.disconnect();
+      if (connection.isConnected()){
+        connection.exit();
+        connection.disconnect();
       }
     } catch (IOException e){
         synchronized(System.err){
-          System.err.println("Failed to disconnect connection: "+conn);
+          System.err.println("Failed to disconnect connection: "+connection);
           e.printStackTrace();
         }
       } 
     
-    System.out.println("Removing connection from mappings");
-    connsToPlugins.remove(conn);
-    connsToUsers.remove(conn);
-
     System.out.println("Modifying menubar");
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    menubar.disconnected(conn);
+    menubar.disconnected(connection);
 
-    conn.getJinListenerManager().removeConnectionListener(this);
+    this.connection = null;
+    this.user = null;
+    this.plugins = null;
 
     // Bugfix
     menubar.repaint();
@@ -497,11 +493,8 @@ public class JinFrame extends JFrame implements ConnectionListener{
    */
 
   public void exiting(){
-    Enumeration conns = connsToPlugins.keys();
-    while (conns.hasMoreElements()){
-      JinConnection conn = (JinConnection)conns.nextElement();
-      closeConnection(conn);
-    }
+    if (getConnection() != null)
+      closeConnection();
   } 
 
 
@@ -515,11 +508,11 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
   protected void processWindowEvent(WindowEvent evt){
     super.processWindowEvent(evt);
-    if (evt.getID()==WindowEvent.WINDOW_OPENED){
+    if (evt.getID() == WindowEvent.WINDOW_OPENED){
       String lastUserFilename = Jin.getProperty("last.user");
       if (lastUserFilename!=null){
         User user = Jin.getUserByFilename(lastUserFilename);
-        if (user!=null){
+        if (user != null){
           showLoginDialog(user);
           return;
         }
@@ -538,7 +531,7 @@ public class JinFrame extends JFrame implements ConnectionListener{
 
   protected void processFocusEvent(FocusEvent evt){
     super.processFocusEvent(evt);
-    if (evt.getID()==FocusEvent.FOCUS_GAINED){
+    if (evt.getID() == FocusEvent.FOCUS_GAINED){
       getDesktop().requestDefaultFocus();
     }
   }
