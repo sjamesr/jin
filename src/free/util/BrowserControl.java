@@ -85,6 +85,8 @@ public class BrowserControl{
         Runtime.getRuntime().exec(cmd); 
       }
       else if (isMacOSX()){
+        if (url.indexOf(":") == -1) // No protocol specified, like in "www.chessclub.com"
+          url = "http://" + url;
         String [] commandLine = new String[]{"open", url};
         Runtime.getRuntime().exec(commandLine);
       }
