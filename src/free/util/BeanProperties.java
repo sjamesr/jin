@@ -118,7 +118,8 @@ public class BeanProperties{
   public void setProperty(String propertyName, Object propertyValue){
     Object oldValue = propertyValue == null ? 
       props.remove(propertyName) : props.put(propertyName, propertyValue);
-    firePropertyChanged(propertyName, oldValue, propertyValue);
+    if (!Utilities.areEqual(oldValue, propertyValue))
+      firePropertyChanged(propertyName, oldValue, propertyValue);
   }
 
 
