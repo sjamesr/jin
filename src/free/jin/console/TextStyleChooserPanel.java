@@ -27,6 +27,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import free.util.swing.ColorChooserButton;
 import free.util.swing.FontSelectorPanel;
+import bsh.Interpreter;
+import bsh.EvalError;
 
 
 /**
@@ -81,8 +83,14 @@ public class TextStyleChooserPanel extends JPanel{
    * background.
    */
 
-  public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor, boolean allowBackgroundSelection){
-    fontSelector = new FontSelectorPanel();
+  public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor,
+      final boolean initAntialiasingValue, boolean allowBackgroundSelection, boolean allowAntialiasingSelection){
+    FontSelectorPanel.BooleanFontOption [] fontOptions = new FontSelectorPanel.BooleanFontOption[]{
+      FontSelectorPanel.createBoldFontOption(),
+      FontSelectorPanel.createItalicFontOption(),
+      new FontSelectorPanel.BooleanFontOption("Antialias", 'A', initAntialiasingValue)
+    };
+    fontSelector = allowAntialiasingSelection ? new FontSelectorPanel(fontOptions) : new FontSelectorPanel();
     foregroundChooser = new ColorChooserButton("Foreground", initForegroundColor);
     foregroundChooser.setMnemonic('F');
     if (allowBackgroundSelection){
@@ -91,6 +99,8 @@ public class TextStyleChooserPanel extends JPanel{
     }
     else
       backgroundChooser = null;
+
+    fontSelector.setPreviewPanel(new TextStylePreviewPanel(fontSelector, initAntialiasingValue));
 
     fontSelector.setSelectedFont(initialFont);
     fontSelector.getPreviewPanel().setOpaque(true);
@@ -263,5 +273,118 @@ public class TextStyleChooserPanel extends JPanel{
     else
       return backgroundChooser.getColor();
   }
+
+
+
+
+  /**
+   * Returns <code>true</code> if antialiasing selection is enabled,
+   * <code>false</code> otherwise.
+   */
+
+  public boolean isAntialiasingSelectionEnabled(){
+    return fontSelector.getFontOption("Antialias") != null;
+  }
+
+
+
+
+  /**
+   * Returns the current value for text antialiasing.
+   *
+   * @throws IllegalArgumentException if text antialiasing selection is not
+   * enabled.
+   */
+
+  public boolean isAntialias(){
+    return fontSelector.getFontOptionValue("Antialias");
+  }
+
+
+
+
+  /**
+   * Sets whether text should be antialiased.
+   */
+
+  public void setAntialias(boolean antialias){
+    FontSelectorPanel.BooleanFontOption antialiasOption = fontSelector.getFontOption("Antialias");
+    if (antialiasOption != null)
+      antialiasOption.setValue(antialias);
+   ((TextStylePreviewPanel)fontSelector.getPreviewPanel()).setAntialias(antialias);
+  }
+
+
+
+
+  /**
+   * The text preview panel we use.
+   */
+
+  private class TextStylePreviewPanel extends FontSelectorPanel.DefaultPreviewPanel{
+
+
+    /**
+     * The initial antialiasing value.
+     */
+
+    private boolean antialias;
+
+
+
+    /**
+     * Becomes false if we find out we're not running under a Java2D capable JVM.
+     */
+    
+    private boolean antialiasingSupported = true;
+
+
+
+    /**
+     * Creates a new <code>TextStylePreviewPanel</code> with the specified
+     * user <code>FontSelectorPanel</code> and the initial antialiasing value.
+     */
+
+    public TextStylePreviewPanel(FontSelectorPanel fontSelector, boolean antialias){
+      super(fontSelector);
+      this.antialias = antialias;
+    }
+
+
+    
+
+    /**
+     * Enables/Disables antialiasing on the specified <code>Graphics</code> object.
+     */
+
+    public void paintComponent(Graphics g){
+      if (antialiasingSupported){
+        try{
+          Interpreter bsh = new Interpreter();
+          bsh.set("g", g);
+          bsh.eval("g2 = (Graphics)g");
+          String textAntialiasValue = "RenderingHints.VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
+          bsh.eval("g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, "+textAntialiasValue+")");
+        } catch (EvalError e){
+            e.printStackTrace();
+            antialiasingSupported = false;
+          }
+      }
+
+      super.paintComponent(g);
+    }
+
+
+
+    /**
+     * Sets the current value for antialiasing.
+     */
+
+    public void setAntialias(boolean antialias){
+      this.antialias = antialias;
+    }
+
+  }
+  
 
 }
