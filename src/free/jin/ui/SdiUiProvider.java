@@ -163,6 +163,9 @@ public class SdiUiProvider extends AbstractUiProvider{
         new PluginContainersMenu(getExistingPluginUIContainers(), "Windows", 'W');
       addPluginUIContainerCreationListener(windowsMenu);
       
+      ActionsMenu actionsMenu = new ActionsMenu();
+      
+      menubar.add(actionsMenu);
       menubar.add(new PrefsMenu());
       menubar.add(windowsMenu);
       menubar.add(new HelpMenu());

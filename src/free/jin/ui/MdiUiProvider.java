@@ -79,6 +79,22 @@ public class MdiUiProvider extends AbstractUiProvider{
    */
 
   private JMenuBar menubar;
+  
+  
+  
+  /**
+   * The "Windows" menu.
+   */
+  
+  private PluginContainersMenu windowsMenu;
+  
+  
+  
+  /**
+   * The "Actions" menu.
+   */
+  
+  private ActionsMenu actionsMenu;
 
 
   
@@ -118,12 +134,13 @@ public class MdiUiProvider extends AbstractUiProvider{
     mainFrame.setContentPane(desktop);
     mainFrame.setJMenuBar(menubar);
 
-    PluginContainersMenu windowsMenu = new PluginContainersMenu("Windows", 'W');
+    windowsMenu = new PluginContainersMenu("Windows", 'W');
     addPluginUIContainerCreationListener(windowsMenu);
+    
+    actionsMenu = new ActionsMenu();
     
     menubar.add(new ConnectionMenu());
     menubar.add(new MdiPrefsMenu());
-    menubar.add(windowsMenu);
     menubar.add(new HelpMenu());
     
     frameSwitcher = new InternalFrameSwitcher(desktop);
@@ -244,6 +261,9 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     mainFrame.setTitle(session.getUser().getUsername() + " at " 
       + session.getServer().getShortName() + " - " + Jin.getInstance().getAppName());
+
+    menubar.add(actionsMenu, 1);
+    menubar.add(windowsMenu, 3);
   }
   
   
@@ -257,6 +277,9 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     mainFrame.setTitle(Jin.getInstance().getAppName());
     
+    menubar.remove(actionsMenu);
+    menubar.remove(windowsMenu);
+
     // Bugfix - otherwise activating the menu via keyboard stops working.
     // On OS X, with native menubar, this actually breaks things.
     if (!PlatformUtils.isMacOSX())
