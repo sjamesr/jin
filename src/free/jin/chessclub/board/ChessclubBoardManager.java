@@ -57,7 +57,8 @@ public class ChessclubBoardManager extends BoardManager{
     BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
 
     Game game = boardPanel.getGame();
-    getConnection().sendCommand("primary "+game.getID());
+    if (boardPanel.isActive())
+      getConnection().sendCommand("primary "+game.getID());
 
     super.internalFrameActivated(e);
   }
