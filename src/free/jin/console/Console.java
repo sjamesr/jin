@@ -265,7 +265,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       }
 
       public void mouseClicked(MouseEvent e){
-        System.out.println(e.getClickCount());
         super.mouseClicked(e);
         if (isCopyOnSelect())
           requestDefaultFocus();

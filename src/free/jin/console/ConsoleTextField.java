@@ -311,7 +311,6 @@ public class ConsoleTextField extends FixedJTextField{
   private class TellNextTellerAction implements ActionListener{
 
     public void actionPerformed(ActionEvent evt){
-      System.out.println("nextTellerAction");
       int traversedTellerCount = console.getTellerRingSize();
 
       tellerIndex--;
