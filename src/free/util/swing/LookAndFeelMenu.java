@@ -26,6 +26,7 @@ import javax.swing.*;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
@@ -109,7 +110,7 @@ public class LookAndFeelMenu extends JMenu{
 
     UIManager.addPropertyChangeListener(new LookAndFeelChangeListener());
 
-    setMnemonic('l');
+    setMnemonic(KeyEvent.VK_L);
   }
 
 

@@ -132,10 +132,10 @@ public class JinFrameMenuBar extends JMenuBar{
 
   public JMenu createConnectionMenu(){
     final JMenu connMenu = new JMenu("Connection");
-    connMenu.setMnemonic('c');
+    connMenu.setMnemonic(KeyEvent.VK_C);
 
     JMenuItem newConn = new JMenuItem("New Connection");
-    newConn.setMnemonic('n');
+    newConn.setMnemonic(KeyEvent.VK_N);
     newConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
     newConn.addActionListener(new ActionListener(){
 
@@ -147,7 +147,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
     JMenuItem openConn = new JMenuItem("Open Connection");
-    openConn.setMnemonic('o');
+    openConn.setMnemonic(KeyEvent.VK_O);
     openConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
     openConn.addActionListener(new ActionListener(){
 
@@ -173,7 +173,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
     JMenuItem exitMenuItem = new JMenuItem("Exit");
-    exitMenuItem.setMnemonic('x');
+    exitMenuItem.setMnemonic(KeyEvent.VK_X);
     exitMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -271,7 +271,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
   public void addPluginsMenu(JinConnection conn){
     JMenu pluginsMenu = new JMenu("Plugins");
-    pluginsMenu.setMnemonic('p');
+    pluginsMenu.setMnemonic(KeyEvent.VK_P);
 
     pluginsMenus.put(conn, pluginsMenu);
   }
@@ -358,8 +358,8 @@ public class JinFrameMenuBar extends JMenuBar{
       JMenuItem menuItem = new UserMenuItem(user);
       menuItem.setText(String.valueOf(usersCount-i)+" "+menuItem.getText());
       menuItem.addActionListener(userConnectionListener);
-      if (usersCount-i<=9)
-        menuItem.setMnemonic(Character.forDigit(usersCount-i,10));
+      if (usersCount - i <= 9)
+        menuItem.setMnemonic(Character.forDigit(usersCount - i,10));
       connMenu.insert(menuItem,startSeparatorIndex+1);
     }
   }
