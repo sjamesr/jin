@@ -36,6 +36,6 @@ public interface PlainTextListener extends EventListener{
    * Gets called when text arrives from the server.
    */
 
-  void plainTextArrived(PlainTextEvent evt);
+  void plainTextReceived(PlainTextEvent evt);
 
 }
