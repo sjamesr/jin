@@ -421,7 +421,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionLoggedIn(ConnectionEvent evt){
-    consoleFrame.setTitle("Main Console - "+getConnection().getUsername()+" on "+getUser().getServer().getProperty("name.long"));    
+    consoleFrame.setTitle("Main Console - "+getConnection().getUsername()+" on "+getUser().getServer().getLongName());    
     consoleFrame.repaint(); // The title doesn't repaint itself.
   }
 
