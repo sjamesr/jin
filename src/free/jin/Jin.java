@@ -543,8 +543,26 @@ public class Jin{
       // Save the l&f class name
       setProperty("default.lf", UIManager.getLookAndFeel().getClass().getName());
 
+
+      boolean isFrameOK = true;
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      Rectangle frameBounds = mainFrame.getBounds();
+      if (frameBounds.x+frameBounds.width < 50)
+        isFrameOK = false;
+      if (frameBounds.y < -10)
+        isFrameOK = false;
+      if (frameBounds.width < 30)
+        isFrameOK = false;
+      if (frameBounds.height < 40)
+        isFrameOK = false;
+      if (frameBounds.x > screenSize.width - 10)
+        isFrameOK = false;
+      if (frameBounds.y > screenSize.height - 20)
+        isFrameOK = false;
+
       // Save the bounds of the main frame.
-      setProperty("frame.bounds", StringEncoder.encodeRectangle(mainFrame.getBounds()));
+      if (isFrameOK)
+        setProperty("frame.bounds", StringEncoder.encodeRectangle(frameBounds));
 
       OutputStream propsOut = new FileOutputStream(new File(jinUserHome, "user.properties"));
       userProps.save(propsOut, "Jin chess client properties");
