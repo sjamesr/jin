@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 /**
  * The event fired when the server asks to flip the board.
@@ -43,7 +43,7 @@ public class FlipBoardEvent extends GameEvent{
    * Creates a new FlipBoardEvent.
    */
 
-  public FlipBoardEvent(JinConnection conn, Game game, boolean isFlipped){
+  public FlipBoardEvent(Connection conn, Game game, boolean isFlipped){
     super(conn, game);
 
     this.isFlipped = isFlipped;

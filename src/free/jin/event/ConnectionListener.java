@@ -32,6 +32,15 @@ import java.util.EventListener;
 public interface ConnectionListener extends EventListener{
 
 
+
+  /**
+   * Gets called when a connection attempt is made.
+   */
+
+  void connectionAttempted(ConnectionEvent evt);
+
+
+
   /**
    * Gets called when the connection to the server is established.
    */

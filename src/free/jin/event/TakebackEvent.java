@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -43,11 +43,11 @@ public class TakebackEvent extends GameEvent{
 
 
   /**
-   * Creates a new TakebackEvent with the given source JinConnection, Game and 
+   * Creates a new TakebackEvent with the given source Connection, Game and 
    * the amount of moves taken back.
    */
 
-  public TakebackEvent(JinConnection conn, Game game, int takebackCount){
+  public TakebackEvent(Connection conn, Game game, int takebackCount){
     super(conn, game);
 
     this.takebackCount = takebackCount;

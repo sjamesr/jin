@@ -24,8 +24,8 @@ package free.jin.event;
 import free.jin.Game;
 import free.chess.Position;
 import free.chess.ChesslikeGenericVariant;
-import free.jin.JinConnection;
-import free.jin.PGNJinConnection;
+import free.jin.Connection;
+import free.jin.PGNConnection;
 
 
 /**
@@ -48,16 +48,16 @@ public class PositionChangedEvent extends GameEvent{
 
 
   /**
-   * Creates a new PositionChangeEvent with the given source JinConnection, the
+   * Creates a new PositionChangeEvent with the given source Connection, the
    * game in which the position changed and the new Position.
    */
 
-  public PositionChangedEvent(JinConnection conn, Game game, Position position){
+  public PositionChangedEvent(Connection conn, Game game, Position position){
     super(conn, game);
 
-    if ((conn instanceof PGNJinConnection) && (position.getVariant() instanceof ChesslikeGenericVariant) &&
+    if ((conn instanceof PGNConnection) && (position.getVariant() instanceof ChesslikeGenericVariant) &&
         (position.getFEN() == null))
-      throw new IllegalStateException("The source JinConnection implements PGNJinConnection, but did not provide a FEN representation of the position");
+      throw new IllegalStateException("The source Connection implements PGNConnection, but did not provide a FEN representation of the position");
 
     this.position = position;
   } 

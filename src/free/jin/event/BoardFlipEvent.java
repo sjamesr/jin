@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -44,7 +44,7 @@ public class BoardFlipEvent extends GameEvent{
    * Creates a new BoardFlipEvent.
    */
 
-  public BoardFlipEvent(JinConnection conn, Game game, boolean isFlipped){
+  public BoardFlipEvent(Connection conn, Game game, boolean isFlipped){
     super(conn, game);
 
     this.isFlipped = isFlipped;

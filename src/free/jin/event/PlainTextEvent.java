@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.event.JinEvent;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 /**
  * The event sent when text that couldn't be identified as some known type
@@ -44,7 +44,7 @@ public class PlainTextEvent extends JinEvent{
    * Creates a new PlainTextEvent with the given text.
    */
 
-  public PlainTextEvent(JinConnection conn, String text){
+  public PlainTextEvent(Connection conn, String text){
     super(conn);
     this.text = text;
   }

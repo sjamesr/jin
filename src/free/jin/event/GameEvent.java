@@ -23,7 +23,7 @@ package free.jin.event;
 
 import free.jin.Game;
 import free.jin.event.JinEvent;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -44,10 +44,10 @@ public abstract class GameEvent extends JinEvent{
 
 
   /**
-   * Creates a new GameEvent with the given Game and source JinConnection.
+   * Creates a new GameEvent with the given Game and source Connection.
    */
 
-  public GameEvent(JinConnection conn, Game game){
+  public GameEvent(Connection conn, Game game){
     super(conn);
 
     this.game = game;

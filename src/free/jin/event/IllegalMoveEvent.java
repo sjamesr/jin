@@ -23,7 +23,7 @@ package free.jin.event;
 
 import free.jin.Game;
 import free.chess.Move;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -45,11 +45,11 @@ public class IllegalMoveEvent extends GameEvent{
 
 
   /**
-   * Creates a new IllegalMoveEvent with the given source JinConnection, Game 
+   * Creates a new IllegalMoveEvent with the given source Connection, Game 
    * and the attempted illegal move.
    */
 
-  public IllegalMoveEvent(JinConnection conn, Game game, Move move){
+  public IllegalMoveEvent(Connection conn, Game game, Move move){
     super(conn, game);
 
     this.move = move;

@@ -23,7 +23,7 @@ package free.jin.event;
 
 import free.chess.Player;
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -69,12 +69,12 @@ public class ClockAdjustmentEvent extends GameEvent{
 
 
   /**
-   * Creates a new ClockAdjustmentEvent with the given source JinConnection, Game,
+   * Creates a new ClockAdjustmentEvent with the given source Connection, Game,
    * the Player whose clock is adjusted, the amount of milliseconds on his clock
    * and whether the clock is running or stopped.
    */
 
-  public ClockAdjustmentEvent(JinConnection conn, Game game, Player player, int time, boolean running){
+  public ClockAdjustmentEvent(Connection conn, Game game, Player player, int time, boolean running){
     super(conn, game);
 
     this.player = player;

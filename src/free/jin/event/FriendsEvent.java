@@ -18,10 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
+
 package free.jin.event;
 
-import free.jin.FriendsJinConnection;
+import free.jin.FriendsConnection;
 
 
 /**
@@ -98,11 +98,11 @@ public class FriendsEvent extends JinEvent{
 
 
   /**
-   * Creates a new FriendsEvent with the given source FriendsJinConnection event
+   * Creates a new FriendsEvent with the given source FriendsConnection event
    * id and friend name.
    */
 
-  public FriendsEvent(FriendsJinConnection source, int id, String friendName){
+  public FriendsEvent(FriendsConnection source, int id, String friendName){
     super(source);
 
     switch (id){

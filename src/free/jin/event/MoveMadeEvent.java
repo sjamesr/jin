@@ -24,8 +24,8 @@ package free.jin.event;
 import free.jin.Game;
 import free.chess.Move;
 import free.chess.ChessMove;
-import free.jin.JinConnection;
-import free.jin.PGNJinConnection;
+import free.jin.Connection;
+import free.jin.PGNConnection;
 
 
 /**
@@ -58,17 +58,17 @@ public class MoveMadeEvent extends GameEvent{
   /**
    * Creates a new <code>MoveMadeEvent</code>.
    *
-   * @param conn The <code>JinConnection</code>.
+   * @param conn The <code>Connection</code>.
    * @param game The game in which the move was made.
    * @param move The made move.
    * @param isNew Is this is a "new" move.
    */
 
-  public MoveMadeEvent(JinConnection conn, Game game, Move move, boolean isNew){
+  public MoveMadeEvent(Connection conn, Game game, Move move, boolean isNew){
     super(conn, game);
 
-    if ((conn instanceof PGNJinConnection) && (move instanceof ChessMove) && (((ChessMove)move).getSAN() == null))
-      throw new IllegalStateException("The source JinConnection implements PGNJinConnection, but did not provide a SAN representation of the move");
+    if ((conn instanceof PGNConnection) && (move instanceof ChessMove) && (((ChessMove)move).getSAN() == null))
+      throw new IllegalStateException("The source Connection implements PGNConnection, but did not provide a SAN representation of the move");
 
     this.move = move;
     this.isNew = isNew;

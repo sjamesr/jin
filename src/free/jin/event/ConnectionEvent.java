@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.event.JinEvent;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -30,6 +30,15 @@ import free.jin.JinConnection;
  */
 
 public class ConnectionEvent extends JinEvent{
+
+
+  
+  /**
+   * The id constant specifying that an attempt to connect is being made.
+   */
+
+  public static final int ATTEMPTING = 0;
+
 
 
   /**
@@ -66,24 +75,45 @@ public class ConnectionEvent extends JinEvent{
 
 
 
-
   /**
-   * Creates a new ConnectionEvent with the given source JinConnection and ID.
-   * Possible ID values are {@link #ESTABLISHED}, {@link #LOGGED_IN} and {@link #LOST}.
+   * The name of the host to which we're connecting/connected.
    */
 
-  public ConnectionEvent(JinConnection conn, int id){
+  private final String hostname;
+
+
+
+  /**
+   * The remote port on which we're connecting/connected.
+   */
+
+  private final int port;
+
+
+
+
+  /**
+   * Creates a new ConnectionEvent with the given source Connection, event id,
+   * hostname and port.
+   * Possible id values are {@link #ATTEMPTING}, {@link #ESTABLISHED},
+   * {@link #LOGGED_IN} and {@link #LOST}.
+   */
+
+  public ConnectionEvent(Connection conn, int id, String hostname, int port){
     super(conn);
     switch(id){
+      case ATTEMPTING:
       case ESTABLISHED:
       case LOGGED_IN:
       case LOST:
         break;
       default:
-        throw new IllegalArgumentException("Wrong ID value: "+id);
+        throw new IllegalArgumentException("Wrong ID value: " + id);
     }
 
     this.id = id;
+    this.hostname = hostname;
+    this.port = port;
   }
 
 
@@ -97,6 +127,27 @@ public class ConnectionEvent extends JinEvent{
   public int getID(){
     return id;
   }
+
+
+
+  /**
+   * Returns the name of the host.
+   */
+
+  public String getHost(){
+    return hostname;
+  }
+
+
+
+  /**
+   * Returns the port.
+   */
+
+  public int getPort(){
+    return port;
+  }
+
 
 
 }

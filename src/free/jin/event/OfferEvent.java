@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 import free.chess.Player;
 
 
@@ -107,7 +107,7 @@ public class OfferEvent extends GameEvent{
    * offers use the other constructor.
    */
 
-  public OfferEvent(JinConnection conn, Game game, int offerId, boolean isOffered, Player player){
+  public OfferEvent(Connection conn, Game game, int offerId, boolean isOffered, Player player){
     super(conn, game);
 
     switch (offerId){
@@ -134,7 +134,7 @@ public class OfferEvent extends GameEvent{
    * Creates a new <code>OfferEvent</code> for a takeback offer.
    */
 
-  public OfferEvent(JinConnection conn, Game game, boolean isOffered, Player player,
+  public OfferEvent(Connection conn, Game game, boolean isOffered, Player player,
       int takebackCount){
     super(conn, game);
 

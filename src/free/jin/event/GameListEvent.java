@@ -119,14 +119,15 @@ public class GameListEvent extends JinEvent{
 
 
   /**
-   * Creates a new GameListEvent with the given source JinConnection,
+   * Creates a new GameListEvent with the given source <code>Connection</code>,
    * id, list of GameListItems, title of the list, the amount of items in the
    * complete list, the index of the first and last items in this list, within 
    * the complete list. The list implied by this event is not always the 
    * complete one.
    */
 
-  public GameListEvent(JinConnection conn, int id, GameListItem [] gameList, String listTitle, int totalNumItems, int firstIndex, int lastIndex){
+  public GameListEvent(Connection conn, int id, GameListItem [] gameList, String listTitle,
+      int totalNumItems, int firstIndex, int lastIndex){
     super(conn);
 
     this.id = id;

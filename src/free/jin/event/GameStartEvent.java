@@ -22,8 +22,8 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
-import free.jin.PGNJinConnection;
+import free.jin.Connection;
+import free.jin.PGNConnection;
 import free.chess.ChesslikeGenericVariant;
 
 
@@ -35,15 +35,15 @@ public class GameStartEvent extends GameEvent{
 
 
   /**
-   * Creates a new GameStartEvent with the given source JinConnection and Game.
+   * Creates a new GameStartEvent with the given source Connection and Game.
    */
 
-  public GameStartEvent(JinConnection conn, Game game){
+  public GameStartEvent(Connection conn, Game game){
     super(conn, game);
 
-    if ((conn instanceof PGNJinConnection) && (game.getVariant() instanceof ChesslikeGenericVariant) &&
+    if ((conn instanceof PGNConnection) && (game.getVariant() instanceof ChesslikeGenericVariant) &&
         (game.getInitialPosition().getFEN() == null))
-      throw new IllegalStateException("The source JinConnection implements PGNJinConnection, but did not provide a FEN representation of the initial position");
+      throw new IllegalStateException("The source Connection implements PGNConnection, but did not provide a FEN representation of the initial position");
   }
 
 }

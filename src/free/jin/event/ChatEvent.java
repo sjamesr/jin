@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.event.JinEvent;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -35,7 +35,7 @@ import free.jin.JinConnection;
  * Note that this class isn't aware of the value of the tell type, it's a server
  * specific string which should be dealt by a server specific class.<br>
  *
- * The source of the event is the JinConnection it came from.
+ * The source of the event is the Connection it came from.
  */
 
 public class ChatEvent extends JinEvent{
@@ -107,7 +107,7 @@ public class ChatEvent extends JinEvent{
    * rating (-1 if unknown), message and forum.
    */
 
-  public ChatEvent(JinConnection conn, String type, String sender, String senderTitle,
+  public ChatEvent(Connection conn, String type, String sender, String senderTitle,
       int senderRating, String message, Object forum){
     super(conn);
 

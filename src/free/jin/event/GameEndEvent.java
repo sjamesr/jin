@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 
 
 /**
@@ -44,12 +44,12 @@ public class GameEndEvent extends GameEvent{
 
 
   /**
-   * Creates a new GameEndEvent with the given Game, source JinConnection and
+   * Creates a new GameEndEvent with the given Game, source Connection and
    * result. Possible result values are defined in the <code>Game</code> class.
    * <code>GAME_IN_PROGRESS</code> is not a valid result, though.
    */
 
-  public GameEndEvent(JinConnection conn, Game game, int result){
+  public GameEndEvent(Connection conn, Game game, int result){
     super(conn, game);
 
     if (game.getResult() == Game.GAME_IN_PROGRESS)
