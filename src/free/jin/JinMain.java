@@ -1013,15 +1013,20 @@ public class JinMain implements JinContext{
     frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
     mainFrame.setBounds(frameBounds);
 
-    // Bugfix for Java bug 4464714 - setExtendedState only works once the
-    // the window is realized
-    mainFrame.pack();
-
-    // Restore maximized state
     boolean vertMaximized = userPrefs.getBool("frame.maximized.vert", false);
     boolean horizMaximized = userPrefs.getBool("frame.maximized.horiz", false);
-    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
-    AWTUtilities.setExtendedFrameState(mainFrame, state);
+
+    if (vertMaximized || horizMaximized){
+      // Bugfix for Java bug 4464714 - setExtendedState only works once the
+      // the window is realized
+      mainFrame.pack();
+      // It's important not to call pack() on MS VM because it causes the window
+      // to become very small
+  
+      // Restore maximized state
+      int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
+      AWTUtilities.setExtendedFrameState(mainFrame, state);
+    }
   }
 
 
