@@ -22,8 +22,6 @@
 package free.jin;
 
 import java.util.Properties;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.*;
 import free.util.ImmutableProperties;
 import free.util.IOUtilities;
