@@ -1077,9 +1077,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       updateMoveHighlighting(isMoveEnRoute);
     }
 
-    isMoveEnRoute = false;
-
-    if (queuedMove != null){
+    // !isMoveEnRoute makes sure that we only send the queued move after we receive
+    // the *opponent's* move, and not just any move.
+    if ((queuedMove != null) && !isMoveEnRoute){ 
       UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
       isBoardPositionUpdating = true;
       board.getPosition().copyFrom(realPosition);
@@ -1089,6 +1089,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       fireUserMadeMove(evt2);
       isMoveEnRoute = true;
     }
+    else
+      isMoveEnRoute = false;
 
     if (!board.isEnabled())
       board.setEnabled(true);
@@ -1311,7 +1313,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Position source = evt.getPosition();
     Move move = evt.getMove();
 
-    if (source==board.getPosition()){
+    if (source == board.getPosition()){
       playAudioClipForMove(move);
       if (isMoveEnRoute||(!isUserTurn())){
         queuedMove = move;
