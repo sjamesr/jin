@@ -81,17 +81,16 @@ public class ChessMove extends Move{
   
   /**
    * Creates a new ChessMove with the given properties. If the move is not a
-   * promotion, the promotion target should be null. The
-   * <code>stringRepresentation</code> argument may be null. Note: this 
-   * constructor doesn't care whether the move is legal or even possible because
-   * it isn't specific to any variant.
+   * promotion, the promotion target should be <code>null</code>. The
+   * <code>moveSAN</code> (the move in SAN format) argument may be
+   * <code>null</code>.
    */
 
   public ChessMove(Square startingSquare, Square endingSquare, Player movingPlayer,
       boolean isEnPassant, boolean isShortCastling, boolean isLongCastling,
-      ChessPiece capturedPiece, ChessPiece promotionTarget, String stringRepresentation){
+      ChessPiece capturedPiece, ChessPiece promotionTarget, String moveSAN){
 
-    super(startingSquare, endingSquare, movingPlayer, stringRepresentation);
+    super(startingSquare, endingSquare, movingPlayer, moveSAN);
 
     this.promotionTarget = promotionTarget;
     this.isEnPassant = isEnPassant;
@@ -108,17 +107,19 @@ public class ChessMove extends Move{
    * Creates a new ChessMove from the given properties. The missing information
    * (en-passant, castling and other information provided by the more complete
    * constructor) is determined according to the rules of standard chess.
+   * The <code>moveSAN</code> (the move in SAN format) argument may be
+   * <code>null</code>.
    *
    * @throws IllegalArgumentException If the there is no piece at the starting
    * square.
    */
 
   public ChessMove(Position pos, Square startingSquare, Square endingSquare, 
-      ChessPiece promotionTarget, String stringRepresentation){
+      ChessPiece promotionTarget, String moveSAN){
     
-    super(startingSquare, endingSquare, pos.getCurrentPlayer(), stringRepresentation);
+    super(startingSquare, endingSquare, pos.getCurrentPlayer(), moveSAN);
 
-    if (pos.getPieceAt(startingSquare)==null)
+    if (pos.getPieceAt(startingSquare) == null)
       throw new IllegalArgumentException("The moving piece may not be null");
 
     this.promotionTarget = promotionTarget;
@@ -180,6 +181,18 @@ public class ChessMove extends Move{
     }
 
     return buf.toString();
+  }
+
+
+
+
+  /**
+   * Returns the SAN representation of the move, or <code>null</code> if none
+   * was specified in the constructor.
+   */
+
+  public String getSAN(){
+    return getStringRepresentation();
   }
  
 
