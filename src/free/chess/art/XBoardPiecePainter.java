@@ -33,7 +33,9 @@ import free.util.IOUtilities;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the pieces used
- * by xboard/winboard.
+ * by xboard/winboard. The piece set is available under the General Public
+ * License from the xboard/winboard author, Tim Mann. More information is
+ * available at http://www.tim-mann.org/xboard.html.
  */
 
 public class XBoardPiecePainter extends ResourceImagePiecePainter{
