@@ -1266,6 +1266,12 @@ public class InternalFramesUIProvider implements UIProvider{
       RectDouble defaultBounds = getInitialBounds();
       RectDouble bounds = (id == null ? defaultBounds :
         prefs.getRectDouble(prefix + "iframe.bounds", defaultBounds));
+        
+      // Fix the bounds in case they went bad for some reason.
+      bounds.setX(Math.min(1, Math.max(0, bounds.getX())));
+      bounds.setY(Math.min(1, Math.max(0, bounds.getY())));
+      bounds.setWidth(Math.min(1, Math.max(0.02, bounds.getWidth())));
+      bounds.setHeight(Math.min(1, Math.max(0.02, bounds.getHeight())));
 
       frame.setBounds(bounds.scale(desktop.getWidth(), desktop.getHeight()).toRect());
 
