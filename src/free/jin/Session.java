@@ -22,6 +22,7 @@
 package free.jin;
 
 import free.jin.plugin.*;
+import free.jin.action.*;
 import java.io.IOException;
 
 
@@ -72,10 +73,17 @@ public class Session{
   private boolean isClosed = false;
 
 
+  
+  /**
+   * An array of the standalone actions in this session.
+   */
+   
+  private final JinAction [] actions; 
+  
+  
 
   /**
-   * An array of the plugins in this session. Creates by the <code>login</code>
-   * method.
+   * An array of the plugins in this session.
    */
 
   private final Plugin [] plugins;
@@ -117,7 +125,45 @@ public class Session{
     this.conn =
       server.createConnection(context, connDetails.getUsername(), connDetails.getPassword());
 
+    this.actions = createActions();
     this.plugins = createPlugins();
+  }
+  
+  
+  
+  /**
+   * Creates the standalone actions for this session and returns an array of
+   * them. Yes, I shouldn't reuse PluginStartException here, but so what :-p.
+   */
+   
+  private JinAction [] createActions() throws PluginStartException{
+    ActionInfo [] actionsInfo = context.getActions(getServer());
+    JinAction [] actions = new JinAction[actionsInfo.length];
+    
+    for (int i = 0; i < actions.length; i++){
+      ActionInfo info = actionsInfo[i];
+      
+      Class actionClass = info.getActionClass();
+      Preferences prefs = info.getActionPreferences();
+      
+      JinAction action;
+      
+      try{
+        action = (JinAction)actionClass.newInstance();
+      } catch (InstantiationException e){
+          throw new PluginStartException(e, "Unable to instantiate " + actionClass);
+        }
+        catch (IllegalAccessException e){
+          throw new PluginStartException(e, "Unable to instantiate " + actionClass);
+        }
+      
+      ActionContext actionContext = new ActionContext(context, conn, user, prefs);
+      action.setContext(actionContext);
+      
+      actions[i] = action;
+    }
+    
+    return actions;
   }
 
 
@@ -148,12 +194,12 @@ public class Session{
     }
 
     // Create plugin context
-    PluginContext pluginContext = new PluginContext(context, conn, user, plugins, pluginPrefs);
+    PluginContext pluginContext = new PluginContext(context, conn, user, plugins, pluginPrefs, actions);
 
     // Set context on plugins
     for (int i = 0; i < plugins.length; i++)
       plugins[i].setContext(pluginContext);
-
+    
     // Start the plugins
     for (int i = 0; i < plugins.length; i++){
       Plugin plugin = plugins[i];
