@@ -603,6 +603,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     boardPanel.getBoard().setDraggedPieceStyle(draggedPieceStyle);
     boardPanel.getBoard().setManualPromote(!autoPromote);
     boardPanel.getBoard().setPiecePainter(piecePainter);
+    boardPanel.getBoard().setBoardPainter(boardPainter);
 
     boardPanel.addUserMoveListener(this);
     getConnection().addGameListener(boardPanel);
