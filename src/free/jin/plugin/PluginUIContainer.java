@@ -23,6 +23,7 @@ package free.jin.plugin;
 
 import java.awt.Container;
 import java.awt.Image;
+import javax.swing.JMenu;
 
 
 /**
@@ -33,29 +34,21 @@ import java.awt.Image;
 
 public interface PluginUIContainer{
 
-
-
+  
+  
   /**
-   * The constant for hiding the plugin container on a close operation.
+   * Returns the plugin to which this <code>PluginUIContainer</code> belongs.
    */
-
-  int HIDE_ON_CLOSE = 1;
-
-
-
+  
+  Plugin getPlugin();
+  
+  
+  
   /**
-   * The constant for closing the session on a close operation.
+   * Returns the id of this <code>PluginUIContainer</code>
    */
-
-  int CLOSE_SESSION_ON_CLOSE = 2;
-
-
-
-  /**
-   * The constant for not doing anything on a close operation.
-   */
-
-  int DO_NOTHING_ON_CLOSE = 3;
+  
+  String getId();
 
 
 
@@ -89,9 +82,17 @@ public interface PluginUIContainer{
    */
 
   void setTitle(String title);
-
-
-
+  
+  
+  
+  /**
+   * Adds a menu to this container.
+   */
+  
+  void addMenu(JMenu menu);
+  
+  
+  
   /**
    * Sets the icon of the container.
    */
@@ -134,16 +135,14 @@ public interface PluginUIContainer{
   boolean isActive();
 
 
-
+  
   /**
-   * Sets this container's close operation. Possible values are
-   * {@link #HIDE_ON_CLOSE}, {@link #CLOSE_SESSION_ON_CLOSE} and
-   * {@link #DO_NOTHING_ON_CLOSE}. The default value depends on the actual
-   * implementation and may even be neither of the operations described above.
+   * Completely disposes of this PluginUIContainer - it will not be usable
+   * after this method is called.
    */
+  
+  void dispose();
 
-  void setCloseOperation(int val);
 
-
-
+  
 }
