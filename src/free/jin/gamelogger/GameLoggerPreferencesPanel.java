@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 import free.workarounds.FixedJTextField;
+import free.jin.Preferences;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
 import free.util.swing.ExtensionFileFilter;
@@ -633,6 +634,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges() throws BadChangesException{
+    Preferences prefs = gameLogger.getPrefs();
+
     int selectedIndex = loggingRulesList.getSelectedIndex();
     if (selectedIndex != -1)
       updateRuleFromUI(selectedIndex);
@@ -652,18 +655,18 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       throw new BadChangesException("You must specify the name of the file into which the games will be logged", 
         allGamesLogFileField);
 
-    gameLogger.setProperty("logging.mode", loggingModeString);
+    prefs.setString("logging.mode", loggingModeString);
 
-    gameLogger.setProperty("logging.all.filename", allGamesLogFile);
+    prefs.setString("logging.all.filename", allGamesLogFile);
 
     DefaultListModel loggingRulesModel = (DefaultListModel)loggingRulesList.getModel();
     int rulesCount = loggingRulesModel.size();
-    gameLogger.setIntegerProperty("logging.rules.count", rulesCount);
+    prefs.setInt("logging.rules.count", rulesCount);
     for (int i = 0; i < rulesCount; i++){
       LoggingRule rule = (LoggingRule)loggingRulesModel.elementAt(i);
-      gameLogger.setProperty("logging.rule-"+(i+1)+".name", rule.getName());
-      gameLogger.setProperty("logging.rule-"+(i+1)+".condition", rule.getCondition());
-      gameLogger.setProperty("logging.rule-"+(i+1)+".filename", rule.getFilename());
+      prefs.setString("logging.rule-" + (i + 1) + ".name", rule.getName());
+      prefs.setString("logging.rule-" + (i + 1) + ".condition", rule.getCondition());
+      prefs.setString("logging.rule-" + (i + 1) + ".filename", rule.getFilename());
     }
 
     gameLogger.refreshFromProperties();
@@ -727,7 +730,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
       JFileChooser fileChooser = new JFileChooser(currentDir);
       fileChooser.setMultiSelectionEnabled(false);
-      fileChooser.addChoosableFileFilter(new ExtensionFileFilter("Portable Game Notation files", ".pgn", false));
+      fileChooser.addChoosableFileFilter(
+        new ExtensionFileFilter("Portable Game Notation files", ".pgn", false));
       fileChooser.setFileHidingEnabled(true);
       fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
       int result = fileChooser.showDialog(parent, "Use File");
@@ -741,7 +745,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         if (path == null)
           path = fileChooser.getSelectedFile().getAbsolutePath();
 
-        if (path.indexOf(".") == -1) // User forgot to specify the pgn extension.
+        if (!(path.endsWith(".pgn") || path.endsWith(".PGN")))
           path = path+".pgn";
 
         textfield.setText(path);

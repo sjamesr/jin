@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,76 +21,118 @@
 
 package free.jin.plugin;
 
+import free.jin.*;
+import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
-import free.jin.JinConnection;
-import free.jin.JinFrame;
-import free.jin.User;
+import free.util.ArrayEnumeration;
+import free.util.Utilities;
+
 
 /**
- * The context in which a plugin is running.
+ * The context of a plugin. Provides the plugin with methods to access the
+ * environment in which it runs.
  */
 
 public class PluginContext{
 
 
+
   /**
-   * The User (what more can I say?).
+   * The <code>JinContext</code>.
+   */
+
+  private final JinContext context;
+
+
+
+  /**
+   * The connection to the server.
+   */
+
+  private final Connection conn;
+
+
+
+  /**
+   * The account with the server.
    */
 
   private final User user;
+
+
+ 
+  /**
+   * A list of plugins run in the session.
+   */
+
+  private final Plugin [] plugins;
+
+
+
+  /**
+   * The plugins' preferences, in order matching the <code>plugins</code>
+   * variable.
+   */
+
+  private final Preferences [] prefs;
+
+
+
+  /**
+   * A lazily filled hashtable of plugins mapped to the <code>Preferences</code>
+   * objects they should use. Note that these aren't the plugin preferences,
+   * but the user preferences backed up by the plugin preferences.
+   */
+
+  private final Hashtable pluginsToPreferences = new Hashtable();
+
   
 
-
   /**
-   * The JinConnection to the server.
+   * Creates a new <code>PluginContext</code> with the specified information.
+   *
+   * @param context The application's context.
+   * @param conn The connection to the server.
+   * @param user The account with the server.
+   * @param plugins The plugins run in the session.
+   * @param prefs The plugins' preferences, in order matching the 
+   * <code>plugins</code> argument.
    */
 
-  private final JinConnection conn;
-
-
-  /**
-   * The Jin's main frame - JinFrame.
-   */
-
-  private final JinFrame mainFrame;
-
-
-
-  /**
-   * Maps plugin property names to property values.
-   */
-
-  private final Properties properties;
-
-
-
-
-  /**
-   * Maps plugin names to Plugins.
-   */
-
-  private final Hashtable plugins;
-
-
-
-  /**
-   * Creates a new PluginContext with the given User, JinConnection, JinFrame, properties
-   * and Hashtable mapping plugin names to plugins.
-   */
-
-  public PluginContext(User user, JinConnection conn, JinFrame mainFrame, Properties properties, Hashtable plugins){
-    this.user = user;
+  public PluginContext(JinContext context, Connection conn, User user,
+      Plugin [] plugins, Preferences [] prefs){
+    this.context = context;
     this.conn = conn;
-    this.mainFrame = mainFrame;
-    this.properties = properties;
+    this.user = user;
     this.plugins = plugins;
+    this.prefs = prefs;
   }
 
 
 
   /**
-   * Returns the User using the plugin.
+   * Returns the <code>JinContext</code> in which we're running.
+   */
+
+  public JinContext getJinContext(){
+    return context;
+  }
+
+
+
+  /**
+   * Returns the connection to the server.
+   */
+
+  public Connection getConnection(){
+    return conn;
+  }
+
+
+
+  /**
+   * Returns the <code>User</code> object representing the account on the
+   * server.
    */
 
   public User getUser(){
@@ -99,55 +141,39 @@ public class PluginContext{
 
 
 
-
   /**
-   * Returns the connection to the server.
+   * Returns the plugin with the specified id.
    */
 
-  public JinConnection getConnection(){
-    return conn;
+  public Plugin getPlugin(String id){
+    for (int i = 0; i < plugins.length; i++)
+      if (plugins[i].getId().equals(id))
+        return plugins[i];
+
+    return null;
   }
 
 
 
   /**
-   * Returns Jin's main frame.
+   * Returns the <code>Preferences</code> the specified plugin should use. Note
+   * that these aren't the plugin's preferences - these are wrapped user
+   * preferences with a prefix of the plugin's id and backed up by the plugin's
+   * own preferences.
    */
 
-  public JinFrame getMainFrame(){
-    return mainFrame;
-  }
+  public synchronized Preferences getPreferences(Plugin plugin){
+    Preferences result = (Preferences)pluginsToPreferences.get(plugin);
+    if (result == null){
+      Preferences pluginPrefs = prefs[Utilities.indexOf(plugins, plugin)];
+      Preferences userPrefs = user.getPrefs();
+      String pluginId = plugin.getId();
+      result = Preferences.createBackedUp(Preferences.createWrapped(userPrefs, pluginId + "."), pluginPrefs);
 
+      pluginsToPreferences.put(plugin, result);
+    }
 
-
-  /**
-   * Returns the Plugin with the given name.
-   */
-
-  public Plugin getPlugin(String pluginName){
-    return (Plugin)plugins.get(pluginName);
-  }
-
-
-
-  /**
-   * Returns the plugin property with the given name, or null if no property
-   * with the given name exists.
-   */
-
-  public String getProperty(String parameterName){
-    return properties.getProperty(parameterName);    
-  }
-
-
-
-  /**
-   * Returns the plugin properties. Note that these are the actual properties,
-   * modifying them will affect the plugin.
-   */
-
-  public Properties getProperties(){
-    return properties;
+    return result;
   }
 
 

@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -23,54 +23,53 @@ package free.jin.plugin;
 
 import free.jin.*;
 import javax.swing.JMenu;
-import free.util.Utilities;
 import free.util.MemoryFile;
 
 
 /**
- * The base class for all Plugins. Usually, a plugin only needs to override the
- * start(), saveState() and stop() methods. During the lifetime of a plugin
- * object, the following things will occur:
- * <ol>
- *   <li>The <code>Plugin</code> object is created via a no-arg constructor.
- *   <li>The <code>setContext(PluginContext)</code> method is called.
- *   <li>The <code>start()</code> method is called.
- *   <li>The <code>createPluginMenu()</code> method is called.
- *   <li>The <code>hasPreferencesUI()</code> method is called.
- *   <li>The <code>getPreferencesUI()</code> method may be called multiple
- *       times.
- *   <li>When the user closes the session, the <code>saveState()</code> method
- *       is invoked.
- *   <li>When the <code>saveState()</code> method returns, <code>stop()</code>
- *       is invoked.
- * </ol>
+ * The base class for all plugins. All subclasses must have a no-arg constructor
+ * to work properly.
  */
-
 
 public abstract class Plugin{
 
 
 
   /**
-   * The context of this Plugin.
+   * The plugin's context.
    */
 
-  private PluginContext context = null;
+  private PluginContext context;
+
+
+
+  /**
+   * The connection.
+   */
+
+  private Connection conn;
+
+
+
+  /**
+   * The preferences.
+   */
+
+  private Preferences prefs;
 
 
 
 
   /**
-   * Sets this plugin's context to the given <code>PluginContext</code>. The
-   * subclass is allowed to override this method and throw an
-   * <code>UnsupportedContextException</code> if the specified context
-   * (typically the connection object) does not provide one of the features
-   * required by the plugin.
+   * Sets the plugin's context. The plugin may override this method to check
+   * that the context has the properties (usually the right type of Connection)
+   * required by the plugin and throw a <code>PluginStartException</code> if
+   * not.
    */
 
-  public void setContext(PluginContext context) throws UnsupportedContextException{
+  public void setContext(PluginContext context) throws PluginStartException{
     if (this.context != null)
-      throw new IllegalStateException("Already has a PluginContext");
+      throw new IllegalStateException("PluginContext already set");
 
     this.context = context;
   }
@@ -78,207 +77,92 @@ public abstract class Plugin{
 
 
   /**
-   * Returns the PluginContext of this Plugin.
+   * Returns the connection to the server.
    */
 
-  public final PluginContext getPluginContext(){
-    return context;
-  }
+  public Connection getConn(){
+    if (conn == null)
+      conn = context.getConnection();
 
-
-  
-  /**
-   * Returns the value of the given User property, or null if the User has no
-   * such property.
-   */
-
-  public String getUserProperty(String propertyName){
-    return getUser().getProperty(propertyName);
+    return conn;
   }
 
 
 
-
   /**
-   * Returns the value of the given Plugin property, or null if the Plugin has
-   * no such property.
+   * Returns the <code>Preferences</code> object the plugin should use for
+   * getting/setting its preferences for the user of the current session.
    */
 
-  public String getPluginProperty(String propertyName){
-    return context.getProperty(propertyName);
+  public Preferences getPrefs(){
+    if (prefs == null)
+      prefs = context.getPreferences(this);
+
+    return prefs;
   }
 
 
 
-
   /**
-   * Returns the value of the User property with a name equal to the plugin 
-   * id plus "." plus the given string. If such a property does not exist,
-   * the value of the plugin property with a name equal to the given string
-   * is returned.
+   * Returns the <code>UIProvider</code>.
    */
 
-  public String getProperty(String propertyName){
-    String val = getUserProperty(getID()+"."+propertyName);
-    return val == null ? getPluginProperty(propertyName) : val;
+  public UIProvider getUIProvider(){
+    return context.getJinContext().getUIProvider();
   }
 
 
 
-
   /**
-   * Returns the value of the user property with a name equal to the plugin 
-   * id plus "." plus the given string. If such a property does not exist,
-   * the value of the plugin property with a name equal to the given string
-   * is returned. If property doesn't exist either, the given default value is
-   * returned.
+   * Creates a UI container with the specified id for this plugin. See
+   * {@link UIProvider#createPluginUIContainer(Plugin, String)} for more
+   * information.
    */
 
-  public String getProperty(String propertyName, String defaultValue){
-    String val = getProperty(propertyName);
-    return val == null ? defaultValue : val;
+  public PluginUIContainer createContainer(String id){
+    return getUIProvider().createPluginUIContainer(this, id);
   }
 
 
 
-
   /**
-   * Invokes the <code>getProperty</code> method and returns its value after
-   * converting it to an int. The specified default value is returned used if 
-   * <code>getProperty</code> returns <code>null</code>.
+   * Returns the user's <code>MemoryFile</code> with the specified name. See
+   * {@link #setFile(String, MemoryFile)} for an explanation on the user files
+   * mechanism.
    */
 
-  public int getIntegerProperty(String propertyName, int defaultValue){
-    String propertyValue = getProperty(propertyName);
-    return propertyValue == null ? defaultValue : Integer.parseInt(propertyValue);
+  public MemoryFile getFile(String filename){
+    return getUser().getFile(getId() + "/" + filename);
   }
 
 
 
-
-
   /**
-   * Looks up and returns a value for the property with the given name. First
-   * the property with the full given name is searched, if that is not found,
-   * a property whose name is equal to the given name up to the last '.' is
-   * looked up. This is repeated recursively until either the property exists
-   * or there are no more '.' characters remaining in the property name (and that
-   * property doesn't exist either). Returns null if the look up didn't find
-   * any values. For example, looking up a property named "channel-foreground.atell"
-   * will first try to find a property named just that, if that's not found, then 
-   * one named "channel-foreground" and if that is not found, it will return null.
+   * Sets the user file with the specified name to be the specified
+   * <code>MemoryFile</code>. If a file with the specified name already exists,
+   * it is deleted. The specified file may also be <code>null</code> if you wish
+   * to use this method just for its side-effect. This mechanism (see also the
+   * {@link #getFile(String) method) allows plugins to store somewhat larger
+   * amounts of information than what the preferences mechanism is intended for.
+   * It also allows storing the data in whatever format is convenient to the
+   * plugin (where Preferences supports only a finite amount of types and
+   * handles the format internally). Typically, you only need to create and set
+   * a file only once - you can then obtain the <code>MemoryFile</code> object
+   * via the <code>getFile</code> method and write into it. There is no need to
+   * replace the file each time you want to change it. You can, however, use it
+   * in both manners.
    */
 
-  public String lookupProperty(String propertyName){
-    String propertyValue = getProperty(propertyName);
-    if (propertyValue == null){
-      int dotIndex = propertyName.lastIndexOf(".");
-      if (dotIndex == -1)
-        return null;
-      return lookupProperty(propertyName.substring(0, dotIndex));
-    }
-    else
-      return propertyValue;
+  public void setFile(String filename, MemoryFile file){
+    getUser().setFile(getId() + "/" + filename, file);
   }
 
 
 
-
-
   /**
-   * Sets the user property with the name equal to the plugin id plus "." plus 
-   * the given property name to the given value.
+   * Returns the <code>User</code> object representing the account we're using
+   * to connect to the server.
    */
-
-  public void setProperty(String propertyName, String propertyValue){
-    if (Utilities.areEqual(propertyValue, getProperty(propertyName)))
-      return;
-
-    getUser().setProperty(getID()+"."+propertyName, propertyValue);
-  }
-
-
-
-
-  /**
-   * Sets the specified property to the specified integer value.
-   */
-
-  public void setIntegerProperty(String propertyName, int propertyValue){
-    setProperty(propertyName, String.valueOf(propertyValue));
-  }
-
-
-
-
-  /**
-   * Opens and returns a new user <code>MemoryFile</code> with the specified
-   * name. If a file with the specified name already exists, it is removed.
-   */
-
-  public MemoryFile createFile(String name){
-    MemoryFile file = new MemoryFile();
-    String filename = getID()+"."+name;
-    getUser().putFile(filename, file);
-    return file;
-  }
-
-
-
-
-  /**
-   * Returns the user's <code>MemoryFile</code> with the specified name, or 
-   * <code>null</code> if there is no such file.
-   */
-
-  public MemoryFile getFile(String name){
-    String filename = getID()+"."+name;
-    return getUser().getFile(filename);
-  }
-
-
-
-
-  /**
-   * Returns <code>true</code> if a user <code>MemoryFile</code> with the
-   * specified name exists. Returns <code>false</code> otherwise.
-   */
-
-  public boolean fileExists(String name){
-    return getFile(name) != null;
-  }
-
-
-
-
-  /**
-   * Returns the id of this plugin. This method is just an alias for
-   * context.getProperty("id").
-   */
-
-  public String getID(){
-    return context.getProperty("id");
-  }
-
-
-
-
-  /**
-   * Returns the name of this plugin. This method is just an alias for
-   * context.getProperty("name"). This is probably something that can be displayed
-   * to the user
-   */
-
-  public String getName(){
-    return context.getProperty("name");
-  }
-
-
-
-
-  /**
-   * Returns the User this Plugin is working for.
-   */                                           
 
   public User getUser(){
     return context.getUser();
@@ -286,65 +170,50 @@ public abstract class Plugin{
 
 
 
-
   /**
-   * Returns the connection to the server.
+   * Returns the <code>Server</code> object representing the server we're
+   * connected to.
    */
 
-  public JinConnection getConnection(){
-    return context.getConnection();
+  public Server getServer(){
+    return getUser().getServer();
   }
 
 
 
   /**
-   * Tells the Plugin it should start doing whatever it should be doing.
-   * The default implementation does nothing.
+   * Returns the plugin with the specified id that is running in the same
+   * context as this plugin.
    */
 
-  public void start(){
-    
+  public Plugin getPlugin(String id){
+    return context.getPlugin(id);
   }
-
+  
 
 
 
   /**
-   * This method return the menu for this plugin. This menu will usually be put
-   * on the menubar, but it can be ignored or put elsewhere depending on the
-   * context. If the plugin has no menu, this method should return 
-   * <code>null</code>. The default implementation returns <code>null</code>.
-   * This method is guaranteed to be called after the <code>start()</code>
-   * method returns.
+   * Returns this plugin's id. Ids need to be unique across all plugins that
+   * can be run for a single <code>User</code> object.
    */
 
-  public JMenu createPluginMenu(){
-    return null;
-  }
-
-
+  public abstract String getId();
 
 
 
   /**
-   * This method should return a JPanel containing UI which allows customizing
-   * this plugin's functionality and/or setting its preferences.
-   * The <code>hasPreferencesUI()</code> method specifies whether this plugin
-   * has a preferences UI. If not, this method will not be called.
-   * The default implementation returns <code>null</code>.
+   * Returns the plugin's name. This should be something descriptive that can
+   * be shown to the user.
    */
 
-  public PreferencesPanel getPreferencesUI(){
-    return null;
-  }
+  public abstract String getName();
 
 
-
-
+  
   /**
-   * Specifies whether this plugin has a UI to modify its preferences. If this
-   * method returns <code>true</code>, the <code>createPreferencesUI</code>
-   * method may not return <code>null</code>. The default implementation returns
+   * Returns whether this plugin has a preferences panel it wants to be
+   * displayed to the user. The default implementation returns
    * <code>false</code>.
    */
 
@@ -355,8 +224,58 @@ public abstract class Plugin{
 
 
   /**
-   * Tells the plugin to save its state into user variables. The default
-   * implementation does nothing.
+   * Return a PreferencesPanel for changing the plugin's preferences. This
+   * method will never be called if <code>hasPreferencesUI</code> returns false.
+   * The default implementation throws an <code>IllegalStateException</code>,
+   * since it's not supposed to be called.
+   */
+
+  public PreferencesPanel getPreferencesUI(){
+    throw new IllegalStateException("This plugin has no preferences ui");
+  }
+
+
+
+  /**
+   * Creates and returns a menu for this plugin. Returns <code>null</code> to
+   * indicate that the plugin doesn't have a menu. The actual placing of the
+   * menu is handled by the context. The default implementation returns
+   * <code>null</code>.
+   */
+
+  public JMenu createPluginMenu(){
+    return null;
+  }
+
+
+
+  /**
+   * Returns whatever <code>getName</code> does.
+   */
+
+  public String toString(){
+    return getName();
+  }
+
+
+
+  /**
+   * This method is invoked to signal to the plugin to start its activity. The
+   * default implementation does nothing. The plugin may throw a
+   * <code>PluginStartException</code> to indicate that something is wrong and
+   * it cannot properly start.
+   */
+
+  public void start() throws PluginStartException{
+
+  }
+
+
+
+  /**
+   * Asks the plugin to save any unsaved information it has into preferences
+   * or whatever other medium it uses. This method is usually called just before
+   * the <code>stop</code> method. The default implementation does nothing.
    */
 
   public void saveState(){
@@ -365,24 +284,14 @@ public abstract class Plugin{
 
 
 
-
   /**
-   * Tells the <code>Plugin</code> it should stop doing whatever it's doing and
-   * cleanup. The default implementation does nothing.
+   * This method is invoked to signal to the plugin to stop its activity. The
+   * default implementation does nothing.
    */
 
   public void stop(){
 
   }
 
-
-
-  /**
-   * Returns a textual representation of this plugin.
-   */
-
-  public String toString(){
-    return getName();
-  }
 
 }

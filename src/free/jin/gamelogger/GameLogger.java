@@ -24,6 +24,7 @@ package free.jin.gamelogger;
 import java.io.*;
 import free.jin.event.*;
 import free.chess.*;
+import free.jin.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Date;
@@ -32,11 +33,8 @@ import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
-import free.jin.plugin.UnsupportedContextException;
+import free.jin.plugin.PluginStartException;
 import free.jin.plugin.PreferencesPanel;
-import free.jin.JinConnection;
-import free.jin.PGNJinConnection;
-import free.jin.Game;
 import bsh.Interpreter;
 import bsh.EvalError;
 
@@ -131,13 +129,13 @@ public class GameLogger extends Plugin implements GameListener{
 
   /**
    * Sets the plugin context - if the connection is not an instance of
-   * <code>SANMoveJinConnection</code>, this method throws an
-   * <code>UnsupportedContextException</code>.
+   * <code>PGNConnection</code>, this method throws a
+   * <code>PluginStartException</code>.
    */
 
-  public void setContext(PluginContext context) throws UnsupportedContextException{
-    if (!(context.getConnection() instanceof PGNJinConnection))
-      throw new UnsupportedContextException("The connection doesn't implement the features necessary for game logging");
+  public void setContext(PluginContext context) throws PluginStartException{
+    if (!(context.getConnection() instanceof PGNConnection))
+      throw new PluginStartException("The connection doesn't implement the features necessary for game logging");
 
     super.setContext(context);
   }
@@ -216,8 +214,8 @@ public class GameLogger extends Plugin implements GameListener{
    */
 
   protected void registerListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.addGameListener(this);
   }
@@ -231,8 +229,8 @@ public class GameLogger extends Plugin implements GameListener{
    */
 
   protected void unregisterListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.removeGameListener(this);
   }
@@ -245,7 +243,9 @@ public class GameLogger extends Plugin implements GameListener{
    */
 
   private void loadLoggingConditions(){
-    String loggingModeString = getProperty("logging.mode", "none");
+    Preferences prefs = getPrefs();
+
+    String loggingModeString = prefs.getString("logging.mode", "none");
     if ("rules".equalsIgnoreCase(loggingModeString))
       loggingMode = USE_RULES;
     else if ("all".equalsIgnoreCase(loggingModeString))
@@ -253,18 +253,18 @@ public class GameLogger extends Plugin implements GameListener{
     else
       loggingMode = LOG_NONE;
 
-    allGamesLogFile = getProperty("logging.all.filename");
+    allGamesLogFile = prefs.getString("logging.all.filename", null);
     if ((allGamesLogFile == null) && (loggingMode == LOG_ALL))
       loggingMode = LOG_NONE;
       
 
-    int rulesCount = getIntegerProperty("logging.rules.count", 0);
+    int rulesCount = prefs.getInt("logging.rules.count", 0);
     loggingRules = new Vector(rulesCount);
 
     for (int i = 0; i < rulesCount; i++){
-      String name = getProperty("logging.rule-"+(i+1)+".name");
-      String condition = getProperty("logging.rule-"+(i+1)+".condition");
-      String filename = getProperty("logging.rule-"+(i+1)+".filename");
+      String name = prefs.getString("logging.rule-"+(i+1)+".name");
+      String condition = prefs.getString("logging.rule-"+(i+1)+".condition");
+      String filename = prefs.getString("logging.rule-"+(i+1)+".filename");
 
       try{
         loggingRules.addElement(new LoggingRule(name, condition, filename));
@@ -513,7 +513,7 @@ public class GameLogger extends Plugin implements GameListener{
       out.close();
     } catch (IOException e){
         e.printStackTrace();
-        JOptionPane.showMessageDialog(getPluginContext().getMainFrame(), "Unable to log game ("+e.getMessage()+")", "I/O Error", JOptionPane.ERROR_MESSAGE);
+        OptionPanel.error(getUIProvider(), "I/O Error", "Unable to log game:\n" + e.getMessage());
       }
   }
 
@@ -640,6 +640,27 @@ public class GameLogger extends Plugin implements GameListener{
   public boolean hasPreferencesUI(){
     return true;
   }
+
+
+
+  /**
+   * Returns the string "gamelogger".
+   */
+
+  public String getId(){
+    return "gamelogger";
+  }
+
+
+
+  /**
+   * Returns the string "Game Logger".
+   */
+
+  public String getName(){
+    return "Game Logger";
+  }
+
 
 
 
