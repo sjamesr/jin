@@ -22,6 +22,9 @@
 package free.chess;
 
 import javax.swing.JComponent;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -32,6 +35,7 @@ import javax.swing.JComponent;
 public abstract class AbstractChessClock extends JComponent{
 
 
+  
   /**
    * The code for the mode where only hours and minutes are displayed. 
    */
@@ -54,14 +58,63 @@ public abstract class AbstractChessClock extends JComponent{
    */
    
   public static final int SECOND_TENTHS_DISPLAY_MODE = 2;
+  
+  
+  
+  /**
+   * The code for the mode where the actual display depends on the current time.
+   */
+   
+  public static final int TIME_DEPENDENT_DISPLAY_MODE = 3;
 
    
    
   /**
-   * The time displayed by this clock, in milliseconds.
+   * The time that was last set on this clock. Note that if the clock is
+   * running, the actual time is calculated by subtracting from this value
+   * the amount of time that has passed since the clock started running.
    */
 
   private int time;
+  
+  
+  
+  /**
+   * The threshold of time under which the clock displays second tenths, when in
+   * <code>TIME_DEPENDENT_DISPLAY_MODE</code> mode.
+   */
+   
+  private int secondTenthsThreshold = 10*1000;
+  
+  
+  
+  /**
+   * The threshold of time under which the clock displays minutes and seconds,
+   * when in <code>TIME_DEPENDENT_DISPLAY_MODE</code> mode.
+   */
+   
+  private int minutesSecondsThreshold = 20*60*1000;
+  
+  
+  
+  /**
+   * The repaint timer.
+   */
+   
+  private final Timer repaintTimer = new Timer(100, new ActionListener(){
+     public void actionPerformed(ActionEvent evt){
+       repaint();
+     }
+  });
+  
+  
+  
+  /**
+   * The value of the system clock at the time the clock was set to run.
+   * -1 if the clock is not running.
+   */
+   
+  private long runStart = -1;
   
   
 
@@ -71,7 +124,7 @@ public abstract class AbstractChessClock extends JComponent{
    * {@link #SECOND_TENTHS_DISPLAY_MODE}.
    */
 
-  private int displayMode = MINUTE_SECOND_DISPLAY_MODE;
+  private int displayMode = TIME_DEPENDENT_DISPLAY_MODE;
 
 
 
@@ -81,8 +134,9 @@ public abstract class AbstractChessClock extends JComponent{
    */
 
   private boolean isActive = false;
-
-
+  
+  
+  
 
   /**
    * Creates a new <code>AbstractChessClock</code> with the given initial amount
@@ -102,6 +156,8 @@ public abstract class AbstractChessClock extends JComponent{
 
   public void setTime(int time){
     this.time = time;
+    if (isRunning())
+      runStart = System.currentTimeMillis(); 
     repaint();
   }
 
@@ -113,7 +169,78 @@ public abstract class AbstractChessClock extends JComponent{
    */
 
   public int getTime(){
-    return time;
+    if (isRunning())
+      return time - (int)(System.currentTimeMillis() - runStart);
+    else
+      return time;
+  }
+  
+  
+  
+  /**
+   * Returns whether the clock is running.
+   */
+   
+  public boolean isRunning(){
+    return runStart >= 0;
+  }
+  
+  
+  
+  /**
+   * Sets the clock's running status.
+   */
+   
+  public void setRunning(boolean isRunning){
+    if (isRunning == isRunning())
+      return;
+    
+    if (isRunning){
+      runStart = System.currentTimeMillis();
+      repaintTimer.start();
+    }
+    else{
+      time = time - (int)(System.currentTimeMillis() - runStart);
+      runStart = -1;
+      repaintTimer.stop();
+    }
+  }
+  
+  
+  
+  /**
+   * Sets the time thresholds under which the clock switches to display
+   * <code>minutes:seconds</code> and <code>minutes:seconds.tenths</code>, when
+   * in <code>TIME_DEPENDENT_DISPLAY_MODE</code> mode.
+   */
+   
+  public void setTimeDependentDisplayModeThresholds(int minutesSeconds, int secondTenths){
+    this.minutesSecondsThreshold = minutesSeconds;
+    this.secondTenthsThreshold = secondTenths;
+    
+    repaint();
+  }
+  
+  
+  
+  /**
+   * Sets the delay between repaints of the clock when it is running, in
+   * milliseconds.
+   */
+   
+  public void setRepaintDelay(int delay){
+    repaintTimer.setDelay(delay);
+  }
+  
+  
+  
+  /**
+   * Returns the delay between repaints of the clock when it is running, in
+   * milliseconds.
+   */
+   
+  public int getRepaintDelay(){
+    return repaintTimer.getDelay();
   }
 
 
@@ -130,6 +257,7 @@ public abstract class AbstractChessClock extends JComponent{
       case HOUR_MINUTE_DISPLAY_MODE:
       case MINUTE_SECOND_DISPLAY_MODE:
       case SECOND_TENTHS_DISPLAY_MODE:
+      case TIME_DEPENDENT_DISPLAY_MODE:
         break;
       default:
         throw new IllegalArgumentException("Unrecognized display mode value: " + displayMode);
@@ -143,12 +271,35 @@ public abstract class AbstractChessClock extends JComponent{
 
   /**
    * Returns the current display mode of the clock. Possible values are
-   * {@link #HOUR_MINUTE_DISPLAY_MODE}, {@link #MINUTE_SECOND_DISPLAY_MODE) and
-   * {@link #SECOND_TENTHS_DISPLAY_MODE}.
+   * {@link #HOUR_MINUTE_DISPLAY_MODE}, {@link #MINUTE_SECOND_DISPLAY_MODE},
+   * {@link #SECOND_TENTHS_DISPLAY_MODE} and
+   * {@link #TIME_DEPENDENT_DISPLAY_MODE}.
    */
 
   public int getDisplayMode(){
     return displayMode;
+  }
+  
+  
+  
+  /**
+   * Returns the actual display mode. If the display mode is
+   * <code>TIME_DEPENDENT_DISPLAY_MODE</code>, returns one of the other display
+   * modes based on the current time.
+   */
+   
+  protected int getActualDisplayMode(){
+    int displayMode = getDisplayMode(); 
+    if (displayMode != TIME_DEPENDENT_DISPLAY_MODE)
+      return displayMode;
+    
+    int time = getTime();
+    if (time < secondTenthsThreshold)
+      return SECOND_TENTHS_DISPLAY_MODE;
+    else if (time < minutesSecondsThreshold)
+      return MINUTE_SECOND_DISPLAY_MODE;
+    else
+      return HOUR_MINUTE_DISPLAY_MODE;
   }
 
   
