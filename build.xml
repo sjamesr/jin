@@ -625,6 +625,7 @@
 	<!-- If the property buildingApplet is set, does things required for Applets -->
 	<target name="doAppletStuff" if="buildingApplet">
 		<javac srcdir="resources/os-specific/applet"
+		       destdir="${build.dir}"
 		       includes="DetectJava.java"
 		       debug="${build.debug}">
 		</javac>
