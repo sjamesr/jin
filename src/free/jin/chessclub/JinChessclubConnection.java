@@ -33,8 +33,10 @@ import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.giveaway.Giveaway;
 import free.chess.variants.atomic.Atomic;
 import free.chessclub.ChessclubConnection;
-import free.chessclub.MoveStruct;
+import free.chessclub.ChessclubConstants;
 import free.chessclub.level2.Datagram;
+import free.chessclub.level2.DatagramListener;
+import free.chessclub.level2.DatagramEvent;
 import free.jin.chessclub.event.CircleEvent;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
@@ -51,8 +53,8 @@ import java.lang.reflect.Array;
  * for the chessclub.com server.
  */
 
-public class JinChessclubConnection extends ChessclubConnection implements Connection, 
-    SeekConnection, GameListConnection, PGNConnection{
+public class JinChessclubConnection extends ChessclubConnection implements DatagramListener,
+    Connection, SeekConnection, GameListConnection, PGNConnection{
 
 
 
@@ -130,9 +132,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     // Hack, currently, the server has a bug which causes it not to send us
     // the current event list even if we have turned DG_TOURNEY on at the login
     // line. Remove when Bert fixes it.
-    if (isDGOn(Datagram.DG_TOURNEY)){
-      sendCommand("set-2 "+Datagram.DG_TOURNEY+" 1");
-    }
+    if (isDGOn(Datagram.DG_TOURNEY))
+      setDGOnAgain(Datagram.DG_TOURNEY);
   }
 
 
@@ -144,7 +145,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    */
 
   public static String displayableTitle(String title){
-    if (title.length()==0)
+    if (title.length() == 0)
       return "";
     else
       return "("+title+")";
@@ -415,10 +416,78 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processLine(String line){
     listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
   }
+  
+  
+  
+  /**
+   * Called when a datagram we're interested in arrives from the server
+   * (implementation of <code>DatagramListener</code>). This method simply
+   * does a huge switch on the id of the datagram and dispatches the actual
+   * handling to the appropriate method.
+   */
+  
+  public void datagramReceived(DatagramEvent evt){
+    Datagram dg = evt.getDatagram();
+    switch (dg.getId()){
+      // Chat related
+      case Datagram.DG_PERSONAL_TELL: processPersonalTellDG(dg); break; 
+      case Datagram.DG_PERSONAL_QTELL: processPersonalQTellDG(dg); break;
+      case Datagram.DG_SHOUT: processShoutDG(dg); break;
+      case Datagram.DG_CHANNEL_TELL: processChannelTellDG(dg); break;
+      case Datagram.DG_CHANNEL_QTELL: processChannelQTellDG(dg); break;
+      case Datagram.DG_KIBITZ: processKibitzDG(dg); break;
+      
+      // Game related
+      case Datagram.DG_MY_GAME_STARTED: processMyGameStartedDG(dg); break;
+      case Datagram.DG_STARTED_OBSERVING: processStartedObservingDG(dg); break;
+      case Datagram.DG_ISOLATED_BOARD: processIsolatedBoardDG(dg); break;
+      case Datagram.DG_MY_GAME_CHANGE: processMyGameChangeDG(dg); break;
+      case Datagram.DG_MY_GAME_RESULT: processMyGameResultDG(dg); break;
+      case Datagram.DG_POSITION_BEGIN: processPositionBeginDG(dg); break;
+      case Datagram.DG_MY_RELATION_TO_GAME: processMyRelationToGameDG(dg); break;
+      case Datagram.DG_SEND_MOVES: processSendMovesDG(dg); break;
+      case Datagram.DG_BACKWARD: processBackwardDG(dg); break;
+      case Datagram.DG_TAKEBACK: processTakebackDG(dg); break;
+      case Datagram.DG_ILLEGAL_MOVE: processIllegalMoveDG(dg); break;
+      case Datagram.DG_MSEC: processMsecDG(dg); break;
+      case Datagram.DG_OFFERS_IN_MY_GAME: processOffersInMyGameDG(dg); break;
+      case Datagram.DG_MORETIME: processMoretimeDG(dg); break;
+      case Datagram.DG_FLIP: processFlipDG(dg); break;
+      case Datagram.DG_ARROW: processArrowDG(dg); break;
+      case Datagram.DG_UNARROW: processUnarrowDG(dg); break;
+      case Datagram.DG_CIRCLE: processCircleDG(dg); break;
+      case Datagram.DG_UNCIRCLE: processUncircleDG(dg); break;
+      
+      // Seek related
+      case Datagram.DG_SEEK: processSeekDG(dg); break;
+      case Datagram.DG_SEEK_REMOVED: processSeekRemovedDG(dg); break;
+      
+      // Game list related
+      case Datagram.DG_GAMELIST_BEGIN: processGamelistBeginDG(dg); break;
+      case Datagram.DG_GAMELIST_ITEM: processGamelistItemDG(dg); break;
+      
+      // Tourney related
+      case Datagram.DG_TOURNEY: processTourneyDG(dg); break;
+      case Datagram.DG_REMOVE_TOURNEY: processRemoveTourneyDG(dg); break;
+      
+      default:
+        throw new IllegalStateException("Unhandled datagram received: " + dg);
+    }
+  }
 
 
 
-
+  
+  /**
+   * Processes a DG_PERSONAL_TELL.
+   */
+   
+  private void processPersonalTellDG(Datagram dg){
+    processPersonalTell(dg.getString(0), dg.getString(1), dg.getString(2), dg.getInteger(3));
+  }
+  
+  
+  
   /**
    * Creates and dispatches an appropriate ChatEvent to all registered
    * ChatListeners.
@@ -427,11 +496,11 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processPersonalTell(String playername, String titles, String message, int tellType){
     String tellTypeString;
     switch (tellType){
-      case TELL: tellTypeString = "tell"; break;
-      case SAY: tellTypeString = "say"; break;
-      case PTELL: tellTypeString = "ptell"; break;
-      case QTELL: tellTypeString = "qtell"; break;
-      case ATELL: tellTypeString = "atell"; break;
+      case ChessclubConstants.REGULAR_TELL: tellTypeString = "tell"; break;
+      case ChessclubConstants.SAY_TELL: tellTypeString = "say"; break;
+      case ChessclubConstants.P_TELL: tellTypeString = "ptell"; break;
+      case ChessclubConstants.Q_TELL: tellTypeString = "qtell"; break;
+      case ChessclubConstants.A_TELL: tellTypeString = "atell"; break;
       default:
         return; // Ignore unknown types.
     }
@@ -446,6 +515,15 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_PERSONAL_QTELL. 
+   */
+   
+  private void processPersonalQTellDG(Datagram dg){
+    processPersonalQTell(dg.getString(0), dg.getString(1), dg.getString(2));
+  }
+   
+   
 
   /**
    * Creates and dispatches an appropriate ChatEvent to all registered
@@ -459,6 +537,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_SHOUT.
+   */
+   
+  private void processShoutDG(Datagram dg){
+    processShout(dg.getString(0), dg.getString(1), dg.getInteger(2), dg.getString(3));
+  }
 
 
 
@@ -470,17 +555,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processShout(String playerName, String titles, int shoutType, String message){
     String tellTypeString;
     switch (shoutType){
-      case SHOUT: tellTypeString = "shout"; break;
-      case I_SHOUT: tellTypeString = "ishout"; break;
-      case SSHOUT: tellTypeString = "sshout"; break;
-      case ANNOUNCEMENT: tellTypeString = "announcement"; break;
+      case ChessclubConstants.REGULAR_SHOUT: tellTypeString = "shout"; break;
+      case ChessclubConstants.I_SHOUT: tellTypeString = "ishout"; break;
+      case ChessclubConstants.S_SHOUT: tellTypeString = "sshout"; break;
+      case ChessclubConstants.ANNOUNCEMENT_SHOUT: tellTypeString = "announcement"; break;
       default:
         return; // Ignore unknown types.
     }
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = shoutType == ANNOUNCEMENT ? 
+    ChatEvent evt = (shoutType == ChessclubConstants.ANNOUNCEMENT_SHOUT) ? 
       new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, playerName, title, -1, message, null):
       new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, playerName, title, -1, message, null);
       
@@ -489,6 +574,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_CHANNEL_TELL.
+   */
+  
+  private void processChannelTellDG(Datagram dg){
+    processChannelTell(dg.getInteger(0), dg.getString(1), dg.getString(2),
+      dg.getString(3), dg.getInteger(4));
+  }
 
   
   /**
@@ -499,9 +592,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processChannelTell(int channel, String playerName, String titles, String message, int tellType){
     String tellTypeString;
     switch (tellType){
-      case CHANNEL_TELL: tellTypeString = "channel-tell"; break;
-      case CHANNEL_ATELL: tellTypeString = "channel-atell"; break;
-      case CHANNEL_QTELL: tellTypeString = "channel-qtell"; break;
+      case ChessclubConstants.REGULAR_CHANNEL_TELL: tellTypeString = "channel-tell"; break;
+      case ChessclubConstants.A_CHANNEL_TELL: tellTypeString = "channel-atell"; break;
       default:
         return; // Ignore unknown types.
     }
@@ -518,6 +610,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
   /**
+   * Processes a DG_CHANNEL_QTELL. 
+   */
+   
+  private void processChannelQTellDG(Datagram dg){
+    processChannelQTell(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
+  }
+   
+   
+   
+  /**
    * Creates and dispatches an appropriate ChatEvent to all registered
    * ChatListeners.
    */
@@ -531,6 +633,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_KIBITZ. 
+   */
+   
+  private void processKibitzDG(Datagram dg){
+    processKibitz(dg.getInteger(0), dg.getString(1), dg.getString(2),
+      dg.getBoolean(3), dg.getString(4));
+  }
+  
+  
 
   /**
    * Creates and dispatches an appropriate ChatEvent to all registered
@@ -805,6 +917,40 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_MY_GAME_STARTED. 
+   */
+   
+  private void processMyGameStartedDG(Datagram dg){
+    int gameNumber = dg.getInteger(0);
+    String whiteName = dg.getString(1);
+    String blackName = dg.getString(2);
+    int wildNumber = dg.getInteger(3);
+    String ratingCategoryString = dg.getString(4);
+    boolean isRated = dg.getBoolean(5);
+    int whiteInitial = dg.getInteger(6);
+    int whiteIncrement = dg.getInteger(7);
+    int blackInitial = dg.getInteger(8);
+    int blackIncrement = dg.getInteger(9);
+    boolean isPlayedGame = dg.getBoolean(10);
+    String exString = dg.getString(11);
+    int whiteRating = dg.getInteger(12);
+    int blackRating = dg.getInteger(13);
+    long gameID = dg.getLong(14);
+    String whiteTitles = dg.getString(15);
+    String blackTitles = dg.getString(16);
+    boolean isIrregularLegality = dg.getBoolean(17);
+    boolean isIrregularSemantics = dg.getBoolean(18);
+    boolean usesPlunkers = dg.getBoolean(19);
+    String fancyTimeControls = dg.getString(20);
+    
+    processMyGameStarted(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString, isRated,
+      whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString, whiteRating,
+      blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality, isIrregularSemantics,
+      usesPlunkers, fancyTimeControls);
+  }
+  
+  
 
   /**
    * Creates the game record for a game played by the user.
@@ -819,7 +965,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
     WildVariant variant = getVariant(variantNumber);
-    if (variant==null){ // Not a supported variant.
+    if (variant == null){ // Not a supported variant.
       sendNotSupportedVariantMessage(variantNumber);
       return;
     }
@@ -832,6 +978,38 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
 
+  /**
+   * Processes a DG_STARTED_OBSERVING.
+   */
+   
+  private void processStartedObservingDG(Datagram dg){
+    int gameNumber = dg.getInteger(0);
+    String whiteName = dg.getString(1);
+    String blackName = dg.getString(2);
+    int wildNumber = dg.getInteger(3);
+    String ratingCategoryString = dg.getString(4);
+    boolean isRated = dg.getBoolean(5);
+    int whiteInitial = dg.getInteger(6);
+    int whiteIncrement = dg.getInteger(7);
+    int blackInitial = dg.getInteger(8);
+    int blackIncrement = dg.getInteger(9);
+    boolean isPlayedGame = dg.getBoolean(10);
+    String exString = dg.getString(11);
+    int whiteRating = dg.getInteger(12);
+    int blackRating = dg.getInteger(13);
+    long gameID = dg.getLong(14);
+    String whiteTitles = dg.getString(15);
+    String blackTitles = dg.getString(16);
+    boolean isIrregularLegality = dg.getBoolean(17);
+    boolean isIrregularSemantics = dg.getBoolean(18);
+    boolean usesPlunkers = dg.getBoolean(19);
+    String fancyTimeControls = dg.getString(20);
+    
+    processStartedObserving(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+      isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame,
+      exString, whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
+      isIrregularSemantics, usesPlunkers, fancyTimeControls);
+  }
 
 
   /**
@@ -856,6 +1034,41 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality, isIrregularSemantics,
       usesPlunkers, fancyTimeControls);
   }
+  
+  
+  
+  /**
+   * Processes a DG_ISOLATED_BOARD.
+   */
+   
+  private void processIsolatedBoardDG(Datagram dg){
+    int gameNumber = dg.getInteger(0);
+    String whiteName = dg.getString(1);
+    String blackName = dg.getString(2);
+    int wildNumber = dg.getInteger(3);
+    String ratingCategoryString = dg.getString(4);
+    boolean isRated = dg.getBoolean(5);
+    int whiteInitial = dg.getInteger(6);
+    int whiteIncrement = dg.getInteger(7);
+    int blackInitial = dg.getInteger(8);
+    int blackIncrement = dg.getInteger(9);
+    boolean isPlayedGame = dg.getBoolean(10);
+    String exString = dg.getString(11);
+    int whiteRating = dg.getInteger(12);
+    int blackRating = dg.getInteger(13);
+    long gameID = dg.getLong(14);
+    String whiteTitles = dg.getString(15);
+    String blackTitles = dg.getString(16);
+    boolean isIrregularLegality = dg.getBoolean(17);
+    boolean isIrregularSemantics = dg.getBoolean(18);
+    boolean usesPlunkers = dg.getBoolean(19);
+    String fancyTimeControls = dg.getString(20);
+    
+    processIsolatedBoard(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+      isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString,
+      whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
+      isIrregularSemantics, usesPlunkers, fancyTimeControls);
+  }
 
 
 
@@ -872,7 +1085,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
     WildVariant variant = getVariant(variantNumber);
-    if (variant==null){ // Not a supported variant.
+    if (variant == null){ // Not a supported variant.
       sendNotSupportedVariantMessage(variantNumber);
       return;
     }
@@ -882,7 +1095,41 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality, isIrregularSemantics,
       usesPlunkers, fancyTimeControls);
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_MY_GAME_CHANGE.
+   */
+   
+  private void processMyGameChangeDG(Datagram dg){
+    int gameNumber = dg.getInteger(0);
+    String whiteName = dg.getString(1);
+    String blackName = dg.getString(2);
+    int wildNumber = dg.getInteger(3);
+    String ratingCategoryString = dg.getString(4);
+    boolean isRated = dg.getBoolean(5);
+    int whiteInitial = dg.getInteger(6);
+    int whiteIncrement = dg.getInteger(7);
+    int blackInitial = dg.getInteger(8);
+    int blackIncrement = dg.getInteger(9);
+    boolean isPlayedGame = dg.getBoolean(10);
+    String exString = dg.getString(11);
+    int whiteRating = dg.getInteger(12);
+    int blackRating = dg.getInteger(13);
+    long gameID = dg.getLong(14);
+    String whiteTitles = dg.getString(15);
+    String blackTitles = dg.getString(16);
+    boolean isIrregularLegality = dg.getBoolean(17);
+    boolean isIrregularSemantics = dg.getBoolean(18);
+    boolean usesPlunkers = dg.getBoolean(19);
+    String fancyTimeControls = dg.getString(20);
+    
+    processMyGameChange(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+      isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString,
+      whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
+      isIrregularSemantics, usesPlunkers, fancyTimeControls);
+  }
 
 
 
@@ -910,8 +1157,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
         isPlayedGame, whiteRating, blackRating, String.valueOf(gameID), whiteTitles, blackTitles);
     } catch (NoSuchGameException e){}
   }
-
-
+  
+  
+  
+  /**
+   * Processes a DG_MY_GAME_RESULT. 
+   */
+   
+  private void processMyGameResultDG(Datagram dg){
+    processMyGameResult(dg.getInteger(0), dg.getBoolean(1), dg.getString(2), dg.getString(3),
+      dg.getString(4));
+  }
 
 
 
@@ -965,9 +1221,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
         }
     } catch (NoSuchGameException e){}
   }
-
-
-
 
 
 
@@ -1034,8 +1287,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.BLACK_PLAYER, blackTime,
       newGameInfo.isBlackClockRunning()));
   }
-
-
+  
+  
+  
+  /**
+   * Processes a DG_POSITION_BEGIN. 
+   */
+   
+  private void processPositionBeginDG(Datagram dg){
+    processPositionBegin(dg.getInteger(0), dg.getString(1), dg.getInteger(2));
+  }
 
 
   
@@ -1077,18 +1338,26 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     }
 
   }
-
-
+  
+  
+  
+  /**
+   * Processes a DG_MY_RELATION_TO_GAME.
+   */
+   
+  private void processMyRelationToGameDG(Datagram dg){
+    processMyRelationToGame(dg.getInteger(0), dg.getString(1));
+  }
 
 
 
   /**
-   * If playerState is {@link ChessclubConnection#DOING_NOTHING}, fires the
-   * appropriate GameEndEvent to all interested GameListeners.
+   * If playerState is {@link ChessclubConstants#DOES_NOTHING_PLAYER_STATE},
+   * fires the appropriate GameEndEvent to all interested GameListeners.
    */
 
-  protected void processMyRelationToGame(int gameNumber, int playerState){
-    if (playerState == DOING_NOTHING){
+  protected void processMyRelationToGame(int gameNumber, String playerState){
+    if (ChessclubConstants.DOING_NOTHING_PLAYER_STATE.equals(playerState)){
 
       GameInfo gameInfo = removeGameInfo(gameNumber);
 
@@ -1111,7 +1380,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       fireGameEvent(new GameEndEvent(this, game, result));
     }
     else{
-      int newGameType = (playerState == OBSERVING) ? Game.OBSERVED_GAME : Game.MY_GAME;
+      int newGameType = ChessclubConstants.OBSERVING_PLAYER_STATE.equals(playerState) ?
+        Game.OBSERVED_GAME : Game.MY_GAME;
 
       if (gameExists(gameNumber)){
         try{
@@ -1119,7 +1389,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
           Game game = gameInfo.game;
 
           boolean isPlayedGame = game.isPlayed();
-          if (playerState == EXAMINING)
+          if (ChessclubConstants.EXAMINING_PLAYER_STATE.equals(playerState))
             isPlayedGame = false;
 
           if ((game.isPlayed() != isPlayedGame) || (newGameType != game.getGameType())){
@@ -1145,7 +1415,31 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       }
     }
   }
+  
+  
+  
+  /**
+   * Processes a DG_SEND_MOVES.
+   */
+   
+  private void processSendMovesDG(Datagram dg){
+    int i = 0;
+    
+    int gameNumber = dg.getInteger(i++);
+    String algebraicMove = dg.getString(i++);
 
+    String smithMove = dg.getString(i++);
+
+    if (isDGOn(Datagram.DG_MOVE_TIME)) // skip
+      i++;
+
+    if (isDGOn(Datagram.DG_MOVE_CLOCK)) // skip
+      i++;
+
+    int variationCode = dg.getInteger(i++);
+
+    processSendMoves(gameNumber, algebraicMove, smithMove, variationCode);
+  }
 
 
 
@@ -1153,18 +1447,19 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    * Fires the appropriate MoveEvent to all interested GameListeners.
    */
 
-  protected void processSendMoves(int gameNumber, MoveStruct moveInfo){
+  protected void processSendMoves(int gameNumber, String algebraicMove,
+      String smithMove, int variationCode){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
       Position position = gameInfo.position;
-      Move move = parseWarrenSmith(moveInfo.smithMove, position, moveInfo.algebraicMove); 
+      Move move = parseWarrenSmith(smithMove, position, algebraicMove); 
 
       position.makeMove(move);
       gameInfo.moves.addElement(move);
 
-      boolean isNewMove = (moveInfo.variationCode != MoveStruct.MOVE_INITIAL) &&
-                          (moveInfo.variationCode != MoveStruct.MOVE_FORWARD);
+      boolean isNewMove = (variationCode != ChessclubConstants.INITIAL_MOVE) &&
+                          (variationCode != ChessclubConstants.FORWARD_MOVE);
 
       clearOffers(gameInfo, move.getPlayer().getOpponent());
       fireGameEvent(new MoveMadeEvent(this, game, move, isNewMove));
@@ -1206,7 +1501,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     else
       return Move.parseWarrenSmith(moveSmith, position, moveString);
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_BACKWARD. 
+   */
+   
+  private void processBackwardDG(Datagram dg){
+    processBackward(dg.getInteger(0), dg.getInteger(1));
+  }
 
 
 
@@ -1232,10 +1536,18 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       fireGameEvent(new TakebackEvent(this, game, backwardCount));
     } catch (NoSuchGameException e){}
   }
+  
+  
+  
+  /**
+   * Processes a DG_TAKEBACK.
+   */
+   
+  private void processTakebackDG(Datagram dg){
+    processTakeback(dg.getInteger(0), dg.getInteger(1));
+  }
 
-
-
-
+  
 
   /**
    * Fires a Takeback event.
@@ -1260,6 +1572,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       updateTakebackOffer(gameInfo, Player.WHITE_PLAYER, 0); // The server seems to only clear
       updateTakebackOffer(gameInfo, Player.BLACK_PLAYER, 0); // takeback offers on a takeback
     } catch (NoSuchGameException e){}
+  }
+  
+  
+  
+  /**
+   * Processes a DG_OFFERS_IN_MY_GAME.
+   */
+   
+  private void processOffersInMyGameDG(Datagram dg){
+    int gameNumber = dg.getInteger(0);
+    boolean whiteDraw = dg.getBoolean(1);
+    boolean blackDraw = dg.getBoolean(2);
+    boolean whiteAdjourn = dg.getBoolean(3);
+    boolean blackAdjourn = dg.getBoolean(4);
+    boolean whiteAbort = dg.getBoolean(5);
+    boolean blackAbort = dg.getBoolean(6);
+    int whiteTakeback = dg.getInteger(7);
+    int blackTakeback = dg.getInteger(8);
+    
+    processOffersInMyGame(gameNumber, whiteDraw, blackDraw, whiteAdjourn, blackAdjourn,
+      whiteAbort, blackAbort, whiteTakeback, blackTakeback);
   }
 
 
@@ -1334,6 +1667,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     updateTakebackOffer(gameInfo, player, 0);
   }
+  
+  
+  
+  /**
+   * Processes a DG_ILLEGAL_MOVE.
+   */
+   
+  private void processIllegalMoveDG(Datagram dg){
+    processIllegalMove(dg.getInteger(0), dg.getString(1), dg.getInteger(2));
+  }
 
 
 
@@ -1357,33 +1700,51 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       }
     } catch (NoSuchGameException e){}
   }
+  
+  
+  
+  /**
+   * Processes a DG_MSEC.
+   */
+   
+  private void processMsecDG(Datagram dg){
+    processMsec(dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2),
+      dg.getBoolean(3));
+  }
 
 
-
-
-
+  
   /**
    * Fires a ClockAdjustmentEvent.
    */
 
-  protected void processMsec(int gameNumber, int color, int msec, boolean isRunning){
+  protected void processMsec(int gameNumber, boolean isWhite, int msec, boolean isRunning){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
       
-      if (color==WHITE)
+      if (isWhite)
         gameInfo.setWhiteClock(msec, isRunning);
       else
         gameInfo.setBlackClock(msec, isRunning);
 
-      Player player = (color==WHITE ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
+      Player player = (isWhite ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
       fireGameEvent(new ClockAdjustmentEvent(this, game, player, msec, isRunning && game.isPlayed()));
       // The server always sends isRunning==true, even for examined games where
       // it doesn't make sense.
       
     } catch (NoSuchGameException e){}
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_MORETIME.
+   */
+   
+  private void processMoretimeDG(Datagram dg){
+    processMoretime(dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2));
+  }
 
 
 
@@ -1391,25 +1752,25 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    * Fires a ClockAdjustmentEvent.
    */
 
-  protected void processMoretime(int gameNumber, int color, int seconds){
+  protected void processMoretime(int gameNumber, boolean isWhite, int seconds){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
 
-      if (color==WHITE){
-        int newTime = gameInfo.getWhiteTime()+seconds*1000;
+      if (isWhite){
+        int newTime = gameInfo.getWhiteTime() + seconds * 1000;
         boolean isRunning = gameInfo.isWhiteClockRunning();
         if (isRunning)
-          newTime -= (int)(System.currentTimeMillis()-gameInfo.getWhiteTimestamp());
+          newTime -= (int)(System.currentTimeMillis() - gameInfo.getWhiteTimestamp());
 
         gameInfo.setWhiteClock(newTime, isRunning);
         fireGameEvent(new ClockAdjustmentEvent(this, game, Player.WHITE_PLAYER, newTime, isRunning));
       }
       else{
-        int newTime = gameInfo.getBlackTime()+seconds*1000;
+        int newTime = gameInfo.getBlackTime() + seconds * 1000;
         boolean isRunning = gameInfo.isBlackClockRunning();
         if (isRunning)
-          newTime -= (int)(System.currentTimeMillis()-gameInfo.getBlackTimestamp());
+          newTime -= (int)(System.currentTimeMillis() - gameInfo.getBlackTimestamp());
 
         gameInfo.setBlackClock(newTime, isRunning);
         fireGameEvent(new ClockAdjustmentEvent(this, game, Player.BLACK_PLAYER, newTime, isRunning));
@@ -1418,7 +1779,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   }
 
 
-
+  
+  /**
+   * Processes a DG_FLIP. 
+   */
+   
+  private void processFlipDG(Datagram dg){
+    processFlip(dg.getInteger(0), dg.getBoolean(1));
+  }
 
 
 
@@ -1441,8 +1809,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       } catch (NoSuchGameException e){}
     }
   }
-
-
+  
+  
+  
+  /**
+   * Processes a DG_CIRCLE. 
+   */
+   
+  private void processCircleDG(Datagram dg){
+    processCircle(dg.getInteger(0), dg.getString(1), dg.getString(2));    
+  }
 
 
 
@@ -1464,6 +1840,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   
   
   /**
+   * Processes a DG_UNCIRCLE.
+   */
+   
+  private void processUncircleDG(Datagram dg){
+    processUncircle(dg.getInteger(0), dg.getString(1), dg.getString(2));
+  }
+  
+  
+  
+  /**
    * Gets called when a DG_UNCIRCLE datagram arrives.
    */
    
@@ -1476,7 +1862,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
       fireGameEvent(new CircleEvent(this, game, CircleEvent.CIRCLE_REMOVED, circleSquare));
     } catch (NoSuchGameException e){}
-  } 
+  }
+  
+  
+  
+  /**
+   * Processes a DG_ARROW.
+   */
+   
+  private void processArrowDG(Datagram dg){
+    processArrow(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
+  }
 
 
 
@@ -1494,6 +1890,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
       fireGameEvent(new ArrowEvent(this, game, ArrowEvent.ARROW_ADDED, fromSquare, toSquare));
     } catch (NoSuchGameException e){}
+  }
+  
+  
+  
+  /**
+   * Processes a DG_UNARROW.
+   */
+   
+  private void processUnarrowDG(Datagram dg){
+    processUnarrow(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
   }
 
 
@@ -2186,8 +2592,34 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   void lastSeekListenerRemoved(){
     seeks.clear();
   }
-
-
+  
+  
+  
+  /**
+   * Processes a DG_SEEK. 
+   */
+   
+  private void processSeekDG(Datagram dg){
+    int index = dg.getInteger(0);
+    String name = dg.getString(1);
+    String titles = dg.getString(2);
+    int rating = dg.getInteger(3);
+    int ratingType = dg.getInteger(4);
+    int wild = dg.getInteger(5);
+    String ratingCategoryString = dg.getString(6);
+    int time = dg.getInteger(7);
+    int inc = dg.getInteger(8);
+    boolean isRated = dg.getBoolean(9);
+    int colorPreference = dg.getInteger(10);
+    int minRating = dg.getInteger(11);
+    int maxRating = dg.getInteger(12);
+    boolean autoAccept = dg.getBoolean(13);
+    boolean formula = dg.getBoolean(14);
+    String fancyTimeControl = dg.getString(15);
+    
+    processSeek(index, name, titles, rating, ratingType, wild, ratingCategoryString, time, inc,
+      isRated, colorPreference, minRating, maxRating, autoAccept, formula, fancyTimeControl);
+  }
 
 
 
@@ -2200,14 +2632,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       boolean autoaccept, boolean formula, String fancyTimeControl){
     
     WildVariant variant = getVariant(wild);
-    if (variant==null)
+    if (variant == null)
       return;
 
-    boolean isProvisional = (ratingType!=ESTABLISHED_RATING);
+    boolean isProvisional = (ratingType != ChessclubConstants.ESTABLISHED_RATING_TYPE);
     Player player;
-    if (color==WHITE)
+    if (color == ChessclubConstants.WHITE_COLOR_PREFERENCE)
       player = Player.WHITE_PLAYER;
-    else if (color==BLACK)
+    else if (color == ChessclubConstants.BLACK_COLOR_PREFERENCE)
       player = Player.BLACK_PLAYER;
     else
       player = null;
@@ -2215,7 +2647,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     boolean isRegistered = (rating != 0);
     boolean isSeekerRated = !isUnrated(titles);
     boolean isComputer = isComputer(titles);
-    boolean isRatingLimited = ((minRating!=0)||(maxRating!=9999));
+    boolean isRatingLimited = ((minRating != 0) || (maxRating != 9999));
 
     String title = displayableTitle(titles);
 
@@ -2228,7 +2660,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   }
 
 
-
+  
+  /**
+   * Processes a DG_SEEK_REMOVED.
+   */
+   
+  private void processSeekRemovedDG(Datagram dg){
+    processSeekRemoved(dg.getInteger(0), dg.getInteger(1));
+  }
 
 
   /**
@@ -2238,7 +2677,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processSeekRemoved(int index, int reasonCode){
     Seek seek = (Seek)seeks.remove(new Integer(index));
 
-    if (seek==null)
+    if (seek == null)
       return;
 
     listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));    
@@ -2306,7 +2745,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   public GameListListenerManager getGameListListenerManager(){
     return getChessclubListenerManager();
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_GAMELIST_BEGIN.
+   */
+   
+  private void processGamelistBeginDG(Datagram dg){
+    processGamelistBegin(dg.getString(0), dg.getString(1), dg.getInteger(2),
+          dg.getInteger(3), dg.getInteger(4), dg.getString(5));
+  }
 
 
 
@@ -2333,7 +2782,41 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     curGameListInfo = new GameListInfo(id, command, argsString, hitsCount, firstIndex, lastIndex, summary);
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_GAMELIST_ITEM.
+   */
+   
+  private void processGamelistItemDG(Datagram dg){
+    int index = dg.getInteger(0);
+    String id = dg.getString(1);
+    String event = dg.getString(2);
+    String date = dg.getString(3);
+    String time = dg.getString(4);
+    String whiteName = dg.getString(5);
+    int whiteRating = dg.getString(6).equals("?") ? -1 : dg.getInteger(6);
+    String blackName = dg.getString(7);
+    int blackRating = dg.getString(8).equals("?") ? -1 : dg.getInteger(8);
+    boolean isRated = dg.getBoolean(9);
+    int ratingCategory = dg.getInteger(10);
+    int wildType = dg.getInteger(11);
+    int whiteInit = dg.getInteger(12);
+    int whiteInc = dg.getInteger(13);
+    int blackInit = dg.getInteger(14);
+    int blackInc = dg.getInteger(15);
+    String eco = dg.getString(16);
+    int status = dg.getInteger(17);
+    boolean isWhite = dg.getInteger(18) == 1;
+    int mode = dg.getInteger(19);
+    String note = dg.getString(20);
+    boolean isOppHere = dg.getBoolean(21);
+    
+    processGamelistItem(index, id, event, date, time, whiteName, whiteRating, blackName,
+      blackRating, isRated, ratingCategory, wildType, whiteInit, whiteInc,
+      blackInit, blackInc, eco, status, isWhite, mode, note, isOppHere);
+  }
 
 
 
@@ -2345,21 +2828,21 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   protected void processGamelistItem(int index, String id, String event, String dateString,
       String timeString, String whiteName, int whiteRating, String blackName, int blackRating,
       boolean isRated, int ratingCategory, int wildType, int whiteTime, int whiteInc,
-      int blackTime, int blackInc, String eco, int status, int color, int mode, String note,
+      int blackTime, int blackInc, String eco, int status, boolean isWhite, int mode, String note,
       boolean isHere){
 
     if (curGameListInfo == null)
       return; // This shouldn't happen, but let's be a little defensive.
 
 
-    String variantName = "w"+wildType;
+    String variantName = "w" + wildType;
     String ratingCategoryName = getRatingCategoryName(ratingCategory);
 
-    String endExplanationString = getEndExplanationString(status, mode, color);
+    String endExplanationString = getEndExplanationString(status, mode, isWhite);
     int resultStatus;
     switch (status){
       case 0:
-        if (color==WHITE)
+        if (isWhite)
           resultStatus = WHITE_LOST;
         else
           resultStatus = WHITE_WON;
@@ -2420,7 +2903,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
         if (resultStatus!=ADJOURNED)
           throw new IllegalArgumentException("ResultStatus is not \"ADJOURNED\" for a stored game");
 
-        String adjournmentReason = getAdjournmentReason(mode, color==WHITE ? whiteName : blackName);
+        String adjournmentReason = getAdjournmentReason(mode, isWhite ? whiteName : blackName);
 
         item = new StoredListItem(index, id, dateString, timeString, whiteName, blackName, whiteTime*60*1000,
             whiteInc*1000, blackTime*60*1000, blackInc*1000, whiteRating, blackRating,
@@ -2454,10 +2937,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    * mode and the color of the player who lost.
    */
 
-  protected String getEndExplanationString(int status, int mode, int color){
-    String winner = (color==WHITE ? "Black" : "White");
-    String loser = (color==WHITE ? "White" : "Black");
-    String result = (color==WHITE ? "(0-1)" : "(1-0)");
+  protected String getEndExplanationString(int status, int mode, boolean isWhite){
+    String winner = (isWhite ? "Black" : "White");
+    String loser = (isWhite ? "White" : "Black");
+    String result = (isWhite ? "(0-1)" : "(1-0)");
 
     String endExplanationString = "(?) No result [specific reason unknown]";
     switch (status){
@@ -2624,11 +3107,11 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     String adjournmentReason = "";
     switch (mode){
       case 0: adjournmentReason = "By mutual agreement"; break;
-      case 1: adjournmentReason = "When "+actor+" disconnected"; break;
+      case 1: adjournmentReason = "When " + actor + " disconnected"; break;
       case 2: adjournmentReason = "By system shutdown"; break;
-      case 3: adjournmentReason = "Courtesyadjourned by "+actor; break;
+      case 3: adjournmentReason = "Courtesyadjourned by " + actor; break;
       case 4: adjournmentReason = "By an administrator"; break;
-      case 5: adjournmentReason = "When "+actor+" got disconnected"; break;
+      case 5: adjournmentReason = "When " + actor + " got disconnected"; break;
     }
 
     return adjournmentReason;
@@ -2766,9 +3249,65 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    */
 
   private final Hashtable chessEvents = new Hashtable();
+  
+
+
+  /**
+   * Processes a DG_TOURNEY.
+   */
+   
+  private void processTourneyDG(Datagram dg){
+    int id = dg.getInteger(0);
+    int bitfield = dg.getInteger(1);
+    boolean canGuestsJoinWatch = (bitfield & 1) != 0;
+    boolean makeNewWindowOnJoin = (bitfield & 2) != 0;
+    boolean makeNewWindowOnWatch = (bitfield & 4) != 0;
+    boolean makeNewWindowOnInfo = (bitfield & 8) != 0;
+    String description = dg.getString(2);
+    String [] joinCommands = parseDGTourneyCommandList(dg.getString(3));
+    String [] watchCommands = parseDGTourneyCommandList(dg.getString(4));
+    String [] infoCommands = parseDGTourneyCommandList(dg.getString(5));
+    String confirmText = dg.getString(6);
+    
+    processTourney(id, canGuestsJoinWatch, makeNewWindowOnJoin, makeNewWindowOnWatch,
+      makeNewWindowOnInfo, description, joinCommands, watchCommands, infoCommands, confirmText);
+  }
 
 
 
+  /**
+   * Parses the given command list as is sent in the DG_TOURNEY datagram.
+   * Returns the list of commands.
+   */
+
+  private static String [] parseDGTourneyCommandList(String commands){
+    StringTokenizer tokenizer = new StringTokenizer(commands, "&");
+    String [] commandList = new String[tokenizer.countTokens()];
+    int commandCount = 0;
+
+    while (tokenizer.hasMoreTokens()){
+      String escaped = tokenizer.nextToken();
+      StringBuffer unescaped = new StringBuffer(escaped.length());
+      int length = escaped.length();
+      int i = 0;
+      while (i < length){
+        if (escaped.charAt(i) == '\\'){
+          unescaped.append(escaped.charAt(i+1));
+          i += 2;
+        }
+        else{
+          unescaped.append(escaped.charAt(i));
+          i++;
+        }
+      }
+      commandList[commandCount++] = unescaped.toString();
+    }
+
+    return commandList;
+  }
+
+
+  
 
   /**
    * Gets called when a DG_TOURNEY event arrives. Fires the appropriate
@@ -2788,7 +3327,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
   }
-
+  
+  
+  
+  /**
+   * Processes a DG_REMOVE_TOURNEY.
+   */
+   
+  private void processRemoveTourneyDG(Datagram dg){
+    processRemoveTourney(dg.getInteger(0));
+  }
 
 
 
