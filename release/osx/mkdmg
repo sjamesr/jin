@@ -1,6 +1,6 @@
 #/bin/bash
 
-imagename=jin-@VERSION@.dmg
+imagename=jin-@VERSION@-osx.dmg
 volumename=Jin-@VERSION@
 targetname=@APPDIRNAME@
 

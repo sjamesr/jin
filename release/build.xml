@@ -183,20 +183,20 @@
     />
     <scp keyfile="${user.home}/.ssh/id_dsa"
          passphrase="${cf.passphrase}"
-         file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}.dmg" 
+         file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}-osx.dmg" 
          todir="${release.osx.dir}"         
     />
     <sshexec host="${cf.host}"
              username="${cf.username}"
              keyfile="${user.home}/.ssh/id_dsa"
              passphrase="${cf.passphrase}"
-             command="rm -rf bundle.zip ${app-dir.name} mkdmg jin-${release.version}.dmg"
+             command="rm -rf bundle.zip ${app-dir.name} mkdmg jin-${release.version}-osx.dmg"
     />
     <delete file="${release.osx.dir}/bundle.zip" />
     <delete file="${release.osx.dir}/mkdmg" />
     <delete dir="${app-dir}" />
     <delete dir="${app-dir}" />
-    <property name="osx-install" value="jin-${release.version}.dmg" />
+    <property name="osx-install" value="jin-${release.version}-osx.dmg" />
     
     
     <!-- Source. Resulting file is ${src-archive} -->
