@@ -116,11 +116,16 @@ public class ReaderThread extends Thread{
     try{
       outerLoop: while (handler.isConnected()){
         buf.setLength(0);
-        int b = 0;
-        while ((char)b!='\n'){
-          b = in.read();
+        int b;
+        while ((b = in.read()) != '\n'){
+          if (b == '\r'){ // Ignore '\r' if followed by '\n'
+            b = in.read();
+            if (b != '\n') // Eat the next '\n', if possible
+              in.unread(b);
+            break;
+          }
 
-          if (b<0){
+          if (b < 0){
             handler.execRunnable(new SafeRunnable(){
               public void safeRun(){
                 handler.handleDisconnection();
@@ -167,14 +172,14 @@ public class ReaderThread extends Thread{
           }
           else{
             if (b==7) // Ignore beeps.
-              buf.setLength(buf.length()-1);
+              buf.setLength(buf.length() - 1);
 
             // Ignore the prompt, remove this line if it's possible to disable it
             if (buf.toString().equals("aics% ")) 
               continue outerLoop;
           }
         }
-        buf.setLength(buf.length()-1);// Remove the '\n'
+
         final String line = buf.toString();
         handler.execRunnable(new SafeRunnable(){
           public void safeRun(){
