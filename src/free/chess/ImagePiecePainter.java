@@ -171,10 +171,9 @@ public class ImagePiecePainter implements PiecePainter{
 
     int size = width > height ? height : width;
     Image pieceImage = getPieceImage(size, piece, shaded);
-    if (shaded)
-      try{
-        ImageUtilities.preload(pieceImage);
-      } catch (InterruptedException e){}
+    
+    ImageUtilities.preload(pieceImage);
+    
     int pieceWidth = pieceImage.getWidth(null);
     int pieceHeight = pieceImage.getHeight(null);
     g.drawImage(pieceImage, x + (width - pieceWidth)/2, y + (height - pieceHeight)/2, component);
