@@ -286,6 +286,24 @@ public class JBoard extends JComponent{
 
 
 
+  /**
+   * We use this image to cache whatever we draw.
+   */
+
+  private Image cacheImage;
+
+
+
+
+  /**
+   * True when we can use the cache image when painting, false when we cannot.
+   */
+
+  private boolean cacheImageUsable = false;
+
+
+
+
 
   /**
    * A boolean telling us whether we're currently showing the promotion target
@@ -308,6 +326,7 @@ public class JBoard extends JComponent{
       throw new IllegalArgumentException("The Position may not be null");
 
     setOpaque(true);
+    setDoubleBuffered(false); // We're double buffering ourselves.
 
     setPosition(position);
     this.boardPainter = position.getVariant().createDefaultBoardPainter();
@@ -601,22 +620,34 @@ public class JBoard extends JComponent{
    * Paints this JBoard on the given Graphics object.
    */
 
-  public void paintComponent(Graphics g){
-    super.paintComponent(g);
+  public void paintComponent(Graphics componentGraphics){
+    if (cacheImageUsable){
+      componentGraphics.drawImage(cacheImage, 0, 0, null);
+      return;
+    }
 
     Dimension size = getSize();
 
+    if ((cacheImage == null) || (cacheImage.getWidth(null) != size.width) || (cacheImage.getHeight(null) != size.height)){
+      if (cacheImage != null)
+        cacheImage.flush();
+      cacheImage = createImage(size.width, size.height);
+    }
+
+    Graphics cacheGraphics = cacheImage.getGraphics();
+    Rectangle clipRect = componentGraphics.getClipBounds();
+    cacheGraphics.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+
+    super.paintComponent(cacheGraphics);
+
     // Fill the borders outside the actual board.
-    g.setColor(getBackground());
-    g.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
-    g.fillRect(0, size.height - size.height%8, size.width, size.height%8);
+    cacheGraphics.setColor(getBackground());
+    cacheGraphics.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
+    cacheGraphics.fillRect(0, size.height - size.height%8, size.width, size.height%8);
 
     Rectangle squareRect = new Rectangle(0, 0, size.width/8, size.height/8);
-    g.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
-    Rectangle clipRect = g.getClipBounds();
-
-    System.out.println("Painting: "+clipRect);
-//    Thread.dumpStack();
+    cacheGraphics.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
+    clipRect = cacheGraphics.getClipBounds();
 
     Position position = getPosition();
     BoardPainter boardPainter = getBoardPainter();
@@ -624,7 +655,7 @@ public class JBoard extends JComponent{
 
     int draggedPieceStyle = getDraggedPieceStyle();
 
-    boardPainter.paintBoard(g, this, 0, 0, size.width, size.height);
+    boardPainter.paintBoard(cacheGraphics, this, 0, 0, size.width, size.height);
 
     for (int file = 0; file < 8; file++)
       for (int rank = 0; rank < 8; rank++){
@@ -641,23 +672,23 @@ public class JBoard extends JComponent{
         if (!squareRect.intersects(clipRect))
           continue;
 
-        piecePainter.paintPiece(piece, g, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
+        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
 
-    callPaintHooks(g);
+    callPaintHooks(cacheGraphics);
 
-    if (movedPieceSquare!=null){
+    if (movedPieceSquare != null){
       getMovedPieceRect(squareRect);
-      if (draggedPieceStyle==NORMAL_DRAGGED_PIECE){
+      if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
         Piece piece = position.getPieceAt(movedPieceSquare);
-        piecePainter.paintPiece(piece, g, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
+        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
       else if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE){
-        g.setColor(Color.blue);
+        cacheGraphics.setColor(Color.blue);
         squareRect.width--;
         squareRect.height--;
         for (int i = 0; i < 2; i++){
-          g.drawRect(squareRect.x, squareRect.y, squareRect.width, squareRect.height);
+          cacheGraphics.drawRect(squareRect.x, squareRect.y, squareRect.width, squareRect.height);
           squareRect.x++;
           squareRect.y++;
           squareRect.width-=2;
@@ -668,6 +699,9 @@ public class JBoard extends JComponent{
         }
       }
     }
+
+    componentGraphics.drawImage(cacheImage, 0, 0, null);
+    cacheImageUsable = true;
   }
 
 
@@ -683,6 +717,19 @@ public class JBoard extends JComponent{
       PaintHook hook = (PaintHook)paintHooks.elementAt(i);
       hook.paint(this, g);
     }
+  }
+
+
+
+
+  /**
+   * Overrides Component.repaint(long, int, int, int, int) to invalidate the
+   * cache image.
+   */
+
+  public void repaint(long time, int x, int y, int width, int height){
+    cacheImageUsable = false;
+    super.repaint(time, x, y, width, height);
   }
 
 
