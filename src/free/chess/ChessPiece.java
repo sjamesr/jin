@@ -124,33 +124,29 @@ public class ChessPiece extends Piece{
    * to be in the format returned by the {@link #toShortString()} method.
    */
 
-  public static ChessPiece fromShortString(String shortString){
-    if (shortString.equals("P"))
-      return WHITE_PAWN;
-    else if (shortString.equals("N"))
-      return WHITE_KNIGHT;
-    else if (shortString.equals("B"))
-      return WHITE_BISHOP;
-    else if (shortString.equals("R"))
-      return WHITE_ROOK;
-    else if (shortString.equals("Q"))
-      return WHITE_QUEEN;
-    else if (shortString.equals("K"))
-      return WHITE_KING;
-    else if (shortString.equals("p"))
-      return BLACK_PAWN;
-    else if (shortString.equals("n"))
-      return BLACK_KNIGHT;
-    else if (shortString.equals("b"))
-      return BLACK_BISHOP;
-    else if (shortString.equals("r"))
-      return BLACK_ROOK;
-    else if (shortString.equals("q"))
-      return BLACK_QUEEN;
-    else if (shortString.equals("k"))
-      return BLACK_KING;
+  public static ChessPiece fromShortString(String piece){
+    if (piece.length()!=1)
+      throw new IllegalArgumentException("The given string must be exactly one character long.");
     
-    throw new IllegalArgumentException("Unknown piece: '"+shortString+"'");
+    char c = piece.charAt(0);
+
+    switch(c){
+     case '-': return null;
+     case 'P': return ChessPiece.WHITE_PAWN;
+     case 'N': return ChessPiece.WHITE_KNIGHT;
+     case 'B': return ChessPiece.WHITE_BISHOP;
+     case 'R': return ChessPiece.WHITE_ROOK;
+     case 'Q': return ChessPiece.WHITE_QUEEN;
+     case 'K': return ChessPiece.WHITE_KING;
+     case 'p': return ChessPiece.BLACK_PAWN;
+     case 'n': return ChessPiece.BLACK_KNIGHT;
+     case 'b': return ChessPiece.BLACK_BISHOP;
+     case 'r': return ChessPiece.BLACK_ROOK;
+     case 'q': return ChessPiece.BLACK_QUEEN;
+     case 'k': return ChessPiece.BLACK_KING;
+    }
+
+    throw new IllegalArgumentException("Unknown piece: "+piece);
   }
 
 
