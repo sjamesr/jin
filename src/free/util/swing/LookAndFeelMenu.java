@@ -98,12 +98,20 @@ public class LookAndFeelMenu extends JMenu{
       this.treeRoots.addElement(treeRoots[i]);
 
     ActionListener lnfActionListener = new LookAndFeelChoiceListener();
+    
+    Hashtable installedLFs = new Hashtable(); // Filter duplicates.
 
     UIManager.LookAndFeelInfo [] lnfs = UIManager.getInstalledLookAndFeels();
     String currentLookAndFeelClassName = UIManager.getLookAndFeel().getClass().getName();
     lnfButtonGroup = new ButtonGroup();
     for (int i = 0; i < lnfs.length; i++){
       UIManager.LookAndFeelInfo lnf = lnfs[i];
+      
+      if (installedLFs.containsKey(lnf.getClassName()))
+        continue;
+      else
+        installedLFs.put(lnf.getClassName(), lnf.getClassName());
+      
       JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(lnf.getName());
       menuItem.addActionListener(lnfActionListener);
 
@@ -175,6 +183,8 @@ public class LookAndFeelMenu extends JMenu{
         String lnf = (String)buttonsToLookAndFeelClassNames.get(evt.getSource());
         UIManager.setLookAndFeel(lnf);
         updateComponents();
+        JOptionPane.showMessageDialog(null, "It is advisable to restart the application\n"+
+          "for the look and feel to take full effect.", "Look and Feel change", JOptionPane.INFORMATION_MESSAGE);
       } catch (Exception e){
           System.err.println("Unable to set look and feel:");
           e.printStackTrace();
