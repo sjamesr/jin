@@ -56,7 +56,11 @@ public class GameInfoStruct extends Struct{
    * @param partnerGameNumber The game number of the bughouse partner, or 0 if
    * it's not a bughouse game.
    * @param whiteRating White's rating.
+   * @param whiteProvShow White's rating provshow character, 'E' is estimated,
+   * 'P' if provisional and ' ' if neither.
    * @param blackRating Black's rating.
+   * @param blackProvShow Black's rating provshow character, 'E' is estimated,
+   * 'P' if provisional and ' ' if neither.
    * @param isWhiteTimesealed Is the white player using timeseal.
    * @param isBlackTimesealed Is the black player using timeseal.
    */
@@ -64,7 +68,8 @@ public class GameInfoStruct extends Struct{
   public GameInfoStruct(int gameNumber, boolean isGamePrivate, String gameCategory,
       boolean isGameRated, boolean isWhiteRegistered, boolean isBlackRegistered,
       int whiteTime, int whiteInc, int blackTime, int blackInc, int partnerGameNumber,
-      int whiteRating, int blackRating, boolean isWhiteTimesealed, boolean isBlackTimesealed){
+      int whiteRating, char whiteProvShow, int blackRating, char blackProvShow, 
+      boolean isWhiteTimesealed, boolean isBlackTimesealed){
 
     super(20);
 
@@ -92,7 +97,9 @@ public class GameInfoStruct extends Struct{
     setIntegerProperty("BlackInc", blackInc);
     setIntegerProperty("PartnerGameNumber", partnerGameNumber);
     setIntegerProperty("WhiteRating", whiteRating);
+    setCharProperty("WhiteProvShow", whiteProvShow);
     setIntegerProperty("BlackRating", blackRating);
+    setCharProperty("BlackProvShow", blackProvShow);
     setBooleanProperty("IsWhiteTimesealed", isWhiteTimesealed);
     setBooleanProperty("IsBlackTimesealed", isBlackTimesealed);
   }
@@ -141,10 +148,16 @@ public class GameInfoStruct extends Struct{
     assertToken(tokens, "rt");
     String whiteRatingString = tokens.nextToken(); // White's rating + provshow character
     String blackRatingString = tokens.nextToken(); // Black's rating + provshow character
-    if (!Character.isDigit(whiteRatingString.charAt(whiteRatingString.length() - 1)))
+    char whiteProvShow = ' ';
+    char blackProvShow = ' ';
+    if (!Character.isDigit(whiteRatingString.charAt(whiteRatingString.length() - 1))){
+      whiteProvShow = whiteRatingString.charAt(whiteRatingString.length() - 1);
       whiteRatingString = whiteRatingString.substring(0, whiteRatingString.length() - 1);
-    if (!Character.isDigit(blackRatingString.charAt(blackRatingString.length() - 1)))
+    }
+    if (!Character.isDigit(blackRatingString.charAt(blackRatingString.length() - 1))){
+      blackProvShow = blackRatingString.charAt(blackRatingString.length() - 1);
       blackRatingString = blackRatingString.substring(0, blackRatingString.length() - 1);
+    }
     int whiteRating = Integer.parseInt(whiteRatingString);
     int blackRating = Integer.parseInt(blackRatingString);
 
@@ -154,7 +167,7 @@ public class GameInfoStruct extends Struct{
 
     return new GameInfoStruct(gameNumber, isGamePrivate, gameType, isGameRated, isWhiteRegistered,
       isBlackRegistered, whiteTime, whiteInc, blackTime, blackInc, partnerGameNumber,
-      whiteRating, blackRating, isWhiteTimesealed, isBlackTimesealed);
+      whiteRating, whiteProvShow, blackRating, blackProvShow, isWhiteTimesealed, isBlackTimesealed);
   }
 
 
@@ -331,11 +344,35 @@ public class GameInfoStruct extends Struct{
 
 
   /**
+   * Returns white's rating provshow character. 'E' if the rating is estimated,
+   * 'P' if provisional, and ' ' if neither.
+   */
+
+  public char getWhiteProvShow(){
+    return getCharProperty("WhiteProvShow");
+  }
+
+
+
+
+  /**
    * Returns black's rating.
    */
 
   public int getBlackRating(){
     return getIntegerProperty("BlackRating");
+  }
+
+
+
+
+  /**
+   * Returns black's rating provshow character. 'E' if the rating is estimated,
+   * 'P' if provisional, and ' ' if neither.
+   */
+
+  public char getBlackProvShow(){
+    return getCharProperty("BlackProvShow");
   }
 
 
