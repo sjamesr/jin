@@ -1,4 +1,4 @@
-Jin chess client for internet chess servers.
+Jin client for internet chess servers.
 Copyright (C) 2001-2002 Alexander Maryanovsky.
 All rights reserved.
  
