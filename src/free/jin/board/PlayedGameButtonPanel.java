@@ -77,7 +77,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The size of the state border.
    */
 
-  private static final int STATE_BORDER_SIZE = 2;
+  private static final int STATE_BORDER_SIZE = 5;
 
 
 
