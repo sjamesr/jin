@@ -239,11 +239,15 @@ public class InternalFramesUIProvider implements UIProvider{
     if (isConnected){
       addPluginMenus(session.getPlugins());
       loadSelectedFrame(session);
+      
+      mainContainer.setTitle(session.getUser().getUsername() + " at " + session.getServer().getShortName());
     }
     else{
       removePluginMenus();
       saveSelectedFrame(session);
       removePluginContainers();
+      
+      mainContainer.setTitle("");
     }
 
     if (!isConnected)            // Bugfix - otherwise activating the menu via
