@@ -62,7 +62,7 @@ public class Jin{
    * deleted/ignored.
    */
 
-  private static final String propsVersion = "2";
+  private static final String propsVersion = "3";
   
 
 
@@ -190,6 +190,36 @@ public class Jin{
 
 
   /**
+   * Loads the supported servers.
+   */
+
+  static{
+    try{
+      InputStream serverListInputStream = Jin.class.getResourceAsStream("resources/servers/list.txt");
+      ByteArrayOutputStream buf = new ByteArrayOutputStream();
+      IOUtilities.pump(serverListInputStream, buf);
+      StringTokenizer serversTokenizer = new StringTokenizer(new String(buf.toByteArray(), "8859_1"), "\n\r");
+
+      while (serversTokenizer.hasMoreTokens()){
+        String serverResourceName = serversTokenizer.nextToken();
+        Server server = Server.load(Jin.class.getResourceAsStream(serverResourceName));
+        servers.put(server.getName(),server);
+      }
+    } catch (IOException e){
+        System.err.println("Unable to load the server list:");
+        e.printStackTrace();
+        System.exit(0);
+      }
+      catch (RuntimeException e){
+        e.printStackTrace();
+      }
+  }
+
+
+
+
+
+  /**
    * Creates the users directory.
    */
 
@@ -212,47 +242,18 @@ public class Jin{
   static{
     try{
       String [] userFilenames = usersDir.list();
-      for (int i=0;i<userFilenames.length;i++){
+      for (int i = 0 ; i < userFilenames.length; i++){
         String userFilename = userFilenames[i];
         File userFile = new File(usersDir, userFilename);
         if (userFile.isDirectory())
           continue;
         
-        User user = User.load(userFile);
+        User user = new User(userFile);
         users.addElement(user);
       }
     } catch (IOException e){
         System.err.println("Unable to load the user list:");
         e.printStackTrace();
-      }
-      catch (RuntimeException e){
-        e.printStackTrace();
-      }
-  }
-
-
-
-
-  /**
-   * Loads the supported servers.
-   */
-
-  static{
-    try{
-      InputStream serverListInputStream = Jin.class.getResourceAsStream("resources/servers/list.txt");
-      ByteArrayOutputStream buf = new ByteArrayOutputStream();
-      IOUtilities.pump(serverListInputStream, buf);
-      StringTokenizer serversTokenizer = new StringTokenizer(new String(buf.toByteArray(), "8859_1"), "\n\r");
-
-      while (serversTokenizer.hasMoreTokens()){
-        String serverResourceName = serversTokenizer.nextToken();
-        Server server = Server.load(Jin.class.getResourceAsStream(serverResourceName));
-        servers.put(server.getName(),server);
-      }
-    } catch (IOException e){
-        System.err.println("Unable to load the server list:");
-        e.printStackTrace();
-        System.exit(0);
       }
       catch (RuntimeException e){
         e.printStackTrace();
