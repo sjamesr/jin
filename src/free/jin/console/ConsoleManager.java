@@ -343,11 +343,13 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     if (!isPaused){
       int size = pausedEventsQueue.size();
       for (int i = 0; i < size; i++){
-        Object evt = pausedEventsQueue.elementAt(i);
-        if (evt instanceof PlainTextEvent)
-          plainTextReceived((PlainTextEvent)evt);
-        else if (evt instanceof ChatEvent)
-          chatMessageReceived((ChatEvent)evt);
+        try{
+          Object evt = pausedEventsQueue.elementAt(i);
+          if (evt instanceof PlainTextEvent)
+            plainTextReceived((PlainTextEvent)evt);
+          else if (evt instanceof ChatEvent)
+            chatMessageReceived((ChatEvent)evt);
+        } catch (Exception e){e.printStackTrace();}
       }
       pausedEventsQueue.removeAllElements();
     }
