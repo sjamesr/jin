@@ -490,7 +490,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleLogin(line))
       return;
-    if (handleIvarSet(line))
+    if (handleIvarStateChanged(line))
       return;
     if (handlePersonalTell(line))
       return;
@@ -538,8 +538,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * The regular expression matching lines which are notifications of an ivar
-   * being set.
+   * The regular expression matching lines which are notifications of an the
+   * state of an ivar changing.
    */
 
   private static final Pattern ivarSetPattern = new Pattern("^(\\w+) (un)?set.$");
@@ -547,30 +547,35 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * Called to determine whether the specified line is a notification that an
-   * ivar has been set.
+   * Called to determine whether the specified line is a notification that the
+   * state of some ivar has changed.
    */
 
-  private boolean handleIvarSet(String line){
+  private boolean handleIvarStateChanged(String line){
     Matcher matcher = ivarSetPattern.matcher(line);
     if (!matcher.matches())
       return false;
 
     String ivarName = matcher.group(1);
-    boolean state = "".equals(matcher.group(2));
+    boolean state = (matcher.group(2) == null) || "".equals(matcher.group(2));
 
     Ivar ivar = Ivar.getByName(ivarName);
     if (ivar == null) // It's a notification that something has been set, but not a known ivar
       return false;
-
+    
     ivarStates.set(ivar.getIndex());
-
-    if (linesToFilter.remove(line) == null)
-      processLine(line);
-
-    return true;
+    
+    return processIvarStateChanged(ivar, state);
   }
-
+  
+  
+  
+  /**
+   * Gets called when the server notifies us of a change in the state of some
+   * ivar.
+   */
+   
+  protected boolean processIvarStateChanged(Ivar ivar, boolean state){return false;}
 
 
 
