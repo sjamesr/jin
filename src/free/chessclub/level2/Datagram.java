@@ -307,11 +307,11 @@ public class Datagram{
       
       // Check that it starts with DG_START
       if (!dgString.startsWith(DG_START))
-        throw new DatagramFormatException("The string (" + dgString + ") does not start with \"^Y(\"");
+        throw new FormatException("The string (" + dgString + ") does not start with \"^Y(\"");
   
       // Check that it ends with DG_END
       if (!dgString.endsWith(DG_END))
-        throw new DatagramFormatException("The string (" + dgString + ") does not end with \"^Y)\"");
+        throw new FormatException("The string (" + dgString + ") does not end with \"^Y)\"");
   
       // Strip DG_START and DG_END and add an extra space at the end to make it
       // easier to parse
