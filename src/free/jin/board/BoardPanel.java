@@ -1711,17 +1711,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       if (isPositionScrollBarUpdating)
         return;
 
-       isPositionScrollBarUpdating = true;
+      isPositionScrollBarUpdating = true;
 
-      int moveNum = positionScrollBar.getValue();
+      if (madeMoves.size() > 0){
+        int moveNum = positionScrollBar.getValue();
 
-      boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
-      int visualMoveNumber = isFirstMoveBlack ? moveNum + 1 : moveNum;
-      int row = (visualMoveNumber-1)/2;
-      int column = (visualMoveNumber == 0) ? 0 : 2 - (visualMoveNumber%2);
+        boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
+        int visualMoveNumber = isFirstMoveBlack ? moveNum + 1 : moveNum;
+        int row = (visualMoveNumber-1)/2;
+        int column = (visualMoveNumber == 0) ? 0 : 2 - (visualMoveNumber%2);
 
-      if (!isMoveListTableSelectionUpdating){
-        setMoveListTableSelection(row, column);
+        if (!isMoveListTableSelectionUpdating){
+          setMoveListTableSelection(row, column);
+        }
       }
 
       isPositionScrollBarUpdating = false;
