@@ -23,8 +23,9 @@ package free.chess;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.Vector;
@@ -37,7 +38,7 @@ import free.util.PaintHook;
  * done in the AWT event dispatching thread.
  */
 
-public class JBoard extends JPanel{
+public class JBoard extends JComponent{
 
 
   /**
@@ -736,6 +737,7 @@ public class JBoard extends JPanel{
 
 
 
+
   /**
    * Processes a mouse event.
    */
@@ -828,6 +830,7 @@ public class JBoard extends JPanel{
       }
     }
 
+    paintImmediately(RepaintManager.currentManager(this).getDirtyRegion(this));
   }
 
 
@@ -885,6 +888,7 @@ public class JBoard extends JPanel{
       }
     }
 
+    paintImmediately(RepaintManager.currentManager(this).getDirtyRegion(this));
   }
 
 
