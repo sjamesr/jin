@@ -1144,6 +1144,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (evt.getGame()!=game)
       return;
 
+    if (timer.isRunning())
+      timer.stop();
+
     setInactive();
   }
 
