@@ -209,9 +209,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     }
 
     JMenuItem clearMenuItem = new JMenuItem("Clear Console");
-    clearMenuItem.setMnemonic('C');
+    clearMenuItem.setMnemonic('l');
     clearMenuItem.setAccelerator(
-      KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+      KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     clearMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -224,7 +224,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     JCheckBoxMenuItem copyOnSelectCB 
       = new JCheckBoxMenuItem("Copy on Select", getPrefs().getBool("copyOnSelect", true));
-    copyOnSelectCB.setMnemonic('S');
+    copyOnSelectCB.setMnemonic('C');
     copyOnSelectCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
