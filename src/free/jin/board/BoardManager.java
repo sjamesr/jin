@@ -1205,6 +1205,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         boardContainer.setTitle(boardPanel.getTitle());
     }
   }
+  
+  
+  
+  /**
+   * Returns whether the user is currently playing a game.
+   */
+   
+  public boolean isUserPlaying(){
+    Enumeration games = gamesToBoardPanels.keys();
+    while (games.hasMoreElements()){
+      Game game = (Game)games.nextElement();
+      if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
+        return true;
+    }
+    
+    return false;
+  }
 
 
 
