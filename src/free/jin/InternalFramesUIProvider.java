@@ -151,7 +151,11 @@ public class InternalFramesUIProvider implements UIProvider{
     
     frameSwitcher = new InternalFrameSwitcher(desktop);
     desktop.setDesktopManager(new DesktopManager());
-    FocusManager.setCurrentManager(new FocusManager());
+    
+    // TODO: Find a way to implement ctrl+TAB without requiring security permissions.
+    try{
+      FocusManager.setCurrentManager(new FocusManager());
+    } catch (SecurityException e){}
   }
 
 
