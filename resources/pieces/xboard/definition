@@ -1,0 +1,3 @@
+id = xboard
+name = Xboard
+classname = XboardPiecePainter

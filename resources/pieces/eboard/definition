@@ -1,0 +1,3 @@
+id = eboard
+name = Eboard Vector
+classname = free.chess.art.EboardVectorPiecePainter
