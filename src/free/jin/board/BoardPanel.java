@@ -942,15 +942,30 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Returns the SoundManager plugin this BoardPanel should use to produce game
+   * related sounds, or <code>null</code> if none should be used.
+   */
+
+  private SoundManager getSoundManager(){
+    String pluginName = plugin.getProperty("sound-manager-plugin.name");
+    if (pluginName == null)
+      return null;
+
+    return (SoundManager)plugin.getPluginContext().getPlugin(pluginName);
+  }
+
+
+
+
+  /**
    * Plays the sound for the given event name.
    */
 
   protected void playSound(String eventName){
-    Plugin soundManagerPlugin = plugin.getPluginContext().getPlugin("SoundManager");
-    if (soundManagerPlugin == null)
+    SoundManager soundManager = getSoundManager();
+    if (soundManager == null)
       return;
 
-    SoundManager soundManager = (SoundManager)soundManagerPlugin;
     soundManager.playEventSound(eventName);
   }
 
