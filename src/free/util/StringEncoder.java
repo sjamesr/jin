@@ -65,7 +65,7 @@ public class StringEncoder{
    */
 
   public static String encodeColor(Color color){
-    return String.valueOf(color.getRGB());
+    return Integer.toHexString(color.getRGB()&0xffffff);
   }
 
   
