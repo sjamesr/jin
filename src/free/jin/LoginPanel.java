@@ -26,6 +26,8 @@ import java.awt.*;
 import free.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.util.StringTokenizer;
 import javax.swing.border.TitledBorder;
 import free.workarounds.FixedJTextField;
@@ -134,8 +136,11 @@ public class LoginPanel extends DialogPanel{
     hostnameBox.setEditable(true);
     hostnameBox.setSelectedItem(hostname);
     final JTextField portsField = new FixedJTextField(StringEncoder.encodeIntList(ports), 7);
-    final JCheckBox savePasswordCheckBox = new JCheckBox("Save password", savePassword);
-    savePasswordCheckBox.setMnemonic('S');
+    final JCheckBox savePasswordCheckBox = context.isSavePrefsCapable() ?
+      new JCheckBox("Save password", savePassword) : null;
+      
+    if (savePasswordCheckBox != null)
+      savePasswordCheckBox.setMnemonic('S');
 
     
     JButton connectButton = new JButton("Connect");
@@ -163,9 +168,10 @@ public class LoginPanel extends DialogPanel{
         if ("".equals(password)) // An empty string indicates there is no password
           password = null;       // but we want to let the user input it himself
 
+        boolean savePassword = (savePasswordCheckBox != null) && savePasswordCheckBox.isSelected();
         ConnectionDetails result = policy.isSame(username, policy.getGuestUsername()) ?
           ConnectionDetails.createGuest(username, (String)hostnameBox.getSelectedItem(), ports) :
-          ConnectionDetails.create(username, password, savePasswordCheckBox.isSelected(),
+          ConnectionDetails.create(username, password, savePassword,
             (String)hostnameBox.getSelectedItem(), ports);
 
         close(result);
@@ -201,8 +207,7 @@ public class LoginPanel extends DialogPanel{
 
         String username = server.getUsernamePolicy().getGuestUsername();
 
-        close(
-          ConnectionDetails.createGuest(username, (String)hostnameBox.getSelectedItem(), ports));
+        close(ConnectionDetails.createGuest(username, (String)hostnameBox.getSelectedItem(), ports));
       }
     });
 
@@ -224,6 +229,20 @@ public class LoginPanel extends DialogPanel{
         close(null);
       }
     });
+    
+    if ((savePasswordCheckBox != null) && (context.getPasswordSaveWarning() != null)){
+      savePasswordCheckBox.addItemListener(new ItemListener(){
+        public void itemStateChanged(ItemEvent evt){
+          if (savePasswordCheckBox.isSelected()){
+            Object result = new OptionPanel(OptionPanel.WARNING, "Save password?", 
+              new Object[]{OptionPanel.YES, OptionPanel.NO}, OptionPanel.YES,
+              context.getPasswordSaveWarning()).show(context.getUIProvider());
+            if (result != OptionPanel.YES)
+              savePasswordCheckBox.setSelected(false);
+          }
+        }
+      });
+    }
 
 
     // Set default focused component
@@ -392,10 +411,16 @@ public class LoginPanel extends DialogPanel{
     passwordField.setColumns(0); // use the amount of columns to calculate preferred size.
 
     Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
+    
+    boolean addSavePasswordCB = savePasswordCheckBox != null;
+    boolean addRetrievePassButton = retrievePasswordButton != null; 
 
-    passwordOptionsPanel.add(savePasswordCheckBox);
-    if (retrievePasswordButton != null){
-      passwordOptionsPanel.add(Box.createHorizontalStrut(10));
+    if (addSavePasswordCB)
+      passwordOptionsPanel.add(savePasswordCheckBox);
+    
+    if (addRetrievePassButton){
+      if (addSavePasswordCB)
+        passwordOptionsPanel.add(Box.createHorizontalStrut(10));
       passwordOptionsPanel.add(retrievePasswordButton);
     }
     passwordOptionsPanel.add(Box.createHorizontalGlue());
