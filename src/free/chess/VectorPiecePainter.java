@@ -217,9 +217,13 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawKingImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(kingPolygon==null)){
-      if (kingPolygon!=null){
+  protected synchronized void drawKingImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+        
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
+        (kingPolygon == null)){
+          
+      if (kingPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
@@ -245,9 +249,13 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawQueenImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(queenPolygon==null)){
-      if (queenPolygon!=null){
+  protected synchronized void drawQueenImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+        
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
+        (queenPolygon == null)){
+          
+      if (queenPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
@@ -274,9 +282,13 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawRookImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(rookPolygon==null)){
-      if (rookPolygon!=null){
+  protected synchronized void drawRookImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+        
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
+        (rookPolygon == null)){
+          
+      if (rookPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
@@ -302,9 +314,12 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawBishopImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(bishopPolygon==null)){
-      if (bishopPolygon!=null){
+  protected synchronized void drawBishopImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) || 
+        (bishopPolygon==null)){
+          
+      if (bishopPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
@@ -330,9 +345,12 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawKnightImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(knightPolygon==null)){
-      if (knightPolygon!=null){
+  protected synchronized void drawKnightImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+        
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) ||
+        (knightPolygon == null)){
+      if (knightPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
@@ -356,9 +374,10 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * outline color using the given Graphics.
    */
 
-  protected void drawPawnImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
-    if ((cachedPieceSize.width!=width)||(cachedPieceSize.height!=height)||(pawnPolygon==null)){
-      if (pawnPolygon!=null){
+  protected synchronized void drawPawnImage(Graphics g, int width, int height,
+      Color pieceColor, Color outlineColor){
+    if ((cachedPieceSize.width != width) || (cachedPieceSize.height != height) || (pawnPolygon == null)){
+      if (pawnPolygon != null){
         cachedPieceSize.width = width;
         cachedPieceSize.height = height;
         clearPieceCache();
