@@ -2,6 +2,13 @@
 	// A bunch of ICC specific functions.
 	
 	
+	// Returns whether prefs.php should be accessed via https, false if via
+	// plain http
+	function isSSLPrefs(){
+		return false;
+	}
+	
+	
 	// Connects to MySQL and selects the Jin database. Returns whether
 	// successful.
 	function connectToMySQL(){
