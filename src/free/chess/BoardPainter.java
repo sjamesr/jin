@@ -27,22 +27,13 @@ import java.awt.Component;
 
 
 /**
- * An interface for classes who paint the board image on the Board component
- * to implement.
+ * An interface for classes who paint the board "background" on JBoard.
  */
 
 public interface BoardPainter{
 
 
-  /**
-   * Returns the preferred board size. Should return a dimension that has no area
-   * if this BoardPainter has no preferred size.
-   */
-
-  Dimension getPreferredBoardSize();
-
   
-
   /**
    * Paints the board at the given location on the given Graphics scaled to
    * the given size. The <code>component</code> argument may be null.
@@ -50,4 +41,6 @@ public interface BoardPainter{
 
   void paintBoard(Graphics g, Component component, int x, int y, int width, int height);
 
+  
+  
 }

@@ -26,23 +26,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+
 /**
- * An interface classes that know how to paint chess pieces should implement.
+ * An interface for classes that paint the pieces on JBoard.
  */
 
 public interface PiecePainter{
 
 
-  /**
-   * Returns the preferred size of the pieces. Should return a dimension that
-   * has no area (width<=0 or height<=0) if this PiecePainter doesn't have a 
-   * preferred piece size.
-   */
-
-  Dimension getPreferredPieceSize();
-    
-
-
+  
   /**
    * Paints the given piece at the given coordinates on the given
    * <code>Graphics</code> object scaled to the given size. The
@@ -53,4 +45,6 @@ public interface PiecePainter{
 
   void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect, boolean shaded);
 
+  
+  
 }
