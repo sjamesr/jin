@@ -231,7 +231,6 @@
 			<param name="server.file" value="chessclub.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
 			<param name="pieces" value="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard" />
-			<param name="auth_code" value="$authenticated = true;" />
 		</antcall>
 
 		<antcall target="create-applet-archive">
@@ -239,7 +238,6 @@
 			<param name="server.file" value="freechess.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
 			<param name="pieces" value="fics/eboard xboard" />
-			<param name="auth_code" value="$authenticated = (file_get_contents(&#34;http://www.freechess.org/cgi-bin/pro/Login/jin/AuthenticateUser.cgi?username=$username&#38;password=$password&#34;) == &#34;1&#34;);" />
 		</antcall>
 	</target>
   
@@ -254,18 +252,21 @@
 		<input message="Please specify ${server.name} database password:" addproperty="db_password" />
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}" 
-			         includes="jin.jar ${server.name}.php ${server.name}_oldjava.php index.html DetectJava.class load_prefs.php reserve_space.php save_prefs.php libs/* libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
+			         includes="jin.jar index.php prefs.php auth.php logout.php detect_java.html DetectJava.class libs/* libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
 					 excludes="${excluded_files}"
 			/>
 			<filterset>
-				<filter token="old_java_url" value="${server.name}_oldjava.php" />
-				<filter token="new_java_url" value="${server.name}.php" />
+				<filter token="old_java_url" value="?oldjava=1" />
+				<filter token="new_java_url" value="?oldjava=0" />
 				<filter token="db_name" value="jin_${server.name}" />
 				<filter token="db_pass" value="${db_password}" />
-				<filter token="auth_code" value="${auth_code}" />
 			</filterset>
 		</copy>
-    
+		<copy todir="${dir-to-tar}">
+			<fileset dir="${build.dir}/${server.name}" />
+		</copy>
+		
+		
 		<foreach list="${boards}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
 			<param name="resource.type" value="boards" />
 		</foreach>
