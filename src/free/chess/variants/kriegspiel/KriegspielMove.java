@@ -33,8 +33,6 @@ import free.chess.*;
  *        it was a capture of the player's piece.
  *   <LI> A completely hidden move.
  * </UL>
- * The various methods in this class will throw an IllegalStateException if the
- * requested information is unknown.
  */
 
 public class KriegspielMove extends Move{
@@ -103,25 +101,24 @@ public class KriegspielMove extends Move{
 
 
   /**
-   * Always throws an IllegalStateException, as the information about the
-   * starting square is never available for a KriegspielMove.
+   * Always throws <code>null</code> since the starting square is always
+   * unknown.
    */
 
   public Square getStartingSquare(){
-    throw new IllegalStateException("The move must be completely visible for the starting square to be known");
+    return null;
   }
 
 
  
   /**
-   * Returns the square to which the moving piece moved.
-   *
-   * @throws IllegalStateException if the move is a completly hidden one.
+   * Returns the square to which the moving piece moved or <code>null</code> if
+   * the move is completely hidden.
    */
 
   public Square getEndingSquare(){
     if (isCompletelyHidden())
-      throw new IllegalStateException("The move must be at least partially visible for the ending square to be known");
+      return null;
 
     return super.getEndingSquare();
   }
@@ -137,7 +134,7 @@ public class KriegspielMove extends Move{
     if (isCompletelyHidden())  
       return "?";
     else
-      return "?x"+getEndingSquare().toString();
+      return "?x" + getEndingSquare().toString();
   }
 
 
