@@ -26,11 +26,11 @@ package free.util;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.applet.AppletContext;
 import java.io.IOException; 
 import java.io.InputStream; 
 import java.io.InterruptedIOException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -59,6 +59,14 @@ public class BrowserControl{
    */
 
   private static Properties environment = null;
+  
+  
+  
+  /**
+   * The context of the applet we're running within, if any.
+   */
+   
+  private static AppletContext appletContext = null;
 
 
 
@@ -72,14 +80,17 @@ public class BrowserControl{
 
   public static boolean displayURL(String url){
     try{
-      if (PlatformUtils.isWindows()){
+      if (appletContext != null){ // Running in an applet.
+        appletContext.showDocument(new URL(url), "_blank");
+      }
+      else if (PlatformUtils.isWindows()){
         if (url.endsWith(".html")||url.endsWith(".htm")){
 
           // url-encode the last character because windows refuses to display URLs
           // ending with ".html" or ".htm", but works fine
           // for ".htm%6c" or ".ht%6d"
-          int lastChar = url.charAt(url.length()-1);
-          url = url.substring(0,url.length()-1)+"%"+Integer.toHexString(lastChar);
+          int lastChar = url.charAt(url.length()  -1);
+          url = url.substring(0, url.length() - 1) + "%" + Integer.toHexString(lastChar);
         }
         String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
         Runtime.getRuntime().exec(cmd); 
@@ -187,21 +198,23 @@ public class BrowserControl{
 
   public static boolean displayMailer(String address){
     try{
-      if (PlatformUtils.isLinux()){
-        synchronized(BrowserControl.class){
-          if (environment == null){
-            try{
-              environment = new Properties();
-              Process env = Runtime.getRuntime().exec("env");
-              environment.load(env.getInputStream());
-            } catch (IOException e){}
+      if (appletContext == null){
+        if (PlatformUtils.isLinux()){
+          synchronized(BrowserControl.class){
+            if (environment == null){
+              try{
+                environment = new Properties();
+                Process env = Runtime.getRuntime().exec("env");
+                environment.load(env.getInputStream());
+              } catch (IOException e){}
+            }
           }
-        }
-
-        String mailer = environment.getProperty("MAILER");
-        if (mailer != null){
-          Runtime.getRuntime().exec(mailer + " " + address);
-          return true;
+  
+          String mailer = environment.getProperty("MAILER");
+          if (mailer != null){
+            Runtime.getRuntime().exec(mailer + " " + address);
+            return true;
+          }
         }
       }
     } catch (IOException e){
@@ -272,6 +285,17 @@ public class BrowserControl{
 
     AWTUtilities.centerWindow(dialog, parent);
     dialog.setVisible(true);
+  }
+  
+  
+  
+  /**
+   * Passes the <code>AppletContext</code> to <code>BrowserControl</code>.
+   * That <code>AppletContext</code> will then be used for opening URLs.
+   */
+   
+  public static void setAppletContext(AppletContext appletContext){
+    BrowserControl.appletContext = appletContext;
   }
   
   
