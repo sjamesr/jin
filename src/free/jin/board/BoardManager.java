@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -967,6 +968,22 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     // Artificially invoke this, since it would not get called otherwise
     // (we're already in the middle of the dispatching of that event).
     boardPanel.gameStarted(evt);
+    
+    // Listener that updates the container title whenever anything changes. 
+    game.addPropertyChangeListener(new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        Game game = (Game)evt.getSource();
+        BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.get(game);        
+        
+        if (boardPanel != null){
+          PluginUIContainer boardContainer =
+            (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
+  
+          if (boardContainer != null) // It could be null if the container has been closed
+            boardContainer.setTitle(getBoardTitle(boardPanel));
+        }
+      }
+    });
   }
 
 
@@ -1063,7 +1080,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     content.invalidate(); // Better wash this container - no 
     content.validate();   // knowing what used to be in it ;-)
 
-    boardContainer.setTitle(boardPanel.getTitle());
+    boardContainer.setTitle(getBoardTitle(boardPanel));
 
     containersToBoardPanels.put(boardContainer, boardPanel);
     boardPanelsToContainers.put(boardPanel, boardContainer);
@@ -1099,14 +1116,37 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       getConn().getListenerManager().removeGameListener(boardPanel);
       boardPanel.removeUserMoveListener(this);
       boardPanel.setInactive();
-
+      
       PluginUIContainer boardContainer =
         (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
 
       if (boardContainer != null) // It could be null if the container has been closed
-        boardContainer.setTitle(boardPanel.getTitle());
+        boardContainer.setTitle(getBoardTitle(boardPanel));
     }
   }
+  
+  
+  
+  /**
+   * Returns the ui container title used for the specified board panel.
+   */
+  
+  protected String getBoardTitle(BoardPanel boardPanel){
+    Game game = boardPanel.getGame();
+    if (boardPanel.isActive()){
+      if (game.getGameType() == Game.MY_GAME){
+        if (game.isPlayed())
+          return game.toString();
+        else
+          return "Examining " + game.toString();
+      }
+      else
+        return "Observing " + game.toString();
+    }
+    else
+      return "Was " + game.toString();
+  }
+  
   
   
   
