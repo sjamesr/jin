@@ -525,7 +525,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     fullscreenButton = createFullscreenButton();
     fullscreenButton.addActionListener(fullscreenAction);
     whiteClock = createWhiteClock(game);
+    setClockDisplayMode(whiteClock, game.getWhiteTime()); 
     blackClock = createBlackClock(game);
+    setClockDisplayMode(blackClock, game.getBlackTime());
     buttonPanel = createButtonPanel(game);
     moveListTableModel = createMoveListTableModel(game);
     moveListTable = createMoveListTable(game, moveListTableModel);
@@ -1668,10 +1670,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (player.equals(Player.WHITE_PLAYER)){
       whiteClock.setTime(time);
       lastWhiteUpdateTimestamp = System.currentTimeMillis();
+      setClockDisplayMode(whiteClock, time); 
     }
     else{
       blackClock.setTime(time);
       lastBlackUpdateTimestamp = System.currentTimeMillis();
+      setClockDisplayMode(blackClock, time);
     }
 
     if (isRunning){
@@ -1689,6 +1693,22 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         timer.stop();
       }
     }
+  }
+  
+  
+  
+  /**
+   * Sets the clock's display mode based on the amount of time on it.
+   */
+   
+  private void setClockDisplayMode(AbstractChessClock clock, int time){
+    time = Math.abs(time);
+    if (time < 10*1000) // Less than 10sec
+      clock.setDisplayMode(AbstractChessClock.SECOND_TENTHS_DISPLAY_MODE);
+    else if (time < 20*60*1000) // Between 10sec and 20min
+      clock.setDisplayMode(AbstractChessClock.MINUTE_SECOND_DISPLAY_MODE);
+    else
+      clock.setDisplayMode(AbstractChessClock.HOUR_MINUTE_DISPLAY_MODE);
   }
 
 
