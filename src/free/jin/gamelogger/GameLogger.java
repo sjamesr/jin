@@ -74,8 +74,6 @@ public class GameLogger extends Plugin implements GameListener{
 
 
 
-
-
   /**
    * The DateFormat used for formatting the Date pgn tag.
    */
@@ -324,43 +322,50 @@ public class GameLogger extends Plugin implements GameListener{
    */
 
   private String [] getFilesToLogInto(Game game){
-    GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
-
-    Vector files = new Vector();
-    for (int i = 0; i < loggingRules.size(); i++){
-      LoggingRule rule = (LoggingRule)loggingRules.elementAt(i);
-      String condition = rule.getCondition();
-      Interpreter bsh = new Interpreter();
-      boolean isUserWhite = game.getUserPlayer().isWhite();
-      try{
-        bsh.set("category", game.getRatingCategoryString().intern());
-        bsh.set("rating", isUserWhite ? game.getBlackRating() : game.getWhiteRating());
-        bsh.set("time", (isUserWhite ? game.getWhiteTime() : game.getBlackTime())/(1000*60));
-        bsh.set("inc", isUserWhite ? game.getWhiteInc() : game.getBlackInc());
-        bsh.set("etime", isUserWhite ? (game.getWhiteTime() + 2*game.getWhiteInc()/3) : 
-                                       (game.getBlackTime() + 2*game.getBlackInc()/3));
-        bsh.set("rated", game.isRated());
-        bsh.set("opponent", (isUserWhite ? game.getBlackName() : game.getWhiteName()).intern());
-        bsh.set("title", (isUserWhite ? game.getBlackTitles() : game.getWhiteTitles()).intern());
-        bsh.set("moves", gameInfo.movelist.size());
-        bsh.set("result", getResultString(isUserWhite, game.getResult()).intern());
-
-        boolean result = ((Boolean)bsh.eval(condition)).booleanValue();
-        if (result)
-          files.addElement(rule.getFilename());
-      } catch (EvalError e){
-          e.printStackTrace();
-        }
-    }
-
-    if (files.size() == 0)
+    if (loggingMode == LOG_NONE)
       return null;
+    else if (loggingMode == LOG_ALL){
+      return new String[]{allGamesLogFile};
+    }
+    else{
+      GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
 
-    String [] filenames = new String[files.size()];
-    for (int i = 0; i < filenames.length; i++)
-      filenames[i] = (String)files.elementAt(i);
+      Vector files = new Vector();
+      for (int i = 0; i < loggingRules.size(); i++){
+        LoggingRule rule = (LoggingRule)loggingRules.elementAt(i);
+        String condition = rule.getCondition();
+        Interpreter bsh = new Interpreter();
+        boolean isUserWhite = game.getUserPlayer().isWhite();
+        try{
+          bsh.set("category", game.getRatingCategoryString().intern());
+          bsh.set("rating", isUserWhite ? game.getBlackRating() : game.getWhiteRating());
+          bsh.set("time", (isUserWhite ? game.getWhiteTime() : game.getBlackTime())/(1000*60));
+          bsh.set("inc", isUserWhite ? game.getWhiteInc() : game.getBlackInc());
+          bsh.set("etime", isUserWhite ? (game.getWhiteTime() + 2*game.getWhiteInc()/3) : 
+                                         (game.getBlackTime() + 2*game.getBlackInc()/3));
+          bsh.set("rated", game.isRated());
+          bsh.set("opponent", (isUserWhite ? game.getBlackName() : game.getWhiteName()).intern());
+          bsh.set("title", (isUserWhite ? game.getBlackTitles() : game.getWhiteTitles()).intern());
+          bsh.set("moves", gameInfo.movelist.size());
+          bsh.set("result", getResultString(isUserWhite, game.getResult()).intern());
 
-    return filenames;
+          boolean result = ((Boolean)bsh.eval(condition)).booleanValue();
+          if (result)
+            files.addElement(rule.getFilename());
+        } catch (EvalError e){
+            e.printStackTrace();
+          }
+      }
+
+      if (files.size() == 0)
+        return null;
+
+      String [] filenames = new String[files.size()];
+      for (int i = 0; i < filenames.length; i++)
+        filenames[i] = (String)files.elementAt(i);
+
+      return filenames;
+    }
   }
 
 
