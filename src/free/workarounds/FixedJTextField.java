@@ -23,7 +23,9 @@ package free.workarounds;
 
 import javax.swing.JTextField;
 import javax.swing.text.Document;
+import javax.swing.UIManager;
 import java.awt.Cursor;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 
@@ -37,6 +39,8 @@ import java.awt.event.ActionListener;
  *        <Enter> in JTextComponent should activate DefaultButton</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4145324.html">
  *        JTextField displays multiple Line</A>.
+ *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4174290.html">
+ *        Disabled JTextField background should be control colour in Windows L&F</A>.
  * </UL>
  */
 
@@ -82,6 +86,43 @@ public class FixedJTextField extends JTextField{
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html 
 
+
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4174290.html
+
+    updateInactiveColor();
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4174290.html
+  }
+
+
+
+  public void updateUI(){
+    super.updateUI();
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4174290.html
+
+    updateInactiveColor();
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4174290.html
+
+  }
+
+
+
+
+  protected void updateInactiveColor(){
+    String lnfClassName = UIManager.getLookAndFeel().getClass().getName();
+    System.out.println(lnfClassName);
+    if (lnfClassName.equals("com.sun.java.swing.plaf.windows.WindowsLookAndFeel")){
+      Color inactiveBackground = UIManager.getColor("TextField.inactiveBackground");
+      if (inactiveBackground == null){
+        if (!isEditable())
+          setBackground(UIManager.getColor("Panel.background"));
+        else
+          setBackground(UIManager.getColor("TextField.background"));
+      }
+    }
   }
 
 
