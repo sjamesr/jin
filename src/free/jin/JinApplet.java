@@ -114,11 +114,11 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * Initializes the applet.
+   * Initializes the applet. 
    */
    
   public void init(){
-    try{    
+    try{
       BrowserControl.setAppletContext(getAppletContext());
       
       // Load the server we'll be connecting to
@@ -143,6 +143,23 @@ public class JinApplet extends Applet implements JinContext{
     } catch (Throwable t){
         createErrorUI(t);
       }
+  }
+  
+  
+  
+  /**
+   * Restarts JinApplet. This is called when the user closes Jin and is supposed
+   * to bring the applet to its initial state - ready to accept a new username
+   * and password.
+   */
+   
+  private void restart(){
+    username = null;
+    password = null;
+    
+    removeAll();
+    add(new UserAuthPanel());
+    validate();
   }
   
   
@@ -470,13 +487,8 @@ public class JinApplet extends Applet implements JinContext{
       AWTUtilities.centerWindow(settingsUploadDialog, this);
       settingsUploadDialog.setVisible(true);
     }
-
-    username = null;
-    password = null;
     
-    removeAll();
-    init();
-    validate();
+    restart();
   }
   
   
