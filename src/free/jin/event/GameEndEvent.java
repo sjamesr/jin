@@ -33,12 +33,43 @@ import free.jin.JinConnection;
 public class GameEndEvent extends GameEvent{
 
 
+
   /**
-   * Creates a new GameEndEvent with the given Game and source JinConnection.
+   * The result of the game.
    */
 
-  public GameEndEvent(JinConnection conn, Game game){
+  private final int result;
+
+
+
+
+  /**
+   * Creates a new GameEndEvent with the given Game, source JinConnection and
+   * result. Possible result values are defined in the <code>Game</code> class.
+   * <code>GAME_IN_PROGRESS</code> is not a valid result, though.
+   */
+
+  public GameEndEvent(JinConnection conn, Game game, int result){
     super(conn, game);
+
+    if (game.getResult() == Game.GAME_IN_PROGRESS)
+      throw new IllegalStateException("The specified game reports it's still in progress");
+
+    if (result != game.getResult())
+      throw new IllegalArgumentException("The specified game result differs from the result returned by Game.getResult()");
+
+    this.result = result;
+  }
+
+
+
+  /**
+   * Returns the result of the game. Possible values are defined in the
+   * <code>Game</code> class.
+   */
+  
+  public int getResult(){
+    return result;
   }
 
 }
