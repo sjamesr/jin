@@ -21,7 +21,7 @@
 
 package free.chess.event;
 
-import java.util.*;
+import java.util.EventListener;
 
 
 /**

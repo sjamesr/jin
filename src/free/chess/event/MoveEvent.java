@@ -21,9 +21,9 @@
 
 package free.chess.event;
 
-import free.chess.*;
-import java.util.*;
-
+import java.util.EventObject;
+import free.chess.Position;
+import free.chess.Move;
 
 
 /**
