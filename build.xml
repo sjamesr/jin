@@ -182,10 +182,21 @@
 			</or>
 		</condition>
 		
+		<condition property="runDoAppletStuff">
+			<or>
+				<isset property="applet" />
+				<and>
+					<isset property="release.platform" />
+					<equals arg1="applet" arg2="${release.platform}" />
+				</and>
+			</or>
+		</condition>
+		
 		<!-- Call the tasks that do platform specific stuff -->
 		<antcall target="doUnixStuff" />
 		<antcall target="doWindowsStuff" />
 		<antcall target="doMacOSXStuff" />
+		<antcall target="doAppletStuff" />
 		
 
 		<!-- Copy Java resources -->
@@ -227,9 +238,9 @@
 		<jar jarfile="${servers.dir}/freechess.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/freechess/** free/freechess/**"
-			         excludes="free/jin/freechess/definition free/jin/freechess/properties" />
+			         excludes="free/jin/freechess/definition" />
 			<fileset dir="${classes.dir}/free/jin/freechess"
-			         includes="definition properties" />
+			         includes="definition" />
 		</jar>
 
 
@@ -237,9 +248,9 @@
 		<jar jarfile="${servers.dir}/chessclub.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/chessclub/** free/chessclub/**" 
-			         excludes="free/jin/chessclub/definition free/jin/chessclub/properties" />
+			         excludes="free/jin/chessclub/definition" />
 			<fileset dir="${classes.dir}/free/jin/chessclub"
-			         includes="definition properties" />
+			         includes="definition" />
 		</jar>
 
 
@@ -255,9 +266,9 @@
 		<jar jarfile="${plugins.dir}/icc/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/console/icc/**"
-			         excludes="free/jin/console/icc/definition free/jin/console/icc/preferences" />
+			         excludes="free/jin/console/icc/definition" />
 			<fileset dir="${classes.dir}/free/jin/console/icc"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -265,9 +276,9 @@
 		<jar jarfile="${plugins.dir}/fics/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/console/fics/**"
-			         excludes="free/jin/console/fics/definition free/jin/console/fics/preferences" />
+			         excludes="free/jin/console/fics/definition" />
 			<fileset dir="${classes.dir}/free/jin/console/fics"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -283,9 +294,9 @@
 		<jar jarfile="${plugins.dir}/icc/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/sound/icc/**"
-			         excludes="free/jin/sound/icc/definition free/jin/sound/icc/preferences" />
+			         excludes="free/jin/sound/icc/definition" />
 			<fileset dir="${classes.dir}/free/jin/sound/icc"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -293,9 +304,9 @@
 		<jar jarfile="${plugins.dir}/fics/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/sound/fics/**"
-			         excludes="free/jin/sound/fics/definition free/jin/sound/fics/preferences" />
+			         excludes="free/jin/sound/fics/definition" />
 			<fileset dir="${classes.dir}/free/jin/sound/fics"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -311,9 +322,9 @@
 		<jar jarfile="${plugins.dir}/icc/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/seek/icc/**"
-			         excludes="free/jin/seek/icc/definition free/jin/seek/icc/preferences" />
+			         excludes="free/jin/seek/icc/definition" />
 			<fileset dir="${classes.dir}/free/jin/seek/icc"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -321,9 +332,9 @@
 		<jar jarfile="${plugins.dir}/fics/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/seek/fics/**"
-			         excludes="free/jin/seek/fics/definition free/jin/seek/fics/preferences" />
+			         excludes="free/jin/seek/fics/definition" />
 			<fileset dir="${classes.dir}/free/jin/seek/fics"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -339,9 +350,9 @@
 		<jar jarfile="${plugins.dir}/icc/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/board/icc/**"
-			         excludes="free/jin/board/icc/definition free/jin/board/icc/preferences" />
+			         excludes="free/jin/board/icc/definition" />
 			<fileset dir="${classes.dir}/free/jin/board/icc"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -349,9 +360,9 @@
 		<jar jarfile="${plugins.dir}/fics/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/board/fics/**"
-			         excludes="free/jin/board/fics/definition free/jin/board/fics/preferences" />
+			         excludes="free/jin/board/fics/definition" />
 			<fileset dir="${classes.dir}/free/jin/board/fics"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -359,9 +370,9 @@
 		<jar jarfile="${plugins.dir}/gamelogger.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/gamelogger/**"
-			         excludes="free/jin/gamelogger/definition free/jin/gamelogger/preferences" />
+			         excludes="free/jin/gamelogger/definition" />
 			<fileset dir="${classes.dir}/free/jin/gamelogger"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 
@@ -376,18 +387,18 @@
 		<jar jarfile="${plugins.dir}/icc/scripter.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/scripter/icc/**"
-			         excludes="free/jin/scripter/icc/definition free/jin/scripter/icc/preferences" />
+			         excludes="free/jin/scripter/icc/definition" />
 			<fileset dir="${classes.dir}/free/jin/scripter/icc"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 
 		<!-- Scripter plugin for FICS -->
 		<jar jarfile="${plugins.dir}/fics/scripter.jar" compress="false">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/scripter/fics/**"
-			         excludes="free/jin/scripter/fics/definition free/jin/scripter/fics/preferences" />
+			         excludes="free/jin/scripter/fics/definition" />
 			<fileset dir="${classes.dir}/free/jin/scripter/fics"
-			         includes="definition preferences" />
+			         includes="definition" />
 		</jar>
 		
 
@@ -563,5 +574,18 @@
 			</classpath>
 		</javac>
 	</target>
+	
 
+	<!-- If the property doAppletStuff is set, does things required for Applets -->
+	<target name="doAppletStuff" if="runDoAppletStuff">
+		<javac srcdir="resources/os-specific/applet"
+		       includes="DetectJava.java"
+		       debug="${debug}">
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset file="resources/os-specific/applet/**" excludes="**.java"/>
+		</copy>
+	</target>
+	
+	
 </project>
