@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -56,6 +56,23 @@ public class ConsoleTextField extends FixedJTextField{
 
 
   /**
+   * The KeyStroke used for telling the last teller.
+   */
+
+  private KeyStroke tellLastTellerKeyStroke;
+
+
+
+  /**
+   * The KeyStroke used for telling the next teller.
+   */
+
+  private KeyStroke tellNextTellerKeyStroke;
+
+
+
+
+  /**
    * The history of all the commands entered by the user.
    */
   
@@ -99,20 +116,48 @@ public class ConsoleTextField extends FixedJTextField{
 
     enableEvents(KeyEvent.KEY_EVENT_MASK|FocusEvent.FOCUS_EVENT_MASK);
 
+    initFromProperties();
+  }
+
+
+
+
+  /**
+   * Initializes this <code>ConsoleTextField</code> from the plugin properties.
+   */
+
+  protected void initFromProperties(){
+    if (tellLastTellerKeyStroke != null)
+      unregisterKeyboardAction(tellLastTellerKeyStroke);
+
+    if (tellNextTellerKeyStroke != null)
+      unregisterKeyboardAction(tellNextTellerKeyStroke);
+
     String tellLastTellerKeyStrokeString = console.getProperty("tell-last-teller-keystroke");
     String tellNextTellerKeyStrokeString = console.getProperty("tell-next-teller-keystroke");
 
     if (tellLastTellerKeyStrokeString != null){
-      KeyStroke tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
+      tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
       registerKeyboardAction(new TellLastTellerAction(), tellLastTellerKeyStroke, WHEN_FOCUSED);
     }
 
     if (tellNextTellerKeyStrokeString != null){
-      KeyStroke tellNextTellerKeyStroke = KeyStroke.getKeyStroke(tellNextTellerKeyStrokeString);
+      tellNextTellerKeyStroke = KeyStroke.getKeyStroke(tellNextTellerKeyStrokeString);
       registerKeyboardAction(new TellNextTellerAction(), tellNextTellerKeyStroke, WHEN_FOCUSED);
     }
   }
 
+
+
+
+  /**
+   * Re-reads all the plugin properties used by this instance and/or clears any
+   * cached values of such properties.
+   */
+
+  public void refreshFromProperties(){
+    initFromProperties();
+  }
 
 
 
