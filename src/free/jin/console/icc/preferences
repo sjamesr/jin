@@ -98,7 +98,7 @@ output-link.command-10 = string;$2
 output-link.index-10 = integer;2
 
 font-underlined.link = boolean;true
-foreground.link = color;3060ff
+foreground.link = color;5080ff
                      
 font-family = string;Monospaced
 font-size = integer;14
