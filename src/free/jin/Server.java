@@ -22,10 +22,9 @@
 package free.jin;
 
 import java.util.Properties;
+import java.util.Hashtable;
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.File;
-import java.io.FileInputStream;
 
 
 /**
@@ -82,14 +81,25 @@ public abstract class Server{
 
 
 
-
   /**
-   * Returns a <code>User</code> for this Server with the specified
-   * <code>Properties</code>.
+   * Creates and returns a <code>User</code> for this <code>Server</code> with
+   * the specified <code>Properties</code> and no User files.
    */
 
   public User createUser(Properties props){
-    return new User(this, props);
+    return createUser(props, new Hashtable());
+  }
+
+
+  /**
+   * Creates and returns a <code>User</code> for this <code>Server</code> with
+   * the specified <code>Properties</code> and Hashtable containing the User
+   * file names mapped to <code>MemoryFile</code> instances containing the
+   * file's data.
+   */
+
+  public User createUser(Properties props, Hashtable userFiles){
+    return new User(this, props, userFiles);
   }
 
 
@@ -99,7 +109,7 @@ public abstract class Server{
    */
 
   public User createGuest(){
-    return new User(this, new Properties());
+    return new User(this, new Properties(), new Hashtable());
   }
 
 

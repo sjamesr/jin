@@ -121,11 +121,12 @@ public class Jin{
 
 
   /**
-   * Maps <code>User</code> object to files from which they were loaded by the
-   * <code>loadUser(String)</code> method.
+   * Maps <code>User</code> object to directories from which they were loaded by
+   * the <code>loadUser(String)</code> method or saved into by the
+   * <code>saveUser(User)</code> method.
    */
 
-  private static final Hashtable userFiles = new Hashtable();
+  private static final Hashtable userDirs = new Hashtable();
 
 
 
@@ -308,7 +309,7 @@ public class Jin{
    */
 
   public static String getSettingsPath(User user){
-    File file = (File)userFiles.get(user);
+    File file = (File)userDirs.get(user);
     return file == null ? null : file.getAbsolutePath();
     // Not 100% sure we should use the absolute path...
   }
@@ -326,36 +327,55 @@ public class Jin{
     if (path == null)
       throw new IllegalArgumentException("Path may not be null");
 
-    File file = new File(path);
+    File userDir = new File(path);
     try{
-      if (!file.exists())
-        throw new FileNotFoundException(file.toString());
+      if (!userDir.exists())
+        throw new FileNotFoundException(userDir.toString());
+      if (!userDir.isDirectory())
+        throw new IOException("Path must be a directory");
 
-      String filename = file.getName();
-      if (!"settings".equals(filename))
-        throw new IllegalArgumentException("Bad path specified: "+path);
-
-      File parent = new File(file.getParent());
-      String username = parent.getName();
-      parent = new File(parent.getParent());
+      String username = userDir.getName();
+      File parent = new File(userDir.getParent());
       String serverID = parent.getName();
 
       Server server = getServer(serverID);
       if (server == null){
-        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+file+
+        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+userDir+
          "\nBecause "+serverID+" is not a known server", "Error", JOptionPane.ERROR_MESSAGE);
         return null;
       }
 
-      InputStream in = new BufferedInputStream(new FileInputStream(file));
-      User user = User.read(server, in);
-      in.close();
+      File settingsFile = new File(userDir, "settings");
+      InputStream propsIn = new BufferedInputStream(new FileInputStream(settingsFile));
+      Properties props = new Properties();
+      props.load(propsIn);
+      propsIn.close();
 
-      userFiles.put(user, file);
+      Hashtable userFiles = new Hashtable();
+      File userFilesFile = new File(userDir, "files"); 
+      if (userFilesFile.exists()){
+        DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(userFilesFile)));
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        int filesCount = in.readInt();
+        for (int i = 0; i < filesCount; i++){
+          String filename = in.readUTF();
+          int filesize = in.readInt();
+          IOUtilities.pump(in, buf, filesize);
+          byte [] data = buf.toByteArray();
+          buf.reset();
+          MemoryFile memFile = new MemoryFile(data);
+          userFiles.put(filename, memFile);
+        }
+        in.close();
+      }
+
+      User user = server.createUser(props, userFiles);
+
+      userDirs.put(user, userDir);
 
       return user;
     } catch (IOException e){
-        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+file, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+userDir, "Error", JOptionPane.ERROR_MESSAGE);
         return null;
       }
   }
@@ -367,38 +387,60 @@ public class Jin{
    * Saves the given User. If this is yet an unknown User and the user doesn't
    * abort the save, it is added to the list of known users. If the process
    * fails for some reason, an appropriate message is displayed to the user, so
-   * the caller needn't worry about that.
+   * the caller needn't worry about that. The returned String is the path into
+   * which the <code>User</code> was saved, or <code>null</code> if the saving
+   * process failed.
    */
 
-  public static void save(User user){
-    File file = (File)userFiles.get(user);
-    if (file == null){
+  public static String saveUser(User user){
+    File userDir = (File)userDirs.get(user);
+    if (userDir == null){
       System.out.println("Querying user about creating a new account");
       int result = JOptionPane.showConfirmDialog(getMainFrame(), "Would you like to save your \"" + user.getUsername() + "\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.YES_OPTION){
         System.out.println("Creating new user, named "+user.getUsername());
         File serverDir = new File(usersDir, user.getServer().getID());
-        File userDir = new File(serverDir, user.getUsername());
+        userDir = new File(serverDir, user.getUsername());
         if (!userDir.mkdirs()){
           JOptionPane.showMessageDialog(mainFrame, "Unable to create directory "+userDir, "Error", JOptionPane.ERROR_MESSAGE);
-          return;
+          return null;
         }
-
-        file = new File(userDir, "settings");
       }
       else
-        return;
+        return null;
     }
 
     try{
-      OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-      user.write(out);
-      out.close();
+      Properties props = user.getProperties();
+      Hashtable userFiles = user.getUserFiles();
 
-      userFiles.put(user, file);
+      File propsFile = new File(userDir, "settings");
+      OutputStream propsOut = new BufferedOutputStream(new FileOutputStream(propsFile));
+      props.save(propsOut, user.getUsername()+"'s properties for "+user.getServer().getLongName());
+      propsOut.close();
+
+      if (!userFiles.isEmpty()){
+        File userFilesFile = new File(userDir, "files"); 
+        DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(userFilesFile)));
+        out.writeInt(userFiles.size());
+        Enumeration filenames = userFiles.keys();
+        while (filenames.hasMoreElements()){
+          String filename = (String)filenames.nextElement();
+          MemoryFile memFile = (MemoryFile)userFiles.get(filename);
+          out.writeUTF(filename);
+          synchronized(memFile){
+            out.writeInt(memFile.getSize());
+            memFile.writeTo(out);
+          }
+        }
+      }
+
+      userDirs.put(user, userDir);
+
+      return getSettingsPath(user);
     } catch (IOException e){
-        JOptionPane.showMessageDialog(mainFrame, "Unable to save user file into:\n"+file, "Error", JOptionPane.ERROR_MESSAGE);
-        return;
+        JOptionPane.showMessageDialog(mainFrame, "Unable to save user file into:\n"+userDir, "Error", JOptionPane.ERROR_MESSAGE);
+        return null;
       }
   }
 
