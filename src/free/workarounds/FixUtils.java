@@ -22,6 +22,7 @@
 package free.workarounds;
 
 import java.awt.event.KeyEvent;
+import javax.swing.text.JTextComponent;
 
 
 /**
@@ -52,6 +53,61 @@ public class FixUtils{
         throw new InternalError();
       }
   }
+  
+  
+  
+  /**
+   * The fake clipboard selection we use when running under MS VM as an applet.
+   */
+   
+  private static String clipboard = null;
+  
+  
+  
+  /**
+   * Pastes via the fake clipboard.
+   */
+   
+  static void fakePaste(JTextComponent tc){
+    String text = tc.getText();
+    int caretPos = tc.getCaretPosition();
+    
+    tc.setText(text.substring(0, caretPos) + clipboard + text.substring(caretPos));
+    tc.setCaretPosition(caretPos + clipboard.length());
+  }
+  
+  
+  
+  /**
+   * Copies via the fake clipboard.
+   */
+   
+  static void fakeCopy(JTextComponent tc){
+    String selection = tc.getSelectedText();
+    if ((selection != null) && (selection.length() > 0))
+      clipboard = selection; 
+  }
+  
+  
+  
+  /**
+   * Cuts via the fake clipboard.
+   */
+   
+  static void fakeCut(JTextComponent tc){
+    String selection = tc.getSelectedText();
+    if ((selection != null) && (selection.length() > 0)){
+      clipboard = selection;
+      
+      String text = tc.getText();
+      int selectionStart = tc.getSelectionStart();
+      int selectionEnd = tc.getSelectionEnd();
+      
+      tc.setText(text.substring(0, selectionStart) + text.substring(selectionEnd));
+      tc.setCaretPosition(selectionStart);
+    }
+  }
+  
 
 
 }
