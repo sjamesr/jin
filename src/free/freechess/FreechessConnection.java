@@ -26,7 +26,9 @@ import java.io.*;
 import jregex.*;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
+import java.util.BitSet;
 import java.util.Vector;
+import free.util.Pair;
 
 
 /**
@@ -94,23 +96,24 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
   /**
-   * <code>true</code> when seek information is turned on, <code>false</code>
-   * when off.
+   * A BitSet keeping the requested state of ivariables. This may be
+   * inconsistent with the server's idea of their state as the message might
+   * have yet to arrive.
+   *
+   * @see #ivarStates
    */
 
-  private boolean seekInfoOn = false;
-
+  private final BitSet requestedIvarStates = new BitSet();
 
 
 
   /**
-   * <code>true</code> when the premove ivar is on, <code>false</code> when off.
+   * A BitSet keeping the (true) state of ivariables. We set this to a non-null
+   * value once we send the requestedIvarStates on the login line.
    */
 
-  private boolean isPremove = false;
-
+  private BitSet ivarStates = null;
 
 
 
@@ -122,14 +125,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-
   /**
    * The value we're supposed to assign to the interface variable during login.
    */
 
   private String interfaceVar = "Java freechess.org library by Alexander Maryanovsky";
-
 
 
 
@@ -140,6 +140,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   public FreechessConnection(String hostname, int port, String username, String password){
     super(hostname, port, username, password);
+
+    setIvarState(Ivar.NOWRAP, true);
+    setIvarState(Ivar.DEFPROMPT, true); // Sets it to the default, which we filter out.
+    setIvarState(Ivar.MS, true);
+    setIvarState(Ivar.NOHIGHLIGHT, true);
   }
 
 
@@ -169,6 +174,88 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  /**
+   * Sets the specified ivar on or off. If we're already logged in, a
+   * <code>set-2 [DG number] [0/1]</code> string is sent to the server,
+   * otherwise the setting is saved, and in the login procedure all 
+   * the ivar settings are sent on the login line in the
+   * <code>%b0011011011...</code> format. You may call this method to set (or
+   * unset) an ivar that has already been set (or unset), which will result in
+   * the appropriate message being send again.
+   * Note that some ivars are necessary for the correct behaviour of this class,
+   * and their states may not be modified (defprompt for example).
+   *
+   * @param ivar The ivar.
+   * @param state Whether set the variable on or off.
+   *
+   * @return whether the state of the variable was modified successfully. This
+   * always returns true when setting an ivar on, and only returns false
+   * when trying to set an essential datagram off.
+   *
+   * @see #isEssentialIvar(Ivar)
+   * @see #getIvarState(int)
+   */
+
+  public final synchronized boolean setIvarState(Ivar ivar, boolean state){
+    if ((state == false) && isEssentialIvar(ivar))
+      return false;
+
+    if (state)
+      requestedIvarStates.set(ivar.getIndex());
+    else
+      requestedIvarStates.clear(ivar.getIndex());
+
+    // if this is called after the ivars have been sent on the login line,
+    // but before we're fully logged in yet, the settings will be fixed in
+    // onLogin(). We don't do it here because it's not a good idea to send
+    // anything in the middle of the login procedure.
+    if (isLoggedIn()){
+      sendCommand("$$iset "+ivar.getName()+" "+(state ? "1" : "0"));
+      filterLine(ivar.getName()+" "+(state ? "" : "un")+"set.");
+    }
+
+    return true;
+  }
+
+
+
+  /**
+   * Returns the current state of the specified ivar as far as data arriving
+   * from the server is concerned. Note that calls to
+   * {@link #setIvarState(Ivar, boolean)} will be reflected by this method only
+   * when the server echoes that it acknowledged the setting of the ivar.
+   */
+
+  public final synchronized boolean getIvarState(Ivar ivar){
+    return (ivarStates == null ? requestedIvarStates : ivarStates).get(ivar.getIndex());
+  }
+
+
+
+  /**
+   * Returns the current "requested" state of the specified ivar, the state as
+   * it has been requested by the last command sent to the server (regarding
+   * this ivar).
+   */
+
+  public final synchronized boolean getRequestedIvarState(Ivar ivar){
+    return requestedIvarStates.get(ivar.getIndex());
+  }
+
+
+
+  /**
+   * Returns true if the specified ivar is essential and can't be set off.
+   * When overriding this method, don't forget to call the superclass' method.
+   */
+
+  protected boolean isEssentialIvar(Ivar ivar){
+    return ((ivar == Ivar.NOWRAP) ||
+            (ivar == Ivar.MS) ||
+            (ivar == Ivar.NOHIGHLIGHT));
+  }
+
+
 
   /**
    * Sets the style. If the ChessclubConnection is already logged in, then
@@ -184,7 +271,6 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       filterLine("Style "+style+" set.");
     }
   }
-
 
 
 
@@ -204,89 +290,6 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-  /**
-   * Sets the state of seek information sending. If the passed argument is
-   * <code>true</code>, the server will be asked to send seek information, if
-   * <code>false</code>, it will be asked not to send it. If the
-   * FreechessConnection is not logged on yet, the setting will be saved and
-   * sent to the server on login.
-   */
-
-  public final synchronized void setSeekInfo(boolean state){
-    if (seekInfoOn == state)
-      return;
-
-    seekInfoOn = state;
-
-    if (isLoggedIn()){
-      sendCommand("$$iset seekinfo " + (seekInfoOn ? "1" : "0"));
-//      sendCommand("$$iset seekremove " + (seekInfoOn ? "1" : "0"));
-      // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
-
-      filterLine("seekinfo "+(seekInfoOn ? "" : "un") + "set.");
-//      filterLine("seekremove "+(seekInfoOn ? "" : "un")+"set.");
-    }
-  }
-
-
-
-
-  /**
-   * Returns the current state of seek information sending.
-   */
-
-  public final synchronized boolean getSeekInfo(){
-    return seekInfoOn;
-  }
-
-
-
-
-  /**
-   * Asks the server to re-send the seeks if the current state of seek
-   * information sending is "on". The call is ignored otherwise.
-   */
-
-  public final synchronized void askSeeksRefresh(){
-    if (seekInfoOn && isLoggedIn()){
-      sendCommand("$$iset seekinfo 1");
-      filterLine("seekinfo set.");
-    }
-  }
-
-
-
-
-  /**
-   * Sets the premove ivar to the specified state. If logged in, sends the
-   * appropriate command immediately. Otherwise, the variable will be set on
-   * login. The default is false.
-   */
-
-  public synchronized void setPremove(boolean val){
-    isPremove = val;
-
-    if (isLoggedIn()){
-      sendCommand("$$iset premove " + (val ? "1" : "0"));
-      filterLine("premove " + (val ? "" : "un") + "set.");
-    }
-  }
-
-
-
-  /**
-   * Returns <code>true</code> if the premove ivar is on.
-   */
-
-  public synchronized boolean isPremove(){
-    return isPremove;
-  }
-
-
-
-
-
   /**
    * Logs in.
    */
@@ -294,9 +297,16 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   protected boolean login() throws IOException{
     out = sock.getOutputStream();
 
-    sendCommand(getRequestedUsername());
-    if (getPassword() != null)
-      sendCommand(getPassword());
+    synchronized(this){
+      sendCommand(createLoginIvarsSettingString(requestedIvarStates));
+
+      ivarStates = (BitSet)requestedIvarStates.clone();
+
+      sendCommand(getRequestedUsername());
+      if (getPassword() != null)
+        sendCommand(getPassword());
+    }
+
 
     synchronized(loginLock){
       try{
@@ -315,43 +325,61 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * Creates the string we send on the login line to set ivars.
+   */
+
+  private static String createLoginIvarsSettingString(BitSet ivars){
+    StringBuffer buf = new StringBuffer();
+    buf.append("%b");
+
+    int largestSetIvarIndex = ivars.size();
+    while ((largestSetIvarIndex >= 0) && !ivars.get(largestSetIvarIndex))
+      largestSetIvarIndex--;
+
+    for (int i = 0; i <= largestSetIvarIndex; i++)
+      buf.append(ivars.get(i) ? "1" : "0");
+
+    return buf.toString();
+  }
+
+
+
+  /**
    * Sets the various things we need to set on login.
    */
 
   protected void onLogin(){
     super.onLogin();
 
-    int style = this.style;
-    String interfaceVar = this.interfaceVar;
-    boolean isPremove = isPremove();
+    // Apply any ivar changes which might have occurred when we were waiting
+    // for login.
+    synchronized(this){
 
-    sendCommand("$iset nowrap 1");
-    sendCommand("$set style "+style);
-    sendCommand("$set interface "+interfaceVar);
-    sendCommand("$set ptime 0");
-    sendCommand("$iset defprompt"); // Sets it to the default, which we filter out.
-    sendCommand("$iset ms 1");
-    sendCommand("$iset nohighlight 1");
-    if (seekInfoOn){
-      sendCommand("$iset seekinfo 1");
-//      sendCommand("$iset seekremove 1"); 
-      // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
-    }
-    sendCommand("$iset premove " + (isPremove ? "1" : "0"));
-    sendCommand("$iset lock 1");
+      // Workaround: the server won't send us the full seek list if we set seekinfo
+      // on the login line.
+      if (ivarStates.get(Ivar.SEEKINFO.getIndex())){
+        sendCommand("$$iset seekinfo 1");
+        filterLine("seekinfo set.");
+      }
 
-    filterLine("Style "+style+" set.");
-    filterLine("Your prompt will now not show the time.");
-    filterLine("defprompt set.");
-    filterLine("nowrap set.");
-    filterLine("ms set.");
-    filterLine("nohighlight set.");
-    if (seekInfoOn){
-      filterLine("seekinfo set.");
-//      filterLine("seekremove set.");
+
+      for (int i = 0; i < requestedIvarStates.size(); i++){
+        boolean state = requestedIvarStates.get(i);
+        Ivar ivar = Ivar.getByIndex(i);
+        if (state != ivarStates.get(i)){
+          sendCommand("$$iset "+ivar.getName()+" "+(state ? "1" : "0"));
+          filterLine(ivar.getName()+" "+(state ? "" : "un")+"set.");
+        }
+      }
+
+      sendCommand("$set style "+style);
+      filterLine("Style "+style+" set.");
+
+      sendCommand("$set interface "+interfaceVar);
+
+      sendCommand("$set ptime 0");
+      filterLine("Your prompt will now not show the time.");
     }
-    filterLine("premove " + (isPremove ? "" : "un") + "set.");
-    filterLine("lock set.");
   }
 
 
@@ -460,6 +488,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleLogin(line))
       return;
+    if (handleIvarSet(line))
+      return;
     if (handlePersonalTell(line))
       return;
     if (handleSayTell(line))
@@ -514,6 +544,43 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (linesToFilter.remove(line) == null)
       processLine(line);
   }
+
+
+
+  /**
+   * The regular expression matching lines which are notifications of an ivar
+   * being set.
+   */
+
+  private static final Pattern ivarSetPattern = new Pattern("^(\\w+) (un)?set.$");
+
+
+
+  /**
+   * Called to determine whether the specified line is a notification that an
+   * ivar has been set.
+   */
+
+  private boolean handleIvarSet(String line){
+    Matcher matcher = ivarSetPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    String ivarName = matcher.group(1);
+    boolean state = "".equals(matcher.group(2));
+
+    Ivar ivar = Ivar.getByName(ivarName);
+    if (ivar == null) // It's a notification that something has been set, but not a known ivar
+      return false;
+
+    ivarStates.set(ivar.getIndex());
+
+    if (linesToFilter.remove(line) == null)
+      processLine(line);
+
+    return true;
+  }
+
 
 
 

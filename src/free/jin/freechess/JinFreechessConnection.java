@@ -69,6 +69,10 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     setInterface(Jin.getInterfaceName());
     setStyle(12);
+
+    setIvarState(Ivar.GAMEINFO, true);
+    setIvarState(Ivar.SHOWOWNSEEK, true);
+    setIvarState(Ivar.LOCK, true);
   }
 
 
@@ -147,15 +151,10 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   public void onLogin(){
-    sendCommand("$set bell 0");
-    sendCommand("$iset gameinfo 1");
-    sendCommand("$iset showownseek 1");
-
-    filterLine("Bell off.");
-    filterLine("gameinfo set.");
-    filterLine("showownseek set.");
-
     super.onLogin();
+
+    sendCommand("$set bell 0");
+    filterLine("Bell off.");
 
     listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN));
   }
@@ -1085,7 +1084,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
 
       if (game.getGameType() == Game.MY_GAME)
-        askSeeksRefresh();
+        setIvarState(Ivar.SEEKINFO, true); // Refresh the seeks
     }
     else
       unsupportedGames.removeElement(gameID);
@@ -1206,9 +1205,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processSeekAdded(SeekInfoStruct seekInfo){
-    // We may get seeks after setting seekInfo to false because the server
+    // We may get seeks after setting seekinfo to false because the server
     // already sent them when we sent it the request to set seekInfo to false.
-    if (getSeekInfo()){
+    if (getRequestedIvarState(Ivar.SEEKINFO)){
       WildVariant variant = getVariant(seekInfo.getMatchType());
       if (variant != null){
         String seekID = String.valueOf(seekInfo.getSeekIndex());
