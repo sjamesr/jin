@@ -1108,7 +1108,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (isRunning){
       if (!timer.isRunning()){
-        timer.setInitialDelay(time%timer.getDelay());
+        int delay = time%timer.getDelay();
+        if (delay < 0)
+          delay += timer.getDelay();
+        
+        timer.setInitialDelay(delay);
         timer.start();
       }
     }
