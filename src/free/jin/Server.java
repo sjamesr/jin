@@ -136,8 +136,24 @@ public abstract class Server{
 
 
 
+
   /**
-   * Returns the name of this server.
+   * Returns an ID of this server. This should be a short, lowecase only string
+   * without any whitespace. It should also be unique between all servers. It is
+   * not necessary (although preferable) for it to be descriptive.
+   */
+
+  public String getID(){
+    return getProperty("id");
+  }
+
+
+
+  /**
+   * Returns the name of this server. The name is a descriptive string that can
+   * be displayed to the user but is not necessarily the full name of the
+   * server. The Free Internet Chess Server would be called here "FICS", for
+   * example.
    */
 
   public String getName(){
@@ -148,7 +164,7 @@ public abstract class Server{
 
 
   /**
-   * Returns a long server name.
+   * Returns a long server name. Example: "Internet Chess Club".
    */
 
   public String getLongName(){
