@@ -124,6 +124,7 @@ public class MemoryFile{
     if (data != null){
       this.data = new byte[bufSize > data.length ? bufSize : data.length];
       System.arraycopy(data, 0, this.data, 0, data.length);
+      this.size = data.length;
     }
   }
 
