@@ -152,11 +152,20 @@ public class JBoard extends JComponent{
 
 
   /**
+   * The constant for move highlighting done by highlighting the target square
+   * of the move.
+   */
+
+  public static final int TARGET_SQUARE_MOVE_HIGHLIGHTING = 1;
+
+
+
+  /**
    * The constant for move highlighting done by highlighting the source and
    * target squares of the move.
    */
 
-  public static final int SQUARE_MOVE_HIGHLIGHTING = 1;
+  public static final int BOTH_SQUARES_MOVE_HIGHLIGHTING = 2;
 
 
 
@@ -165,7 +174,7 @@ public class JBoard extends JComponent{
    * square to the target square.
    */
 
-  public static final int ARROW_MOVE_HIGHLIGHTING = 2;
+  public static final int ARROW_MOVE_HIGHLIGHTING = 3;
 
   
   
@@ -659,7 +668,8 @@ public class JBoard extends JComponent{
   public void setMoveHighlightingStyle(int newStyle){
     switch(newStyle){
       case NO_MOVE_HIGHLIGHTING:
-      case SQUARE_MOVE_HIGHLIGHTING:
+      case TARGET_SQUARE_MOVE_HIGHLIGHTING:
+      case BOTH_SQUARES_MOVE_HIGHLIGHTING:
       case ARROW_MOVE_HIGHLIGHTING:
         break;
       default:
@@ -716,7 +726,9 @@ public class JBoard extends JComponent{
     if ((from == null) || (to == null))
       return;
 
-    if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
+    if (moveHighlightingStyle == TARGET_SQUARE_MOVE_HIGHLIGHTING)
+      repaint(squareToRect(to, null));
+    if (moveHighlightingStyle == BOTH_SQUARES_MOVE_HIGHLIGHTING){
       repaint(squareToRect(from, null));
       repaint(squareToRect(to, null));
     }
@@ -1072,13 +1084,20 @@ public class JBoard extends JComponent{
     if ((moveHighlightingStyle != NO_MOVE_HIGHLIGHTING) && (highlightedMove != null)){
       Square from = highlightedMove.getStartingSquare();
       Square to = highlightedMove.getEndingSquare();
+      
+      squareToRect(from, rect);
+      int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/12);
       if ((from != null) && (to != null)){
-        if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
-          drawSquare(g, from, 3, getMoveHighlightingColor());
-          drawSquare(g, to, 4, getMoveHighlightingColor());
+        if (moveHighlightingStyle == BOTH_SQUARES_MOVE_HIGHLIGHTING){
+          drawSquare(g, from, highlightSize - Math.max(1, highlightSize/4), getMoveHighlightingColor());
+          drawSquare(g, to, highlightSize, getMoveHighlightingColor());
         }
-        else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
-          drawArrow(g, from, to, 6, getMoveHighlightingColor());
+        else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING){
+          drawArrow(g, from, to, highlightSize+1, getMoveHighlightingColor());
+        }
+      }
+      if ((to != null) && (moveHighlightingStyle == TARGET_SQUARE_MOVE_HIGHLIGHTING)){
+        drawSquare(g, to, highlightSize, getMoveHighlightingColor());
       }
     }
     
@@ -1099,8 +1118,10 @@ public class JBoard extends JComponent{
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE){
         Square square = locationToSquare(rect.x, rect.y);
-        if (square != null) // May be null if mouse is dragged out of the board
-          drawSquare(g, square, 2, getDragSquareHighlightingColor());
+        if (square != null){ // May be null if mouse is dragged out of the board
+          int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
+          drawSquare(g, square, highlightSize, getDragSquareHighlightingColor());
+        }
       }
     }
   }
@@ -1276,12 +1297,12 @@ public class JBoard extends JComponent{
     int toX = toRect.x + toRect.width/2;
     int toY = toRect.y + toRect.height/2;
 
-    int dx = toX - fromX;
-    int dy = toY - fromY;
-
-    double angle = Math.atan2(dy, dx);
+    double angle = Math.atan2(toY - fromY, toX - fromX);
     double sin = Math.sin(angle);
     double cos = Math.cos(angle);
+    
+    toX -= (int)(cos*toRect.width/2);
+    toY -= (int)(sin*toRect.height/2);
 
     int [] xpoints = new int[4];
     int [] ypoints = new int[4];
@@ -1301,12 +1322,12 @@ public class JBoard extends JComponent{
     // The arrow "point"
     xpoints[0] = (int)(toX+cos*arrowSize);
     ypoints[0] = (int)(toY+sin*arrowSize);
-    xpoints[1] = (int)(toX+Math.cos(angle-Math.PI*3/4)*arrowSize*2);
-    ypoints[1] = (int)(toY+Math.sin(angle-Math.PI*3/4)*arrowSize*2);
-    xpoints[2] = (int)(toX-cos*arrowSize/2);
-    ypoints[2] = (int)(toY-sin*arrowSize/2);
-    xpoints[3] = (int)(toX+Math.cos(angle+Math.PI*3/4)*arrowSize*2);
-    ypoints[3] = (int)(toY+Math.sin(angle+Math.PI*3/4)*arrowSize*2);
+    xpoints[1] = (int)(toX+Math.cos(angle-Math.PI*3/4)*arrowSize*3);
+    ypoints[1] = (int)(toY+Math.sin(angle-Math.PI*3/4)*arrowSize*3);
+    xpoints[2] = (int)(toX-cos*arrowSize);
+    ypoints[2] = (int)(toY-sin*arrowSize);
+    xpoints[3] = (int)(toX+Math.cos(angle+Math.PI*3/4)*arrowSize*3);
+    ypoints[3] = (int)(toY+Math.sin(angle+Math.PI*3/4)*arrowSize*3);
 
     g.fillPolygon(xpoints, ypoints, 4);
   }
