@@ -80,7 +80,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public JinChessclubConnection(String hostname, int port, String username, String password){
     super(hostname, port, username, password, System.out);
 
-    setInterface(Jin.getProperty("name")+" "+Jin.getProperty("version")+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")");
+    setInterface(Jin.getInterfaceName());
   }
 
 
@@ -110,12 +110,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Current functionality includes:
-   * <UL>
-   *   <LI> Sets the interface variable.
-   *   <LI> Fires a ConnectionEvent specifying that the login procedure is done
-   *        (in the Event dispatching thread of course).
-   * </UL>
+   * Performs various on-login tasks. Also notifies all interested
+   * ConnectionListeners that we've successfully logged in.
    */
 
   public void onLogin(){
