@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ package free.jin.chessclub.board;
 import javax.swing.*;
 import free.jin.event.*;
 import free.jin.board.BoardPanel;
-import free.jin.plugin.Plugin;
+import free.jin.board.BoardManager;
 import free.jin.Game;
 import free.chess.JBoard;
 import free.chess.Player;
@@ -63,11 +63,12 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
 
   /**
-   * Creates a new ChessclubBoardPanel with the given Plugin and Game.
+   * Creates a new <code>ChessclubBoardPanel</code> with the given
+   * <code>BoardManager</code> and <code>Game</code>.
    */
 
-  public ChessclubBoardPanel(Plugin plugin, Game game){
-    super(plugin, game);
+  public ChessclubBoardPanel(BoardManager boardManager, Game game){
+    super(boardManager, game);
 
     new PlayerImageChecker(Player.WHITE_PLAYER).start();
     new PlayerImageChecker(Player.BLACK_PLAYER).start();
@@ -248,8 +249,8 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
   public void mouseClicked(MouseEvent evt){
     Object source = evt.getSource();
 
-    if ((source==whiteLabel)||(source==blackLabel)){
-      String name = (source==whiteLabel ? getGame().getWhiteName() : getGame().getBlackName());
+    if ((source == whiteLabel) || (source == blackLabel)){
+      String name = (source == whiteLabel ? getGame().getWhiteName() : getGame().getBlackName());
       URL url;
       try{
         url = new URL("http://www.chessclub.com/mugshots/"+name+".jpg");
@@ -260,7 +261,8 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
       JInternalFrame frame = new UserImageInternalFrame(url, name);
       frame.setLocation(0,0);
-      plugin.getPluginContext().getMainFrame().getDesktop().add(frame, JLayeredPane.PALETTE_LAYER);
+      JDesktopPane desktop = boardManager.getPluginContext().getMainFrame().getDesktop();
+      desktop.add(frame, JLayeredPane.PALETTE_LAYER);
       frame.setSize(frame.getPreferredSize());
       frame.setVisible(true);
       frame.toFront();
@@ -279,8 +281,8 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
       return;
 
     handlingArrowCircleEvent = true;
-    ((ChessclubJBoard)getBoard()).removeArrow(evt.getFromSquare(), evt.getToSquare());
-    ((ChessclubJBoard)getBoard()).addArrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
+    ((ChessclubJBoard)board).removeArrow(evt.getFromSquare(), evt.getToSquare());
+    ((ChessclubJBoard)board).addArrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
     handlingArrowCircleEvent = false;
   }
 
@@ -296,8 +298,8 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
       return;
 
     handlingArrowCircleEvent = true;
-    ((ChessclubJBoard)getBoard()).removeCircle(evt.getCircleSquare());
-    ((ChessclubJBoard)getBoard()).addCircle(evt.getCircleSquare(), Color.blue);
+    ((ChessclubJBoard)board).removeCircle(evt.getCircleSquare());
+    ((ChessclubJBoard)board).addCircle(evt.getCircleSquare(), Color.blue);
     handlingArrowCircleEvent = false;
   }
 
@@ -312,7 +314,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
     if (handlingArrowCircleEvent)
       return;
 
-    plugin.getConnection().sendCommand("arrow "+fromSquare+" "+toSquare);
+    boardManager.getConnection().sendCommand("arrow "+fromSquare+" "+toSquare);
   }
 
 
@@ -335,7 +337,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
     if (handlingArrowCircleEvent)
       return;
 
-    plugin.getConnection().sendCommand("circle "+circleSquare);
+    boardManager.getConnection().sendCommand("circle "+circleSquare);
   }
 
 

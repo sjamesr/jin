@@ -23,6 +23,7 @@ package free.jin.freechess.board;
 
 import javax.swing.*;
 import free.jin.board.BoardPanel;
+import free.jin.board.BoardManager;
 import free.jin.plugin.Plugin;
 import free.jin.Game;
 
@@ -36,11 +37,12 @@ public class FreechessBoardPanel extends BoardPanel{
 
 
   /**
-   * Creates a new FreechessBoardPanel with the given Plugin and Game.
+   * Creates a new <code>FreechessBoardPanel</code> with the given
+   * <code>BoardManager</code> and <code>Game</code>.
    */
 
-  public FreechessBoardPanel(Plugin plugin, Game game){
-    super(plugin, game);
+  public FreechessBoardPanel(BoardManager boardManager, Game game){
+    super(boardManager, game);
   }
 
 
