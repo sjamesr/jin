@@ -426,7 +426,7 @@ public class InternalFramesUIProvider implements UIProvider{
       // If you use 'c' as the mnemonic here, alt+c won't work for the menu,
       // see http://developer.java.sun.com/developer/bugParade/bugs/4213634.html
       add(closeConnection = new JMenuItem("Close Connection", 'l'));
-      separatorIndex = separatorIndex = getItemCount();
+      separatorIndex = getItemCount();
       addSeparator();
       add(exit = new JMenuItem("Exit", 'x'));
 
