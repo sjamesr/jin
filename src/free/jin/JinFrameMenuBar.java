@@ -261,6 +261,7 @@ public class JinFrameMenuBar extends JMenuBar{
     prefsMenu.setMnemonic('p');
 
     JMenuItem backgroundMenuItem = new JMenuItem("Background");
+    backgroundMenuItem.setMnemonic('B');
     backgroundMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
