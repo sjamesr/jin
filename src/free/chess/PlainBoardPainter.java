@@ -31,14 +31,14 @@ import java.awt.image.ImageObserver;
  * An implementation of BoardPainter which fills the squares with colors.
  */
 
-public class PlainBoardPainter implements BoardPainter{
+public class PlainBoardPainter implements ColoredBoardPainter{
 
 
   /**
    * The color of the light squares.
    */
 
-  private final Color lightColor;
+  private Color lightColor;
 
 
 
@@ -46,7 +46,7 @@ public class PlainBoardPainter implements BoardPainter{
    * The color of the dark squares.
    */
 
-  private final Color darkColor;
+  private Color darkColor;
 
 
 
@@ -73,12 +73,35 @@ public class PlainBoardPainter implements BoardPainter{
 
 
 
+
+  /**
+   * Sets the color of the light squares.
+   */
+
+  public void setLightColor(Color color){
+    this.lightColor = color;
+  }
+
+
+
+
   /**
    * Returns the color with which dark squares are drawn.
    */
 
   public Color getDarkColor(){
     return darkColor;
+  }
+
+
+
+
+  /**
+   * Sets the color of the dark squares.
+   */
+
+  public void setDarkColor(Color color){
+    this.darkColor = color;
   }
 
 
