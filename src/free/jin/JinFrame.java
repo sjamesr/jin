@@ -80,6 +80,20 @@ public class JinFrame extends JFrame{
 
     setJMenuBar(createJMenuBar());
 
+//    getToolkit().getSystemEventQueue().push(new EventQueue(){
+//
+//      protected void dispatchEvent(AWTEvent evt){
+//        super.dispatchEvent(evt);
+//
+//        if (evt instanceof KeyEvent){
+//          System.out.println("KeyEvent: "+evt);
+//          System.out.println("Focus owner: "+getFocusOwner());
+//          System.out.println();
+//        }
+//      }
+//
+//    });
+
     enableEvents(AWTEvent.WINDOW_EVENT_MASK|AWTEvent.FOCUS_EVENT_MASK);
   }
 
@@ -144,7 +158,6 @@ public class JinFrame extends JFrame{
         if (e instanceof RuntimeException)
           throw (RuntimeException)e;
         System.err.println("Turning expensive rendering hints off failed due to: "+e.getClass().getName()+": "+e.getMessage());
-        e.printStackTrace();
         clearingExpensiveRenderingHintsFailed = true;
       }
 
