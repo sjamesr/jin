@@ -724,7 +724,13 @@ public class ConsoleTextPane extends JTextPane{
       setCursor(regCursor);
     }
 
-    if ((evt.getID() == MouseEvent.MOUSE_ENTERED) || (evt.getID() == MouseEvent.MOUSE_RELEASED)){
+        // We're not doing anything on a MOUSE_ENTERED event (although we should)
+        // because if we do, and the user clicks in a popup directly over a link
+        // we get a MOUSE_ENTERED event immediately followed by a MOUSE_CLICK
+        // event (bug http://developer.java.sun.com/developer/bugParade/bugs/4119993.html probably)
+        // and so we run the link.
+    if (/*(evt.getID() == MouseEvent.MOUSE_ENTERED) || */
+        (evt.getID() == MouseEvent.MOUSE_RELEASED)){
       processPossibleLinkUpdate(evt);
     } 
 
