@@ -127,10 +127,8 @@ public class FixedJInternalFrame extends JInternalFrame{
       if (findFocusOwner() == null){
         if (previousFocusedComponent != null)
           previousFocusedComponent.requestFocus();
-        else{
-          if (!requestDefaultFocus())
-            requestFocus();
-        }
+        else if (!requestDefaultFocus())
+          requestFocus();
       }
     }
     else
@@ -148,7 +146,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    */
 
   private Component findFocusOwner(){
-    if (!isSelected()){
+    if (isSelected()){
       Window window = SwingUtilities.windowForComponent(this);
       if (window == null)
         return null;
