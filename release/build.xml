@@ -220,6 +220,7 @@
 		<antcall target="build">
 			<param name="release.platform" value="applet" />
       <param name="build.compress" value="yes" />
+      <param name="build.manifest" value="release/applet/manifest.txt" />
 		</antcall>
 
  		<propertyfile file="${source.dir}/free/jin/resources/app.props">
