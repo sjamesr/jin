@@ -22,6 +22,7 @@
 package free.jin;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import free.util.swing.LookAndFeelMenu;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
@@ -33,8 +34,6 @@ import free.jin.plugin.PreferencesPanel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListDataEvent;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -427,7 +426,14 @@ public class JinFrameMenuBar extends JMenuBar{
 
       JButton okButton = new JButton("OK");
       JButton cancelButton = new JButton("Cancel");
-      JButton applyButton = new JButton("Apply");
+      final JButton applyButton = new JButton("Apply");
+      applyButton.setEnabled(false);
+      prefPanel.addChangeListener(new ChangeListener(){
+        public void stateChanged(ChangeEvent evt){
+          applyButton.setEnabled(true);
+        }
+      });
+
       buttonPanel.add(okButton);
       buttonPanel.add(cancelButton);
       buttonPanel.add(applyButton);
@@ -449,6 +455,7 @@ public class JinFrameMenuBar extends JMenuBar{
       applyButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
           prefPanel.applyChanges();
+          applyButton.setEnabled(false);
         }
       });
 
