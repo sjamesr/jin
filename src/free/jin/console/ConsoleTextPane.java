@@ -95,26 +95,6 @@ public class ConsoleTextPane extends JTextPane{
 
 
   /**
-   * A Hashtable mapping <code>RenderingHints$Key</code> objects (as strings,
-   * so that they can be used via BeanShell to their current values (again, as
-   * strings).
-   */
-
-  private Hashtable renderingHints = null;
-
-
-
-  /**
-   * This is set to <code>false</code> if we find out that we're not running
-   * under a Java2D capable JVM.
-   */
-
-  private static boolean renderingHintsSupported = true;
-
-
-
-
-  /**
    * Creates a new ConsoleTextPane which will be a part of the given Console.
    */
 
@@ -156,6 +136,38 @@ public class ConsoleTextPane extends JTextPane{
 
 
 
+
+  /**
+   * A Hashtable mapping <code>RenderingHints$Key</code> objects (as strings,
+   * so that they can be used via BeanShell to their current values (again, as
+   * strings).
+   */
+
+  private Hashtable renderingHints = null;
+
+
+
+  /**
+   * This is set to <code>false</code> if we find out that we're not running
+   * under a Java2D capable JVM.
+   */
+
+  private static boolean renderingHintsSupported = true;
+
+
+
+  
+  /**
+   * Some classes, methods and fields we use for rendering hints setting.
+   */
+
+  private Class g2Class, rhClass, rhKeyClass;
+  private Class [] argumentTypes;
+  private Method setRenderingHint;
+
+
+
+
   /**
    * Overrides <code>paintComponent</code> to enable/disable antialiasing and
    * perhaps other expensive rendering hints.
@@ -175,11 +187,13 @@ public class ConsoleTextPane extends JTextPane{
 
     if (renderingHintsSupported && !renderingHints.isEmpty()){
       try{
-        Class g2Class = Class.forName("java.awt.Graphics2D");
-        Class rhClass = Class.forName("java.awt.RenderingHints");
-        Class rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
-        Class [] argumentTypes = new Class[]{rhKeyClass, Object.class};
-        Method setRenderingHint = g2Class.getDeclaredMethod("setRenderingHint", argumentTypes);
+        if (g2Class == null){
+          g2Class = Class.forName("java.awt.Graphics2D");
+          rhClass = Class.forName("java.awt.RenderingHints");
+          rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
+          argumentTypes = new Class[]{rhKeyClass, Object.class};
+          setRenderingHint = g2Class.getDeclaredMethod("setRenderingHint", argumentTypes);
+        }
 
         Enumeration renderingHintsEnum = renderingHints.keys();
         while (renderingHintsEnum.hasMoreElements()){
