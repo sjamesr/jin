@@ -135,11 +135,11 @@ public class GameInfoStruct extends Struct{
     boolean isBlackRegistered = parseBoolean(tokens.nextToken()); // Is black registered?
 
     assertToken(tokens, "it"); // it=
-    int whiteTime = 60*Integer.parseInt(tokens.nextToken()); // White's initial time
+    int whiteTime = Integer.parseInt(tokens.nextToken()); // White's initial time
     int whiteInc = Integer.parseInt(tokens.nextToken()); // White's increment    
 
     assertToken(tokens, "i");
-    int blackTime = 60*Integer.parseInt(tokens.nextToken()); // Black's initial time
+    int blackTime = Integer.parseInt(tokens.nextToken()); // Black's initial time
     int blackInc = Integer.parseInt(tokens.nextToken()); // Black's increment
 
     assertToken(tokens, "pt");
