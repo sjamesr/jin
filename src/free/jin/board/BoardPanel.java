@@ -1121,6 +1121,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.setEnabled(true);
 
     displayedMoveNumber = 0;
+    updateClockActiveness();
     updateMoveListTable();
     updatePositionScrollBar();
   }
@@ -1206,7 +1207,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void clockAdjusted(ClockAdjustmentEvent evt){
-    if (evt.getGame()!=game)
+    if (evt.getGame() != game)
       return;
 
     Player player = evt.getPlayer();
