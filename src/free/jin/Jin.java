@@ -566,6 +566,11 @@ public class Jin{
         UIManager.installLookAndFeel("3D Look&Feel", "swing.addon.plaf.threeD.ThreeDLookAndFeel");
       } catch (ClassNotFoundException e){}
 
+      try{
+        Class.forName("net.sourceforge.mlf.metouia.MetouiaLookAndFeel");
+        UIManager.installLookAndFeel("Metouia", "net.sourceforge.mlf.metouia.MetouiaLookAndFeel");
+      } catch (ClassNotFoundException e){}
+
       mainFrame = new JinFrame();
 
       String lnf = getProperty("default.lf");
