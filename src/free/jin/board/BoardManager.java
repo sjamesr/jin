@@ -53,7 +53,7 @@ import java.util.Vector;
  */
 
 public class BoardManager extends Plugin implements GameListener, UserMoveListener,
-    PluginUIListener{
+    PluginUIListener, ConnectionListener{
 
 
 
@@ -916,6 +916,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     ListenerManager listenerManager = getConn().getListenerManager();
 
     listenerManager.addGameListener(this);
+    listenerManager.addConnectionListener(this);
   }
   
   
@@ -940,6 +941,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     ListenerManager listenerManager = getConn().getListenerManager();
 
     listenerManager.removeGameListener(this);
+    listenerManager.removeConnectionListener(this);
   } 
 
 
@@ -1090,7 +1092,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-  /**
+  /*
    * GameListener implementation.
    */
 
@@ -1106,12 +1108,50 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Gets called when a game ends. Notifies the BoardPanel displaying the board
-   * marking it unused.
+   * Cleanup the game.
    */
 
   public void gameEnded(GameEndEvent evt){
-    BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.remove(evt.getGame());
+    gameEndCleanup(evt.getGame());
+  }
+  
+  
+  
+  /*
+   * ConnectionListener implementation.
+   */
+  
+  public void connectionAttempted(ConnectionEvent evt){}
+  public void connectionEstablished(ConnectionEvent evt){}
+  public void connectionLoggedIn(ConnectionEvent evt){}
+  
+  
+  
+  /**
+   * Cleanup all current games, otherwise the BoardPanels think everything is
+   * dandy, and so may the user.   
+   */
+  
+  public void connectionLost(ConnectionEvent evt){
+    // We need to copy them to a Vector because you can't use an Enumeration
+    // while modifying its HashTable, and gameEndCleanup modifies the HashTable
+    Vector games = new Vector();
+    Enumeration gamesEnum = gamesToBoardPanels.keys();
+    while (gamesEnum.hasMoreElements())
+      games.addElement(gamesEnum.nextElement());
+    
+    for (int i = 0; i < games.size(); i++)
+      gameEndCleanup((Game)games.elementAt(i));
+  }
+
+  
+    
+  /**
+   * Performs cleanup when we stop looking at the specified game.
+   */
+  
+  protected void gameEndCleanup(Game game){
+    BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.remove(game);
     if (boardPanel != null){
       getConn().getListenerManager().removeGameListener(boardPanel);
       boardPanel.removeUserMoveListener(this);
@@ -1124,6 +1164,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         boardContainer.setTitle(getBoardTitle(boardPanel));
     }
   }
+  
   
   
   
