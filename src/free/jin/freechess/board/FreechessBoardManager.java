@@ -30,10 +30,12 @@ import free.jin.Game;
 import free.jin.JinConnection;
 import free.jin.event.GameStartEvent;
 import free.jin.event.GameEndEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 
 /**
- * A freechess.oorg specific extension of the BoardManager plugin.
+ * A freechess.org specific extension of the BoardManager plugin.
  */
 
 public class FreechessBoardManager extends BoardManager{
@@ -54,6 +56,13 @@ public class FreechessBoardManager extends BoardManager{
 
   private Object primaryPlayedGameID = null;
 
+
+
+  /**
+   * The amount of games played by the user.
+   */
+
+  private int userPlayedGamesCount = 0;
 
 
 
@@ -109,13 +118,30 @@ public class FreechessBoardManager extends BoardManager{
    */
 
   public void gameStarted(GameStartEvent evt){
-    int gameType = evt.getGame().getGameType();
-    Object gameID = evt.getGame().getID();
+    Game game = evt.getGame();
+    int gameType = game.getGameType();
+    Object gameID = game.getID();
 
     if ((gameType == Game.OBSERVED_GAME) && (primaryObservedGameID == null))
       primaryObservedGameID = gameID;
     else if ((gameType == Game.MY_GAME) && (primaryPlayedGameID == null))
       primaryPlayedGameID = gameID;
+
+    if ((gameType == Game.MY_GAME) && game.isPlayed())
+      userStartedPlayingGame();
+
+    game.addPropertyChangeListener(new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        String propertyName = evt.getPropertyName();
+        if ("played".equals(propertyName)){
+          Game game = (Game)evt.getSource();
+          if (game.isPlayed())
+            userStartedPlayingGame();
+          else
+            userStoppedPlayingGame();
+        }
+      }
+    });
 
     super.gameStarted(evt);
   }
@@ -128,17 +154,48 @@ public class FreechessBoardManager extends BoardManager{
    */
 
   public void gameEnded(GameEndEvent evt){
-    int gameType = evt.getGame().getGameType();
-    Object gameID = evt.getGame().getID();
+    Game game = evt.getGame();
+    int gameType = game.getGameType();
+    Object gameID = game.getID();
 
     if ((gameType == Game.OBSERVED_GAME) && gameID.equals(primaryObservedGameID))
       primaryObservedGameID = null;
     else if ((gameType == Game.MY_GAME) && gameID.equals(primaryPlayedGameID))
       primaryPlayedGameID = null;
 
+    if ((gameType == Game.MY_GAME) && game.isPlayed())
+      userStoppedPlayingGame();
+
     super.gameEnded(evt);
   }
 
+
+
+
+  /**
+   * Gets called when the user starts playing a game.
+   */
+
+  private void userStartedPlayingGame(){
+    userPlayedGamesCount++;
+
+    if (userPlayedGamesCount == 1)
+      premoveRadioButton.setEnabled(false);
+  }
+
+
+
+
+  /**
+   * Gets called when the user stops playing a game.
+   */
+
+  private void userStoppedPlayingGame(){
+    userPlayedGamesCount--;
+
+    if (userPlayedGamesCount == 0)
+      premoveRadioButton.setEnabled(true);
+  }
 
 
 
@@ -153,8 +210,6 @@ public class FreechessBoardManager extends BoardManager{
 
     super.setMoveSendingMode(moveSendingMode);
   }
-
-
 
 
 }
