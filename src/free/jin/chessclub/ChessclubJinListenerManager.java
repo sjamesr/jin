@@ -201,16 +201,20 @@ public class ChessclubJinListenerManager extends BasicJinListenerManager{
       for (int i = 0; i < listeners.length; i += 2){
         if (listeners[i] == GameListener.class){
           GameListener listener = (GameListener)listeners[i+1];
-          if (evt instanceof CircleEvent){ 
-            if (listener instanceof ChessclubGameListener) 
-              ((ChessclubGameListener)listener).circleAdded((CircleEvent)evt);
-          }
-          else if (evt instanceof ArrowEvent){
-            if (listener instanceof ChessclubGameListener)
-              ((ChessclubGameListener)listener).arrowAdded((ArrowEvent)evt);
-          }
-          else
-            throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
+          try{
+            if (evt instanceof CircleEvent){ 
+              if (listener instanceof ChessclubGameListener) 
+                ((ChessclubGameListener)listener).circleAdded((CircleEvent)evt);
+            }
+            else if (evt instanceof ArrowEvent){
+              if (listener instanceof ChessclubGameListener)
+                ((ChessclubGameListener)listener).arrowAdded((ArrowEvent)evt);
+            }
+            else
+              throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
+          } catch (RuntimeException e){
+              e.printStackTrace();
+            }
         }
       }
     }
@@ -386,14 +390,18 @@ public class ChessclubJinListenerManager extends BasicJinListenerManager{
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChessEventListener.class){
         ChessEventListener listener = (ChessEventListener)listeners[i+1];
-        switch (evt.getID()){
-          case ChessEventEvent.EVENT_ADDED:
-            listener.chessEventAdded(evt);
-            break;
-          case ChessEventEvent.EVENT_REMOVED:
-            listener.chessEventRemoved(evt);
-            break;
-        }
+        try{
+          switch (evt.getID()){
+            case ChessEventEvent.EVENT_ADDED:
+              listener.chessEventAdded(evt);
+              break;
+            case ChessEventEvent.EVENT_REMOVED:
+              listener.chessEventRemoved(evt);
+              break;
+          }
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }

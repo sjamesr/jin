@@ -102,19 +102,23 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ConnectionListener.class){
         ConnectionListener listener = (ConnectionListener)listeners[i+1];
-        switch (evtID){
-          case ConnectionEvent.ESTABLISHED:
-            listener.connectionEstablished(evt);
-            break;
-          case ConnectionEvent.LOGGED_IN:
-            listener.connectionLoggedIn(evt);
-            break;
-          case ConnectionEvent.LOST:
-            listener.connectionLost(evt);
-            break;
-          default:
-            throw new IllegalArgumentException("Unknown ConnectionEvent id: "+evtID);
-        }
+        try{
+          switch (evtID){
+            case ConnectionEvent.ESTABLISHED:
+              listener.connectionEstablished(evt);
+              break;
+            case ConnectionEvent.LOGGED_IN:
+              listener.connectionLoggedIn(evt);
+              break;
+            case ConnectionEvent.LOST:
+              listener.connectionLost(evt);
+              break;
+            default:
+              throw new IllegalArgumentException("Unknown ConnectionEvent id: "+evtID);
+          }
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -154,7 +158,11 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == PlainTextListener.class){
         PlainTextListener listener = (PlainTextListener)listeners[i+1];
-        listener.plainTextReceived(evt);
+        try{
+          listener.plainTextReceived(evt);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -195,7 +203,11 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChatListener.class){
         ChatListener listener = (ChatListener)listeners[i+1];
-        listener.chatMessageReceived(evt);
+        try{
+          listener.chatMessageReceived(evt);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -235,24 +247,28 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == GameListener.class){
         GameListener listener = (GameListener)listeners[i+1];
-        if (evt instanceof GameStartEvent)
-          listener.gameStarted((GameStartEvent)evt);
-        else if (evt instanceof GameEndEvent)
-          listener.gameEnded((GameEndEvent)evt);
-        else if (evt instanceof MoveMadeEvent)
-          listener.moveMade((MoveMadeEvent)evt);
-        else if (evt instanceof PositionChangedEvent)
-          listener.positionChanged((PositionChangedEvent)evt);  
-        else if (evt instanceof TakebackEvent)
-          listener.takebackOccurred((TakebackEvent)evt);
-        else if (evt instanceof IllegalMoveEvent)
-          listener.illegalMoveAttempted((IllegalMoveEvent)evt);
-        else if (evt instanceof ClockAdjustmentEvent)
-          listener.clockAdjusted((ClockAdjustmentEvent)evt);
-        else if (evt instanceof BoardFlipEvent)
-          listener.boardFlipped((BoardFlipEvent)evt);
-        else
-          throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
+        try{
+          if (evt instanceof GameStartEvent)
+            listener.gameStarted((GameStartEvent)evt);
+          else if (evt instanceof GameEndEvent)
+            listener.gameEnded((GameEndEvent)evt);
+          else if (evt instanceof MoveMadeEvent)
+            listener.moveMade((MoveMadeEvent)evt);
+          else if (evt instanceof PositionChangedEvent)
+            listener.positionChanged((PositionChangedEvent)evt);  
+          else if (evt instanceof TakebackEvent)
+            listener.takebackOccurred((TakebackEvent)evt);
+          else if (evt instanceof IllegalMoveEvent)
+            listener.illegalMoveAttempted((IllegalMoveEvent)evt);
+          else if (evt instanceof ClockAdjustmentEvent)
+            listener.clockAdjusted((ClockAdjustmentEvent)evt);
+          else if (evt instanceof BoardFlipEvent)
+            listener.boardFlipped((BoardFlipEvent)evt);
+          else
+            throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -312,16 +328,20 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == SeekListener.class){
         SeekListener listener = (SeekListener)listeners[i+1];
-        switch(evt.getID()){
-          case SeekEvent.SEEK_ADDED:
-            listener.seekAdded(evt);
-            break;
-          case SeekEvent.SEEK_REMOVED:
-            listener.seekRemoved(evt);
-            break;
-          default:
-            throw new IllegalArgumentException("Unknown SeekEvent ID: "+evt.getID());
-        }
+        try{
+          switch(evt.getID()){
+            case SeekEvent.SEEK_ADDED:
+              listener.seekAdded(evt);
+              break;
+            case SeekEvent.SEEK_REMOVED:
+              listener.seekRemoved(evt);
+              break;
+            default:
+              throw new IllegalArgumentException("Unknown SeekEvent ID: "+evt.getID());
+          }
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -379,7 +399,11 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == GameListListener.class){
         GameListListener listener = (GameListListener)listeners[i+1];
-        listener.gameListArrived(evt);
+        try{
+          listener.gameListArrived(evt);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -440,23 +464,27 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
     for (int i = 0; i < listenerList.length; i += 2){
       if (listenerList[i] == FriendsListener.class){
         FriendsListener listener = (FriendsListener)listenerList[i+1];
-        switch (evt.getID()){
-          case FriendsEvent.FRIEND_CONNECTED:
-            listener.friendConnected(evt);
-            break;
-          case FriendsEvent.FRIEND_DISCONNECTED:
-            listener.friendDisconnected(evt);
-            break;
-          case FriendsEvent.FRIEND_ADDED:
-            listener.friendAdded(evt);
-            break;
-          case FriendsEvent.FRIEND_REMOVED:
-            listener.friendRemoved(evt);
-            break;
-          case FriendsEvent.FRIEND_ONLINE:
-            listener.friendOnline(evt);
-            break;
-        }
+        try{
+          switch (evt.getID()){
+            case FriendsEvent.FRIEND_CONNECTED:
+              listener.friendConnected(evt);
+              break;
+            case FriendsEvent.FRIEND_DISCONNECTED:
+              listener.friendDisconnected(evt);
+              break;
+            case FriendsEvent.FRIEND_ADDED:
+              listener.friendAdded(evt);
+              break;
+            case FriendsEvent.FRIEND_REMOVED:
+              listener.friendRemoved(evt);
+              break;
+            case FriendsEvent.FRIEND_ONLINE:
+              listener.friendOnline(evt);
+              break;
+          }
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
       }
     }
   }
