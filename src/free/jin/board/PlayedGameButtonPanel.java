@@ -510,10 +510,10 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     resignButtonPanel = new JPanel(new BorderLayout());
-    resignButtonPanel.add(BorderLayout.CENTER, resignButton);
+    resignButtonPanel.add(resignButton, BorderLayout.CENTER);
 
     drawButtonPanel = new JPanel(new BorderLayout());
-    drawButtonPanel.add(BorderLayout.CENTER, drawButton);
+    drawButtonPanel.add(drawButton, BorderLayout.CENTER);
 
     Box upperBox = Box.createHorizontalBox();
     upperBox.add(drawButtonPanel);
@@ -526,14 +526,14 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       Box lowerBox = Box.createHorizontalBox();
       if (abortButton != null){
         abortButtonPanel = new JPanel(new BorderLayout());
-        abortButtonPanel.add(BorderLayout.CENTER, abortButton);
+        abortButtonPanel.add(abortButton, BorderLayout.CENTER);
 
         lowerBox.add(abortButtonPanel);
         lowerBox.add(Box.createHorizontalStrut(10));
       }
       if (adjournButton != null){
         adjournButtonPanel = new JPanel(new BorderLayout());
-        adjournButtonPanel.add(BorderLayout.CENTER, adjournButton);
+        adjournButtonPanel.add(adjournButton, BorderLayout.CENTER);
 
         lowerBox.add(adjournButtonPanel);
       }
