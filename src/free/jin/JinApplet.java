@@ -364,7 +364,8 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * Returns the resource with the specified type and id.
+   * Returns the resource with the specified type and id, or <code>null</code>
+   * if the resource can't be loaded.
    */
    
   public Resource getResource(String type, String id, Plugin plugin){
@@ -392,7 +393,8 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * Loads a single resource from the specified URL.
+   * Loads a single resource from the specified URL. Returns <code>null</code>
+   * if unsuccessful.
    */
    
   private Resource loadResource(URL url, Plugin plugin) throws IOException{
@@ -409,9 +411,10 @@ public class JinApplet extends Applet implements JinContext{
       // resource may be of a type which is a part of the plugin.
       Class resourceClass = plugin.getClass().getClassLoader().loadClass(classname);
       Resource resource = (Resource)resourceClass.newInstance();
-      resource.load(url, plugin);
-      
-      return resource;
+      if (resource.load(url, plugin))
+        return resource;
+      else
+        return null;
     } catch (ClassNotFoundException e){e.printStackTrace(); return null;}
       catch (InstantiationException e){e.printStackTrace(); return null;}
       catch (IllegalAccessException e){e.printStackTrace(); return null;}

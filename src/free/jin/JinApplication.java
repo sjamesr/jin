@@ -1030,8 +1030,9 @@ public class JinApplication implements JinContext{
   
   
   /**
-   * Loads a single resource from the specified file. Helper method for
-   * <code>loadResources</code> and <code>getResource</code>.
+   * Loads a single resource from the specified file. Returns <code>null</code>
+   * if unsuccessful. Helper method for <code>loadResources</code> and
+   * <code>getResource</code>.
    */
    
   private Resource loadResource(File file, Plugin plugin) throws IOException{
@@ -1052,9 +1053,10 @@ public class JinApplication implements JinContext{
       // resource may be of a type which is a part of the plugin.
       Class resourceClass = plugin.getClass().getClassLoader().loadClass(classname);
       Resource resource = (Resource)resourceClass.newInstance();
-      resource.load(cl.getResource("/"), plugin);
-      
-      return resource;
+      if (resource.load(cl.getResource("/"), plugin))
+        return resource;
+      else
+        return null;
     } catch (ClassNotFoundException e){e.printStackTrace(); return null;}
       catch (InstantiationException e){e.printStackTrace(); return null;}
       catch (IllegalAccessException e){e.printStackTrace(); return null;}
