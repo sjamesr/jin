@@ -40,6 +40,7 @@ import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import java.net.URL;
 
 
 /**
@@ -224,6 +225,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   protected JInternalFrame createSoughtGraphFrame(){
     JInternalFrame frame = new JInternalFrame("Seek graph", true, true, true, true);
+
+    String iconImageName = getProperty("icon-image");
+    if (iconImageName != null){
+      URL iconImageURL = SoughtGraphPlugin.class.getResource(iconImageName);
+      if (iconImageURL!= null)
+        frame.setFrameIcon(new ImageIcon(iconImageURL));
+    } 
+
     return frame;
   }
 
