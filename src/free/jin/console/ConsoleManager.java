@@ -100,7 +100,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     // Again, some procedural clean up.
     saveState();
     unregisterConnListeners();
-    closeConsole();
+//    closeConsole();
   }
 
 
@@ -148,8 +148,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
           if (getConnection().isConnected())
             result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), "Really close this window and log out?", "Select an option", JOptionPane.YES_NO_OPTION);
-          if (result==JOptionPane.YES_OPTION)
-            getPluginContext().getMainFrame().closeConnection(getConnection());
+          if (result==JOptionPane.YES_OPTION){
+            if (getConnection().isConnected())
+              getPluginContext().getMainFrame().closeConnection(getConnection());
+            closeConsole();
+          }
           else
             throw new PropertyVetoException("Canceled closing", pce);
         }
