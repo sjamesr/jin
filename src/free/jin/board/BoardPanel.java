@@ -1106,6 +1106,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void positionChanged(PositionChangedEvent evt){
+    if (evt.getGame() != game)
+      return;
+
     madeMoves.removeAllElements();
     realPosition.copyFrom(evt.getPosition());
 
