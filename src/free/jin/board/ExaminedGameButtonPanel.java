@@ -151,6 +151,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go to the beginning of the game");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -166,6 +168,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go to the end of the game");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -181,6 +185,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go one ply backward");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -195,6 +201,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setMargin(new Insets(5,5,5,5));
     button.setToolTipText("Go one ply forward");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 

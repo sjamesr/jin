@@ -160,6 +160,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.setToolTipText("Resign the game");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -175,6 +177,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.setToolTipText("Offer or claim draw");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -190,6 +194,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.setToolTipText("Abort or request to abort the game");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
@@ -205,6 +211,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.setToolTipText("Adjourn or request to adjourn the game");
     button.addActionListener(this);
+    button.setFocusPainted(false);
+
     return button;
   }
 
