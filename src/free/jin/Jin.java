@@ -385,6 +385,20 @@ public class Jin{
 
 
   /**
+   * Loads and returns the guest <code>User</code> for the specified
+   * <code>Server</code> or returns <code>null</code> if the guest account
+   * hasn't been created yet.
+   */
+
+  static User loadGuest(Server server){
+    String guestPath = Jin.getProperty(server.getID()+".guestAccountPath");
+    return guestPath == null ? null : loadUser(guestPath);
+  }
+
+
+
+
+  /**
    * Saves the given User. If this is yet an unknown User and the user doesn't
    * abort the save, it is added to the list of known users. If the process
    * fails for some reason, an appropriate message is displayed to the user, so
@@ -395,9 +409,30 @@ public class Jin{
 
   public static String saveUser(User user){
     File userDir = (File)userDirs.get(user);
-    if (userDir == null){
+
+    if (user.isGuest()){
+      System.out.println("Querying user about saving guest settings");
+      int result = JOptionPane.showConfirmDialog(getMainFrame(), 
+        "Would you like to save the guest preferences?\n(they may be shared with anyone else using this computer)", "Save preferences?", JOptionPane.YES_NO_OPTION);
+      if (result == JOptionPane.YES_OPTION){
+        if (userDir == null){
+          System.out.println("Creating new guest user");
+          File serverDir = new File(usersDir, user.getServer().getID());
+          userDir = new File(serverDir, user.getUsername());
+          if ((!userDir.exists() || !userDir.isDirectory()) && !userDir.mkdirs()){
+            JOptionPane.showMessageDialog(mainFrame, "Unable to create directory "+userDir, 
+              "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+          }
+        }
+      }
+      else
+        return null;
+    }
+    else if (userDir == null){
       System.out.println("Querying user about creating a new account");
-      int result = JOptionPane.showConfirmDialog(getMainFrame(), "Would you like to save your \"" + user.getUsername() + "\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
+      int result = JOptionPane.showConfirmDialog(getMainFrame(),
+        "Would you like to save your \"" + user.getUsername() + "\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.YES_OPTION){
         System.out.println("Creating new user, named "+user.getUsername());
         File serverDir = new File(usersDir, user.getServer().getID());
@@ -439,7 +474,12 @@ public class Jin{
 
       userDirs.put(user, userDir);
 
-      return getSettingsPath(user);
+      String settingsPath = getSettingsPath(user);
+
+      if (user.isGuest())
+        setProperty(user.getServer().getID()+".guestAccountPath", settingsPath);
+
+      return settingsPath;
     } catch (IOException e){
         JOptionPane.showMessageDialog(mainFrame, "Unable to save user file into:\n"+userDir, "Error", JOptionPane.ERROR_MESSAGE);
         return null;
