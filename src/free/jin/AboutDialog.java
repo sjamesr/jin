@@ -65,7 +65,7 @@ public class AboutDialog extends JDialog{
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     setContentPane(contentPane);
 
-    Icon jinIcon = new ImageIcon(AboutDialog.class.getResource("resources/jinicon.gif"));
+    Icon jinIcon = new ImageIcon(AboutDialog.class.getResource(Jin.getProperty("logo")));
     JLabel jinLabel = new JLabel(Jin.getAppName()+" "+Jin.getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
     jinLabel.setAlignmentX(CENTER_ALIGNMENT);
