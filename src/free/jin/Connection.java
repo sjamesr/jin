@@ -242,8 +242,9 @@ public interface Connection{
 
 
   /**
-   * Sends a request to draw the given game. The given game must be a played 
-   * game and of type Game.MY_GAME.
+   * Sends a request to draw the given game, or if the opponent already offered
+   * a draw, accepts it. The given game must be a played game and of type
+   * <code>Game.MY_GAME</code>.
    */
 
   void requestDraw(Game game);
@@ -252,19 +253,19 @@ public interface Connection{
 
 
   /**
-   * Returns true if the server supports aborting a game. If the implementation
-   * returns true in this method, it also must implement the requestAbort(Game)
-   * method.
+   * Returns whether the server supports aborting a game.
    */
 
   boolean isAbortSupported();
 
 
 
-
   /**
-   * Sends a request to abort the given game. The given game must be a played 
-   * game and of type Game.MY_GAME.
+   * Sends a request to abort the given game, or if the opponent already offered
+   * to abort, accepts it. The given game must be a played game and of type
+   * <code>Game.MY_GAME</code>. This method should throw an
+   * <code>UnsupportedOperationException</code> if
+   * <code>isAbortSupported</code> returns <code>false</code>.
    */
 
   void requestAbort(Game game);
@@ -272,9 +273,7 @@ public interface Connection{
 
 
   /**
-   * Returns true if the server supports adjourning a game. If the implementation
-   * returns true in this method, it also must implement the requestAdjourn(Game)
-   * method.
+   * Returns whether the server supports adjourning a game.
    */
 
   boolean isAdjournSupported();
@@ -283,12 +282,56 @@ public interface Connection{
 
 
   /**
-   * Sends a request to adjourn the given game. The given game must be a played
-   * game and of type Game.MY_GAME.
+   * Sends a request to adjourn the given game, or if the opponent already
+   * offered adjournment, accepts it. The given game must be a played game and
+   * of type <code>Game.MY_GAME</code>. This method should throw an
+   * <code>UnsupportedOperationException</code> if
+   * <code>isAdjournSupported</code> returns <code>false</code>. 
    */
 
   void requestAdjourn(Game game);
+  
+  
+  
+  /**
+   * Returns whether the server supports one ply takebacks.
+   */
+   
+  boolean isTakebackSupported();
+  
+  
+  
+  /**
+   * Sends a one ply takeback request in the given game, or if the opponent
+   * already offered a one ply takeback, accepts it. The given game must be a
+   * played game and of type <code>Game.MY_GAME</code>. This method should throw
+   * an <code>UnsupportedOperationException</code> if
+   * <code>isTakebackSupported</code> returns <code>false</code>.
+   */
+  
+  void requestTakeback(Game game);
+   
 
+  
+  /**
+   * Returns whether the server supports multiple ply takebacks.
+   */
+   
+  boolean isMultipleTakebackSupported();
+  
+  
+  
+  /**
+   * Sends a takeback request for the specified amount of plies in the given
+   * game, or if the opponent already offered a one ply takeback, accepts it.
+   * The given game must be a played game and of type <code>Game.MY_GAME</code>.
+   * This method should throw an <code>UnsupportedOperationException</code> if
+   * <code>isTakebackSupported</code> returns <code>false</code>.
+   */
+  
+  void requestTakeback(Game game, int plyCount);
+
+  
 
 
   /**
