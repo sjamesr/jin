@@ -34,6 +34,7 @@ import free.jin.seek.event.SeekSelectionListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.util.StringParser;
 import free.util.StringEncoder;
+import free.workarounds.FixedJInternalFrame;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;
@@ -235,7 +236,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected JInternalFrame createSoughtGraphFrame(){
-    JInternalFrame frame = new JInternalFrame("Seek graph", true, true, true, true);
+    JInternalFrame frame = new FixedJInternalFrame("Seek graph", true, true, true, true);
 
     String iconImageName = getProperty("icon-image");
     if (iconImageName != null){
