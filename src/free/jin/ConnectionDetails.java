@@ -49,6 +49,8 @@ public class ConnectionDetails extends Struct{
    * Creates a new <code>ConnectionDetails</code> object with the specified
    * details.
    *
+   * @param server The server to connect to.
+   * @param user The account to connect with.
    * @param username The requested username.
    * @param password The password.
    * @param savePassword Whether the password should be saved.
@@ -56,16 +58,18 @@ public class ConnectionDetails extends Struct{
    * @param ports A list of ports on which to try connecting.
    */
 
-  public static ConnectionDetails create(String username, String password, boolean savePassword,
-      String hostname, int [] ports){
+  public static ConnectionDetails create(Server server, User user, String username,
+      String password, boolean savePassword, String hostname, int [] ports){
+        
     ConnectionDetails details = new ConnectionDetails();
 
-    details.setBooleanProperty("isGuest", false);
+    details.setProperty("server", server);
+    details.setProperty("user", user);
     details.setStringProperty("username", username);
     details.setStringProperty("password", password);
     details.setBooleanProperty("savePassword", savePassword);
     details.setStringProperty("hostname", hostname);
-    details.setProperty("ports", ports.clone());
+    details.setProperty("ports", ports == null ? null : ports.clone());
 
     return details;
   }
@@ -77,10 +81,13 @@ public class ConnectionDetails extends Struct{
    * logging in as a guest.
    */
 
-  public static ConnectionDetails createGuest(String username, String hostname, int [] ports){
+  public static ConnectionDetails createGuest(Server server, String username, 
+      String hostname, int [] ports){
+        
     ConnectionDetails details = new ConnectionDetails();
 
-    details.setBooleanProperty("isGuest", true);
+    details.setProperty("server", server);
+    details.setProperty("user", server.getGuest());
     details.setStringProperty("username", username);
     details.setStringProperty("hostname", hostname);
     details.setProperty("ports", ports.clone());
@@ -108,12 +115,33 @@ public class ConnectionDetails extends Struct{
     ports[0] = port;
 
     if (isGuest())
-      return createGuest(getUsername(), getHost(), ports);
+      return createGuest(getServer(), getUsername(), getHost(), ports);
     else
-      return create(getUsername(), getPassword(), isSavePassword(), getHost(), ports);
+      return create(getServer(), getUser(), getUsername(), getPassword(),
+        isSavePassword(), getHost(), ports);
   }
 
 
+  
+  /**
+   * Returns the server to which we are to connect.
+   */
+  
+  public Server getServer(){
+    return (Server)getProperty("server");
+  }
+  
+  
+  
+  /**
+   * Returns the account with which we are to connect. May be <code>null</code>
+   * if a User object hasn't been created for the account yet.
+   */
+   
+  public User getUser(){
+    return (User)getProperty("user");
+  }
+  
 
 
   /**
@@ -121,7 +149,7 @@ public class ConnectionDetails extends Struct{
    */
 
   public boolean isGuest(){
-    return getBooleanProperty("isGuest");
+    return getUser().isGuest();
   }
 
 
