@@ -95,8 +95,12 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
   protected void configureBoard(Game game, JBoard board){
     super.configureBoard(game, board);
 
-    if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed())
+    if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed()){
       ((ChessclubJBoard)board).addArrowCircleListener(this);
+      ((ChessclubJBoard)board).setArrowCircleEnabled(true);
+    }
+    else
+      ((ChessclubJBoard)board).setArrowCircleEnabled(false);
   }
 
 
