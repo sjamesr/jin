@@ -83,7 +83,7 @@ output-link.command-7 = string;$2
 output-link.index-7 = integer;2
 
 #Matches the "Type "more" to see more" sent by the server when the text is longer than height
-output-link.pattern-8 = string;^\\[?Type "(more)" to see more\.\\]?
+output-link.pattern-8 = string;^\\[?Type "(more)" to see more\\.\\]?
 output-link.command-8 = string;$1
 output-link.index-8 = integer;1
 
