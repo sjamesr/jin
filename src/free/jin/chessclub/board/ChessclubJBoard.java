@@ -450,6 +450,8 @@ public class ChessclubJBoard extends JBoard implements PaintHook{
 
       fireArrowRemoved(from, to);
     }
+
+    repaint();
   }
 
 
