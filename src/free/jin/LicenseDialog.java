@@ -208,7 +208,7 @@ public class LicenseDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel blitzinPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    blitzinPanel.add(new JLabel("<html>* Jin includes piece sets and boards from&nbsp</html>"));
+    blitzinPanel.add(new JLabel("<html>* Jin includes piece sets, boards and sounds from&nbsp</html>"));
     LinkLabel blitzinWebsiteLabel = new LinkLabel("Internet Chess Club's Blitzin");
     blitzinWebsiteLabel.setToolTipText("http://www.chessclub.com/interface/download_w32.html");
     blitzinWebsiteLabel.addActionListener(new URLActionListener("http://www.chessclub.com/interface/download_w32.html"));
