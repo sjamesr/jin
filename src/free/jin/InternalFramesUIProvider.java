@@ -1021,7 +1021,6 @@ public class InternalFramesUIProvider implements UIProvider{
           frame.toFront();
         }
         else{
-          frame.toBack();
           frameSwitcher.selectPrevious();
         }
       } catch (PropertyVetoException e){}
@@ -1172,6 +1171,9 @@ public class InternalFramesUIProvider implements UIProvider{
     private void hide(){
       saveProps();
 
+      if (frame.isSelected())
+        frameSwitcher.selectPrevious();
+      
       frame.setVisible(false);
       desktop.remove(frame);
 
@@ -1182,9 +1184,6 @@ public class InternalFramesUIProvider implements UIProvider{
         desktop.repaint();
       }
       // end workaround
-
-      frameSwitcher.selectPrevious();
-
 
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_HIDDEN));
     }
@@ -1435,7 +1434,6 @@ public class InternalFramesUIProvider implements UIProvider{
       super.dragFrame(f, newX, newY);
     }
 
-        
 
   }
 
