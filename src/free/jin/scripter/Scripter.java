@@ -893,7 +893,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[3], vars);
     }
 
-    public void offerChanged(OfferEvent evt){
+    public void offerUpdated(OfferEvent evt){
       String offerType;
       switch (evt.getOfferId()){
         case OfferEvent.DRAW_OFFER: offerType = "draw"; break;
@@ -906,7 +906,7 @@ public class Scripter extends Plugin{
 
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"offerType", offerType});
-      varsVector.addElement(new Object[]{"isMade", new Boolean(evt.isOfferMade())});
+      varsVector.addElement(new Object[]{"isOffered", new Boolean(evt.isOffered())});
       varsVector.addElement(new Object[]{"player", evt.getPlayer().toString().toLowerCase()});
       if (evt.getOfferId() == OfferEvent.TAKEBACK_OFFER)
         varsVector.addElement(new Object[]{"takebackCount", new Integer(evt.getTakebackCount())});

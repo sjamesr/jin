@@ -265,7 +265,7 @@ public class BasicJinListenerManager implements JinListenerManager, SeekJinListe
           else if (evt instanceof BoardFlipEvent)
             listener.boardFlipped((BoardFlipEvent)evt);
           else if (evt instanceof OfferEvent)
-            listener.offerChanged((OfferEvent)evt);
+            listener.offerUpdated((OfferEvent)evt);
           else
             throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
         } catch (RuntimeException e){
