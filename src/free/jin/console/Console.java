@@ -123,7 +123,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting URLs.
    */
 
-  private static final Pattern URL_REGEX = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"'!?]");
+  private static final Pattern URL_REGEX = new Pattern("((([Ff][Tt][Pp]|[Hh][Tt][Tt][Pp]([Ss])?)://)|([Ww][Ww][Ww]\\.))([^\\s()<>\"])*[^\\s.,()<>\"'!?]");
 
 
 
@@ -777,9 +777,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     }
     else if (command.startsWith("url ")){
       String urlString = command.substring("url ".length());
+      
+      // A www. string
+      if (urlString.substring(0, Math.min(4, urlString.length())).equalsIgnoreCase("www."))
+        urlString = "http://" + urlString; // Assume http
+
       if (!BrowserControl.displayURL(urlString))
         BrowserControl.showDisplayBrowserFailedDialog(urlString, this, true);
-
     }
     else if (command.startsWith("email ")){
       String emailString = command.substring("email ".length());
