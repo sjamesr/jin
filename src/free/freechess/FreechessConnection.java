@@ -450,6 +450,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleStoppedExamining(line))
       return;
+    if (handleEnteredBSetupMode(line))
+      return;
+    if (handleExitedBSetupMode(line))
+      return;
     if (handleIllegalMove(line))
       return;
     if (handleChannelTell(line))
@@ -1328,6 +1332,50 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private static final Pattern illegalMovePattern = 
     new Pattern("^Illegal move \\((.*)\\)\\.(.*)");
+
+
+
+  /**
+   * Called to determine whether the specified line of text specifies entering
+   * bsetup mode.
+   */
+
+  private boolean handleEnteredBSetupMode(String line){
+    if (!line.equals("Entering setup mode."))
+      return false;
+
+    if (!processBSetupMode(true))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Called to determine whether the specified line of text specifies exiting
+   * bsetup mode.
+   */
+
+  private boolean handleExitedBSetupMode(String line){
+    if (!line.equals("Game is validated - entering examine mode."))
+      return false;
+
+    if (!processBSetupMode(false))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * This method is called whenever the user enters or exits bsetup mode.
+   * The boolean argument is <code>true</code> if we've entered bsetup mode,
+   * <code>false</code> when exited.
+   */
+
+  protected boolean processBSetupMode(boolean entered){return false;}
 
 
 
