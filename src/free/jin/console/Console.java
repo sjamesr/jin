@@ -367,8 +367,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         Dimension newViewportSize = getExtentSize();
         Rectangle lastVisibleIndexPosition = view.modelToView(lastVisibleIndex);
         if (lastVisibleIndexPosition != null){
-          setViewPosition(
-            new Point(0, lastVisibleIndexPosition.y + lastVisibleIndexPosition.height - 1 - newViewportSize.height));
+          setViewPosition(new Point(0,
+            Math.max(0, lastVisibleIndexPosition.y + lastVisibleIndexPosition.height - 1 - newViewportSize.height)));
         }
       } catch (BadLocationException e){}
     }
