@@ -36,14 +36,6 @@ public class Session{
 
 
   /**
-   * The <code>User</code> object representing the account we're logging in for.
-   */
-
-  private final User user;
-
-
-
-  /**
    * The <code>ConnectionDetails</code> which we use to connect and log in.
    */
 
@@ -92,28 +84,22 @@ public class Session{
 
 
   /**
-   * Creates a new <code>Session</code> for the specified account with the
-   * specified <code>ConnectionDetails</code>. The <code>Session</code> is not
-   * initially connected - you must invoke the {@link #login()} method to
-   * connect and log in.
+   * Creates a new <code>Session</code> with the specified
+   * <code>ConnectionDetails</code>. The <code>Session</code> is not initially
+   * connected - you must invoke the {@link #login()} method to connect and log
+   * in.
    *
    * @throws PluginStartException creating, initializing or starting one of the
    * plugins fails.
    */
 
-  public Session(User user, ConnectionDetails connDetails)
+  public Session(ConnectionDetails connDetails)
       throws PluginStartException{
-    if (user == null)
-      throw new IllegalArgumentException("user may not be null");
     if (connDetails == null)
       throw new IllegalArgumentException("connDetails may not be null");
    
-    Server server = user.getServer();
-
-    this.user = user;
     this.connDetails = connDetails; 
-    this.conn =
-      server.createConnection(connDetails.getUsername(), connDetails.getPassword());
+    this.conn = connDetails.getServer().createConnection(connDetails);
 
     this.actions = createActions();
     this.plugins = createPlugins();
@@ -147,7 +133,7 @@ public class Session{
           throw new PluginStartException(e, "Unable to instantiate " + actionClass);
         }
       
-      ActionContext actionContext = new ActionContext(conn, user, prefs);
+      ActionContext actionContext = new ActionContext(conn, getUser(), prefs);
       
       if (action.setContext(actionContext))
         actions.addElement(action);
@@ -188,7 +174,8 @@ public class Session{
     }
 
     // Create plugin context
-    PluginContext pluginContext = new PluginContext(conn, user, plugins, pluginPrefs, actions);
+    PluginContext pluginContext = 
+      new PluginContext(conn, getUser(), plugins, pluginPrefs, actions);
 
     // Set context on plugins
     for (int i = 0; i < plugins.length; i++)
@@ -235,7 +222,7 @@ public class Session{
    */
 
   public Server getServer(){
-    return user.getServer();
+    return getUser().getServer();
   }
 
 
@@ -246,7 +233,7 @@ public class Session{
    */
 
   public User getUser(){
-    return user;
+    return connDetails.getUser();
   }
 
 
