@@ -22,15 +22,18 @@
 package free.jin;
 
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 import java.util.Properties;
-import java.io.InputStream;
-import java.io.IOException;
 import java.net.URL;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.util.Hashtable;
 import free.jin.plugin.PluginInfo;
 import free.util.PlatformUtils;
+import free.util.IOUtilities;
+import free.util.BrowserControl;
 
 
 /**
@@ -358,6 +361,20 @@ public class AppletJinContext implements JinContext{
   public ClassLoader [] loadResources(String resourceType){
     return new ClassLoader[0];
   }
+  
+  
+  
+  /**
+   * This is called by the <code>JinApplet</code> to tell us when the applet's
+   * stop method was called. We don't try to save preferences here because this
+   * method is usually given very little time to finish by most applet
+   * containers, after which the applet and all its windows are killed.
+   */
+   
+  void stop(){
+    if (mainFrame.isVisible())
+      mainFrame.dispose();
+  }
 
 
 
@@ -467,7 +484,11 @@ public class AppletJinContext implements JinContext{
    */
   
   public boolean storeUser(User user){
-    return false;
+    if (!JinUtilities.isKnownUser(this, user))
+      throw new IllegalArgumentException("Unknown user: " + user);
+    
+    // All the preferences are uploaded when the application is closed.
+    return true;
   }
 
 
@@ -485,9 +506,19 @@ public class AppletJinContext implements JinContext{
 
     users.removeElement(user);
 
-    // TODO: Implement actual removing, if needed.    
-    
     return true;
+  }
+  
+  
+  
+  /**
+   * Returns <code>true</code> iff the applet has been given a
+   * <code>savePrefsUrl</code> parameter.
+   */
+   
+  public boolean isSavePrefsCapable(){
+    String savePrefsUrl = applet.getParameter("savePrefsUrl");
+    return (savePrefsUrl != null) && !"".equals(savePrefsUrl);
   }
 
 
@@ -511,15 +542,253 @@ public class AppletJinContext implements JinContext{
   }
   
   
+  
+  /**
+   * The result string of saving the preferences. <code>null</code> if
+   * successful or a description of the error if not successful.
+   */
+   
+  private String userPrefsUploadResult = null;
+  
+  
+  
+  /**
+   * The thread that uploads preferences, <code>null</code> when none.
+   */
+   
+  private Thread uploadThread = null;
+  
+  
+  
+  /**
+   * The cookieKey.
+   */
+   
+  private String cookieKey = null;
+  
+  
 
   /**
-   * Stores the user preferences.
+   * Stores the user preferences. Returns whether successful.
    */
 
   private void storeUserPrefs(){
-    // TODO: Implement this.
+    if (!isSavePrefsCapable())
+      return;
+    
+    if (uploadThread != null)
+      return;
+    
+    // Get the cookieKey
+    if (cookieKey == null){
+      cookieKey = applet.getParameter("cookieKey");
+      
+      if (cookieKey == null)
+        cookieKey = new AskCookieKeyDialogPanel().askKey();
+      
+      if ((cookieKey == null) || "".equals(cookieKey))
+        return;
+    }
+    
+    userPrefsUploadResult = null;
+    
+    final OptionPanel infoPanel = new OptionPanel(OptionPanel.INFO, "Uploading Preferences", 
+        new Object[]{OptionPanel.CANCEL}, OptionPanel.CANCEL, "Uploading preferences - please wait."){
+        
+      // We must make sure we are visible before starting the thread.
+      // Otherwise the thread might finish before we're visible and the
+      // the dialog will never be disposed.
+      public void addNotify(){
+        super.addNotify();
+        
+        uploadThread.start();
+      }
+      
+    };
+    
+    
+    uploadThread = new Thread("Preferences-Upload"){
+      public void run(){
+        try{
+          // Add known accounts to the preferences.
+          userPrefs.setInt("accounts.count", users.getSize());
+          for (int i = 0; i < users.getSize(); i++)
+            userPrefs.setString("accounts." + i + ".username", ((User)users.getElementAt(i)).getUsername());
+          
+          
+          URL savePrefsUrl = new URL(applet.getDocumentBase(), applet.getParameter("savePrefsUrl"));
+          HttpURLConnection conn = (HttpURLConnection)savePrefsUrl.openConnection();
+          conn.setDoOutput(true);
+          conn.setRequestMethod("POST");
+          conn.setRequestProperty("Content-type", "application/binary");
+          
+          DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+          out.writeBytes(cookieKey + "\n");
+          out.writeBytes("user\n");
+          userPrefs.save(out);
+          
+          for (int i = 0; i < users.getSize(); i++){
+            User user = (User)users.getElementAt(i);
+            
+            out.writeByte('\n');
+            out.writeBytes("users." + user.getUsername() + "\n");
+            user.getPrefs().save(out);
+          }
+          
+          out.writeBytes("Done");
+    
+          out.close();
+          
+          conn.connect();
+          
+          ByteArrayOutputStream buf = new ByteArrayOutputStream();
+          IOUtilities.pump(conn.getInputStream(), buf);
+          String result = new String(buf.toByteArray());
+          userPrefsUploadResult =  "".equals(result) ? null : result;
+        } catch (MalformedURLException e){e.printStackTrace(); userPrefsUploadResult = e.getMessage();}
+          catch (IOException e){e.printStackTrace(); userPrefsUploadResult = e.getMessage();}
+          finally{
+            if (uploadThread != null){
+              uploadThread = null;
+              infoPanel.close(null);
+            }
+          }
+        
+      }
+    };
+    
+    
+    infoPanel.show(uiProvider);
+    if (uploadThread != null){ // User pressed "Cancel"
+      uploadThread.stop();
+      uploadThread = null;
+    }
+    else if (userPrefsUploadResult != null){
+      OptionPanel.error(uiProvider, "Error", 
+        "An error occurred while uploading preferences:\n" + userPrefsUploadResult);  
+    }
   }
+  
+  
+  
+  /**
+   * A <code>DialogPanel</code> which asks the user to go to the
+   * <code>reserveSpaceUrl</code> and paste his cookieKey.
+   */
+   
+  private class AskCookieKeyDialogPanel extends DialogPanel implements ActionListener{
+    
+    
+    /**
+     * The cookie key text field.
+     */
+     
+    private final TextField cookieKeyTF;
+    
+    
+    
+    /**
+     * The url for reserving space.
+     */
+     
+    private final String reserveSpaceUrl;
+    
+    
+    
+    /**
+     * Creates the <code>AskCookieKeyDialogPanel</code>.
+     */
+     
+    public AskCookieKeyDialogPanel(){
+      setLayout(new BorderLayout(10, 10));
 
+      String url = null;      
+      try{
+        url = new URL(applet.getDocumentBase(), applet.getParameter("reserveSpaceUrl")).toString();
+      } catch (MalformedURLException e){
+          e.printStackTrace();
+          url = "MalformedURLException";
+        }
+        
+      reserveSpaceUrl = url;
+        
+      cookieKeyTF = new TextField();
+      
+      Panel textPanel = new Panel(new GridLayout(4, 1)); 
+      textPanel.add(new Label("To be able to save your preferences, you must "));  
+      textPanel.add(new Label("first reserve space for them on the server."));
+      textPanel.add(new Label("Please visit " + reserveSpaceUrl));
+      textPanel.add(new Label("(by clicking the \"Go to URL\" button) and copy the key:"));
+      
+      add(textPanel, BorderLayout.NORTH);
+      
+      Panel tfPanel = new Panel(new BorderLayout(10, 10));
+      tfPanel.add(new JLabel("Key: "), BorderLayout.WEST);
+      tfPanel.add(cookieKeyTF, BorderLayout.CENTER);
+      
+      add(tfPanel, BorderLayout.CENTER);
+      
+      Button gotoUrl = new Button("Go to URL");
+      Button ok = new Button("OK");
+      Button cancel = new Button("Cancel");
+      
+      Panel buttonPanel = new Panel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+      buttonPanel.add(gotoUrl);
+      buttonPanel.add(ok);
+      buttonPanel.add(cancel);
+      
+      add(buttonPanel, BorderLayout.SOUTH);
+      
+      gotoUrl.addActionListener(this);
+      ok.addActionListener(this);
+      cancel.addActionListener(this);
+      
+      gotoUrl.setActionCommand("url");
+      ok.setActionCommand("ok");
+      cancel.setActionCommand("cancel");
+    }
+    
+    
+    
+    /**
+     * <code>ActionListener</code> implementation.
+     */
+     
+    public void actionPerformed(ActionEvent evt){
+      String actionCommand = evt.getActionCommand();
+      
+      if ("ok".equals(actionCommand))
+        close(cookieKeyTF.getText()); 
+      else if ("url".equals(actionCommand))
+        BrowserControl.displayURL(reserveSpaceUrl);
+      else if ("cancel".equals(actionCommand))
+        close(null);
+      else
+        throw new IllegalArgumentException("Unknown actionCommand: " + actionCommand);
+    }
+    
+    
+    
+    /**
+     * Returns the title of this panel.
+     */
+     
+    public String getTitle(){
+      return "Specify Key";
+    }
+    
+    
+    
+    /**
+     * Displays the dialog, asks the user for the cookie key and returns it.
+     */
+     
+    public String askKey(){
+      return (String)askResult(uiProvider);
+    }
+    
+    
+  }
   
    
 }
