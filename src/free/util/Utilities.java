@@ -40,7 +40,7 @@ public class Utilities{
    */
 
   public static boolean areEqual(Object obj1, Object obj2){
-    return obj1 == null ? obj2 == null : obj1.equals(obj2);
+    return (obj1 == obj2) || (obj1 == null ? false : obj1.equals(obj2));
   }
 
 
