@@ -172,6 +172,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
+  /**
+   * The radio button that sets the move sending mode to premove. We need an
+   * instance reference to it because subclasses (such as the freechess.org one)
+   * may want to disable it during games.
+   */
+
+  protected JRadioButtonMenuItem premoveRadioButton;
+
+
+
 
   /**
    * Starts this plugin.
@@ -958,23 +968,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     JRadioButtonMenuItem legalChess = new JRadioButtonMenuItem("Legal Chess");
     JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Predrag");
-    JRadioButtonMenuItem premove = new JRadioButtonMenuItem("Premove");
+    premoveRadioButton = new JRadioButtonMenuItem("Premove");
 
     switch (getMoveSendingMode()){
       case LEGAL_CHESS_MOVE_SENDING_MODE: legalChess.setSelected(true); break;
       case PREDRAG_MOVE_SENDING_MODE: predrag.setSelected(true); break;
-      case PREMOVE_MOVE_SENDING_MODE: premove.setSelected(true); break;
+      case PREMOVE_MOVE_SENDING_MODE: premoveRadioButton.setSelected(true); break;
       default:
         throw new IllegalStateException("Unrecognized move sending mode: "+getMoveSendingMode());
     }
 
     legalChess.setMnemonic('l');
     predrag.setMnemonic('p');
-    premove.setMnemonic('m');
+    premoveRadioButton.setMnemonic('m');
 
     legalChess.setActionCommand("legalchess");
     predrag.setActionCommand("predrag");
-    premove.setActionCommand("premove");
+    premoveRadioButton.setActionCommand("premove");
 
     ActionListener moveSendingModeActionListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -993,12 +1003,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     legalChess.addActionListener(moveSendingModeActionListener);
     predrag.addActionListener(moveSendingModeActionListener);
-    premove.addActionListener(moveSendingModeActionListener);
+    premoveRadioButton.addActionListener(moveSendingModeActionListener);
 
     ButtonGroup moveSendingModeButtonGroup = new ButtonGroup();
     moveSendingModeButtonGroup.add(legalChess);
     moveSendingModeButtonGroup.add(predrag);
-    moveSendingModeButtonGroup.add(premove);
+    moveSendingModeButtonGroup.add(premoveRadioButton);
 
    
     final JCheckBoxMenuItem autoQueenMenuItem =
@@ -1018,7 +1028,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveInputMenu.addSeparator();
     moveInputMenu.add(legalChess);
     moveInputMenu.add(predrag);
-    moveInputMenu.add(premove);
+    moveInputMenu.add(premoveRadioButton);
     moveInputMenu.addSeparator();
     moveInputMenu.add(autoQueenMenuItem);
 
