@@ -193,9 +193,9 @@ public class FullscreenPanel extends FixedJPanel{
         frame.setIconImage(originalFrame.getIconImage());        
 
       Method setUndecorated = 
-        Frame.class.getDeclaredMethod("setUndecorated", new Class[]{boolean.class});
+        Frame.class.getMethod("setUndecorated", new Class[]{boolean.class});
       Method setResizable = 
-        Frame.class.getDeclaredMethod("setResizable", new Class[]{boolean.class});
+        Frame.class.getMethod("setResizable", new Class[]{boolean.class});
 
       setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
       setResizable.invoke(frame, new Object[]{Boolean.FALSE});
@@ -204,17 +204,17 @@ public class FullscreenPanel extends FixedJPanel{
       Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
       Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
       Method getGraphicsConfiguration = 
-        windowClass.getDeclaredMethod("getGraphicsConfiguration", (Class[])null);
-      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", new Class[0]);
+        windowClass.getMethod("getGraphicsConfiguration", (Class[])null);
+      Method getDevice = graphicsConfigurationClass.getMethod("getDevice", new Class[0]);
       Method setFullScreenWindow =
-        graphicsDeviceClass.getDeclaredMethod("setFullScreenWindow", new Class[]{Window.class});
+        graphicsDeviceClass.getMethod("setFullScreenWindow", new Class[]{Window.class});
 
       Object graphicsConfiguration = 
         getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), new Object[0]);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
       
       if (originalFrame != null){
-        Method getExtState = Frame.class.getDeclaredMethod("getExtendedState", new Class[0]);
+        Method getExtState = Frame.class.getMethod("getExtendedState", new Class[0]);
         originalFrameState = getExtState.invoke(originalFrame, new Object[0]);
   
         originalFrame.setVisible(false);
@@ -281,10 +281,10 @@ public class FullscreenPanel extends FixedJPanel{
       Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
       Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
       Method getGraphicsConfiguration = 
-        windowClass.getDeclaredMethod("getGraphicsConfiguration", new Class[0]);
-      Method getDevice = graphicsConfigurationClass.getDeclaredMethod("getDevice", new Class[0]);
+        windowClass.getMethod("getGraphicsConfiguration", new Class[0]);
+      Method getDevice = graphicsConfigurationClass.getMethod("getDevice", new Class[0]);
       Method setFullScreenWindow =
-        graphicsDeviceClass.getDeclaredMethod("setFullScreenWindow", new Class[]{Window.class});
+        graphicsDeviceClass.getMethod("setFullScreenWindow", new Class[]{Window.class});
 
       Object graphicsConfiguration = getGraphicsConfiguration.invoke(frame, new Object[0]);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
@@ -295,7 +295,7 @@ public class FullscreenPanel extends FixedJPanel{
       
       if (originalFrame != null){
         Method setExtState =
-          Frame.class.getDeclaredMethod("setExtendedState", new Class[]{int.class});
+          Frame.class.getMethod("setExtendedState", new Class[]{int.class});
         setExtState.invoke(originalFrame, new Object[]{originalFrameState});
         originalFrame.setVisible(true);
       }
