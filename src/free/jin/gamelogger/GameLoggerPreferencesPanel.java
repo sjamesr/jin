@@ -342,7 +342,6 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     addRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
-        System.out.println("Selected index: "+selectedIndex);
         if (selectedIndex != -1){
           try{
             updateRuleFromUI(selectedIndex);
