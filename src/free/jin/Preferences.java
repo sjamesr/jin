@@ -616,8 +616,6 @@ public abstract class Preferences{
     int prefsCount = 
       prefsCountString == null ? 0 : Integer.parseInt(prefsCountString);
     
-    System.out.println("Loading " + prefsCount + "preferences");
-    
     for (int i = 0; i < prefsCount; i++){
       String preference = applet.getParameter(category + "." + i);
       if (preference == null)
