@@ -1354,28 +1354,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     return board;
   }
 
-
-
-
-  /**
-   * Returns the title the parent frame or internal frame of this BoardPanel
-   * should have. Whoever adds the BoardPanel may consult with this method.
-   */
-
-  public String getTitle(){
-    if (isActive()){
-      if (game.getGameType()==Game.MY_GAME){
-        if (game.isPlayed())
-          return game.toString();
-        else
-          return "Examining "+game.toString();
-      }
-      else
-        return "Observing "+game.toString();
-    }
-    else
-      return "Was "+game.toString();
-  }
   
   
   
