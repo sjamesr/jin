@@ -197,26 +197,26 @@ public class OptionPanel extends DialogPanel{
 
 
   /**
-   * Creates, shows an error panel with the specified arguments.
+   * Creates and shows an error panel with the specified arguments.
    */
 
-  public static void error(UIProvider ui, String title, String message){
+  public static void error(String title, String message){
     OptionPanel panel = new OptionPanel(OptionPanel.ERROR, title, new Object[]{OK}, OK, message);
-    panel.show(ui);
+    panel.display();
   }
 
 
 
   /**
-   * Creates, shows a confirmation panel with the specified arguments and
+   * Creates, displays a confirmation panel with the specified arguments and
    * returns the result value. Possible result values are {@link #OK} and
    * {@link #CANCEL}.
    */
 
-  public static Object confirm(UIProvider ui, String title, String message, Object defaultOption){
+  public static Object confirm(String title, String message, Object defaultOption){
     OptionPanel panel = new OptionPanel(OptionPanel.QUESTION, title,
       new Object[]{OK, CANCEL}, defaultOption, message);
-    return panel.show(ui);
+    return panel.display();
   }
 
 
@@ -226,10 +226,11 @@ public class OptionPanel extends DialogPanel{
    * result options are {@link #YES}, {@link #NO} and {@link #CANCEL}.
    */
 
-  public static Object question(UIProvider ui, String title, String message, Object defaultOption){
+  public static Object question(String title, String message, Object defaultOption){
     OptionPanel panel = new OptionPanel(OptionPanel.QUESTION, title,
       new Object[]{YES, NO}, defaultOption, message);
-    return panel.show(ui);
+      
+    return panel.display();
   }
 
 
@@ -307,15 +308,14 @@ public class OptionPanel extends DialogPanel{
 
 
   /**
-   * Displays this <code>OptionPanel</code> using the specified
-   * <code>UIProvider</code> and returns the option chosen by the user. Note
-   * that the return value be {@link #CANCEL} even if you didn't specify it in
-   * the constructor, since that is the value returned when the user cancels
-   * the panel without selecting any options.
+   * Displays this <code>OptionPanel</code> and returns the option chosen by
+   * the user. Note that the return value be {@link #CANCEL} even if you didn't
+   * specify it in the constructor, since that is the value returned when the
+   * user cancels the panel without selecting any options.
    */
 
-  public Object show(UIProvider uiProvider){
-    return super.askResult(uiProvider);
+  public Object display(){
+    return super.askResult();
   }
 
 
