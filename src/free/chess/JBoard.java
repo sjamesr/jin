@@ -174,7 +174,6 @@ public class JBoard extends JComponent{
 
 
 
-
   /**
    * A copy of the current position on the board. We keep this so that when the
    * real position changes, we know which squares need repainting.
@@ -222,9 +221,8 @@ public class JBoard extends JComponent{
         repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
 
       if (movedPieceSquare != null){                        // We were dragging a piece
-        if (position.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging is no longer there
-          movedPieceSquare = null;
-          movedPieceLoc = null;
+        if (position.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging 
+          cancelMovingPiece();                              // is no longer there
         }
       }
 
@@ -294,6 +292,14 @@ public class JBoard extends JComponent{
    */
 
   private int moveHighlightingStyle = NO_MOVE_HIGHLIGHTING;
+
+
+
+  /**
+   * Is the board editable?
+   */
+
+  private boolean isEditable = true;
 
 
 
@@ -417,9 +423,7 @@ public class JBoard extends JComponent{
     setOpaque(true);
     setDoubleBuffered(false); // We're double buffering ourselves.
     enableEvents(MouseEvent.MOUSE_EVENT_MASK |
-                 MouseEvent.MOUSE_MOTION_EVENT_MASK |
-                 KeyEvent.KEY_EVENT_MASK);
-    registerKeyboardActions();
+                 MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
 
@@ -442,35 +446,6 @@ public class JBoard extends JComponent{
 
   public JBoard(){
     this(new Position());
-  }
-
-
-
-
-  /**
-   * Registers all the keyboard actions for this <code>JBoard</code>.
-   */
-
-  protected void registerKeyboardActions(){
-    // Release the currently dragged/moved piece on ESCAPE
-    ActionListener releasePieceListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        if (movedPieceSquare != null){
-          repaint(getMovedPieceRect(null));
-          repaint(squareToRect(movedPieceSquare, null));
-          movedPieceSquare = null;
-          movedPieceLoc = null;
-          movedPieceSquare = null;
-          if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-            setCursor(Cursor.getDefaultCursor());
-          
-        }
-      }
-    };
-    
-    registerKeyboardAction(releasePieceListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-    registerKeyboardAction(releasePieceListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
-
   }
 
 
@@ -596,7 +571,7 @@ public class JBoard extends JComponent{
     }
     int oldMode = moveInputMode;
     moveInputMode = newMode;
-    firePropertyChange("moveInputMode",oldMode, newMode);
+    firePropertyChange("moveInputMode", oldMode, newMode);
   }
   
 
@@ -615,6 +590,31 @@ public class JBoard extends JComponent{
 
 
   /**
+   * Sets whether pieces can at all be moved.
+   */
+
+  public void setEditable(boolean isEditable){
+    boolean oldEditable = this.isEditable;
+    this.isEditable = isEditable;
+    firePropertyChange("editable", oldEditable, isEditable);
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the board is editable, i.e. the pieces can at
+   * all be moved.
+   */
+
+  public boolean isEditable(){
+    return isEditable;
+  }
+
+
+
+
+  /**
    * Sets the dragged piece style to the given style. Possible values are
    * {@link #NORMAL_DRAGGED_PIECE} and {@link #CROSSHAIR_DRAGGED_PIECE}.
    */
@@ -627,8 +627,10 @@ public class JBoard extends JComponent{
       default:
         throw new IllegalArgumentException("Illegal dragged piece style value: "+newStyle);
     }
-
+    
+    int oldStyle = draggedPieceStyle;
     this.draggedPieceStyle = newStyle;
+    firePropertyChange("draggedPieceStyle", oldStyle, newStyle);
   }
 
 
@@ -659,9 +661,11 @@ public class JBoard extends JComponent{
         throw new IllegalArgumentException("Illegal move highlighting style value: "+newStyle);
     }
 
+    int oldStyle = moveHighlightingStyle;
     this.moveHighlightingStyle = newStyle;
     if (highlightedMove != null)
       repaint();
+    firePropertyChange("moveHighlightingStyle", oldStyle, newStyle);
   }
 
 
@@ -728,8 +732,10 @@ public class JBoard extends JComponent{
    */
 
   public void setFlipped(boolean isFlipped){
+    boolean oldFlipped = this.isFlipped;
     this.isFlipped = isFlipped;
     repaint();
+    firePropertyChange("flipped", oldFlipped, isFlipped);
   }
 
 
@@ -752,8 +758,10 @@ public class JBoard extends JComponent{
    * promotion occurs or will the default promotion piece be used.
    */
 
-  public void setManualPromote(boolean manualPromote){
-    this.isManualPromote = manualPromote;
+  public void setManualPromote(boolean isManualPromote){
+    boolean oldManualPromote = this.isManualPromote;
+    this.isManualPromote = isManualPromote;
+    firePropertyChange("manualPromote", oldManualPromote, isManualPromote);
   }
 
 
@@ -801,8 +809,10 @@ public class JBoard extends JComponent{
    */
 
   public void setBoardPainter(BoardPainter boardPainter){
+    Object oldBoardPainter = this.boardPainter;
     this.boardPainter = boardPainter;
     repaint();
+    firePropertyChange("boardPainter", oldBoardPainter, boardPainter);
   } 
 
 
@@ -812,8 +822,10 @@ public class JBoard extends JComponent{
    */
 
   public void setPiecePainter(PiecePainter piecePainter){
+    Object oldPiecePainter = this.piecePainter;
     this.piecePainter = piecePainter;
     repaint();
+    firePropertyChange("piecePainter", oldPiecePainter, piecePainter);
   }
 
 
@@ -824,8 +836,10 @@ public class JBoard extends JComponent{
    */
 
   public void setMoveHighlightingColor(Color moveHighlightingColor){
+    Object oldColor = this.moveHighlightingColor;
     this.moveHighlightingColor = moveHighlightingColor;
     repaint();
+    firePropertyChange("moveHighlightingColor", oldColor, moveHighlightingColor);
   }
 
 
@@ -848,8 +862,10 @@ public class JBoard extends JComponent{
    */
 
   public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
+    Object oldColor = this.dragSquareHighlightingColor;
     this.dragSquareHighlightingColor = dragSquareHighlightingColor;
     repaint();
+    firePropertyChange("dragSquareHighlightingColor", oldColor, dragSquareHighlightingColor);
   }
 
 
@@ -863,7 +879,39 @@ public class JBoard extends JComponent{
     return dragSquareHighlightingColor;
   }
 
-   
+
+
+  /**
+   * Returns <code>true</code> if a piece is currently being moved/dragged,
+   * <code>false</code> otherwise.
+   */
+
+  public boolean isMovingPiece(){
+    return movedPieceSquare != null;
+  }
+
+
+
+  /**
+   * If a piece is currently being moved/dragged, the moving/dragging is
+   * canceled and the moved/dragged piece is returned to its original location.
+   * If no piece is currently being moved/dragged, an
+   * <code>IllegalStateException</code> is thrown.
+   */
+
+  public void cancelMovingPiece(){
+    if (!isMovingPiece())
+      throw new IllegalStateException();
+
+    repaint(getMovedPieceRect(null));
+    repaint(squareToRect(movedPieceSquare, null));
+    movedPieceSquare = null;
+    movedPieceLoc = null;
+    if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
+      setCursor(Cursor.getDefaultCursor());
+  }
+
+
 
   
   /**
@@ -1277,7 +1325,7 @@ public class JBoard extends JComponent{
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
 
-    if (!isEnabled())
+    if (!(isEnabled() && isEditable()))
       return;
 
     boolean isLeftMouseButton = SwingUtilities.isLeftMouseButton(evt);
@@ -1293,11 +1341,8 @@ public class JBoard extends JComponent{
     Square square = locationToSquare(x,y);
 
     if (square == null){
-      if (evtID == MouseEvent.MOUSE_RELEASED){
-        movedPieceSquare = null;
-        movedPieceLoc = null;
-        repaint();
-      }
+      if (evtID == MouseEvent.MOUSE_RELEASED)
+        cancelMovingPiece();
       return;
     }
 
@@ -1315,6 +1360,7 @@ public class JBoard extends JComponent{
         Piece piece = position.getPieceAt(movedPieceSquare);
         if ((piece == null) || (!canBeMoved(piece))){
           movedPieceSquare = null;
+          movedPieceLoc = null;
           return;
         }
         movedPieceLoc = new Point(x, y);
@@ -1345,7 +1391,7 @@ public class JBoard extends JComponent{
           WildVariant variant = position.getVariant();
           Piece [] promotionTargets = variant.getPromotionTargets(position, movedPieceSquare, square);
           Move madeMove;
-          if (promotionTargets!=null){
+          if (promotionTargets != null){
             Piece promotionTarget;
             if (isManualPromote()){
               isShowingModalDialog = true;
@@ -1369,8 +1415,6 @@ public class JBoard extends JComponent{
 
         movedPieceSquare = null;
         movedPieceLoc = null;
-        if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-          setCursor(Cursor.getDefaultCursor());
       }
     }
 
@@ -1389,7 +1433,7 @@ public class JBoard extends JComponent{
   protected void processMouseMotionEvent(MouseEvent evt){
     super.processMouseMotionEvent(evt);
 
-    if (!isEnabled())
+    if (!(isEnabled() && isEditable()))
       return;
 
     int evtID = evt.getID();
@@ -1466,11 +1510,26 @@ public class JBoard extends JComponent{
 
   public static void main(String [] args){
     javax.swing.JFrame frame = new javax.swing.JFrame("JBoard Test");
-    frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+    frame.addWindowListener(new free.util.AppKiller());
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
-    JBoard board = new JBoard();
+    final JBoard board = new JBoard();
+    ActionListener escapeListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        System.out.println("Invoked");
+        if (board.isMovingPiece())
+          board.cancelMovingPiece();
+      }
+    };
+
+    board.setMoveInputStyle(JBoard.CLICK_N_CLICK);
+    board.registerKeyboardAction(escapeListener,
+      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK),
+      JComponent.WHEN_IN_FOCUSED_WINDOW);
+    board.registerKeyboardAction(escapeListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+      JComponent.WHEN_IN_FOCUSED_WINDOW);
+
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
-    frame.setBounds(50, 50, 300, 300);
+    frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);
   }
 
