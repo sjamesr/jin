@@ -178,8 +178,8 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
 
   /**
-   * Overrides BoardPanel.createWhiteLabel(Game) to return a chessclub.com specific
-   * version.
+   * Overrides BoardPanel.createWhiteLabel(Game) to return a chessclub.com
+   * specific version.
    */
 
   protected JLabel createWhiteLabel(Game game){
@@ -194,10 +194,9 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
 
 
-
   /**
-   * Overrides BoardPanel.createBlackLabel(Game) to return a chessclub.com specific
-   * version.
+   * Overrides BoardPanel.createBlackLabel(Game) to return a chessclub.com
+   * specific version.
    */
 
   protected JLabel createBlackLabel(Game game){
@@ -205,6 +204,23 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
     int rating = game.getBlackRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
     label.setText(game.getBlackName()+game.getBlackTitles()+ratingString);
+
+    return label;
+  }
+
+
+
+
+  /**
+   * Overrides BoardPanel.createGameLabel(Game) to return a chessclub.com
+   * specific version.
+   */
+
+  protected JLabel createGameLabel(Game game){
+    JLabel label = super.createGameLabel(game);
+    free.chess.WildVariant variant = game.getVariant();
+    String category = variant.equals(free.chess.Chess.getInstance()) ? game.getRatingCategoryString() : variant.getName();
+    label.setText((game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + category);
 
     return label;
   }
