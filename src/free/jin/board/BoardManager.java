@@ -1098,7 +1098,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Returns the BoardPanel displaying the given Game.
    */
 
-  protected BoardPanel getBoardPanel(Game game){
+  public BoardPanel getBoardPanel(Game game){
     return (BoardPanel)gamesToBoardPanels.get(game);
   }
 
