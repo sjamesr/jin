@@ -24,6 +24,7 @@ package free.jin;
 import javax.swing.ListModel;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
+import free.jin.action.ActionInfo;
 
 
 /**
@@ -99,6 +100,15 @@ public interface JinContext{
   Server [] getServers();
 
 
+  
+  /**
+   * Returns a list of <code>ActionInfo</code> objects describing the standalone
+   * actions for the specified server.
+   */
+   
+  ActionInfo [] getActions(Server server);
+  
+  
   
   /**
    * Returns a list of <code>PluginInfo</code> objects describing the plugins
