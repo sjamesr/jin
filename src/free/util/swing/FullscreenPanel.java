@@ -25,6 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.*;
 import free.workarounds.FixedJPanel;
+import free.util.AWTUtilities;
 import free.util.PlatformUtils;
 
 
@@ -272,7 +273,7 @@ public class FullscreenPanel extends FixedJPanel{
   private RootPaneContainer setFakeFullscreen(){
     JWindow window = new JWindow(SwingUtils.frameForComponent(this));
 
-    Dimension screenSize = window.getToolkit().getScreenSize();
+    Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     window.setBounds(0, 0, screenSize.width, screenSize.height);
     window.setVisible(true);
     window.toFront();
