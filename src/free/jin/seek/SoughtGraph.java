@@ -439,9 +439,9 @@ public class SoughtGraph extends JComponent{
     Font originalFont = g.getFont();
 
     // The "Bullet", "Blitz" and "Standard" strings.    
-    String bulletString = "Bullet";
-    String blitzString = "Blitz";
-    String standardString = "Standard";
+    String bulletString = plugin.getProperty("fast-category.name");
+    String blitzString = plugin.getProperty("medium-category.name");
+    String standardString = plugin.getProperty("slow-category.name");
     int timeStringHeight = (height-(graphY+graphHeight))/2;
     int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, bulletString, bulletWidth, timeStringHeight);
     int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, blitzString, blitzWidth, timeStringHeight);
