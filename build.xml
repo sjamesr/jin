@@ -6,6 +6,7 @@
 	
 	<path id="compile.class.path">
 		<pathelement path="timestamping.jar"/>
+		<pathelement path="timesealing.jar"/>
 		<pathelement path="jregex.jar"/>
 	</path>
 	
