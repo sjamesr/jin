@@ -26,6 +26,7 @@ import java.io.*;
 import jregex.*;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -1387,6 +1388,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       final String prompt = "fics% ";
       final int promptLength = prompt.length();
 
+      Vector lines = new Vector(50);
+
       InputStream in = new BufferedInputStream(sock.getInputStream());
 
       StringBuffer buf = new StringBuffer();
@@ -1409,11 +1412,17 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
             }
           }
           System.out.println(s);
-          execRunnable(new HandleLineRunnable(s));
+          lines.addElement(s);
           buf.setLength(0);
         }
         else{
           buf.append((char)b);
+        }
+                                    // <= 1 and not == 0 because of a bug in MS VM which 
+                                    // returns 1 and then blocks the next read() call.
+        if ((lines.size() > 100) || ((in.available() <= 1) && !lines.isEmpty())){
+          execRunnable(new HandleLinesRunnable(lines));
+          lines.removeAllElements();
         }
       }
     } catch (IOException e){}
@@ -1430,28 +1439,31 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * A runnable which takes a String and invokes handleLine(String) with it when
-   * run. Used by the reader thread to communicate with the data handling code.
+   * A runnable which takes a vector of lines and invokes handleLine(String)
+   * with them when run. Used by the reader thread to communicate with the 
+   * data handling code.
    */
 
-  private class HandleLineRunnable implements Runnable{
+  private class HandleLinesRunnable implements Runnable{
 
 
     /**
-     * The string.
+     * The lines.
      */
 
-    private final String line;
-
+    private final Vector lines;
 
 
 
     /**
-     * Creates a new HandleLineRunnable with the specified string.
+     * Creates a new HandleLinesRunnable with the specified vector of lines.
      */
 
-    public HandleLineRunnable(String line){
-      this.line = line;
+    public HandleLinesRunnable(Vector lines){
+      int size = lines.size();
+      this.lines = new Vector(size);
+      for (int i = 0; i < size; i++)
+        this.lines.addElement(lines.elementAt(i));
     }
 
 
@@ -1463,7 +1475,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
      */
 
     public void run(){
-      handleLine(line);
+      int size = lines.size();
+      for (int i = 0; i < size; i++){
+        String line = (String)lines.elementAt(i);
+        handleLine(line);
+      }
     }
 
 
