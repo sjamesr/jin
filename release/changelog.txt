@@ -60,7 +60,7 @@
   
   
 
-2.11
+2.11b
 
 * Added audio notification for draw, abort, adjourn and takeback offers.
 * Added visual notification for draw, abort and adjourn offers by setting a
