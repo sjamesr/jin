@@ -460,7 +460,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     categoryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     JScrollPane scrollPane = new JScrollPane(categoryList);
 
-    JPanel listPanel = new JPanel(new BorderLayout());
+    JPanel listPanel = new JPanel(new BorderLayout(2, 2));
     JLabel textTypeLabel = new JLabel("Text type", JLabel.CENTER);
     textTypeLabel.setDisplayedMnemonic('t');
     textTypeLabel.setLabelFor(categoryList);

@@ -203,7 +203,7 @@ public class FontSelectorPanel extends JPanel{
 
     JPanel fontNamePanel = new JPanel(new BorderLayout());
     JScrollPane fontNamesListScrollPane = new JScrollPane(fontNamesList);
-    JPanel fontNameLabelAndField = new JPanel(new BorderLayout());
+    JPanel fontNameLabelAndField = new JPanel(new BorderLayout(2, 2));
     JLabel fontNameLabel = new JLabel("Font name", JLabel.CENTER);
     fontNameLabel.setDisplayedMnemonic('n');
     fontNameLabel.setLabelFor(fontNameField);
@@ -214,7 +214,7 @@ public class FontSelectorPanel extends JPanel{
 
     JPanel fontSizePanel = new JPanel(new BorderLayout());
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
-    JPanel fontSizeLabelAndField = new JPanel(new BorderLayout());
+    JPanel fontSizeLabelAndField = new JPanel(new BorderLayout(2, 2));
     JLabel fontSizeLabel = new JLabel("Font size", JLabel.CENTER);
     fontSizeLabel.setDisplayedMnemonic('s');
     fontSizeLabel.setLabelFor(fontSizeField);
