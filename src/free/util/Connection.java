@@ -295,13 +295,10 @@ public abstract class Connection{
    * Returns the login error message. Note that this may return null even if the
    * login failed.
    *
-   * @throws IllegalStateException if a connection hasn't been established yet
-   * or the login did not fail.
+   * @throws IllegalStateException if login did not fail.
    */
 
   public String getLoginErrorMessage(){
-    if (!isConnected())
-      throw new IllegalStateException("Not connected yet");
     if (isLoggedIn())
       throw new IllegalStateException("The login did not fail");
 
