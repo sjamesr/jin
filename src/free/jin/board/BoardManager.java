@@ -330,7 +330,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else
       setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
     
-    String coordsDisplayStyleString = prefs.getString("coords-display-style", "none");
+    String coordsDisplayStyleString = prefs.getString("coords-display.style", "none");
     if ("rim".equals(coordsDisplayStyleString))
       setCoordsDisplayStyle(JBoard.RIM_COORDS);
     else if ("outside".equals(coordsDisplayStyleString))
@@ -339,6 +339,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setCoordsDisplayStyle(JBoard.EVERY_SQUARE_COORDS);
     else
       setCoordsDisplayStyle(JBoard.NO_COORDS);
+    
+    setCoordsDisplayColor(prefs.getColor("coords-display.color", Color.blue.darker()));
 
     setPieceSet(prefs.getString("piece-set-id", null));
     setBoardPattern(prefs.getString("board-pattern-id", null));
@@ -821,6 +823,26 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   }
 
 
+  
+  /**
+   * Returns the color used for coordinates display.
+   */
+   
+  public Color getCoordsDisplayColor(){
+    return (Color)props.getProperty("coordsDisplayColor");
+  }
+  
+  
+  
+  /**
+   * Sets the color used for coordinates display to the specified value.
+   */
+   
+  public void setCoordsDisplayColor(Color color){
+    props.setProperty("coordsDisplayColor", color);
+  }
+  
+  
 
   /**
    * Returns the current piece set.
@@ -1614,7 +1636,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       default:
         throw new IllegalStateException("Unrecognized coords display style: " + getCoordsDisplayStyle());
     }
-    prefs.setString("coords-display-style", coordsDisplayStyleString);
+    prefs.setString("coords-display.style", coordsDisplayStyleString);
+    prefs.setColor("coords-display.color", getCoordsDisplayColor());
 
     prefs.setBool("move-highlight.highlight-own", isHighlightingOwnMoves());
 

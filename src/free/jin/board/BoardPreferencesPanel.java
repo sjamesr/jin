@@ -118,6 +118,13 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
 
 
+  /**
+   * The ColorChooserButton for selecting the coordinates display color.
+   */
+
+  private final ColorChooserButton coordsDisplayColorChooser;
+  
+  
 
   /**
    * Creates a new BoardPreferencesPanel with the given BoardManager.
@@ -153,6 +160,11 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     moveHighlightingColorChooser.setMnemonic('M');
     dragSquareHighlightingColorChooser.setMnemonic('S');
+    
+    coordsDisplayColorChooser = new ColorChooserButton("Square Coordinates",
+      boardManager.getCoordsDisplayColor());
+      
+    coordsDisplayColorChooser.setMnemonic('C');
 
 
     ChangeListener changeNotifyListener = new ChangeListener(){
@@ -169,6 +181,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     darkColorChooser.addChangeListener(changeNotifyListener);
     moveHighlightingColorChooser.addChangeListener(changeNotifyListener);
     dragSquareHighlightingColorChooser.addChangeListener(changeNotifyListener);
+    coordsDisplayColorChooser.addChangeListener(changeNotifyListener);
 
     createUI();
   }
@@ -188,22 +201,28 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     piecesPanel.add(whiteOutlineChooser);
     piecesPanel.add(blackOutlineChooser);
     Border innerBorder = new EmptyBorder(5, 5, 5, 5);
-    Border outerBorder = new TitledBorder(" Piece preferences (*) ");
+    Border outerBorder = new TitledBorder(" Piece colors* ");
     piecesPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
     JPanel boardPanel = new JPanel(new GridLayout(1, 2, 5, 5));
     boardPanel.add(lightColorChooser);
     boardPanel.add(darkColorChooser);
     innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder(" Board preferences (*) ");
+    outerBorder = new TitledBorder(" Board colors* ");
     boardPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
     JPanel highlightPanel = new JPanel(new GridLayout(1, 2, 5, 5));
     highlightPanel.add(moveHighlightingColorChooser);
     highlightPanel.add(dragSquareHighlightingColorChooser);
     innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder(" Highlighting preferences ");
+    outerBorder = new TitledBorder(" Highlighting colors ");
     highlightPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
+    
+    JPanel miscPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    miscPanel.add(coordsDisplayColorChooser);
+    innerBorder = new EmptyBorder(5, 5, 5, 5);
+    outerBorder = new TitledBorder(" Other colors ");
+    miscPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
     JPanel notePanel = new JPanel(new BorderLayout());
     notePanel.add(new JLabel("* - Color preferences only affect vector pieces and the solid color board"), BorderLayout.CENTER);
@@ -213,6 +232,8 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     add(boardPanel);
     add(Box.createVerticalStrut(10));
     add(highlightPanel);
+    add(Box.createVerticalStrut(10));
+    add(miscPanel);
     add(Box.createVerticalStrut(10));
     add(notePanel);
   }
@@ -235,6 +256,8 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     boardManager.setMoveHighlightingColor(moveHighlightingColorChooser.getColor());
     boardManager.setDragSquareHighlightingColor(dragSquareHighlightingColorChooser.getColor());
+    
+    boardManager.setCoordsDisplayColor(coordsDisplayColorChooser.getColor());
   }
 
 

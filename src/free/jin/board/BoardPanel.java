@@ -585,6 +585,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
     board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
     board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
+    board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
     board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
@@ -1980,6 +1981,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       }
       else if ("coordsDisplayStyle".equals(propertyName))
         board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
+      else if ("coordsDisplayColor".equals(propertyName))
+        board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
       else if ("whitePieceColor".equals(propertyName) ||
                "blackPieceColor".equals(propertyName) ||
                "whiteOutlineColor".equals(propertyName) ||
