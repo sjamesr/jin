@@ -1,0 +1,4 @@
+id = cold-marble
+name = Cold Marble
+classname = ImageBoardLoader
+scaleSquares = true
