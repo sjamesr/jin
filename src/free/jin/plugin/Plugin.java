@@ -201,8 +201,22 @@ public abstract class Plugin{
     return context.getPlugin(id);
   }
   
-
-
+  
+  
+  /**
+   * Asks all other plugins, to set their paused state to the specified state.
+   */
+   
+  public void setOtherPluginsPaused(boolean isPaused){
+    Plugin [] plugins = context.getPlugins();
+    
+    for (int i = 0; i < plugins.length; i++){
+      if (plugins[i] != this)
+        plugins[i].setPaused(isPaused);
+    }
+  }
+   
+   
 
   /**
    * Returns this plugin's id. Ids need to be unique across all plugins that
@@ -303,6 +317,33 @@ public abstract class Plugin{
   public void stop(){
 
   }
+  
+  
+  
+  /**
+   * Asks the plugin to pause processing events arriving from the connection or
+   * any other intensive tasks. This is meant to be used by plugins which
+   * temporarily require precedence over any other tasks. The plugin may ignore
+   * the request, especially if it's not doing anything intensive. The default
+   * implementation does nothing.
+   */
+   
+  public void setPaused(boolean isPaused){
+    
+  }
+  
+  
+  
+  /**
+   * Returns whether the plugin is really paused. That is, it has been asked to
+   * pause and the request wasn't ignored. The default implementation simply
+   * return <code>false</code>.
+   */
+   
+  public boolean isPaused(){
+    return false;
+  }
+   
 
 
 }
