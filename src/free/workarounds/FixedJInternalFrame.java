@@ -31,8 +31,6 @@ import java.beans.PropertyVetoException;
 /**
  * A fix of JInternalFrame. Fixes the following bugs:
  * <UL>
- *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4109910.html">
- *        When a JInternalFrame is activated, focus is not transferred to its children</A>.
  *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4230389.html">
  *        Adding a desktop icon to JDesktopPane causes null pointer exception</A>.
  *        Note that the workaround for this bug is not completely transparent -
@@ -114,60 +112,6 @@ public class FixedJInternalFrame extends JInternalFrame{
       boolean maximizable, boolean iconifiable){
     super(title, resizable, closable, maximizable, iconifiable);
   }
-
-
-
-  // <4109910>
-
-
-  /**
-   * The component that had the focus when this internal frame became
-   * deselected.
-   */
-
-  private Component previousFocusedComponent = null;
-
-
-
-  public void setSelected(boolean selected) throws PropertyVetoException{
-    super.setSelected(selected);
-
-    if (selected){
-      if (findFocusOwner() == null){
-        if (previousFocusedComponent != null)
-          previousFocusedComponent.requestFocus();
-        else if (!requestDefaultFocus())
-          requestFocus();
-      }
-    }
-    else
-      previousFocusedComponent = findFocusOwner();
-  }
-
-
-
-
-  /**
-   * Returns the current focus owner of this JInternalFrame or null if it's not
-   * active or isn't displayable.
-   */
-
-  private Component findFocusOwner(){
-    if (isSelected()){
-      Window window = SwingUtilities.windowForComponent(this);
-      if (window == null)
-        return null;
-      Component component = window.getFocusOwner();
-      return isAncestorOf(component) ? component : null;
-        // The "null" case shouldn't happen, because we are selected, but just in case...
-    }
-    else
-      return null;
-  }
-
-
-
-  // </4109910>
 
 
 
