@@ -23,12 +23,11 @@ package free.jin.console;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Method;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import free.util.swing.ColorChooser;
 import free.util.swing.FontSelectorPanel;
-import bsh.Interpreter;
-import bsh.EvalError;
 
 
 /**
@@ -358,12 +357,17 @@ public class TextStyleChooserPanel extends JPanel{
     public void paintComponent(Graphics g){
       if (antialiasingSupported){
         try{
-          Interpreter bsh = new Interpreter();
-          bsh.set("g", g);
-          bsh.eval("g2 = (Graphics)g");
-          String textAntialiasValue = "RenderingHints.VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
-          bsh.eval("g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, "+textAntialiasValue+")");
-        } catch (EvalError e){
+          Class graphics2dClass = Class.forName("java.awt.Graphics2D");
+          Class renderingHintsKeyClass = Class.forName("java.awt.RenderingHints$Key");
+          Method setRenderingHintMethod = graphics2dClass.getMethod("setRenderingHint", 
+            new Class[]{renderingHintsKeyClass, Object.class});
+            
+          Object antialiasKey = RenderingHints.KEY_TEXT_ANTIALIASING;
+          Object antialiasValue = antialias ? 
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+            
+          setRenderingHintMethod.invoke(g, new Object[]{antialiasKey, antialiasValue});
+        } catch (Exception e){
             antialiasingSupported = false;
           }
       }
