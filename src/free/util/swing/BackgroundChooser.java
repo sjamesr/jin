@@ -170,14 +170,12 @@ public class BackgroundChooser extends JDialog{
     boxesPanel.add(stretchButton);
     boxesPanel.add(centerButton);
 
-    JButton closeButton = new JButton("Close");
-    closeButton.setMnemonic('C');
-
     mainPanel.add(pickColor);
     mainPanel.add(pickImage);
     mainPanel.add(boxesPanel);
     mainPanel.add(useDefault);
 
+    JButton closeButton = new JButton("Close");
     JPanel closeButtonPanel = new JPanel(new GridLayout(1,1));
     closeButtonPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
     closeButtonPanel.add(closeButton);
