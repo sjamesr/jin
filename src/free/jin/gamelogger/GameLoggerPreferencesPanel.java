@@ -326,7 +326,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JScrollPane loggingListRulesScrollPane = new JScrollPane(loggingRulesList); loggingListRulesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    JScrollPane loggingListRulesScrollPane = new JScrollPane(loggingRulesList); loggingListRulesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     loggingListRulesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     loggingListRulesScrollPane.setPreferredSize(new Dimension(80, 80));
 

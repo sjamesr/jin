@@ -636,7 +636,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected JScrollPane createMoveListTableScrollPane(Game game, JTable moveListTable){
     JScrollPane scrollPane = new JScrollPane(moveListTable);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
     return scrollPane;
