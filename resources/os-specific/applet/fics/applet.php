@@ -21,7 +21,7 @@
 	<PARAM NAME="savePrefsURL" VALUE="prefs.php?savePrefs">
 	
 	<PARAM NAME="bgcolor" VALUE="<?php echo getBackgroundColor(); ?>">
-	<PARAM NAME="login.ports" VALUE="<?php echo getPort(); ?>">
+	<PARAM NAME="port" VALUE="<?php echo getPort(); ?>">
 
 	
 	<PARAM NAME="server.classname" VALUE="free.jin.freechess.FreechessServer">
