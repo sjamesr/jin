@@ -1251,6 +1251,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
 
+    displayedMoveNumber = 0;
+
     updateMoveHighlighting(false);
 
     isMoveEnRoute = false; // We shouldn't keep state between 
@@ -1258,7 +1260,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (!board.isEnabled())
       board.setEnabled(true);
 
-    displayedMoveNumber = 0;
     updateClockActiveness();
     updateMoveListTable();
     updatePositionScrollBar();
