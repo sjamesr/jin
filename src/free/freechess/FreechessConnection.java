@@ -210,10 +210,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
     if (isLoggedIn()){
       sendCommand("iset seekinfo " + (seekInfoOn ? "1" : "0"));
-      sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0")); // This is not really needed, but "help iv_seekinfo" says it is.
+//      sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0"));
+      // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
 
       filterLine("seekinfo "+(seekInfoOn ? "" : "un")+"set.");
-      filterLine("seekremove "+(seekInfoOn ? "" : "un")+"set.");
+//      filterLine("seekremove "+(seekInfoOn ? "" : "un")+"set.");
     }
   }
 
@@ -258,9 +259,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     sendCommand("iset ms 1");
     if (seekInfoOn){
       sendCommand("iset seekinfo 1");
-      sendCommand("iset seekremove 1"); // This is not really needed, but "help iv_seekinfo" says it is, so we'll do it :-)
+//      sendCommand("iset seekremove 1"); 
+      // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
     }
-//    sendCommand("iset lock 1"); // Don't do this, otherwise we can't set seekinfo and seekremove
+    sendCommand("iset lock 1");
 
     filterLine("Style "+style+" set.");
     filterLine("Your prompt will now not show the time.");
@@ -269,9 +271,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     filterLine("ms set.");
     if (seekInfoOn){
       filterLine("seekinfo set.");
-      filterLine("seekremove set.");
+//      filterLine("seekremove set.");
     }
-//    filterLine("lock set.");
+    filterLine("lock set.");
   }
 
 
