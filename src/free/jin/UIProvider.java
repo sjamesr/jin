@@ -31,9 +31,20 @@ import free.jin.plugin.PluginUIContainer;
  * UI containers for the rest of the application. An implementation might, for
  * example, choose to use a single main frame with many internal frames, or a
  * separate toplevel frame for each container request.
+ * An implementation must have a no-arg constructor.
  */
 
 public interface UIProvider{
+  
+  
+  
+  /**
+   * This method is called at startup to ask the UIProvider to display its
+   * initial UI. Presumably, the user can then use that UI to connect to the
+   * server.
+   */
+   
+  void start();
 
 
 
@@ -71,7 +82,17 @@ public interface UIProvider{
    */
 
   void setConnected(boolean isConnected, Session session);
-
+  
+  
+  
+  /**
+   * This method is called to notify the UIProvider that Jin is being shut down.
+   * The implementation is supposed to save any state it requires into
+   * preferences and close any UI elements it owns. 
+   */
+   
+  void stop();
+  
   
  
 }
