@@ -48,7 +48,7 @@ public interface Server{
    * the specified connection details.
    */
 
-  Connection createConnection(String username, String password);
+  Connection createConnection(ConnectionDetails connDetails);
 
 
 
