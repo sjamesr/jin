@@ -14,7 +14,7 @@
 <P>
 <APPLET CODE="free.jin.JinApplet"
         ARCHIVE="jin.jar, <?php if ($_REQUEST['oldjava']) echo "libs/swingall.jar," ?>libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/fics/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
-		WIDTH="400" HEIGHT="300">
+		WIDTH="450" HEIGHT="300">
 		
 	<PARAM NAME="prefsProtocol" VALUE="http<?php if (isSSLPrefs()) echo "s"?>">
 	<PARAM NAME="loadPrefsURL" VALUE="prefs.php?loadPrefs">
