@@ -198,7 +198,12 @@ public class Jin{
    */
 
   private void restoreLookAndFeel(){
-    String lfClassName = getPrefs().getString("lookAndFeel.classname", UIManager.getSystemLookAndFeelClassName());
+    String defaultLnf = UIManager.getSystemLookAndFeelClassName();
+    if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf)) // The GKT look and feel is still broken
+      defaultLnf = UIManager.getCrossPlatformLookAndFeelClassName();
+    
+    String lfClassName = getPrefs().getString("lookAndFeel.classname", defaultLnf);
+    
     try{
       UIManager.setLookAndFeel(lfClassName);
     } catch (Exception e){}
