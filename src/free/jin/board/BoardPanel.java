@@ -451,6 +451,49 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     // We're not adding them because the layout depends on the size, which is unknown at this point.
     // See the doLayout() method.
   }
+  
+  
+  
+  
+  /**
+   * A mouse listener which pauses other plugins when the mouse moves over the
+   * board in order to give the board maximum preference.
+   */
+   
+  private class OtherPluginsPauser implements MouseListener, MouseMotionListener{
+    
+    private boolean paused = false;
+                                  
+    private Timer timer = new Timer(1000, new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        boardManager.setOtherPluginsPaused(false);
+        paused = false;
+      }
+    });
+    
+    private void go(){
+      if (!paused){
+        paused = true;
+        boardManager.setOtherPluginsPaused(true);
+      }
+      
+      if (timer.isRunning())
+        timer.restart();
+      else{
+        timer.setRepeats(false);
+        timer.start();
+      }
+    }
+    
+    
+    public void mouseDragged(MouseEvent e){go();}
+    public void mouseMoved(MouseEvent e){go();}
+    public void mouseClicked(MouseEvent e){go();}
+    public void mouseEntered(MouseEvent e){go();}
+    public void mouseExited(MouseEvent e){go();}
+    public void mousePressed(MouseEvent e){go();}
+    public void mouseReleased(MouseEvent e){go();}
+  };
 
 
 
@@ -489,23 +532,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     moveListTable = createMoveListTable(game, moveListTableModel);
     moveListTableScrollPane = createMoveListTableScrollPane(game, moveListTable);
     
-    board.addMoveProgressListener(new MoveProgressListener(){
-      public void moveMakingStarted(MoveProgressEvent evt){
-        SwingUtilities.invokeLater(new Runnable(){
-          public void run(){
-            boardManager.setOtherPluginsPaused(true);
-          }
-        });
-      }
-      
-      public void moveMakingEnded(MoveProgressEvent evt){
-        SwingUtilities.invokeLater(new Runnable(){
-          public void run(){
-            boardManager.setOtherPluginsPaused(false);
-          }
-        });
-      }
-    });
+    // Pauses other plugins when a move is in progress.
+    OtherPluginsPauser pauser = new OtherPluginsPauser();
+    board.addMouseListener(pauser);
+    board.addMouseMotionListener(pauser);
 
     moveListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
      
