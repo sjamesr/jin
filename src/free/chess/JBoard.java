@@ -983,11 +983,11 @@ public class JBoard extends JComponent{
       Square to = highlightedMove.getEndingSquare();
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
-          drawSquare(g, from, 2, getMoveHighlightingColor());
-          drawSquare(g, to, 2, getMoveHighlightingColor());
+          drawSquare(g, from, 3, getMoveHighlightingColor());
+          drawSquare(g, to, 4, getMoveHighlightingColor());
         }
         else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
-          drawArrow(g, from, to, 5, getMoveHighlightingColor());
+          drawArrow(g, from, to, 6, getMoveHighlightingColor());
       }
     }
 
