@@ -43,14 +43,6 @@ public class ActionsPlugin extends Plugin{
   
   
   /**
-   * The plugin's menu, listing all the actions.
-   */
-   
-  private final JMenu menu = new JMenu("Actions");
-  
-  
-  
-  /**
    * The ui container for the action buttons.
    */
    
@@ -96,7 +88,6 @@ public class ActionsPlugin extends Plugin{
     buttonContainer = createButtonContainer();
     
     addActionButtons();
-    addActionMenuItems();
   }
   
   
@@ -133,43 +124,6 @@ public class ActionsPlugin extends Plugin{
     
     buttonContainer.getContentPane().setLayout(new BorderLayout());
     buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
-  }
-  
-  
-  
-  /**
-   * Adds all the actions to the plugin's menu.
-   */
-   
-  private void addActionMenuItems(){
-    menu.addSeparator();
-    ListModel actions = getActions();
-    for (int i = 0; i < actions.getSize(); i++){
-      JinAction action = (JinAction)actions.getElementAt(i);
-      JMenuItem menuItem = new JMenuItem(action.getName());
-      menuItem.addActionListener(action);
-      menu.add(menuItem);
-    }
-  }
-  
-  
-  
-  /**
-   * Returns the menu for this plugin.
-   */
-   
-  public JMenu getPluginMenu(){
-    return menu;
-  }
-  
-  
-  
-  /**
-   * Saves the plugin's state into preferences.
-   */
-   
-  public void saveState(){
-    getPrefs().setBool("visible", buttonContainer.isVisible());     
   }
   
   
