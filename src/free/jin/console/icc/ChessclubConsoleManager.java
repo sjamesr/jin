@@ -21,9 +21,10 @@
 
 package free.jin.console.icc;
 
-import free.jin.console.*;
+import free.jin.console.Console;
+import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
-import free.jin.PreferencesPanel;
+import free.jin.ui.PreferencesPanel;
 
 
 /**
@@ -166,7 +167,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
 
   public PreferencesPanel getPreferencesUI(){
-    return new ChannelConsolePreferencesPanel(this);
+    return new ChessclubConsolePrefsPanel(this);
   }
 
 
