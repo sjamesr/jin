@@ -1,7 +1,7 @@
 /**
  * The chess framework library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The chess framework library is free software; you can redistribute
@@ -467,6 +467,26 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
   /**
+   * Creates a <code>Move</code> object representing a move just like the
+   * specified one, but made in the specified position.
+   */
+
+  public Move createMove(Position pos, Move move){
+    checkPosition(pos);
+
+    if (!(move instanceof ChessMove))
+      throw new IllegalArgumentException("Wrong move type: "+move.getClass());
+
+    ChessMove cmove = (ChessMove)move;
+    return createMove(pos, cmove.getStartingSquare(), cmove.getEndingSquare(),
+      cmove.getPromotionTarget(), cmove.getStringRepresentation());
+  }
+
+
+
+
+
+  /**
    * Creates a short castling move for the current player in the specified
    * position.
    */
@@ -525,7 +545,7 @@ public class ChesslikeGenericVariant implements WildVariant{
                         // be of this wild variant anyway.
 
     if (!(move instanceof ChessMove))
-      throw new IllegalArgumentException("Wrong piece type: "+move.getClass());
+      throw new IllegalArgumentException("Wrong move type: "+move.getClass());
 
     ChessMove cmove = (ChessMove)move;
 

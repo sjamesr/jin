@@ -148,16 +148,38 @@ public class Kriegspiel implements WildVariant{
 
     checkPosition(pos);
 
-    if (endSquare==null){
+    if (endSquare == null){
       return new KriegspielMove(pos.getCurrentPlayer(), stringRepresentation);
     }
-    else if (startSquare==null){
+    else if (startSquare == null){
       return new KriegspielMove(pos, endSquare, stringRepresentation);
     } 
     else{
       return new ChessMove(pos, startSquare, endSquare, (ChessPiece)promotionTarget, stringRepresentation);
     }
   }
+
+
+
+
+  /**
+   * Creates a <code>Move</code> object representing a move just like the
+   * specified one, but made in the specified position.
+   */
+
+  public Move createMove(Position pos, Move move){
+    checkPosition(pos);
+
+    if (move instanceof ChessMove){
+      ChessMove cmove = (ChessMove)move;
+      return createMove(pos, cmove.getStartingSquare(), cmove.getEndingSquare(),
+        cmove.getPromotionTarget(), cmove.getStringRepresentation());
+    }
+    else
+      return createMove(pos, move.getStartingSquare(), move.getEndingSquare(),
+        null, move.getStringRepresentation());
+  }
+
 
 
 
