@@ -30,12 +30,11 @@ import java.awt.event.ActionEvent;
 import free.jin.DialogPanel;
 import free.jin.UIProvider;
 import free.jin.action.JinAction;
-import free.jin.action.ActionContext;
 import free.workarounds.FixedJTextField;
 
 
 /**
- * An action which displays a dialog where the user can type a question, which
+ * An action which displays a panel where the user can type a question, which
  * is then sent to the server's help channel.
  */
 
@@ -64,16 +63,11 @@ public class AskQuestionAction extends JinAction{
   
   
   /**
-   * Overrides <code>setContext</code> to make sure the context is of a
-   * supported server.
+   * Returns an array containing <code>"icc"</code> and <code>"fics"</code>.
    */
    
-  public void setContext(ActionContext context){
-    super.setContext(context);
-    
-    String serverId = getServer().getId();
-    if ((!"icc".equals(serverId)) && (!"fics".equals(serverId)))
-      throw new IllegalArgumentException("Unsupported server: " + getServer());
+  protected String [] getSupportedServers(){
+    return new String[]{"icc", "fics"};
   }
   
   
@@ -86,7 +80,7 @@ public class AskQuestionAction extends JinAction{
     String question = new QuestionPanel().getQuestion(getUIProvider());
     
     if ((question != null) && !"".equals(question.trim()))
-      getConn().sendCommand("tell 1 * " + question);
+      getConn().sendHelpQuestion(question);
   }
   
   
