@@ -23,7 +23,9 @@ package free.jin.plugin;
 
 import free.jin.*;
 import javax.swing.JMenu;
+import javax.swing.ListModel;
 import free.util.MemoryFile;
+import free.jin.action.JinAction;
 
 
 /**
@@ -226,6 +228,38 @@ public abstract class Plugin{
         plugins[i].setPaused(isPaused);
     }
   }
+  
+  
+  
+  /**
+   * Returns a list of available actions. Listeners to the
+   * <code>ListModel</code> will receive notification when actions are added.
+   */
+   
+  public ListModel getActions(){
+    return context.getActions();
+  }
+  
+  
+  
+  /**
+   * Returns the action with the specified id, or <code>null</code> if no action
+   * with the specified id is available.
+   */
+   
+  public JinAction getAction(String id){
+    return context.getAction(id);
+  }
+  
+  
+  
+  /**
+   * Exports the specified <code>JinAction</code> to the other plugins.
+   */
+   
+  public void exportAction(JinAction action){
+    context.addAction(action);
+  }
    
    
 
@@ -273,13 +307,12 @@ public abstract class Plugin{
 
 
   /**
-   * Creates and returns a menu for this plugin. Returns <code>null</code> to
-   * indicate that the plugin doesn't have a menu. The actual placing of the
-   * menu is handled by the context. The default implementation returns
-   * <code>null</code>.
+   * Returns a menu for this plugin. Returns <code>null</code> to indicate that
+   * the plugin doesn't have a menu. The actual placing of the menu is handled
+   * by the context. The default implementation returns <code>null</code>.
    */
 
-  public JMenu createPluginMenu(){
+  public JMenu getPluginMenu(){
     return null;
   }
 
@@ -292,9 +325,9 @@ public abstract class Plugin{
   public String toString(){
     return getName();
   }
-
-
-
+  
+  
+ 
   /**
    * This method is invoked to signal to the plugin to start its activity. The
    * default implementation does nothing. The plugin may throw a

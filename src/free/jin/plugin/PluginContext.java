@@ -23,7 +23,10 @@ package free.jin.plugin;
 
 import free.jin.*;
 import java.util.Hashtable;
+import javax.swing.ListModel;
+import javax.swing.DefaultListModel;
 import free.util.Utilities;
+import free.jin.action.JinAction;
 
 
 /**
@@ -73,6 +76,14 @@ public class PluginContext{
    */
 
   private final Preferences [] prefs;
+  
+  
+  
+  /**
+   * A list of the actions in this session.
+   */
+   
+  private final DefaultListModel actions = new DefaultListModel();
 
 
 
@@ -98,12 +109,15 @@ public class PluginContext{
    */
 
   public PluginContext(JinContext context, Connection conn, User user,
-      Plugin [] plugins, Preferences [] prefs){
+      Plugin [] plugins, Preferences [] prefs, JinAction [] actions){
     this.context = context;
     this.conn = conn;
     this.user = user;
     this.plugins = plugins;
     this.prefs = prefs;
+    
+    for (int i = 0; i < actions.length; i++)
+      this.actions.addElement(actions[i]);
   }
 
 
@@ -187,6 +201,45 @@ public class PluginContext{
     }
 
     return result;
+  }
+  
+  
+  
+  /**
+   * Returns a list of currently available actions. Listeners to the
+   * <code>ListModel</code> will receive notification when actions are added.
+   */
+   
+  public ListModel getActions(){
+    return actions;
+  }
+  
+  
+  
+  /**
+   * Returns the action with the specified id, or <code>null</code> if no such
+   * action is available.
+   */
+   
+  public JinAction getAction(String id){
+    int size = actions.size();
+    for (int i = 0; i < size; i++){
+      JinAction action = (JinAction)actions.elementAt(i);
+      if (action.getId().equals(id))
+        return action;
+    }
+    
+    return null;
+  }
+  
+  
+  
+  /**
+   * Adds the specified action to the list of available actions.
+   */
+  
+  public void addAction(JinAction action){
+    actions.addElement(action);
   }
 
 
