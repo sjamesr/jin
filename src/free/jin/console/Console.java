@@ -1014,32 +1014,38 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   public void keyPressed(KeyEvent evt){
     if ((evt.getSource()==inputComponent)){
-      if (evt.getID()==KeyEvent.KEY_PRESSED){
+      if (evt.getID() == KeyEvent.KEY_PRESSED){
         long modifiers = evt.getModifiers();
-        if ((modifiers & KeyEvent.CTRL_MASK) != 0){
-          JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
-          Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
-          int value = vscrollbar.getValue();
-          switch (evt.getKeyCode()){
-            case KeyEvent.VK_UP:
+        boolean isCtrlDown = (modifiers & KeyEvent.CTRL_MASK) != 0;
+        JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
+        Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
+        int value = vscrollbar.getValue();
+
+        switch (evt.getKeyCode()){
+          case KeyEvent.VK_UP:
+            if (isCtrlDown){
               vscrollbar.setValue(value - outputComponent.getScrollableUnitIncrement(viewRect, SwingConstants.VERTICAL, -1));
-              break;
-            case KeyEvent.VK_DOWN:
+            }
+            break;
+          case KeyEvent.VK_DOWN:
+            if (isCtrlDown){
               vscrollbar.setValue(value + outputComponent.getScrollableUnitIncrement(viewRect, SwingConstants.VERTICAL, +1));
-              break;
-            case KeyEvent.VK_PAGE_UP:
-              vscrollbar.setValue(value - outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, -1));
-              break;
-            case KeyEvent.VK_PAGE_DOWN:
-              vscrollbar.setValue(value + outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, -1));
-              break;
-            case KeyEvent.VK_HOME:
+            }
+            break;
+          case KeyEvent.VK_PAGE_UP:
+            vscrollbar.setValue(value - outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, -1));
+            break;
+          case KeyEvent.VK_PAGE_DOWN:
+            vscrollbar.setValue(value + outputComponent.getScrollableBlockIncrement(viewRect, SwingConstants.VERTICAL, +1));
+            break;
+          case KeyEvent.VK_HOME:
+            if (isCtrlDown)
               vscrollbar.setValue(vscrollbar.getMinimum());
-              break;
-            case KeyEvent.VK_END:
+            break;
+          case KeyEvent.VK_END:
+            if (isCtrlDown)
               vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
-              break;
-          }
+            break;
         }
       }
     }
