@@ -419,6 +419,17 @@ public class JinFrame extends JFrame{
 
     // Bugfix
     menubar.repaint();
+
+    // Bugfix - otherwise the menubar stops responding to mnemonics, at least
+    //          until the focus is given to it by the user or the frame is
+    //          deactivated and then activated again. Also, at least under 1.4,
+    //          events for repainting the caret keep being dispatched, although
+    //          the target text field shouldn't exist anymore.
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run(){
+        getJMenuBar().grabFocus();
+      }
+    });
   }
 
 
