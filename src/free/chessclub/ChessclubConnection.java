@@ -588,7 +588,7 @@ public class ChessclubConnection extends free.util.Connection{
    * the login procedure.
    */
 
-  public final synchronized void setInterface(String interfaceVar){
+  public synchronized final void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
     this.interfaceVar = interfaceVar;
