@@ -124,8 +124,9 @@ public class ChannelConsolePreferencesPanel extends ConsolePreferencesPanel{
     Font font = getCategoryFont(mainCategory);
     Color foreground = StringParser.parseColor(lookupProperty("foreground."+mainCategory));
     Color background = StringParser.parseColor(lookupProperty("background"));
+    boolean antialias = new Boolean(getProperty("output-text.antialias")).booleanValue();
 
-    TextStyleChooserPanel textStyleChooser = new TextStyleChooserPanel(font, foreground, background, false);
+    TextStyleChooserPanel textStyleChooser = new TextStyleChooserPanel(font, foreground, background, antialias, false, false);
 
     return new ChannelsCategoryPanel(categoryName, textStyleChooser, categoryIDs, channelsCount);    
   }
