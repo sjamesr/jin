@@ -229,6 +229,8 @@ public class Datagram{
   public static final int DG_RETRACT                 = 99;
   public static final int DG_MY_GAME_CHANGE          = 100;
   public static final int DG_POSITION_BEGIN          = 101;
+  public static final int DG_TOURNEY                 = 103;
+  public static final int DG_REMOVE_TOURNEY          = 104;
   public static final int DG_DIALOG_START            = 105;
   public static final int DG_DIALOG_DATA             = 106;
   public static final int DG_DIALOG_DEFAULT          = 107;
