@@ -816,6 +816,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             game.getBlackInc(), false, game.getWhiteRating(), game.getBlackRating(), game.getID(),
             game.getWhiteTitles(), game.getBlackTitles());
         }
+        else if (game.getGameType() == Game.ISOLATED_BOARD){
+          fireGameEvent(new GameEndEvent(this, game, result));
+        }
+
 
       } catch (IllegalStateException e){
           e.printStackTrace();
@@ -845,6 +849,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     Game game = gameInfo.game;
 
     int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+    if (game.getResult() == Game.GAME_IN_PROGRESS) // Make sure the game doesn't remain in progress
+      game.setResult(result);
+
     fireGameEvent(new GameEndEvent(this, game, result));
 
     Game newGame = new Game(gameType, game.getInitialPosition(), whiteName, blackName,
@@ -905,11 +912,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       gameNumbersToGameInfo.put(new Integer(gameNumber), gameInfo);
 
       fireGameEvent(new GameStartEvent(this, newGame));
-
-      // We need to do this because if numMovesToFollow is already 0, we won't get any DG_SEND_MOVES datagrams.
-      if ((gameInfo.numMovesToFollow == 0) && (gameInfo.game.getGameType() == Game.ISOLATED_BOARD)){
-        fireGameEvent(new GameEndEvent(this, newGame, Game.UNKNOWN_RESULT));
-      }
     }
     else{ // This can happen during an examined game on a "p@a2", "clearboard" and "loadgame" for example.
       try{
@@ -953,6 +955,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       unechoedMoves.remove(game);
 
       int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+      if (game.getResult() == Game.GAME_IN_PROGRESS) // Make sure the game doesn't stay in progress...
+        game.setResult(result);
+
       fireGameEvent(new GameEndEvent(this, game, result));
     }
     else{
@@ -1007,10 +1012,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
-        if ((gameInfo.numMovesToFollow == 0) && (gameInfo.game.getGameType() == Game.ISOLATED_BOARD)){
-          int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
-          fireGameEvent(new GameEndEvent(this, game, result));
-        }
       }
       else{
         Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
