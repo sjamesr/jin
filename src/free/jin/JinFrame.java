@@ -285,6 +285,7 @@ public class JinFrame extends JFrame{
       if (pluginMenu != null)
         pluginsMenu.add(pluginMenu);
     }
+    // Bugfix
     menubar.invalidate();
     menubar.validate();
 
@@ -394,7 +395,10 @@ public class JinFrame extends JFrame{
     connsToUsers.remove(conn);
 
     System.out.println("Removing plugins menu");
-    getJinFrameMenuBar().removePluginsMenu(conn);
+    JinFrameMenuBar menubar = getJinFrameMenuBar();
+    menubar.removePluginsMenu(conn);
+    // Bugfix
+    menubar.repaint();
   }
 
 

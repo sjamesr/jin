@@ -283,7 +283,12 @@ public class JinFrameMenuBar extends JMenuBar{
    */
 
   public void removePluginsMenu(JinConnection conn){
-    pluginsMenus.remove(conn);
+    JMenu pluginsMenu = (JMenu)pluginsMenus.remove(conn);
+
+    if (currentlyVisiblePluginsMenu == pluginsMenu){
+      remove(currentlyVisiblePluginsMenu);
+      currentlyVisiblePluginsMenu = null;
+    }
   }
 
 
@@ -297,7 +302,7 @@ public class JinFrameMenuBar extends JMenuBar{
   public void makePluginsMenuVisible(JinConnection conn){
     JMenu menu = (JMenu)pluginsMenus.get(conn);
     
-    if (currentlyVisiblePluginsMenu==menu)
+    if (currentlyVisiblePluginsMenu == menu)
       return;
     if (currentlyVisiblePluginsMenu!=null){
       int index = getComponentIndex(currentlyVisiblePluginsMenu);
