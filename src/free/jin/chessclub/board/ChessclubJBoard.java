@@ -528,6 +528,9 @@ public class ChessclubJBoard extends JBoard implements PaintHook{
     if ((evt.getModifiers()&MouseEvent.BUTTON3_MASK) != MouseEvent.BUTTON3_MASK)
       return;
 
+    if (!isArrowCircleEnabled())
+      return;
+
     int x = evt.getX();
     int y = evt.getY();
 
@@ -561,6 +564,9 @@ public class ChessclubJBoard extends JBoard implements PaintHook{
 
     // Only take into account the right mouse button
     if ((evt.getModifiers()&MouseEvent.BUTTON3_MASK) != MouseEvent.BUTTON3_MASK)
+      return;
+
+    if (!isArrowCircleEnabled())
       return;
 
     int x = evt.getX();
