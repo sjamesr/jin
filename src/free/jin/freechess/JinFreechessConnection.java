@@ -190,7 +190,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processPersonalTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tell", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "tell", username,
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -203,7 +204,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processSayTell(String username, String titles, int gameNumber, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "say", username, (titles == null ? "" : titles), message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(new ChatEvent(this, "say", username,
+      (titles == null ? "" : titles), -1, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -216,7 +218,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processPTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", username,
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -228,8 +231,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate ChatEvent.
    */
 
-  protected boolean processChannelTell(String username, String titles, int channelNumber, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", username, (titles == null ? "" : titles), message, new Integer(channelNumber)));
+  protected boolean processChannelTell(String username, String titles, int channelNumber, 
+      String message){
+
+    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", username,
+      (titles == null ? "" : titles), -1, message, new Integer(channelNumber)));
 
     return true;
   }
@@ -241,13 +247,14 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate ChatEvent.
    */
 
-  protected boolean processKibitz(String username, String titles, int rating, int gameNumber, String message){
+  protected boolean processKibitz(String username, String titles, int rating, int gameNumber,
+      String message){
+
     if (titles == null)
       titles = "";
-    if (rating != -1)
-      titles = titles+"("+rating+")";
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "kibitz", username, titles, message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(
+      new ChatEvent(this, "kibitz", username, titles, rating, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -259,13 +266,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate ChatEvent.
    */
 
-  protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){
+  protected boolean processWhisper(String username, String titles, int rating, int gameNumber,
+      String message){
     if (titles == null)
       titles = "";
-    if (rating != -1)
-      titles = titles+"("+rating+")";
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "whisper", username, titles, message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(
+      new ChatEvent(this, "whisper", username, titles, rating, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -278,7 +285,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processQTell(String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "qtell", null, null, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "qtell", null, null, -1, message, null));
 
     return true;
   }
@@ -292,7 +299,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "shout", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "shout", username,
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -305,7 +313,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processIShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", username,
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -318,7 +327,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processTShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", username, 
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -331,7 +341,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processCShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", username, (titles == null ? "" : titles), message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", username, 
+      (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -344,7 +355,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processAnnouncement(String username, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "announcement", username, "", message, null));
+    listenerManager.fireChatEvent(
+      new ChatEvent(this, "announcement", username, "", -1, message, null));
 
     return true;
   }
@@ -420,6 +432,20 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   private final Hashtable unechoedMoves = new Hashtable(1);
 
 
+
+
+  /**
+   * Returns the Game object currently assosiated with the specified game
+   * number. Returns <code>null</code> if there is no such game.
+   */
+
+  public Game getGame(int gameNumber){
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(new Integer(gameNumber));
+    if (gameData == null)
+      return null;
+
+    return gameData.game;
+  }
 
 
   /**
