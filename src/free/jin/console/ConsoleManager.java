@@ -21,21 +21,23 @@
 
 package free.jin.console;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.GameListConnection;
+import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import java.awt.*;
-import javax.swing.border.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import free.jin.plugin.Plugin;
-import free.jin.PreferencesPanel;
 import free.jin.plugin.PluginUIContainer;
+import free.jin.ui.PreferencesPanel;
+import free.jin.ui.UIProvider;
+
+import java.awt.*;
 import java.net.URL;
 import java.util.Vector;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.*;
 
 
 /**
@@ -44,6 +46,30 @@ import java.util.Vector;
  */
 
 public class ConsoleManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListListener{
+  
+  
+  
+  /**
+   * The constant specifying "embedded" game lists display style.
+   */
+  
+  public static final int EMBEDDED_GAME_LISTS = 0;
+  
+  
+  
+  /**
+   * The constant specifying "external" game lists display style.
+   */
+  
+  public static final int EXTERNAL_GAME_LISTS = 1;
+  
+  
+  
+  /**
+   * The constant specifying that game lists aren't displayed specially.
+   */
+  
+  public static final int NO_GAME_LISTS = 2;
 
 
   
@@ -64,10 +90,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * The current game list table display style.
+   * The current game lists display style.
    */
 
-  protected String gameListDisplayStyle;
+  private int gameListsDisplayStyle;
   
   
   
@@ -114,7 +140,13 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected void initState(){
-    gameListDisplayStyle = getPrefs().getString("game-list-display-style", "embedded");
+    String gameListsDisplayStyleString = getPrefs().getString("game-list-display-style", "embedded");
+    if ("embedded".equals(gameListsDisplayStyleString))
+      setGameListsDisplayStyle(EMBEDDED_GAME_LISTS);
+    else if ("framed".equals(gameListsDisplayStyleString))
+      setGameListsDisplayStyle(EXTERNAL_GAME_LISTS);
+    else if ("none".equals(gameListsDisplayStyleString))
+      setGameListsDisplayStyle(NO_GAME_LISTS);
   }
 
 
@@ -126,14 +158,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   private void openConsole(){
     console = createConsole();
 
-    consoleContainer = createContainer("");
+    consoleContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
     consoleContainer.setTitle("Main Console");
 
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
       consoleContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
-
-    consoleContainer.setCloseOperation(PluginUIContainer.CLOSE_SESSION_ON_CLOSE);
 
     Container content = consoleContainer.getContentPane();
     content.setLayout(new BorderLayout());
@@ -151,91 +181,66 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   protected Console createConsole(){
     return new Console(getConn(), getPrefs());
   }
-
-
-
+  
+  
+  
   /**
-   * Creates and returns the JMenu for this plugin.
+   * Sets the current game lists display style to the specified value. Possible
+   * values are <code>EMBEDDED_GAME_LISTS</code>,
+   * <code>EXTERNAL_GAME_LISTS</code> and <code>NO_GAME_LISTS</code>. 
    */
-
-  public JMenu getPluginMenu(){
-    JMenu myMenu = new JMenu("Console");
-
-    if (getConn() instanceof GameListConnection){
-      JMenu gameListDisplayStyleMenu = new JMenu("Game lists display style");
-      gameListDisplayStyleMenu.setMnemonic('g');
-
-      JCheckBoxMenuItem embeddedCB = new JCheckBoxMenuItem("Embedded", gameListDisplayStyle.equalsIgnoreCase("embedded"));
-      JCheckBoxMenuItem framedCB = new JCheckBoxMenuItem("Framed", gameListDisplayStyle.equalsIgnoreCase("framed"));
-      JCheckBoxMenuItem noneCB = new JCheckBoxMenuItem("None", gameListDisplayStyle.equalsIgnoreCase("none"));
-      embeddedCB.setActionCommand("embedded");
-      framedCB.setActionCommand("framed");
-      noneCB.setActionCommand("none");
-      embeddedCB.setMnemonic('E');
-      framedCB.setMnemonic('F');
-      noneCB.setMnemonic('N');
-      ButtonGroup gameListDisplayStyleCBGroup = new ButtonGroup();
-      gameListDisplayStyleCBGroup.add(embeddedCB);
-      gameListDisplayStyleCBGroup.add(framedCB);
-      gameListDisplayStyleCBGroup.add(noneCB);
-
-      ActionListener gameListDisplayStyleListener = new ActionListener(){
-        
-        public void actionPerformed(ActionEvent evt){
-          String actionCommand = evt.getActionCommand();
-          if (actionCommand.equals(gameListDisplayStyle))
-            return;
-          String oldStyle = gameListDisplayStyle;
-          gameListDisplayStyle = actionCommand;
-
-          GameListListenerManager listenerManager = ((GameListConnection)getConn()).getGameListListenerManager();
-
-          if (gameListDisplayStyle.equals("none"))
-            listenerManager.removeGameListListener(ConsoleManager.this);
-          else if (oldStyle.equalsIgnoreCase("none"))
-            listenerManager.addGameListListener(ConsoleManager.this);
-        }
-      };
-
-      embeddedCB.addActionListener(gameListDisplayStyleListener);
-      framedCB.addActionListener(gameListDisplayStyleListener);
-      noneCB.addActionListener(gameListDisplayStyleListener);
-
-      gameListDisplayStyleMenu.add(embeddedCB);
-      gameListDisplayStyleMenu.add(framedCB);
-      gameListDisplayStyleMenu.add(noneCB);
-
-      myMenu.add(gameListDisplayStyleMenu);
+  
+  public void setGameListsDisplayStyle(int style){
+    switch (style){
+      case EMBEDDED_GAME_LISTS:
+      case EXTERNAL_GAME_LISTS:
+      case NO_GAME_LISTS:
+        break;
+      default:
+        throw new IllegalArgumentException("Bad game lists display style value: " + style);
     }
 
-    JMenuItem clearMenuItem = new JMenuItem("Clear Console");
-    clearMenuItem.setMnemonic('l');
-    clearMenuItem.setAccelerator(
-      KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-    clearMenuItem.addActionListener(new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        console.clear();
-      }
-
-    });
-    myMenu.add(clearMenuItem);
-
-
-    JCheckBoxMenuItem copyOnSelectCB 
-      = new JCheckBoxMenuItem("Copy on Select", getPrefs().getBool("copyOnSelect", true));
-    copyOnSelectCB.setMnemonic('C');
-    copyOnSelectCB.addChangeListener(new ChangeListener(){
-      
-      public void stateChanged(ChangeEvent evt){
-        JCheckBoxMenuItem source = (JCheckBoxMenuItem)evt.getSource();
-        getPrefs().setBool("copyOnSelect", source.isSelected());
-      }
+    if (getConn() instanceof GameListConnection){
+      GameListListenerManager listenerManager = ((GameListConnection)getConn()).getGameListListenerManager();
   
-    });
-    myMenu.add(copyOnSelectCB);
-
-    return myMenu;
+      if (style == NO_GAME_LISTS)
+        listenerManager.removeGameListListener(ConsoleManager.this);
+      else if (gameListsDisplayStyle == NO_GAME_LISTS)
+        listenerManager.addGameListListener(ConsoleManager.this);
+    }
+    
+    this.gameListsDisplayStyle = style;
+  }
+  
+  
+  
+  /**
+   * Returns the current game lists display style.
+   */
+  
+  public int getGameListsDisplayStyle(){
+    return gameListsDisplayStyle;
+  }
+  
+  
+  
+  /**
+   * Sets whether text is copied to the clipboard automatically, upon selection.
+   */
+  
+  public void setCopyOnSelect(boolean isCopyOnSelect){
+    getPrefs().setBool("copyOnSelect", isCopyOnSelect);
+  }
+  
+  
+  
+  /**
+   * Returns whether text is copied to the clipboard automatically, upon
+   * selection.
+   */
+  
+  public boolean isCopyOnSelect(){
+    return getPrefs().getBool("copyOnSelect", true);
   }
 
 
@@ -264,7 +269,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
 
-    if ((conn instanceof GameListConnection) && !gameListDisplayStyle.equalsIgnoreCase("none"))
+    if ((conn instanceof GameListConnection) && (getGameListsDisplayStyle() != NO_GAME_LISTS))
       ((GameListConnection)conn).getGameListListenerManager().addGameListListener(this);
   }
 
@@ -283,7 +288,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     listenerManager.removeChatListener(this);
     listenerManager.removeConnectionListener(this);
 
-    if ((conn instanceof GameListConnection) && !gameListDisplayStyle.equalsIgnoreCase("none"))
+    if ((conn instanceof GameListConnection) && (getGameListsDisplayStyle() != NO_GAME_LISTS))
       ((GameListConnection)conn).getGameListListenerManager().removeGameListListener(this);
   } 
 
@@ -481,7 +486,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     // See bug https://sourceforge.net/tracker/index.php?func=detail&aid=602496&group_id=50386&atid=459537
     scrollPane.setColumnHeaderView(table.getTableHeader());
 
-    if (gameListDisplayStyle.equals("embedded")){
+    if (getGameListsDisplayStyle() == EMBEDDED_GAME_LISTS){
       scrollPane.setBorder(new TitledBorder(title));
       int maxHeight = (console.getOutputArea().height - 40) * 2/3;
       if (scrollPane.getPreferredSize().height > maxHeight)
@@ -494,7 +499,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       console.addToOutput(scrollPane);
     }
     else{
-      PluginUIContainer container = createContainer(null);
+      PluginUIContainer container = createContainer(null, UIProvider.CLOSEABLE_CONTAINER_MODE);
       container.setTitle(title);
 
       Container content = container.getContentPane();
@@ -512,8 +517,17 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void saveState(){
-    if (getConn() instanceof GameListConnection)
-      getPrefs().setString("game-list-display-style", gameListDisplayStyle);
+    if (getConn() instanceof GameListConnection){
+      String displayStyleString;
+      switch (getGameListsDisplayStyle()){
+        case EMBEDDED_GAME_LISTS: displayStyleString = "embedded"; break;
+        case EXTERNAL_GAME_LISTS: displayStyleString = "framed"; break;
+        case NO_GAME_LISTS: displayStyleString = "none"; break;
+        default:
+          throw new IllegalStateException("Bad gameListsDisplayStyle value");
+      }
+      getPrefs().setString("game-list-display-style", displayStyleString);
+    }
   }
 
 
@@ -557,7 +571,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public PreferencesPanel getPreferencesUI(){
-    return new ConsolePreferencesPanel(this);
+    return new ConsolePrefsPanel(this);
   }
 
 
