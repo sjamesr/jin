@@ -29,12 +29,10 @@ import java.awt.event.ActionListener;
 
 
 /**
- * A fix of JTextField. Fixes the following bugs:
+ * A fix of JTextArea. Fixes the following bugs:
  * <UL>
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html">
  *        Ibeam cursor not appearing on TextField or TextArea in editmode</A>.
- *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4133908.html">
- *        <Enter> in JTextComponent should activate DefaultButton</A>.
  * </UL>
  */
 
@@ -84,25 +82,6 @@ public class FixedJTextArea extends JTextArea{
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html
-
-  }
-
-
-
-  protected void processComponentKeyEvent(KeyEvent evt){
-    
-    // http://developer.java.sun.com/developer/bugParade/bugs/4133908.html
-
-    if ((evt.getKeyCode()==KeyEvent.VK_ENTER)&&(listenerList.getListenerCount(ActionListener.class)==0))
-      return;
-
-      // Removes AWT compatibility regarding pressing ENTER generating an 
-      // ActionEvent if there are no registered listeners.
-    
-
-    super.processComponentKeyEvent(evt);
-
-    // http://developer.java.sun.com/developer/bugParade/bugs/4133908.html
 
   }
 
