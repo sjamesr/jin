@@ -94,6 +94,16 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * <code>true</code> when seek information is turned on, <code>false</code>
+   * when off.
+   */
+
+  private boolean seekInfoOn = false;
+
+
+
+
+  /**
    * The value we're supposed to assign to the interface variable during login.
    */
 
@@ -147,12 +157,36 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * the login procedure.
    */
 
-  public final synchronized void setInterface(String interfaceVar){
+  public synchronized final void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
 
     this.interfaceVar = interfaceVar;
   }
+
+
+
+
+  /**
+   * Sets the state of seek information sending. If the passed argument is
+   * <code>true</code>, the server will be asked to send seek information, if
+   * <code>false</code>, it will be asked not to send it. If the
+   * FreechessConnection is not logged on yet, the setting will be saved and
+   * sent to the server on login.
+   */
+
+  public synchronized final void setSeekInfoState(boolean state){
+    if (seekInfoOn == state)
+      return;
+
+    seekInfoOn = state;
+
+    if (isLoggedIn()){
+      sendCommand("iset seekinfo " + (seekInfoOn ? "1" : "0"));
+      sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0")); // This is not really needed, but "help iv_seekinfo" says it is.
+    }
+  }
+
 
 
 
@@ -206,6 +240,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     sendCommand("set interface "+interfaceVar);
     sendCommand("iset nowrap 1");
     sendCommand("iset ms 1");
+    if (seekInfoOn){
+      sendCommand("iset seekinfo 1");
+      sendCommand("iset seekremove 1"); // This is not really needed, but "help iv_seekinfo" says it is, so we'll do it :-)
+    }
 //    sendCommand("iset lock 1");
   }
 
@@ -292,6 +330,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (handleStyle12(line))
       return;
     if (handleDeltaBoard(line))
+      return;
+    if (handleSeeksCleared(line))
+      return;
+    if (handleSeekAdded(line))
+      return;
+    if (handleSeeksRemoved(line))
       return;
     if (handleGameEnd(line))
       return;
@@ -402,7 +446,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a personal tell arrives. 
+   * This method is called when a personal tell is received. 
    */
 
   protected boolean processPersonalTell(String username, String titles, String message){return false;}
@@ -447,7 +491,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a "say" tell arrives. The
+   * This method is called when a "say" tell is received. The
    * <code>gameNumber</code> argument will contain -1 if the game number was not
    * specified.
    */
@@ -491,7 +535,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a "ptell" tell arrives. 
+   * This method is called when a "ptell" tell is received. 
    */
 
   protected boolean processPTell(String username, String titles, String message){return false;}
@@ -536,7 +580,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a channel tell arrives. 
+   * This method is called when a channel tell is received. 
    */
 
   protected boolean processChannelTell(String username, String titles, int channelNumber, String message){return false;}
@@ -583,8 +627,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a kibitz arrives. The rating argument contains
-   * -1 if the player is unrated or otherwise doesn't have a rating.
+   * This method is called when a kibitz is received. The rating argument
+   * contains -1 if the player is unrated or otherwise doesn't have a rating.
    */
 
   protected boolean processKibitz(String username, String titles, int rating, int gameNumber, String message){return false;}
@@ -632,8 +676,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a whisper arrives. The rating argument contains
-   * -1 if the player is unrated or otherwise doesn't have a rating.
+   * This method is called when a whisper is received. The rating argument
+   * contains -1 if the player is unrated or otherwise doesn't have a rating.
    */
 
   protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){return false;}
@@ -675,7 +719,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a shout arrives. 
+   * This method is called when a shout is received. 
    */
 
   protected boolean processShout(String username, String titles, String message){return false;}
@@ -717,7 +761,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when an "ishout" arrives. 
+   * This method is called when an "ishout" is received. 
    */
 
   protected boolean processIShout(String username, String titles, String message){return false;}
@@ -760,7 +804,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a "tshout" arrives. 
+   * This method is called when a "tshout" is received. 
    */
 
   protected boolean processTShout(String username, String titles, String message){return false;}
@@ -803,7 +847,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a "cshout" arrives. 
+   * This method is called when a "cshout" is received. 
    */
 
   protected boolean processCShout(String username, String titles, String message){return false;}
@@ -844,7 +888,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when an announcement arrives. 
+   * This method is called when an announcement is received. 
    */
 
   protected boolean processAnnouncement(String username, String message){return false;}
@@ -883,8 +927,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a gameinfo line arrives. To turn gameinfo lines
-   * on, use <code>sendCommand("iset gameinfo 1")</code>
+   * This method is called when a gameinfo line is received. To turn gameinfo
+   * lines on, use <code>sendCommand("iset gameinfo 1")</code>
    */
 
   protected boolean processGameInfo(GameInfoStruct data){return false;}
@@ -924,7 +968,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a style12 line arrives. To turn on style 12,
+   * This method is called when a style12 line is received. To turn on style 12,
    * use <code>setStyle(12)</code>.
    */
 
@@ -964,10 +1008,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a delta board line arrives. To turn delta board
-   * on, use <code>sendCommand("iset compressmove 1")</code>. Note, however,
-   * that it will disable the sending of a full board (like a style12 board) in
-   * some cases.
+   * This method is called when a delta board line is received. To turn delta
+   * board on, use <code>sendCommand("iset compressmove 1")</code>. Note,
+   * however, that it will disable the sending of a full board (like a style12
+   * board) in some cases.
    */
 
   protected boolean processDeltaBoard(DeltaBoardStruct data){return false;}
@@ -1012,7 +1056,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a game end line arrives.
+   * This method is called when a game end line is received.
    */
 
   protected boolean processGameEnd(int gameNumber, String whiteName, String blackName, String reason, String result){return false;}
@@ -1055,7 +1099,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a line specifying that we've stopped observing a
-   * game arrives.
+   * game is received.
    */
 
   protected boolean processStoppedObserving(int gameNumber){return false;}
@@ -1098,7 +1142,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a line specifying that we've stopped examining a
-   * game arrives.
+   * game is received.
    */
 
   protected boolean processStoppedExamining(int gameNumber){return false;}
@@ -1140,11 +1184,140 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a line specifying that an illegal move has been
-   * attempted. The specified string is the move string that was sent to the
-   * server.
+   * attempted is received. The specified string is the move string that was
+   * sent to the server.
    */
 
   protected boolean processIllegalMove(String moveString){return false;}
+
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that all seeks have been
+   * cleared.
+   */
+
+  private static final Pattern seeksClearedPattern = new Pattern("^<sc>$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that all seeks have been cleared.
+   */
+
+  private boolean handleSeeksCleared(String line){
+    Matcher matcher = seeksClearedPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    if (!processSeeksCleared())
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that all seeks have been
+   * cleared is received.
+   */
+
+  protected boolean processSeeksCleared(){return false;}
+
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that a new seek has been
+   * added.
+   */
+
+  private static final Pattern seekAddedPattern = new Pattern("^<s> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a new seek has been added.
+   */
+
+  private boolean handleSeekAdded(String line){
+    Matcher matcher = seekAddedPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    SeekInfoStruct seekInfo = SeekInfoStruct.parseSeekInfoLine(line);
+
+    if (!processSeekAdded(seekInfo))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that a new seek has been added
+   * is received.
+   */
+
+  protected boolean processSeekAdded(SeekInfoStruct seekInfo){return false;}
+
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that seeks have been
+   * removed.
+   */
+
+  private static final Pattern seeksRemovedPattern = new Pattern("^<sr> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that seeks have been removed.
+   */
+
+  private boolean handleSeeksRemoved(String line){
+    Matcher matcher = seeksRemovedPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    StringTokenizer tokenizer = new StringTokenizer(line, " ");
+    tokenizer.nextToken(); // Skip the "<sr>"
+
+    int [] removedSeeks = new int[tokenizer.countTokens()];
+    for (int i = 0; i < removedSeeks.length; i++)
+      removedSeeks[i] = Integer.parseInt(tokenizer.nextToken());
+
+    if (!processSeeksRemoved(removedSeeks))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that seeks have been removed
+   * is received. The array specifies the numbers of the removed seeks.
+   */
+
+  protected boolean processSeeksRemoved(int [] removedSeeks){return false;}
 
 
 
