@@ -41,8 +41,6 @@ import free.chess.variants.suicide.Suicide;
 import free.chess.variants.atomic.Atomic;
 import free.util.Pair;
 import free.util.TextUtilities;
-import free.util.Utilities;
-
 
 
 /**

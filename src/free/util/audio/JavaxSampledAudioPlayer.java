@@ -25,7 +25,6 @@ import javax.sound.sampled.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Hashtable;
 import free.util.BlockingQueue;
 import free.util.PlatformUtils;
 import free.util.IOUtilities;

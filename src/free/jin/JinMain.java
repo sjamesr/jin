@@ -37,7 +37,6 @@ import free.util.zip.ZipClassLoader;
 import free.util.zip.ZipURLStreamHandler;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.jin.action.JinAction;
 import free.jin.action.ActionInfo;
 
 

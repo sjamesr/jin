@@ -30,11 +30,8 @@ import free.jin.*;
 import free.jin.board.event.UserMoveListener;
 import free.jin.board.event.UserMoveEvent;
 import free.util.BeanProperties;
-import free.util.IOUtilities;
-import free.util.TextUtilities;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
