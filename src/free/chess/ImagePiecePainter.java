@@ -26,64 +26,104 @@ import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.image.ImageObserver;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 
 /**
- * An implementation of PiecePainter which paints images. Note that due to
- * JDK1.1 limitations, this implementation will not try to scale the pieces.
+ * An implementation of PiecePainter which paints images.
  */
 
 public class ImagePiecePainter implements PiecePainter{
 
 
-  /**
-   * A Hashtable mapping Pieces to Images.
-   */
-
-  private final Hashtable pieceImages = new Hashtable();
-
-
-
 
   /**
-   * The size of the pieces.
+   * An array whose indices specify the size of the images and whose values
+   * are Hashtables mapping Pieces to Images.
    */
 
-  private final Dimension pieceSize;
-
+  private final Hashtable [] pieceImages;
 
 
 
 
   /**
-   * Creates a new ImagePiecePainter with the given piece image size. Note that
-   * you may set images of different size than this (and than each other) to
-   * represent pieces. This size is used in the getPreferredPieceSize method,
-   * so it should be something at least close to the size of the images.
+   * The preferred size of the pieces.
    */
 
-  public ImagePiecePainter(Dimension pieceSize){
-    this.pieceSize = new Dimension(pieceSize.width, pieceSize.height);
+  private final Dimension prefPieceSize;
+
+
+
+
+  /**
+   * Creates a new ImagePiecePainter with the given preferred piece image size.
+   * The given Hashtable should map Integer objects specifying the size of the
+   * piece images to Hashtables which in turn map Piece objects to piece Images.
+   * The constructor does not clone the given Hashtable, so it should not be
+   * modified after creating the ImagePiecePainter.
+   */
+
+  public ImagePiecePainter(Dimension prefPieceSize, Hashtable pieceImages){
+
+    // Find the largest size
+    int maxSize = 0;
+    Enumeration sizes = pieceImages.keys();
+    while (sizes.hasMoreElements()){
+      int size = ((Integer)sizes.nextElement()).intValue();
+      if (size <= 0)
+        throw new IllegalArgumentException("Image sizes must be positive");
+
+      if (size > maxSize)
+        maxSize = size;
+    }
+
+    if (maxSize == 0)
+      throw new IllegalArgumentException("No sizes in the hashtable");
+
+    this.pieceImages = new Hashtable[maxSize+1];
+
+    // Fill the array
+    sizes = pieceImages.keys();
+    while (sizes.hasMoreElements()){
+      Integer key = (Integer)sizes.nextElement();
+      this.pieceImages[key.intValue()] = (Hashtable)pieceImages.get(key);
+    }
+
+    this.prefPieceSize = new Dimension(prefPieceSize.width, prefPieceSize.height);
   }
 
 
 
-  /**
-   * Sets the given Piece to be represented by the given Image.
-   */
-
-  public void setPieceImage(Piece piece, Image image){
-    pieceImages.put(piece, image);
-  }
-
-
 
   /**
-   * Returns the Image by which the given Piece is represented.
+   * Returns the Image by which the given Piece is represented at the given
+   * size.
    */
 
-  public Image getPieceImage(Piece piece){
-    return (Image)pieceImages.get(piece);
+  public Image getPieceImage(int size, Piece piece){
+    if (size <= 0)
+      throw new IllegalArgumentException("Image size must be positive");
+
+    if (size >= pieceImages.length)
+      return (Image)(pieceImages[pieceImages.length-1].get(piece));
+
+    if (pieceImages[size] != null)
+      return (Image)(pieceImages[size].get(piece));
+
+    int distance = 1;
+    while (true){
+      int smaller = size - distance;
+      int bigger = size + distance;
+
+      if ((smaller > 0) && (pieceImages[smaller] != null))
+        return (Image)(pieceImages[smaller].get(piece));
+
+      if ((bigger < pieceImages.length) && (pieceImages[bigger] != null))
+        return (Image)(pieceImages[bigger].get(piece));
+
+      distance++;
+    }
   }
 
 
@@ -106,7 +146,7 @@ public class ImagePiecePainter implements PiecePainter{
    */
 
   public Dimension getPreferredPieceSize(){
-    return pieceSize;
+    return new Dimension(prefPieceSize.width, prefPieceSize.height);
   }
 
 
@@ -119,7 +159,8 @@ public class ImagePiecePainter implements PiecePainter{
    */
 
   public void paintPiece(Piece piece, Graphics g, ImageObserver observer, int x, int y, int width, int height){
-    Image pieceImage = (Image)pieceImages.get(piece);
+    int size = width > height ? height : width;
+    Image pieceImage = getPieceImage(size, piece);
     int pieceWidth = pieceImage.getWidth(null);
     int pieceHeight = pieceImage.getHeight(null);
     g.drawImage(pieceImage, x+(width-pieceWidth)/2, y+(height-pieceHeight)/2, observer);
