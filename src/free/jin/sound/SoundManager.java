@@ -26,6 +26,7 @@ import free.jin.event.*;
 import jregex.*;
 import free.jin.plugin.Plugin;
 import free.jin.JinConnection;
+import free.jin.FriendsJinConnection;
 import free.jin.Game;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -42,7 +43,7 @@ import javax.swing.event.ChangeListener;
  * The plugin responsible for producing sound on all the relevant events.
  */
 
-public class SoundManager extends Plugin implements ChatListener, ConnectionListener, GameListener{
+public class SoundManager extends Plugin implements ChatListener, ConnectionListener, GameListener, FriendsListener{
 
 
   /**
@@ -212,6 +213,9 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     loadEventAudioClip("IllegalMove");
     loadEventAudioClip("GameEnd");
     loadEventAudioClip("GameStart");
+
+    loadEventAudioClip("FriendConnected");
+    loadEventAudioClip("FriendDisconnected");
   }
 
 
@@ -249,6 +253,9 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     JinConnection conn = getConnection();
     conn.addChatListener(this);
     conn.addConnectionListener(this);
+    conn.addGameListener(this);
+    if (conn instanceof FriendsJinConnection)
+      ((FriendsJinConnection)conn).addFriendsListener(this);
   }
 
 
@@ -263,6 +270,9 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     JinConnection conn = getConnection();
     conn.removeChatListener(this);
     conn.removeConnectionListener(this);
+    conn.removeGameListener(this);
+    if (conn instanceof FriendsJinConnection)
+      ((FriendsJinConnection)conn).removeFriendsListener(this);
   }
 
 
@@ -322,6 +332,8 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    *   <LI> IllegalMove - An illegal move was attempted.
    *   <LI> GameStart - A game started.
    *   <LI> GameEnd - A game ended.
+   *   <LI> FriendConnected - A friend logged on.
+   *   <LI> FriendDisconnected - A friend logged off.
    * </UL>
    * Returns true if the given event is recognized, false otherwise. Note that
    * for various reasons (like the user disabling sounds), the sound may not
@@ -387,32 +399,6 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
 
 
-  /**
-   * Currently, does nothing.
-   */
-
-  public void moveMade(MoveMadeEvent evt){}
-
-
-
-
-  /**
-   * Currently does nothing.
-   */
-
-  public void positionChanged(PositionChangedEvent evt){}
-
-
-
-
-  /**
-   * Currently does nothing.
-   */
-
-  public void takebackOccurred(TakebackEvent evt){}
-
-
-
 
   /**
    * Plays the sound mapped to the "IllegalMove" event.
@@ -426,24 +412,6 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
 
   /**
-   * Currently does nothing.
-   */
-
-  public void clockAdjusted(ClockAdjustmentEvent evt){}
-
-
-
-
-  /**
-   * Currently does nothing.
-   */
-
-  public void boardFlipped(BoardFlipEvent evt){}
-
-
-
-
-  /**
    * Plays the sound mapped to the "GameEnd" event.
    */
 
@@ -452,6 +420,47 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
     if ((game.getGameType()==Game.MY_GAME)&&(game.isPlayed()))
       playEventSound("GameEnd");
   }
+
+
+
+
+  public void moveMade(MoveMadeEvent evt){}
+  public void positionChanged(PositionChangedEvent evt){}
+  public void takebackOccurred(TakebackEvent evt){}
+  public void clockAdjusted(ClockAdjustmentEvent evt){}
+  public void boardFlipped(BoardFlipEvent evt){}
+
+
+
+
+
+  /**
+   * Called when a friend logs on to the server.
+   */
+
+  public void friendConnected(FriendsEvent evt){
+    playEventSound("FriendConnected");
+  }
+
+
+
+
+
+  /**
+   * Called when a friend logs out from the server.
+   */
+
+  public void friendDisconnected(FriendsEvent evt){
+    playEventSound("FriendDisconnected");
+  }
+
+
+
+
+
+  public void friendOnline(FriendsEvent evt){}
+  public void friendAdded(FriendsEvent evt){}
+  public void friendRemoved(FriendsEvent evt){}
 
 
 
