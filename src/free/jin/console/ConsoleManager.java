@@ -34,6 +34,7 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.PluginUIContainer;
 import java.net.URL;
+import java.util.Vector;
 
 
 /**
@@ -66,6 +67,22 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected String gameListDisplayStyle;
+  
+  
+  
+  /**
+   * Are we currently paused?
+   */
+   
+  private boolean isPaused = false;
+  
+  
+  
+  /**
+   * A queue of the events we've accumulated while being paused.
+   */
+   
+  private final Vector pausedEventsQueue = new Vector();
 
 
 
@@ -284,6 +301,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void plainTextReceived(PlainTextEvent evt){
+    if (isPaused()){
+      pausedEventsQueue.addElement(evt);
+      return;
+    }
+      
     console.addToOutput(evt.getText(), "plain");
   }
 
@@ -294,12 +316,49 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void chatMessageReceived(ChatEvent evt){
+    if (isPaused()){
+      pausedEventsQueue.addElement(evt);
+      return;
+    }
+    
     String type = evt.getType();
     Object forum = evt.getForum();
     String sender = evt.getSender();
-    String chatMessageType = type+"."+(forum == null ? "" : forum.toString())+"."+sender;
+    String chatMessageType = type + "." + (forum == null ? "" : forum.toString()) + "." + sender;
 
-    console.addToOutput(translateChat(evt),chatMessageType);
+    console.addToOutput(translateChat(evt), chatMessageType);
+  }
+  
+  
+  
+  /**
+   * Sets the pause state of the console manager.
+   */
+   
+  public void setPaused(boolean isPaused){
+    this.isPaused = isPaused;
+    
+    if (!isPaused){
+      int size = pausedEventsQueue.size();
+      for (int i = 0; i < size; i++){
+        Object evt = pausedEventsQueue.elementAt(i);
+        if (evt instanceof PlainTextEvent)
+          plainTextReceived((PlainTextEvent)evt);
+        else if (evt instanceof ChatEvent)
+          chatMessageReceived((ChatEvent)evt);
+      }
+      pausedEventsQueue.clear();
+    }
+  }
+  
+  
+  
+  /**
+   * Returns whether the console manager is currently paused.
+   */
+   
+  public boolean isPaused(){
+    return isPaused;
   }
 
 
