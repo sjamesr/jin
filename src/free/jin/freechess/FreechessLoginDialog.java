@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -100,19 +100,21 @@ public class FreechessLoginDialog extends StandardLoginDialog{
    * Checks that the username is valid.
    */
 
-  public String findInputIllegalityReason(){
-    String username = usernameField.getText();
-    int usernameLength = username.length();
-    if ((usernameLength<3)||(usernameLength>17))
-      return "Usernames must be between 3 and 17 characters long";
+  public String findInputIllegalityReason(boolean checkUsernameAndPassword){
+    if (checkUsernameAndPassword){
+      String username = usernameField.getText();
+      int usernameLength = username.length();
+      if ((usernameLength<3)||(usernameLength>17))
+        return "Usernames must be between 3 and 17 characters long";
 
-    for (int i=0;i<usernameLength;i++){
-      char c = username.charAt(i);
-      if (!isValidUsernameCharacter(c))
-        return "Your username contains at least one illegal character: "+c;
+      for (int i=0;i<usernameLength;i++){
+        char c = username.charAt(i);
+        if (!isValidUsernameCharacter(c))
+          return "Your username contains at least one illegal character: "+c;
+      }
     }
 
-    return super.findInputIllegalityReason();
+    return super.findInputIllegalityReason(checkUsernameAndPassword);
   }
 
 
@@ -124,9 +126,9 @@ public class FreechessLoginDialog extends StandardLoginDialog{
 
   private boolean isValidUsernameCharacter(char c){
     int val = c;
-    if ((val>=97)&&(val<=122)) // Lowercase characters.
+    if ((val >= 97) && (val <= 122)) // Lowercase characters.
       return true;
-    if ((val>=65)&&(val<=90)) // Uppercase characters.
+    if ((val >= 65) && (val <= 90)) // Uppercase characters.
       return true;
     return false;
   }
@@ -135,17 +137,19 @@ public class FreechessLoginDialog extends StandardLoginDialog{
 
 
   /**
-   * Returns a JinChessclubConnection based on the hostname, port, username and
-   * password chosen by the user.
+   * Returns a <code>JinFreechessConnection</code> based on the hostname, port,
+   * username and password chosen by the user.
    */
 
   public JinConnection createConnection(){
-    String hostname = (String)hostnameBox.getSelectedItem();
-    int port = Integer.parseInt(portField.getText());
-    String username = usernameField.getText();
-    String password = new String(passwordField.getPassword());
+    String hostname = resultUser.getProperty("login.hostname");
+    int port = Integer.parseInt(resultUser.getProperty("login.port"));
+    String username = resultUser.getUsername();
+    String password = resultUser.getProperty("login.password");
+    if (password == null)
+      password = new String(passwordField.getPassword());
+
     return new JinFreechessConnection(hostname, port, username, password);
   }
-
 
 }

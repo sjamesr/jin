@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -94,25 +94,27 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
    * Checks that the username is valid.
    */
 
-  public String findInputIllegalityReason(){
-    String username = usernameField.getText();
-    int usernameLength = username.length();
-    if ((usernameLength<2)||(usernameLength>15))
-      return "Usernames must be between 2 and 15 characters long";
+  public String findInputIllegalityReason(boolean checkUsernameAndPassword){
+    if (checkUsernameAndPassword){
+      String username = usernameField.getText();
+      int usernameLength = username.length();
+      if ((usernameLength < 2) || (usernameLength > 15))
+        return "Usernames must be between 2 and 15 characters long";
 
-    boolean hasHyphenAppeared = false;
-    for (int i=0;i<usernameLength;i++){
-      char c = username.charAt(i);
-      if (c=='-')
-        if (hasHyphenAppeared)
-          return "A username must contain at most one hyphen ('-')";
-        else
-          hasHyphenAppeared = true;
-      if (!isValidUsernameCharacter(c))
-        return "Your username contains at least one illegal character: "+c;
+      boolean hasHyphenAppeared = false;
+      for (int i = 0; i < usernameLength; i++){
+        char c = username.charAt(i);
+        if (c == '-')
+          if (hasHyphenAppeared)
+            return "A username must contain at most one hyphen ('-')";
+          else
+            hasHyphenAppeared = true;
+        if (!isValidUsernameCharacter(c))
+          return "Your username contains at least one illegal character: " + c;
+      }
     }
 
-    return super.findInputIllegalityReason();
+    return super.findInputIllegalityReason(checkUsernameAndPassword);
   }
 
 
@@ -139,15 +141,18 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
 
 
   /**
-   * Returns a JinChessclubConnection based on the hostname, port, username and
-   * password chosen by the user.
+   * Returns a <code>JinChessclubConnection</code> based on the hostname, port,
+   * username and password chosen by the user.
    */
 
   public JinConnection createConnection(){
-    String hostname = (String)hostnameBox.getSelectedItem();
-    int port = Integer.parseInt(portField.getText());
-    String username = usernameField.getText();
-    String password = new String(passwordField.getPassword());
+    String hostname = resultUser.getProperty("login.hostname");
+    int port = Integer.parseInt(resultUser.getProperty("login.port"));
+    String username = resultUser.getUsername();
+    String password = resultUser.getProperty("login.password");
+    if (password == null)
+      password = new String(passwordField.getPassword());
+
     return new JinChessclubConnection(hostname, port, username, password);
   }
 
