@@ -36,7 +36,7 @@ public class PlatformUtils{
    */
    
   public static boolean isJavaBetterThan(String ver){
-    return ver.compareTo(System.getProperty("java.version")) >= 0;
+    return System.getProperty("java.version").compareTo(ver) >= 0;
   }
   
   
