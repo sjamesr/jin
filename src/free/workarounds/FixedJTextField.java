@@ -38,13 +38,15 @@ import java.awt.event.ActionListener;
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html">
  *        Ibeam cursor not appearing on TextField or TextArea in editmode</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4133908.html">
- *        <Enter> in JTextComponent should activate DefaultButton</A>.
+ *        [Enter] in JTextComponent should activate DefaultButton</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4145324.html">
  *        JTextField displays multiple Line</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4174290.html">
  *        Disabled JTextField background should be control colour in Windows L&F</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4137845.html">
- *         JTextField draws out of bounds</A>.
+ *        JTextField draws out of bounds</A>.
+ *   <LI> copy()/paste()/cut() throws exceptions under MS VM when run as an
+ *        applet.
  * </UL>
  */
 
@@ -178,17 +180,65 @@ public class FixedJTextField extends JTextField{
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4145324.html
 
-    super.paste();
-    String text = getText();
-    int firstCR = text.indexOf('\n');
-    int firstLF = text.indexOf('\r');
-    int first = firstCR==-1 ? firstLF : (firstLF==-1 ? firstCR : (firstCR<firstLF ? firstCR : firstLF));
+    try{
+      super.paste();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakePaste(this);
+        else
+          throw e;
+      }
+      
 
-    if (first!=-1)
-      setText(text.substring(0,first));
+    int caretPosition = getCaretPosition();
+    
+    // First replace all \r\n with a space
+    String text = getText();
+    int index;
+    while ((index = text.indexOf("\r\n")) != -1){
+      text = text.substring(0, index) + " " + text.substring(index + 2);
+      if (index < caretPosition)
+        caretPosition--;
+    }
+    
+    // The replace all individual \r and \n with a space
+    text = text.replace('\n', ' ').replace('\r', ' ');
+    
+    setText(text);
+    
+    // Restore caret position because setText puts it at the end
+    setCaretPosition(caretPosition);
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4145324.html
 
   }
+  
+  
+  
+  public void copy(){
+    try{
+      super.copy();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakeCopy(this);
+        else
+          throw e;
+      }
+  }
+
+
+  
+  public void cut(){
+    try{
+      super.cut();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakeCut(this);
+        else
+          throw e;
+      }
+  }
+  
+  
 
 }

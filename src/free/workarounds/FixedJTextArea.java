@@ -31,6 +31,8 @@ import java.awt.Cursor;
  * <UL>
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html">
  *        Ibeam cursor not appearing on TextField or TextArea in editmode</A>.
+ *   <LI> copy()/paste()/cut() throws exceptions under MS VM when run as an
+ *        applet.
  * </UL>
  */
 
@@ -82,6 +84,46 @@ public class FixedJTextArea extends JTextArea{
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html
 
   }
+  
+  
+  
+  public void paste(){
+    try{
+      super.paste();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakePaste(this);
+        else
+          throw e;
+      }
+  }
+  
+  
+  
+  public void copy(){
+    try{
+      super.copy();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakeCopy(this);
+        else
+          throw e;
+      }
+  }
+
+
+  
+  public void cut(){
+    try{
+      super.cut();
+    } catch (RuntimeException e){ // MS VM throws a com.ms.security.SecurityExceptionEx
+        if (e.getClass().getName().equals("com.ms.security.SecurityExceptionEx"))
+          FixUtils.fakeCut(this);
+        else
+          throw e;
+      }
+  }
+  
 
 
 }
