@@ -113,7 +113,7 @@
       <fileset dir="resources/lnfs" />
     </copy>
 
-    <!-- Check whether Unix -->    
+    <!-- Check whether Unix (but not Mac OS X) -->    
     <condition property="unix">
       <and>
         <os family="unix"/>
@@ -127,6 +127,14 @@
 		<condition property="windows">
 			<os family="windows" />
 		</condition>
+    
+    <!-- Check whether Mac OS X -->
+    <condition property="macosx">
+      <and>
+        <os family="unix"/>
+        <os family="mac"/>
+      </and>
+    </condition>
     
     
 		<condition property="runDoUnixStuff">
@@ -159,9 +167,25 @@
 			</or>
 		</condition>
     
+    <condition property="runDoMacOSXStuff">
+			<or>
+				<and>
+					<not>
+						<isset property="release.platform" />
+					</not>
+					<isset property="macosx" />
+				</and>
+				<and>
+					<isset property="release.platform" />
+					<equals arg1="macosx" arg2="${release.platform}" />
+				</and>
+			</or>
+    </condition>
+    
     <!-- Call the tasks that do platform specific stuff -->
 		<antcall target="doUnixStuff" />
 		<antcall target="doWindowsStuff" />
+    <antcall target="doMacOSXStuff" />
     
 
     <!-- Copy Java resources -->
@@ -487,7 +511,7 @@
 	</target>
   
   
-  <!-- If the property unix is set, does things required for this platform -->
+  <!-- If the property runDoUnixStuff is set, does things required for Unix -->
   <target name="doUnixStuff" if="runDoUnixStuff">
     <copy todir="${build.dir}">
       <fileset dir="resources/os-specific/unix" includes="jin" />
@@ -518,11 +542,25 @@
   </target>
 
 
-  <!-- If the property windows is set, does things required for this platform -->
+  <!-- If the property runDoWindowsStuff is set, does things required for Windows -->
   <target name="doWindowsStuff" if="runDoWindowsStuff">   
     <copy todir="${build.dir}">
       <fileset dir="resources/os-specific/windows" />
     </copy>
+  </target>
+  
+  
+  <!-- If the property doMacOSXStuff is set, does things required for Mac OS X -->
+  <target name="doMacOSXStuff" if="runDoMacOSXStuff">
+		<javac srcdir="resources/os-specific/macosx"
+           destdir="${classes.dir}"
+           includes="free/jin/MacOSXSpecific.java"
+		       debug="${debug}">
+      <classpath>
+        <pathelement location="resources/os-specific/macosx/ui.jar"/>
+        <pathelement path="${classes.dir}"/>
+      </classpath>
+		</javac>
   </target>
 
 </project>
