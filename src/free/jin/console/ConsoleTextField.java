@@ -27,6 +27,7 @@ import free.jin.Preferences;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.Vector;
+import java.awt.Font;
 import javax.swing.KeyStroke;
 
 
@@ -118,6 +119,9 @@ public class ConsoleTextField extends FixedJTextField{
     enableEvents(KeyEvent.KEY_EVENT_MASK|FocusEvent.FOCUS_EVENT_MASK);
 
     initFromProperties();
+    
+    Font oldFont = getFont();
+    setFont(new Font("Monospaced", oldFont.getStyle(), oldFont.getSize()));
   }
 
 
