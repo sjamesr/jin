@@ -319,7 +319,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
   void disconnected(JinConnection conn, User user){
     String userPath = Jin.getSettingsPath(user);
-    if (userPath != null){
+    if ((userPath != null) && !user.isGuest()){
       // Update the recent user properties
       int recentUsersCount = Integer.parseInt(Jin.getProperty("recent.users.count", "0"));
       int existingUserIndex = recentUsersCount + 2;
