@@ -206,7 +206,7 @@ public class JinFrameMenuBar extends JMenuBar{
     });
     connectionSensitiveMenuItems.addElement(openConnMenuItem);
 
-    JMenuItem closeConnMenuItem = new JMenuItem("Close connection");
+    JMenuItem closeConnMenuItem = new JMenuItem("Close Connection");
     closeConnMenuItem.setMnemonic('l'); 
     closeConnMenuItem.addActionListener(new ActionListener(){
 
