@@ -1,0 +1,61 @@
+/**
+ * Jin - a chess client for internet chess servers.
+ * More information is available at http://www.hightemplar.com/jin/.
+ * Copyright (C) 2002 Alexander Maryanovsky.
+ * All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+package free.util.audio;
+
+import java.util.Hashtable;
+
+
+/**
+ * This is an AudioPlayer implementation which uses the Applet.newAudioClip(URL)
+ * API introduced in JDK1.2
+ */
+
+public class JDK1_2AudioPlayer implements AudioPlayer{
+
+
+
+  /**
+   * Maps free.util.audio.AudioClip instances to java.applet.AudioClip
+   * instances.
+   */
+
+  private static final Hashtable audioClips = new Hashtable();
+
+
+
+
+  /**
+   * Plays the given AudioClip.
+   */
+
+  public void play(AudioClip clip){
+    java.applet.AudioClip newAudioClip = (java.applet.AudioClip)audioClips.get(clip);
+    if (newAudioClip == null){
+      newAudioClip = java.applet.Applet.newAudioClip(clip.getURL());
+      audioClips.put(clip, newAudioClip);
+    }
+    newAudioClip.play();
+  }
+
+
+}
+
