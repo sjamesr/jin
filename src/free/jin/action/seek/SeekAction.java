@@ -81,7 +81,7 @@ public class SeekAction extends JinAction{
    */
   
   public void go(){
-    UserSeek seek = new SeekPanel().getSeek(getUIProvider());
+    UserSeek seek = new SeekPanel().getSeek();
     
     if (seek != null){
       ((SeekConnection)getConn()).issueSeek(seek);
@@ -382,14 +382,14 @@ public class SeekAction extends JinAction{
           try{
             time = Integer.parseInt(timeField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getUIProvider(), "Time Error", "You must specify a valid initial time");
+              OptionPanel.error("Time Error", "You must specify a valid initial time");
               return;
             }
             
           try{
             inc = Integer.parseInt(incField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getUIProvider(), "Increment Error", "You must specify a valid increment");
+              OptionPanel.error("Increment Error", "You must specify a valid increment");
               return;
             }
             
@@ -405,13 +405,13 @@ public class SeekAction extends JinAction{
             try{
               minRating = Integer.parseInt(minRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getUIProvider(), "Min Rating Error", "You must specify a valid minimum rating");
+                OptionPanel.error("Min Rating Error", "You must specify a valid minimum rating");
                 return;
               }
             try{
               maxRating = Integer.parseInt(maxRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getUIProvider(), "Max Rating Error", "You must specify a valid maximum rating");
+                OptionPanel.error("Max Rating Error", "You must specify a valid maximum rating");
                 return;
               }
           }
@@ -463,8 +463,8 @@ public class SeekAction extends JinAction{
      * canceled the dialog.
      */
      
-    public UserSeek getSeek(UIProvider uiProvider){
-      return (UserSeek)askResult(uiProvider);
+    public UserSeek getSeek(){
+      return (UserSeek)askResult();
     }
     
 
