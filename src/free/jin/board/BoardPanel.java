@@ -99,10 +99,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * The JBoard showing the current position.
+   * The JinBoard showing the current position.
    */
 
-  protected JBoard board;
+  protected JinBoard board;
 
 
 
@@ -491,10 +491,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Creates and returns the JBoard.
+   * Creates and returns the <code>JinBoard</code>.
    */
 
-  protected JBoard createBoard(Game game){
+  protected JinBoard createBoard(Game game){
     return new JinBoard(game.getInitialPosition());
   }
 
@@ -506,7 +506,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * Configures the board.
    */
 
-  protected void configureBoard(Game game, JBoard board){
+  protected void configureBoard(Game game, JinBoard board){
     if (isFlipped())
       board.setFlipped(true);
 
@@ -522,7 +522,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     ActionListener escapeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        JBoard board = BoardPanel.this.board;
+        JinBoard board = BoardPanel.this.board;
         if (board.isMovingPiece())
           board.cancelMovingPiece();
         else if (queuedMove != null){
@@ -537,7 +537,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     };
 
     // We have no choice but to use WHEN_FOCUSED and to give the focus to the
-    // JBoard when it is pressed because WHEN_IN_FOCUSED_WINDOW doesn't work
+    // JinBoard when it is pressed because WHEN_IN_FOCUSED_WINDOW doesn't work
     // in MS VM.
     board.registerKeyboardAction(escapeListener,
       KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_FOCUSED);
@@ -564,13 +564,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (game.getGameType() == Game.MY_GAME)
       if (game.isPlayed())
         if (game.getUserPlayer() == Player.WHITE_PLAYER)
-          return JBoard.WHITE_PIECES_MOVE;
+          return JinBoard.WHITE_PIECES_MOVE;
         else
-          return JBoard.BLACK_PIECES_MOVE;
+          return JinBoard.BLACK_PIECES_MOVE;
       else 
-        return JBoard.CURRENT_PLAYER_MOVES; 
+        return JinBoard.CURRENT_PLAYER_MOVES; 
     else // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
-      return JBoard.NO_PIECES_MOVE;
+      return JinBoard.NO_PIECES_MOVE;
   }
 
 
@@ -1785,7 +1785,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void setInactive(){
     this.isActive = false;
     board.getPosition().removeMoveListener(this);
-    board.setMoveInputMode(JBoard.ALL_PIECES_MOVE);
+    board.setMoveInputMode(JinBoard.ALL_PIECES_MOVE);
     board.setEditable(true);
   }
 
