@@ -202,7 +202,6 @@
 		
 		
 		<!-- Utility library: free.util.* and free.workarounds.* -->
-
 		<jar jarfile="${libs.dir}/util.jar"
 		     basedir="${classes.dir}"
 		     includes="free/util/** free/workarounds/**"
@@ -225,7 +224,7 @@
 		<!-- Jin classes -->
 		<jar jarfile="${build.dir}/jin.jar"
 		     basedir="${classes.dir}"
-		     includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/action/* free/jin/resources/**"
+		     includes="free/jin/* free/jin/ui/** free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/action/* free/jin/resources/**"
 		     compress="${build.compress}"
 		     manifest="${build.manifest}"
 		/>
