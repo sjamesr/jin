@@ -30,8 +30,9 @@ import free.workarounds.FixedJTextArea;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
 import free.util.AWTUtilities;
-import free.util.WindowDisposingActionListener;
+import free.util.WindowDisposingListener;
 import free.util.Utilities;
+import java.util.EventObject;
 
 
 /**
@@ -354,13 +355,12 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
 
 
     /**
-     * The actionListener that closes the dialog when the user cancels.
+     * The listener that closes the dialog when the user cancels.
      */
 
-    ActionListener closer = new WindowDisposingActionListener(this){
-      public void actionPerformed(ActionEvent evt){
+     WindowDisposingListener closer = new WindowDisposingListener(this){
+      public void beforeDisposing(EventObject evt){
         scriptType = null;
-        super.actionPerformed(evt);
       }
     };
 
@@ -373,8 +373,12 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     public ScriptTypeSelectionDialog(Component parent){
       super(AWTUtilities.frameForComponent(parent), "Choose script type", true);
 
+      setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
       KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       this.getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+      addWindowListener(closer);
 
       createUI();
     }
@@ -407,7 +411,9 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       boxesPanel.add(commands);
       boxesPanel.add(beanshell);
 
-      final JTextArea typeExplanationTextArea = new FixedJTextArea();
+      final JTextArea typeExplanationTextArea = new FixedJTextArea(){
+        public boolean isFocusTraversable(){return false;}
+      };
       typeExplanationTextArea.setPreferredSize(new Dimension(370, 150));
       typeExplanationTextArea.setFont(new Font("Serif", Font.PLAIN, 16));
       typeExplanationTextArea.setEditable(false);
@@ -438,7 +444,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       buttonsPanel.add(next);
       buttonsPanel.add(cancel);
 
-      next.addActionListener(new WindowDisposingActionListener(this));
+      next.addActionListener(new WindowDisposingListener(this));
       cancel.addActionListener(closer);
 
       content.add(boxesPanel, BorderLayout.NORTH);
