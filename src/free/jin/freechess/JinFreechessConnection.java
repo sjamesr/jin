@@ -490,10 +490,16 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
       if (plyDifference < 0){
-        if (gameData.getMoveCount() < -plyDifference) // Can't issue takeback
+        if ((gameData.getMoveCount() < -plyDifference) || // Can't issue takeback
+            ((boardData.getPlayedPlyCount() == 0) && !gameData.game.isPlayed()))
+            // This special check is for cases when you start in examine mode, make a few moves
+            // and then enter bsetup mode - the ply count is set to 0, but we want to change the
+            // position, not issue a takeback.
           changePosition(gameData, boardData);
-        else
+        else{
+          
           issueTakeback(gameData, boardData);
+        }
       }
       else if (plyDifference == 0){
         if (!gameData.game.isPlayed()) // Examined
