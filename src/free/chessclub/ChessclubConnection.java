@@ -2489,7 +2489,7 @@ public class ChessclubConnection extends free.util.Connection{
       case Datagram.DG_MOVE_LIST:{
         int gameNumber = datagram.getInteger(0);
         String initialPosition = datagram.getString(1);
-        String movesString = datagram.getString(2);
+        String movesString = (datagram.getArgumentCount() >= 3) ? datagram.getString(2) : "";
         StringTokenizer moveListTokenizer = new StringTokenizer(movesString,"{}");
         MoveStruct [] moves = new MoveStruct[moveListTokenizer.countTokens()];
         int movesCounter = 0;
