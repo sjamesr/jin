@@ -472,6 +472,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleSeeksRemoved(line))
       return;
+    if (handleBughouseHoldings(line))
+      return;
     if (handleGameEnd(line))
       return;
     if (handleStoppedObserving(line))
@@ -1270,6 +1272,33 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   protected boolean processDeltaBoard(DeltaBoardStruct data){return false;}
+
+
+
+  
+  /**
+   * The regular expression matching bughouse holdings lines.
+   */
+
+  private static final Pattern bughouseHoldingsPattern = new Pattern("^<b1> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a bughouse holdings
+   * line and to further process it if it is.
+   */
+
+  private boolean handleBughouseHoldings(String line){
+    Matcher matcher = bughouseHoldingsPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    // Implement real handling.
+    
+    return true;
+  }
 
 
 
