@@ -415,7 +415,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   protected boolean processGameInfo(GameInfoStruct data){
     unstartedGamesData.put(new Integer(data.getGameNumber()), data);
-    
+
     return true;
   }
 
@@ -716,6 +716,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     listenerManager.fireGameEvent(new GameStartEvent(this, game));
 
+    // The server doesn't send us seek remove lines during games, so we have
+    // no choice but to remove *all* seeks during a game. The seeks are restored
+    // when a game ends by setting seekinfo to 1 again.
+    if (gameType == Game.MY_GAME)
+      removeAllSeeks(); 
+
     return gameData;
   }
 
@@ -873,6 +879,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
       game.setResult(result);
       listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
+
+      if (game.getGameType() == Game.MY_GAME)
+        askSeeksRefresh();
     }
   }
 
@@ -1089,6 +1098,18 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processSeeksCleared(){
+    removeAllSeeks();
+    return true;
+  }
+
+
+
+
+  /**
+   * Removes all the seeks and notifies the listeners.
+   */
+
+  private void removeAllSeeks(){
     int seeksCount = seeks.size();
     if (seeksCount != 0){
       Object [] seeksIndices = new Object[seeksCount];
@@ -1106,8 +1127,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         seeks.remove(seekIndex);
       }
     }
-    
-    return true;
   }
 
 
