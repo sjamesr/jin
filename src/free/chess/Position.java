@@ -269,15 +269,15 @@ public final class Position{
    * expected format.
    */
   
-  public void setLexigraphic(String pos){
-    if (pos.length()<64)
-      throw new PositionFormatException("Less than 64 letters in the string: "+pos);
+  public void setLexigraphic(String pos) throws PositionFormatException{
+    if (pos.length() < 64)
+      throw new PositionFormatException("Less than 64 letters in the string: " + pos);
 
-    int i=0;
+    int i = 0;
     try{
-      for (int rank=7;rank>=0;rank--){
-        for (int file=0;file<8;file++){
-          setPieceAtImpl(variant.parsePiece(""+pos.charAt(i++)), Square.getInstance(file,rank));
+      for (int rank = 7; rank >= 0; rank--){
+        for (int file = 0; file < 8; file++){
+          setPieceAtImpl(variant.parsePiece("" + pos.charAt(i++)), Square.getInstance(file, rank));
         }
       }
     } catch (IllegalArgumentException e){
@@ -329,26 +329,26 @@ public final class Position{
    * format.
    */
 
-  public void setFEN(String fen){
+  public void setFEN(String fen) throws PositionFormatException{
     StringTokenizer fenTokenizer = new StringTokenizer(fen, " ");
-    if (fenTokenizer.countTokens()!=6)
+    if (fenTokenizer.countTokens() != 6)
       throw new PositionFormatException("Wrong amount of fields");
       
     String pos = fenTokenizer.nextToken();
     StringTokenizer ranks = new StringTokenizer(pos,"/");
-    if (ranks.countTokens()!=8)
+    if (ranks.countTokens() != 8)
       throw new PositionFormatException("Wrong amount of ranks");
 
     for (int rank = 7; rank >= 0; rank--){
       String rankString = ranks.nextToken();
       int file = 0;
-      for (int i=0;i<rankString.length();i++){
-        if (file>7)
-          throw new PositionFormatException("Rank "+rank+" extends beyond the board");
+      for (int i = 0; i < rankString.length(); i++){
+        if (file > 7)
+          throw new PositionFormatException("Rank " + rank + " extends beyond the board");
 
         char c = rankString.charAt(i);
         if (Character.isDigit(c)){
-          int emptyFiles = Character.digit(c,10);
+          int emptyFiles = Character.digit(c, 10);
           while (emptyFiles-- > 0){
             setPieceAtImpl(null, Square.getInstance(file, rank));
             file++;
@@ -363,19 +363,19 @@ public final class Position{
             }
         }
       }
-      if (file!=8)
-        throw new PositionFormatException("Rank "+rank+" is a few files short");
+      if (file != 8)
+        throw new PositionFormatException("Rank " + rank + " is a few files short");
     }
 
     String colorToMove = fenTokenizer.nextToken();
-    if (colorToMove.length()!=1)
-      throw new PositionFormatException("Wrong amount of characters in active color indicator: "+colorToMove);
+    if (colorToMove.length() != 1)
+      throw new PositionFormatException("Wrong amount of characters in active color indicator: " + colorToMove);
     if (colorToMove.equals("w"))
       setCurrentPlayerImpl(Player.WHITE_PLAYER);
     else if (colorToMove.equals("b"))
       setCurrentPlayerImpl(Player.BLACK_PLAYER);
     else
-      throw new PositionFormatException("Wrong active color indicator: "+colorToMove);
+      throw new PositionFormatException("Wrong active color indicator: " + colorToMove);
 
     this.positionFEN = fen;
   }
