@@ -30,6 +30,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.Component;
 import free.jin.plugin.Plugin;
+import free.jin.ui.PreferencesPanel;
 import free.util.MemoryFile;
 import free.util.Utilities;
 import free.util.swing.UrlDisplayingAction;
