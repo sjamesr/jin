@@ -1050,12 +1050,15 @@ public class JinMain implements JinContext{
     for (int i = 0; i < extraLooksCount; i++){
       String name = appProps.getProperty("lf.extra." + i + ".name");
       String className = appProps.getProperty("lf.extra." + i + ".class");
-      try{
-        Class.forName(className);
-        UIManager.installLookAndFeel(name, className);
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to load class " + className + " for the " + name + " look and feel");
-        }
+      String minRequiredJavaVer = appProps.getProperty("lf.extra." + i + ".minRequiredJava", "0");
+      if (PlatformUtils.isJavaBetterThan(minRequiredJavaVer)){
+        try{
+          Class.forName(className).newInstance();
+          UIManager.installLookAndFeel(name, className);
+        } catch (Exception e){
+            System.err.println("Unable to load class " + className + " for the " + name + " look and feel");
+          }
+      }
     }
   }
 
