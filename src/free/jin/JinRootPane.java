@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002-2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ public class JinRootPane extends JRootPane{
    * The DesktopPane.
    */
 
-  private AdvancedJDesktopPane desktop;
+  private final AdvancedJDesktopPane desktop;
 
 
 
@@ -58,7 +58,7 @@ public class JinRootPane extends JRootPane{
    * The statusbar.
    */
 
-  private JPanel statusbar;
+  private final JPanel statusbar;
 
 
 
@@ -68,22 +68,15 @@ public class JinRootPane extends JRootPane{
 
   public JinRootPane(JinFrame jinFrame){
     this.jinFrame = jinFrame;
-  }
 
-
-  
-  /**
-   * Creates the content pane - a JinContentPane.
-   */
-
-  public Container createContentPane(){
     Container contentPane = new JPanel(new BorderLayout());
 
     String bgColorString = Jin.getProperty("desktop.background.color");
-    Color bgColor = bgColorString==null ? null : StringParser.parseColor(bgColorString);
+    Color bgColor = (bgColorString == null ? null : StringParser.parseColor(bgColorString));
 
     String wallpaperFilename = Jin.getProperty("desktop.wallpaper");
-    Image wallpaper = wallpaperFilename==null ? null : Toolkit.getDefaultToolkit().getImage(wallpaperFilename);
+    Image wallpaper = wallpaperFilename == null ? 
+      null : Toolkit.getDefaultToolkit().getImage(wallpaperFilename);
     String wallpaperLayoutString = Jin.getProperty("desktop.wallpaper.layout", "tile");
     int wallpaperLayout = AdvancedJDesktopPane.CENTER;
     if (wallpaperLayoutString.equalsIgnoreCase("stretch"))
@@ -93,11 +86,11 @@ public class JinRootPane extends JRootPane{
     else if (wallpaperLayoutString.equalsIgnoreCase("center"))
       wallpaperLayout = AdvancedJDesktopPane.CENTER;
 
-
     desktop = new AdvancedJDesktopPane();
     desktop.setBackground(bgColor);
     desktop.setWallpaper(wallpaper);
     desktop.setWallpaperLayoutStyle(wallpaperLayout);
+    desktop.setDesktopManager(new JinDesktopManager(jinFrame));
 
     String dragMode = Jin.getProperty("desktop.dragMode","faster");
     desktop.putClientProperty("JDesktopPane.dragMode", dragMode);
@@ -109,7 +102,7 @@ public class JinRootPane extends JRootPane{
     statusbar.setBorder(new MatteBorder(1, 0, 0, 0, Color.white));
     contentPane.add(statusbar, BorderLayout.SOUTH);
 
-    return contentPane;
+    setContentPane(contentPane);
   }
 
 
