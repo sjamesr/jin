@@ -22,6 +22,7 @@
 package free.util;
 
 import java.io.*;
+import java.net.URL;
 
 /**
  * Various utility methods that have something to do with I/O.
@@ -202,12 +203,10 @@ public class IOUtilities{
   public static byte [] readToEnd(InputStream in) throws IOException{
     byte [] buf = new byte[2048];
 
-    int amountToRead = buf.length;
     int amountRead = 0;
     int count = 0;
-    while ((count = in.read(buf, count, amountToRead)) > 0){
+    while ((count = in.read(buf, amountRead, buf.length-amountRead)) > 0){
       amountRead += count;
-      amountToRead -= count;
 
       if (amountRead == buf.length){
         byte [] oldBuf = buf;
@@ -231,6 +230,20 @@ public class IOUtilities{
 
   public static String loadText(InputStream in) throws IOException{
     return new String(readToEnd(in));
+  }
+
+
+
+
+  /**
+   * Loads the text from the given URL and returns it as a string.
+   *
+   * @throws IOException if the given URL does not exist or an I/O error occurs
+   * while accessing it.
+   */
+
+  public static String loadText(URL url) throws IOException{
+    return loadText(url.openStream());
   }
 
 
