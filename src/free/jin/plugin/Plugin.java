@@ -25,6 +25,7 @@ import free.jin.*;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import free.util.Utilities;
+import free.util.MemoryFile;
 
 
 /**
@@ -193,6 +194,45 @@ public abstract class Plugin{
     setProperty(propertyName, String.valueOf(propertyValue));
   }
 
+
+
+
+  /**
+   * Opens and returns a new user <code>MemoryFile</code> with the specified
+   * name. If a file with the specified name already exists, it is removed.
+   */
+
+  public MemoryFile createFile(String name){
+    MemoryFile file = new MemoryFile();
+    String filename = getID()+"."+name;
+    getUser().putFile(filename, file);
+    return file;
+  }
+
+
+
+
+  /**
+   * Returns the user's <code>MemoryFile</code> with the specified name, or 
+   * <code>null</code> if there is no such file.
+   */
+
+  public MemoryFile getFile(String name){
+    String filename = getID()+"."+name;
+    return getUser().getFile(filename);
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if a user <code>MemoryFile</code> with the
+   * specified name exists. Returns <code>false</code> otherwise.
+   */
+
+  public boolean fileExists(String name){
+    return getFile(name) != null;
+  }
 
 
 
