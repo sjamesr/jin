@@ -471,7 +471,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       return Atomic.getInstance();
 
     // This means it's a fake variant we're using because the server hasn't told us the real one.
-    else if (categoryName.equals("fake-variant"))
+    else if (categoryName.equals("Unknown variant"))
       return Chess.getInstance();
 
     return null;
@@ -670,12 +670,13 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     }
     else if (!unsupportedGames.contains(gameNumber)){ 
       // Grr, the server started a game without sending us a GameInfo line.
-      // Currently happens if you start examining a game (26.08.2002)
+      // Currently happens if you start examining a game (26.08.2002), or
+      // doing "refresh <game>" (04.07.2004).
 
       // We have no choice but to fake the data, since the server simply doesn't
       // send us this information.
       GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(),
-        false, "fake-variant", false, false, false, boardData.getInitialTime(),
+        false, "Unknown variant", false, false, false, boardData.getInitialTime(),
         boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(),
         0, -1, ' ', -1, ' ', false, false);
 
@@ -1311,9 +1312,11 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     Player currentPlayer = playerForString(boardData.getCurrentPlayer());
 
-    boolean whiteRunning = boardData.isClockRunning() && currentPlayer.isWhite();
-    boolean blackRunning = boardData.isClockRunning() && currentPlayer.isBlack();
-
+    // Don't make clocks run for an isolated position.
+    boolean isIsolatedBoard = game.getGameType() == Game.ISOLATED_BOARD; 
+    boolean whiteRunning = (!isIsolatedBoard) && boardData.isClockRunning() && currentPlayer.isWhite();
+    boolean blackRunning = (!isIsolatedBoard) && boardData.isClockRunning() && currentPlayer.isBlack();
+    
     listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.WHITE_PLAYER, whiteTime, whiteRunning));
     listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.BLACK_PLAYER, blackTime, blackRunning));
   }
