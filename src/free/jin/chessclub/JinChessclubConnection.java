@@ -354,7 +354,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, playername, title, message, null);
+    ChatEvent evt = new ChatEvent(this, tellTypeString, playername, title, -1, message, null);
     listenerManager.fireChatEvent(evt);
   }
 
@@ -367,8 +367,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processPersonalQTell(String name, String titles, String message){
-    ChatEvent evt = new ChatEvent(this, "qtell", name, displayableTitle(titles), message, null);
-    listenerManager.fireChatEvent(evt);
+    listenerManager.fireChatEvent(
+      new ChatEvent(this, "qtell", name, displayableTitle(titles), -1, message, null));
   }
 
 
@@ -394,7 +394,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, null);
+    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, -1, message, null);
     listenerManager.fireChatEvent(evt);
   }
 
@@ -419,7 +419,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, new Integer(channel));
+    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, -1, message, new Integer(channel));
     listenerManager.fireChatEvent(evt);
   }
 
@@ -432,7 +432,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processChannelQTell(int channel, String name, String titles, String message){
-    ChatEvent evt = new ChatEvent(this, "channel-qtell", name, displayableTitle(titles), message, new Integer(channel));
+    ChatEvent evt = new ChatEvent(this, "channel-qtell", name, displayableTitle(titles),
+      -1, message, new Integer(channel));
+
     listenerManager.fireChatEvent(evt);
   }
 
@@ -449,7 +451,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, message, new Integer(gameNumber));
+    ChatEvent evt = new ChatEvent(this, tellTypeString, playerName, title, -1, message,
+      new Integer(gameNumber));
     listenerManager.fireChatEvent(evt);
   }
 
