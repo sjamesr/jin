@@ -50,59 +50,75 @@ import java.lang.reflect.Array;
  * for the chessclub.com server.
  */
 
-public class JinChessclubConnection extends ChessclubConnection implements JinConnection, 
-    SeekJinConnection, GameListJinConnection, PGNJinConnection{
+public class JinChessclubConnection extends ChessclubConnection implements Connection, 
+    SeekConnection, GameListConnection, PGNConnection{
 
 
 
   /**
-   * Our listener manager
+   * The context.
+   */
+  
+  private final JinContext context;
+
+
+
+  /**
+   * Our listener manager.
    */
 
-  private final ChessclubJinListenerManager listenerManager = new ChessclubJinListenerManager(this);
-
-
+  private final ChessclubListenerManager listenerManager = new ChessclubListenerManager(this);
 
 
  
   /**
-   * Creates a new JinChessclubConnection with the given hostname, port, username
-   * and password.
-   *
-   * @param hostname The name of the host to which to connect.
-   * @param port The port on which to connect.
-   * @param username The name of the account to log on with.
-   * @param password The password of the account to log on with.
+   * Creates a new JinChessclubConnection with the specified details.
    */
 
-  public JinChessclubConnection(String hostname, int port, String username, String password){
-    super(hostname, port, username, password, System.out);
+  public JinChessclubConnection(JinContext context, String username, String password){
+    super(username, password, System.out);
 
-    setInterface(Jin.getInterfaceName());
+    this.context = context;
+
+    setInterface(context.getAppName() + " " + context.getAppVersion() +
+      " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
+      "," + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
   }
 
 
 
-
   /**
-   * Returns the ChessclubJinListenerManager.
+   * Returns the listener manager as its actual type for use by ICC specific
+   * code.
    */
 
-  public ChessclubJinListenerManager getChessclubJinListenerManager(){
+  public ChessclubListenerManager getChessclubListenerManager(){
     return listenerManager;
   }
 
 
 
-
   /**
-   * Returns the JinListenerManager.
+   * Returns the listener manager.
    */
 
-  public JinListenerManager getJinListenerManager(){
-    return getChessclubJinListenerManager();
+  public ListenerManager getListenerManager(){
+    return getChessclubListenerManager();
   }
 
+
+
+
+  /**
+   * Fires an ATTEMPING connection event and invokes the superclass' method.
+   */
+
+  public boolean connectAndLogin(String hostname, int port) throws IOException{
+    listenerManager.fireConnectionEvent(
+      new ConnectionEvent(this, ConnectionEvent.ATTEMPTING, hostname, port));
+
+    return super.connectAndLogin(hostname, port);
+  }
 
 
 
@@ -115,7 +131,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void onLogin(){
     super.onLogin();
 
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN));
+    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN,
+      getHostname(), getPort()));
 
     sendCommand("set-quietly wrap 0");
     sendCommand("set-quietly bell 0");
@@ -127,7 +144,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       sendCommand("set-2 "+Datagram.DG_TOURNEY+" 1");
     }
   }
-
 
 
 
@@ -192,13 +208,13 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * thread of course).
    */
 
-  protected Socket createSocket(String hostname, int port) throws IOException{
+  protected Socket createSocket(final String hostname, final int port) throws IOException{
     Socket sock = new free.chessclub.timestamp.TimestampingSocket(hostname, port);
 
     execRunnable(new Runnable(){
 
       public void run(){
-        listenerManager.fireConnectionEvent(new ConnectionEvent(JinChessclubConnection.this, ConnectionEvent.ESTABLISHED));
+        listenerManager.fireConnectionEvent(new ConnectionEvent(JinChessclubConnection.this, ConnectionEvent.ESTABLISHED, hostname, port));
       }
 
     });
@@ -308,11 +324,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void exit(){
-    sendCommand("exit");
+    quit();
   }
-
-
-
 
 
 
@@ -322,7 +335,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   protected void processDisconnection(){
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOST));
+    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOST, getHostname(), getPort()));
   }
 
 
@@ -1973,14 +1986,13 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-
   /**
-   * Returns the SeekJinListenerManager via which you can register and
+   * Returns the <code>SeekListenerManager</code> via which you can register and
    * unregister SeekListeners.
    */
 
-  public SeekJinListenerManager getSeekJinListenerManager(){
-    return getChessclubJinListenerManager();
+  public SeekListenerManager getSeekListenerManager(){
+    return getChessclubListenerManager();
   }
 
 
@@ -2101,12 +2113,12 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Returns the GameListJinListenerManager via which you can register and
-   * unregister GameListListeners.
+   * Returns the <code>GameListListenerManager</code> via which you can register
+   * and unregister GameListListeners.
    */
 
-  public GameListJinListenerManager getGameListJinListenerManager(){
-    return getChessclubJinListenerManager();
+  public GameListListenerManager getGameListListenerManager(){
+    return getChessclubListenerManager();
   }
 
 
