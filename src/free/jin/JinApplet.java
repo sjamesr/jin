@@ -51,11 +51,11 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * These override any applet parameters for the <code>getParameter</code>
-   * method.
+   * Autologin parameters for Jin. They override any applet parameters in
+   * <code>getParameter</code>.
    */
    
-  private final Properties params = new Properties();
+  private final Properties autologinParams = new Properties();
   
   
   
@@ -159,6 +159,7 @@ public class JinApplet extends Applet implements JinContext{
       password = null;
       
       removeAll();
+      autologinParams.clear();
       
       // The server needs to be recreated because the user might use a different
       // account after restarting Jin, which means a different guest User.
@@ -187,9 +188,9 @@ public class JinApplet extends Applet implements JinContext{
     
     server.setGuestUser(guestUser);
     
-    params.put("login.username", username);
-    params.put("login.password", password);
-    params.put("autologin", "true");
+    autologinParams.put("login.username", username);
+    autologinParams.put("login.password", password);
+    autologinParams.put("autologin", "true");
     
     Jin.createInstance(this);
     Jin.getInstance().start();
@@ -209,8 +210,8 @@ public class JinApplet extends Applet implements JinContext{
     
     server.setGuestUser(null);
     
-    params.put("login.guest", "true");
-    params.put("autologin", "true");
+    autologinParams.put("login.guest", "true");
+    autologinParams.put("autologin", "true");
     
     Jin.createInstance(this);
     Jin.getInstance().start();
@@ -324,7 +325,7 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   public String getParameter(String paramName){
-    String paramValue = params.getProperty(paramName);
+    String paramValue = autologinParams.getProperty(paramName);
     
     return paramValue == null ? super.getParameter(paramName) : paramValue;
   }
