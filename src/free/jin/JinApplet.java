@@ -154,12 +154,21 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   private void restart(){
-    username = null;
-    password = null;
-    
-    removeAll();
-    add(new UserAuthPanel());
-    validate();
+    try{
+      username = null;
+      password = null;
+      
+      removeAll();
+      
+      // The server needs to be recreated because the user might use a different
+      // account after restarting Jin, which means a different guest User.
+      server = loadServer();
+      
+      add(new UserAuthPanel());
+      validate();
+    } catch (Throwable t){
+        createErrorUI(t);
+      }
   }
   
   
