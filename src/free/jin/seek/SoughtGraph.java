@@ -176,11 +176,15 @@ public class SoughtGraph extends JComponent{
     setBackground(prefs.getColor("background-color", Color.white));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
 
-    Image bgImage = getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
-    try{
-      if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
-        bgImage = null;
-    } catch (InterruptedException e){}
+    String bgImageFilename = prefs.getString("background.image", null);
+    Image bgImage = bgImageFilename == null ? null :
+      getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
+    if (bgImage != null){
+      try{
+        if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
+          bgImage = null;
+      } catch (InterruptedException e){}
+    }
 
     this.bgImage = bgImage;
 

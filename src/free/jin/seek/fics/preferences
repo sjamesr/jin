@@ -13,3 +13,5 @@ seek-image.unrated.computer.Chess = string;unrated_comp.gif
 fast-category.name = string;Lightning
 medium-category.name = string;Blitz
 slow-category.name = string;Standard
+
+background.image = string;background.gif
