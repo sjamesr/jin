@@ -157,25 +157,6 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The color used for move highlighting.
-   */
-
-  private Color moveHighlightColor = Color.cyan.darker();
-
-
-
-
-  /**
-   * The color used for highlighting the square when in CROSSHAIR_DRAGGED_PIECE
-   * mode.
-   */
-
-  private Color crosshairDragHighlightColor = Color.blue;
-
-
-
-
-  /**
    * The Position on the board.
    */
 
@@ -325,6 +306,23 @@ public class JBoard extends JComponent{
 
 
 
+  /**
+   * The color used for move highlighting.
+   */
+
+  private Color moveHighlightingColor = Color.cyan.darker();
+
+
+
+
+  /**
+   * The color used for highlighting the square when dragging a piece.
+   */
+
+  private Color dragSquareHighlightingColor = Color.blue;
+
+
+
 
   /**
    * The current highlighted move.
@@ -389,22 +387,38 @@ public class JBoard extends JComponent{
 
 
 
+
+  /**
+   * Creates a new JBoard with the specified position and BoardPainter and
+   * PiecePainter.
+   */
+
+  public JBoard(Position position, BoardPainter boardPainter, PiecePainter piecePainter){
+    if (position == null)
+      throw new IllegalArgumentException("The Position may not be null");
+    if (boardPainter == null)
+      throw new IllegalArgumentException("The BoardPainter may not be null");
+    if (piecePainter == null)
+      throw new IllegalArgumentException("The PiecePainter may not be null");
+
+    setPosition(position);
+    this.boardPainter = boardPainter;
+    this.piecePainter = piecePainter;
+
+    setOpaque(true);
+    setDoubleBuffered(false); // We're double buffering ourselves.
+    enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+  }
+
+
+
+
   /**
    * Creates a new JBoard with the given position set on it.
    */
 
   public JBoard(Position position){
-    if (position == null)
-      throw new IllegalArgumentException("The Position may not be null");
-
-    setOpaque(true);
-    setDoubleBuffered(false); // We're double buffering ourselves.
-
-    setPosition(position);
-    this.boardPainter = position.getVariant().createDefaultBoardPainter();
-    this.piecePainter = position.getVariant().createDefaultPiecePainter();
-
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    this(position, position.getVariant().createDefaultBoardPainter(), position.getVariant().createDefaultPiecePainter());
   }
   
 
@@ -768,8 +782,8 @@ public class JBoard extends JComponent{
    * Sets the color used for move highlighting to the specified color.
    */
 
-  public void setMoveHighlightColor(Color moveHighlightColor){
-    this.moveHighlightColor = moveHighlightColor;
+  public void setMoveHighlightingColor(Color moveHighlightingColor){
+    this.moveHighlightingColor = moveHighlightingColor;
     repaint();
   }
 
@@ -780,32 +794,32 @@ public class JBoard extends JComponent{
    * Returns the color used for move highlighting.
    */
 
-  public Color getMoveHighlightColor(){
-    return moveHighlightColor;
+  public Color getMoveHighlightingColor(){
+    return moveHighlightingColor;
   }
 
 
 
 
   /**
-   * Sets the color used for square highlighting when in CROSSHAIR_DRAGGED_PIECE
-   * mode to the specified color.
+   * Sets the color used for square highlighting when dragging a piece (such as
+   * what occurs when in CROSSHAIR_DRAGGED_PIECE mode) to the specified color.
    */
 
-  public void setCrosshairDragHighlightColor(Color crosshairDragHighlightColor){
-    this.crosshairDragHighlightColor = crosshairDragHighlightColor;
+  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
+    this.dragSquareHighlightingColor = dragSquareHighlightingColor;
     repaint();
   }
 
 
 
   /**
-   * Returns the color used for square highlighting when in
-   * CROSSHAIR_DRAGGED_PIECE mode.
+   * Returns the color used for square highlighting when dragging a piece (such
+   * as what occurs when in CROSSHAIR_DRAGGED_PIECE mode).
    */
 
-  public Color getCrosshairDragHighlightColor(){
-    return crosshairDragHighlightColor;
+  public Color getDragSquareHighlightingColor(){
+    return dragSquareHighlightingColor;
   }
 
    
@@ -882,11 +896,11 @@ public class JBoard extends JComponent{
       Square to = highlightedMove.getEndingSquare();
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
-          drawSquare(cacheGraphics, from, 2, getMoveHighlightColor());
-          drawSquare(cacheGraphics, to, 2, getMoveHighlightColor());
+          drawSquare(cacheGraphics, from, 2, getMoveHighlightingColor());
+          drawSquare(cacheGraphics, to, 2, getMoveHighlightingColor());
         }
         else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
-          drawArrow(cacheGraphics, from, to, 5, getMoveHighlightColor());
+          drawArrow(cacheGraphics, from, to, 5, getMoveHighlightingColor());
       }
     }
 
@@ -902,7 +916,7 @@ public class JBoard extends JComponent{
         piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-        drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, getCrosshairDragHighlightColor());
+        drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, getDragSquareHighlightingColor());
     }
 
     componentGraphics.drawImage(cacheImage, 0, 0, null);
