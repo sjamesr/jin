@@ -1012,11 +1012,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     JMenu moveHighlightingMenu =  new JMenu("Move Highlighting");
     moveHighlightingMenu.setMnemonic('H');
     
-    JRadioButtonMenuItem noMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("No Highlighting",
+    JRadioButtonMenuItem noMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("None",
       moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem squareMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Square Highlighting",
+    JRadioButtonMenuItem squareMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Square",
       moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem arrowMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Arrow Highlighting",
+    JRadioButtonMenuItem arrowMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Arrow",
       moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
 
     noMoveHighlightingStyleMenuItem.setMnemonic('N');
