@@ -343,7 +343,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       String text = view.getText();
 
       if ((viewSize.height <= viewportSize.height) || (viewportSize.height < 0) 
-          || settingViewSize || (text == null) || (text.length() == 0)){
+          || settingViewSize || (width == this.getWidth()) || (text == null)
+          || (text.length() == 0)){
         super.reshape(x, y, width, height);
         return;
       }
