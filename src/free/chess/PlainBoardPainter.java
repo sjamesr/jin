@@ -24,7 +24,7 @@ package free.chess;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.image.ImageObserver;
+import java.awt.Component;
 
 
 /**
@@ -122,7 +122,7 @@ public class PlainBoardPainter implements ColoredBoardPainter{
    * the given size.
    */
 
-  public void paintBoard(Graphics g, ImageObserver observer, int x, int y, int width, int height){
+  public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     int squareWidth = width/8;
     int squareHeight = height/8;
     for (int i=0;i<8;i++)

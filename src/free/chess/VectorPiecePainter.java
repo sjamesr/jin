@@ -336,7 +336,7 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
    * the given Graphics.
    */
 
-  public void paintPiece(Piece piece, Graphics g, ImageObserver observer, Rectangle rect,
+  public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean shaded){
 
     Color pieceColor = (piece.isWhite() ? getWhiteColor() : getBlackColor());
@@ -372,7 +372,7 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
     else if (cPiece.isPawn())
       drawPawnImage(g, width, height, pieceColor, outlineColor);
 
-    g.translate(-x,-y);
+    g.translate(-x, -y);
   }
 
 

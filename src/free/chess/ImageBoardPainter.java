@@ -22,7 +22,6 @@
 package free.chess;
 
 import java.awt.*;
-import java.awt.image.ImageObserver;
 import free.util.ImageUtilities;
 
 
@@ -264,7 +263,7 @@ public class ImageBoardPainter implements BoardPainter{
    * the given size.
    */
 
-  public void paintBoard(Graphics g, ImageObserver observer, int x, int y, int width, int height){
+  public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     scaleImages(width, height);
 
     if (boardImage == null){
@@ -282,26 +281,26 @@ public class ImageBoardPainter implements BoardPainter{
           
           if ((file+rank) % 2 == 0){
             if (isScaled)
-              g.drawImage(scaledDark, drawnRect.x, drawnRect.y, observer);
+              g.drawImage(scaledDark, drawnRect.x, drawnRect.y, component);
             else{
               g.setClip(clipRect.intersection(drawnRect));
               int imgX = Math.max(0, file * (dwidth - drawnRect.width)/7);
               int imgY = Math.max(0, ((7-rank)/2) * (dheight - drawnRect.height)/3);
               for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += dwidth)
                 for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += dheight)
-                  g.drawImage(darkImage, offx - imgX, offy - imgY, observer);
+                  g.drawImage(darkImage, offx - imgX, offy - imgY, component);
             }
           }
           else{
             if (isScaled)
-              g.drawImage(scaledLight, drawnRect.x, drawnRect.y, observer);
+              g.drawImage(scaledLight, drawnRect.x, drawnRect.y, component);
             else{
               g.setClip(clipRect.intersection(drawnRect));
               int imgX = Math.max(0, file * (lwidth - drawnRect.width)/7);
               int imgY = Math.max(0, ((7-rank)/2) * (lheight - drawnRect.height)/3);
               for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += lwidth)
                 for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += lheight)
-                  g.drawImage(lightImage, offx - imgX, offy - imgY, observer);
+                  g.drawImage(lightImage, offx - imgX, offy - imgY, component);
             }
           }
         }
@@ -310,7 +309,7 @@ public class ImageBoardPainter implements BoardPainter{
       g.setClip(clipRect);
     }
     else{
-      g.drawImage(scaled, x, y, observer);
+      g.drawImage(scaled, x, y, component);
     }
   } 
 

@@ -22,7 +22,7 @@
 package free.chess;
 
 import java.awt.Graphics;
-import java.awt.image.ImageObserver;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
@@ -45,11 +45,12 @@ public interface PiecePainter{
 
   /**
    * Paints the given piece at the given coordinates on the given
-   * <code>Graphics</code> object scaled to the given size.
-   * The <code>shaded</code> argument specifies whether the piece should be
-   * drawn in a special, shaded manner.
+   * <code>Graphics</code> object scaled to the given size. The
+   * <code>component</code> argument may be null. The <code>shaded</code>
+   * argument specifies whether the piece should be drawn in a special, shaded
+   * manner.
    */
 
-  void paintPiece(Piece piece, Graphics g, ImageObserver observer, Rectangle rect, boolean shaded);
+  void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect, boolean shaded);
 
 }

@@ -23,7 +23,7 @@ package free.chess;
 
 import java.awt.Graphics;
 import java.awt.Dimension;
-import java.awt.image.ImageObserver;
+import java.awt.Component;
 
 
 /**
@@ -45,9 +45,9 @@ public interface BoardPainter{
 
   /**
    * Paints the board at the given location on the given Graphics scaled to
-   * the given size.
+   * the given size. The <code>component</code> argument may be null.
    */
 
-  void paintBoard(Graphics g, ImageObserver observer, int x, int y, int width, int height);
+  void paintBoard(Graphics g, Component component, int x, int y, int width, int height);
 
 }

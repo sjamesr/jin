@@ -185,7 +185,7 @@ public class ImagePiecePainter implements PiecePainter{
    * Graphics object scaled to the given size.
    */
 
-  public void paintPiece(Piece piece, Graphics g, ImageObserver observer, Rectangle rect,
+  public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean shaded){
 
     int x = rect.x;
@@ -201,7 +201,7 @@ public class ImagePiecePainter implements PiecePainter{
       } catch (InterruptedException e){}
     int pieceWidth = pieceImage.getWidth(null);
     int pieceHeight = pieceImage.getHeight(null);
-    g.drawImage(pieceImage, x + (width - pieceWidth)/2, y + (height - pieceHeight)/2, observer);
+    g.drawImage(pieceImage, x + (width - pieceWidth)/2, y + (height - pieceHeight)/2, component);
   }
 
 

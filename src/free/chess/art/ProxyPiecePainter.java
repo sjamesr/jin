@@ -87,9 +87,9 @@ public class ProxyPiecePainter implements PiecePainter{
    * Delegates the call to the "real" <code>PiecePainter</code>.
    */
 
-  public void paintPiece(Piece piece, Graphics g, ImageObserver observer, Rectangle rect,
+  public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean shaded){
-    delegate.paintPiece(piece, g, observer, rect, shaded);
+    delegate.paintPiece(piece, g, component, rect, shaded);
   }
 
 
