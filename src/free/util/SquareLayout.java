@@ -50,7 +50,7 @@ public class SquareLayout implements LayoutManager{
    */
    
   public static Container createSquareContainer(Component child){
-    Container container = new Container();
+    Container container = new ConcreteContainer();
     container.setLayout(new SquareLayout());
     container.add(child);
     
