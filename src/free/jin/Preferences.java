@@ -30,6 +30,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.applet.Applet;
 
 
 /**
@@ -455,7 +456,8 @@ public abstract class Preferences{
 
   /**
    * Writes this <code>Preferences</code> object into the specified output
-   * stream.
+   * stream. The format is as documented in the <code>load(InputStream)</code>
+   * method.
    */
 
   public void save(OutputStream out) throws IOException{
@@ -507,11 +509,37 @@ public abstract class Preferences{
 
 
   /**
-   * Reads preferences from the specified input stream. If the format version
-   * of the preferences is different than the one supported by this class, an
-   * empty <code>Preferences</code> object is returned.
-   *
-   * @param in The input stream from which the preferences are read.
+   * Reads preferences from the specified input stream. The format is:
+   * <ul>
+   *   <li> Each line is either an empty line, a comment line or a preference
+   *        line.
+   *   <li> An empty line is a line consisting entirely of whitespace
+   *        characters.
+   *   <li> A command line is a line whose first character is '#'.
+   *   <li> A preference line is a line in the format
+   *        <code>[whitespace]preferenceName[whitespace]=[whitespace]preferenceType;preferenceValue[whitespace]</code>.
+   *   <li> The allowed preference types and their corresponding allowed values
+   *        are:
+   *     <ul>
+   *       <li> <code>boolean</code> - Either <code>true</code> or
+   *            <code>false</code>.
+   *       <li> <code>integer</code> - An integer in standard notation, fitting
+   *            into a 32-bit signed int.
+   *       <li> <code>double</code> - A fractional number, in standard notation.
+   *       <li> <code>string</code> - Any string.
+   *       <li> <code>intlist</code> - A list of integers in standard notation,
+   *            separated by spaces (each must fit into a 32-bit signed int).
+   *       <li> <code>color</code> - An integer in hexadecimal notation in the
+   *            range [0..0xffffff], specifying the color components in RGB
+   *            format.
+   *       <li> <code>rect.int</code> - A string in the format
+   *            <code>x;y;width;height</code> where the values are specified as
+   *            integers in standard notation.
+   *       <li> <code>rect.double</code> - A string in the format
+   *            <code>x;y;width;height</code> where the values are specified as
+   *            fractions and usually mean a part of some bigger rectangle.
+   *     </ul>
+   * </ul>
    */
 
   public static Preferences load(InputStream in) throws IOException{
@@ -532,14 +560,81 @@ public abstract class Preferences{
       if (eqIndex == -1)
         throw new FormatException("No \'=\' found on line: " + line);
 
-      String propName = line.substring(0, eqIndex).trim();
-      String propValue = line.substring(eqIndex + 1).trim();
-      prefs.set(propName, parsePreference(propValue));
+      String prefName = line.substring(0, eqIndex).trim();
+      String prefValue = line.substring(eqIndex + 1).trim();
+      prefs.set(prefName, parsePreference(prefValue));
     }
 
     return prefs;
   }
+  
+  
+  
+  /**
+   * Loads preferences of the specified category from the parameters of the
+   * specified Applet. The applet must have its stub set, of course.
+   * The format is:
+   * <ul>
+   *   <li> A parameter named <code>category.prefsCount</code> specifies the
+   *        amount of preferences where category is the corresponding argument
+   *        to this method. If this parameter is not present, it's assumed that
+   *        there are no preferences and an empty Preferences object is
+   *        returned.
+   *   <li> Each preference is specified by a single parameter named
+   *        <code>category.index</code> where index is a number between 0
+   *        (inclusive) and the amount of preferences (exclusive).
+   *        The value of this parameter is a string in the format
+   *        <code>preferenceName[whitespace]=[whitespace]preferenceType;preferenceValue</code>.
+   *   <li> The allowed preference types and their corresponding allowed values
+   *        are:
+   *     <ul>
+   *       <li> <code>boolean</code> - Either <code>true</code> or
+   *            <code>false</code>.
+   *       <li> <code>integer</code> - An integer in standard notation, fitting
+   *            into a 32-bit signed int.
+   *       <li> <code>double</code> - A fractional number, in standard notation.
+   *       <li> <code>string</code> - Any string.
+   *       <li> <code>intlist</code> - A list of integers in standard notation,
+   *            separated by spaces (each must fit into a 32-bit signed int).
+   *       <li> <code>color</code> - An integer in hexadecimal notation in the
+   *            range [0..0xffffff], specifying the color components in RGB
+   *            format.
+   *       <li> <code>rect.int</code> - A string in the format
+   *            <code>x;y;width;height</code> where the values are specified as
+   *            integers in standard notation.
+   *       <li> <code>rect.double</code> - A string in the format
+   *            <code>x;y;width;height</code> where the values are specified as
+   *            fractions and usually mean a part of some bigger rectangle.
+   *     </ul>
+   * </ul>
+   */
+  
+  public static Preferences load(Applet applet, String category){
+    BeanPreferences prefs = new BeanPreferences();
+    
+    String prefsCountString = applet.getParameter(category + ".prefsCount");
+    int prefsCount = 
+      prefsCountString == null ? 0 : Integer.parseInt(prefsCountString);
+    
+    System.out.println("Loading " + prefsCount + "preferences");
+    
+    for (int i = 0; i < prefsCount; i++){
+      String preference = applet.getParameter(category + "." + i);
+      if (preference == null)
+        continue;
+      
+      int eqIndex = preference.indexOf("=");
+      if (eqIndex == -1)
+        throw new FormatException("No \'=\' found in preference No. " + i);
 
+      String prefName = preference.substring(0, eqIndex).trim();
+      String prefValue = preference.substring(eqIndex + 1).trim();
+      prefs.set(prefName, parsePreference(prefValue));
+      
+    }
+    
+    return prefs;
+  }
 
 
   /**
