@@ -35,7 +35,7 @@ import free.util.PairKey;
 
 /**
  * An extension of ImagePiecePainter which loads the images by using the
- * Class.getResourceAsStream() method, allowing you to package piece sets
+ * Class.getResource() method, allowing you to package piece sets
  * along with your application's jar file.
  */
 
@@ -51,7 +51,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
    * is a Hashtable of preloaded images.
    */
 
-  private final static Hashtable cache = new Hashtable();
+  private static final Hashtable cache = new Hashtable();
 
 
 
@@ -145,58 +145,44 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
       Hashtable pieces = new Hashtable(15);
       Integer size = new Integer(sizes.nextToken());
 
-      InputStream in;
-      byte [] imageData;
       Image image;
 
       String dirName = relPath+"/"+size;
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wk.gif"));
-      pieces.put(ChessPiece.WHITE_KING, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_KING, image = toolkit.createImage(c.getResource(dirName+"/wk.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/bk.gif"));
-      pieces.put(ChessPiece.BLACK_KING, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_KING, image = toolkit.createImage(c.getResource(dirName+"/bk.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wq.gif"));
-      pieces.put(ChessPiece.WHITE_QUEEN, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_QUEEN, image = toolkit.createImage(c.getResource(dirName+"/wq.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/bq.gif"));
-      pieces.put(ChessPiece.BLACK_QUEEN, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_QUEEN, image = toolkit.createImage(c.getResource(dirName+"/bq.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wr.gif"));
-      pieces.put(ChessPiece.WHITE_ROOK, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_ROOK, image = toolkit.createImage(c.getResource(dirName+"/wr.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/br.gif"));
-      pieces.put(ChessPiece.BLACK_ROOK, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_ROOK, image = toolkit.createImage(c.getResource(dirName+"/br.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wb.gif"));
-      pieces.put(ChessPiece.WHITE_BISHOP, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_BISHOP, image = toolkit.createImage(c.getResource(dirName+"/wb.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/bb.gif"));
-      pieces.put(ChessPiece.BLACK_BISHOP, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_BISHOP, image = toolkit.createImage(c.getResource(dirName+"/bb.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wn.gif"));
-      pieces.put(ChessPiece.WHITE_KNIGHT, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_KNIGHT, image = toolkit.createImage(c.getResource(dirName+"/wn.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/bn.gif"));
-      pieces.put(ChessPiece.BLACK_KNIGHT, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_KNIGHT, image = toolkit.createImage(c.getResource(dirName+"/bn.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/wp.gif"));
-      pieces.put(ChessPiece.WHITE_PAWN, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.WHITE_PAWN, image = toolkit.createImage(c.getResource(dirName+"/wp.gif")));
       tracker.addImage(image, 0);
 
-      imageData = IOUtilities.readToEnd(c.getResourceAsStream(dirName+"/bp.gif"));
-      pieces.put(ChessPiece.BLACK_PAWN, image = toolkit.createImage(imageData));
+      pieces.put(ChessPiece.BLACK_PAWN, image = toolkit.createImage(c.getResource(dirName+"/bp.gif")));
       tracker.addImage(image, 0);
 
       pieceImages.put(size, pieces);
