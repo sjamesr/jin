@@ -669,19 +669,23 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   protected void addMoveToListTable(Move move){
     DefaultTableModel model = (DefaultTableModel)moveListTableModel;
     int rowCount = moveListTable.getRowCount();
-    if ((rowCount>0)&&(moveListTable.getValueAt(rowCount-1,2)==null))
-      model.setValueAt(move, rowCount-1, 2);
-    else{
+    if ((rowCount == 0) || move.getPlayer().isWhite()){
       model.setNumRows(++rowCount);
       model.setValueAt(rowCount+".", rowCount-1, 0);
-      model.setValueAt(move, rowCount-1, 1);
+    }
+    if (move.getPlayer().isWhite())
+      model.setValueAt(move, rowCount - 1, 1);
+    else{
+      model.setValueAt(move, rowCount - 1, 2);
     }
 
     if (displayedMoveNumber==0)
       moveListTable.clearSelection();
     else{
-      int row = (displayedMoveNumber-1)/2;
-      int column = ((displayedMoveNumber%2 == 0) ? 2 : 1);
+      boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
+      int visualMoveNumber = isFirstMoveBlack ? displayedMoveNumber + 1 : displayedMoveNumber;
+      int row = (visualMoveNumber-1)/2;
+      int column = ((visualMoveNumber%2 == 0) ? 2 : 1);
       isMoveListTableSelectionUpdating = true;
       moveListTable.setRowSelectionInterval(row, row);
       moveListTable.setColumnSelectionInterval(column, column);
@@ -701,28 +705,31 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   protected void updateMoveListTable(){
     DefaultTableModel model = (DefaultTableModel)moveListTableModel;
     int moveCount = madeMoves.size();
-    model.setNumRows((moveCount+1)/2);
-    for (int i=0;i<moveCount/2;i++){
-      Move whiteMove = (Move)madeMoves.elementAt(i*2);
-      Move blackMove = (Move)madeMoves.elementAt(i*2+1);
+    boolean isFirstMoveBlack = (moveCount > 0) && ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
+    int numRows = isFirstMoveBlack ? 1+moveCount/2 : (moveCount+1)/2;
+    model.setNumRows(numRows);
+    for (int i = 0; i < numRows; i++)
       model.setValueAt((i+1)+".", i, 0);
-      model.setValueAt(whiteMove, i, 1);
-      model.setValueAt(blackMove, i, 2);
+
+    int row = 0;
+    int column = isFirstMoveBlack ? 2 : 1;
+    for (int i = 0; i < moveCount; i++){
+      Object move = madeMoves.elementAt(i);
+      model.setValueAt(move, row, column);
+      column++;
+      if (column == 3){
+        row++;
+        column = 1;
+      }
     }
 
-    if (moveCount%2!=0){
-      int row = model.getRowCount()-1;
-      Move whiteMove = (Move)madeMoves.lastElement();
-      model.setValueAt((row+1)+".", row, 0);
-      model.setValueAt(whiteMove, row, 1);
-      model.setValueAt(null, row, 2);
-    }
 
     if (displayedMoveNumber==0)
       moveListTable.clearSelection();
     else{
-      int row = (displayedMoveNumber-1)/2;
-      int column = ((displayedMoveNumber%2 == 0) ? 2 : 1);
+      int visualMoveNumber = isFirstMoveBlack ? displayedMoveNumber + 1 : displayedMoveNumber;
+      row = (visualMoveNumber-1)/2;
+      column = ((visualMoveNumber%2 == 0) ? 2 : 1);
       isMoveListTableSelectionUpdating = true;
       moveListTable.setRowSelectionInterval(row, row);
       moveListTable.setColumnSelectionInterval(column, column);
@@ -1278,19 +1285,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if ((row==-1)||(column==-1))
       return;
 
-    int moveNum;
-    if (column==0)
-      moveNum = row*2;
-    else if (column==1)
-      moveNum = row*2+1;
-    else
-      moveNum = row*2+2;
+    boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
 
-    if (moveNum>madeMoves.size()) // The user pressed an empty cell
-      return;
+    int moveNum = column + row*2;
+    if (isFirstMoveBlack && (moveNum > 0))
+      moveNum--;
+
+    if (moveNum == madeMoves.size() + 1) // The user pressed the last empty cell
+      moveNum--;
+
+    if (moveNum > madeMoves.size()) // Shouldn't happen
+      throw new IllegalStateException();
 
     Position pos = game.getInitialPosition();
-    for (int i=0;i<moveNum;i++){
+    for (int i = 0; i < moveNum; i++){
       Move move = (Move)madeMoves.elementAt(i);
       pos.makeMove(move);
     }
@@ -1299,7 +1307,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(pos);
     isBoardPositionUpdating = false;
     displayedMoveNumber = moveNum;
-    board.setEnabled(displayedMoveNumber==madeMoves.size());
+    board.setEnabled(displayedMoveNumber == madeMoves.size());
 
     updatePositionScrollBar();
   }
@@ -1321,7 +1329,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
       int moveNum = positionScrollBar.getValue();
       Position pos = game.getInitialPosition();
-      for (int i=0;i<moveNum;i++){
+      for (int i = 0; i < moveNum; i++){
         Move move = (Move)madeMoves.elementAt(i);
         pos.makeMove(move);
       }
@@ -1330,7 +1338,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.getPosition().copyFrom(pos);
       isBoardPositionUpdating = false;
       displayedMoveNumber = moveNum;
-      board.setEnabled(displayedMoveNumber==madeMoves.size());
+      board.setEnabled(displayedMoveNumber == madeMoves.size());
 
       updateMoveListTable();
     }
