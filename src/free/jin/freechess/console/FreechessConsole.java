@@ -23,6 +23,7 @@ package free.jin.freechess.console;
 
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
+import free.jin.console.ConsoleTextPane;
 import free.jin.plugin.Plugin;
 
 
@@ -51,6 +52,18 @@ public class FreechessConsole extends Console{
 
   protected ConsoleTextField createInputComponent(){
     return new FreechessConsoleTextField(this);
+  }
+
+
+
+
+  /**
+   * Overrides <code>Console.createOutputComponent()</code> since we need a
+   * special <code>ConsoleTextPane</code> for FICS.
+   */
+
+  protected ConsoleTextPane createOutputComponent(){
+    return new FreechessConsoleTextPane(this);
   }
 
 
