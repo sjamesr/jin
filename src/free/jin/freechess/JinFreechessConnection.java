@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -25,6 +25,8 @@ import free.jin.*;
 import free.jin.event.*;
 import free.chess.*;
 import free.freechess.*;
+import jregex.Pattern;
+import jregex.Matcher;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -37,6 +39,7 @@ import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
 import free.chess.variants.atomic.Atomic;
 import free.util.Pair;
+
 
 
 /**
@@ -282,17 +285,38 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+  /**
+   * Regex for matching tourney tell qtells.
+   */
+
+  private static final Pattern tourneyTellPattern =
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(T(\\d+)\\): (.*)");
+
+
 
   /**
    * Fires an appropriate ChatEvent.
    */
 
   protected boolean processQTell(String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "qtell", null, null, -1, message, null));
+    ChatEvent evt;
+    Matcher matcher = tourneyTellPattern.matcher(message);
+    if (matcher.matches()){
+      String sender = matcher.group(1);
+      String title = matcher.group(2);
+      if (title == null)
+        title = "";
+      Integer tourneyIndex = new Integer(matcher.group(3));
+      message = matcher.group(4);
+      evt = new ChatEvent(this, "qtell.tourney", sender, title, -1, message, tourneyIndex);
+    }
+    else
+      evt = new ChatEvent(this, "qtell", null, null, -1, message, null);
+
+    listenerManager.fireChatEvent(evt);
 
     return true;
   }
-
 
 
 
