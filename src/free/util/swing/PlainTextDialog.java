@@ -127,8 +127,7 @@ public class PlainTextDialog extends JDialog{
 
     contentPane.add(Box.createVerticalStrut(20));
 
-    JButton closeButton = new JButton("Close");
-    closeButton.setMnemonic('C');
+    JButton closeButton = new JButton("OK");
     closeButton.addActionListener(new WindowDisposingActionListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);
