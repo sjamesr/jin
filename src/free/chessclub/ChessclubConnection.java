@@ -452,7 +452,7 @@ public class ChessclubConnection extends free.util.Connection{
    * The value we're supposed to assign to the interface variable during login.
    */
 
-  private String interfaceVar = "Java chessclub.com library (http://www.hightemplar.com/jin/downloads/chessclub/)";
+  private String interfaceVar = "Java chessclub.com library (http://www.jinchess.com/)";
      
 
 

@@ -1,6 +1,6 @@
 /**
  * Jin - a chess client for internet chess servers.
- * More information is available at http://www.hightemplar.com/jin/.
+ * More information is available at http://www.jinchess.com/.
  * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
