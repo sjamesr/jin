@@ -66,8 +66,8 @@ public class Style12Struct extends Struct{
    * want to use the <code>parseStyle12Line</code> method and not this
    * constructor to obtain Style12Struct objects.
    *
-   * @param position The current position.
-   * @param move The last move, or <code>null</code> if none.
+   * @param boardLexigraphic The current board, in lexigraphic format.
+   * @param currentPlayer The player to move, either "B" or "W".
    * @param doublePawnPushFile The file of the double pawn push on the last
    * move, or -1 if the last move wasn't a double pawn push.
    * @param canWhiteCastleKingside Can white castle kingside?
@@ -90,20 +90,21 @@ public class Style12Struct extends Struct{
    * @param increment Increment (in seconds) of the match.
    * @param whiteMaterialStrength White's material strength.
    * @param blackMaterialStrength Black's material strength.
-   * @param whiteTime White's remaining time, in seconds.
-   * @param blackTime Black's remaining time, in seconds.
+   * @param whiteTime White's remaining time, in milliseconds.
+   * @param blackTime Black's remaining time, in milliseconds.
    * @param nextMoveNumber The number of the move about to be made (standard
    * chess numbering -- White's and Black's first moves are both 1, etc.)
    * @param moveVerbose A verbose representation of the last move,
    * <code>null</code> if none.
    * @param movePretty A pretty (algebraic) representation of the last move,
    * <code>null</code> if none.
-   * @param moveTime The amount of time taken to make the last move, in seconds.
+   * @param moveTime The amount of time taken to make the last move, in
+   * milliseconds.
    * @param isBoardFlipped <code>true</code> if the board should be flipped
    * (black at bottom), <code>false</code> otherwise.
    */
 
-  public Style12Struct(String positionLexigraphic, String currentPlayer,
+  public Style12Struct(String boardLexigraphic, String currentPlayer,
       int doublePawnPushFile, boolean canWhiteCastleKingside, 
       boolean canWhiteCastleQueenside, boolean canBlackCastleKingside,
       boolean canBlackCastleQueenside, int movesSinceIrreversible,
@@ -116,11 +117,11 @@ public class Style12Struct extends Struct{
     if ((doublePawnPushFile < -1) || (doublePawnPushFile > 7))
       throw new IllegalArgumentException("Bad value for double pawn push file: "+doublePawnPushFile);
 
-    if (positionLexigraphic == null)
-      throw new IllegalArgumentException("Position may not be null");
+    if (boardLexigraphic == null)
+      throw new IllegalArgumentException("Board may not be null");
 
-    if (positionLexigraphic.length() != 64)
-      throw new IllegalArgumentException("Position string length ("+positionLexigraphic.length()+") must be 64 characters");
+    if (boardLexigraphic.length() != 64)
+      throw new IllegalArgumentException("Board string length ("+boardLexigraphic.length()+") must be 64 characters");
 
     if ((currentPlayer == null) || ((!currentPlayer.equals("W")) && (!currentPlayer.equals("B"))))
       throw new IllegalArgumentException("Current player string ("+currentPlayer+") must be either \"W\" or \"B\"");
@@ -134,7 +135,7 @@ public class Style12Struct extends Struct{
     if (blackName == null)
       throw new IllegalArgumentException("Black name may not be null");
 
-    if (initTime <= 0)
+    if (initTime < 0) // Can be 0 for examined games.
       throw new IllegalArgumentException("Initial time ("+initTime+") must be positive");
 
     if (increment < 0)
@@ -161,7 +162,7 @@ public class Style12Struct extends Struct{
         throw new IllegalArgumentException("Unknown game type: "+gameType);
     }
 
-    setStringProperty("PositionLexigraphic", positionLexigraphic);
+    setStringProperty("BoardLexigraphic", boardLexigraphic);
     setStringProperty("CurrentPlayer", currentPlayer);
     setIntegerProperty("DoublePawnPushFile", doublePawnPushFile);
     setBooleanProperty("CanWhiteCastleKingside", canWhiteCastleKingside);
@@ -253,7 +254,7 @@ public class Style12Struct extends Struct{
 
     boolean isMyTurn = myRelation > 0;
 
-    int initTime = Integer.parseInt(tokens.nextToken()); // Initial time
+    int initTime = 60*Integer.parseInt(tokens.nextToken()); // Initial time
     int increment = Integer.parseInt(tokens.nextToken()); // Increment
 
     int whiteMaterialStrength = Integer.parseInt(tokens.nextToken()); // White's material strength
@@ -270,8 +271,11 @@ public class Style12Struct extends Struct{
 
     String moveTimeString = tokens.nextToken(); // The amount of time taken for the last move
     moveTimeString = moveTimeString.substring(1, moveTimeString.length() - 1);
-    StringTokenizer timeTokens = new StringTokenizer(moveTimeString, ":");
-    int moveTime = 60*Integer.parseInt(timeTokens.nextToken()) + Integer.parseInt(timeTokens.nextToken());
+    StringTokenizer timeTokens = new StringTokenizer(moveTimeString, ":.");
+    int minutes = Integer.parseInt(timeTokens.nextToken());
+    int seconds = Integer.parseInt(timeTokens.nextToken());
+    int milliseconds = Integer.parseInt(timeTokens.nextToken());
+    int moveTime = 60*1000*minutes + 60*seconds + milliseconds;
 
     String movePretty = tokens.nextToken(); // The move in pretty (algebraic) notation
     if (movePretty.equals("none"))
@@ -311,8 +315,8 @@ public class Style12Struct extends Struct{
    * Returns the current board in lexigraphic format.
    */
 
-  public String getPositionLexigraphic(){
-    return getStringProperty("PositionLexigraphic");
+  public String getBoardLexigraphic(){
+    return getStringProperty("BoardLexigraphic");
   }
 
 
