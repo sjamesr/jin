@@ -253,7 +253,7 @@ public abstract class Plugin{
    * The default implementation returns <code>null</code>.
    */
 
-  public JPanel createPreferencesUI(){
+  public JPanel getPreferencesUI(){
     return null;
   }
 
