@@ -9,12 +9,14 @@
 <CENTER>
 <APPLET CODE="free.jin.JinApplet"
         ARCHIVE="jin.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar"
-		WIDTH="300" HEIGHT="300">
+		WIDTH="400" HEIGHT="300">
 		
 	<PARAM NAME="port" value="5000">
 		
 	<PARAM NAME="server.classname"
 	           VALUE="free.jin.freechess.FreechessServer">
+			   
+			   
 			   
 	<PARAM NAME="plugins.count" VALUE="4">
 			   
@@ -29,6 +31,12 @@
 
 	<PARAM NAME="plugins.3.classname"
 	           VALUE="free.jin.sound.fics.FreechessSoundManager">
+			   
+			   
+
+	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark">
+	
+	<PARAM NAME="resources.pieces" VALUE="eboard xboard">
 			   
 <!--
 
