@@ -81,7 +81,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
    * com/mycompany/marble/32/br.gif, com/mycompany/marble/64/wq.gif etc.
    */
 
-  public static ResourceImagePiecePainter getInstance(Class c, String relPath) throws IOException{
+  public static ImagePiecePainter getInstance(Class c, String relPath) throws IOException{
     return getInstance(c.getClassLoader(), TextUtilities.translateResource(c, relPath));        
   }
   
@@ -95,7 +95,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
    * is the specified <code>path</code> string.
    */
   
-  public static ResourceImagePiecePainter getInstance(ClassLoader cl, String path) throws IOException{
+  public static ImagePiecePainter getInstance(ClassLoader cl, String path) throws IOException{
     if (!(path.endsWith("/") || "".equals(path)))
       path = path + "/";
     String defFile = path + "definition";
