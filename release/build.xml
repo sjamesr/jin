@@ -214,6 +214,7 @@
 
  		<propertyfile file="${source.dir}/free/jin/resources/app.props">
 			<entry key="app.name" value="JinApplet" />
+			<entry key="lf.extra.count" value="0" />
 		</propertyfile>
 		
 		<antcall target="build">
@@ -251,7 +252,7 @@
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}" 
-			         includes="jin.jar index.html prefs.php DetectJava.class libs/* libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
+			         includes="jin.jar index.html prefs.php DetectJava.class libs/*.jar libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
 					 excludes="${excluded_files}"
 			/>
 			<filterset>
