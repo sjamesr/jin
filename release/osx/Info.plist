@@ -20,7 +20,7 @@
       <key>MainClass</key><string>free.jin.JinMain</string>
       <key>Properties</key>
         <dict>
-          <key>apple.laf.useScreenMenuBar</key><string>true</string>
+          <key>apple.laf.useScreenMenuBar</key><string>false</string>
           <key>apple.awt.fakefullscreen</key><string>false</string>
         </dict>
       <key>WorkingDirectory</key><string>$JAVAROOT</string>
