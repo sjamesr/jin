@@ -49,8 +49,8 @@ public class GraphicsUtilities{
 
   public static int getMaxFittingFontSize(Graphics g, Font font, String string, int width, int height){
     int minSize = 0;
-    int maxSize = 72;
-    int curSize = 36;
+    int maxSize = 288;
+    int curSize = font.getSize();
 
     while (maxSize - minSize > 2){
       FontMetrics fm = g.getFontMetrics(new Font(font.getName(), font.getStyle(), curSize));
