@@ -21,15 +21,13 @@
 
 package free.util;
 
-import java.awt.LayoutManager;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 
 
 /**
  * A LayoutManager which lays out a single component making sure its height is
- * always the same as its width.
+ * always the same as its width. If the parent container's width differs from
+ * it height, the child will be laid out according to its x and y alignment.
  */
 
 public class SquareLayout implements LayoutManager{
@@ -109,8 +107,17 @@ public class SquareLayout implements LayoutManager{
       return;
     
     Dimension parentSize = container.getSize();
-    int minSize = parentSize.width < parentSize.height ? parentSize.width : parentSize.height;
-    child.setBounds(0, 0, minSize, minSize);
+    Insets insets = container.getInsets();
+    
+    // A rectangle specifying the actual area available for layout. 
+    Rectangle rect = new Rectangle(insets.left, insets.top,
+      parentSize.width - insets.left - insets.right, parentSize.height - insets.top - insets.bottom);
+
+    int minSize = rect.width < rect.height ? rect.width : rect.height;
+    int widthSpace = rect.width - minSize;
+    int heightSpace = rect.height - minSize;
+    child.setBounds(rect.x + (int)(widthSpace*child.getAlignmentX()),
+                    rect.y + (int)(heightSpace*child.getAlignmentY()), minSize, minSize);
   }
 
   
@@ -126,7 +133,11 @@ public class SquareLayout implements LayoutManager{
       return new Dimension(0, 0);
     
     Dimension childMinSize = child.getMinimumSize();
-    int maxSize = childMinSize.width > childMinSize.height ? childMinSize.width : childMinSize.height;
+    Insets insets = container.getInsets();
+    
+    int width = childMinSize.width + insets.left + insets.right;
+    int height = childMinSize.height + insets.top + insets.bottom;
+    int maxSize = Math.max(width, height);
     return new Dimension(maxSize, maxSize);
   }
 
@@ -144,7 +155,11 @@ public class SquareLayout implements LayoutManager{
       return new Dimension(0, 0);
     
     Dimension childPrefSize = child.getPreferredSize();
-    int maxSize = childPrefSize.width > childPrefSize.height ? childPrefSize.width : childPrefSize.height;
+    Insets insets = container.getInsets();
+    
+    int width = childPrefSize.width + insets.left + insets.right;
+    int height = childPrefSize.height + insets.top + insets.bottom;
+    int maxSize = Math.max(width, height);
     return new Dimension(maxSize, maxSize);
   }
 
