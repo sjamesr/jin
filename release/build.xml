@@ -295,9 +295,9 @@
   
 	<!-- A helper target for copying a specified list of resources -->
 	<target name="copy-applet-resources">
-    	<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="resources/${resource.type}/${resource.name}/**" /> 
-		</copy>
+		<mkdir dir="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
+    	<unzip src="${build.dir}/resources/${resource.type}/${resource.name}.zip"
+    	       dest="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
 	</target>
   
 
