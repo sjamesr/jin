@@ -1000,7 +1000,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       position.makeMove(move);
       gameInfo.moves.addElement(move);
 
-      fireGameEvent(new MoveMadeEvent(this, game, move, gameInfo.numMovesToFollow == 0));
+      boolean isNewMove = (moveInfo.variationCode != MoveStruct.MOVE_INITIAL) &&
+                          (moveInfo.variationCode != MoveStruct.MOVE_FORWARD);
+      System.out.println(moveInfo.variationCode);
+
+      fireGameEvent(new MoveMadeEvent(this, game, move, isNewMove));
 
       if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
