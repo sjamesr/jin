@@ -23,6 +23,7 @@ package free.jin.plugin;
 
 import free.jin.*;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 
 
 /**
@@ -228,16 +229,46 @@ public abstract class Plugin{
 
 
   /**
-   * This method should create and return the menu for this plugin. This menu
-   * will usually be put on the menubar, but it can be ignored or put elsewhere
-   * depending on the context. If the plugin has no menu, this method should
-   * return <code>null</code>. The default implementation returns
-   * <code>null</code>. This method is guaranteed to be called after the 
-   * <code>start()</code> method returns.
+   * This method return the menu for this plugin. This menu will usually be put
+   * on the menubar, but it can be ignored or put elsewhere depending on the
+   * context. If the plugin has no menu, this method should return 
+   * <code>null</code>. The default implementation returns <code>null</code>.
+   * This method is guaranteed to be called after the <code>start()</code>
+   * method returns.
    */
 
   public JMenu createPluginMenu(){
     return null;
+  }
+
+
+
+
+
+  /**
+   * This method should return a JPanel containing UI which allows customizing
+   * this plugin's functionality and/or setting its preferences.
+   * The <code>hasPreferencesUI()</code> method specifies whether this plugin
+   * has a preferences UI. If not, this method will not be called.
+   * The default implementation returns <code>null</code>.
+   */
+
+  public JPanel createPreferencesUI(){
+    return null;
+  }
+
+
+
+
+  /**
+   * Specifies whether this plugin has a UI to modify its preferences. If this
+   * method returns <code>true</code>, the <code>createPreferencesUI</code>
+   * method may not return <code>null</code>. The default implementation returns
+   * <code>false</code>.
+   */
+
+  public boolean hasPreferencesUI(){
+    return false;
   }
 
 
