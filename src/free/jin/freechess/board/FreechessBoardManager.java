@@ -21,9 +21,13 @@
 
 package free.jin.freechess.board;
 
+import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
 import free.jin.Game;
+import free.jin.event.GameStartEvent;
 
 
 /**
@@ -31,6 +35,16 @@ import free.jin.Game;
  */
 
 public class FreechessBoardManager extends BoardManager{
+
+
+
+  /**
+   * The current primary game.
+   */
+
+  private Object primaryGameID = null;
+
+
 
 
   /**
@@ -41,6 +55,47 @@ public class FreechessBoardManager extends BoardManager{
     BoardPanel boardPanel = new FreechessBoardPanel(this, game);
 
     return boardPanel;
+  }
+
+
+
+
+  /**
+   * Gets called when a game starts. Creates a new BoardPanel and a
+   * JInternalFrame to put it in and displays it.
+   */
+
+  public void gameStarted(GameStartEvent evt){
+    primaryGameID = evt.getGame().getID();
+
+    super.gameStarted(evt);
+  }
+
+
+
+
+  /**
+   * Creates a JInternalFrame to be used for displaying the given
+   * BoardPanel. Overrides the superclass' method to register a listener so that
+   * we can set the primary game appropriately.
+   */
+
+  protected JInternalFrame createBoardFrame(final BoardPanel boardPanel){
+    JInternalFrame boardFrame = super.createBoardFrame(boardPanel);
+
+    if (boardPanel.getGame().getGameType() != Game.ISOLATED_BOARD){
+      boardFrame.addInternalFrameListener(new InternalFrameAdapter(){
+        public void internalFrameActivated(InternalFrameEvent evt){
+          Object gameID = boardPanel.getGame().getID();
+          if (!gameID.equals(primaryGameID)){
+            getConnection().sendCommand("primary "+gameID);
+            primaryGameID = gameID;
+          }
+        }
+      });
+    }
+
+    return boardFrame;
   }
 
 }

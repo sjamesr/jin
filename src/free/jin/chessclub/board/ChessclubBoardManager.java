@@ -21,6 +21,10 @@
 
 package free.jin.chessclub.board;
 
+
+import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
 import free.jin.Game;
@@ -42,5 +46,29 @@ public class ChessclubBoardManager extends BoardManager{
 
     return boardPanel;
   }
+
+
+
+  /**
+   * Creates a JInternalFrame to be used for displaying the given
+   * BoardPanel. Overrides the superclass' method to register a listener so that
+   * we can set the primary game appropriately.
+   */
+
+  protected JInternalFrame createBoardFrame(final BoardPanel boardPanel){
+    JInternalFrame boardFrame = super.createBoardFrame(boardPanel);
+
+    if (boardPanel.getGame().getGameType() != Game.ISOLATED_BOARD){
+      boardFrame.addInternalFrameListener(new InternalFrameAdapter(){
+        public void internalFrameActivated(InternalFrameEvent evt){
+          Game game = boardPanel.getGame();
+          getConnection().sendCommand("primary "+game.getID());
+        }
+      });
+    }
+
+    return boardFrame;
+  }
+
 
 }
