@@ -109,7 +109,34 @@ public class IOUtilities{
 
       }
     }
+  }
 
+
+
+
+  /**
+   * Removes the given directory and all files within it, recursively. Returns
+   * <code>true</code> if successful, <code>false</code> otherwise. Note that if
+   * it return <code>false</code>, some (or all) the files in the directory may
+   * already be deleted.
+   */
+  
+  public static boolean rmdir(File dir){
+    if (!dir.isDirectory())
+      throw new IllegalArgumentException();
+
+    String [] filenames = dir.list();
+    for (int i = 0; i < filenames.length; i++){
+      File file = new File(dir, filenames[i]);
+      if (file.isDirectory()){
+        if (!rmdir(file))
+          return false;
+      }
+      else if (!file.delete())
+        return false;
+    }
+
+    return dir.delete();
   }
 
 
