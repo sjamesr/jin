@@ -1,6 +1,8 @@
 <project name="Jin2" default="dist">
 
-	<property name="build.compiler" value="modern"/>
+	<property name="build.compiler" value="jikes"/>
+	<property name="build.compiler.emacs" value="on"/>
+	<property name="build.compiler.pedantic" value="on"/>
 	<property name="source.dir" value="src"/>
 	<property name="build.dir" value="build/"/>	
 	
@@ -29,7 +31,8 @@
 		<javac srcdir="${source.dir}"
 		       destdir="${build.dir}"
 		       includes="free/chessclub/**"
-			   classpathref="compile.class.path"			   
+			   excludes="free/chessclub/bot/**"
+			   classpathref="compile.class.path"
 		/>
 	</target>
 	
