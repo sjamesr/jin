@@ -292,6 +292,23 @@ public class ImageBoardPainter implements ResourceBoardPainter{
       ImageUtilities.preload(scaled);
     } 
   }
+  
+  
+  
+  /**
+   * Causes the images used by the ImageBoardPainter to start loading.
+   */
+   
+  public void loadResources(){
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    
+    if (boardImage == null){
+      toolkit.prepareImage(lightImage, -1, -1, null);
+      toolkit.prepareImage(darkImage, -1, -1, null);
+    }
+    else
+      toolkit.prepareImage(boardImage, -1, -1, null);
+  }
 
 
 

@@ -27,7 +27,7 @@ import java.awt.Component;
 
 
 /**
- * An implementation of BoardPainter which fills the squares with colors.
+ * An implementation of BoardPainter which fills the squares with a solid color.
  */
 
 public class PlainBoardPainter extends AbstractColoredBoardPainter{
@@ -52,6 +52,16 @@ public class PlainBoardPainter extends AbstractColoredBoardPainter{
    
   public PlainBoardPainter(){
     this(new Color(255,207,144),new Color(143,96,79));
+  }
+  
+  
+  
+  /**
+   * Does nothing, since we have no external resources to load.
+   */
+   
+  public void loadResources(){
+    
   }
 
   

@@ -32,6 +32,17 @@ import java.awt.Component;
 public interface BoardPainter{
 
 
+
+  /**
+   * Forces the board painter to load any resources it requires to draw the
+   * board. It's up to the implementation whether the resources should be loaded
+   * in the current thread (preferably, only if they are small and guaranteed
+   * not to block for a long time), or in a background thread.
+   */
+  
+  void loadResources();
+  
+   
   
   /**
    * Paints the board at the given location on the given Graphics scaled to
