@@ -1149,8 +1149,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       String spacePad = TextUtilities.padStart("", ' ', categoryName.length()+1) + "*";
       processLine("********************************************************" + starsPad);
       processLine("* This version of Jin does not support the wild variant " + categoryName + " *");
-      processLine("* and is thus unable to display the game. Please use the" + spacePad);
-      processLine("* appropriate command to close the game.                " + spacePad);
+      processLine("* and is thus unable to display the game.               " + spacePad);
+      processLine("* Please use the appropriate command to close the game. " + spacePad);
       processLine("********************************************************" + starsPad);
       unsupportedGames.addElement(new Integer(gameInfo.getGameNumber()));
       return null;
