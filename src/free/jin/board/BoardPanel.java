@@ -38,6 +38,7 @@ import free.util.swing.NonEditableTableModel;
 import free.util.swing.FullscreenPanel;
 import free.util.SquareLayout;
 import free.util.PlatformUtils;
+import free.util.Utilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.border.EmptyBorder;
@@ -1505,15 +1506,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       return;
 
     Move move = evt.getMove();
+    
+    // Is this an echo to the current move en route?
+    boolean moveEnRouteEcho = (moveEnRoute != null) &&
+      Utilities.areEqual(move.getStartingSquare(), moveEnRoute.getStartingSquare()) &&
+      Utilities.areEqual(move.getEndingSquare(), moveEnRoute.getEndingSquare()) &&
+      Utilities.areEqual(move.getPlayer(), moveEnRoute.getPlayer());
 
-    // If for example, the user is observing a game, and is looking at a
-    // position other than the last one, we don't want to update the board when
-    // a new move arrives.
     boolean shouldUpdateBoard = true; 
 
+    // The user is looking at a position other than the last one, so we don't
+    // want to update the board when a new move arrives.
     if (displayedMoveNumber != madeMoves.size())
       shouldUpdateBoard = false;
-
+    
     madeMoves.addElement(move);
     realPosition.makeMove(move);
 
@@ -1562,7 +1568,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         fireUserMadeMove(evt2);
       }
     }
-    else
+    else if (moveEnRouteEcho)
       moveEnRoute = null;
 
     updateClockActiveness();
