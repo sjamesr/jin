@@ -637,7 +637,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         Color fg = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
         
         textStyleChooser = new TextStyleChooserPanel(font, fg, bg, antialias, false, false);
-        setLayout(new BorderLayout());
+        this.setLayout(new BorderLayout());
         add(textStyleChooser, BorderLayout.CENTER);
       }
     }
