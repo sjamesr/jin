@@ -25,6 +25,7 @@ package free.chessclub;
 import java.io.*;
 import java.util.*;
 import free.chessclub.level2.*;
+import free.util.EventListenerList;
 
 
 /**
@@ -389,10 +390,9 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public static final int RATING_CATEGORIES_COUNT = 6;
-
-
-
-
+  
+  
+  
   /**
    * Maps rating keys to their english names.
    */
@@ -520,15 +520,16 @@ public class ChessclubConnection extends free.util.Connection{
     setDGState(Datagram.DG_RATING_TYPE_KEY, true); 
 
     // We need this to know the wild number to wild name mapping.
-    setDGState(Datagram.DG_WILD_KEY, true); 
+    setDGState(Datagram.DG_WILD_KEY, true);
+    
+    setDGState(Datagram.DG_SJI_AD, true);
 
     // We need this to know which datagrams are actually on.
     setDGState(Datagram.DG_SET2, true);
   }
-
-
-
-
+  
+  
+  
   /**
    * Sets the given level2 datagram on or off. If the ChessclubConnection is
    * already logged in, then the <code>set-2 [DG number] [0/1]</code> string
@@ -885,29 +886,30 @@ public class ChessclubConnection extends free.util.Connection{
     if (echoStream != null)
       echoStream.println(datagram);
 
-    if ((datagram.getType() == Datagram.DG_WHO_AM_I) && !isLoggedIn()){
+    int id = datagram.getId();
+    if ((id == Datagram.DG_WHO_AM_I) && !isLoggedIn()){
       synchronized(loginLock){
         setUsername(datagram.getString(0));
         loginLock.notify();
       }
     }
-    else if ((datagram.getType() == Datagram.DG_LOGIN_FAILED) && !isLoggedIn()){
+    else if ((id == Datagram.DG_LOGIN_FAILED) && !isLoggedIn()){
       synchronized(loginLock){
         setLoginErrorMessage(datagram.getString(1));
         loginLock.notify();
       }
     }
-    else if (datagram.getType() == Datagram.DG_RATING_TYPE_KEY){
+    else if (id == Datagram.DG_RATING_TYPE_KEY){
       int index = datagram.getInteger(0);
       String name = datagram.getString(1);
       ratingCategoryNames.put(new Integer(index), name);
     }
-    else if (datagram.getType() == Datagram.DG_WILD_KEY){
+    else if (id == Datagram.DG_WILD_KEY){
       int number = datagram.getInteger(0);
       String name = datagram.getString(1);
       variantNames.put(new Integer(number), name);
     }
-    else if (datagram.getType() == Datagram.DG_SET2){
+    else if (id == Datagram.DG_SET2){
       int dgType = datagram.getInteger(0);
       boolean state = datagram.getBoolean(1);
       if (state)
@@ -2267,13 +2269,13 @@ public class ChessclubConnection extends free.util.Connection{
    */
   
   protected void processDatagram(Datagram datagram){
-    switch (datagram.getType()){
+    switch (datagram.getId()){
       case Datagram.DG_WHO_AM_I:{
         processWhoAmI(datagram.getString(0), datagram.getString(1));
         break;
       }
       case Datagram.DG_PLAYER_ARRIVED:{
-        int i=0;
+        int i = 0;
         String username = datagram.getString(i++);
 
         int [] ratings = new int[RATING_CATEGORIES_COUNT];
@@ -2551,7 +2553,7 @@ public class ChessclubConnection extends free.util.Connection{
       case Datagram.DG_MOVE_LIST:{
         int gameNumber = datagram.getInteger(0);
         String initialPosition = datagram.getString(1);
-        String movesString = (datagram.getArgumentCount() >= 3) ? datagram.getString(2) : "";
+        String movesString = (datagram.getFieldCount() >= 3) ? datagram.getString(2) : "";
         StringTokenizer moveListTokenizer = new StringTokenizer(movesString,"{}");
         MoveStruct [] moves = new MoveStruct[moveListTokenizer.countTokens()];
         int movesCounter = 0;
@@ -2726,11 +2728,11 @@ public class ChessclubConnection extends free.util.Connection{
         break;
       }
       case Datagram.DG_CHANNELS_SHARED:{
-        int [] channels = new int[datagram.getArgumentCount()-1];
-        for (int i=0;i<channels.length;i++)
-          channels[i] = datagram.getInteger(i+1);
+        int [] channels = new int[datagram.getFieldCount() - 1];
+        for (int i = 0; i < channels.length; i++)
+          channels[i] = datagram.getInteger(i + 1);
 
-        processChannelsShared(datagram.getString(0),channels);
+        processChannelsShared(datagram.getString(0), channels);
         break;
       }
       case Datagram.DG_MY_VARIABLE:{
@@ -3013,33 +3015,33 @@ public class ChessclubConnection extends free.util.Connection{
         throw new IllegalStateException("DG_MATCH_ASSESSMENT should never be sent");
       }
       case Datagram.DG_LOG_PGN:{  
-        String [] pgnLines = new String[datagram.getArgumentCount()];
-        for (int i=0;i<pgnLines.length;i++)
+        String [] pgnLines = new String[datagram.getFieldCount()];
+        for (int i = 0;i < pgnLines.length; i++)
           pgnLines[i] = datagram.getString(i);
         
         processLogPGN(pgnLines);
         break;
       }
       case Datagram.DG_NEW_MY_RATING:{
-        int [] ratings = new int[datagram.getArgumentCount()];
-        for (int i=0;i<ratings.length;i++)
+        int [] ratings = new int[datagram.getFieldCount()];
+        for (int i = 0; i < ratings.length; i++)
           ratings[i] = datagram.getInteger(i);
 
         processNewMyRating(ratings);
         break;
       }
       case Datagram.DG_UNCIRCLE:{
-        processUncircle(datagram.getInteger(0),datagram.getString(1),datagram.getString(2));
+        processUncircle(datagram.getInteger(0), datagram.getString(1), datagram.getString(2));
         break;
       }
       case Datagram.DG_UNARROW:{
-        processUnarrow(datagram.getInteger(0),datagram.getString(1),datagram.getString(2),
+        processUnarrow(datagram.getInteger(0), datagram.getString(1), datagram.getString(2),
           datagram.getString(3));
         break;
       }
       case Datagram.DG_WSUGGEST:{
-        processWSuggest(datagram.getString(0),datagram.getString(1),datagram.getInteger(2),
-          datagram.getString(3), datagram.getString(4),datagram.getString(5));
+        processWSuggest(datagram.getString(0), datagram.getString(1), datagram.getInteger(2),
+          datagram.getString(3), datagram.getString(4), datagram.getString(5));
         break;
       }
       case Datagram.DG_TEMPORARY_PASSWORD:{
@@ -3050,16 +3052,16 @@ public class ChessclubConnection extends free.util.Connection{
         break;
       }
       case Datagram.DG_MESSAGELIST_ITEM:{
-        processMessagelistItem(datagram.getInteger(0),datagram.getString(1),datagram.getString(2),
-          datagram.getString(3),datagram.getString(4));
+        processMessagelistItem(datagram.getInteger(0), datagram.getString(1), datagram.getString(2),
+          datagram.getString(3), datagram.getString(4));
         break;
       }
       case Datagram.DG_LIST:{
-        String [] items = new String[datagram.getArgumentCount()-2];
-        for (int i=0;i<items.length;i++)
-          items[i] = datagram.getString(i+2);
+        String [] items = new String[datagram.getFieldCount() - 2];
+        for (int i = 0; i < items.length; i++)
+          items[i] = datagram.getString(i + 2);
 
-        processList(datagram.getString(0),datagram.getString(1),items);
+        processList(datagram.getString(0), datagram.getString(1), items);
         break;
       }
       case Datagram.DG_SJI_AD:{
