@@ -188,7 +188,7 @@ public class User{
    * Returns the preferred connection details of this user.
    */
 
-  ConnectionDetails getPreferredConnDetails(){
+  public ConnectionDetails getPreferredConnDetails(){
     String password = prefs.getString("login.password", "");
     boolean savePassword = prefs.getBool("login.savePassword", false);
     String hostname = prefs.getString("login.hostname", server.getDefaultHost());
