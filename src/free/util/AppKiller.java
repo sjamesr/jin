@@ -26,16 +26,17 @@ import java.awt.event.WindowAdapter;
 
 
 /**
- * A WindowListener which calls System.exit(0) when a WINDOW_CLOSING event
- * occurs on a window it is a listener of. Add an instance of this class to be
- * a WindowListener of the main frame of your application.
+ * A WindowListener which calls <code>System.exit(0)</code> when a 
+ * <code>WINDOW_CLOSING</code> event occurs on a window it is a listener of.
+ * Add an instance of this class to be a WindowListener of the main frame of 
+ * your application.
  */
 
 public class AppKiller extends WindowAdapter{
 
   
   /**
-   * Calls System.exit(0).
+   * Calls <code>System.exit(0)</code>.
    */
 
   public void windowClosing(WindowEvent evt){
