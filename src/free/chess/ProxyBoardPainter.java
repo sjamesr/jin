@@ -57,16 +57,6 @@ public class ProxyBoardPainter implements BoardPainter{
   }
   
   
-  
-  /**
-   * Delegates the action to the delegate BoardPainter.
-   */
-
-  public Dimension getPreferredBoardSize(){
-    return delegate.getPreferredBoardSize();
-  }
-
-  
 
   /**
    * Delegates the action to the delegate BoardPainter.

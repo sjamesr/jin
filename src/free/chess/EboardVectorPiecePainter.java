@@ -97,18 +97,6 @@ public class EboardVectorPiecePainter extends VectorPiecePainter{
 
 
 
-
-  /**
-   * Returns 36x36.
-   */
-
-  public Dimension getPreferredPieceSize(){
-    return new Dimension(36,36);
-  }
-
-
-
-
   /**
    * Creates and returns a Polygon for drawing a king.
    */

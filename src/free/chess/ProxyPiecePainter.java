@@ -68,18 +68,6 @@ public class ProxyPiecePainter implements PiecePainter{
 
 
 
-
-  /**
-   * Delegates the call to the "real" <code>PiecePainter</code>.
-   */
-
-  public Dimension getPreferredPieceSize(){
-    return delegate.getPreferredPieceSize();
-  }
-
-
-
-
   /**
    * Delegates the call to the "real" <code>PiecePainter</code>.
    */
