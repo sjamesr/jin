@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -158,7 +158,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * there's no such property there, the plugin is asked for such a property.
    */
 
-  private String getProperty(String propertyName){
+  protected String getProperty(String propertyName){
     String value = modifiedProps.getProperty(propertyName);
     return value == null ? consoleManager.getProperty(propertyName) : value; 
   }
@@ -172,7 +172,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * <code>null</code>, returns the 2nd specified string instead.
    */
 
-  public String getProperty(String propertyName, String defaultValue){
+  protected String getProperty(String propertyName, String defaultValue){
     String propertyValue = getProperty(propertyName);
     return propertyValue == null ? defaultValue : propertyValue;
   }
@@ -212,7 +212,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   /**
    * The listener that listens to settings changes in the various panels
-   * and updates the properties accordingly. You may should register this
+   * and updates the properties accordingly. You may register this
    * listener as the change listener of any custom components you're adding.
    * Note that if you do that, you should also override
    * <code>updatePropertiesFrom</code> and <code>updatePanels</code> to apply
@@ -245,6 +245,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected void updatePropertiesFrom(CategoryPanel categoryPanel){
+    TextStyleChooserPanel textStyleChooser = categoryPanel.getTextStyleChooser();
+
     if (categoryPanel == defaultSettingsPanel){
       String newSelectionColor = StringEncoder.encodeColor(selectionColorButton.getColor());
       modifiedProps.put("output-selection", newSelectionColor);
@@ -252,11 +254,15 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       String newSelectedColor = StringEncoder.encodeColor(selectedColorButton.getColor());
       modifiedProps.put("output-selected", newSelectedColor);
 
-      Color background = defaultSettingsPanel.getTextStyleChooser().getSelectedBackground();
+      Color background = textStyleChooser.getSelectedBackground();
       modifiedProps.put("background", StringEncoder.encodeColor(background));
+
+      if (textStyleChooser.isAntialiasingSelectionEnabled()){
+        boolean antialias = defaultSettingsPanel.getTextStyleChooser().isAntialias();
+        modifiedProps.put("output-text.antialias", String.valueOf(antialias));
+      }
     }
 
-    TextStyleChooserPanel textStyleChooser = categoryPanel.getTextStyleChooser();
     Font font = textStyleChooser.getSelectedFont();
     Color foreground = textStyleChooser.getSelectedForeground();
 
@@ -286,6 +292,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     selectedColorButton.setColor(StringParser.parseColor(getProperty("output-selected")));
 
     Color background = StringParser.parseColor(getProperty("background"));
+    boolean antialias = new Boolean(getProperty("output-text.antialias")).booleanValue();
 
     for (int i = 0; i < categoryPanels.size(); i++){
       CategoryPanel panel = (CategoryPanel)categoryPanels.elementAt(i);
@@ -298,6 +305,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       textStyleChooser.setSelectedFont(font);
       textStyleChooser.setSelectedForeground(foreground);
       textStyleChooser.setSelectedBackground(background);
+      textStyleChooser.setAntialias(antialias);
     }
   }
 
@@ -328,8 +336,16 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     Color foreground = StringParser.parseColor(getProperty("foreground"));
     Color background = StringParser.parseColor(getProperty("background"));
 
+    boolean antialiasingSupported;
+    try{
+      antialiasingSupported = Class.forName("java.awt.Graphics2D") != null;
+    } catch (ClassNotFoundException e){
+        antialiasingSupported = false;
+      }
+    boolean antialiasingValue = new Boolean(getProperty("output-text.antialias")).booleanValue();
+
     TextStyleChooserPanel defaultSettingsChooserPanel = 
-      new TextStyleChooserPanel(font, foreground, background, true);
+      new TextStyleChooserPanel(font, foreground, background, antialiasingValue, true, antialiasingSupported);
 
     selectionColorButton = createSelectionColorButton();
     selectedColorButton = createSelectedColorButton();
@@ -357,6 +373,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   private void createSettingsPanelsFromProperties(){
     Color background = StringParser.parseColor(getProperty("background"));
+    boolean antialiasingValue = new Boolean(getProperty("output-text.antialias")).booleanValue();
 
     int categoriesCount = Integer.parseInt(getProperty("preferences.categories.count", "0"));
 
@@ -382,7 +399,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         Font font = getCategoryFont(mainCategory);
         Color foreground = StringParser.parseColor(lookupProperty("foreground."+mainCategory));
           
-        TextStyleChooserPanel textStyleChooserPanel = new TextStyleChooserPanel(font, foreground, background, false);
+        TextStyleChooserPanel textStyleChooserPanel = new TextStyleChooserPanel(font, foreground, background, antialiasingValue, false, false);
         categoryPanel = new CategoryPanel(categoryName, textStyleChooserPanel, categories);
         categoryPanel.setLayout(new BorderLayout());
         categoryPanel.add(textStyleChooserPanel, BorderLayout.CENTER);
