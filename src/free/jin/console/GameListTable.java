@@ -85,9 +85,7 @@ public class GameListTable extends FixedJTable{
     this.gameListEvent = evt;
 
     setModel(createGameListModel(evt));
-
-    setEnabled(false);
-
+    
     javax.swing.ToolTipManager tooltipManager = javax.swing.ToolTipManager.sharedInstance();
     if (!tooltipManager.isEnabled())
       tooltipManager.setEnabled(true);
@@ -96,12 +94,20 @@ public class GameListTable extends FixedJTable{
     // I do this because that behaviour is not documented, and so may change
     // in a future release.
     tooltipManager.registerComponent(this);
-
+    
     enableEvents(MouseEvent.MOUSE_EVENT_MASK);
+  }    
+
+
+
+  /**
+   * Returns false.
+   */
+   
+  public boolean isFocusTraversable(){
+    return false;   
   }
-
-
-
+  
 
   /**
    * Creates a TableModel for this GameListTable for the given GameListEvent.
@@ -124,11 +130,11 @@ public class GameListTable extends FixedJTable{
 
   protected JPopupMenu createPopup(){
     int numSelectedRows = getSelectedRowCount();
-    if (numSelectedRows==0)
+    if (numSelectedRows == 0)
       return null;
 
     String issuedCommandName = commandNameForID(gameListEvent.getID());
-    if (issuedCommandName==null)
+    if (issuedCommandName == null)
       return null;
 
     Preferences prefs = console.getPrefs();
@@ -250,10 +256,9 @@ public class GameListTable extends FixedJTable{
       command = insertItemProperties(command, item, '$');
       console.issueCommand(new Command(command, 0));
     }
-
     else if (evt.isPopupTrigger()){
       popup = createPopup();
-      if (popup!=null){
+      if (popup != null){
         Component rootPane = SwingUtilities.getRootPane(this);
         Dimension rootPaneSize = rootPane.getSize();
         Point clickPointOnRootPane = SwingUtilities.convertPoint(this, evt.getPoint(), rootPane);
