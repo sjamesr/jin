@@ -393,6 +393,8 @@ public class FischerRandom extends ChesslikeGenericVariant{
 
       modifier.setPieceAt(movingPiece, endingSquare);
       modifier.setPieceAt(rook, rookEndingSquare);
+
+      modifier.setCurrentPlayer(pos.getCurrentPlayer().getOpponent());
     }
     else
       super.makeMove(move, pos, modifier);
