@@ -78,7 +78,7 @@
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/jin-${release.version}" />
 		<mkdir dir="${unix-dir-to-tar}" />
 		<copy todir="${unix-dir-to-tar}">
-			<fileset dir="${build.dir}" excludes="libs/swingall.jar lnfs/jgoodies-windows.jar" />
+			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/jgoodies-windows.jar" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="unix" includes="README" />
 		</copy>
@@ -167,7 +167,7 @@
 		</copy>
 		<copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
 		<copy todir="${app-dir}/Contents/Resources/Java">
-			<fileset dir="${build.dir}" excludes="libs/swingall.jar lnfs/**" />
+			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/**" />
 		</copy>
 		<zip destfile="${release.osx.dir}/bundle.zip" basedir="${release.osx.dir}" />
 		<scp keyfile="${user.home}/.ssh/id_dsa"
@@ -223,7 +223,7 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="icc" />
 			<param name="server.file" value="chessclub.jar" />
-			<param name="libs" value="icc/timestamping.jar jregex.jar chess.jar seek.jar board.jar sound.jar util.jar swingall.jar console.jar" />
+			<param name="libs" value="icc/timestamping.jar jregex.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
@@ -233,7 +233,7 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="fics" />
 			<param name="server.file" value="freechess.jar" />
-			<param name="libs" value="fics/timesealing.jar jregex.jar chess.jar seek.jar board.jar sound.jar util.jar swingall.jar console.jar" />
+			<param name="libs" value="fics/timesealing.jar jregex.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
@@ -250,7 +250,7 @@
 	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
+			<fileset dir="${build.dir}" includes="util.jar chess.jar swingall.jar jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
 		</copy>
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}/${server.name}" />
