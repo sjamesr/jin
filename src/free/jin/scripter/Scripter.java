@@ -1021,7 +1021,7 @@ public class Scripter extends Plugin{
       varsVector.addElement(new Object[]{"blackTitle", game.getBlackTitles()});
 
       Move move = new ChessMove(Square.parseSquare("e2"), Square.parseSquare("e4"),
-        Player.WHITE_PLAYER, false, false, false, null, null, "e4");
+        Player.WHITE_PLAYER, false, false, false, null, 4, null, "e4");
 
       if (Utilities.contains(eventSubtypes, subtypes[1])){
         varsVector.addElement(new Object[]{"move", move});
