@@ -391,6 +391,10 @@ public class ConsoleTextPane extends JTextPane{
           continue;
         }
 
+      // Sometimes modelToView returns null, not sure why.
+      if ((startCharRect == null) || (endCharRect == null)) 
+        continue;
+
       if (startCharRect.y+startCharRect.height<=endCharRect.y){ // Separate lines.
         if (y>startCharRect.y){
           if (y<=startCharRect.y+startCharRect.height){
