@@ -31,6 +31,7 @@ import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;
 import free.util.ArrayEnumeration;
 import free.util.AWTUtilities;
+import javax.swing.FocusManager;
 
 
 /**
@@ -91,7 +92,7 @@ public class JinFrame extends JFrame{
     enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
     internalFrameSwitcher = new InternalFrameSwitcher(this);
-    javax.swing.FocusManager.setCurrentManager(new JinFocusManager(this));
+    FocusManager.setCurrentManager(new JinFocusManager(this));
   }
 
 
@@ -466,6 +467,10 @@ public class JinFrame extends JFrame{
   protected void processWindowEvent(WindowEvent evt){
     super.processWindowEvent(evt);
     if (evt.getID() == WindowEvent.WINDOW_OPENED){
+
+      // Bugfix, otherwise menu mnemonics don't work in JDK1.4
+      getJMenuBar().grabFocus();
+
       String lastUserPath = Jin.getProperty("last.user.path");
       if (lastUserPath != null){
         User user = Jin.loadUser(lastUserPath);
