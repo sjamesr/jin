@@ -40,9 +40,23 @@ public interface JinContext{
    */
 
   Preferences getPrefs();
-
-
-
+  
+  
+  
+  /**
+   * Loads and returns the extensions of the specified type. Extensions are
+   * typically used when there is a need to allow the user to add resources
+   * which Jin (or a plugin) then uses. For example, this mechanism is used for
+   * loading piece sets and boards by the board manager plugin. A
+   * <code>JinContext</code> implementation may then look for piece set "packs"
+   * in some predefined directories, allowing the user to add/remove piece sets
+   * simply by adding/deleting files from those directories.
+   */
+   
+  ClassLoader [] loadExtensions(String extensionType);
+  
+  
+  
   /**
    * Performs any required cleanup/saving and shuts the application down. This
    * method will usually not return.
