@@ -464,8 +464,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   void lastGameListenerRemoved(){
-    gameNumbersToGameInfo.clear();
-    nonStartedGames.clear();
+    // Why do we clear this? What if another listener registers?
+//    gameNumbersToGameInfo.clear();
+//    nonStartedGames.clear();
   }
 
 
@@ -506,6 +507,15 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
+   * The amount of user played games.
+   */
+
+  private int userGamesCount = 0;
+
+
+
+
+  /**
    * <P>Returns the GameInfo object for the given game number. This method 
    * throws a <code>NoSuchGameException</code> if there is no started game with
    * the given number. It is important to throw it here and to force the user to
@@ -522,8 +532,38 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   private GameInfo getGameInfo(int gameNumber) throws NoSuchGameException{
     GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.get(new Integer(gameNumber));
-    if (gameInfo==null)
+    if (gameInfo == null)
       throw new NoSuchGameException();
+
+    return gameInfo;
+  }
+
+
+
+
+  /**
+   * Adds the specified <code>GameInfo</code> to the
+   * <code>gameNumbersToGameInfo</code> hashtable.
+   */
+
+  private void addGameInfo(int gameNumber, GameInfo gameInfo){
+    gameNumbersToGameInfo.put(new Integer(gameNumber), gameInfo);
+    if (gameInfo.game.getGameType() == Game.MY_GAME)
+      userGamesCount++;
+  }
+
+
+
+
+  /**
+   * Removes the <code>GameInfo</code> of the specified game from the
+   * <code>gameNumbersToGameInfo</code> hashtable.
+   */
+
+  private GameInfo removeGameInfo(int gameNumber){
+    GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
+    if ((gameInfo != null) && (gameInfo.game.getGameType() == Game.MY_GAME))
+      userGamesCount--;
 
     return gameInfo;
   }
@@ -539,7 +579,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   private boolean gameExists(int gameNumber){
     return gameNumbersToGameInfo.containsKey(new Integer(gameNumber));
   }
-
 
 
 
@@ -713,7 +752,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     boolean usesPlunkers, String fancyTimeControls){
 
     WildVariant variant = getVariant(variantNumber);
-    if (variant==null){ // Not a supported variant.
+    if (variant == null){ // Not a supported variant.
       sendNotSupportedVariantMessage(variantNumber);
       return;
     }
@@ -809,11 +848,16 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         game.setResult(result);
 
         if (becomesExamined){
-          updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(),
-            game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
-            game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), false,
-            game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
-            game.getBlackTitles());
+          // For our own games, we will get a DG_MY_RELATION_TO_GAME
+          // where we will change the state of the game to nonplayed.
+          if (game.getGameType() == Game.OBSERVED_GAME){
+            updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(),
+              game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
+              game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), false, // <-- the change
+              game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
+              game.getBlackTitles());
+          }
+
         }
         else if (game.getGameType() == Game.ISOLATED_BOARD){
           fireGameEvent(new GameEndEvent(this, game, result));
@@ -844,7 +888,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       int blackInitial, int blackIncrement, boolean isPlayedGame, int whiteRating, 
       int blackRating, Object gameID, String whiteTitles, String blackTitles){
 
-    GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
+    GameInfo gameInfo = removeGameInfo(gameNumber);
     Game game = gameInfo.game;
 
     int result = 
@@ -862,7 +906,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     GameInfo newGameInfo = new GameInfo(newGame, new Position(newGame.getInitialPosition()),
       gameInfo.numMovesToFollow);
-    gameNumbersToGameInfo.put(new Integer(gameNumber), newGameInfo);
+    addGameInfo(gameNumber, newGameInfo);
 
     fireGameEvent(new GameStartEvent(this, newGame));
 
@@ -912,7 +956,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       Game newGame = createGameFromNonStarted(gameNumber, pos);
       GameInfo gameInfo = new GameInfo(newGame, new Position(pos), numMovesToFollow);
-      gameNumbersToGameInfo.put(new Integer(gameNumber), gameInfo);
+      addGameInfo(gameNumber, gameInfo);
 
       fireGameEvent(new GameStartEvent(this, newGame));
     }
@@ -949,7 +993,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   protected void processMyRelationToGame(int gameNumber, int playerState){
     if (playerState == DOING_NOTHING){
 
-      GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
+      GameInfo gameInfo = removeGameInfo(gameNumber);
 
       // Game wasn't set up properly, probably because the wild variant is not supported.
       if (gameInfo == null) 
@@ -971,25 +1015,24 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       int newGameType = (playerState == OBSERVING) ? Game.OBSERVED_GAME : Game.MY_GAME;
 
       if (gameExists(gameNumber)){
-         // This code:
-         // A. Doesn't seem necessary as the game becoming an examined game at the end
-         //    is already handled by processMyGameResult.
-         // B. Is wrong because it sends unnecessary updates for example at the
-         //    beginning of a game when the server notifies about our relation
-         //    to the game. 
+        try{
+          GameInfo gameInfo = getGameInfo(gameNumber);
+          Game game = gameInfo.game;
 
-//        try{
-//          GameInfo gameInfo = getGameInfo(gameNumber);
-//          Game game = gameInfo.game;
-//
-//          updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
-//            game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
-//            game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), game.isPlayed(),
-//            game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
-//            game.getBlackTitles());
-//        } catch (NoSuchGameException e){
-//            throw new IllegalStateException("This isn't supposed to happen - we checked that the game exists");
-//          }
+          boolean isPlayedGame = game.isPlayed();
+          if (playerState == EXAMINING)
+            isPlayedGame = false;
+
+          if ((game.isPlayed() != isPlayedGame) || (newGameType != game.getGameType())){
+            updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
+              game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
+              game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), isPlayedGame,
+              game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
+              game.getBlackTitles());
+          }
+        } catch (NoSuchGameException e){
+            throw new IllegalStateException("This isn't supposed to happen - we checked that the game exists");
+          }
       }
       else{ // The game doesn't exist, either because it's a non started game or a game 
             // that wasn't set up properly (usually happens for non-supported variants).
@@ -1317,23 +1360,15 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * Makes the given move in the given game.
    */
 
-  public void makeMove(Game game, Move move) throws IllegalArgumentException{
-    Enumeration gameInfoEnum = gameNumbersToGameInfo.elements();
-    boolean ourGame = false;
-    while (gameInfoEnum.hasMoreElements()){
-      GameInfo gameInfo = (GameInfo)gameInfoEnum.nextElement();
-      if (gameInfo.game == game){
-        ourGame = true;
-        break;
-      }
-    }
-
-    if (!ourGame)
-      throw new IllegalArgumentException("The specified Game object was not created by this JinConnection or the game has ended.");
-
-    // Using "; primary <gamenum> ; <movestring>" is the closest we can currently
-    // get to making sure that the move is made on the correct board.
-    sendCommand("; primary " + game.getID() + " ; "+moveToString(game, move));
+  public void makeMove(Game game, Move move){
+    String moveString = moveToString(game, move);
+    if (userGamesCount > 1)
+      // It seems that "; goto <gamenum> ; <movestring>" will abort making the
+      // move (or whatever other command follows it) if you aren't playing
+      // a game with the specified number.
+      sendCommand("; goto " + game.getID() + " ; " + moveString);
+    else
+      sendCommand(moveString);
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if (unechoedGameMoves == null){
@@ -1375,7 +1410,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   private void checkGameMineAndPlayed(Game game){
-    if ((game.getGameType()!=Game.MY_GAME)||(!game.isPlayed()))
+    if ((game.getGameType() != Game.MY_GAME) || !game.isPlayed())
       throw new IllegalArgumentException("The given game must be of type Game.MY_GAME and a played one");
   }
 
@@ -1388,7 +1423,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   private void checkGameMineAndExamined(Game game){
-    if ((game.getGameType() != Game.MY_GAME)||game.isPlayed())
+    if ((game.getGameType() != Game.MY_GAME) || game.isPlayed())
       throw new IllegalArgumentException("The given game must be of type Game.MY_GAME and an examined one");
   }
 
@@ -1403,7 +1438,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("; primary "+game.getID()+" ; resign");
+    if (userGamesCount > 1)
+      sendCommand("; goto "+game.getID()+" ; resign");
+    else
+      sendCommand("resign");
   }
 
 
@@ -1417,7 +1455,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("; primary "+game.getID()+" ; draw");
+    if (userGamesCount > 1)
+      sendCommand("; goto "+game.getID()+" ; draw");
+    else
+      sendCommand("draw");
   }
 
 
@@ -1442,7 +1483,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("; primary "+game.getID()+" ; abort");
+    if (userGamesCount > 1)
+      sendCommand("; goto "+game.getID()+" ; abort");
+    else
+      sendCommand("abort");
   }
 
 
@@ -1465,7 +1509,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("; primary "+game.getID()+" ; adjourn");
+    if (userGamesCount > 1)
+      sendCommand("; goto "+game.getID()+" ; adjourn");
+    else
+      sendCommand("adjourn");
   }
 
 
@@ -2343,8 +2390,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   private final Hashtable chessEvents = new Hashtable();
-
-
 
 
 
