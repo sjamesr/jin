@@ -789,7 +789,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
       boolean isProvisional = (seekInfo.getSeekerProvShow() == 'P');
 
-      boolean isSeekerRated = (seekInfo.getSeekerProvShow() != 'E');
+      boolean isSeekerRated = (seekInfo.getSeekerRating() != 0);
 
       boolean isRegistered = ((seekInfo.getSeekerTitles() & SeekInfoStruct.UNREGISTERED) == 0);
 
