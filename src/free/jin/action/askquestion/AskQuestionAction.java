@@ -62,15 +62,6 @@ public class AskQuestionAction extends JinAction{
   
   
   
-  /**
-   * Returns an array containing <code>"icc"</code> and <code>"fics"</code>.
-   */
-   
-  protected String [] getSupportedServers(){
-    return new String[]{"icc", "fics"};
-  }
-  
-  
   
   /**
    * Displays a small dialog which lets the user ask a question.
