@@ -21,7 +21,10 @@
 
 package free.jin;
 
+import java.io.IOException;
+import java.util.Properties;
 import javax.swing.ListModel;
+import free.util.IOUtilities;
 
 
 /**
@@ -29,6 +32,16 @@ import javax.swing.ListModel;
  */
 
 public class JinUtilities{
+  
+  
+  
+  /**
+   * Loads and returns the application properties.
+   */
+  
+  static Properties loadAppProps() throws IOException{
+    return IOUtilities.loadProperties(JinUtilities.class.getResourceAsStream("resources/app.props"));
+  }
 
 
 

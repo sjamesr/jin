@@ -216,7 +216,7 @@ public class JinMain implements JinContext{
     this.prefsDir = prefsDir;
 
     // Load application properties
-    appProps = loadAppProps();
+    appProps = JinUtilities.loadAppProps();
 
     // Load user preferences
     userPrefs = loadUserPrefs();
@@ -597,16 +597,6 @@ public class JinMain implements JinContext{
 
   public ConnectionManager getConnManager(){
     return connManager;
-  }
-
-
-
-  /**
-   * Loads the application properties.
-   */
-
-  private Properties loadAppProps() throws IOException{
-    return IOUtilities.loadProperties(getClass().getResourceAsStream("resources/app.props"));
   }
 
 
