@@ -68,7 +68,7 @@ public interface WildVariant{
    * Makes the given Move in the given Position. This method shoudln't 
    * (and can't) be called directly - call Position.makeMove(Move) instead.
    * Implementations of this method should only modify the Position via the
-   * modifier to avoid the change listeners of the position from beind modified
+   * modifier to avoid the change listeners of the position from being notified
    * in the middle of a move procedure where the position isn't "stable". There
    * is no need to trigger the listeners to be called after the move procedure
    * is done - <code>Position.makeMove(Move)</code> triggers them as needed
