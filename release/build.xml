@@ -45,9 +45,8 @@
 		</propertyfile>
 		
 		<property name="release.dir" value="jin-${release.version}" />
-		<delete dir="${release.dir}" />
-		<mkdir dir="${release.dir}" />
-		
+    
+    <mkdir dir="${release.dir}" />
 	</target>
 
 
@@ -67,6 +66,10 @@
 		<echo message="Creating unix/linux release" />
 		
 		<property name="release.unix.dir" value="${release.dir}/unix" />
+    
+		<delete dir="${release.unix.dir}" />
+    
+		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.unix.dir}" />
 		
 		<antcall target="build">
@@ -98,8 +101,10 @@
 		<echo message="Creating windows release" />
 	
 		<property name="release.win.dir" value="${release.dir}/win" />
+    
+		<delete dir="${release.win.dir}" />
 		<mkdir dir="${release.win.dir}" />
-		
+    
 		<antcall target="build">
 			<param name="release.platform" value="windows" />
 		</antcall>
@@ -132,6 +137,8 @@
 		<echo message="Creating Mac OS X release" />
 		
 		<property name="release.osx.dir" value="${release.dir}/osx" />
+    
+    <delete dir="${release.osx.dir}" />
 		<mkdir dir="${release.osx.dir}" />
 		
 		<antcall target="build">
@@ -196,6 +203,8 @@
 		<echo message="Creating Source release" />
 
 		<property name="release.src.dir" value="${release.dir}/src" />
+    
+    <delete dir="${release.src.dir}" />
 		<mkdir dir="${release.src.dir}" />
 		
 		<property name="src-archive-dir.name" value="jin-${release.version}" />
