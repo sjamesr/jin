@@ -1,0 +1,321 @@
+tell-last-teller-keystroke = string;F9
+tell-next-teller-keystroke = string;shift F9
+
+game-list-display-style = string;embedded
+
+# Output properties
+output-selection = color;000080
+output-selected = color;ffffff
+
+output-popup.num-commands = integer;16
+output-popup.command-0 = string;finger !@
+output-popup.command-0-name = string;finger
+output-popup.command-1 = string;vars !@
+output-popup.command-1-name = string;vars
+output-popup.command-2 = string;ping !@
+output-popup.command-2-name = string;ping
+output-popup.command-3 = string;match !@
+output-popup.command-3-name = string;match
+output-popup.command-4 = string;assess !@
+output-popup.command-4-name = string;assess
+output-popup.command-5 = string;separator
+output-popup.command-6 = string;observe !@
+output-popup.command-6-name = string;observe
+output-popup.command-7 = string;follow !@
+output-popup.command-7-name = string;follow
+output-popup.command-8 = string;separator
+output-popup.command-9 = string;history !@
+output-popup.command-9-name = string;history
+output-popup.command-10 = string;liblist !@
+output-popup.command-10-name = string;liblist
+output-popup.command-11 = string;stored !@
+output-popup.command-11-name = string;stored
+output-popup.command-12 = string;separator
+output-popup.command-13 = string;$copy
+output-popup.command-13-name = string;Copy
+output-popup.command-14 = string;$expurgate
+output-popup.command-14-name = string;Expurgate
+output-popup.command-15 = string;$execute
+output-popup.command-15-name = string;Execute
+
+
+output-link.num-patterns = integer;12
+
+#Matches "finger <playername>"
+output-link.pattern-0 = string;(["'])([Ff][Ii][Nn][Gg][Ee][Rr] +[-0-9A-z]{2,15})\\1
+output-link.command-0 = string;$2
+output-link.index-0 = integer;2
+
+#Matches "help <topic>"
+output-link.pattern-1 = string;(["'])([Hh][Ee][Ll][Pp] +[-_0-9A-z\.]{1,})\\1
+output-link.command-1 = string;$2
+output-link.index-1 = integer;2
+
+#Matches "ping <playername>"
+output-link.pattern-2 = string;(["'])([Pp][Ii][Nn][Gg] +[-0-9A-z]{2,15})\\1
+output-link.command-2 = string;$2
+output-link.index-2 = integer;2
+
+#Matches "match <playername>"
+output-link.pattern-3 = string;(["'])([Mm][Aa][Tt][Cc][Hh] +[-0-9A-z]{2,15})\\1
+output-link.command-3 = string;$2
+output-link.index-3 = integer;2
+
+#Matches "follow <playername>"
+output-link.pattern-4 = string;(["'])([Ff][Oo][Ll][Ll][Oo][Ww] +[-0-9A-z]{2,15})\\1
+output-link.command-4 = string;$2
+output-link.index-4 = integer;2
+
+#Matches "observe <playername or gamenumber or *>", or "ob <playername or gamenumber>",
+#for the sake of tomato's channel qtell about each starting game.
+output-link.pattern-5 = string;(["'])([Oo][Bb]([Ss][Ee][Rr][Vv][Ee])? (([-0-9A-z]{1,15})|(\\*[-BbsofwLdzreTC]*)))\\1
+output-link.command-5 = string;$2
+output-link.index-5 = integer;2
+
+#Matches "liblist <playername>"
+output-link.pattern-6 = string;(["'])([Ll][Ii][Bb][Ll][Ii][Ss][Tt] +[-0-9A-z]{2,15})\\1
+output-link.command-6 = string;$2
+output-link.index-6 = integer;2
+
+#Matches "news <number>"
+output-link.pattern-7 = string;(["'])([Nn][Ee][Ww][Ss] +[0-9]+)\\1
+output-link.command-7 = string;$2
+output-link.index-7 = integer;2
+
+#Matches the "Type "more" to see more" sent by the server when the text is longer than height
+output-link.pattern-8 = string;^\\[?Type "(more)" to see more\.\\]?
+output-link.command-8 = string;$1
+output-link.index-8 = integer;1
+
+#Matches "tell <bot name> help <topic>", or the same with '?'
+output-link.pattern-9 = string;(["'])([Tt][Ee][Ll][Ll] [-0-9A-z]{2,15} (([Hh][Ee][Ll][Pp])|(\\?)) [-_0-9A-z\.]{1,})\\1
+output-link.command-9 = string;$2
+output-link.index-9 = integer;2
+
+#Matches the game number in the output of "tell tomato games"
+output-link.pattern-10 = string;^> ([\?&\.\^\*])[-0-9A-z]{2,15} +[0-9]+ \\1[-0-9A-z]{2,15} +[0-9]+ [^\[]*\\[ *([0-9]*)\\]
+output-link.command-10 = string;observe $2
+output-link.index-10 = integer;2
+
+#Matches "examine <playername, optional> <history or library number>"
+output-link.pattern-11 = string;(["'])([Ee][Xx][Aa][Mm][Ii][Nn][Ee] +([-0-9A-z]{2,15} +)?[-%]?[0-9]+)\\1
+output-link.command-11 = string;$2
+output-link.index-11 = integer;2
+
+font-underlined.link = boolean;true
+foreground.link = color;3060ff
+                     
+font-family = string;Monospaced
+font-size = integer;14
+font-bold = boolean;false
+font-italic = boolean;false
+font-underlined = boolean;false
+foreground = color;f37849
+
+# Note that extending the background property will not work
+background = color;000000
+
+output-text.antialias = boolean;false
+
+foreground.tell = color;ffff00
+foreground.say = color;ffff00
+foreground.ptell = color;ffff00
+
+foreground.atell = color;ff0000
+font-bold.atell = boolean;true
+
+foreground.qtell = color;f37849
+
+foreground.user = color;3060ff
+
+foreground.special = color;7fff7f
+
+foreground.info = color;ff0000
+font-bold.info = boolean;true
+
+foreground.shout = color;00ffff
+
+foreground.ishout = color;00ffff
+
+foreground.sshout = color;ffffff
+
+foreground.announcement = color;ffffff
+font-bold.announcement = boolean;true
+
+foreground.channel-tell = color;dfbe80
+foreground.channel-tell.0 = color;00a4a4
+foreground.channel-tell.1 = color;e48785
+foreground.channel-tell.2 = color;14bc8a
+foreground.channel-tell.15 = color;ff0080
+foreground.channel-tell.34 = color;bbb6c9
+foreground.channel-tell.43 = color;ff7070
+foreground.channel-tell.46 = color;d57bf2
+foreground.channel-tell.47 = color;cdb5fb
+foreground.channel-tell.49 = color;d57bf2
+foreground.channel-tell.55 = color;cd9ce2
+foreground.channel-tell.64 = color;d39981
+foreground.channel-tell.100 = color;ff2020
+foreground.channel-tell.166 = color;acb00b
+foreground.channel-tell.212 = color;cd9ce2
+foreground.channel-tell.221 = color;d57bf2
+foreground.channel-tell.222 = color;d57bf2
+foreground.channel-tell.223 = color;d57bf2
+foreground.channel-tell.224 = color;d57bf2
+
+foreground.channel-atell = color;dfbe80
+foreground.channel-atell.0 = color;00a4a4
+foreground.channel-atell.1 = color;e48785
+foreground.channel-atell.2 = color;14bc8a
+foreground.channel-atell.15 = color;ff0080
+foreground.channel-atell.34 = color;bbb6c9
+foreground.channel-atell.43 = color;ff7070
+foreground.channel-atell.46 = color;d57bf2
+foreground.channel-atell.47 = color;cdb5fb
+foreground.channel-atell.49 = color;d57bf2
+foreground.channel-atell.55 = color;cd9ce2
+foreground.channel-atell.64 = color;d39981
+foreground.channel-atell.100 = color;ff2020
+foreground.channel-atell.166 = color;acb00b
+foreground.channel-atell.212 = color;cd9ce2
+foreground.channel-atell.221 = color;d57bf2
+foreground.channel-atell.222 = color;d57bf2
+foreground.channel-atell.223 = color;d57bf2
+foreground.channel-atell.224 = color;d57bf2
+font-bold.channel-atell = boolean;true
+font-bold.channel-atell.unmodifiable = boolean;true
+
+foreground.channel-qtell = color;f37849
+
+foreground.kibitz = color;c0c0c0
+foreground.whisper = color;c0c0c0
+
+
+#Game lists properties
+history-game-list-action = string;sposition #$id$
+stored-game-list-action = string;examine #$id$
+liblist-game-list-action = string;examine #$id$
+search-game-list-action = string;examine #$id$
+
+history-popup.num-commands = string;7
+history-popup.command-0 = string;examine #$id$
+history-popup.command-0-name = string;Examine game
+history-popup.command-0-multi-select-supported = string;false
+history-popup.command-1 = string;sposition #$id$
+history-popup.command-1-name = string;View last position
+history-popup.command-1-multi-select-supported = string;false
+history-popup.command-2 = string;smoves #$id$
+history-popup.command-2-name = string;View move list
+history-popup.command-3 = string;spgn #$id$
+history-popup.command-3-name = string;View PGN
+history-popup.command-4 = string;separator
+history-popup.command-5 = string;libappend #$id$
+history-popup.command-5-name = string;Append to personal library
+history-popup.command-6 = string;mailstored #$id$
+history-popup.command-6-name = string;Email me the game
+
+stored-popup.num-commands = string;7
+stored-popup.command-0 = string;examine #$id$
+stored-popup.command-0-name = string;Examine game
+stored-popup.command-0-multi-select-supported = string;false
+stored-popup.command-1 = string;sposition #$id$
+stored-popup.command-1-name = string;View last position
+stored-popup.command-1-multi-select-supported = string;false
+stored-popup.command-2 = string;smoves #$id$
+stored-popup.command-2-name = string;View move list
+stored-popup.command-3 = string;spgn #$id$
+stored-popup.command-3-name = string;View PGN
+stored-popup.command-4 = string;separator
+stored-popup.command-5 = string;libappend #$id$
+stored-popup.command-5-name = string;Append to personal library
+stored-popup.command-6 = string;mailstored #$id$
+stored-popup.command-6-name = string;Email me the game
+
+liblist-popup.num-commands = string;7
+liblist-popup.command-0 = string;examine #$id$
+liblist-popup.command-0-name = string;Examine game
+liblist-popup.command-0-multi-select-supported = string;false
+liblist-popup.command-1 = string;sposition #$id$
+liblist-popup.command-1-name = string;View last position
+liblist-popup.command-1-multi-select-supported = string;false
+liblist-popup.command-2 = string;smoves #$id$
+liblist-popup.command-2-name = string;View move list
+liblist-popup.command-3 = string;spgn #$id$
+liblist-popup.command-3-name = string;View PGN
+liblist-popup.command-4 = string;separator
+liblist-popup.command-5 = string;libappend #$id$
+liblist-popup.command-5-name = string;Append to personal library
+liblist-popup.command-6 = string;mailstored #$id$
+liblist-popup.command-6-name = string;Email me the game
+
+search-popup.num-commands = string;7
+search-popup.command-0 = string;examine #$id$
+search-popup.command-0-name = string;Examine game
+search-popup.command-0-multi-select-supported = string;false
+search-popup.command-1 = string;sposition #$id$
+search-popup.command-1-name = string;View last position
+search-popup.command-1-multi-select-supported = string;false
+search-popup.command-2 = string;smoves #$id$
+search-popup.command-2-name = string;View move list
+search-popup.command-3 = string;spgn #$id$
+search-popup.command-3-name = string;View PGN
+search-popup.command-4 = string;separator
+search-popup.command-5 = string;libappend #$id$
+search-popup.command-5-name = string;Append to personal library
+search-popup.command-6 = string;mailstored #$id$
+search-popup.command-6-name = string;Email me the game
+
+# Input properties
+input-background = color;ffffff
+input-foreground = color;000000
+
+# Preferences panel properties
+preferences.show = boolean;true
+preferences.categories.count = integer;15
+
+preferences.categories.0.name = string;Default channel settings
+preferences.categories.0.ids = string;channel-tell;channel-atell
+
+preferences.categories.1.custom = boolean;true
+preferences.categories.1.id = string;channels-panel
+preferences.categories.channels-panel.ids = string;channel-tell;channel-atell
+preferences.categories.channels-panel.channels-count = integer;400
+preferences.categories.channels-panel.name = string;Channels
+
+preferences.categories.2.name = string;Personal tells
+preferences.categories.2.ids = string;tell
+
+preferences.categories.3.name = string;Opponent tells
+preferences.categories.3.ids = string;say
+
+preferences.categories.4.name = string;Bughouse partner tells
+preferences.categories.4.ids = string;ptell
+
+preferences.categories.5.name = string;Qtells (Bot tells)
+preferences.categories.5.ids = string;qtell
+
+preferences.categories.6.name = string;Shouts
+preferences.categories.6.ids = string;shout;ishout
+
+preferences.categories.7.name = string;S-Shouts
+preferences.categories.7.ids = string;sshout
+
+preferences.categories.8.name = string;Announcements
+preferences.categories.8.ids = string;announcement
+
+preferences.categories.9.name = string;Kibitzes
+preferences.categories.9.ids = string;kibitz
+
+preferences.categories.10.name = string;Whispers
+preferences.categories.10.ids = string;whisper
+
+preferences.categories.11.name = string;Links
+preferences.categories.11.ids = string;link
+
+preferences.categories.12.name = string;User commands
+preferences.categories.12.ids = string;user
+
+preferences.categories.13.name = string;System information
+preferences.categories.13.ids = string;info
+
+preferences.categories.14.name = string;Special information
+preferences.categories.14.ids = string;special
