@@ -433,7 +433,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if (unstartedGameInfo != null) // A new game
       gameData = startGame(unstartedGameInfo, boardData);
     else if (gameData != null){ // A known game
-      Game game = gameData.game;
       Style12Struct oldBoardData = gameData.boardData;
       int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
