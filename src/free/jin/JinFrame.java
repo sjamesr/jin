@@ -344,6 +344,7 @@ public class JinFrame extends JFrame{
     User user = (User)connsToUsers.get(conn);
 
     if (Jin.isKnownUser(user)){
+      /*
       if (user.isUserModified()){
         System.out.println("Querying user about saving settings");
         int result = JOptionPane.showConfirmDialog(this,"Save "+user.getUsername()+"'s settings into "+user.getFilename()+"?","Save settings?",JOptionPane.YES_NO_OPTION);
@@ -360,6 +361,11 @@ public class JinFrame extends JFrame{
         System.out.println("Saving user's implicit settings");
         Jin.save(user);
       }
+      */
+
+      // Isn't it stupid to ask the user whether he wants to save his settings?
+      System.out.println("Saving user settings");
+      Jin.save(user);
     }
     else{
       if (user.getUsername()!=null){ // Null means a guest.
