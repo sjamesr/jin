@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002-2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -20,6 +20,8 @@
  */
 
 package free.util;
+
+import java.util.StringTokenizer;
 
 
 /**
@@ -126,6 +128,24 @@ public class TextUtilities{
     buf.reverse();
 
     return str;
+  }
+
+
+
+
+
+  /**
+   * Returns an array of the tokens produced by the specified string with the
+   * specified delimiter characters.
+   */
+
+  public static String [] getTokens(String text, String delimiters){
+    StringTokenizer tokenizer = new StringTokenizer(text, delimiters);
+    String [] tokens = new String[tokenizer.countTokens()];
+    for (int i = 0; i < tokens.length; i++)
+      tokens[i] = tokenizer.nextToken();
+
+    return tokens;
   }
 
 
