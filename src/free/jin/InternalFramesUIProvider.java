@@ -1159,7 +1159,6 @@ public class InternalFramesUIProvider implements UIProvider{
 
       desktop.add(frame);
       frame.setVisible(true);
-      firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_SHOWN));
     }
 
 
@@ -1291,11 +1290,14 @@ public class InternalFramesUIProvider implements UIProvider{
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DEACTIVATED));
     } 
 
+    public void internalFrameOpened(InternalFrameEvent e){
+      firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_SHOWN));    
+    }
+    
     public void internalFrameClosed(InternalFrameEvent e){}
     public void internalFrameClosing(InternalFrameEvent e){}
     public void internalFrameDeiconified(InternalFrameEvent e){}
     public void internalFrameIconified(InternalFrameEvent e){}
-    public void internalFrameOpened(InternalFrameEvent e){}
 
 
   }
