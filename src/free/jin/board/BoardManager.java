@@ -741,6 +741,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     JInternalFrame boardFrame = (JInternalFrame)unusedInternalFrames.lastElement();
     unusedInternalFrames.removeElementAt(unusedInternalFrames.size()-1);
 
+    BoardPanel oldBoardPanel = (BoardPanel)internalFramesToBoardPanels.remove(boardFrame);
+    boardPanelsToInternalFrames.remove(oldBoardPanel);
+
     Container contentPane = boardFrame.getContentPane();
     contentPane.removeAll();
     contentPane.add(boardPanel, BorderLayout.CENTER);
@@ -866,15 +869,20 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public void gameEnded(GameEndEvent evt){
     BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.remove(evt.getGame());
-    if (boardPanel!=null){
+    if (boardPanel != null){
       getConnection().removeGameListener(boardPanel);
       boardPanel.removeUserMoveListener(this);
       boardPanel.setInactive();
-      JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.remove(boardPanel);
-      internalFramesToBoardPanels.remove(boardFrame);
+      JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.get(boardPanel);
+//      JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.remove(boardPanel);
+//      internalFramesToBoardPanels.remove(boardFrame);
       boardFrame.setTitle(boardPanel.getTitle());
       boardFrame.repaint(); // It doesn't seem to repaint itself.
-      if (!boardFrame.isClosed())
+      if (boardFrame.isClosed()){
+        internalFramesToBoardPanels.remove(boardFrame);
+        boardPanelsToInternalFrames.remove(boardPanel);
+      }
+      else
         unusedInternalFrames.addElement(boardFrame);
     }
   }
@@ -975,6 +983,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     internalFrames.setElementAt(null, index);
     frame.removeInternalFrameListener(this);
     unusedInternalFrames.removeElement(frame);
+
+    BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(frame);
+
+    if (!boardPanel.isActive()){
+      internalFramesToBoardPanels.remove(frame);
+      boardPanelsToInternalFrames.remove(boardPanel);
+    }
   }
 
 
