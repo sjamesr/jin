@@ -1043,7 +1043,9 @@ public class JinMain implements JinContext{
       try{
         Class.forName(className);
         UIManager.installLookAndFeel(name, className);
-      } catch (ClassNotFoundException e){}
+      } catch (ClassNotFoundException e){
+          System.err.println("Unable to load class " + className + " for the " + name + " look and feel");
+        }
     }
   }
 
