@@ -15,6 +15,10 @@
 	}
 	
 	session_start();
+	
+	$isGuest = null;
+	$username = null;
+	$password = null;
 
 	// Pressed the 'continue as guest' button on the login form or already
 	// logged in as guest
