@@ -71,7 +71,7 @@ public class MacOSXSpecific{
     Application.getApplication().addApplicationListener(new ApplicationAdapter(){
       public void handleQuit(ApplicationEvent event){
         event.setHandled(true);
-        JinMain.getApp().quit(false);
+        Jin.getInstance().quit(false);
       }
     });
   }
