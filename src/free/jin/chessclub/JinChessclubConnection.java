@@ -2020,7 +2020,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String command = curGameListInfo.command;
 
-    String endExplanationString = getEndExplanationString(status, mode);
+    String endExplanationString = getEndExplanationString(status, mode, color);
     int resultStatus;
     switch (status){
       case 0:
@@ -2115,53 +2115,57 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Returns the end game explanation string corresponding to the given status
-   * and mode.
+   * Returns the end game explanation string corresponding to the given status,
+   * mode and the color of the player who lost.
    */
 
-  protected String getEndExplanationString(int status, int mode){
+  protected String getEndExplanationString(int status, int mode, int color){
+    String winner = (color==WHITE ? "Black" : "White");
+    String loser = (color==WHITE ? "White" : "Black");
+    String result = (color==WHITE ? "(0-1)" : "(1-0)");
+
     String endExplanationString = "(?) No result [specific reason unknown]";
     switch (status){
       case 0:
         switch (mode){
           case 0:
-            endExplanationString = "(Res) Black resigns";
+            endExplanationString = "(Res) "+loser+" resigns";
             break;
           case 1:
-            endExplanationString = "(Mat) Black checkmated";
+            endExplanationString = "(Mat) "+loser+" checkmated";
             break;
           case 2:
-            endExplanationString = "(Fla) Black forfeits on time.";
+            endExplanationString = "(Fla) "+loser+" forfeits on time.";
             break;
           case 3:
-            endExplanationString = "(Adj) White declared the winner by adjudication";
+            endExplanationString = "(Adj) "+winner+" declared the winner by adjudication";
             break;
           case 4:
-            endExplanationString = "(BQ) Black disconnected and forfeits";
+            endExplanationString = "(BQ) "+loser+" disconnected and forfeits";
             break;
           case 5:
-            endExplanationString = "(BQ) Black got disconnected and forfeits";
+            endExplanationString = "(BQ) "+loser+" got disconnected and forfeits";
             break;
           case 6:
-            endExplanationString = "(BQ) Unregistered player Black disconnected and forfeits";
+            endExplanationString = "(BQ) Unregistered player "+loser+" disconnected and forfeits";
             break;
           case 7:
-            endExplanationString = "(Res) Black's partner resigns";
+            endExplanationString = "(Res) "+loser+"'s partner resigns";
             break;
           case 8:
-            endExplanationString = "(Mat) Black's partner checkmated";
+            endExplanationString = "(Mat) "+loser+"'s partner checkmated";
             break;
           case 9:
-            endExplanationString = "(Fla) Black's partner forfeits on time";
+            endExplanationString = "(Fla) "+loser+"'s partner forfeits on time";
             break;
           case 10:
-            endExplanationString = "(BQ) Black's partner disconnected and forfeits";
+            endExplanationString = "(BQ) "+loser+"'s partner disconnected and forfeits";
             break;
           case 11:
-            endExplanationString = "(BQ) Black disconnected and forfeits [obsolete?]";
+            endExplanationString = "(BQ) "+loser+" disconnected and forfeits [obsolete?]";
             break;
           case 12:
-            endExplanationString = "(1-0) White wins [specific reason unknown]";
+            endExplanationString = result+" "+winner+" wins [specific reason unknown]";
             break;
         }
         break;
@@ -2172,7 +2176,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             endExplanationString = "(Agr) Game drawn by mutual agreement";
             break;
           case 1:
-            endExplanationString = "(Sta) Black stalemated";
+            endExplanationString = "(Sta) "+loser+" stalemated";
             break;
           case 2:
             endExplanationString = "(Rep) Game drawn by repetition";
@@ -2181,7 +2185,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             endExplanationString = "(50) Game drawn by the 50 move rule";
             break;
           case 4:
-            endExplanationString = "(TM) Black ran out of time and White has no material to mate";
+            endExplanationString = "(TM) "+loser+" ran out of time and "+winner+" has no material to mate";
             break;
           case 5:
             endExplanationString = "(NM) Game drawn because neither player has mating material";
@@ -2210,19 +2214,19 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             endExplanationString = "(?) Game adjourned by mutual agreement";
             break;
           case 1:
-            endExplanationString = "(?) Game adjourned when Black disconnected";
+            endExplanationString = "(?) Game adjourned when "+loser+" disconnected";
             break;
           case 2:
             endExplanationString = "(?) Game adjourned by system shutdown";
             break;
           case 3:
-            endExplanationString = "(?) Game courtesyadjourned by Black";
+            endExplanationString = "(?) Game courtesyadjourned by "+loser+"";
             break;
           case 4:
             endExplanationString = "(?) Game adjourned by an administrator";
             break;
           case 5:
-            endExplanationString = "(?) Game adjourned when Black got disconnected";
+            endExplanationString = "(?) Game adjourned when "+loser+" got disconnected";
             break;
         }
         break;
@@ -2232,13 +2236,13 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             endExplanationString = "(Agr) Game aborted by mutual agreement";
             break;
           case 1:
-            endExplanationString = "(BQ) Game aborted when Black disconnected";
+            endExplanationString = "(BQ) Game aborted when "+loser+" disconnected";
             break;
           case 2:
             endExplanationString = "(SD) Game aborted by system shutdown";
             break;
           case 3:
-            endExplanationString = "(BA) Game courtesyaborted by Black";
+            endExplanationString = "(BA) Game courtesyaborted by "+loser+"";
             break;
           case 4:
             endExplanationString = "(Adj) Game aborted by an administrator";
@@ -2247,22 +2251,22 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
             endExplanationString = "(Sho) Game aborted because it's too short to adjourn";
             break;
           case 6:
-            endExplanationString = "(BQ) Game aborted when Black's partner disconnected";
+            endExplanationString = "(BQ) Game aborted when "+loser+"'s partner disconnected";
             break;
           case 7:
-            endExplanationString = "(Sho) Game aborted by Black at move 1";
+            endExplanationString = "(Sho) Game aborted by "+loser+" at move 1";
             break;
           case 8:
-            endExplanationString = "(Sho) Game aborted by Black's partner at move 1";
+            endExplanationString = "(Sho) Game aborted by "+loser+"'s partner at move 1";
             break;
           case 9:
             endExplanationString = "(Sho) Game aborted because it's too short";
             break;
           case 10:
-            endExplanationString = "(Adj) Game aborted because Black's account expired";
+            endExplanationString = "(Adj) Game aborted because "+loser+"'s account expired";
             break;
           case 11:
-            endExplanationString = "(BQ) Game aborted when Black got disconnected";
+            endExplanationString = "(BQ) Game aborted when "+loser+" got disconnected";
             break;
           case 12:
             endExplanationString = "(?) No result [specific reason unknown]";
@@ -2270,6 +2274,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         }
         break;
     }
+
     return endExplanationString;
   }
 
