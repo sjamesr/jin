@@ -51,13 +51,24 @@ public class PlainBoardPainter implements ColoredBoardPainter{
 
 
   /**
-   * Creates a new PlainBoardPainter which paints squares with the given light
-   * square color and dark square color.
+   * Creates a new <code>PlainBoardPainter</code> which paints squares with the
+   * given light square color and dark square color.
    */
 
   public PlainBoardPainter(Color lightColor, Color darkColor){
     this.lightColor = lightColor;
     this.darkColor = darkColor;
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>PlainBoardPainter</code> with some default colors for
+   * light and dark squares.
+   */
+   
+  public PlainBoardPainter(){
+    this(new Color(255,207,144),new Color(143,96,79));
   }
 
 
