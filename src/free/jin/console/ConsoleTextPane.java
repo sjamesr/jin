@@ -113,11 +113,9 @@ public class ConsoleTextPane extends JTextPane{
     keymap.addActionForKeyStroke(
       KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), copyAction);
     keymap.addActionForKeyStroke(
-      KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), copyAction);
-    keymap.addActionForKeyStroke(
-      KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_MASK), copyAction);
+      KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), copyAction);
 
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    enableEvents(MouseEvent.MOUSE_EVENT_MASK | MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
 
