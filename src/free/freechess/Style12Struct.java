@@ -102,6 +102,9 @@ public class Style12Struct extends Struct{
    * milliseconds.
    * @param isBoardFlipped <code>true</code> if the board should be flipped
    * (black at bottom), <code>false</code> otherwise.
+   * @param isClockRunning <code>true</code> if the clock of the player to move
+   * is running.
+   * @param lag The lag incurred when making the move, in milliseconds.
    */
 
   public Style12Struct(String boardLexigraphic, String currentPlayer,
@@ -112,7 +115,7 @@ public class Style12Struct extends Struct{
       boolean isPlayedGame, boolean isMyTurn, int initTime, int increment,
       int whiteMaterialStrength, int blackMaterialStrength, int whiteTime,
       int blackTime, int nextMoveNumber, String moveVerbose, String moveSAN,
-      int moveTime, boolean isBoardFlipped){
+      int moveTime, boolean isBoardFlipped, boolean isClockRunning, int lag){
 
     if ((doublePawnPushFile < -1) || (doublePawnPushFile > 7))
       throw new IllegalArgumentException("Bad value for double pawn push file: "+doublePawnPushFile);
@@ -162,6 +165,9 @@ public class Style12Struct extends Struct{
         throw new IllegalArgumentException("Unknown game type: "+gameType);
     }
 
+    if (lag < 0)
+      throw new IllegalArgumentException("Lag may not be negative (really, it's against the laws of physics)");
+
     setStringProperty("BoardLexigraphic", boardLexigraphic);
     setStringProperty("CurrentPlayer", currentPlayer);
     setIntegerProperty("DoublePawnPushFile", doublePawnPushFile);
@@ -187,6 +193,8 @@ public class Style12Struct extends Struct{
     setStringProperty("MoveSAN", moveSAN);
     setIntegerProperty("MoveTime", moveTime);
     setBooleanProperty("IsBoardFlipped", isBoardFlipped);
+    setBooleanProperty("IsClockRunning", isClockRunning);
+    setIntegerProperty("Lag", lag);
   }
 
 
@@ -279,15 +287,19 @@ public class Style12Struct extends Struct{
 
     String moveSAN = tokens.nextToken(); // The move in SAN notation
     if (moveSAN.equals("none"))
-      moveSAN= null;
+      moveSAN = null;
 
     boolean isBoardFlipped = parseBoolean(tokens.nextToken()); // Is the board flipped?
+
+    boolean isClockRunning = parseBoolean(tokens.nextToken()); // Is the clock of the player to move running?
+
+    int lag = Integer.parseInt(tokens.nextToken()); // The lag, in milliseconds.
 
     return new Style12Struct(positionLexigraphic, currentPlayer, doublePawnPushFile, canWhiteCastleKingside,
       canWhiteCastleQueenside, canBlackCastleKingside, canBlackCastleQueenside, pliesSinceIrreversible,
       gameNumber, whiteName, blackName, gameType, isPlayedGame, isMyTurn, initTime, increment,
       whiteMaterialStrength, blackMaterialStrength, whiteTime, blackTime, nextMoveNumber, moveVerbose,
-      moveSAN, moveTime, isBoardFlipped);
+      moveSAN, moveTime, isBoardFlipped, isClockRunning, lag);
   }
 
 
@@ -673,5 +685,28 @@ public class Style12Struct extends Struct{
   public boolean isBoardFlipped(){
     return getBooleanProperty("IsBoardFlipped");
   }
+
+
+
+  /**
+   * Returns <code>true</code> if the clock of the player to move is running.
+   */
+
+  public boolean isClockRunning(){
+    return getBooleanProperty("IsClockRunning");
+  }
+
+
+
+  /**
+   * Returns the amount of lag incurred when making the move that caused this
+   * style12 message to be sent.
+   */
+
+  public int getLag(){
+    return getIntegerProperty("Lag");
+  }
+
+
 
 }
