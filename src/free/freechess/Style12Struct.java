@@ -74,7 +74,7 @@ public class Style12Struct extends Struct{
    * @param canWhiteCastleQueenside Can white castle queenside?
    * @param canBlackCastleKingside Can black castle kingside?
    * @param canBlackCastleQueenside Can black castle queenside?
-   * @param movesSinceIrreversible The number of moves made since the last
+   * @param pliesSinceIrreversible The number of half moves made since the last
    * irreversible move (0 if the last move is irreversible).
    * @param gameNumber The game number.
    * @param whiteName The white player's nickname.
@@ -96,8 +96,8 @@ public class Style12Struct extends Struct{
    * chess numbering -- White's and Black's first moves are both 1, etc.)
    * @param moveVerbose A verbose representation of the last move,
    * <code>null</code> if none.
-   * @param movePretty A pretty (algebraic) representation of the last move,
-   * <code>null</code> if none.
+   * @param movePretty A SAN (Standard Algebraic Notation) representation of the
+   * last move, <code>null</code> if none.
    * @param moveTime The amount of time taken to make the last move, in
    * milliseconds.
    * @param isBoardFlipped <code>true</code> if the board should be flipped
@@ -107,11 +107,11 @@ public class Style12Struct extends Struct{
   public Style12Struct(String boardLexigraphic, String currentPlayer,
       int doublePawnPushFile, boolean canWhiteCastleKingside, 
       boolean canWhiteCastleQueenside, boolean canBlackCastleKingside,
-      boolean canBlackCastleQueenside, int movesSinceIrreversible,
+      boolean canBlackCastleQueenside, int pliesSinceIrreversible,
       int gameNumber, String whiteName, String blackName, int gameType,
       boolean isPlayedGame, boolean isMyTurn, int initTime, int increment,
       int whiteMaterialStrength, int blackMaterialStrength, int whiteTime,
-      int blackTime, int nextMoveNumber, String moveVerbose, String movePretty,
+      int blackTime, int nextMoveNumber, String moveVerbose, String moveSAN,
       int moveTime, boolean isBoardFlipped){
 
     if ((doublePawnPushFile < -1) || (doublePawnPushFile > 7))
@@ -126,8 +126,8 @@ public class Style12Struct extends Struct{
     if ((currentPlayer == null) || ((!currentPlayer.equals("W")) && (!currentPlayer.equals("B"))))
       throw new IllegalArgumentException("Current player string ("+currentPlayer+") must be either \"W\" or \"B\"");
 
-    if (movesSinceIrreversible < 0)
-      throw new IllegalArgumentException("Moves since irreversible move ("+movesSinceIrreversible+") cannot be negative");
+    if (pliesSinceIrreversible < 0)
+      throw new IllegalArgumentException("Plies since irreversible move ("+pliesSinceIrreversible+") cannot be negative");
 
     if (whiteName == null)
       throw new IllegalArgumentException("White name may not be null");
@@ -169,7 +169,7 @@ public class Style12Struct extends Struct{
     setBooleanProperty("CanWhiteCastleQueenside", canWhiteCastleQueenside);
     setBooleanProperty("CanBlackCastleKingside", canBlackCastleKingside);
     setBooleanProperty("CanBlackCastleQueenside", canBlackCastleQueenside);
-    setIntegerProperty("MovesSinceIrreversible", movesSinceIrreversible);
+    setIntegerProperty("PliesSinceIrreversible", pliesSinceIrreversible);
     setIntegerProperty("GameNumber", gameNumber);
     setStringProperty("WhiteName", whiteName);
     setStringProperty("BlackName", blackName);
@@ -184,7 +184,7 @@ public class Style12Struct extends Struct{
     setIntegerProperty("BlackTime", blackTime);
     setIntegerProperty("NextMoveNumber", nextMoveNumber);
     setStringProperty("MoveVerbose", moveVerbose);
-    setStringProperty("MovePretty", movePretty);
+    setStringProperty("MoveSAN", moveSAN);
     setIntegerProperty("MoveTime", moveTime);
     setBooleanProperty("IsBoardFlipped", isBoardFlipped);
   }
@@ -216,7 +216,7 @@ public class Style12Struct extends Struct{
     boolean canBlackCastleKingside = parseBoolean(tokens.nextToken()); // Can black castle kingside
     boolean canBlackCastleQueenside = parseBoolean(tokens.nextToken()); // Can black castle queenside
 
-    int movesSinceIrreversible = Integer.parseInt(tokens.nextToken()); // Number of moves since an irreversible move
+    int pliesSinceIrreversible = Integer.parseInt(tokens.nextToken()); // Number of plies since an irreversible move
 
     int gameNumber = Integer.parseInt(tokens.nextToken()); // The game number
 
@@ -277,17 +277,17 @@ public class Style12Struct extends Struct{
     int milliseconds = Integer.parseInt(timeTokens.nextToken());
     int moveTime = 60*1000*minutes + 60*seconds + milliseconds;
 
-    String movePretty = tokens.nextToken(); // The move in pretty (algebraic) notation
-    if (movePretty.equals("none"))
-      movePretty = null;
+    String moveSAN = tokens.nextToken(); // The move in SAN notation
+    if (moveSAN.equals("none"))
+      moveSAN= null;
 
     boolean isBoardFlipped = parseBoolean(tokens.nextToken()); // Is the board flipped?
 
     return new Style12Struct(positionLexigraphic, currentPlayer, doublePawnPushFile, canWhiteCastleKingside,
-      canWhiteCastleQueenside, canBlackCastleKingside, canBlackCastleQueenside, movesSinceIrreversible,
+      canWhiteCastleQueenside, canBlackCastleKingside, canBlackCastleQueenside, pliesSinceIrreversible,
       gameNumber, whiteName, blackName, gameType, isPlayedGame, isMyTurn, initTime, increment,
       whiteMaterialStrength, blackMaterialStrength, whiteTime, blackTime, nextMoveNumber, moveVerbose,
-      movePretty, moveTime, isBoardFlipped);
+      moveSAN, moveTime, isBoardFlipped);
   }
 
 
@@ -317,6 +317,77 @@ public class Style12Struct extends Struct{
 
   public String getBoardLexigraphic(){
     return getStringProperty("BoardLexigraphic");
+  }
+
+
+
+
+  /**
+   * Returns the current board in FEN format.
+   */
+
+  public String getBoardFEN(){
+    StringBuffer buf = new StringBuffer();
+    String boardLexigraphic = getBoardLexigraphic();
+    int emptySquareCounter = 0;
+    for (int i = 0; i < 8; i++){
+      for (int j = 0; j < 8; j++){
+        char c = boardLexigraphic.charAt(j+i*8);
+        if (c == '-')
+          emptySquareCounter++;
+        else{
+          if (emptySquareCounter != 0){
+            buf.append(emptySquareCounter);
+            emptySquareCounter = 0;
+          }
+          buf.append(c);
+        }
+      }
+      if (emptySquareCounter != 0){
+        buf.append(emptySquareCounter);
+        emptySquareCounter = 0;
+      }
+      if (i != 7)
+        buf.append('/');
+    }
+
+    buf.append(" ");
+
+    buf.append(getCurrentPlayer().toLowerCase());
+
+    buf.append(" ");
+
+    StringBuffer castlingAvailability = new StringBuffer();
+    if (canWhiteCastleKingside())
+      castlingAvailability.append('K');
+    if (canWhiteCastleQueenside())
+      castlingAvailability.append('Q');
+    if (canBlackCastleKingside())
+      castlingAvailability.append('k');
+    if (canBlackCastleQueenside())
+      castlingAvailability.append('q');
+
+    buf.append(castlingAvailability.length() == 0 ? "-" : castlingAvailability.toString());
+
+    buf.append(" ");
+
+    String enPassantSquare;
+    if (getDoublePawnPushFile() == -1)
+      enPassantSquare = "-";
+    else
+      enPassantSquare = "" + ('a' + getDoublePawnPushFile()) + (getCurrentPlayer().equals("W") ? "6" : "3");
+
+    buf.append(enPassantSquare);
+
+    buf.append(" ");
+
+    buf.append(getPliesSinceIrreversible());
+
+    buf.append(" ");
+
+    buf.append(getNextMoveNumber());
+
+    return buf.toString();
   }
 
 
@@ -395,12 +466,12 @@ public class Style12Struct extends Struct{
 
 
   /**
-   * Returns the amount of moves made since the last irreversible move, or 0 if
+   * Returns the amount of half moves made since the last irreversible move, or 0 if
    * the last move was irreversible.
    */
 
-  public int getMovesSinceIrreversible(){
-    return getIntegerProperty("MovesSinceIrreversible");
+  public int getPliesSinceIrreversible(){
+    return getIntegerProperty("PliesSinceIrreversible");
   }
 
 
@@ -574,12 +645,12 @@ public class Style12Struct extends Struct{
 
 
   /**
-   * Returns a pretty (algebraic) representation of the move, or
+   * Returns a SAN (Standard Algebraic Notation) representation of the move, or
    * <code>null</code> if none.
    */
 
-  public String getMovePretty(){
-    return getStringProperty("MovePretty");
+  public String getMoveSAN(){
+    return getStringProperty("MoveSAN");
   }
 
 
