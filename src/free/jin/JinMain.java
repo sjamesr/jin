@@ -528,6 +528,16 @@ public class JinMain implements JinContext{
 
     return true;
   }
+  
+  
+  
+  /**
+   * Returns <code>true</code>.
+   */
+   
+  public boolean isSavePrefsCapable(){
+    return true;
+  }
 
 
 
