@@ -495,7 +495,7 @@ public class ChesslikeGenericVariant implements WildVariant{
       modifier.setPieceAt(rook, rookEndingSquare);
     }
 
-    modifier.setCurrentPlayer(pos.getCurrentPlayer().getOpponent());
+    modifier.setCurrentPlayer(cmove.getPlayer().getOpponent());
   }
 
   
