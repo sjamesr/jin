@@ -24,9 +24,10 @@ package free.jin;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import free.util.*;
 import free.util.swing.LinkLabel;
+import free.util.swing.PlainTextDialog;
 import java.io.IOException;
 
 
@@ -35,6 +36,14 @@ import java.io.IOException;
  */
 
 public class LicenseDialog extends JDialog{
+
+
+
+  /**
+   * The font of the text area displaying the license text.
+   */
+
+  private final static Font LICENSE_TEXT_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
 
 
@@ -110,7 +119,8 @@ public class LicenseDialog extends JDialog{
             }
         }
 
-        JDialog textDialog = new LicenseTextDialog((Frame)getParent(), "The GNU General Public License", gplText);
+        PlainTextDialog textDialog = new PlainTextDialog(LicenseDialog.this, "The GNU General Public License", gplText);
+        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
       }
@@ -127,7 +137,8 @@ public class LicenseDialog extends JDialog{
             }
         }
 
-        JDialog textDialog = new LicenseTextDialog((Frame)getParent(), "The GNU Lesser General Public License", lgplText);
+        PlainTextDialog textDialog = new PlainTextDialog((Frame)getParent(), "The GNU Lesser General Public License", lgplText);
+        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
       }
@@ -144,7 +155,8 @@ public class LicenseDialog extends JDialog{
             }
         }
 
-        JDialog textDialog = new LicenseTextDialog((Frame)getParent(), "The jregex License (BSD)", jregexCopyrightText);
+        PlainTextDialog textDialog = new PlainTextDialog(LicenseDialog.this, "The jregex License (BSD)", jregexCopyrightText);
+        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
       }
@@ -161,7 +173,8 @@ public class LicenseDialog extends JDialog{
             }
         }
 
-        JDialog textDialog = new LicenseTextDialog((Frame)getParent(), "The BeanShell License", beanshellCopyrightText);
+        PlainTextDialog textDialog = new PlainTextDialog(LicenseDialog.this, "The BeanShell License", beanshellCopyrightText);
+        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
       }
@@ -287,7 +300,7 @@ public class LicenseDialog extends JDialog{
 
     contentPane.add(Box.createVerticalStrut(15));
 
-    JButton closeButton = new JButton("OK");
+    JButton closeButton = new JButton("Close");
     closeButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         dispose();
@@ -336,89 +349,6 @@ public class LicenseDialog extends JDialog{
       } catch (IOException e){
           JOptionPane.showMessageDialog(LicenseDialog.this, "Unable to display url: "+url, "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-  }
-
-
-
-
-  /**
-   * A simple dialog for displaying the licenses.
-   */
-
-  private static class LicenseTextDialog extends JDialog{
-
-
-    /**
-     * The title.
-     */
-
-    private final String title;
-
-
-
-    /**
-     * The text.
-     */
-
-    private final String text;
-
-
-
-    /**
-     * Creates a new LicenseTextDialog with the given parent, title and text.
-     */
-
-    public LicenseTextDialog(Frame parent, String title, String text){
-      super(parent, title, true);
-
-      this.title = title;
-      this.text = text;
-
-      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-      KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-      ActionListener closer = new WindowDisposingActionListener(this);
-      getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-      createUI();
-    }
-
-
-
-    /**
-     * Creates the UI.
-     */
-
-    private void createUI(){
-      JPanel contentPane = new JPanel();
-      contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-      contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-      setContentPane(contentPane);
-
-      JLabel titleLabel = new JLabel(title, JLabel.CENTER);
-      titleLabel.setAlignmentX(CENTER_ALIGNMENT);
-      titleLabel.setFont(new Font("Serif", Font.PLAIN, 36));
-      contentPane.add(titleLabel);
-
-      contentPane.add(Box.createVerticalStrut(20));
-
-      JTextArea textArea = new JTextArea(text, 20, 80);
-      textArea.setEditable(false);
-      textArea.setLineWrap(true);
-      textArea.setWrapStyleWord(true);
-      textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-      JScrollPane scrollPane = new JScrollPane(textArea);
-      contentPane.add(scrollPane);
-
-      contentPane.add(Box.createVerticalStrut(20));
-
-      JButton closeButton = new JButton("OK");
-      closeButton.addActionListener(new WindowDisposingActionListener(this));
-      closeButton.setAlignmentX(CENTER_ALIGNMENT);
-      getRootPane().setDefaultButton(closeButton);
-      contentPane.add(closeButton);
     }
 
   }
