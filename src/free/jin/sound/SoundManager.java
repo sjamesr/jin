@@ -35,8 +35,8 @@ import java.net.URL;
 import javax.swing.JMenu;
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -149,28 +149,33 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     JMenu myMenu = new JMenu(getName());
     
     JRadioButtonMenuItem onMenu = new JRadioButtonMenuItem("Sound on", isOn);
-    onMenu.setMnemonic('S');
-    onMenu.addChangeListener(new ChangeListener(){
-      
-      public void stateChanged(ChangeEvent evt){
-        isOn = ((JRadioButtonMenuItem)(evt.getSource())).isSelected();
-      }
-      
-    });
-
     JRadioButtonMenuItem offMenu = new JRadioButtonMenuItem("Sound off", !isOn);
+
+    onMenu.setMnemonic('S');
     offMenu.setMnemonic('o');
-    offMenu.addChangeListener(new ChangeListener(){
-      
-      public void stateChanged(ChangeEvent evt){
-        isOn = !((JRadioButtonMenuItem)(evt.getSource())).isSelected();
-      }
-      
-    });
 
     ButtonGroup onOffGroup = new ButtonGroup();
     onOffGroup.add(onMenu);
     onOffGroup.add(offMenu);
+
+    onMenu.setActionCommand("on");
+    offMenu.setActionCommand("off");
+
+    ActionListener soundStateListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String actionCommand = evt.getActionCommand();
+
+        if ("on".equals(actionCommand))
+          isOn = true;
+        else if ("off".equals(actionCommand))
+          isOn = false;
+        else
+          throw new IllegalStateException("Unknown action command: "+actionCommand);
+      }
+    };
+
+    onMenu.addActionListener(soundStateListener);
+    offMenu.addActionListener(soundStateListener);
 
     myMenu.add(onMenu);
     myMenu.add(offMenu);
