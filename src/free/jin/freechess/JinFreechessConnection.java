@@ -277,6 +277,20 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate ChatEvent.
    */
 
+  protected boolean processQTell(String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "qtell", null, null, message, null));
+
+    return true;
+  }
+
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
   protected boolean processShout(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, "shout", username, (titles == null ? "" : titles), message, null));
 
