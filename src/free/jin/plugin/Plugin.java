@@ -105,11 +105,22 @@ public abstract class Plugin{
   
   /**
    * Returns the resources of the specified type. See
-   * <code>JinContext.loadResources</code> for more information.
+   * <code>JinContext.getResources</code> for more information.
    */
    
-  public ClassLoader [] loadResources(String resourceType){
-    return context.getJinContext().loadResources(resourceType); 
+  public Resource [] getResources(String resourceType){
+    return context.getJinContext().getResources(resourceType, this); 
+  }
+  
+  
+  
+  /**
+   * Returns the resource of the specified type and of the specified id. See
+   * <code>JinContext.getResource</code> for more information.
+   */
+   
+  public Resource getResource(String resourceType, String resourceId){
+    return context.getJinContext().getResource(resourceType, resourceId, this);
   }
 
 
