@@ -436,6 +436,11 @@ public class GameLogger extends Plugin implements GameListener{
           break;
       }
 
+      int whiteRating = game.getWhiteRating();
+      int blackRating = game.getBlackRating();
+      String whiteRatingString = (whiteRating < 0) ? "-" : String.valueOf(whiteRating);
+      String blackRatingString = (blackRating < 0) ? "-" : String.valueOf(blackRating);
+
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)));
       writeTag(out, "Event", "Casual Game");
       writeTag(out, "Site", getUser().getServer().getLongName());
@@ -443,6 +448,8 @@ public class GameLogger extends Plugin implements GameListener{
       writeTag(out, "Round", "-");
       writeTag(out, "White", game.getWhiteName());
       writeTag(out, "Black", game.getBlackName());
+      writeTag(out, "WhiteElo", whiteRatingString);
+      writeTag(out, "BlackElo", blackRatingString);
       writeTag(out, "Result", resultString);
       writeTag(out, "Time", timeFormat.format(gameInfo.gameStartDate));
       if (!game.isTimeOdds())
