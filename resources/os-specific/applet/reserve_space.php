@@ -69,40 +69,38 @@
 <BODY>
 
 	<?php
-		if ($submit){
-			if ($authenticated){
-				if ($known_user){
-					echo "<p>You already have space reserved for your preferences. Your key is:<br>";
-					echo "<center><h2>$prefs_key</h2></center>";
-				}
-				else if ($insert_result){
-					echo "<p>Space has been reserved for your preferences on the server. Your key is:<br>";
-					echo "<center><h2>$prefs_key</h2></center>";
-				}
-				else{
-					echo "An error occurred when reserving space for your preferences";	
-				}
+		if ($submit && $authenticated){
+			if ($known_user){
+				echo "<p>You already have space reserved for your preferences. Your key is:<br>";
+				echo "<center><h2>$prefs_key</h2></center>";
+			}
+			else if ($insert_result){
+				echo "<p>Space has been reserved for your preferences on the server. Your key is:<br>";
+				echo "<center><h2>$prefs_key</h2></center>";
 			}
 			else{
-			
-			}	
+				echo "An error occurred when reserving space for your preferences";	
+			}
 		}
 		else{
-		?>
+			if ($submit && !$authenticated){
+				echo "<H3>Wrong username/password, try again:</H3><br>";
+			}
+	?>
+			
+			<P>Please provide your username and password to reserve space for preferences:
+			<P><form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		
-		<P>Please provide your username and password to reserve space for preferences:
-		<P><form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-	
-		<table>
-			<tr><td>Username:</td><td><input type="Text" name="username"></td></tr>
-			<tr><td>Password:</td><td><input type="Password" name="password"></td></tr>
-		</table>
-		<br>
-		<input type="Submit" name="submit" value="Reserve space">
-		
-		<?php
+			<table>
+				<tr><td>Username:</td><td><input type="Text" name="username"></td></tr>
+				<tr><td>Password:</td><td><input type="Password" name="password"></td></tr>
+			</table>
+			<br>
+			<input type="Submit" name="submit" value="Reserve space">
+			
+	<?php
 		}
-		?>
+	?>
 </form>
 
 </BODY>
