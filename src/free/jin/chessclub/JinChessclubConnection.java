@@ -39,6 +39,7 @@ import free.jin.chessclub.event.CircleEvent;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
 import free.util.Pair;
+import free.util.Utilities;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.Array;
@@ -243,7 +244,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
         return null;
       case 24: // Bughouse
         return null;
-      case 26: // Giveaway (Not ChesslikeGenericVariant because promotion to to king is allowed)
+      case 26: // Giveaway (Not ChesslikeGenericVariant because promotion to king is allowed)
         return Giveaway.getInstance();
       case 27: // Atomic
         return Atomic.getInstance();
@@ -293,8 +294,80 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     return null;
   }
-
-
+  
+  
+  
+  /**
+   * Returns the wild number corresponding to the specified wild variant.
+   * Returns -1 if the specified wild variant is not supported by ICC.
+   */
+   
+  private int getWildNumber(WildVariant variant){
+    if (variant == null)
+      throw new IllegalArgumentException("Null variant");
+    
+    String [] variantNames = new String[]{
+      "Chess", "Shuffle both", "Shuffle mirror", "Random mirror", "Random shuffle",
+      "Reversed", "Empty board", "KPPP vs KPPP", "Advanced pawns", "Two kings each",
+      "Pawn+move odds", "Knight odds", "Rook odds", "Queen odds","Rook odds a3", "KBN vs K",
+      "Kriegspiel", "Loser's chess", "Power chess", "KNN vs KP", "Loadgame", "Thematic",
+      "Fischer random", "Crazyhouse", "Bughouse", "Three checks", "Giveaway", "Atomic", "Shatranj",
+      "Random Wild"      
+    };
+    
+    return Utilities.indexOf(variantNames, variant.getName());
+  }
+  
+  
+  
+  /**
+   * A list of supported wild variants, initialized lazily.
+   */
+   
+  private static WildVariant [] wildVariants;
+  
+  
+  
+  /**
+   * Returns a list of support wild variants.
+   */
+   
+  public WildVariant [] getSupportedVariants(){
+    if (wildVariants == null){
+      wildVariants = new WildVariant[]{
+        Chess.getInstance(),
+        ShuffleBoth.getInstance(),
+        new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, "Shuffle mirror"),
+        new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, "Random shuffle"),
+        new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, "Reversed"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Empty board"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "KPPP vs KPPP"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Advanced pawns"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Two kings each"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Pawn+move odds"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Knight odds"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Rook odds"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Queen odds"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Rood odds a3"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "KBN vs K"),
+        Kriegspiel.getInstance(),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Loser's chess"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Power chess"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "KNN vs KP"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Loadgame"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Thematic"),
+        FischerRandom.getInstance(),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Three checks"),
+        Giveaway.getInstance(),
+        Atomic.getInstance(),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Random Wild") // This is bad, but there's nothing else to do
+      };
+    }
+    
+    return (WildVariant [])wildVariants.clone();
+  }
+  
+  
 
 
   /**
@@ -2179,7 +2252,32 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     sendCommand("play "+seek.getID());
   }
-
+  
+  
+  
+  /**
+   * Issues the specified seek.
+   */
+   
+  public void issueSeek(UserSeek seek){
+    int wildNumber = getWildNumber(seek.getVariant());
+    if (wildNumber == -1)
+      throw new IllegalArgumentException("Unsupported sought wild variant: " + seek.getVariant());
+    
+    Player color = seek.getColor();
+    
+    
+    String seekCommand = "seek " + seek.getTime() + " " + seek.getInc() + " " +
+      (seek.isRated() ? "r" : "u") + " " + 
+      "w" + wildNumber + " " +
+      (color == null ? "" : color.isWhite() ? "white " : "black ") +
+      (seek.isManualAccept() ? "manual " : "auto ") +
+      (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
+      (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " " +
+      (seek.isFormula() ? "f" : "");
+      
+    sendCommand(seekCommand);
+  }
 
 
 
