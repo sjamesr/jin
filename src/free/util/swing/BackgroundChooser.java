@@ -153,6 +153,10 @@ public class BackgroundChooser extends JDialog{
     JButton pickImage = new JButton("Pick image");
     JButton useDefault = new JButton("Use default");
 
+    pickColor.setDefaultCapable(false);
+    pickImage.setDefaultCapable(false);
+    useDefault.setDefaultCapable(false);
+
     int curStyle = desktop.getWallpaperLayoutStyle();
     final JRadioButton tileButton = new JRadioButton("tile", curStyle == AdvancedJDesktopPane.TILE);
     final JRadioButton stretchButton = new JRadioButton("stretch", curStyle == AdvancedJDesktopPane.STRETCH);
@@ -263,6 +267,9 @@ public class BackgroundChooser extends JDialog{
       }
 
     });
+
+
+    getRootPane().setDefaultButton(closeButton);
   }
 
 
