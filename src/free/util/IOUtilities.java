@@ -25,6 +25,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Properties;
+import java.util.Hashtable;
 
 
 /**
@@ -32,6 +33,15 @@ import java.util.Properties;
  */
 
 public class IOUtilities{
+  
+  
+  
+  /**
+   * Maps URLs to byte arrays of the data loaded from them.
+   */
+   
+  private final static Hashtable urlCache = new Hashtable();
+  
 
 
   /**
@@ -291,7 +301,8 @@ public class IOUtilities{
    */
 
   public static String loadText(URL url) throws IOException{
-    InputStream in = url.openStream();
+    byte [] cached = (byte [])urlCache.get(url);
+    InputStream in = cached == null ? url.openStream() : new ByteArrayInputStream(cached);
     String text = loadText(in);
     in.close();
     return text;
@@ -425,8 +436,24 @@ public class IOUtilities{
    */
 
   public static Properties loadProperties(URL url) throws IOException{
-    InputStream in = url.openStream();
+    byte [] cached = (byte [])urlCache.get(url);
+    InputStream in = cached == null ? url.openStream() : new ByteArrayInputStream(cached);
     return loadProperties(in);
+  }
+  
+  
+  
+  /**
+   * Loads and caches the contents of the specified URL. Calls to any of the
+   * methods that load from URLs in this class will use the cached data. Calling
+   * this method with an already cached URL will cause it to be loaded again.
+   */
+   
+  public static void cacheURL(URL url) throws IOException{
+    InputStream in = url.openStream(); 
+    byte [] data = readToEnd(in);
+    in.close();
+    urlCache.put(url, data);
   }
 
 
