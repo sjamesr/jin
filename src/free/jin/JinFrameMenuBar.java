@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
+import free.jin.plugin.BadChangesException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -449,8 +450,15 @@ public class JinFrameMenuBar extends JMenuBar{
 
       okButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          prefPanel.applyChanges();
-          dialog.dispose();
+          try{
+            if (applyButton.isEnabled())
+              prefPanel.applyChanges();
+            dialog.dispose();
+          } catch (BadChangesException e){
+              JOptionPane.showMessageDialog(dialog, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+              if (e.getErrorComponent() != null)
+                e.getErrorComponent().requestFocus();
+            }
         }
       });
 
@@ -462,8 +470,14 @@ public class JinFrameMenuBar extends JMenuBar{
 
       applyButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          prefPanel.applyChanges();
-          applyButton.setEnabled(false);
+          try{
+            prefPanel.applyChanges();
+            applyButton.setEnabled(false);
+          } catch (BadChangesException e){
+              JOptionPane.showMessageDialog(dialog, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+              if (e.getErrorComponent() != null)
+                e.getErrorComponent().requestFocus();
+            }
         }
       });
 
