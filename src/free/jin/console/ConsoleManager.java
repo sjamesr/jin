@@ -188,7 +188,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
     boolean isSelected = Boolean.valueOf(getProperty("selected", "false")).booleanValue();
-    if (Boolean.valueOf(getProperty("selected", "true")).booleanValue()){
+    if (isSelected){
       // We can't do this immediately because if some other plugin adds another frame
       // afterwards, our frame will lose selection.
       SwingUtilities.invokeLater(new Runnable(){
@@ -209,8 +209,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       icon.setBounds(iconBounds);
     }
 
+    // We shouldn't bring the console to front and make it selected if isSelected==false
+    // but we do it anyway because otherwise it causes the console to think it's in front
+    // and selected when it's really not under MS VM (at least)
+    // This works either way as someone will have to claim selectedness later
+    // if they really want it.
     consoleFrame.setVisible(true);
     try{
+      consoleFrame.toFront();
       consoleFrame.setSelected(true);
     } catch (java.beans.PropertyVetoException e){} // Ignore.
 
