@@ -21,10 +21,11 @@
 
 package free.jin;
 
+import java.beans.PropertyChangeListener;
 import free.chess.Position;
 import free.chess.WildVariant;
 import free.chess.Player;
-import free.util.Struct;
+import free.util.BeanProperties;
 
 
 /**
@@ -37,7 +38,7 @@ import free.util.Struct;
  * information provided by the server.
  */
 
-public class Game extends Struct{
+public class Game{
 
 
   /**
@@ -106,19 +107,10 @@ public class Game extends Struct{
 
 
   /**
-   * The initial position.
+   * The <code>BeanProperties</code> object actually holding the properties.
    */
 
-  private final Position initialPosition; 
-
-
-
-  /**
-   * The amount of plies made from the beginning of the actual game to the
-   * position specified by the <code>initialPosition</code> property.
-   */
-
-  private int pliesSinceStart;
+  private final BeanProperties props = new BeanProperties(this);
 
 
 
@@ -160,44 +152,29 @@ public class Game extends Struct{
 
   public Game(int gameType, Position initialPosition, int pliesSinceStart, String whiteName,
       String blackName, int whiteTime, int whiteInc, int blackTime, int blackInc, int whiteRating,
-      int blackRating, Object gameID, String ratingCategoryString, boolean isRated,
+      int blackRating, Object gameId, String ratingCategoryString, boolean isRated,
       boolean isPlayed, String whiteTitles, String blackTitles, boolean initiallyFlipped,
       Player userPlayer){
 
-    super(20);
-
-    switch(gameType){
-      case MY_GAME:
-      case OBSERVED_GAME:
-      case ISOLATED_BOARD:
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown game type: "+gameType);
-    }
-
-    setIntegerProperty("GameType", gameType);
-    setStringProperty("WhiteName", whiteName);
-    setProperty("BlackName", blackName);
-    setIntegerProperty("WhiteTime", whiteTime);
-    setIntegerProperty("WhiteInc", whiteInc);
-    setIntegerProperty("BlackTime", blackTime);
-    setIntegerProperty("BlackInc", blackInc);
-    setIntegerProperty("WhiteRating", whiteRating);
-    setIntegerProperty("BlackRating", blackRating);
-    setBooleanProperty("IsRated", isRated);
-    setProperty("GameID", gameID);
-    setStringProperty("RatingCategoryString", ratingCategoryString);
-    setBooleanProperty("IsPlayed", isPlayed);
-    setStringProperty("WhiteTitles", whiteTitles);
-    setStringProperty("BlackTitles", blackTitles);
-    setBooleanProperty("InitiallyFlipped", initiallyFlipped);
-    setProperty("UserPlayer", userPlayer);
-
-    setBooleanProperty("IsTimeOdds", (whiteTime!=blackTime) || (whiteInc!=blackInc));
-
-    this.initialPosition = new Position(initialPosition.getVariant());
-
-    setInitialPosition(initialPosition, pliesSinceStart);
+    setGameType(gameType);
+    setInitialPosition(initialPosition);
+    setPliesSinceStart(pliesSinceStart);
+    setWhiteName(whiteName);
+    setBlackName(blackName);
+    setWhiteTime(whiteTime);
+    setWhiteInc(whiteInc);
+    setBlackTime(blackTime);
+    setBlackInc(blackInc);
+    setWhiteRating(whiteRating);
+    setBlackRating(blackRating);
+    setRated(isRated);
+    setId(gameId);
+    setRatingCategoryString(ratingCategoryString);
+    setPlayed(isPlayed);
+    setWhiteTitles(whiteTitles);
+    setBlackTitles(blackTitles);
+    setBoardInitiallyFlipped(initiallyFlipped);
+    setUserPlayer(userPlayer);
   }
 
 
@@ -248,6 +225,48 @@ public class Game extends Struct{
 
 
 
+  /**
+   * Registers the specified <code>PropertyChangeListener</code>.
+   */
+
+  public void addPropertyChangeListener(PropertyChangeListener listener){
+    props.addPropertyChangeListener(listener);
+  }
+
+
+
+
+  /**
+   * Unregisters the specified <code>PropertyChangeListener</code>.
+   */
+
+  public void removePropertyChangeListener(PropertyChangeListener listener){
+    props.removePropertyChangeListener(listener);
+  }
+
+
+
+
+  /**
+   * Sets the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME}
+   * or {@link #ISOLATED_BOARD}.
+   */
+
+  public void setGameType(int gameType){
+    switch(gameType){
+      case MY_GAME:
+      case OBSERVED_GAME:
+      case ISOLATED_BOARD:
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown game type: "+gameType);
+    }
+
+    props.setIntegerProperty("gameType", gameType);
+  }
+
+
+
 
   /**
    * Returns the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME}
@@ -255,22 +274,19 @@ public class Game extends Struct{
    */
 
   public int getGameType(){
-    return getIntegerProperty("GameType");
+    return props.getIntegerProperty("gameType");
   }
 
 
 
-
   /**
-   * Returns the amount of half-moves made from the beginning of the actual game
-   * to the initial position as specified by this <code>Game</code> object.
-   * This will always be 0 for games played by the user.
-   * Note that this property, along with <code>initialPosition</code> may be
-   * modified.
+   * Sets the initial position of the game to the given position.
    */
 
-  public int getPliesSinceStart(){
-    return pliesSinceStart;
+  public void setInitialPosition(Position initialPosition){
+    Position newInitPos = new Position(initialPosition.getVariant());
+    newInitPos.copyFrom(initialPosition);
+    props.setProperty("initialPosition", initialPosition);
   }
 
 
@@ -281,24 +297,33 @@ public class Game extends Struct{
    */
 
   public Position getInitialPosition(){
-    return new Position(initialPosition);
+    Position pos = (Position)props.getProperty("initialPosition");
+    return new Position(pos);
   }
 
 
 
-
   /**
-   * Sets the initial position of the game to the given position. Usually, Game
-   * objects are supposed to be immutable, this exception is necessary because
-   * some commands (like clearboard, loadgame) modify the initial position of
-   * the game for all practical purposes, and it's not feasible to recreate the
-   * game on each such command. Note however, that whoever is modifying this
-   * should also take care to notify all the clients of the change.
+   * Sets the amount of plies made from the beginning of the actual game to the
+   * initial position as specified by this <code>Game</code> object.
    */
 
-  public void setInitialPosition(Position initialPosition, int pliesSinceStart){
-    this.initialPosition.copyFrom(initialPosition);
-    this.pliesSinceStart = pliesSinceStart;
+  public void setPliesSinceStart(int plies){
+    if (plies < 0)
+      throw new IllegalArgumentException("plies may not be negative");
+
+    props.setIntegerProperty("pliesSinceStart", plies);
+  }
+
+
+
+  /**
+   * Returns the amount of half-moves made from the beginning of the actual game
+   * to the initial position as specified by this <code>Game</code> object.
+   */
+
+  public int getPliesSinceStart(){
+    return props.getIntegerProperty("pliesSinceStart");
   }
 
 
@@ -309,9 +334,19 @@ public class Game extends Struct{
    */
 
   public WildVariant getVariant(){
-    return initialPosition.getVariant();
+    return ((Position)props.getProperty("initialPosition")).getVariant();
   }
 
+
+
+
+  /**
+   * Sets the name of the player with the white pieces.
+   */
+
+  public void setWhiteName(String name){
+    props.setStringProperty("whiteName", name);
+  }
 
 
 
@@ -320,9 +355,18 @@ public class Game extends Struct{
    */
 
   public String getWhiteName(){
-    return getStringProperty("WhiteName");
+    return props.getStringProperty("whiteName");
   }
 
+
+
+  /**
+   * Sets the name of the player with the black pieces.
+   */
+
+  public void setBlackName(String blackName){
+    props.setStringProperty("blackName", blackName);
+  }
 
 
 
@@ -331,10 +375,19 @@ public class Game extends Struct{
    */
 
   public String getBlackName(){
-    return getStringProperty("BlackName");
+    return props.getStringProperty("blackName");
   }
 
 
+
+  /**
+   * Sets the initial time on the clock of the player with the white pieces,
+   * in milliseconds.
+   */
+
+  public void setWhiteTime(int time){
+    props.setIntegerProperty("whiteTime", time);
+  }
 
 
   /**
@@ -343,7 +396,18 @@ public class Game extends Struct{
    */
 
   public int getWhiteTime(){
-    return getIntegerProperty("WhiteTime");
+    return props.getIntegerProperty("whiteTime");
+  }
+
+
+
+  /**
+   * Sets the the number of milliseconds by which the clock of the white player
+   * is incremented each time he makes a move. 
+   */
+
+  public void setWhiteInc(int inc){
+    props.setIntegerProperty("whiteInc", inc);
   }
 
 
@@ -354,9 +418,19 @@ public class Game extends Struct{
    */
 
   public int getWhiteInc(){
-    return getIntegerProperty("WhiteInc");
+    return props.getIntegerProperty("whiteInc");
   }
 
+
+
+  /**
+   * Sets the initial time on the clock of the player with the black pieces,
+   * in milliseconds.
+   */
+
+  public void setBlackTime(int time){
+    props.setIntegerProperty("blackTime", time);
+  }
 
 
 
@@ -366,9 +440,20 @@ public class Game extends Struct{
    */
 
   public int getBlackTime(){
-    return getIntegerProperty("BlackTime");
+    return props.getIntegerProperty("blackTime");
   }
 
+
+
+
+  /**
+   * Sets the number of milliseconds by which the clock of the black player
+   * is incremented each time he makes a move.
+   */
+
+  public void setBlackInc(int time){
+    props.setIntegerProperty("blackInc", time);
+  }
 
 
 
@@ -378,10 +463,18 @@ public class Game extends Struct{
    */
 
   public int getBlackInc(){
-    return getIntegerProperty("BlackInc");
+    return props.getIntegerProperty("blackInc");
   }
 
 
+
+  /**
+   * Sets the rating of the player with the white pieces.
+   */
+
+  public void setWhiteRating(int rating){
+    props.setIntegerProperty("whiteRating", rating);
+  }
 
 
   /**
@@ -389,9 +482,19 @@ public class Game extends Struct{
    */
 
   public int getWhiteRating(){
-    return getIntegerProperty("WhiteRating");
+    return props.getIntegerProperty("whiteRating");
   } 
 
+
+
+
+  /**
+   * Sets the rating of the player with the black pieces.
+   */
+
+  public void setBlackRating(int rating){
+    props.setIntegerProperty("blackRating", rating);
+  }
 
 
 
@@ -400,11 +503,18 @@ public class Game extends Struct{
    */
 
   public int getBlackRating(){
-    return getIntegerProperty("BlackRating");
+    return props.getIntegerProperty("blackRating");
   } 
 
 
 
+  /**
+   * Sets the ratedness of this game.
+   */
+
+  public void setRated(boolean rated){
+    props.setBooleanProperty("rated", rated);
+  }
 
 
   /**
@@ -412,9 +522,18 @@ public class Game extends Struct{
    */
 
   public boolean isRated(){
-    return getBooleanProperty("IsRated");
+    return props.getBooleanProperty("rated");
   }
 
+
+
+  /**
+   * Sets the id of this game.
+   */
+
+  private void setId(Object id){
+    props.setProperty("id", id);
+  }
 
 
 
@@ -424,9 +543,18 @@ public class Game extends Struct{
    */
 
   public Object getID(){
-    return getProperty("GameID");
+    return props.getProperty("id");
   }
 
+
+
+  /**
+   * Sets the rating category of the game.
+   */
+
+  public void setRatingCategoryString(String category){
+    props.setStringProperty("ratingCategoryString", category);
+  }
 
 
 
@@ -436,7 +564,17 @@ public class Game extends Struct{
    */
 
   public String getRatingCategoryString(){
-    return getStringProperty("RatingCategoryString");
+    return props.getStringProperty("ratingCategoryString");
+  }
+
+
+
+  /**
+   * Sets whether the game is played or examined.
+   */
+
+  public void setPlayed(boolean played){
+    props.setBooleanProperty("played", played);
   }
 
 
@@ -446,7 +584,17 @@ public class Game extends Struct{
    */
 
   public boolean isPlayed(){
-    return getBooleanProperty("IsPlayed");
+    return props.getBooleanProperty("played");
+  }
+
+
+
+  /**
+   * Sets the titles of the player with the white pieces.
+   */
+
+  public void setWhiteTitles(String titles){
+    props.setStringProperty("whiteTitles", titles);
   }
 
 
@@ -456,7 +604,17 @@ public class Game extends Struct{
    */
 
   public String getWhiteTitles(){
-    return getStringProperty("WhiteTitles");
+    return props.getStringProperty("whiteTitles");
+  }
+
+
+
+  /** 
+   * Sets the titles of the player with the black pieces.
+   */
+
+  public void setBlackTitles(String titles){
+    props.setStringProperty("blackTitles", titles);
   }
 
 
@@ -466,7 +624,17 @@ public class Game extends Struct{
    */
 
   public String getBlackTitles(){
-    return getStringProperty("BlackTitles");
+    return props.getStringProperty("blackTitles");
+  }
+
+
+
+  /**
+   * Sets whether the board should be initially flipped.
+   */
+
+  private void setBoardInitiallyFlipped(boolean flipped){
+    props.setBooleanProperty("boardInitiallyFlipped", flipped);
   }
 
 
@@ -476,8 +644,9 @@ public class Game extends Struct{
    */
 
   public boolean isBoardInitiallyFlipped(){
-    return getBooleanProperty("InitiallyFlipped");
+    return props.getBooleanProperty("boardInitiallyFlipped");
   }
+
 
 
 
@@ -486,9 +655,18 @@ public class Game extends Struct{
    */
 
   public boolean isTimeOdds(){
-    return getBooleanProperty("IsTimeOdds");
+    return (getWhiteTime() != getBlackTime()) || (getWhiteInc() != getBlackInc());
   }
 
+
+
+  /**
+   * Sets the side the user is playing for.
+   */
+
+  private void setUserPlayer(Player player){
+    props.setProperty("userPlayer", player);
+  }
 
 
 
@@ -500,7 +678,7 @@ public class Game extends Struct{
 
   public Player getUserPlayer(){
     if ((getGameType()==MY_GAME)&&isPlayed())
-      return (Player)getProperty("UserPlayer");
+      return (Player)props.getProperty("userPlayer");
     else
       return null;
   } 
@@ -519,6 +697,8 @@ public class Game extends Struct{
     else
       return null;
   }
+
+
 
   /**
    * Returns true if the user is allowed to move the pieces of the given Player.
@@ -555,7 +735,7 @@ public class Game extends Struct{
    */
 
   public int getResult(){
-    Integer result = (Integer)getProperty("Result");    
+    Integer result = (Integer)props.getProperty("result");    
     if (result == null)
       return GAME_IN_PROGRESS;
     return result.intValue();
@@ -586,7 +766,7 @@ public class Game extends Struct{
     if (getResult() != GAME_IN_PROGRESS)
       throw new IllegalStateException("Unable to set the result more than once");
 
-    setIntegerProperty("Result", result);
+    props.setProperty("result", new Integer(result));
   }
 
 
