@@ -21,10 +21,10 @@
 
 package free.jin.console.fics;
 
-import free.jin.console.*;
+import free.jin.console.Console;
+import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
-import free.jin.console.ChannelConsolePreferencesPanel;
-import free.jin.PreferencesPanel;
+import free.jin.ui.PreferencesPanel;
 
 
 /**
@@ -122,7 +122,7 @@ public class FreechessConsoleManager extends ConsoleManager{
    */
 
   public PreferencesPanel getPreferencesUI(){
-    return new ChannelConsolePreferencesPanel(this);
+    return new FreechessConsolePrefsPanel(this);
   }
 
 
