@@ -222,6 +222,20 @@ public class IOUtilities{
   }
 
 
+
+
+  /**
+   * Reads all the information from the given InputStream and returns it as
+   * plain text by using the default system encoding.
+   */
+
+  public static String loadText(InputStream in) throws IOException{
+    return new String(readToEnd(in));
+  }
+
+
+
+
   /**
    * Loads the given text file from the local drive, converts it to a String and
    * returns the String. 
@@ -233,14 +247,7 @@ public class IOUtilities{
     if (!file.exists())
       throw new IOException("File does not exist");
 
-    InputStream in = new FileInputStream(file);
-    ByteArrayOutputStream buf = new ByteArrayOutputStream();
-    byte [] arr = new byte[1000];
-    int size;
-    while ((size = in.read(arr))!=-1)
-      buf.write(arr,0,size);
-    
-    return buf.toString();
+    return loadText(new FileInputStream(file));
   }
 
 
