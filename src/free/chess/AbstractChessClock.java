@@ -293,7 +293,7 @@ public abstract class AbstractChessClock extends JComponent{
     if (displayMode != TIME_DEPENDENT_DISPLAY_MODE)
       return displayMode;
     
-    int time = getTime();
+    int time = Math.abs(getTime());
     if (time < secondTenthsThreshold)
       return SECOND_TENTHS_DISPLAY_MODE;
     else if (time < minutesSecondsThreshold)
