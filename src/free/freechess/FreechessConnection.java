@@ -134,12 +134,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * Creates a new FreechessConnection to the given hostname, on the given port,
-   * with the given username and password.
+   * Creates a new <code>FreechessConnection</code> with the given requested 
+   * username and password.
    */
 
-  public FreechessConnection(String hostname, int port, String username, String password){
-    super(hostname, port, username, password);
+  public FreechessConnection(String username, String password){
+    super(username, password);
 
     setIvarState(Ivar.NOWRAP, true);
     setIvarState(Ivar.DEFPROMPT, true); // Sets it to the default, which we filter out.

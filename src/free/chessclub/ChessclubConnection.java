@@ -444,7 +444,6 @@ public class ChessclubConnection extends free.util.Connection{
 
 
 
-
   /**
    * The value we're supposed to assign to the interface variable during login.
    */
@@ -494,10 +493,8 @@ public class ChessclubConnection extends free.util.Connection{
    * Creates a new ChessclubConnection with a chessclub.com server, the 
    * ChessclubConnection is initially unconnected. After creating the 
    * ChessclubConnection, you can set the various settings (level2 settings for 
-   * example) and then call the connect() method.
+   * example) and then call the <code>connectAndLogin</code> method.
    *
-   * @param hostname The server we will connect to.
-   * @param port The port we will connect on.
    * @param username The requested username, note that the actual username is
    * unknown until after the login.
    * @param password The password of the account.
@@ -508,8 +505,8 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #setDGState(int, boolean)
    */
 
-  public ChessclubConnection(String hostname, int port, String username, String password, PrintStream echoStream){
-    super(hostname, port, username, password);
+  public ChessclubConnection(String username, String password, PrintStream echoStream){
+    super(username, password);
 
     this.echoStream = echoStream;
 
@@ -780,11 +777,13 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Sends the "exit" command to the server.
+   * If the connection is currently connected, sends the "exit" command to the
+   * server. Otherwise the call is simply ignored.
    */
 
   public void quit(){
-    sendCommand("exit");
+    if (isConnected())
+      sendCommand("exit");
   }
 
 
@@ -808,7 +807,7 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public synchronized void sendCommand(String command){
-    if (echoStream!=null){
+    if (echoStream != null){
       echoStream.println("SENDING COMMAND: "+command);
     }
 
@@ -3431,7 +3430,7 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   final synchronized void handleDisconnection(){
-    if (echoStream!=null)
+    if (echoStream != null)
       echoStream.println("DISCONNECTED");
 
     if (isConnected())
