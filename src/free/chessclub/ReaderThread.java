@@ -103,11 +103,8 @@ public class ReaderThread extends Thread{
 
   /**
    * This method does the actual reading from the server and delegating
-   * the data to the handler. When the end of the input stream is reached or
-   * an IOException is thrown, the {@link ChessclubConnection#handleDisconnection()} method of the 
-   * handler is invoked.
-   * All handler method invocations are done via ChessclubConnection.execRunnable(Runnable)
-   * (defined at {@link free.util.Connection#execRunnable(java.lang.Runnable)}
+   * the data to the handler. All handler method invocations are done via 
+   * {@link free.util.Connection#execRunnable(java.lang.Runnable)}.
    */
 
   public void run(){

@@ -493,9 +493,9 @@ public class ChessclubConnection extends free.util.Connection{
    * @param username The requested username, note that the actual username is
    * unknown until after the login.
    * @param password The password of the account.
-   * @echoStream The PrintStream where this ChessclubConnection will echo all 
-   * information sent by the server and commands sent by this ChessclubConnection. 
-   * Pass null if you don't want echoing.
+   * @param echoStream The PrintStream where this ChessclubConnection will echo
+   * all information sent by the server and commands sent by this
+   * ChessclubConnection. Pass null if you don't want echoing.
    *
    * @see #setDGState(int, boolean)
    */
@@ -1228,8 +1228,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_KIBITZ datagram arrives. isKibitz is true if it's a
-   * kibitz, false if it's a whisper.
+   * Gets called when a DG_KIBITZ datagram arrives. <code>isKibitz</code> is
+   * true if it's a kibitz, false if it's a whisper.
    */
 
   protected void processKibitz(int gameNumber, String playerName, String titles,
@@ -1242,8 +1242,8 @@ public class ChessclubConnection extends free.util.Connection{
 
   /**
    * Gets called when a DG_PEOPLE_IN_MY_CHANNEL datagram arrives.
-   * isInChannel==true indicates the player joined a channel, false indicates
-   * he left it.
+   * <code>isInChannel==true</code> indicates the player joined a channel,
+   * <code>false</code> indicates he left it.
    */
 
   protected void processPeopleInMyChannel(int channel, String playerName, boolean isInChannel){
@@ -1255,8 +1255,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_CHANNEL_TELL datagram arrives. tellType is either
-   * {@link #CHANNEL_TELL} or {@link #CHANNEL_ATELL}.
+   * Gets called when a DG_CHANNEL_TELL datagram arrives. <code>tellType</code>
+   * is either {@link #CHANNEL_TELL} or {@link #CHANNEL_ATELL}.
    */
 
   protected void processChannelTell(int channel, String playerName, String titles,
@@ -1269,12 +1269,13 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MATCH datagram arrives. challengerRatingType and
-   * receiverRatingType are {@link #NO_RATING}, 
-   * {@link #PROVISIONAL_RATING} or {@link #ESTABLISHED_RATING}.
-   * colorRequest is {@link #COLORLESS}, {@link #WHITE} or
-   * {@link #BLACK}. The assessLoss, assessDraw and assessWin arguments
-   * only contain valid values if DG_MATCH_ASSESSMENT is on.
+   * Gets called when a DG_MATCH datagram arrives.
+   * <code>challengerRatingType</code> and <code>receiverRatingType</code> are
+   * {@link #NO_RATING}, {@link #PROVISIONAL_RATING} or
+   * {@link #ESTABLISHED_RATING}. <code>colorRequest</code> is
+   * {@link #COLORLESS}, {@link #WHITE} or {@link #BLACK}. The
+   * <code>assessLoss</code>, <code>assessDraw</code> and <code>assessWin</code>
+   * arguments only contain valid values if DG_MATCH_ASSESSMENT is on.
    */
 
   protected void processMatch(String challengerName, int challengerRating, int challengerRatingType,
@@ -1303,9 +1304,9 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_PERSONAL_TELL datagram arrives. tellType is
-   * {@link #TELL}, {@link #SAY}, {@link #PTELL},
-   * {@link #QTELL} or {@link #ATELL}.
+   * Gets called when a DG_PERSONAL_TELL datagram arrives. <code>tellType</code>
+   * is {@link #TELL}, {@link #SAY}, {@link #PTELL}, {@link #QTELL}
+   * or {@link #ATELL}.
    */
 
   protected void processPersonalTell(String playerName, String titles, String message, int tellType){
@@ -1317,7 +1318,7 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_SHOUT datagram arrives. shoutType is
+   * Gets called when a DG_SHOUT datagram arrives. <code>shoutType</code> is
    * {@link #SHOUT}, {@link #I_SHOUT},
    * {@link #SSHOUT} or {@link #ANNOUNCEMENT}.
    */
@@ -1410,9 +1411,9 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MY_RELATION_TO_GAME datagram arrives. playerState is
-   * {@link #DOING_NOTHING} (left the board), {@link #OBSERVING},
-   * {@link #PLAYING_WHITE}, {@link #PLAYING_BLACK},
+   * Gets called when a DG_MY_RELATION_TO_GAME datagram arrives.
+   * <code>playerState</code> is {@link #DOING_NOTHING} (left the board),
+   * {@link #OBSERVING}, {@link #PLAYING_WHITE}, {@link #PLAYING_BLACK},
    * {@link #PLAYING_SIMUL_WHITE}, {@link #PLAYING_SIMUL_BLACK} or
    * {@link #EXAMINING}.
    */
@@ -1486,8 +1487,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_JBOARD datagram arrives. sideToMove is either
-   * {@link #WHITE} or {@link #BLACK}. gameType is 
+   * Gets called when a DG_JBOARD datagram arrives. <code>sideToMove</code> is
+   * either {@link #WHITE} or {@link #BLACK}. <code>gameType</code> is 
    * {@link #STORED_GAME}, {@link #EXAMINED_GAME} or
    * {@link #PLAYED_GAME}.
    */
@@ -1505,9 +1506,10 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_SEEK datagram arrives. ratingType is {@link #NO_RATING},
-   * {@link #PROVISIONAL_RATING} or {@link #ESTABLISHED_RATING}. color
-   * is {@link #WHITE}, {@link #BLACK} or {@link #COLORLESS}.
+   * Gets called when a DG_SEEK datagram arrives. <code>ratingType</code> is
+   * {@link #NO_RATING}, {@link #PROVISIONAL_RATING} or 
+   * {@link #ESTABLISHED_RATING}. <code>color</code> is {@link #WHITE},
+   * {@link #BLACK} or {@link #COLORLESS}.
    */
 
   protected void processSeek(int index, String name, String titles, int rating, int ratingType, int wild,
@@ -1570,7 +1572,7 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MSEC datagram arrives. color is either
+   * Gets called when a DG_MSEC datagram arrives. <code>color</code> is either
    * {@link #WHITE} or {@link #BLACK}.
    */
 
@@ -1583,8 +1585,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_BUGHOUSE_PASS datagram arrives. color is either
-   * {@link #WHITE} or {@link #BLACK}.
+   * Gets called when a DG_BUGHOUSE_PASS datagram arrives. </code>color</code>
+   * is either {@link #WHITE} or {@link #BLACK}.
    */
 
   protected void processBughousePass(int gameNumber, int color, String piece){
@@ -1617,8 +1619,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MORETIME datagram arrives. color is either
-   * {@link #WHITE} or {@link #BLACK}.
+   * Gets called when a DG_MORETIME datagram arrives. <code>color</code> is
+   * either {@link #WHITE} or {@link #BLACK}.
    */
 
   protected void processMoretime(int gameNumber, int color, int seconds){
@@ -1630,8 +1632,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_PERSONAL_TELL_ECHO datagram arrives. tellType is
-   * {@link #TELL}, {@link #SAY}, {@link #PTELL},
+   * Gets called when a DG_PERSONAL_TELL_ECHO datagram arrives.
+   * <code>tellType</code> is {@link #TELL}, {@link #SAY}, {@link #PTELL},
    * {@link #QTELL} or {@link #ATELL}.
    */
 
@@ -1706,8 +1708,9 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_MY_NOTIFY_LIST datagram arrives. "added" is true when
-   * the player was added to the list and false when he was removed.
+   * Gets called when a DG_MY_NOTIFY_LIST datagram arrives. <code>added</code>
+   * is true when the player was added to the list and false when he was
+   * removed.
    */
 
   protected void processMyNotifyList(String name, boolean added){
@@ -1757,8 +1760,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_GAMELIST_ITEM datagram arrives. color is either
-   * {@link #WHITE} or {@link #BLACK}. Note that color
+   * Gets called when a DG_GAMELIST_ITEM datagram arrives. <code>color</code>
+   * is either {@link #WHITE} or {@link #BLACK}. Note that color
    * is the player who LOST, not the one who WON in case of status=win. Note also
    * that the server sends black=0, white=1, when usually it's vice versa (but
    * it's converted into a defined constant). The ratings are -1 if unrated.
@@ -1885,8 +1888,8 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Gets called when a DG_SET_BOARD datagram arrives. sideToMove is either
-   * {@link #BLACK} or {@link #WHITE}.
+   * Gets called when a DG_SET_BOARD datagram arrives. <code>sideToMove</code>
+   * is either {@link #BLACK} or {@link #WHITE}.
    */
 
   protected void processSetBoard(int gameNumber, String board, int sideToMove){

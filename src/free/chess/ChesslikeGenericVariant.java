@@ -35,7 +35,7 @@ package free.chess;
  * etc.). Variants that only differ from chess in their definition of these
  * terms can override these methods and implement them accordingly. Note that
  * it is not necessary to override the
- * {@link #createMove(Position, Square, Square, Piece, String) method as it
+ * {@link #createMove(Position, Square, Square, Piece, String)} method as it
  * already calls the forementioned methods when determining the properties of
  * the created ChessMove.
  */
@@ -507,7 +507,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
   /**
-   * Returns what is described by the {@link #parseChessMove(String)} method.
+   * Returns what is described by the {@link #parseChessPiece(String)} method.
    *
    * <P>If you want to use this method from an implementation of some other
    * wild variant, use the static {@link #parseChessPiece(String)} method
@@ -541,10 +541,11 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
   /**
-   * Returns what is described by the {@link #parseChessMove(String)} method.
+   * Returns what is described by the {@link #chessPieceToString(ChessPiece)}
+   * method.
    *
    * <P>If you want to use this method from an implementation of some other
-   * wild variant, use the static {@link #parseChessPiece(String)} method
+   * wild variant, use the static {@link #chessPieceToString(ChessPiece)} method
    * instead.
    *
    * @param piece The string representing the piece.

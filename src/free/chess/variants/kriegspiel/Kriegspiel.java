@@ -209,8 +209,8 @@ public class Kriegspiel implements WildVariant{
 
   /**
    * Returns a String corresponding to the given Piece. See
-   * {@link free.chess.ChesslikeGenericVariant#chessPieceToString(String)} for
-   * more details.
+   * {@link free.chess.ChesslikeGenericVariant#chessPieceToString(ChessPiece)}
+   * for more details.
    */
 
   public String pieceToString(Piece piece){
