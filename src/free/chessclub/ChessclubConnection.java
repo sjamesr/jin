@@ -503,10 +503,19 @@ public class ChessclubConnection extends free.util.Connection{
 
     this.echoStream = echoStream;
 
-    setDGState(Datagram.DG_WHO_AM_I, true); // We need this to get the real username
-    setDGState(Datagram.DG_RATING_TYPE_KEY, true); // We need this to know the key to rating name mapping.
-    setDGState(Datagram.DG_WILD_KEY, true); // We need this to know the wild number to wild name mapping.
+    // We need this to get the real username
+    setDGState(Datagram.DG_WHO_AM_I, true); 
 
+    // We need this to set the login error message properly
+    setDGState(Datagram.DG_LOGIN_FAILED, true); 
+
+    // We need this to know the key to rating name mapping.
+    setDGState(Datagram.DG_RATING_TYPE_KEY, true); 
+
+    // We need this to know the wild number to wild name mapping.
+    setDGState(Datagram.DG_WILD_KEY, true); 
+
+    // We need this to know which datagrams are actually on.
     setDGState(Datagram.DG_SET2, true);
   }
 
@@ -630,6 +639,7 @@ public class ChessclubConnection extends free.util.Connection{
   protected boolean isEssentialDG(int dgNumber){
     switch (dgNumber){
       case Datagram.DG_WHO_AM_I:
+      case Datagram.DG_LOGIN_FAILED:
       case Datagram.DG_RATING_TYPE_KEY:
       case Datagram.DG_SET2:
         return true;
@@ -689,7 +699,7 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #disconnect()
    */
 
-  protected void login() throws IOException{
+  protected boolean login() throws IOException{
     out = sock.getOutputStream();
 
     int largestSetDGNumber = level2Settings.size();
@@ -711,11 +721,15 @@ public class ChessclubConnection extends free.util.Connection{
       sendCommand(requestedUsername+" "+password);
     synchronized(loginLock){
       try{
-        loginLock.wait(); // Wait until we receive DG_WHO_AM_I
+        loginLock.wait(); // Wait until we receive DG_WHO_AM_I or DG_LOGIN_FAILED
       } catch (InterruptedException e){
           throw new InterruptedIOException(e.getMessage());
         } 
     }
+
+    // We always set the login error message on error, so this is a valid way
+    // to check whether there was an error.
+    return getLoginErrorMessage() == null; 
   }
 
 
@@ -832,26 +846,32 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public final void handleDatagram(Datagram datagram){
-    if (echoStream!=null)
+    if (echoStream != null)
       echoStream.println(datagram);
 
-    if ((datagram.getType()==Datagram.DG_WHO_AM_I)&&(!isLoggedIn())){
+    if ((datagram.getType() == Datagram.DG_WHO_AM_I) && !isLoggedIn()){
       synchronized(loginLock){
         setUsername(datagram.getString(0));
         loginLock.notify();
       }
     }
-    else if (datagram.getType()==Datagram.DG_RATING_TYPE_KEY){
+    else if ((datagram.getType() == Datagram.DG_LOGIN_FAILED) && !isLoggedIn()){
+      synchronized(loginLock){
+        setLoginErrorMessage(datagram.getString(1));
+        loginLock.notify();
+      }
+    }
+    else if (datagram.getType() == Datagram.DG_RATING_TYPE_KEY){
       int index = datagram.getInteger(0);
       String name = datagram.getString(1);
       ratingCategoryNames.put(new Integer(index), name);
     }
-    else if (datagram.getType()==Datagram.DG_WILD_KEY){
+    else if (datagram.getType() == Datagram.DG_WILD_KEY){
       int number = datagram.getInteger(0);
       String name = datagram.getString(1);
       variantNames.put(new Integer(number), name);
     }
-    else if (datagram.getType()==Datagram.DG_SET2){
+    else if (datagram.getType() == Datagram.DG_SET2){
       int dgType = datagram.getInteger(0);
       boolean state = datagram.getBoolean(1);
       if (state)
@@ -2213,7 +2233,7 @@ public class ChessclubConnection extends free.util.Connection{
   protected void processDatagram(Datagram datagram){
     switch (datagram.getType()){
       case Datagram.DG_WHO_AM_I:{
-        processWhoAmI(datagram.getString(0),datagram.getString(1));
+        processWhoAmI(datagram.getString(0), datagram.getString(1));
         break;
       }
       case Datagram.DG_PLAYER_ARRIVED:{

@@ -226,11 +226,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * Logs in.
    */
 
-  protected void login() throws IOException{
+  protected boolean login() throws IOException{
     out = sock.getOutputStream();
 
     sendCommand(getRequestedUsername());
-    sendCommand(getPassword());
+    if ((getPassword() != null) && (getPassword().length() != 0))
+      sendCommand(getPassword());
 
     synchronized(loginLock){
       try{
@@ -239,6 +240,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
           throw new InterruptedIOException(e.getMessage());
         } 
     }
+
+    // We always set the login error message on error, so this is a valid way
+    // to check whether there was an error.
+    return getLoginErrorMessage() == null; 
   }
 
 
@@ -416,6 +421,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  /**
+   * The regular expression matching login failure due to wrong password lines. 
+   */
+
+  private static final Pattern wrongPasswordPattern = 
+    new Pattern("^\\*\\*\\*\\* Invalid password! \\*\\*\\*\\*");
+
+
+
 
   /**
    * Called to determine if the given line of text is a login confirming line
@@ -426,17 +440,24 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleLogin(String line){
     Matcher matcher = loginPattern.matcher(line);
-    if (!matcher.find())
-      return false;
+    if (matcher.matches()){
+      synchronized(loginLock){
+        setUsername(matcher.group(1));
+        loginLock.notify();
+      }
 
-    synchronized(loginLock){
-      setUsername(matcher.group(1));
-      loginLock.notify();
+      processLine(line);
+
+      return true;
+    }
+    else if (wrongPasswordPattern.matcher(line).matches()){
+      synchronized(loginLock){
+        setLoginErrorMessage("Invalid password");
+        loginLock.notify();
+      }
     }
 
-    processLine(line);
-
-    return true;
+    return false;
   }
 
 
