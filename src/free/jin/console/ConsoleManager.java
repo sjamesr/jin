@@ -36,11 +36,8 @@ import free.jin.plugin.Plugin;
 import free.util.StringParser;
 import free.util.StringEncoder;
 import free.util.GraphicsUtilities;
-import free.util.IOUtilities;
 import free.util.audio.AudioClip;
-import java.io.InputStream;
-import java.io.IOException;
-
+import java.net.URL;
 
 
 /**
@@ -130,16 +127,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     consoleFrame = new JInternalFrame("Main Console",true,true,true,true);
 
-    try{
-      String iconImage = getProperty("icon-image");
-      if (iconImage != null){
-        InputStream imageStream = ConsoleManager.class.getResourceAsStream(iconImage);
-        if (imageStream != null){
-          byte [] imageData = IOUtilities.readToEnd(imageStream);
-          consoleFrame.setFrameIcon(new ImageIcon(imageData));
-        }
-      }
-    } catch (IOException e){}
+    String iconImageName = getProperty("icon-image");
+    if (iconImageName != null){
+      URL iconImageURL = ConsoleManager.class.getResource(iconImageName);
+      if (iconImageURL!= null)
+        consoleFrame.setFrameIcon(new ImageIcon(iconImageURL));
+    } 
 
     /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html on
        why I do this instead of adding an InternalFrameListener like a sane person. */
