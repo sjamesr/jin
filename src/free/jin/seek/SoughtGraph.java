@@ -333,6 +333,9 @@ public class SoughtGraph extends JComponent{
 
   public void removeSeek(Seek seek){
     Point location = (Point)seeksToLocations.remove(seek);
+    if (location == null)
+      throw new IllegalArgumentException("Unknown seek: " + seek.getID());
+
     seekMatrix[location.x][location.y] = null;
 
     Rectangle seekBounds = getSeekBounds(location.x, location.y, null);
