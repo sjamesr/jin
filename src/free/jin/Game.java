@@ -114,6 +114,16 @@ public class Game extends Struct{
 
 
   /**
+   * The amount of plies made from the beginning of the actual game to the
+   * position specified by the <code>initialPosition</code> property.
+   */
+
+  private int pliesSinceStart;
+
+
+
+
+  /**
    * Creates a new Game with the given game properties.
    *
    * @param gameType The type of the game - possible values are {@link #MY_GAME},
@@ -146,10 +156,11 @@ public class Game extends Struct{
    * be null for all other cases.
    */
 
-  public Game(int gameType, Position initialPosition, String whiteName, String blackName, int whiteTime,
-          int whiteInc, int blackTime, int blackInc, int whiteRating, int blackRating, Object gameID, 
-          String ratingCategoryString, boolean isRated, boolean isPlayed, String whiteTitles, 
-          String blackTitles, boolean initiallyFlipped, Player userPlayer){
+  public Game(int gameType, Position initialPosition, int pliesSinceStart, String whiteName,
+      String blackName, int whiteTime, int whiteInc, int blackTime, int blackInc, int whiteRating,
+      int blackRating, Object gameID, String ratingCategoryString, boolean isRated,
+      boolean isPlayed, String whiteTitles, String blackTitles, boolean initiallyFlipped,
+      Player userPlayer){
 
     super(20);
 
@@ -182,7 +193,9 @@ public class Game extends Struct{
 
     setBooleanProperty("IsTimeOdds", (whiteTime!=blackTime) || (whiteInc!=blackInc));
 
-    this.initialPosition = initialPosition;
+    this.initialPosition = new Position(initialPosition.getVariant());
+
+    setInitialPosition(initialPosition, pliesSinceStart);
   }
 
 
@@ -190,7 +203,9 @@ public class Game extends Struct{
 
 
   /**
-   * Creates a new Game with the given game properties.
+   * Creates a new Game with the given game properties. This constructor differs
+   * from the other one in that it doesn't let you specify separate time and
+   * increment for white and black.
    *
    * @param initialPosition The initial position in the game.
    * @param whiteName The name of the player with the white pieces.
@@ -216,13 +231,14 @@ public class Game extends Struct{
    * be null for all other cases.
    */
 
-  public Game(int gameType, Position initialPosition, String whiteName, String blackName, int time,
-          int inc, int whiteRating, int blackRating, Object gameID, String ratingCategoryString,
-          boolean isRated, boolean isPlayed, String whiteTitles, String blackTitles,
-          boolean initiallyFlipped, Player userPlayer){
+  public Game(int gameType, Position initialPosition, int pliesSinceStart, String whiteName,
+      String blackName, int time, int inc, int whiteRating, int blackRating, Object gameID,
+      String ratingCategoryString, boolean isRated, boolean isPlayed, String whiteTitles,
+      String blackTitles, boolean initiallyFlipped, Player userPlayer){
 
-    this(gameType, initialPosition, whiteName, blackName, time, inc, time, inc, whiteRating,
-      blackRating, gameID, ratingCategoryString, isRated, isPlayed, whiteTitles, blackTitles, initiallyFlipped, userPlayer);
+    this(gameType, initialPosition, pliesSinceStart, whiteName, blackName, time, inc, time, inc,
+      whiteRating, blackRating, gameID, ratingCategoryString, isRated, isPlayed, whiteTitles,
+      blackTitles, initiallyFlipped, userPlayer);
   }
 
 
@@ -236,6 +252,21 @@ public class Game extends Struct{
 
   public int getGameType(){
     return getIntegerProperty("GameType");
+  }
+
+
+
+
+  /**
+   * Returns the amount of half-moves made from the beginning of the actual game
+   * to the initial position as specified by this <code>Game</code> object.
+   * This will always be 0 for games played by the user.
+   * Note that this property, along with <code>initialPosition</code> may be
+   * modified.
+   */
+
+  public int getPliesSinceStart(){
+    return pliesSinceStart;
   }
 
 
@@ -261,8 +292,12 @@ public class Game extends Struct{
    * should also take care to notify all the clients of the change.
    */
 
-  public void setInitialPosition(Position newInitPos){
-    this.initialPosition.copyFrom(newInitPos);
+  public void setInitialPosition(Position initialPosition, int pliesSinceStart){
+    if (isPlayed() && (getGameType() == MY_GAME) && (pliesSinceStart != 0))
+      throw new IllegalArgumentException("pliesSinceStart may not be nonzero for games played by the user");
+
+    this.initialPosition.copyFrom(initialPosition);
+    this.pliesSinceStart = pliesSinceStart;
   }
 
 
