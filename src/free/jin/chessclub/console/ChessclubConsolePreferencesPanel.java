@@ -149,6 +149,23 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
 
 
 
+
+  /**
+   * A change listener which calls fireStateChanged() whenever it's called.
+   */
+
+  private final ChangeListener relayChangeListener = new ChangeListener(){
+    public void stateChanged(ChangeEvent evt){
+      if (handlingChangeEvent || channelsPanelChanging)
+        return;
+
+      fireStateChanged();
+    }
+  };
+
+
+
+  
   /**
    * Creates a new ChessclubConsolePreferencesPanel for the given
    * ChessclubConsoleManager.
@@ -214,6 +231,10 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
       }
     });
 
+    selectionChooserButton.addChangeListener(relayChangeListener);
+    selectedChooserButton.addChangeListener(relayChangeListener);
+    channelTextStyleChooser.addChangeListener(relayChangeListener);
+
     createUI();
   }
 
@@ -262,6 +283,8 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     categoriesToTextStyleChoosers.put(categoryName, textStyleChooser);
     textStyleChoosersToCategories.put(textStyleChooser, categoryName);
     visibleCategoriesToTotal.put(categoryName, categoriesToUpdate);
+
+    textStyleChooser.addChangeListener(relayChangeListener);
   }
 
 
