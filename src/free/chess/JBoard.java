@@ -833,7 +833,7 @@ public class JBoard extends JComponent{
     Rectangle clipRect = componentGraphics.getClipBounds();
 
     if (cacheImage != null){
-      if ((dirtyRect == null) || !GraphicsUtilities.contains(clipRect, dirtyRect)){
+      if ((dirtyRect == null) || !GraphicsUtilities.intersect(clipRect, dirtyRect)){
         componentGraphics.drawImage(cacheImage, 0, 0, null);
         return;
       }
@@ -841,14 +841,17 @@ public class JBoard extends JComponent{
 
     Dimension size = getSize();
 
+    boolean newImage = false;
     if ((cacheImage == null) || (cacheImage.getWidth(null) != size.width) || (cacheImage.getHeight(null) != size.height)){
       if (cacheImage != null)
         cacheImage.flush();
       cacheImage = createImage(size.width, size.height);
+      newImage = true;
     }
 
     Graphics cacheGraphics = cacheImage.getGraphics();
-    cacheGraphics.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+    if (!newImage) // A new image needs to be drawn completely.
+      cacheGraphics.clipRect(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
 
     super.paintComponent(cacheGraphics);
 
