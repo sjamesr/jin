@@ -76,20 +76,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * True as long as we haven't logged on to the server.
-   */
-
-  private boolean didNotLogon = true;
-  
-
-
-
-  /**
    * Starts this plugin.
    */
 
   public void start(){
-    // Some procedural programming :-)
     initState();
     openConsole();
     registerConnListeners();
@@ -105,10 +95,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void stop(){
-    // Again, some procedural clean up.
     saveState();
     unregisterConnListeners();
-//    closeConsole();
+    closeConsole();
   }
 
 
@@ -120,7 +109,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected void initState(){
-    gameListDisplayStyle = getProperty("game-list-display-style","embedded");
+    gameListDisplayStyle = getProperty("game-list-display-style", "embedded");
   }
 
 
@@ -134,7 +123,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   private void openConsole(){
     console = createConsole();
 
-    consoleFrame = new JInternalFrame("Main Console",true,true,true,true);
+    consoleFrame = new JInternalFrame("Main Console", true, true, true, true);
 
     String iconImageName = getProperty("icon-image");
     if (iconImageName != null){
@@ -157,11 +146,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
           if (getConnection().isConnected())
             result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), "Really close this window and log out?", "Select an option", JOptionPane.YES_NO_OPTION);
 
-          if (result==JOptionPane.YES_OPTION){
-            if (getConnection().isConnected() || didNotLogon)
-              getPluginContext().getMainFrame().closeConnection(getConnection());
-            closeConsole();
-          }
+          if (result==JOptionPane.YES_OPTION)
+            getPluginContext().getMainFrame().closeConnection();
           else
             throw new PropertyVetoException("Canceled closing", pce);
         }
@@ -437,8 +423,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   public void connectionLoggedIn(ConnectionEvent evt){
     consoleFrame.setTitle("Main Console - "+getConnection().getUsername()+" on "+getUser().getServer().getProperty("name.long"));    
     consoleFrame.repaint(); // The title doesn't repaint itself.
-
-    didNotLogon = false;
   }
 
 
