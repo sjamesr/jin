@@ -83,7 +83,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     else if (type.equals("ishout"))
       return "--> "+sender+" "+message;
     else if (type.equals("sshout"))
-      return sender+title+" sshouts: "+message;
+      return sender+title+" s-shouts: "+message;
     else if (type.equals("announcement"))
       return "*** ANNOUNCEMENT from "+sender+": "+message+" ***";
     
@@ -161,26 +161,14 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
 
 
-  /**
-   * Overrides <code>hasPreverencesUI</code> to return <code>true</code>.
-   */
-
-  public boolean hasPreferencesUI(){
-    return true;
-  }
-
-
-
 
   /**
-   * Return a JPanel containing UI which allows the user to modify the
-   * preferences of the console manager.
+   * Return a PreferencesPanel for changing the console manager's settings.
    */
 
   public PreferencesPanel getPreferencesUI(){
-    PreferencesPanel prefPanel = new ChessclubConsolePreferencesPanel(this);
-      
-    return prefPanel;
+    return new ChannelConsolePreferencesPanel(this);
   }
+
 
 }
