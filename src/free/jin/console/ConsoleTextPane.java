@@ -30,6 +30,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.lang.reflect.*;
+import free.workarounds.TranslatingGraphics;
 
 
 /**
@@ -111,11 +112,17 @@ public class ConsoleTextPane extends JTextPane{
     Keymap keymap = getKeymap();
     keymap.removeBindings();
     keymap.setResolveParent(null);
-    keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(0xFFCD, 0), copyAction);
-    keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), copyAction);
+    keymap.addActionForKeyStroke(
+      KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), copyAction);
+    keymap.addActionForKeyStroke(
+      KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), copyAction);
+    keymap.addActionForKeyStroke(
+      KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_MASK), copyAction);
 
     enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
+
+
 
 
 
@@ -209,6 +216,7 @@ public class ConsoleTextPane extends JTextPane{
 
     super.paintComponent(g);
   }
+
 
 
     
