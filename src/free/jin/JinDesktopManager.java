@@ -75,6 +75,26 @@ public class JinDesktopManager extends DefaultDesktopManager{
 
 
 
+  /**
+   * The amount of pixels on the x axis of an internal frame that must always
+   * be visible.
+   */
+
+  private final static int X_MARGIN = 100;
+  // This must be big enough for the draggable area of the title bar to always
+  // be visible.
+
+
+
+  /**
+   * The amount of pixels on the y axis of an internal frame that must always
+   * be visible.
+   */
+
+  private final static int Y_MARGIN = 100; 
+  // Must be at least the height of the title bar
+
+
 
   /**
    * This method makes sure the user doesn't do stupid things like moving the
@@ -85,7 +105,6 @@ public class JinDesktopManager extends DefaultDesktopManager{
     JDesktopPane desktop = jinFrame.getDesktop();
     Dimension desktopSize = desktop.getSize();
     Rectangle jifBounds = f.getBounds();
-    final int MARGIN = 100;
 
     // Determine which border is being dragged by checking which sides are
     // not at their original locations.
@@ -100,15 +119,20 @@ public class JinDesktopManager extends DefaultDesktopManager{
     int x2 = x1 + newWidth;
     int y2 = y1 + newHeight;
 
+    // Don't impose margins bigger than the frame itself (if it's iconified, for example)
+    int xMargin = jifBounds.width < X_MARGIN ? jifBounds.width : X_MARGIN;
+    int yMargin = jifBounds.height < Y_MARGIN ? jifBounds.height : Y_MARGIN;
+
     // Adjust the appropriate sides
     if (right)
-      x2 = Math.min(Math.max(x2, MARGIN), x1 + desktopSize.width);
+      x2 = Math.min(Math.max(x2, xMargin), x1 + desktopSize.width);
     if (bottom)
       y2 = Math.min(y2, y1 + desktopSize.height);
     if (left)
-      x1 = Math.min(Math.max(x1, x2 - desktopSize.width), desktopSize.width - MARGIN);
+      x1 = Math.min(Math.max(x1, x2 - desktopSize.width), desktopSize.width - xMargin);
     if (top)
-      y1 = Math.max(Math.min(Math.max(y1, 0), desktopSize.height - MARGIN), y2 - desktopSize.height);
+      y1 = Math.max(Math.min(Math.max(y1, 0), desktopSize.height - yMargin),
+                    y2 - desktopSize.height);
     
     super.resizeFrame(f, x1, y1, x2 - x1, y2 - y1);
   }
@@ -122,9 +146,14 @@ public class JinDesktopManager extends DefaultDesktopManager{
   public void dragFrame(JComponent f, int newX, int newY){
     JDesktopPane desktop = jinFrame.getDesktop();
     Dimension desktopSize = desktop.getSize();
+    Rectangle jifBounds = f.getBounds();
 
-    newX = Math.max(Math.min(newX, desktopSize.width - 100), 100 - f.getWidth());
-    newY = Math.max(Math.min(newY, desktopSize.height - 100), 0);
+    // Don't impose margins bigger than the frame itself (if it's iconified, for example)
+    int xMargin = jifBounds.width < X_MARGIN ? jifBounds.width : X_MARGIN;
+    int yMargin = jifBounds.height < Y_MARGIN ? jifBounds.height : Y_MARGIN;
+
+    newX = Math.max(Math.min(newX, desktopSize.width - xMargin), xMargin - f.getWidth());
+    newY = Math.max(Math.min(newY, desktopSize.height - yMargin), 0);
 
     super.dragFrame(f, newX, newY);
   }
