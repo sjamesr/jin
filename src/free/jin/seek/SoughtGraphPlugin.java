@@ -272,6 +272,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       return;
 
     soughtGraphFrame.setVisible(false);
+    soughtGraph.removeAllSeeks();
+
     if ((visibleCB!=null)&&(visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
       visibleCB.setSelected(false);
     SeekJinConnection conn = (SeekJinConnection)getConnection();

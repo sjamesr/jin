@@ -292,6 +292,22 @@ public class SoughtGraph extends JComponent{
 
 
 
+
+  /**
+   * Removes all the seeks.
+   */
+
+  public void removeAllSeeks(){
+    seeksToLocations.clear();
+
+    for (int i = 0; i < seekMatrix.length; i++)
+      for (int j = 0; j < seekMatrix[i].length; j++)
+        seekMatrix[i][j] = null;
+  }
+
+
+
+
   /**
    * Returns the bounding rectangle of the seek at the given location in the
    * seek matrix.
