@@ -447,8 +447,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void addChatListener(ChatListener listener){
     if (listenerList.getListenerCount(ChatListener.class)==0){
       setDGState(Datagram.DG_PERSONAL_TELL, true);
+      setDGState(Datagram.DG_PERSONAL_QTELL, true);
       setDGState(Datagram.DG_SHOUT, true);
       setDGState(Datagram.DG_CHANNEL_TELL, true);
+      setDGState(Datagram.DG_CHANNEL_QTELL, true);
       setDGState(Datagram.DG_KIBITZ, true);
     }
 
@@ -467,8 +469,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     if (listenerList.getListenerCount(ChatListener.class)==0){
       setDGState(Datagram.DG_PERSONAL_TELL, false);
+      setDGState(Datagram.DG_PERSONAL_QTELL, false);
       setDGState(Datagram.DG_SHOUT, false);
       setDGState(Datagram.DG_CHANNEL_TELL, false);
+      setDGState(Datagram.DG_CHANNEL_QTELL, true);
       setDGState(Datagram.DG_KIBITZ, false);
     }
   }
@@ -498,6 +502,20 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     ChatEvent evt = new ChatEvent(this, tellTypeString, playername, title, message, null);
     fireChatMessageArrived(evt);
   }
+
+
+
+
+  /**
+   * Creates and dispatches an appropriate ChatEvent to all registered
+   * ChatListeners.
+   */
+
+  protected void processPersonalQTell(String name, String titles, String message){
+    ChatEvent evt = new ChatEvent(this, "qtell", name, displayableTitle(titles), message, null);
+    fireChatMessageArrived(evt);
+  }
+
 
 
 
@@ -550,6 +568,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     fireChatMessageArrived(evt);
   }
 
+
+
+
+  /**
+   * Creates and dispatches an appropriate ChatEvent to all registered
+   * ChatListeners.
+   */
+
+  protected void processChannelQTell(int channel, String name, String titles, String message){
+    ChatEvent evt = new ChatEvent(this, "channel-qtell", name, displayableTitle(titles), message, new Integer(channel));
+    fireChatMessageArrived(evt);
+  }
 
 
 
