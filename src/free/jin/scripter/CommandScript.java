@@ -25,7 +25,7 @@ import jregex.*;
 import bsh.EvalError;
 import bsh.Interpreter;
 import free.jin.plugin.PluginContext;
-import free.jin.JinConnection;
+import free.jin.Connection;
 import free.jin.event.JinEvent;
 
 
@@ -73,17 +73,18 @@ public class CommandScript extends Script{
    * expression.
    */
 
-  public CommandScript(PluginContext context, String name, String eventType,
+  public CommandScript(Scripter scripter, String name, String eventType,
       String [] eventSubtypes, String condition, String [] commands) throws EvalError{
-    super(context, name, eventType, eventSubtypes);
+    super(scripter, name, eventType, eventSubtypes);
 
     this.condition = condition;
     this.commands = (String [])commands.clone();
 
     bsh = new Interpreter();
 
-    bsh.set("context", getContext());
-    bsh.set("connection", getContext().getConnection());
+    bsh.set("scripter", scripter);
+    bsh.set("prefs", scripter.getPrefs());
+    bsh.set("connection", scripter.getConn());
 
     addImports(bsh);
   }
@@ -178,7 +179,7 @@ public class CommandScript extends Script{
       if (!result)
         return;
 
-      JinConnection conn = getContext().getConnection();
+      Connection conn = scripter.getConn();
       for (int i = 0; i < commands.length; i++){
         String line = preprocess(commands[i], vars);
         conn.sendCommand(line);
@@ -199,8 +200,8 @@ public class CommandScript extends Script{
 
   public Script createCopy(){
     try{
-      CommandScript script = new CommandScript(getContext(), getName(), getEventType(), getEventSubtypes(),
-        getCondition(), getCommands());
+      CommandScript script = new CommandScript(scripter, getName(), getEventType(),
+        getEventSubtypes(), getCondition(), getCommands());
       script.setEnabled(isEnabled());
       return script;
     } catch (EvalError e){

@@ -30,7 +30,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.Component;
 import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginContext;
 import free.jin.plugin.PreferencesPanel;
 import free.util.MemoryFile;
 import free.util.Utilities;
@@ -106,7 +105,7 @@ public class Scripter extends Plugin{
   
   private ScriptDispatcher getScriptDispatcher(String eventType){
     ScriptDispatcher dispatcher = (ScriptDispatcher)dispatchers.get(eventType);
-    if ((dispatcher == null) || !dispatcher.isSupportedBy(getConnection()))
+    if ((dispatcher == null) || !dispatcher.isSupportedBy(getConn()))
       return null;
 
     return dispatcher;
@@ -120,7 +119,7 @@ public class Scripter extends Plugin{
    */
 
   public String [] getSupportedEventTypes(){
-    JinConnection conn = getConnection();
+    Connection conn = getConn();
 
     Enumeration eventTypesEnum = dispatchers.keys();
     Vector eventTypesVector = new Vector(dispatchers.size());
@@ -180,8 +179,7 @@ public class Scripter extends Plugin{
 
   public void start(){
     JMenuItem help = new JMenuItem("Help", 'H');
-    help.addActionListener(new UrlDisplayingAction(getPluginContext().getMainFrame(),
-      "http://www.jinchess.com/docs/scripter/"));
+    help.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/docs/scripter/"));
 
     menu.add(help);
     menu.addSeparator();
@@ -230,9 +228,8 @@ public class Scripter extends Plugin{
     if (dispatcher == null)
       throw new IllegalArgumentException(""+script+" is of an unsupported/unknown event type ("+eventType+")");
 
-    if (dispatcher instanceof UserInvokedScriptDispatcher){
-      menu.add(new UserInvokedScriptMenuItem(script, getPluginContext().getMainFrame()));
-    }
+    if (dispatcher instanceof UserInvokedScriptDispatcher)
+      menu.add(new UserInvokedScriptMenuItem(script, getUIProvider()));
 
     dispatcher.addScript(script);
   }
@@ -321,10 +318,10 @@ public class Scripter extends Plugin{
    */
 
   private void loadScripts(){
-    int scriptCount = getIntegerProperty("scripts.count", 0);
+    int scriptCount = getPrefs().getInt("scripts.count", 0);
 
     for (int i = 0; i < scriptCount; i++){
-      MemoryFile scriptFile = getFile("script-"+i);
+      MemoryFile scriptFile = getFile("script-" + i);
       if (scriptFile == null)
         continue;
       Script script = parseScript(scriptFile.getInputStream());
@@ -347,17 +344,25 @@ public class Scripter extends Plugin{
    */
 
   private void saveScripts(){
-    Script [] scripts = getScripts();
+    Preferences prefs = getPrefs();
 
-    setIntegerProperty("scripts.count", scripts.length);
+    // Delete old scripts first.
+    int scriptCount = prefs.getInt("scripts.count", 0);
+    for (int i = 0; i < scriptCount; i++)
+      setFile("script-" + i, null);
+
+
+    Script [] scripts = getScripts();
+    prefs.setInt("scripts.count", scripts.length);
 
     for (int i = 0; i < scripts.length; i++){
       Script script = scripts[i];
-      MemoryFile scriptFile = createFile("script-"+i);
+      MemoryFile scriptFile = new MemoryFile();
       try{
         OutputStream out = scriptFile.getOutputStream();
         writeScript(script, out);
         out.close();
+        setFile("script-" + i, scriptFile);
       } catch (IOException e){
           e.printStackTrace();
         }
@@ -398,12 +403,10 @@ public class Scripter extends Plugin{
           eventSubtypes[i] = props.getProperty("event-subtype."+i);
       }
 
-      PluginContext context = getPluginContext();
-
       Script script;
       if ("beanshell".equals(scriptType)){
         String code = props.getProperty("code");
-        script = new BeanShellScript(context, scriptName, eventType, eventSubtypes, code);
+        script = new BeanShellScript(this, scriptName, eventType, eventSubtypes, code);
       }
       else if ("commands".equals(scriptType)){
         String condition = props.getProperty("condition");
@@ -411,7 +414,7 @@ public class Scripter extends Plugin{
         String [] commands = new String[commandCount];
         for (int i = 0; i < commandCount; i++)
           commands[i] = props.getProperty("command-"+i);
-        script = new CommandScript(context, scriptName, eventType, eventSubtypes, condition, commands);
+        script = new CommandScript(this, scriptName, eventType, eventSubtypes, condition, commands);
       }
       else
         return null;
@@ -483,12 +486,31 @@ public class Scripter extends Plugin{
 
 
 
+  /**
+   * Returns the string "scripter".
+   */
+
+  public String getId(){
+    return "scripter";
+  }
+
+
+
+  /**
+   * Returns the string "Scripter".
+   */
+
+  public String getName(){
+    return "Scripter";
+  }
+
+
 
   /**
    * An abstract base class for classes responsible for supporting scripting for
    * a certain event type. It allows registering and unregistering scripts and
    * testing whether the event type is supported by a specified
-   * <code>JinConnection</code> implementation.
+   * <code>Connection</code> implementation.
    */ 
 
   protected abstract class ScriptDispatcher{
@@ -553,7 +575,7 @@ public class Scripter extends Plugin{
 
     public void addScript(Script script){
       if (scripts.size() == 0)
-        registerForEvent(getConnection().getJinListenerManager());
+        registerForEvent(getConn().getListenerManager());
 
       scripts.addElement(script);
     }
@@ -570,7 +592,7 @@ public class Scripter extends Plugin{
         throw new IllegalArgumentException("The specified script ("+script+") has not been previously registered with this ScriptDispatcher ("+this+").");
 
       if (scripts.size() == 0)
-        unregisterForEvent(getConnection().getJinListenerManager());
+        unregisterForEvent(getConn().getListenerManager());
     }
 
 
@@ -597,7 +619,7 @@ public class Scripter extends Plugin{
     protected void runScripts(JinEvent evt, String eventSubtype, Object [][] vars){
       String [] supportedSubtypes = getEventSubtypesImpl();
       if ((supportedSubtypes != null) && ((eventSubtype == null) ||
-                                         !Utilities.isElementOf(supportedSubtypes, eventSubtype))){
+                                         !Utilities.contains(supportedSubtypes, eventSubtype))){
         System.err.println("Unknown event subtype occurred: "+eventSubtype);
         return;
       }
@@ -609,7 +631,7 @@ public class Scripter extends Plugin{
       for (int i = 0; i < scriptCount; i++){
         Script script = (Script)scripts.elementAt(i);
         String [] eventSubtypes = script.getEventSubtypes();
-        if (script.isEnabled() && ((eventSubtype == null) || Utilities.isElementOf(eventSubtypes, eventSubtype))){
+        if (script.isEnabled() && ((eventSubtype == null) || Utilities.contains(eventSubtypes, eventSubtype))){
           try{
             script.run(evt, eventSubtype, vars);
           } catch (RuntimeException e){
@@ -623,28 +645,28 @@ public class Scripter extends Plugin{
 
 
     /**
-     * Returns <code>true</code> if the specified <code>JinConnection</code>
+     * Returns <code>true</code> if the specified <code>Connection</code>
      * supports the event type this <code>EventTypeSupport</code> is for.
      * Returns <code>false</code> otherwise.
      */
 
-    public abstract boolean isSupportedBy(JinConnection conn);
+    public abstract boolean isSupportedBy(Connection conn);
     
 
     /**
      * Registers for the event with the specified
-     * <code>JinListenerManager</code>.
+     * <code>ListenerManager</code>.
      */
 
-    protected abstract void registerForEvent(JinListenerManager listenerManager);
+    protected abstract void registerForEvent(ListenerManager listenerManager);
 
 
     /**
      * Unregisters for the event with the specified
-     * <code>JinListenerManager</code>.
+     * <code>ListenerManager</code>.
      */
 
-    protected abstract void unregisterForEvent(JinListenerManager listenerManager);
+    protected abstract void unregisterForEvent(ListenerManager listenerManager);
 
 
 
@@ -668,22 +690,23 @@ public class Scripter extends Plugin{
 
   private class ConnectionScriptDispatcher extends ScriptDispatcher implements ConnectionListener{
 
-    private final String [] subtypes = new String[]{"Connect", "Login", "Disconnect"};
+    private final String [] subtypes = new String[]{"Attempt", "Connect", "Login", "Disconnect"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
-    public boolean isSupportedBy(JinConnection conn){return true;}
+    public boolean isSupportedBy(Connection conn){return true;}
 
-    public void registerForEvent(JinListenerManager listenerManager){
+    public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addConnectionListener(this);      
     }
 
-    public void unregisterForEvent(JinListenerManager listenerManager){
+    public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removeConnectionListener(this);
     }
 
-    public void connectionEstablished(ConnectionEvent evt){runScripts(evt, subtypes[0], null);}
-    public void connectionLoggedIn(ConnectionEvent evt){runScripts(evt, subtypes[1], null);}
-    public void connectionLost(ConnectionEvent evt){runScripts(evt, subtypes[2], null);}
+    public void connectionAttempted(ConnectionEvent evt){runScripts(evt, subtypes[0], null);}
+    public void connectionEstablished(ConnectionEvent evt){runScripts(evt, subtypes[1], null);}
+    public void connectionLoggedIn(ConnectionEvent evt){runScripts(evt, subtypes[2], null);}
+    public void connectionLost(ConnectionEvent evt){runScripts(evt, subtypes[3], null);}
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return null;
@@ -701,13 +724,13 @@ public class Scripter extends Plugin{
 
     protected String [] getEventSubtypesImpl(){return null;}
 
-    public boolean isSupportedBy(JinConnection conn){return true;}
+    public boolean isSupportedBy(Connection conn){return true;}
 
-    public void registerForEvent(JinListenerManager listenerManager){
+    public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addPlainTextListener(this);      
     }
 
-    public void unregisterForEvent(JinListenerManager listenerManager){
+    public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removePlainTextListener(this);
     }
 
@@ -735,13 +758,13 @@ public class Scripter extends Plugin{
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
 
-    public boolean isSupportedBy(JinConnection conn){return true;}
+    public boolean isSupportedBy(Connection conn){return true;}
 
-    public void registerForEvent(JinListenerManager listenerManager){
+    public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addGameListener(this);      
     }
 
-    public void unregisterForEvent(JinListenerManager listenerManager){
+    public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removeGameListener(this);
     }
 
@@ -1000,36 +1023,36 @@ public class Scripter extends Plugin{
       Move move = new ChessMove(Square.parseSquare("e2"), Square.parseSquare("e4"),
         Player.WHITE_PLAYER, false, false, false, null, null, "e4");
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[1])){
+      if (Utilities.contains(eventSubtypes, subtypes[1])){
         varsVector.addElement(new Object[]{"move", move});
         varsVector.addElement(new Object[]{"isNewMove", new Boolean(true)});
       }
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[6]))
+      if (Utilities.contains(eventSubtypes, subtypes[6]))
         varsVector.addElement(new Object[]{"newPosition", new Position()});
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[2]))
+      if (Utilities.contains(eventSubtypes, subtypes[2]))
         varsVector.addElement(new Object[]{"takebackCount", new Integer(3)});
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[4]))
+      if (Utilities.contains(eventSubtypes, subtypes[4]))
         varsVector.addElement(new Object[]{"illegalMove", move});
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[5])){
+      if (Utilities.contains(eventSubtypes, subtypes[5])){
         varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
         varsVector.addElement(new Object[]{"time", new Integer(4*60*1000)});
         varsVector.addElement(new Object[]{"isClockRunning", new Boolean(true)});
       }
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[3]))
+      if (Utilities.contains(eventSubtypes, subtypes[3]))
         varsVector.addElement(new Object[]{"isFlipped", new Boolean(true)});
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[7])){
+      if (Utilities.contains(eventSubtypes, subtypes[7])){
         varsVector.addElement(new Object[]{"offerType", "draw"});
         varsVector.addElement(new Object[]{"isMade", new Boolean(true)});
         varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
       }
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[8]))
+      if (Utilities.contains(eventSubtypes, subtypes[8]))
         varsVector.addElement(new Object[]{"gameResult", "win"});
 
       Object [][] vars = new Object[varsVector.size()][];
@@ -1052,14 +1075,14 @@ public class Scripter extends Plugin{
     private final String [] subtypes = new String[]{"Post", "Withdraw"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
-    public boolean isSupportedBy(JinConnection conn){return (conn instanceof SeekJinConnection);}
+    public boolean isSupportedBy(Connection conn){return (conn instanceof SeekConnection);}
 
-    public void registerForEvent(JinListenerManager listenerManager){
-      ((SeekJinListenerManager)listenerManager).addSeekListener(this);
+    public void registerForEvent(ListenerManager listenerManager){
+      ((SeekListenerManager)listenerManager).addSeekListener(this);
     }
 
-    public void unregisterForEvent(JinListenerManager listenerManager){
-      ((SeekJinListenerManager)listenerManager).removeSeekListener(this);
+    public void unregisterForEvent(ListenerManager listenerManager){
+      ((SeekListenerManager)listenerManager).removeSeekListener(this);
     }
 
     /**
@@ -1157,14 +1180,14 @@ public class Scripter extends Plugin{
     private final String [] subtypes = new String[]{"Online", "Connected", "Disconnected", "Added", "Removed"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
-    public boolean isSupportedBy(JinConnection conn){return (conn instanceof FriendsJinConnection);}
+    public boolean isSupportedBy(Connection conn){return (conn instanceof FriendsConnection);}
 
-    public void registerForEvent(JinListenerManager listenerManager){
-      ((FriendsJinListenerManager)listenerManager).addFriendsListener(this);
+    public void registerForEvent(ListenerManager listenerManager){
+      ((FriendsListenerManager)listenerManager).addFriendsListener(this);
     }
 
-    public void unregisterForEvent(JinListenerManager listenerManager){
-      ((FriendsJinListenerManager)listenerManager).removeFriendsListener(this);
+    public void unregisterForEvent(ListenerManager listenerManager){
+      ((FriendsListenerManager)listenerManager).removeFriendsListener(this);
     }
 
     public void friendOnline(FriendsEvent evt){
@@ -1206,11 +1229,11 @@ public class Scripter extends Plugin{
 
     protected String [] getEventSubtypesImpl(){return null;}
 
-    public boolean isSupportedBy(JinConnection conn){return true;}
+    public boolean isSupportedBy(Connection conn){return true;}
 
-    public void registerForEvent(JinListenerManager listenerManager){}
+    public void registerForEvent(ListenerManager listenerManager){}
 
-    public void unregisterForEvent(JinListenerManager listenerManager){}
+    public void unregisterForEvent(ListenerManager listenerManager){}
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return null;

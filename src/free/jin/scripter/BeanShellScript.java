@@ -23,7 +23,6 @@ package free.jin.scripter;
 
 import bsh.Interpreter;
 import bsh.EvalError;
-import free.jin.plugin.PluginContext;
 import free.jin.event.JinEvent;
 
 
@@ -33,6 +32,7 @@ import free.jin.event.JinEvent;
  */
 
 public class BeanShellScript extends Script{
+
 
 
   /**
@@ -53,20 +53,20 @@ public class BeanShellScript extends Script{
 
 
   /**
-   * Creates a new <code>CodeExecutable</code> which will run the specified code
-   * within the specified context.
+   * Creates a new <code>CodeExecutable</code> which will run the specified
+   * code.
    */
 
-  public BeanShellScript(PluginContext context, String name, String eventType, String [] eventSubtypes,
+  public BeanShellScript(Scripter scripter, String name, String eventType, String [] eventSubtypes,
       String code) throws EvalError{
-    super(context, name, eventType, eventSubtypes);
+    super(scripter, name, eventType, eventSubtypes);
 
     this.code = code;
 
     bsh = new Interpreter();
     addImports(bsh);
-    addVariables(bsh, context);
-    addMethods(bsh, context);
+    addVariables(bsh, scripter);
+    addMethods(bsh, scripter);
     
     bsh.eval("void runScript(){"+code+"}");
   }
@@ -91,9 +91,10 @@ public class BeanShellScript extends Script{
    * environment.
    */
 
-  private static void addVariables(Interpreter bsh, PluginContext context) throws EvalError{
-    bsh.set("context", context);
-    bsh.set("connection", context.getConnection());
+  private static void addVariables(Interpreter bsh, Scripter scripter) throws EvalError{
+    bsh.set("scripter", scripter);
+    bsh.set("prefs", scripter.getPrefs());
+    bsh.set("connection", scripter.getConn());
   }
 
 
@@ -104,7 +105,7 @@ public class BeanShellScript extends Script{
    * environment.
    */
 
-  private static void addMethods(Interpreter bsh, PluginContext context) throws EvalError{
+  private static void addMethods(Interpreter bsh, Scripter scripter) throws EvalError{
     bsh.eval("void sendCommand(String command){connection.sendCommand(command);}");
 
     bsh.eval("void playSound(String filename){\n"+
@@ -119,8 +120,7 @@ public class BeanShellScript extends Script{
              "}");
 
     bsh.eval("void appendLine(String line){\n"+
-             "  String pluginName = context.getProperty(\"consolePlugin.name\");\n"+
-             "  free.jin.console.ConsoleManager plugin = context.getPlugin(pluginName);\n"+
+             "  free.jin.console.ConsoleManager plugin = getPlugin(\"console\");\n"+
              "  plugin.addSpecialLine(line);\n"+
              "}");
   }
@@ -200,8 +200,8 @@ public class BeanShellScript extends Script{
 
   public Script createCopy(){
     try{
-      BeanShellScript script = new BeanShellScript(getContext(), getName(), getEventType(), getEventSubtypes(),
-        getCode());
+      BeanShellScript script = new BeanShellScript(scripter, getName(), getEventType(),
+        getEventSubtypes(), getCode());
       script.setEnabled(isEnabled());
 
       return script;

@@ -22,7 +22,6 @@
 package free.jin.scripter;
 
 import free.jin.event.JinEvent;
-import free.jin.plugin.PluginContext;
 
 
 /**
@@ -37,10 +36,10 @@ public abstract class Script{
 
 
   /**
-   * The PluginContext we're working in.
+   * The Scripter we're working with.
    */
 
-  private final PluginContext context;
+  protected final Scripter scripter;
 
 
 
@@ -84,15 +83,15 @@ public abstract class Script{
    * subtype of the event that must occur for this script to be invoked.
    */
 
-  public Script(PluginContext context, String name, String eventType, String [] eventSubtypes){
-    if (context == null)
-      throw new IllegalArgumentException("A null plugin context is not allowed");
+  public Script(Scripter scripter, String name, String eventType, String [] eventSubtypes){
+    if (scripter == null)
+      throw new IllegalArgumentException("A null scripter is not allowed");
     if (eventType == null)
       throw new IllegalArgumentException("A null event type for a script is not allowed");
     if ((name == null) || (name.length() == 0))
       throw new IllegalArgumentException("A null/empty script name is not allowed");
 
-    this.context = context;
+    this.scripter = scripter;
     this.name = name;
     this.eventType = eventType;
     this.eventSubtypes = (eventSubtypes == null ? null : (String [])(eventSubtypes.clone()));
@@ -101,11 +100,11 @@ public abstract class Script{
 
 
   /**
-   * Returns the plugin context we're running in.
+   * Returns the scripter.
    */
 
-  public PluginContext getContext(){
-    return context;
+  public Scripter getScripter(){
+    return scripter;
   }
 
 

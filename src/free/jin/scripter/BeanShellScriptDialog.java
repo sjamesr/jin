@@ -136,7 +136,7 @@ class BeanShellScriptDialog extends ScriptDialog{
     String code = codeArea.getText();
 
     try{
-      BeanShellScript script = new BeanShellScript(scripter.getPluginContext(), scriptName, 
+      BeanShellScript script = new BeanShellScript(scripter, scriptName, 
         eventType, selectedSubtypes, code);
 
       if (templateScript != null)

@@ -32,6 +32,9 @@ import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import free.jin.DialogPanel;
+import free.jin.UIProvider;
+import free.jin.OptionPanel;
 import free.util.swing.SwingUtils;
 import free.util.AWTUtilities;
 import free.workarounds.FixedJComboBox;
@@ -46,14 +49,6 @@ import java.util.Vector;
 
 class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
-
-  /**
-   * The parent frame. This is needed because for some reason, menu items don't
-   * have the correct ancestor - AWTUtilities.frameForComponent returns null.
-   */
-
-  private final Frame parent;
-
   
 
   /**
@@ -65,14 +60,22 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
 
   /**
+   * The ui provider.
+   */
+
+  private final UIProvider uiProvider;
+
+
+
+  /**
    * The constructor, duh.
    */
 
-  public UserInvokedScriptMenuItem(Script script, Frame parent){
+  public UserInvokedScriptMenuItem(Script script, UIProvider uiProvider){
     super(script.getName());
 
-    this.parent = parent;
     this.script = script;
+    this.uiProvider = uiProvider;
 
     setMnemonic(script.getName().charAt(0));
     addActionListener(this);
@@ -85,10 +88,9 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
    */
 
   public void actionPerformed(ActionEvent evt){
-    VariablesDialog varsDialog = new VariablesDialog(parent);
-    AWTUtilities.centerWindow(varsDialog, parent);
+    VariablesPanel varsPanel = new VariablesPanel();
 
-    Object [][] vars = varsDialog.askVars();
+    Object [][] vars = varsPanel.askVars(uiProvider);
     if (vars == null)
       return;
 
@@ -108,10 +110,10 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
 
   /**
-   * A dialog which allows the user to specify variables to the script.
+   * A panel which allows the user to specify variables to the script.
    */
 
-  private class VariablesDialog extends JDialog{
+  private class VariablesPanel extends DialogPanel{
 
 
     /**
@@ -122,15 +124,6 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
 
     
-    /**
-     * The result. A list of arrays of size two where the first element is a
-     * String specifying the name of the variable and the 2nd one is the
-     * variable value.
-     */
-
-    private Object [][] result;
-
-
 
     /**
      * The table model.
@@ -161,11 +154,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
      * The constructor.
      */
 
-    public VariablesDialog(Frame parent){
-      super(parent, "Specify Variables for the Script", true);
-
-      SwingUtils.registerEscapeCloser(this);
-
+    public VariablesPanel(){
       columnModel = new DefaultTableColumnModel();
       JComboBox typeChoice = new FixedJComboBox(VAR_TYPES);
       typeChoice.setEditable(false);
@@ -191,13 +180,21 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
 
     /**
+     * Returns the title of this dialog panel.
+     */
+
+    public String getTitle(){
+      return "Specify Variables for the Script";
+    }
+
+
+
+    /**
      * Displays the dialog and returns the variables once the user is done.
      */
 
-    public Object [][] askVars(){
-      this.setVisible(true);
-
-      return result;
+    public Object [][] askVars(UIProvider uiProvider){
+      return (Object [][])super.askResult(uiProvider);
     }
 
 
@@ -305,7 +302,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
                 value = new Double(valueString);
               else throw new IllegalStateException("Unknown variable type: "+type);
             } catch (IllegalArgumentException e){
-                JOptionPane.showMessageDialog(parent, "Inappropriate value specified for variable \""+name+"\", must be of type \""+type+"\"", "Bad Variable Value", JOptionPane.ERROR_MESSAGE);
+                OptionPanel.error(uiProvider, "Bad Variable Value", "Inappropriate value specified for variable \""+name+"\", must be of type \""+type+"\"");
                 return;
               }
             varsVector.addElement(new Object[]{name, value});
@@ -314,15 +311,13 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
           Object [][] vars = new Object[varsVector.size()][];
           varsVector.copyInto(vars);
 
-          result = vars;
-
-          dispose();
+          close(vars);
         }
       });
 
       cancelButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          dispose();
+          close(null);
         }
       });
 
@@ -340,16 +335,14 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       finishButtonsPanel.add(runScriptButton);
       finishButtonsPanel.add(cancelButton);
 
-      JPanel content = new JPanel(new BorderLayout(10, 5));
-      content.setBorder(new EmptyBorder(10, 10, 5, 10)); 
-      content.add(variablesLabel, BorderLayout.NORTH);
-      content.add(scrollPane, BorderLayout.CENTER);
-      content.add(buttonsWrapper, BorderLayout.EAST);
-      content.add(finishButtonsPanel, BorderLayout.SOUTH);
+      this.setLayout(new BorderLayout(10, 5));
+      this.setBorder(new EmptyBorder(10, 10, 5, 10)); 
+      this.add(variablesLabel, BorderLayout.NORTH);
+      this.add(scrollPane, BorderLayout.CENTER);
+      this.add(buttonsWrapper, BorderLayout.EAST);
+      this.add(finishButtonsPanel, BorderLayout.SOUTH);
 
-      setContentPane(content);
-
-      this.getRootPane().setDefaultButton(runScriptButton);
+      setDefaultButton(runScriptButton);
 
       // So that the default button is activated on ENTER and the dialog closes on ESCAPE
       if (System.getProperty("java.version").compareTo("1.3") >= 0){
@@ -360,7 +353,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
         };
         Action closeDialogAction = new AbstractAction(){
           public void actionPerformed(ActionEvent evt){
-            dispose();
+            close(null);
           }
         };
         try{

@@ -340,7 +340,7 @@ abstract class ScriptDialog extends JDialog{
           String subtype = subtypes[i];
           JCheckBox checkbox = new JCheckBox(subtype);
           checkbox.setActionCommand(subtype);
-          checkbox.setSelected(Utilities.isElementOf(selectedSubtypes, subtype));
+          checkbox.setSelected(Utilities.contains(selectedSubtypes, subtype));
           panel.add(checkbox);
         }
       }

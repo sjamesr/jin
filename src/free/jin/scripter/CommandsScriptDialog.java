@@ -225,7 +225,7 @@ class CommandsScriptDialog extends ScriptDialog{
       }
 
     try{
-      CommandScript script = new CommandScript(scripter.getPluginContext(), scriptName, eventType,
+      CommandScript script = new CommandScript(scripter, scriptName, eventType,
         selectedSubtypes, condition, commands);
 
       if (templateScript != null)
