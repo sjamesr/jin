@@ -526,10 +526,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
   /**
-   * Returns the chess piece represented by the given string.
-   * The string must contain exactly one character and be one of the characters
-   * in the string "-PNBRQKpnbrqk". The '-' character specifies an empty piece
-   * and this method will return <code>null</code> for it.
+   * Calls <code>ChessPiece.fromShortString(String)</code> to parse the piece.
    *
    * @param piece The string representing the piece.
    *
@@ -537,28 +534,42 @@ public class ChesslikeGenericVariant implements WildVariant{
    */
 
   public static ChessPiece parseChessPiece(String piece) throws IllegalArgumentException{
-    if (piece.length()!=1)
-      throw new IllegalArgumentException("The given string must be exactly one character long.");
-    
-    char c = piece.charAt(0);
+    return ChessPiece.fromShortString(piece);
+  }
 
-    switch(c){
-     case '-': return null;
-     case 'P': return ChessPiece.WHITE_PAWN;
-     case 'N': return ChessPiece.WHITE_KNIGHT;
-     case 'B': return ChessPiece.WHITE_BISHOP;
-     case 'R': return ChessPiece.WHITE_ROOK;
-     case 'Q': return ChessPiece.WHITE_QUEEN;
-     case 'K': return ChessPiece.WHITE_KING;
-     case 'p': return ChessPiece.BLACK_PAWN;
-     case 'n': return ChessPiece.BLACK_KNIGHT;
-     case 'b': return ChessPiece.BLACK_BISHOP;
-     case 'r': return ChessPiece.BLACK_ROOK;
-     case 'q': return ChessPiece.BLACK_QUEEN;
-     case 'k': return ChessPiece.BLACK_KING;
-    }
 
-    throw new IllegalArgumentException("Unknown piece: "+piece);
+
+
+  /**
+   * Returns what is described by the {@link #parseChessMove(String)} method.
+   *
+   * <P>If you want to use this method from an implementation of some other
+   * wild variant, use the static {@link #parseChessPiece(String)} method
+   * instead.
+   *
+   * @param piece The string representing the piece.
+   *
+   * @throws IllegalArgumentException if the string is not in the correctformat.
+   */
+
+  public String pieceToString(Piece piece){
+    if (!(piece instanceof ChessPiece))
+      throw new IllegalArgumentException("The piece must be an instance of ChessPiece.");
+
+    return chessPieceToString((ChessPiece)piece);
+  }
+  
+
+
+
+
+  /**
+   * Calls <code>ChessPiece.toShortString()</code> to obtain a textual
+   * representation of the piece.
+   */
+
+  public static String chessPieceToString(ChessPiece piece){
+    return piece.toShortString();
   }
 
 
