@@ -128,10 +128,12 @@ public class BoardPreferencesPanel extends PreferencesPanel{
   public BoardPreferencesPanel(BoardManager boardManager){
     this.boardManager = boardManager;
 
-    whiteColorChooser = new ColorChooserButton("White Pieces", getColorProperty("white-piece-color", Color.white));
-    blackColorChooser = new ColorChooserButton("Black Pieces", getColorProperty("black-piece-color", Color.black));
-    whiteOutlineChooser = new ColorChooserButton("White Pieces' Outline", getColorProperty("white-outline-color", Color.black));
-    blackOutlineChooser = new ColorChooserButton("Black Pieces' Outline", getColorProperty("black-outline-color", Color.white));
+    whiteColorChooser = new ColorChooserButton("White Pieces", boardManager.getWhitePieceColor());
+    blackColorChooser = new ColorChooserButton("Black Pieces", boardManager.getBlackPieceColor());
+    whiteOutlineChooser = new ColorChooserButton("White Pieces' Outline",
+      boardManager.getWhiteOutlineColor());
+    blackOutlineChooser = new ColorChooserButton("Black Pieces' Outline",
+      boardManager.getBlackOutlineColor());
 
     whiteColorChooser.setMnemonic('W');
     blackColorChooser.setMnemonic('B');
@@ -139,15 +141,17 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     blackOutlineChooser.setMnemonic('k');
 
 
-    lightColorChooser = new ColorChooserButton("Light Squares", getColorProperty("light-square-color", new Color(255,207,144)));
-    darkColorChooser = new ColorChooserButton("Dark Squares", getColorProperty("dark-square-color", new Color(143,96,79)));
+    lightColorChooser = new ColorChooserButton("Light Squares", boardManager.getLightSquareColor());
+    darkColorChooser = new ColorChooserButton("Dark Squares", boardManager.getDarkSquareColor());
 
     lightColorChooser.setMnemonic('L');
     darkColorChooser.setMnemonic('D');
 
 
-    moveHighlightingColorChooser = new ColorChooserButton("Move Highlighting", getColorProperty("move-highlighting-color", boardManager.getMoveHighlightingColor()));
-    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag Square Highlighting", getColorProperty("drag-square-highlighting-color", boardManager.getDragSquareHighlightingColor()));
+    moveHighlightingColorChooser = new ColorChooserButton("Move Highlighting",
+      boardManager.getMoveHighlightingColor());
+    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag Square Highlighting",
+      boardManager.getDragSquareHighlightingColor());
 
     moveHighlightingColorChooser.setMnemonic('M');
     dragSquareHighlightingColorChooser.setMnemonic('S');
@@ -170,23 +174,6 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     createUI();
   }
-
-
-
-
-  /**
-   * Returns the given color property. If there is no such property, returns the
-   * given default.
-   */
-
-  private Color getColorProperty(String name, Color defaultValue){
-    String value = boardManager.getProperty(name);
-    if (value == null)
-      return defaultValue;
-    else
-      return StringParser.parseColor(value);
-  }
-
 
 
 
@@ -240,33 +227,17 @@ public class BoardPreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges(){
-    maybeSetColorProperty("white-piece-color", whiteColorChooser.getColor());
-    maybeSetColorProperty("black-piece-color", blackColorChooser.getColor());
-    maybeSetColorProperty("white-outline-color", whiteOutlineChooser.getColor());
-    maybeSetColorProperty("black-outline-color", blackOutlineChooser.getColor());
+    boardManager.setWhitePieceColor(whiteColorChooser.getColor());
+    boardManager.setBlackPieceColor(blackColorChooser.getColor());
+    boardManager.setWhiteOutlineColor(whiteOutlineChooser.getColor());
+    boardManager.setBlackOutlineColor(blackOutlineChooser.getColor());
 
-    maybeSetColorProperty("light-square-color", lightColorChooser.getColor());
-    maybeSetColorProperty("dark-square-color", darkColorChooser.getColor());
+    boardManager.setLightSquareColor(lightColorChooser.getColor());
+    boardManager.setDarkSquareColor(darkColorChooser.getColor());
 
-    maybeSetColorProperty("move-highlighting-color", moveHighlightingColorChooser.getColor());
-    maybeSetColorProperty("drag-square-highlighting-color", dragSquareHighlightingColorChooser.getColor());
-
-    boardManager.refreshFromProperties();
+    boardManager.setMoveHighlightingColor(moveHighlightingColorChooser.getColor());
+    boardManager.setDragSquareHighlightingColor(dragSquareHighlightingColorChooser.getColor());
   }
 
-
-
-
-  /**
-   * If the current value of the color property is the same as the new one, does
-   * nothing. Otherwise, sets the user property to the given color.
-   */
-
-  private void maybeSetColorProperty(String name, Color newValue){
-    if (newValue.equals(getColorProperty(name, null)))
-      return;
-
-    boardManager.setProperty(name, StringEncoder.encodeColor(newValue));
-  }
 
 }
