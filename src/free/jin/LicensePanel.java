@@ -69,6 +69,14 @@ public class LicensePanel extends DialogPanel{
   private String jregexCopyrightText = null;
 
 
+  
+  /**
+   * The text of the jgoodies copyright, loaded lazily.
+   */
+
+  private String jgoodiesCopyrightText = null;
+
+  
 
   /**
    * The text of the BeanShell license/copyright notice, loaded lazily.
@@ -194,6 +202,26 @@ public class LicensePanel extends DialogPanel{
         textDialog.setVisible(true);
       }
     };
+    
+    
+    ActionListener jgoodiesActionListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        if (jgoodiesCopyrightText == null){
+          try{
+            jgoodiesCopyrightText = IOUtilities.loadText(LicensePanel.class.getResource("legal/jgoodies.txt"));
+          } catch (IOException e){
+              e.printStackTrace();
+              return;
+            }
+        }
+
+        PlainTextDialog textDialog = new PlainTextDialog(LicensePanel.this, "The JGoodies License (BSD)", jgoodiesCopyrightText);
+        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
+        AWTUtilities.centerWindow(textDialog, getParent());
+        textDialog.setVisible(true);
+      }
+    };
+    
 
     ActionListener beanshellActionListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -359,6 +387,21 @@ public class LicensePanel extends DialogPanel{
     liquidlfPanel.add(liquidlfLicenseLabel);
     liquidlfPanel.add(new JLabel("<html>.</html>"));
     add(liquidlfPanel);
+    add(Box.createVerticalStrut(5));
+    
+    JPanel jgoodieslfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    jgoodieslfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+    LinkLabel jgoodieslfWebsiteLabel = new LinkLabel("JGoodies Looks");
+    jgoodieslfWebsiteLabel.setToolTipText("http://jgoodies.dev.java.net");
+    jgoodieslfWebsiteLabel.addActionListener(
+      new UrlDisplayingAction("http://jgoodies.dev.java.net"));
+    jgoodieslfPanel.add(jgoodieslfWebsiteLabel);
+    jgoodieslfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel jgoodieslfLicenseLabel = new LinkLabel("BSD License");
+    jgoodieslfLicenseLabel.addActionListener(jgoodiesActionListener);
+    jgoodieslfPanel.add(jgoodieslfLicenseLabel);
+    jgoodieslfPanel.add(new JLabel("<html>.</html>"));
+    add(jgoodieslfPanel);
     add(Box.createVerticalStrut(5));
     
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
