@@ -36,103 +36,22 @@ import free.util.IOUtilities;
  * by xboard/winboard.
  */
 
-public class XBoardPiecePainter extends ImagePiecePainter{
+public class XBoardPiecePainter extends ResourceImagePiecePainter{
 
 
 
 
   /**
-   * The Hashtable of piece images. Maps Integer objects specifying the size
-   * to Hashtables mapping Piece objects to Image objects.
-   */
-
-  private static final Hashtable pieceImages;
-
-
-
-
-  /**
-   * Loads the piece images.
+   * Attempt to load the image data at classload time so that if it fails,
+   * the user of the class will know immediately and also to cache the result
+   * when the class is loaded, as is usually expected.
    */
 
   static{
     try{
-      Class myClass = XBoardPiecePainter.class;
-      Toolkit toolkit = Toolkit.getDefaultToolkit();
-      MediaTracker tracker = new MediaTracker(new Canvas());
-      InputStream sizesIn = myClass.getResourceAsStream("xboard/sizes.txt");
-      StringTokenizer sizes = new StringTokenizer(IOUtilities.loadText(sizesIn));
-      pieceImages = new Hashtable(sizes.countTokens()*5/4);
-      while (sizes.hasMoreTokens()){
-        Hashtable pieces = new Hashtable(15);
-        Integer size = new Integer(sizes.nextToken());
-
-        InputStream in;
-        byte [] imageData;
-        Image image;
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wk.gif"));
-        pieces.put(ChessPiece.WHITE_KING, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/bk.gif"));
-        pieces.put(ChessPiece.BLACK_KING, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wq.gif"));
-        pieces.put(ChessPiece.WHITE_QUEEN, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/bq.gif"));
-        pieces.put(ChessPiece.BLACK_QUEEN, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wr.gif"));
-        pieces.put(ChessPiece.WHITE_ROOK, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/br.gif"));
-        pieces.put(ChessPiece.BLACK_ROOK, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wb.gif"));
-        pieces.put(ChessPiece.WHITE_BISHOP, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/bb.gif"));
-        pieces.put(ChessPiece.BLACK_BISHOP, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wn.gif"));
-        pieces.put(ChessPiece.WHITE_KNIGHT, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/bn.gif"));
-        pieces.put(ChessPiece.BLACK_KNIGHT, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/wp.gif"));
-        pieces.put(ChessPiece.WHITE_PAWN, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        imageData = IOUtilities.readToEnd(myClass.getResourceAsStream("xboard/"+size+"/bp.gif"));
-        pieces.put(ChessPiece.BLACK_PAWN, image = toolkit.createImage(imageData));
-        tracker.addImage(image, 0);
-
-        pieceImages.put(size, pieces);
-
-        try{
-          tracker.waitForAll();
-        } catch (InterruptedException e){
-            e.printStackTrace();
-          }
-      }
+      new ResourceImagePiecePainter(XBoardPiecePainter.class, "xboard", "gif");
     } catch (IOException e){
-        throw new RuntimeException("Unable to load xboard piece images");
-      }
-      catch (RuntimeException e){
-        e.printStackTrace();
-        throw e;
+        throw new RuntimeException("Unable to load the xboard piece set: "+e.getMessage());
       }
   }
 
@@ -143,8 +62,8 @@ public class XBoardPiecePainter extends ImagePiecePainter{
    * Creates a new XBoardPiecePainter.
    */
 
-  public XBoardPiecePainter(){
-    super(new Dimension(64, 64), pieceImages);
+  public XBoardPiecePainter() throws IOException{
+    super(XBoardPiecePainter.class, "xboard", "gif");
   }
 
 }
