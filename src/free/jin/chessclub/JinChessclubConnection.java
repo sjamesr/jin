@@ -51,7 +51,7 @@ import java.lang.reflect.Array;
  * TODO: document the tell types.
  */
 
-public class JinChessclubConnection extends ChessclubConnection implements JinConnection, SeekJinConnection, GameListJinConnection, ChessEventJinConnection{
+public class JinChessclubConnection extends ChessclubConnection implements JinConnection, SeekJinConnection, GameListJinConnection, ChessEventJinConnection, FriendsJinConnection{
 
 
 
@@ -400,6 +400,30 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   protected void processLine(String line){
     firePlainTextReceived(line);
+
+
+    // HACK until Bert implements a way for us to know about real arrivals/departs
+    line = line.trim();
+    if (handlingFriends){
+      if (line.startsWith("Notification: ")){
+        if (line.endsWith(" has arrived.")){
+          int firstSpaceIndex = line.indexOf(" ");
+          int secondSpaceIndex = line.indexOf(" ", firstSpaceIndex+1);
+          String playerName = line.substring(firstSpaceIndex+1, secondSpaceIndex);
+          if ((playerName.length() > 0) && (playerName.length() <= 15))
+            fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, playerName));
+        }
+        else if (line.endsWith(" has departed.")){
+          int firstSpaceIndex = line.indexOf(" ");
+          int secondSpaceIndex = line.indexOf(" ", firstSpaceIndex+1);
+          String playerName = line.substring(firstSpaceIndex+1, secondSpaceIndex);
+          if ((playerName.length() > 0) && (playerName.length() <= 15))
+            fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
+        }
+      }
+    }
+    // END HACK 
+
   }
 
 
@@ -2620,7 +2644,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   protected void fireChessEventEvent(ChessEventEvent evt){
     Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
+    for (int i = 0; i < listenerList.length; i += 2){
       if (listenerList[i]==ChessEventListener.class){
         ChessEventListener listener = (ChessEventListener)listenerList[i+1];
         switch (evt.getID()){
@@ -2636,6 +2660,254 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   }
 
 
+
+
+
+  /**
+   * The complete list of friends.
+   */
+
+  private final Vector friends = new Vector();
+
+
+
+
+  /**
+   * The list of online friends.
+   */
+
+  private final Vector onlineFriends = new Vector();
+
+
+
+
+  /**
+   * True when we're handling friend related datagrams, false when we're not.
+   */
+
+  private boolean handlingFriends = false;
+
+
+
+
+
+  /**
+   * Adds the given FriendsListener to the list of listeners receiving
+   * notifications about friends.
+   */
+
+  public void addFriendsListener(FriendsListener listener){
+    listenerList.add(FriendsListener.class, listener);
+
+    if (!handlingFriends){
+//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
+//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
+//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
+
+      handlingFriends = true;
+    }
+  }
+
+
+
+  /**
+   * Removes the given FriendsListener from the list of listeners receiving
+   * notifications about friends.
+   */
+
+  public void removeFriendsListener(FriendsListener listener){
+    listenerList.remove(FriendsListener.class, listener);
+
+    if (listenerList.getListenerCount(FriendsListener.class)==0){
+//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
+//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
+//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
+
+      handlingFriends = false;
+      friends.removeAllElements();
+      onlineFriends.removeAllElements();
+    }
+  }
+
+
+
+
+  /**
+   * Gets called when a player on our notify list arrives. 
+   */
+
+  protected void processNotifyArrived(free.chessclub.Player player){
+    if (!handlingFriends)
+      return;
+
+    String playerName = player.getUsername();
+    if (onlineFriends.contains(playerName))
+      return;
+
+    onlineFriends.addElement(playerName);
+    fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ONLINE, playerName));
+  }
+
+
+
+
+  /**
+   * Gets called when a player on our notify list departs.
+   */
+
+  protected void processNotifyLeft(String playerName){
+    if (!handlingFriends)
+      return;
+
+    if (!onlineFriends.contains(playerName))
+      return; // We're not going to handle these.
+
+    onlineFriends.removeElement(playerName);
+
+    // As a temporary hack, we do this from processLine(String line)
+//    fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, playerName));
+  }
+
+
+
+
+  /**
+   * Gets called when a player is added or removed from the notify list.
+   */
+
+  protected void processMyNotifyList(String playerName, boolean added){
+    if (!handlingFriends)
+      return;
+
+    if (added){
+      if (friends.contains(playerName))
+        return;
+
+      friends.addElement(playerName);
+      fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, playerName));
+
+      setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
+    }
+    else{
+      if (!friends.contains(playerName))
+        return;
+
+      friends.removeElement(playerName);
+      fireFriendsEvent(new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, playerName));
+    }
+  }
+
+
+
+
+
+  /**
+   * Adds the given person to the list of friends.
+   */
+
+  public void addFriend(String playerName){
+    sendCommand("+notify "+playerName);
+  }
+
+
+
+
+  /**
+   * Removed the given person from the list of friends.
+   */
+
+  public void removeFriend(String playerName){
+    sendCommand("-notify "+playerName);
+  }
+
+
+
+
+  /**
+   * Returns the current list of friends.
+   */
+
+  public String [] getFriends(){
+    String [] arr = new String[friends.size()];
+    friends.copyInto(arr);
+    return arr;
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the given person is a "friend",
+   * <code>false</code> otherwise.
+   */
+
+  public boolean isFriend(String playerName){
+    return friends.contains(playerName);
+  }
+
+
+
+
+  /**
+   * Returns the currently online friends.
+   */
+
+  public String [] getOnlineFriends(){
+    String [] arr = new String[onlineFriends.size()];
+    onlineFriends.copyInto(arr);
+    return arr;
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the given person is a friend who is online,
+   * returns <code>false</code> otherwise.
+   */
+
+  public boolean isFriendOnline(String friendName){
+    return onlineFriends.contains(friendName);
+  }
+
+
+
+
+
+  /**
+   * Dispatches the given FriendsEvent to all interested listeners.
+   */
+
+  protected void fireFriendsEvent(FriendsEvent evt){
+    Object [] listenerList = this.listenerList.getListenerList();
+    for (int i = 0; i < listenerList.length; i += 2){
+      if (listenerList[i] == FriendsListener.class){
+        FriendsListener listener = (FriendsListener)listenerList[i+1];
+        switch (evt.getID()){
+          case FriendsEvent.FRIEND_CONNECTED:
+            listener.friendConnected(evt);
+            break;
+          case FriendsEvent.FRIEND_DISCONNECTED:
+            listener.friendDisconnected(evt);
+            break;
+          case FriendsEvent.FRIEND_ADDED:
+            listener.friendAdded(evt);
+            break;
+          case FriendsEvent.FRIEND_REMOVED:
+            listener.friendRemoved(evt);
+            break;
+          case FriendsEvent.FRIEND_ONLINE:
+            listener.friendOnline(evt);
+            break;
+        }
+      }
+    }
+  }
+
+  
+  
+  
+  
   /**
    * Overrides ChessclubConnection.execRunnable(Runnable) to execute the
    * runnable on the AWT thread using SwingUtilities.invokeLater(Runnable), 
