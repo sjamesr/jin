@@ -97,7 +97,7 @@ public class Game extends Struct{
    * @param blackRating The rating of the player with the black pieces, or -1 if
    * no rating (guest for example).
    * @param isRated Is the game rated?
-   * @param gameID A string identifying the game for the user.
+   * @param gameID A string identifying the game.
    * @param ratingCategoryString A string identifying the rating category of the game 
    * ("Blitz" for example)
    * @param isPlayed Is this a real game? <code>false</code> if an examined game.
@@ -110,7 +110,7 @@ public class Game extends Struct{
    */
 
   public Game(int gameType, Position initialPosition, String whiteName, String blackName, int whiteTime,
-          int whiteInc, int blackTime, int blackInc, int whiteRating, int blackRating, String gameID, 
+          int whiteInc, int blackTime, int blackInc, int whiteRating, int blackRating, Object gameID, 
           String ratingCategoryString, boolean isRated, boolean isPlayed, String whiteTitles, 
           String blackTitles, boolean initiallyFlipped, Player userPlayer){
 
@@ -135,7 +135,7 @@ public class Game extends Struct{
     setIntegerProperty("WhiteRating", whiteRating);
     setIntegerProperty("BlackRating", blackRating);
     setBooleanProperty("IsRated", isRated);
-    setStringProperty("GameID", gameID);
+    setProperty("GameID", gameID);
     setStringProperty("RatingCategoryString", ratingCategoryString);
     setBooleanProperty("IsPlayed", isPlayed);
     setStringProperty("WhiteTitles", whiteTitles);
@@ -165,7 +165,7 @@ public class Game extends Struct{
    * @param blackRating The rating of the player with the black pieces, or -1 if
    * no rating (guest for example).
    * @param isRated Is the game rated?
-   * @param gameID A string identifying the game for the user.
+   * @param gameID A string identifying the game.
    * @param ratingCategoryString A string identifying the rating category of the game 
    * ("Blitz" for example)
    * @param gameType The type of the game - possible values are {@link #MY_GAME},
@@ -180,7 +180,7 @@ public class Game extends Struct{
    */
 
   public Game(int gameType, Position initialPosition, String whiteName, String blackName, int time,
-          int inc, int whiteRating, int blackRating, String gameID, String ratingCategoryString,
+          int inc, int whiteRating, int blackRating, Object gameID, String ratingCategoryString,
           boolean isRated, boolean isPlayed, String whiteTitles, String blackTitles,
           boolean initiallyFlipped, Player userPlayer){
 
@@ -351,13 +351,12 @@ public class Game extends Struct{
 
 
   /**
-   * Returns a string identifying the game. This could be displayed to the user,
-   * but shouldn't be used as an actual identifier (to map id's to Games for example,
-   * or compare if to games are equal according to their id's).
+   * Returns an object identifying the game. This object, when converted to a
+   * String (via the toString() method) could be displayed to the user.
    */
 
-  public String getID(){
-    return getStringProperty("GameID");
+  public Object getID(){
+    return getProperty("GameID");
   }
 
 
