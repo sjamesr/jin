@@ -122,11 +122,11 @@ public class LicensePanel extends DialogPanel{
 
 
   /**
-   * Displays the panel using the specified <code>UIProvider</code>.
+   * Displays the panel.
    */
 
-  public void display(UIProvider uiProvider){
-    super.askResult(uiProvider);
+  public void display(){
+    super.askResult();
   }
 
 
