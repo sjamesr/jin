@@ -32,7 +32,7 @@ import free.chess.ChessPiece;
  * based piece sets.
  */
 
-public abstract class VectorPiecePainter implements ColoredPiecePainter{
+public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
 
 
 
@@ -87,41 +87,32 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
 
 
   /**
-   * Creates a new VectorPiecePainter. White pieces will be drawn with white
-   * black pieces with black.
+   * Creates a new <code>VectorPiecePainter</code>.
    */
-
+   
   public VectorPiecePainter(){
-    this(Color.white,Color.black);
+    super(Color.white, Color.black);
   }
 
 
 
-
   /**
-   * Creates a new VectorPiecePainter which will draw white and black pieces
-   * using the given colors. The outline of the pieces will have an RGB value
-   * reverse to the RGB values of the given colors (if the color for the white
-   * pieces is for example R=255 G=128 B=0 then the outline of the white
-   * pieces will be R=0 G=127 B=255).
+   * Creates a new <code>VectorPiecePainter</code> which will draw white and
+   * black pieces using the given colors.
    *
    * @param whiteColor The color for the white pieces.
    * @param blackColor The color for the black pieces.
    */
 
   public VectorPiecePainter(Color whiteColor, Color blackColor){
-    this(whiteColor, blackColor, getReversed(whiteColor), getReversed(blackColor));
+    super(whiteColor, blackColor);
   }
 
 
 
-
-
-
   /**
-   * Creates a new VectorPiecePainter which will produce
-   * white and black pieces with the given colors and the given
-   * outline colors.
+   * Creates a new <code>VectorPiecePainter</code> which will produce white and
+   * black pieces with the given colors and the given outline colors.
    *
    * @param whiteColor The color for the white pieces.
    * @param blackColor The color for the black pieces.
@@ -131,10 +122,7 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
 
   public VectorPiecePainter(Color whiteColor, Color blackColor,
                             Color whiteOutline, Color blackOutline){
-    this.whiteColor = whiteColor;
-    this.blackColor = blackColor;
-    this.whiteOutline = whiteOutline;
-    this.blackOutline = blackOutline;
+    super(whiteColor, blackColor, whiteOutline, blackOutline);
   }
 
 
@@ -200,117 +188,6 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
 
 
 
-  /**
-   * Returns the color with the opposite RGB values from the given color.
-   *
-   * @param color The color to reverse.
-   */
-
-  private static Color getReversed(Color color){
-    return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
-  }
-
-
-
-
-  /**
-   * Retrieves the color with which white pieces are drawn.
-   *
-   * @return The color for the white pieces.
-   */
-
-  public Color getWhiteColor(){
-    return whiteColor;
-  }
-
-
-
-
-  /**
-   * Sets the color with which white pieces are drawn.
-   */
-
-  public void setWhiteColor(Color color){
-    whiteColor = color;
-  }
-
-
-
-
-
-  /**
-   * Retrieves the color with which black pieces are drawn.
-   *
-   * @return The color for the black pieces.
-   */
-
-  public Color getBlackColor(){
-    return blackColor;
-  }
-
-
-
-
-  /**
-   * Sets the color with which black pieces are drawn.
-   */
-
-  public void setBlackColor(Color color){
-    blackColor = color;
-  }
-
-
-
-
-  /**
-   * Retrieves the color with which the outline of white pieces is drawn.
-   *
-   * @return The color for the outline of white pieces.
-   */
-
-  public Color getWhiteOutline(){
-    return whiteOutline;
-  }
-
-
-
-
-  /**
-   * Sets the color with which the outline of white pieces is drawn.
-   */
-
-  public void setWhiteOutline(Color color){
-    whiteOutline = color;
-  }
-
-
-
-
-
-  /**
-   * Retrieves the color with which the outline of black pieces is drawn.
-   *
-   * @return The color for the outline of black pieces.
-   */
-
-  public Color getBlackOutline(){
-    return blackOutline;
-  }
-
-
-
-
-
-  /**
-   * Sets the color with which the outline of black pieces is drawn.
-   */
-
-  public void setBlackOutline(Color color){
-    blackOutline = color;
-  }
-
-
-
 
   /**
    * Clears the caching of piece polygons.
@@ -336,15 +213,10 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
    */
 
   public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
-      boolean shaded){
+      boolean isShaded){
 
-    Color pieceColor = (piece.isWhite() ? getWhiteColor() : getBlackColor());
-    Color outlineColor = (piece.isWhite() ? getWhiteOutline() : getBlackOutline());
-
-    if (shaded){
-      pieceColor = shade(pieceColor);
-      outlineColor = shade(outlineColor);
-    }
+    Color pieceColor = getPieceColor(piece, isShaded);
+    Color outlineColor = getOutlineColor(piece, isShaded);
 
     int x = rect.x;
     int y = rect.y;
@@ -372,21 +244,6 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
       drawPawnImage(g, width, height, pieceColor, outlineColor);
 
     g.translate(-x, -y);
-  }
-
-
-
-
-  /**
-   * Returns a shaded version of the specified Color.
-   */
-
-  private Color shade(Color color){
-    int r = (color.getRed() + 128*2)/3;
-    int g = (color.getGreen() + 128*2)/3;
-    int b = (color.getBlue() + 128*2)/3;
-
-    return new Color(r, g, b);
   }
 
 
