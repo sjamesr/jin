@@ -66,10 +66,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * requested username and password.
    */
 
-  public JinFreechessConnection(JinContext context, String username, String password){
+  public JinFreechessConnection(String username, String password){
     super(username, password);
 
-    setInterface(context.getAppName() + " " + context.getAppVersion() +
+    setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
       ", " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
 

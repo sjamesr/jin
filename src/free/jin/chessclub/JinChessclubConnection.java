@@ -68,10 +68,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
    * Creates a new JinChessclubConnection with the specified details.
    */
 
-  public JinChessclubConnection(JinContext context, String username, String password){
+  public JinChessclubConnection(String username, String password){
     super(username, password, System.out);
 
-    setInterface(context.getAppName() + " " + context.getAppVersion() +
+    setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
       ", " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
   }
