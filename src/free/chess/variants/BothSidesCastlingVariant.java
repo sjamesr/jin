@@ -213,7 +213,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
         return WHITE_SHORT_CASTLING;
       else if (pos.getPieceAt(Square.parseSquare("d1")) == ChessPiece.WHITE_KING)
         return new ChessMove(Square.parseSquare("d1"), Square.parseSquare("b1"), Player.WHITE_PLAYER,
-                             false, true, false, null, null, "O-O");
+                             false, true, false, null, -1, null, "O-O");
       else throw new IllegalArgumentException("Castling is not allowed in the specified position");
     }
     else{
@@ -221,7 +221,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
         return BLACK_SHORT_CASTLING;
       else if (pos.getPieceAt(Square.parseSquare("d8")) == ChessPiece.BLACK_KING)
         return new ChessMove(Square.parseSquare("d8"), Square.parseSquare("b8"), Player.BLACK_PLAYER,
-                             false, true, false, null, null, "O-O");
+                             false, true, false, null, -1, null, "O-O");
       else throw new IllegalArgumentException("Castling is not allowed in the specified position");
     }
   }
@@ -243,7 +243,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
         return WHITE_LONG_CASTLING;
       else if (pos.getPieceAt(Square.parseSquare("d1")) == ChessPiece.WHITE_KING)
         return new ChessMove(Square.parseSquare("d1"), Square.parseSquare("f1"), Player.WHITE_PLAYER,
-                             false, false, true, null, null, "O-O-O");
+                             false, false, true, null, -1, null, "O-O-O");
       else throw new IllegalArgumentException("Castling is not allowed in the specified position");
     }
     else{
@@ -251,7 +251,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
         return BLACK_LONG_CASTLING;
       else if (pos.getPieceAt(Square.parseSquare("d8")) == ChessPiece.BLACK_KING)
         return new ChessMove(Square.parseSquare("d8"), Square.parseSquare("f8"), Player.BLACK_PLAYER,
-                             false, false, true, null, null, "O-O-O");
+                             false, false, true, null, -1, null, "O-O-O");
       else throw new IllegalArgumentException("Castling is not allowed in the specified position");
     }
   }

@@ -263,7 +263,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
         throw new IllegalArgumentException("Castling is not allowed in the specified position");
 
       return new ChessMove(startSquare, Square.parseSquare("g1"), Player.WHITE_PLAYER,
-                             false, true, false, null, null, "O-O");
+                             false, true, false, null, -1, null, "O-O");
     }
     else{
       Square startSquare = findPieceOnRow(pos, ChessPiece.BLACK_KING, 7);
@@ -271,7 +271,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
         throw new IllegalArgumentException("Castling is not allowed in the specified position");
 
       return new ChessMove(startSquare, Square.parseSquare("g8"), Player.BLACK_PLAYER,
-                             false, true, false, null, null, "O-O");
+                             false, true, false, null, -1, null, "O-O");
     }
   }
 
@@ -293,7 +293,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
         throw new IllegalArgumentException("Castling is not allowed in the specified position");
 
       return new ChessMove(startSquare, Square.parseSquare("c1"), Player.WHITE_PLAYER,
-                             false, false, true, null, null, "O-O");
+                             false, false, true, null, -1, null, "O-O");
     }
     else{
       Square startSquare = findPieceOnRow(pos, ChessPiece.BLACK_KING, 7);
@@ -301,7 +301,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
         throw new IllegalArgumentException("Castling is not allowed in the specified position");
 
       return new ChessMove(startSquare, Square.parseSquare("c8"), Player.BLACK_PLAYER,
-                             false, false, true, null, null, "O-O");
+                             false, false, true, null, -1, null, "O-O");
     }
   }
 
