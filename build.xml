@@ -393,120 +393,13 @@
     
 		<!-- Resources -->
 		<mkdir dir="${resources.dir}" />
+		
+		<!-- Copy over piece sets and board patterns -->
+		<copy todir="${resources.dir}">
+			<fileset dir="${res.dir}" includes="pieces/**/*.jar pieces/**/*.zip" />
+			<fileset dir="${res.dir}" includes="boards/**/.jar boards/**/*.zip" />
+		</copy>
 
-		
-		<!-- Piece sets -->
-		<mkdir dir="${resources.dir}/pieces" />
-		<mkdir dir="${resources.dir}/pieces/icc" />
-		<mkdir dir="${resources.dir}/pieces/fics" />
-		
-		
-		<!-- Eboard Vector - this one is special because it's the default set --> 
-		<jar jarfile="${resources.dir}/pieces/fics/eboard.jar" compress="false">
-			<fileset dir="${res.dir}/pieces/fics/eboard" />
-		</jar>
-		<antcall target="extractResource">
-			<param name="resource.file" value="${resources.dir}/pieces/fics/eboard.jar" />
-			<param name="resource.name" value="eboard" />
-		</antcall>
-    
-		<!-- Blitzin Vector -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.dir" value="icc" />
-			<param name="piece-set.id" value="blitzin" />
-		</antcall>
-
-		<!-- Xboard -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.id" value="xboard" />
-		</antcall>
-
-		<!-- Bookup -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.dir" value="icc" />
-			<param name="piece-set.id" value="bookup" />
-		</antcall>
-
-		<!-- Dyche Gray -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.dir" value="icc" />
-			<param name="piece-set.id" value="dyche1" />
-		</antcall>
-
-		<!-- Dyche Color -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.dir" value="icc" />
-			<param name="piece-set.id" value="dyche2" />
-		</antcall>
-		
-		<!-- Dyche Standard -->
-		<antcall target="buildImagePieceSet">
-			<param name="piece-set.dir" value="icc" />
-			<param name="piece-set.id" value="dyche3" />
-		</antcall>
-		
-		
-		<!-- Board patterns -->
-		<mkdir dir="${resources.dir}/boards" />
-		<mkdir dir="${resources.dir}/boards/icc" />
-		<mkdir dir="${resources.dir}/boards/fics" />
-
-		<!-- Plain Color -->		
-		<zip destfile="${resources.dir}/boards/plain.zip" compress="false">
-			<fileset dir="${res.dir}/boards/plain" />
-		</zip>
-		<antcall target="extractResource">
-			<param name="resource.file" value="${resources.dir}/boards/plain.zip" />
-			<param name="resource.name" value="plain" />
-		</antcall>
-    
-		
-		<!-- Dark Wood -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="wooden-dark" />
-		</antcall>
-		
-		<!-- Light Wood -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.dir" value="icc" />
-			<param name="board-pattern.id" value="wooden-light" />
-		</antcall>
-		
-		<!-- Slate -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="slate" />
-		</antcall>
-		
-		<!-- Cold Marble -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="cold-marble" />
-		</antcall>
-		
-		<!-- Gray Tiles -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="gray-tiles" />
-		</antcall>
-
-		<!-- Green Marble -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="green-marble" />
-		</antcall>
-
-		<!-- Pale Wood -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="pale-wood" />
-		</antcall>
-		
-		<!-- Winter -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="winter" />
-		</antcall>
-		
-		<!-- Red Marble -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern.id" value="red-marble" />
-		</antcall>
-		
 	</target>
   
   
@@ -540,48 +433,6 @@
 	</target>
   
 	
-	<!-- Builds a single piece set
-	     Parameters: piece-set.dir (optional, for server specific piece sets), piece-set.id
-	-->
-	<target name="buildImagePieceSet">
-		<property name="piece-set.dir" value="" />
-		<property name="resource.file" value="${resources.dir}/pieces/${piece-set.dir}/${piece-set.id}.zip" />
-		<zip destfile="${resource.file}" compress="false">
-			<fileset dir="${res.dir}/pieces/${piece-set.dir}/${piece-set.id}" />
-		</zip>
-		<antcall target="extractResource">
-			<param name="resource.file" value="${resource.file}" />
-			<param name="resource.name" value="${piece-set.id}" />
-		</antcall>
-	</target>
-	
-	
-	<!-- Builds a single board pattern
-	     Parameters: board-pattern.dir (optional, for server specific boards), board-pattern.dir
-	-->
-	<target name="buildBoardPattern">
-		<property name="board-pattern.dir" value="" />
-		<property name="resource.file" value="${resources.dir}/boards/${board-pattern.dir}/${board-pattern.id}.zip" />
-		<zip destfile="${resource.file}" compress="false">
-			<fileset dir="${res.dir}/boards/${board-pattern.dir}/${board-pattern.id}" />
-		</zip>
-		<antcall target="extractResource">
-			<param name="resource.file" value="${resource.file}" />
-			<param name="resource.name" value="${board-pattern.id}" />
-		</antcall>
-	</target>
-  
-  
-	<!-- If the buildingApplet property is set, extracts the file specified by
-	     the resource.file property into a directory specified by the resource.name
-	     property and then deletes the file
-	-->
-	<target name="extractResource" if="buildingApplet">
-		<dirname file="${resource.file}" property="base-dir" />
-		<unzip src="${resource.file}" dest="${base-dir}/${resource.name}" />
-		<delete file="${resource.file}" />
-	</target>
-  
 	
 	<!-- If the property buildingForUnix is set, does things required for Unix -->
 	<target name="doUnixStuff" if="buildingForUnix">
