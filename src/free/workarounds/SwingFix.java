@@ -40,18 +40,43 @@ public class SwingFix{
    * on Sun keyboards which are missing from the Motif Look and Feel.
    * <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4106281.html">
    * http://developer.java.sun.com/developer/bugParade/bugs/4106281.html</A>
+   * Note: also adds Command-C, Command-V and Command-X keybindings for MacOS
+   * users.
    */
 
   static{
-    Keymap defaultKeyMap = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
-    JTextComponent.KeyBinding CUT = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(0xFFD1, 0), DefaultEditorKit.cutAction);
-    JTextComponent.KeyBinding COPY = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(0xFFCD, 0), DefaultEditorKit.copyAction);
-    JTextComponent.KeyBinding PASTE = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(0xFFCF, 0), DefaultEditorKit.pasteAction);
-    JTextComponent.KeyBinding ctrl_x = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK), DefaultEditorKit.cutAction);
-    JTextComponent.KeyBinding ctrl_c = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), DefaultEditorKit.copyAction);
-    JTextComponent.KeyBinding ctrl_v = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK), DefaultEditorKit.pasteAction);
+    String cutAction = DefaultEditorKit.cutAction;
+    String copyAction = DefaultEditorKit.copyAction;
+    String pasteAction = DefaultEditorKit.pasteAction;
+    int ctrlMask = InputEvent.CTRL_MASK;
+    int metaMask = InputEvent.META_MASK;
 
-    JTextComponent.KeyBinding[] extraBindings = new JTextComponent.KeyBinding[]{CUT, COPY, PASTE, ctrl_x, ctrl_c, ctrl_v};
+    JTextComponent.KeyBinding CUT =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, 0), cutAction);
+    JTextComponent.KeyBinding COPY =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), copyAction);
+    JTextComponent.KeyBinding PASTE =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0), pasteAction);
+    JTextComponent.KeyBinding ctrl_x =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, ctrlMask), cutAction);
+    JTextComponent.KeyBinding ctrl_c =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, ctrlMask), copyAction);
+    JTextComponent.KeyBinding ctrl_v = 
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, ctrlMask), pasteAction);
+    JTextComponent.KeyBinding cmd_x =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, metaMask), cutAction);
+    JTextComponent.KeyBinding cmd_c =
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, metaMask), copyAction);
+    JTextComponent.KeyBinding cmd_v = 
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, metaMask), pasteAction);
+
+    JTextComponent.KeyBinding[] extraBindings =
+      new JTextComponent.KeyBinding[]{CUT, COPY, PASTE, 
+                                     ctrl_x, ctrl_c, ctrl_v,
+                                     cmd_x, cmd_c, cmd_v};
+
+    Keymap defaultKeyMap = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
+
     JTextComponent tempC = new JTextField();
     JTextComponent.loadKeymap(defaultKeyMap, extraBindings, tempC.getActions());
   }
@@ -75,8 +100,9 @@ public class SwingFix{
   /**
    * Fix the color of the scrollbar track to something different than the
    * default panel color - otherwise it's invisible sometimes.
-   * This changes the color on both Motif and Windows, breaking Motif, but
-   * fixing Windows, so will change it only if we're on windows.
+   * This changes the color on both Motif and Windows L&Fs, breaking the Motif
+   * L&F, but fixing the Windows L&F, so will change it only if we're on windows
+   * (the OS, not the L&F).
    */
 
   static{
