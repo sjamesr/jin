@@ -21,11 +21,9 @@
 
 package free.util;
 
+import java.io.*;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 
 /**
@@ -71,16 +69,29 @@ public class Bounce{
         return;
       }
 
+    boolean shouldLog = args.length > 3 ? Boolean.valueOf(args[3]).booleanValue() : false;
+    int numConnections = 0;
+
     try{
       ServerSocket ssock = new ServerSocket(localPort);
       while (true){
         Socket incomingSock = ssock.accept();
         Socket outgoingSock = new Socket(hostname, remotePort);
+        numConnections++;
 
         InputStream incomingIn = incomingSock.getInputStream();
-        OutputStream incomingOut = incomingSock.getOutputStream();
         InputStream outgoingIn = outgoingSock.getInputStream();
+        OutputStream incomingOut = incomingSock.getOutputStream();
         OutputStream outgoingOut = outgoingSock.getOutputStream();
+
+        if (shouldLog){
+          String incomingLogName = "in-log-"+incomingSock.getInetAddress().getHostName()+ "("+localPort+")-" + numConnections + ".dat";
+          String outgoingLogName = "out-log-" + hostname + "("+remotePort + ")-" + numConnections+".dat";
+          OutputStream incomingLog = new FileOutputStream(incomingLogName);
+          incomingOut = new MultiOutputStream(incomingOut, incomingLog);
+          OutputStream outgoingLog = new FileOutputStream(outgoingLogName);
+          outgoingOut = new MultiOutputStream(outgoingOut, outgoingLog);
+        }
 
         PumpThread t1 = new PumpThread(incomingIn, outgoingOut);
         PumpThread t2 = new PumpThread(outgoingIn, incomingOut);
@@ -103,7 +114,7 @@ public class Bounce{
     System.err.println("Bounce Utility");
     System.err.println("Copyright (C) 2002 Alexander Maryanovsky");
     System.err.println();
-    System.err.println("Usage: java free.util.Bounce localPort hostname remotePort");
+    System.err.println("Usage: java free.util.Bounce localPort hostname remotePort [shouldLog]");
     System.out.println();
     System.out.println("Version 1.01 - 31 Nov. 2002");
   }
