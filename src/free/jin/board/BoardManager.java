@@ -747,6 +747,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     contentPane.invalidate();
     contentPane.validate();
 
+    if (boardFrame.isIcon()){
+      try{
+        boardFrame.setIcon(false);
+      } catch (PropertyVetoException e){}
+    }
+
     return boardFrame;
   }
 
