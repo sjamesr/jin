@@ -1173,11 +1173,14 @@ public class JBoard extends JComponent{
         piecePainter.paintPiece(piece, g, this, rect, false);
       }
       else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE){
+        int targetHighlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
+        int originHighlightSize = Math.min(2*targetHighlightSize/3, targetHighlightSize - 1);
+        
         Square square = locationToSquare(rect.x, rect.y);
-        if (square != null){ // May be null if mouse is dragged out of the board
-          int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
-          drawSquare(g, square, highlightSize, getDragSquareHighlightingColor());
-        }
+        if (square != null) // May be null if mouse is dragged out of the board
+          drawSquare(g, square, targetHighlightSize, getDragSquareHighlightingColor());
+        
+        drawSquare(g, movedPieceSquare, originHighlightSize, getDragSquareHighlightingColor());
       }
     }
   }
