@@ -493,7 +493,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     public void mouseExited(MouseEvent e){go();}
     public void mousePressed(MouseEvent e){go();}
     public void mouseReleased(MouseEvent e){go();}
-  };
+  }
 
 
 
