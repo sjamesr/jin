@@ -37,6 +37,15 @@ import java.awt.Frame;
  */
 
 public abstract class TopLevelContainer{
+  
+  
+  
+  /**
+   * Sets the title of the top level container. This may be ignored by the
+   * implementation if it has no notion of a title.
+   */
+   
+  public abstract void setTitle(String title);
 
 
 
@@ -73,7 +82,8 @@ public abstract class TopLevelContainer{
 
 
   /**
-   * Returns the topmost component, a frame.
+   * Returns the topmost component, a frame. This should only be used as the
+   * parent of dialogs and other windows.
    */
 
   public abstract Frame getTopMostFrame();
@@ -82,18 +92,70 @@ public abstract class TopLevelContainer{
 
   /**
    * Returns a <code>TopLevelContainer</code> for the specified
-   * <code>JFrame</code>.
+   * <code>JFrame</code> with the specified title. The title will be used as a
+   * constant prefix for the real title (as set via the <code>setTitle</code>
+   * method).
    */
 
-  public static TopLevelContainer getFor(final JFrame frame){
-    return new TopLevelContainer(){
-      public void setMenuBar(JMenuBar menubar){frame.setJMenuBar(menubar);}
-      public JMenuBar getMenuBar(){return frame.getJMenuBar();}
-      public void setContentPane(Container container){frame.setContentPane(container);}
-      public Container getContentPane(){return frame.getContentPane();}
-      public Frame getTopMostFrame(){return frame;}
-    };
+  public static TopLevelContainer getFor(final JFrame frame, String titlePrefix){
+    return new JFrameTopLevelContainer(frame, titlePrefix);
   }
+  
+  
+  
+  
+  /**
+   * A TopLevelContainer implementation for a JFrame.
+   */
+   
+  private static class JFrameTopLevelContainer extends TopLevelContainer{
+    
+    
+    /**
+     * The frame.
+     */
+     
+    private final JFrame frame;
+    
+    
+    /**
+     * The title prefix. We use this to set the title to
+     * <code>[original title] - [requested title]</code> when
+     * <code>setTitle</code> is called. 
+     */
+     
+    private final String titlePrefix;
+    
+    
+    /**
+     * Creates a new <code>FrameTopLevelContainer</code> for the specified
+     * <code>JFrame</code> and title.
+     */
+     
+    public JFrameTopLevelContainer(JFrame frame, String titlePrefix){
+      this.frame = frame;
+      this.titlePrefix = titlePrefix;
+    }
+    
+    
+    
+    // Implementation
+
+    public void setTitle(String title){
+      if ((title == null) || "".equals(title))
+        frame.setTitle(titlePrefix);
+      else
+        frame.setTitle(titlePrefix + " - " + title);
+    }    
+    public void setMenuBar(JMenuBar menubar){frame.setJMenuBar(menubar);}
+    public JMenuBar getMenuBar(){return frame.getJMenuBar();}
+    public void setContentPane(Container container){frame.setContentPane(container);}
+    public Container getContentPane(){return frame.getContentPane();}
+    public Frame getTopMostFrame(){return frame;}
+
+    
+  }
+   
 
 
 }
