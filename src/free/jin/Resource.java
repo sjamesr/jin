@@ -38,10 +38,11 @@ public interface Resource{
   /**
    * This method is called once immediately after the class is instantiated to
    * let the resource load itself from the specified URL and for the specified
-   * plugin.
+   * plugin. Returns whether the resource was loaded successfully and is ready
+   * to be used.
    */
    
-  void load(URL url, Plugin plugin) throws IOException;
+  boolean load(URL url, Plugin plugin) throws IOException;
   
   
   
