@@ -112,7 +112,7 @@ public class ReaderThread extends Thread{
   public void run(){
     StringBuffer buf = new StringBuffer();
     StringBuffer dgBuf = new StringBuffer();
-    Vector data = new Vector(); // Lines and datagrams.
+    Vector data = new Vector(100); // Lines and datagrams.
     try{
       outerLoop: while (handler.isConnected()){
         buf.setLength(0);
@@ -193,7 +193,7 @@ public class ReaderThread extends Thread{
   private void maybeFireData(Vector data, InputStream in) throws IOException{
                             // <= 1 and not == 0 because of a bug in MS VM which 
                             // returns 1 and then blocks the next read() call.
-    if ((data.size() > 50) || ((in.available() <= 1) && !data.isEmpty())){
+    if ((data.size() > 100) || ((in.available() <= 1) && !data.isEmpty())){
       fireData(data);
       data.removeAllElements();
     }
