@@ -190,7 +190,6 @@ public class ConsoleTextPane extends JTextPane{
           setRenderingHint.invoke(g, args);
         }
       } catch (Exception e){
-          e.printStackTrace();
           System.err.println("Failed to set rendering hints. Probably not running under a Java2D capable JVM.");
           renderingHintsSupported = false;
         }
