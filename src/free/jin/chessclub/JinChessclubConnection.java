@@ -1837,11 +1837,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void acceptSeek(Seek seek){
-    if (!seeks.containsKey(seek.getID()))
-      throw new IllegalArgumentException("The id of the specified seek is not on the seek list");
-
-    if (seeks.get(seek.getID()) != seek)
-      throw new IllegalArgumentException("The seek mapped to the id of the specified seek does not match the specified seek");
+    if (!seeks.contains(seek))
+      throw new IllegalArgumentException("The specified seek is not on the seek list");
 
     sendCommand("play "+seek.getID());
   }
