@@ -34,7 +34,6 @@ import java.util.Enumeration;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
-import java.util.Hashtable;
 import free.util.zip.ZipClassLoader;
 import free.util.zip.ZipURLStreamHandler;
 import free.jin.plugin.PluginInfo;

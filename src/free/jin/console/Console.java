@@ -29,8 +29,6 @@ import jregex.*;
 import javax.swing.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import free.jin.Connection;
 import free.jin.Preferences;
 import free.util.BrowserControl;
