@@ -40,16 +40,7 @@ public class Utilities{
    */
 
   public static boolean areEqual(Object obj1, Object obj2){
-    if (obj1 == null){
-      if (obj2 == null)
-        return true;
-      else
-        return false;
-    }
-    else if (obj2 == null)
-      return false;
-
-    return obj1.equals(obj2);
+    return obj1 == null ? obj2 == null : obj1.equals(obj2);
   }
 
 
@@ -64,10 +55,7 @@ public class Utilities{
    */
 
   public static Object put(Hashtable table, Object key, Object value){
-    if (value == null)
-      return table.remove(key);
-    else
-      return table.put(key, value);
+    return value == null ? table.remove(key) : table.put(key, value);
   }
 
 
