@@ -31,6 +31,7 @@ import free.jin.seek.event.SeekSelectionListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.util.GraphicsUtilities;
 import free.util.StringParser;
+import free.util.ImageUtilities;
 import free.chess.WildVariant;
 import free.chess.Player;
 import free.chess.Chess;
@@ -141,6 +142,16 @@ public class SoughtGraph extends JComponent{
 
 
 
+
+  /**
+   * The background image.
+   */
+
+  private final Image bgImage;
+
+
+
+
   /**
    * Creates a new SoughtGraph with the give user Plugin.
    */
@@ -148,9 +159,22 @@ public class SoughtGraph extends JComponent{
   public SoughtGraph(Plugin plugin){
     this.plugin = plugin;
 
-    setOpaque(true);
-    setBackground(StringParser.parseColor(plugin.getProperty("background", "ffffff")));
+    setBackground(StringParser.parseColor(plugin.getProperty("background-color", "ffffff")));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
+
+    String bgImageName = plugin.getProperty("background-image");
+    Image bgImage;
+    if (bgImageName == null)
+      bgImage = null;
+    else{
+      bgImage = getToolkit().getImage(SoughtGraph.class.getResource(bgImageName));
+      try{
+        if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
+          bgImage = null;
+      } catch (InterruptedException e){}
+    }
+
+    this.bgImage = bgImage;
 
     enableEvents(MouseEvent.MOUSE_MOTION_EVENT_MASK|MouseEvent.MOUSE_EVENT_MASK);
   }
@@ -354,7 +378,20 @@ public class SoughtGraph extends JComponent{
     Color lightFG = new Color((bg.getRed()+fg.getRed())/2, (bg.getGreen()+fg.getGreen())/2, (bg.getBlue()+fg.getBlue())/2);
 
     g.setColor(bg);
-    g.fillRect(0,0,width,height);
+    g.fillRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+
+    if (bgImage != null){
+      Rectangle imageRect = new Rectangle(0, 0, bgImage.getWidth(null), bgImage.getHeight(null));
+      while (imageRect.x < width){
+        imageRect.y = 0;
+        while (imageRect.y < height){
+          if (imageRect.intersects(clipRect))
+            g.drawImage(bgImage, imageRect.x, imageRect.y, this);
+          imageRect.y += imageRect.height;
+        }
+        imageRect.x += imageRect.width;
+      }
+    }
 
     int graphX = (int)(width*(1-GRAPH_WIDTH_PERCENTAGE));
     int graphY = 0;
