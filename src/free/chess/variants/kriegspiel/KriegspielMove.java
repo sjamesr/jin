@@ -101,7 +101,7 @@ public class KriegspielMove extends Move{
 
 
   /**
-   * Always throws <code>null</code> since the starting square is always
+   * Always returns <code>null</code> since the starting square is always
    * unknown.
    */
 
