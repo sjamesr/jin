@@ -139,8 +139,8 @@ public class LoginPanel extends DialogPanel{
     final JTextField usernameField = new FixedJTextField(username);
     final JPasswordField passwordField = new FixedJPasswordField(password);
     final JComboBox hostnameBox = new FixedJComboBox(hostnames);
-    hostnameBox.setSelectedItem(hostname);
     hostnameBox.setEditable(true);
+    hostnameBox.setSelectedItem(hostname);
     final JTextField portsField = new FixedJTextField(StringEncoder.encodeIntList(ports), 7);
     final JCheckBox savePasswordCheckBox = new JCheckBox("Save password", savePassword);
     savePasswordCheckBox.setMnemonic('S');
