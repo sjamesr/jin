@@ -21,7 +21,7 @@
 
 package free.jin;
 
-import free.jin.event.FriendsListener;
+import free.jin.event.FriendsJinListenerManager;
 
 
 /**
@@ -32,23 +32,14 @@ import free.jin.event.FriendsListener;
 public interface FriendsJinConnection extends JinConnection{
 
 
-
-  /**
-   * Adds a FriendsListener to the list of listeners receiving FriendsEvents.
-   */
-
-  void addFriendsListener(FriendsListener listener);
-
-
-
-
-  /**
-   * Removes a FriendsListener from the list of listeners receiving
-   * FriendsEvents.
-   */
   
-  void removeFriendsListener(FriendsListener listener);
+  /**
+   * Returns the FriendsJinListenerManager which allows registering and
+   * unregistering FriendsListeners.
+   */
 
+  FriendsJinListenerManager getFriendsJinListenerManager();
+  
 
 
 

@@ -21,7 +21,7 @@
 
 package free.jin;
 
-import free.jin.event.GameListListener;
+import free.jin.event.GameListJinListenerManager;
 
 
 /**
@@ -30,23 +30,14 @@ import free.jin.event.GameListListener;
 
 public interface GameListJinConnection extends JinConnection{
 
-
-
-  /**
-   * Adds the given GameListListener to receive notifications of GameListEvents.
-   */
-
-  void addGameListListener(GameListListener listener);
-
-
-
+  
 
   /**
-   * Removes the given GameListListener from the list of listeners receiving
-   * notifications of GameListEvents.
+   * Returns the GameListJinListenerManager via which you can register and
+   * unregister GameListListeners.
    */
 
-  void removeGameListListener(GameListListener listener);
+  GameListJinListenerManager getGameListJinListenerManager();
 
 
 }

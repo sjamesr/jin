@@ -249,11 +249,13 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
   protected void registerListeners(){
     JinConnection conn = getConnection();
-    conn.addChatListener(this);
-    conn.addConnectionListener(this);
-    conn.addGameListener(this);
+    JinListenerManager listenerManager = conn.getJinListenerManager();
+
+    listenerManager.addChatListener(this);
+    listenerManager.addConnectionListener(this);
+    listenerManager.addGameListener(this);
     if (conn instanceof FriendsJinConnection)
-      ((FriendsJinConnection)conn).addFriendsListener(this);
+      ((FriendsJinConnection)conn).getFriendsJinListenerManager().addFriendsListener(this);
   }
 
 
@@ -266,11 +268,13 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
 
   protected void unregisterListeners(){
     JinConnection conn = getConnection();
-    conn.removeChatListener(this);
-    conn.removeConnectionListener(this);
-    conn.removeGameListener(this);
+    JinListenerManager listenerManager = conn.getJinListenerManager();
+
+    listenerManager.removeChatListener(this);
+    listenerManager.removeConnectionListener(this);
+    listenerManager.removeGameListener(this);
     if (conn instanceof FriendsJinConnection)
-      ((FriendsJinConnection)conn).removeFriendsListener(this);
+      ((FriendsJinConnection)conn).getFriendsJinListenerManager().removeFriendsListener(this);
   }
 
 
@@ -292,7 +296,7 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
    * Listens to ChatEvents and makes appropriate sounds.
    */
 
-  public void chatMessageArrived(ChatEvent evt){
+  public void chatMessageReceived(ChatEvent evt){
     if (!isOn())
       return;
 

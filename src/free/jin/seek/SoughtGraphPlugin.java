@@ -279,7 +279,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if ((visibleCB!=null)&&(!visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
       visibleCB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
-    conn.addSeekListener(SoughtGraphPlugin.this);
+    conn.getSeekJinListenerManager().addSeekListener(SoughtGraphPlugin.this);
 
     changingGraphVisibility = false;
   }
@@ -307,7 +307,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if ((visibleCB!=null)&&(visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
       nonVisibleCB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
-    conn.removeSeekListener(SoughtGraphPlugin.this);
+    conn.getSeekJinListenerManager().removeSeekListener(SoughtGraphPlugin.this);
 
     changingGraphVisibility = false;
   }
@@ -360,7 +360,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     SeekJinConnection conn = (SeekJinConnection)getConnection();
 
     soughtGraph.removeSeekSelectionListener(this);
-    conn.removeSeekListener(this); // Just in case.
+    conn.getSeekJinListenerManager().removeSeekListener(this); // Just in case.
   }
 
 

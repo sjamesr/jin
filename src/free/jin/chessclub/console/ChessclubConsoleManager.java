@@ -38,12 +38,12 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
 
   /**
-   * Overrides <code>chatMessageArrived(ChatEvent)</code> to notify the
+   * Overrides <code>chatMessageReceived(ChatEvent)</code> to notify the
    * <code>ChessclubConsole</code> when tells are received.
    */
 
-  public void chatMessageArrived(ChatEvent evt){
-    super.chatMessageArrived(evt);
+  public void chatMessageReceived(ChatEvent evt){
+    super.chatMessageReceived(evt);
 
     String type = evt.getType();
     if (type.equals("tell") || type.equals("say") || type.equals("atell"))

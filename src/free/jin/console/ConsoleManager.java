@@ -247,10 +247,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
           String oldStyle = gameListDisplayStyle;
           gameListDisplayStyle = actionCommand;
 
+          GameListJinListenerManager listenerManager = ((GameListJinConnection)getConnection()).getGameListJinListenerManager();
+
           if (gameListDisplayStyle.equals("none"))
-            ((GameListJinConnection)getConnection()).removeGameListListener(ConsoleManager.this);
+            listenerManager.removeGameListListener(ConsoleManager.this);
           else if (oldStyle.equalsIgnoreCase("none"))
-            ((GameListJinConnection)getConnection()).addGameListListener(ConsoleManager.this);
+            listenerManager.addGameListListener(ConsoleManager.this);
         }
       };
 
@@ -325,11 +327,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   protected void registerConnListeners(){
     JinConnection conn = getConnection();
-    conn.addPlainTextListener(this);
-    conn.addChatListener(this);
-    conn.addConnectionListener(this);
+    JinListenerManager listenerManager = conn.getJinListenerManager();
+
+    listenerManager.addPlainTextListener(this);
+    listenerManager.addChatListener(this);
+    listenerManager.addConnectionListener(this);
+
     if ((conn instanceof GameListJinConnection)&&(!gameListDisplayStyle.equalsIgnoreCase("none")))
-      ((GameListJinConnection)conn).addGameListListener(this);
+      ((GameListJinConnection)conn).getGameListJinListenerManager().addGameListListener(this);
   }
 
 
@@ -341,11 +346,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   protected void unregisterConnListeners(){
     JinConnection conn = getConnection();
-    conn.removePlainTextListener(this);
-    conn.removeChatListener(this);
-    conn.removeConnectionListener(this);
+    JinListenerManager listenerManager = conn.getJinListenerManager();
+
+    listenerManager.removePlainTextListener(this);
+    listenerManager.removeChatListener(this);
+    listenerManager.removeConnectionListener(this);
+
     if ((conn instanceof GameListJinConnection)&&(!gameListDisplayStyle.equalsIgnoreCase("none")))
-      ((GameListJinConnection)conn).removeGameListListener(this);
+      ((GameListJinConnection)conn).getGameListJinListenerManager().removeGameListListener(this);
   } 
 
 
@@ -355,7 +363,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Listens to plain text and adds it to the console.
    */
 
-  public void plainTextArrived(PlainTextEvent evt){
+  public void plainTextReceived(PlainTextEvent evt){
     console.addToOutput(evt.getText(), "plain");
   }
 
@@ -365,7 +373,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Listens to ChatEvents and adds appropriate text to the console.
    */
 
-  public void chatMessageArrived(ChatEvent evt){
+  public void chatMessageReceived(ChatEvent evt){
     String type = evt.getType();
     Object forum = evt.getForum();
     String sender = evt.getSender();

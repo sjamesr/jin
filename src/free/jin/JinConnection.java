@@ -126,6 +126,16 @@ public interface JinConnection{
 
 
   /**
+   * Returns the JinListenerManager for this JinConnection. Via this object, you
+   * can register and unregister listeners for various events.
+   */
+
+  JinListenerManager getJinListenerManager();
+
+
+
+
+  /**
    * Connects to the server.
    */
 
@@ -200,81 +210,6 @@ public interface JinConnection{
 
   void exit();
 
-
-
-  /**
-   * Adds the given ConnectionListener to receive notifications when the connection
-   * to the server is established/lost.
-   */
-
-  void addConnectionListener(ConnectionListener listener);
-
-
-
-  /**
-   * Removes the given ConnectionListener from the list of listeners receiving
-   * notifications when the connection to the server is established/lost.
-   */
-
-  void removeConnectionListener(ConnectionListener listener);
-
-
-
-  /**
-   * Adds the given PlainTextListener to receive notification when otherwise
-   * unidentified text arrives from the server.
-   */
-
-  void addPlainTextListener(PlainTextListener listener);
-
-
-
-  /**
-   * Removes the given PlainTextListener from the list of PlainTextListeners
-   * receiving notification when otherwise unidentified text arrives from 
-   * the server.
-   */
-
-  void removePlainTextListener(PlainTextListener listener);
-
-
-
-
-
-  /**
-   * Adds the given ChatListener to receive notification when chat related
-   * messages arrive from the server.
-   */
-
-  void addChatListener(ChatListener listener);
-
-
-
-  /**
-   * Removes the given ChatListener from the list of ChatListeners receiving
-   * notification when chat related messages arrive from the server.
-   */
-
-  void removeChatListener(ChatListener listener);
-
-
-
-
-  /**
-   * Adds the given GameListener to the list of listeners receiving notifications
-   * of GameEvents.
-   */
-
-  void addGameListener(GameListener listener);
-
-
-
-  /**
-   * Removes the given GameListener from the list of listeners receiving notifications
-   * of GameEvents.
-   */
-
-  void removeGameListener(GameListener listener);
 
 
 
