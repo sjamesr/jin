@@ -475,6 +475,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
   public void takebackOccurred(TakebackEvent evt){}
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
+  public void offerChanged(OfferEvent evt){}
 
 
 

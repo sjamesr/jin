@@ -731,7 +731,7 @@ public class Scripter extends Plugin{
 
   private class GameScriptDispatcher extends ScriptDispatcher implements GameListener{
 
-    private final String [] subtypes = new String[]{"Game Start", "Move", "Takeback/Backward", "Board Flip", "Illegal Move Attempt", "Clock Update", "Other Position Change", "Game End"};
+    private final String [] subtypes = new String[]{"Game Start", "Move", "Takeback/Backward", "Board Flip", "Illegal Move Attempt", "Clock Update", "Other Position Change", "Offers", "Game End"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
 
@@ -807,13 +807,14 @@ public class Scripter extends Plugin{
           vars.addElement(new Object[]{"oppTitle", game.getWhiteTitles()});
           vars.addElement(new Object[]{"myTitle", game.getBlackTitles()});
         }
+
+        vars.addElement(new Object[]{"userPlayer", game.getUserPlayer().toString().toLowerCase()});
       }
 
       vars.addElement(new Object[]{"isGameRated", new Boolean(game.isRated())});
       vars.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
       vars.addElement(new Object[]{"isPlayed", new Boolean(game.isPlayed())});
       vars.addElement(new Object[]{"isTimeOdds", new Boolean(game.isTimeOdds())});
-      vars.addElement(new Object[]{"userPlayer", game.getUserPlayer().toString().toLowerCase()});
 
       return vars;
     }
@@ -885,10 +886,35 @@ public class Scripter extends Plugin{
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"isFlipped", new Boolean(evt.isFlipped())});
 
+
       Object [][] vars = new Object[varsVector.size()][];
       varsVector.copyInto(vars);
 
       runScripts(evt, subtypes[3], vars);
+    }
+
+    public void offerChanged(OfferEvent evt){
+      String offerType;
+      switch (evt.getOfferId()){
+        case OfferEvent.DRAW_OFFER: offerType = "draw"; break;
+        case OfferEvent.ADJOURN_OFFER: offerType = "adjourn"; break;
+        case OfferEvent.ABORT_OFFER: offerType = "abort"; break;
+        case OfferEvent.TAKEBACK_OFFER: offerType = "takeback"; break;
+        default:
+          return;
+      }
+
+      Vector varsVector = createVarsVector(evt);
+      varsVector.addElement(new Object[]{"offerType", offerType});
+      varsVector.addElement(new Object[]{"isMade", new Boolean(evt.isOfferMade())});
+      varsVector.addElement(new Object[]{"player", evt.getPlayer().toString().toLowerCase()});
+      if (evt.getOfferId() == OfferEvent.TAKEBACK_OFFER)
+        varsVector.addElement(new Object[]{"takebackCount", new Integer(evt.getTakebackCount())});
+
+      Object [][] vars = new Object[varsVector.size()][];
+      varsVector.copyInto(vars);
+
+      runScripts(evt, subtypes[7], vars);
     }
 
     public void gameEnded(GameEndEvent evt){
@@ -936,7 +962,7 @@ public class Scripter extends Plugin{
       Object [][] vars = new Object[varsVector.size()][];
       varsVector.copyInto(vars);
 
-      runScripts(evt, subtypes[7], vars);
+      runScripts(evt, subtypes[8], vars);
     }
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
@@ -989,7 +1015,7 @@ public class Scripter extends Plugin{
         varsVector.addElement(new Object[]{"illegalMove", move});
 
       if (Utilities.isElementOf(eventSubtypes, subtypes[5])){
-        varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER});
+        varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
         varsVector.addElement(new Object[]{"time", new Integer(4*60*1000)});
         varsVector.addElement(new Object[]{"isClockRunning", new Boolean(true)});
       }
@@ -997,7 +1023,13 @@ public class Scripter extends Plugin{
       if (Utilities.isElementOf(eventSubtypes, subtypes[3]))
         varsVector.addElement(new Object[]{"isFlipped", new Boolean(true)});
 
-      if (Utilities.isElementOf(eventSubtypes, subtypes[7]))
+      if (Utilities.isElementOf(eventSubtypes, subtypes[7])){
+        varsVector.addElement(new Object[]{"offerType", "draw"});
+        varsVector.addElement(new Object[]{"isMade", new Boolean(true)});
+        varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
+      }
+
+      if (Utilities.isElementOf(eventSubtypes, subtypes[8]))
         varsVector.addElement(new Object[]{"gameResult", "win"});
 
       Object [][] vars = new Object[varsVector.size()][];

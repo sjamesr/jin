@@ -1515,6 +1515,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation.
    */
 
+  public void offerChanged(OfferEvent evt){
+
+  }
+
+
+
+  /**
+   * GameListener implementation.
+   */
+
   public void gameEnded(GameEndEvent evt){
     if (evt.getGame()!=game)
       return;

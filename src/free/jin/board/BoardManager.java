@@ -1455,7 +1455,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void illegalMoveAttempted(IllegalMoveEvent evt){}
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
-
+  public void offerChanged(OfferEvent evt){}
 
 
 
