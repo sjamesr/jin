@@ -32,13 +32,19 @@ public interface ChessclubGameListener extends GameListener{
 
 
 
-
   /**
    * This method gets called when an arrow has been added to the board.
    */
 
   void arrowAdded(ArrowEvent evt);
-
+  
+  
+  
+  /**
+   * This method gets called when an arrow has been removed from the board.
+   */
+   
+  void arrowRemoved(ArrowEvent evt);
 
 
 
@@ -47,6 +53,14 @@ public interface ChessclubGameListener extends GameListener{
    */
 
   void circleAdded(CircleEvent evt);
+  
+  
+  
+  /**
+   * This method gets called when a circle has been removed from the board.
+   */
+   
+  void circleRemoved(CircleEvent evt);
 
 
 }
