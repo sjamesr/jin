@@ -80,6 +80,26 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
+   * The JCheckBoxMenuItem indicating whether the sought graph is invisible.
+   */
+
+  private JCheckBoxMenuItem nonVisibleCB;
+
+
+
+
+  /**
+   * We set this to true when we modify the visibility of the graph to avoid
+   * handling echo events.
+   */
+
+  private boolean changingGraphVisibility = false;
+
+
+
+
+
+  /**
    * Sets the plugin context - if the connection is not an instance of
    * SeekJinConnection, this method throws an UnsupportedContextException.
    */
@@ -250,11 +270,16 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (soughtGraphFrame.isVisible())
       return;
 
+    changingGraphVisibility = true;
+
     soughtGraphFrame.setVisible(true);
+
     if ((visibleCB!=null)&&(!visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
       visibleCB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.addSeekListener(SoughtGraphPlugin.this);
+
+    changingGraphVisibility = false;
   }
 
 
@@ -262,7 +287,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   /**
    * Hides the sought graph frame. Hiding the sought graph frame should only be
-   * done through this method, since it also unregisters this SoughtGraphPlugin as
+   *
+   done through this method, since it also unregisters this SoughtGraphPlugin as
    * a SeekListener. I haven't used a ComponentListener to automatically 
    * unregister the listener because it seems to be broken in JDK 1.1
    */
@@ -271,13 +297,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (!soughtGraphFrame.isVisible())
       return;
 
+    changingGraphVisibility = true;
+
     soughtGraphFrame.setVisible(false);
     soughtGraph.removeAllSeeks();
 
     if ((visibleCB!=null)&&(visibleCB.isSelected())) // It may be null if the graph is shown before it's created.
-      visibleCB.setSelected(false);
+      nonVisibleCB.setSelected(true);
     SeekJinConnection conn = (SeekJinConnection)getConnection();
     conn.removeSeekListener(SoughtGraphPlugin.this);
+
+    changingGraphVisibility = false;
   }
 
 
@@ -341,10 +371,13 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
-    visibleCB = new JCheckBoxMenuItem("Show seek graph", new Boolean(getProperty("visible","true")).booleanValue());
+    visibleCB = new JCheckBoxMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
     visibleCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
+        if (changingGraphVisibility)
+          return;
+
         if (visibleCB.isSelected())
           showSoughtGraphFrame();
         else
@@ -353,7 +386,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
     });
 
+    nonVisibleCB = new JCheckBoxMenuItem("Graph hidden", !visibleCB.isSelected());
+
+    ButtonGroup visibilityGroup = new ButtonGroup();
+    visibilityGroup.add(visibleCB);
+    visibilityGroup.add(nonVisibleCB);
+
     myMenu.add(visibleCB);
+    myMenu.add(nonVisibleCB);
 
     return myMenu;
   }
