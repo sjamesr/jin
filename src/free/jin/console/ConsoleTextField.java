@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002, 2003 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003, 2004 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -27,8 +27,12 @@ import free.jin.Preferences;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.Vector;
+import java.io.IOException;
 import java.awt.Font;
 import javax.swing.KeyStroke;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javax.swing.text.DefaultEditorKit;
 
 
 /**
@@ -49,14 +53,15 @@ import javax.swing.KeyStroke;
 public class ConsoleTextField extends FixedJTextField{
 
 
+  
   /**
    * The Console we're a part of.
    */
 
   protected final Console console;
-
-
-
+  
+  
+  
   /**
    * The KeyStroke used for telling the last teller.
    */
@@ -116,7 +121,7 @@ public class ConsoleTextField extends FixedJTextField{
   public ConsoleTextField(Console console){
     this.console = console;
 
-    enableEvents(KeyEvent.KEY_EVENT_MASK|FocusEvent.FOCUS_EVENT_MASK);
+    enableEvents(KeyEvent.KEY_EVENT_MASK | FocusEvent.FOCUS_EVENT_MASK | MouseEvent.MOUSE_EVENT_MASK);
 
     initFromProperties();
     
@@ -328,17 +333,20 @@ public class ConsoleTextField extends FixedJTextField{
     Transferable content = clipboard.getContents(this);
     if (content != null){
       try{
-        String data = (String)(content.getTransferData(DataFlavor.stringFlavor));
-        int index;
-        while ((index = data.indexOf("\r\n"))!=-1)
-          data = data.substring(0,index)+" "+data.substring(index+2);
-
-        data = data.replace('\n',' ');
-        data = data.replace('\r',' ');
-
-        StringSelection tempContents = new StringSelection(data);
-        clipboard.setContents(tempContents, null);
-      } catch (Exception e){}
+        if (content.isDataFlavorSupported(DataFlavor.stringFlavor)){
+          String data = (String)(content.getTransferData(DataFlavor.stringFlavor));
+          int index;
+          while ((index = data.indexOf("\r\n"))!=-1)
+            data = data.substring(0,index)+" "+data.substring(index+2);
+  
+          data = data.replace('\n',' ');
+          data = data.replace('\r',' ');
+  
+          StringSelection tempContents = new StringSelection(data);
+          clipboard.setContents(tempContents, null);
+        }
+      } catch (UnsupportedFlavorException e){} // Shouldn't happen - we checked for it
+        catch (IOException e){e.printStackTrace();}
     }
 
     super.paste();
@@ -402,5 +410,118 @@ public class ConsoleTextField extends FixedJTextField{
     }
 
   }
+  
+  
+  
+  /**
+   * Displays the popup menu on a popup trigger event. 
+   */
+   
+  protected void processMouseEvent(MouseEvent evt){
+    super.processMouseEvent(evt);
+    
+    if (evt.isPopupTrigger()){
+      if (popup == null)
+        popup = createPopup();
+    
+      configurePopup();
+      
+      popup.setSize(popup.getPreferredSize());
+      popup.show(this, evt.getX(), Math.min(evt.getY(), getHeight() - popup.getHeight()));
+    }
+  }
+  
+
+
+  /**
+   * The field's popup.
+   */
+   
+  private JPopupMenu popup;
+
+  
+  
+  /**
+   * The "cut" menu item.
+   */
+   
+  private JMenuItem cut;
+  
+  
+  
+  /**
+   * The "copy" menu item.
+   */
+   
+  private JMenuItem copy;
+  
+  
+  
+  /**
+   * The "paste" menu item.
+   */
+   
+  private JMenuItem paste;
+  
+  
+  
+  /**
+   * Creates the popup for this console text field.
+   */
+   
+  protected JPopupMenu createPopup(){
+    cut = new JMenuItem("Cut");
+    copy = new JMenuItem("Copy");
+    paste = new JMenuItem("Paste");
+    
+    ActionListener popupListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        Object src = evt.getSource();
+        if (src == cut)
+          cut();
+        else if (src == copy)
+          copy();
+        else if (src == paste)
+          paste();
+      }
+    };
+    
+    cut.addActionListener(popupListener);
+    copy.addActionListener(popupListener);
+    paste.addActionListener(popupListener);
+    
+    JPopupMenu popup = new JPopupMenu();
+    popup.add(cut);
+    popup.add(copy);
+    popup.add(paste);
+    
+    return popup;
+  }
+  
+  
+  
+  /**
+   * Configures the popup prior to showing it - enables or disabled certain menu
+   * items of the popup, based on the current state of the component.
+   */
+   
+  protected void configurePopup(){
+    boolean isSelected = (getSelectedText() != null) && !"".equals(getSelectedText());
+    cut.setEnabled(isSelected);
+    copy.setEnabled(isSelected);
+
+    try{
+      Transferable transferable = getToolkit().getSystemClipboard().getContents(this);
+      if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)){
+        String clipContents = (String)transferable.getTransferData(DataFlavor.stringFlavor);
+        boolean hasPaste = (clipContents != null) && !"".equals(clipContents);     
+        paste.setEnabled(hasPaste);
+      }
+      else
+        paste.setEnabled(false);
+    } catch (UnsupportedFlavorException e){} // Shouldn't happen - we checked for it
+      catch (IOException e){e.printStackTrace();}
+  }
+  
 
 }
