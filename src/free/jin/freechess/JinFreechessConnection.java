@@ -850,76 +850,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     Player currentPlayer = playerForString(oldBoardData.getCurrentPlayer());
     position.setCurrentPlayer(currentPlayer);
 
+    Move move;
     Square fromSquare, toSquare;
     Piece promotionPiece = null;
-    if (moveVerbose.equals("o-o")){
-      if (variant instanceof BothSidesCastlingVariant){
-        if (currentPlayer.isWhite()){
-          if (position.getPieceAt("e1") == ChessPiece.WHITE_KING){
-            fromSquare = Square.parseSquare("e1");
-            toSquare = Square.parseSquare("g1");
-          }
-          else{
-            fromSquare = Square.parseSquare("d1");
-            toSquare = Square.parseSquare("b1");
-          }
-        }
-        else{
-          if (position.getPieceAt("e8") == ChessPiece.BLACK_KING){
-            fromSquare = Square.parseSquare("e8");
-            toSquare = Square.parseSquare("g8");
-          }
-          else{
-            fromSquare = Square.parseSquare("d8");
-            toSquare = Square.parseSquare("b8");
-          }
-        }
-      }
-      else{      
-        if (currentPlayer.isWhite()){
-          fromSquare = Square.parseSquare("e1");
-          toSquare = Square.parseSquare("g1");
-        }
-        else{
-          fromSquare = Square.parseSquare("e8");
-          toSquare = Square.parseSquare("g8");
-        }
-      }
-    }
-    else if (moveVerbose.equals("o-o-o")){
-      if (variant instanceof BothSidesCastlingVariant){
-        if (currentPlayer.isWhite()){
-          if (position.getPieceAt("e1") == ChessPiece.WHITE_KING){
-            fromSquare = Square.parseSquare("e1");
-            toSquare = Square.parseSquare("c1");
-          }
-          else{
-            fromSquare = Square.parseSquare("d1");
-            toSquare = Square.parseSquare("f1");
-          }
-        }
-        else{
-          if (position.getPieceAt("e8") == ChessPiece.BLACK_KING){
-            fromSquare = Square.parseSquare("e8");
-            toSquare = Square.parseSquare("c8");
-          }
-          else{
-            fromSquare = Square.parseSquare("d8");
-            toSquare = Square.parseSquare("f8");
-          }
-        }
-      }
-      else{
-        if (currentPlayer.isWhite()){
-          fromSquare = Square.parseSquare("e1");
-          toSquare = Square.parseSquare("c1");
-        }
-        else{
-          fromSquare = Square.parseSquare("e8");
-          toSquare = Square.parseSquare("c8");
-        }
-      }
-    }
+    if (moveVerbose.equals("o-o"))
+      move = variant.createShortCastling(position);
+    else if (moveVerbose.equals("o-o-o"))
+      move = variant.createLongCastling(position);
     else{
       fromSquare = Square.parseSquare(moveVerbose.substring(2, 4));
       toSquare = Square.parseSquare(moveVerbose.substring(5, 7));
@@ -930,9 +867,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
           pieceString = pieceString.toLowerCase(); 
         promotionPiece = variant.parsePiece(pieceString);
       }
-    }
 
-    Move move = variant.createMove(position, fromSquare, toSquare, promotionPiece, moveSAN);
+      move = variant.createMove(position, fromSquare, toSquare, promotionPiece, moveSAN);
+    }
 
     listenerManager.fireGameEvent(new MoveMadeEvent(this, game, move, true)); 
       // (isNew == true) because FICS never sends the entire move history
@@ -1363,6 +1300,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     WildVariant variant = game.getVariant();
     if (move instanceof ChessMove){
       ChessMove cmove = (ChessMove)move;
+      if (cmove.isShortCastling())
+        return "O-O";
+      else if (cmove.isLongCastling())
+        return "O-O-O";
+
       String s = cmove.getStartingSquare().toString() + cmove.getEndingSquare().toString();
       if (cmove.isPromotion())
         return s + "=" + variant.pieceToString(cmove.getPromotionTarget());

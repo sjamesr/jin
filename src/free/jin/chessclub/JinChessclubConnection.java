@@ -1107,10 +1107,17 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       }
     }
     else{
+      char lastChar = moveString.charAt(moveString.length() - 1);
+      if (lastChar == 'c') // Short castling
+        return variant.createShortCastling(position);
+      else if (lastChar == 'C') // Long castling
+        return variant.createLongCastling(position);
+
       Square startSquare = Square.parseSquare(moveString.substring(0, 2));
       Square endSquare = Square.parseSquare(moveString.substring(2, 4));
+      
       Piece promotionTarget = null;
-      if ("NBRQK".indexOf(moveString.charAt(moveString.length() - 1)) != -1){
+      if ("NBRQK".indexOf(lastChar) != -1){
         // The 'K' can happen in Giveaway, where you can promote to a king
         String promotionTargetString = String.valueOf(moveString.charAt(moveString.length() - 1));
         if (position.getCurrentPlayer().isBlack())
@@ -1392,6 +1399,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     WildVariant variant = game.getVariant();
     if (move instanceof ChessMove){
       ChessMove cmove = (ChessMove)move;
+      if (cmove.isShortCastling())
+        return "O-O";
+      else if (cmove.isLongCastling())
+        return "O-O-O";
+
       String s = cmove.getStartingSquare().toString() + cmove.getEndingSquare().toString();
       if (cmove.isPromotion())
         return s + "=" + variant.pieceToString(cmove.getPromotionTarget());
