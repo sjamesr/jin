@@ -42,8 +42,8 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
    * position and name.
    */
 
-  public NoCastlingVariant(String initialPositionLexigraphic, String variantName){
-    super(initialPositionLexigraphic, variantName);
+  public NoCastlingVariant(String initialPositionFEN, String variantName){
+    super(initialPositionFEN, variantName);
   }
 
 
