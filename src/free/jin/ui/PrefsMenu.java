@@ -344,7 +344,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
       bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
 
       content.add(bottomPanel, BorderLayout.SOUTH);
-      getRootPane().setDefaultButton(okButton);
+      this.getRootPane().setDefaultButton(okButton);
     }
 
 
