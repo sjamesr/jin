@@ -59,22 +59,13 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
 
   /**
-   * The ui provider.
-   */
-
-  private final UIProvider uiProvider;
-
-
-
-  /**
    * The constructor, duh.
    */
 
-  public UserInvokedScriptMenuItem(Script script, UIProvider uiProvider){
+  public UserInvokedScriptMenuItem(Script script){
     super(script.getName());
 
     this.script = script;
-    this.uiProvider = uiProvider;
 
     setMnemonic(script.getName().charAt(0));
     addActionListener(this);
@@ -89,7 +80,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
   public void actionPerformed(ActionEvent evt){
     VariablesPanel varsPanel = new VariablesPanel();
 
-    Object [][] vars = varsPanel.askVars(uiProvider);
+    Object [][] vars = varsPanel.askVars();
     if (vars == null)
       return;
 
@@ -191,8 +182,8 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
      * Displays the dialog and returns the variables once the user is done.
      */
 
-    public Object [][] askVars(UIProvider uiProvider){
-      return (Object [][])super.askResult(uiProvider);
+    public Object [][] askVars(){
+      return (Object [][])super.askResult();
     }
 
 
@@ -300,7 +291,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
                 value = new Double(valueString);
               else throw new IllegalStateException("Unknown variable type: "+type);
             } catch (IllegalArgumentException e){
-                OptionPanel.error(uiProvider, "Bad Variable Value", "Inappropriate value specified for variable \""+name+"\", must be of type \""+type+"\"");
+                OptionPanel.error("Bad Variable Value", "Inappropriate value specified for variable \""+name+"\", must be of type \""+type+"\"");
                 return;
               }
             varsVector.addElement(new Object[]{name, value});
