@@ -1078,9 +1078,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       updateMoveHighlighting(isMoveEnRoute);
     }
 
-    // !isMoveEnRoute makes sure that we only send the queued move after we receive
-    // the *opponent's* move, and not just any move.
-    if ((queuedMove != null) && !isMoveEnRoute){ 
+    // queuedMove.getPlayer() == realPosition.getCurrentPlayer() makes sure
+    // that we only send the queued on the correct move, not when getting *any* response
+    if ((queuedMove != null) && (queuedMove.getPlayer() == realPosition.getCurrentPlayer())){ 
       UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
       isBoardPositionUpdating = true;
       board.getPosition().copyFrom(realPosition);
