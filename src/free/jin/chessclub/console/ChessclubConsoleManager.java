@@ -127,7 +127,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String message = evt.getMessage();
     int index;
     while ((index = message.indexOf("\\n"))!=-1)
-      message = message.substring(0,index)+"\n: "+message.substring(index+2);
+      message = message.substring(0,index)+"\n:"+message.substring(index+2);
     while ((index = message.indexOf("\\h"))!=-1)
       message = message.substring(0,index)+message.substring(index+2);
     while ((index = message.indexOf("\\H"))!=-1)
@@ -148,7 +148,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     Object forum = evt.getForum();
     int index;
     while ((index = message.indexOf("\\n"))!=-1)
-      message = message.substring(0,index)+"\n"+forum+"> "+message.substring(index+2);
+      message = message.substring(0,index)+"\n"+forum+">"+message.substring(index+2);
     while ((index = message.indexOf("\\h"))!=-1)
       message = message.substring(0,index)+message.substring(index+2);
     while ((index = message.indexOf("\\H"))!=-1)
