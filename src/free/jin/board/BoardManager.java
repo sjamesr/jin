@@ -317,9 +317,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   protected JMenu createMoveInputMenu(){
     JMenu moveInputMenu = new JMenu("Move-Input");
+    moveInputMenu.setMnemonic('M');
 
-    final JCheckBoxMenuItem dragndrop = new JCheckBoxMenuItem("Drag'n'Drop", moveInputStyle==JBoard.DRAG_N_DROP);
-    JCheckBoxMenuItem clicknclick = new JCheckBoxMenuItem("Click'n'Click", moveInputStyle==JBoard.CLICK_N_CLICK);
+    final JRadioButtonMenuItem dragndrop = new JRadioButtonMenuItem("Drag'n'Drop", moveInputStyle==JBoard.DRAG_N_DROP);
+    JRadioButtonMenuItem clicknclick = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle==JBoard.CLICK_N_CLICK);
+
+    dragndrop.setMnemonic('D');
+    dragndrop.setMnemonic('C');
+
     ButtonGroup inputModeGroup = new ButtonGroup();
     inputModeGroup.add(dragndrop);
     inputModeGroup.add(clicknclick);
@@ -338,8 +343,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     });
 
 
-    final JCheckBoxMenuItem normalDraggedPieceStyle = new JCheckBoxMenuItem("Normal Dragged Piece", draggedPieceStyle==JBoard.NORMAL_DRAGGED_PIECE);
-    JCheckBoxMenuItem targetDraggedPieceStyle = new JCheckBoxMenuItem("Target Cursor", draggedPieceStyle==JBoard.CROSSHAIR_DRAGGED_PIECE);
+    final JRadioButtonMenuItem normalDraggedPieceStyle = new JRadioButtonMenuItem("Normal Dragged Piece",
+      draggedPieceStyle==JBoard.NORMAL_DRAGGED_PIECE);
+    JRadioButtonMenuItem targetDraggedPieceStyle = new JRadioButtonMenuItem("Target Cursor",
+      draggedPieceStyle==JBoard.CROSSHAIR_DRAGGED_PIECE);
+
+    normalDraggedPieceStyle.setMnemonic('N');
+    targetDraggedPieceStyle.setMnemonic('T');
+
     ButtonGroup draggedPieceStyleGroup = new ButtonGroup();
     draggedPieceStyleGroup.add(normalDraggedPieceStyle);
     draggedPieceStyleGroup.add(targetDraggedPieceStyle);
@@ -360,6 +371,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
     final JCheckBoxMenuItem alwaysQueen = new JCheckBoxMenuItem("Auto Queen");
+    alwaysQueen.setMnemonic('A');
     alwaysQueen.addChangeListener(new ChangeListener(){
 
       public void stateChanged(ChangeEvent evt){
@@ -410,6 +422,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     };
 
     JMenu pieceSetsMenu = new JMenu("Piece Sets");
+    pieceSetsMenu.setMnemonic('P');
     ButtonGroup pieceSetsCheckBoxGroup = new ButtonGroup();
     for (int i=0;i<pieceSetCount;i++){
       String pieceSet = getProperty("piece-set-"+i);
@@ -420,7 +433,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         System.err.println("Piece set with index "+i+" is not specified");
         continue;
       }
-      JCheckBoxMenuItem menuCheckBox = new JCheckBoxMenuItem(pieceSetName);
+      JRadioButtonMenuItem menuCheckBox = new JRadioButtonMenuItem(pieceSetName);
       menuCheckBox.setActionCommand(className);
       if (className.equals(piecePainter.getClass().getName()))
         menuCheckBox.setSelected(true);
@@ -457,6 +470,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     };
 
     JMenu boardsMenu = new JMenu("Boards");
+    boardsMenu.setMnemonic('B');
     ButtonGroup boardsCheckBoxGroup = new ButtonGroup();
     for (int i=0;i<boardCount;i++){
       String board = getProperty("board-"+i);
@@ -467,7 +481,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         System.err.println("Board with index "+i+" is not specified");
         continue;
       }
-      JCheckBoxMenuItem menuCheckBox = new JCheckBoxMenuItem(boardName);
+      JRadioButtonMenuItem menuCheckBox = new JRadioButtonMenuItem(boardName);
       menuCheckBox.setActionCommand(className);
       if (className.equals(boardPainter.getClass().getName()))
         menuCheckBox.setSelected(true);
