@@ -60,23 +60,13 @@ public class ImagePiecePainter implements PiecePainter{
 
 
 
-
   /**
-   * The preferred size of the pieces.
-   */
-
-  private final Dimension prefPieceSize;
-
-
-
-
-  /**
-   * Creates a new ImagePiecePainter with the given preferred piece image size.
+   * Creates a new ImagePiecePainter with the specified piece images.
    * The given Hashtable should map Integer objects specifying the size of the
    * piece images to Hashtables which in turn map Piece objects to piece Images.
    */
 
-  public ImagePiecePainter(Dimension prefPieceSize, Hashtable pieceImages){
+  public ImagePiecePainter(Hashtable pieceImages){
 
     // Find the largest size
     int maxSize = 0;
@@ -117,8 +107,6 @@ public class ImagePiecePainter implements PiecePainter{
         this.shadedPieceImages[sizeInt].put(key, shadedImage);
       }
     }
-
-    this.prefPieceSize = new Dimension(prefPieceSize.width, prefPieceSize.height);
   }
 
 
@@ -164,18 +152,6 @@ public class ImagePiecePainter implements PiecePainter{
 
     throw new Error("This can't happen");
   }
-
-
-
-
-  /**
-   * Returns the preferred size of the pieces.
-   */
-
-  public Dimension getPreferredPieceSize(){
-    return new Dimension(prefPieceSize.width, prefPieceSize.height);
-  }
-
 
 
 
@@ -229,4 +205,5 @@ public class ImagePiecePainter implements PiecePainter{
   }
 
 
+  
 }

@@ -238,26 +238,6 @@ public class ImageBoardPainter implements BoardPainter{
 
 
 
-
-  /**
-   * Returns the size of the unscaled image.
-   */
-
-  public Dimension getPreferredBoardSize(){
-    if (boardImage == null){
-      int width = lightImage.getWidth(null);
-      int height = lightImage.getHeight(null);
-      if (isScaled)
-        return new Dimension(width*8, height*8);
-      else
-        return new Dimension(width, height*2);
-    }
-    return new Dimension(boardImage.getWidth(null), boardImage.getHeight(null)); 
-  }
-
-
-
-
   /**
    * Paints the board at the given location on the given Graphics scaled to
    * the given size.
@@ -313,5 +293,6 @@ public class ImageBoardPainter implements BoardPainter{
     }
   } 
 
+  
 
 }

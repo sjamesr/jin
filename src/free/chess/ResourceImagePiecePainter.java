@@ -41,14 +41,11 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
 
 
   /**
-   * Creates a new <code>ResourceImagePiecePainter</code> with the given
-   * preferred piece image size. The given Hashtable maps Integer objects
-   * specifying the size of the piece images to Hashtables which in turn map 
-   * Piece objects to piece Images.
+   * A private constructor.
    */
 
-  private ResourceImagePiecePainter(Dimension prefSize, Hashtable pieces){
-    super(prefSize, pieces);
+  private ResourceImagePiecePainter(Hashtable pieces){
+    super(pieces);
   }
 
 
@@ -105,10 +102,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
       throw new IOException("Unable to load " + defFile + " with classloader: " + cl);
     
     String ext = def.getProperty("ext", "gif");
-    int sizeInt = Integer.parseInt(def.getProperty("size.pref"));
     int [] sizes = TextUtilities.parseIntList(def.getProperty("size.list"), " ");
-    
-    Dimension prefSize = new Dimension(sizeInt, sizeInt);
     
     Toolkit toolkit = Toolkit.getDefaultToolkit();
     Hashtable pieceImages = new Hashtable(sizes.length*5/4);
@@ -153,7 +147,7 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
       int [] results = ImageUtilities.preload(images, null);
     } catch (InterruptedException e){}
 
-    return new ResourceImagePiecePainter(prefSize, pieceImages);
+    return new ResourceImagePiecePainter(pieceImages);
   }
 
 
