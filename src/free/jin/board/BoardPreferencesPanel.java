@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.border.TitledBorder;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
 import free.util.SquareLayout;
@@ -142,8 +141,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     JPanel boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(null,  "Testing Board",
-        TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION),
+      BorderFactory.createTitledBorder(null,  "Testing Board"),
       BorderFactory.createEmptyBorder(5, 5, 5, 5)));
     
     squarePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
