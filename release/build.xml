@@ -196,6 +196,71 @@
 		<delete dir="${app-dir}" />
 		<property name="osx-install" value="jin-${release.version}-osx.dmg" />
 	</target>
+  
+
+	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
+	<target name="applet" depends="init">
+		<echo message="Creating applet release" />
+    
+		<property name="release.applet.dir" value="${release.dir}/applet" />
+    
+		<delete dir="${release.applet.dir}" />
+    
+		<mkdir dir="${release.dir}" />
+		<mkdir dir="${release.applet.dir}" />
+
+ 		<propertyfile file="${source.dir}/free/jin/resources/app.props">
+			<entry key="app.name" value="JinApplet" />
+		</propertyfile>
+		
+		<antcall target="build">
+			<param name="release.platform" value="applet" />
+		</antcall>
+
+ 		<propertyfile file="${source.dir}/free/jin/resources/app.props">
+			<entry key="app.name" value="Jin" />
+		</propertyfile>
+    
+    <antcall target="create-applet-archive">
+      <param name="server.name" value="icc" />
+      <param name="server.file" value="chessclub.jar" />
+    </antcall>
+
+    <antcall target="create-applet-archive">
+      <param name="server.name" value="fics" />
+      <param name="server.file" value="freechess.jar" />
+    </antcall>
+	</target>
+  
+  
+  
+  <!-- Helper target for building an applet release. Builds a release for
+       the server specified by the server.name property -->
+  <target name="create-applet-archive">
+  
+		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
+		<mkdir dir="${dir-to-tar}" />
+		<copy todir="${dir-to-tar}">
+			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.html ${server.name}_oldjava.html detect_java.html DetectJava.class libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
+      <filterset>
+        <filter token="old_java_url" value="${server.name}_oldjava.html"/>
+        <filter token="new_java_url" value="${server.name}.html"/>
+      </filterset>
+		</copy>
+    
+		<property name="tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}.tar" />
+		<property name="gz" value="${tar}.gz" />
+		<tar destfile="${tar}">
+			<tarfileset dir="${dir-to-tar}"/>
+		</tar>
+    
+		<gzip src="${tar}" zipfile="${gz}" />
+		<delete dir="${dir-to-tar}" />
+		<delete file="${tar}" />
+		<property name="applet-${server.name}-archive" value="${gz}" />
+  </target>
+  
+  
 
 	<!-- Source. Resulting file is ${src-archive} -->
 	<target name="src" depends="init">
@@ -241,6 +306,6 @@
 
 	
 	<!-- Makes releases for windows, unix and os x -->
-	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" />
+	<target name="release" depends="init, ask-cf-info, unix, windows, osx, applet, src" />
 	
 </project>
