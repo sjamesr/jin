@@ -35,9 +35,7 @@ import free.util.Struct;
  * possible. If it's genuinely impossibly to implement the feature, the 
  * implementation should provide a reasonable blank value.
  * Server specific subclasses should add methods for retrieving all the 
- * information provided by the server. Game instances are immutable and so
- * should instances of Game subclasses be (There is an exception to this - see
- * the <code>setInitialPosition</code> method).
+ * information provided by the server.
  */
 
 public class Game extends Struct{
@@ -65,6 +63,46 @@ public class Game extends Struct{
 
   public static final int ISOLATED_BOARD = 3;
 
+
+
+  /**
+   * The constant for a "white wins" result.
+   */
+
+  public static final int WHITE_WINS = 1;
+
+
+
+  /**
+   * The constant for a "black wins" result.
+   */
+
+  public static final int BLACK_WINS = 2;
+
+
+
+  /**
+   * The constant for a "draw" result.
+   */
+
+  public static final int DRAW = 3;
+
+
+
+  /**
+   * The constant for an unknown game result.
+   */
+
+  public static final int UNKNOWN_RESULT = 4;
+
+
+
+  /**
+   * The constant for when the game result is not yet known because the game
+   * hasn't finished yet.
+   */
+
+  public static final int GAME_IN_PROGRESS = 5;
 
 
 
@@ -216,7 +254,7 @@ public class Game extends Struct{
 
 
   /**
-   * Sets the initial position of the game to the given position. Although Game
+   * Sets the initial position of the game to the given position. Usually, Game
    * objects are supposed to be immutable, this exception is necessary because
    * some commands (like clearboard, loadgame) modify the initial position of
    * the game for all practical purposes, and it's not feasible to recreate the
@@ -277,9 +315,7 @@ public class Game extends Struct{
 
   /**
    * Returns the number of milliseconds by which the clock of the white player
-   * is incremented each time he makes a move. This could be used to indicate
-   * increment in Bronstein-clock style, depending on the clock style used by
-   * the server.
+   * is incremented each time he makes a move.
    */
 
   public int getWhiteInc(){
@@ -296,6 +332,18 @@ public class Game extends Struct{
 
   public int getBlackTime(){
     return getIntegerProperty("BlackTime");
+  }
+
+
+
+
+  /**
+   * Returns the number of milliseconds by which the clock of the black player
+   * is incremented each time he makes a move.
+   */
+
+  public int getBlackInc(){
+    return getIntegerProperty("BlackInc");
   }
 
 
@@ -320,21 +368,6 @@ public class Game extends Struct{
     return getIntegerProperty("BlackRating");
   } 
 
-
-
-
-
-
-  /**
-   * Returns the number of milliseconds by which the clock of the black player
-   * is incremented each time he makes a move. This could be used to indicate
-   * increment in Bronstein-clock style, depending on the clock style used by
-   * the server.
-   */
-
-  public int getBlackInc(){
-    return getIntegerProperty("BlackInc");
-  }
 
 
 
@@ -457,15 +490,56 @@ public class Game extends Struct{
 
   public boolean isUserAllowedToMovePieces(Player player){
     int gameType = getGameType();
-    if (gameType==OBSERVED_GAME){
+    if (gameType==OBSERVED_GAME)
       return false;
-    }
-    else if (gameType==ISOLATED_BOARD){
+    else if (gameType==ISOLATED_BOARD)
       return false;
+    else // MY_GAME
+      return player.equals(getUserPlayer());
+  }
+
+
+
+
+  /**
+   * Returns the result of the game. Possible values are
+   * <code>WHITE_WINS</code>, <code>BLACK_WINS</code>, <code>DRAW</code>,
+   * <code>UNKNOWN_RESULT</code> and <code>GAME_IN_PROGRESS</code>.
+   */
+
+  public int getResult(){
+    Integer result = (Integer)getProperty("Result");    
+    if (result == null)
+      return GAME_IN_PROGRESS;
+    return result.intValue();
+  }
+
+
+
+
+  /**
+   * Sets the result of the game to the specified value. Possible values are
+   * <code>WHITE_WINS</code>, <code>BLACK_WINS</code>, <code>DRAW</code> and
+   * <code>UNKNOWN_RESULT</code>. This method may only be called once per Game
+   * object (when the game ends), and the caller is responsible for notifying 
+   * all interested parties that the game ended.
+   */
+
+  public void setResult(int result){
+    switch(result){
+      case WHITE_WINS:
+      case BLACK_WINS:
+      case DRAW:
+      case UNKNOWN_RESULT:
+        break;
+      default:
+        throw new IllegalArgumentException("Bad value for game result specified: "+result);
     }
-    else{ // MY_GAME
-      return player.equals(getProperty("UserPlayer"));
-    }
+
+    if (getResult() != GAME_IN_PROGRESS)
+      throw new IllegalStateException("Unable to set the result more than once");
+
+    setIntegerProperty("Result", result);
   }
 
 
@@ -476,10 +550,11 @@ public class Game extends Struct{
    */
 
   public String getTCString(){
-    String timeString = (getWhiteTime()/(1000*60))+" "+(getWhiteInc()/1000);
+    String timeString = ""+(getWhiteTime()/(1000*60))+" "+(getWhiteInc()/1000);
     if (isTimeOdds())
-      timeString = "("+timeString+") ("+(getBlackTime()/(1000*60))+" "+(getBlackInc()/1000)+")";
-    return timeString;
+      return "("+timeString+") ("+(getBlackTime()/(1000*60))+" "+(getBlackInc()/1000)+")";
+    else
+      return timeString;
   }
 
 
