@@ -1,0 +1,4 @@
+id = winter
+name = Winter
+classname = ImageBoardLoader
+scaleSquares = true

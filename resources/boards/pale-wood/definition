@@ -1,0 +1,4 @@
+id = pale-wood
+name = Pale Wood
+classname = ImageBoardLoader
+scaleSquares = true
