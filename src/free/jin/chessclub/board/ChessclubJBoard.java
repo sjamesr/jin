@@ -292,100 +292,22 @@ public class ChessclubJBoard extends JBoard implements PaintHook{
     if (component != this)
       throw new IllegalArgumentException("Can only paint on this.");
 
+    Rectangle rect = squareToRect(0, 0, null);
+
+    final int arrowSize = rect.width / 7; // Assume width==height
+    final int squareSize = rect.width / 10; // Assume width==height
+
     int arrowCount = arrows.size()/3;
+    
     for (int i = 0; i < arrowCount; i++)
-      drawArrow(g, (Square)arrows.elementAt(i*3), (Square)arrows.elementAt(i*3+1), (Color)arrows.elementAt(i*3+2));
+      drawArrow(g, (Square)arrows.elementAt(i*3), (Square)arrows.elementAt(i*3+1), arrowSize, (Color)arrows.elementAt(i*3+2));
 
     int circleCount = circles.size()/2;
     for (int i = 0; i < circleCount; i++)
-      drawCircle(g, (Square)circles.elementAt(i*2), (Color)circles.elementAt(i*2+1));
+      drawSquare(g, (Square)circles.elementAt(i*2), squareSize, (Color)circles.elementAt(i*2+1));
 
     if ((tmpArrowFrom != null)&&(tmpArrowTo != null)&&!tmpArrowFrom.equals(tmpArrowTo))
-      drawArrow(g, tmpArrowFrom, tmpArrowTo, getDefaultArrowColor());
-  }
-
-
-
-
-  /**
-   * Draws the specified arrow on the given Graphics object.
-   */
-
-  private void drawArrow(Graphics g, Square from, Square to, Color color){
-    g.setColor(color);
-
-    Rectangle fromRect = squareToRect(from, null);
-    Rectangle toRect = squareToRect(to, null);
-
-    final int arrowSize = fromRect.width/7; // Assume width==height
-
-    int fromX = fromRect.x + fromRect.width/2;
-    int fromY = fromRect.y + fromRect.height/2;
-    int toX = toRect.x + toRect.width/2;
-    int toY = toRect.y + toRect.height/2;
-
-    int dx = toX - fromX;
-    int dy = toY - fromY;
-
-    double angle = Math.atan2(dy, dx);
-    double sin = Math.sin(angle);
-    double cos = Math.cos(angle);
-
-    int [] xpoints = new int[4];
-    int [] ypoints = new int[4];
-
-    // The arrow "stick"
-    xpoints[0] = (int)(fromX+sin*arrowSize/2);
-    ypoints[0] = (int)(fromY-cos*arrowSize/2);
-    xpoints[1] = (int)(fromX-sin*arrowSize/2);
-    ypoints[1] = (int)(fromY+cos*arrowSize/2);
-    xpoints[2] = (int)(toX-sin*arrowSize/2);
-    ypoints[2] = (int)(toY+cos*arrowSize/2);
-    xpoints[3] = (int)(toX+sin*arrowSize/2);
-    ypoints[3] = (int)(toY-cos*arrowSize/2);
-
-    g.fillPolygon(xpoints, ypoints, 4);
-
-    // The arrow "point"
-    xpoints[0] = (int)(toX+cos*arrowSize);
-    ypoints[0] = (int)(toY+sin*arrowSize);
-    xpoints[1] = (int)(toX+Math.cos(angle-Math.PI*3/4)*arrowSize*2);
-    ypoints[1] = (int)(toY+Math.sin(angle-Math.PI*3/4)*arrowSize*2);
-    xpoints[2] = (int)(toX-cos*arrowSize/2);
-    ypoints[2] = (int)(toY-sin*arrowSize/2);
-    xpoints[3] = (int)(toX+Math.cos(angle+Math.PI*3/4)*arrowSize*2);
-    ypoints[3] = (int)(toY+Math.sin(angle+Math.PI*3/4)*arrowSize*2);
-
-    g.fillPolygon(xpoints, ypoints, 4);
-  }
-
-
-
-
-  /**
-   * Draws the specified circle on the given Graphics object.
-   */
-
-  private void drawCircle(Graphics g, Square circleSquare, Color color){
-    g.setColor(color);
-
-    Rectangle rect = squareToRect(circleSquare, null);
-
-    int size = rect.width/10; // Assume width==height
-
-    g.translate(rect.x, rect.y);
-
-    g.fillRect(size, 0, rect.width - size*2, size);
-    g.fillRect(rect.width - size, size, size, rect.height - size*2);
-    g.fillRect(size, rect.height - size, rect.width - size*2, size);
-    g.fillRect(0, size, size, rect.height - size*2);
-
-    g.fillArc(0, 0, size*2, size*2, 90, 90);
-    g.fillArc(rect.width - size*2, 0, size*2, size*2, 0, 90);
-    g.fillArc(rect.width - size*2, rect.height - size*2, size*2, size*2, 270, 90);
-    g.fillArc(0, rect.height - size*2, size*2, size*2, 180, 90);
-
-    g.translate(-rect.x, -rect.y);
+      drawArrow(g, tmpArrowFrom, tmpArrowTo, arrowSize, getDefaultArrowColor());
   }
 
 
