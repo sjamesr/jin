@@ -110,6 +110,9 @@ public class BrowserControl{
           return false;
 
         StringTokenizer tokenizer = new StringTokenizer(browsers, ":");
+        if (!tokenizer.hasMoreTokens())
+          return false;
+        
         String browser = tokenizer.nextToken();
         int percentPercentIndex;
         while ((percentPercentIndex = browser.indexOf("%%")) != -1)
@@ -267,7 +270,7 @@ public class BrowserControl{
   public static void showDisplayBrowserFailedDialog(String url, Component parent, boolean modal){
     final Dialog dialog = new Dialog(AWTUtilities.frameForComponent(parent), "Error displaying URL", modal);
     dialog.setLayout(new BorderLayout(5, 5));
-    dialog.add(new Label("Unable to show url, copy/paste it into your browser:"), BorderLayout.NORTH);
+    dialog.add(new Label("Unable to show URL - please copy/paste it into your browser:"), BorderLayout.NORTH);
     TextField urlTextField = new TextField(url);
     urlTextField.setEditable(false);
     dialog.add(urlTextField, BorderLayout.CENTER);
@@ -298,7 +301,7 @@ public class BrowserControl{
   public static void showDisplayMailerFailedDialog(String address, Component parent, boolean modal){
     final Dialog dialog = new Dialog(AWTUtilities.frameForComponent(parent), "Error displaying mailer", modal);
     dialog.setLayout(new BorderLayout(5, 5));
-    dialog.add(new Label("Unable to display mailer, copy/paste the address into your mailer:"), BorderLayout.NORTH);
+    dialog.add(new Label("Unable to display mailer - please copy/paste the address into your mailer:"), BorderLayout.NORTH);
     TextField addressTextField = new TextField(address);
     addressTextField.setEditable(false);
     dialog.add(addressTextField, BorderLayout.CENTER);
