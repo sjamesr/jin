@@ -29,6 +29,7 @@ import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
+import free.util.swing.UrlDisplayingAction;
 import free.util.TableLayout;
 import free.util.AWTUtilities;
 import free.chess.ColoredBoardPainter;
@@ -248,14 +249,24 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     lightSquares.addChangeListener(boardColorChangeListener);
     
     
-    JPanel contentPanel = new JPanel();
-    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
-    piecesPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
-    boardPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
+    JButton downloadExtras = new JButton("Download Extras");
+    downloadExtras.setMnemonic('E');
+    downloadExtras.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/extras/"));
     
-    contentPanel.add(piecesPanel);
-    contentPanel.add(Box.createHorizontalStrut(10));
-    contentPanel.add(boardPanel);
+    JPanel boardAndExtraPanel = new JPanel();
+    boardAndExtraPanel.setLayout(new BoxLayout(boardAndExtraPanel, BoxLayout.Y_AXIS));
+    boardPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    downloadExtras.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    boardAndExtraPanel.add(boardPanel);
+    boardAndExtraPanel.add(Box.createVerticalStrut(15));
+    boardAndExtraPanel.add(downloadExtras);
+    boardAndExtraPanel.add(Box.createVerticalStrut(15));
+   
+    
+    JPanel contentPanel = new JPanel(new BorderLayout());
+    contentPanel.add(BorderLayout.WEST, piecesPanel);
+    contentPanel.add(BorderLayout.CENTER, Box.createHorizontalStrut(10));
+    contentPanel.add(BorderLayout.EAST, boardAndExtraPanel);
     
     JLabel noticeLabel = new JLabel("Color settings apply only to some of the sets and patterns");
     
@@ -266,7 +277,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));    
     add(contentPanel);
     add(Box.createVerticalStrut(10));
-    add(noticeLabel); 
+    add(noticeLabel);
   }
   
   
@@ -308,7 +319,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createPiecesUI(){
-    JComponent piecesPanel = new PreferredSizedPanel();
+    JComponent piecesPanel = new JPanel();
     piecesPanel.setLayout(new BoxLayout(piecesPanel, BoxLayout.Y_AXIS));
     piecesPanel.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createTitledBorder("Pieces"),
@@ -338,8 +349,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     piecesPanel.add(scrollPane);
     piecesPanel.add(Box.createVerticalStrut(10));
     piecesPanel.add(colorsPanel);
-    piecesPanel.add(Box.createVerticalGlue());
-    
+        
     pieceColorsPanel = colorsPanel;
     
     return piecesPanel;
@@ -352,7 +362,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createBoardUI(){
-    JComponent boardPanel = new PreferredSizedPanel();
+    JComponent boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createTitledBorder("Board"),
@@ -369,8 +379,6 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
       new JScrollPane(boardPatterns, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-    boardPatterns.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    boardPatterns.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     
     JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(1, 0, 5));
     colorsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -382,7 +390,6 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     boardPanel.add(scrollPane);
     boardPanel.add(Box.createVerticalStrut(10));
     boardPanel.add(colorsPanel);
-    boardPanel.add(Box.createVerticalGlue());
     
     boardColorsPanel = colorsPanel;
     
