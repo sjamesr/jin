@@ -44,14 +44,6 @@ public class LoginPanel extends DialogPanel{
 
 
   /**
-   * The context in which we're running.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * The server we're to connect to.
    */
 
@@ -72,8 +64,7 @@ public class LoginPanel extends DialogPanel{
    * connection details.
    */
 
-  public LoginPanel(JinContext context, Server server, ConnectionDetails connDetails){
-    this.context = context;
+  public LoginPanel(Server server, ConnectionDetails connDetails){
     this.server = server;
     this.connDetails = connDetails;
 
@@ -83,13 +74,13 @@ public class LoginPanel extends DialogPanel{
 
 
   /**
-   * Displays this panel using the specified <code>UIProvider</code> and returns
-   * the connection details specified by the user. Returns <code>null</code> if
-   * the user closes the panel or otherwise cancels the operation.
+   * Displays this panel and returns the connection details specified by the
+   * user. Returns <code>null</code> if the user closes the panel or otherwise
+   * cancels the operation.
    */
 
-  public ConnectionDetails askConnectionDetails(UIProvider uiProvider){
-    return (ConnectionDetails)super.askResult(uiProvider);
+  public ConnectionDetails askConnectionDetails(){
+    return (ConnectionDetails)super.askResult();
   }
 
 
@@ -112,7 +103,7 @@ public class LoginPanel extends DialogPanel{
     OptionPanel panel = new OptionPanel(OptionPanel.ERROR, title,
       new Object[]{OptionPanel.OK}, OptionPanel.OK, message);
     panel.setHintParent(this);
-    panel.show(context.getUIProvider());
+    panel.show();
   }
 
 
@@ -136,11 +127,9 @@ public class LoginPanel extends DialogPanel{
     hostnameBox.setEditable(true);
     hostnameBox.setSelectedItem(hostname);
     final JTextField portsField = new FixedJTextField(StringEncoder.encodeIntList(ports), 7);
-    final JCheckBox savePasswordCheckBox = context.isSavePrefsCapable() ?
-      new JCheckBox("Save password", savePassword) : null;
-      
-    if (savePasswordCheckBox != null)
-      savePasswordCheckBox.setMnemonic('S');
+    final JCheckBox savePasswordCheckBox = new JCheckBox("Save password", savePassword);
+    
+    savePasswordCheckBox.setMnemonic('S');
 
     
     JButton connectButton = new JButton("Connect");
@@ -230,13 +219,13 @@ public class LoginPanel extends DialogPanel{
       }
     });
     
-    if ((savePasswordCheckBox != null) && (context.getPasswordSaveWarning() != null)){
+    if (Jin.getInstance().getPasswordSaveWarning() != null){
       savePasswordCheckBox.addItemListener(new ItemListener(){
         public void itemStateChanged(ItemEvent evt){
           if (savePasswordCheckBox.isSelected()){
             Object result = new OptionPanel(OptionPanel.WARNING, "Save password?", 
               new Object[]{OptionPanel.YES, OptionPanel.NO}, OptionPanel.YES,
-              context.getPasswordSaveWarning()).show(context.getUIProvider());
+              Jin.getInstance().getPasswordSaveWarning()).display();
             if (result != OptionPanel.YES)
               savePasswordCheckBox.setSelected(false);
           }
