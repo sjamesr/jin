@@ -47,7 +47,7 @@ public abstract class Connection{
    * is done.
    */
 
-  private String username = null;
+  private volatile String username = null;
 
 
 
@@ -156,12 +156,14 @@ public abstract class Connection{
    * @see #disconnect()
    */
 
-  public synchronized void connect() throws IOException{
-    if (isConnected())
-      throw new IllegalStateException();
-    sock = createSocket(hostname,port);
+  public void connect() throws IOException{
+    synchronized(this){
+      if (isConnected())
+        throw new IllegalStateException();
+      sock = createSocket(hostname,port);
 
-    isConnected = true;
+      isConnected = true;
+    }
 
     readerThread = createReaderThread();
     readerThread.start();
@@ -170,6 +172,12 @@ public abstract class Connection{
     if (getUsername()==null)
       throw new Error("The login() method MUST assign a username");
     isLoggedIn = true;
+
+    execRunnable(new Runnable(){
+      public void run(){
+        onLogin();
+      }
+    });
   }
 
 
@@ -219,6 +227,17 @@ public abstract class Connection{
 
 
   /**
+   * This method is called right after the login, in the handler thread (the
+   * one in which things are called when you invoke
+   * <code>execRunnable()</code>).
+   * The default implementation does nothing.
+   */
+
+  protected void onLogin(){}
+
+
+
+  /**
    * Returns the username assigned by the server, this may be null until the 
    * session is logged on.
    *
@@ -239,7 +258,7 @@ public abstract class Connection{
    * @see #getUsername()
    */
 
-  protected final void setUsername(String username){
+  protected synchronized final void setUsername(String username){
     if (this.username!=null)
       throw new IllegalStateException("A username may only be assigned once");
 
@@ -340,13 +359,13 @@ public abstract class Connection{
    * the AWT thread thus avoiding multi-threading problems.
    * The default implementation of this method, meant for non-graphical
    * applications, such as bots, simply invokes the run() method of the Runnable
-   * in the current thread.
+   * in the current thread. Note that it's important that the runnable is always
+   * run in <B>one</B> thread, so you can't do load balancing from here.
    */
 
   public void execRunnable(Runnable runnable){
     runnable.run();
   }
-
 
 
 }
