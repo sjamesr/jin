@@ -30,7 +30,7 @@ import free.util.AWTUtilities;
 
 /**
  * A <code>JPanel</code> which allows its content (always a single component)
- * to be displayed in fullscreen mode.
+ * to be displayed in fullscreen mode. 
  */
 
 public class FullscreenPanel extends FixedJPanel{
@@ -77,6 +77,16 @@ public class FullscreenPanel extends FixedJPanel{
    */
    
   private Object originalFrameState;
+  
+  
+  
+  /**
+   * The original parent frame. We need to keep this because the fullscreen
+   * panel might get removed from its parent, but we still need to make the
+   * original parent frame visible when the target panel is made "normal" again.
+   */
+   
+  private Frame originalFrame;
   
   
   
@@ -178,7 +188,10 @@ public class FullscreenPanel extends FixedJPanel{
 
   private RootPaneContainer setRealFullscreen(){
     try{
-      JFrame frame = new JFrame(SwingUtils.frameForComponent(this).getTitle());
+      originalFrame = SwingUtils.frameForComponent(this);
+      JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle());
+      if (originalFrame != null)
+        frame.setIconImage(originalFrame.getIconImage());        
 
       Method setUndecorated = 
         Frame.class.getDeclaredMethod("setUndecorated", new Class[]{boolean.class});
@@ -201,12 +214,13 @@ public class FullscreenPanel extends FixedJPanel{
         getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), null);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, null);
       
-      Frame originalFrame = SwingUtils.frameForComponent(this);
-      Method getExtState = Frame.class.getDeclaredMethod("getExtendedState", new Class[0]);
-      originalFrameState = getExtState.invoke(originalFrame, new Object[0]);
-
-      originalFrame.setVisible(false);
-      setFullScreenWindow.invoke(graphicsDevice, new Object[]{frame});
+      if (originalFrame != null){
+        Method getExtState = Frame.class.getDeclaredMethod("getExtendedState", new Class[0]);
+        originalFrameState = getExtState.invoke(originalFrame, new Object[0]);
+  
+        originalFrame.setVisible(false);
+        setFullScreenWindow.invoke(graphicsDevice, new Object[]{frame});
+      }
 
       return frame;
     } catch (Exception e){e.printStackTrace();}
@@ -280,12 +294,12 @@ public class FullscreenPanel extends FixedJPanel{
       frame.dispose();
 
       
-      Frame originalFrame = SwingUtils.frameForComponent(this);
-      
-      Method setExtState =
-        Frame.class.getDeclaredMethod("setExtendedState", new Class[]{int.class});
-      setExtState.invoke(originalFrame, new Object[]{originalFrameState});
-      originalFrame.setVisible(true);
+      if (originalFrame != null){
+        Method setExtState =
+          Frame.class.getDeclaredMethod("setExtendedState", new Class[]{int.class});
+        setExtState.invoke(originalFrame, new Object[]{originalFrameState});
+        originalFrame.setVisible(true);
+      }
     } catch (Exception e){e.printStackTrace();}
   }
 
