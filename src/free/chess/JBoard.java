@@ -1455,21 +1455,6 @@ public class JBoard extends JComponent{
     frame.addWindowListener(new free.util.AppKiller());
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
-    ActionListener escapeListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        System.out.println("Invoked");
-        if (board.isMovingPiece())
-          board.cancelMovingPiece();
-      }
-    };
-
-    board.setMoveInputStyle(JBoard.CLICK_N_CLICK);
-    board.registerKeyboardAction(escapeListener,
-      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK),
-      JComponent.WHEN_IN_FOCUSED_WINDOW);
-    board.registerKeyboardAction(escapeListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-      JComponent.WHEN_IN_FOCUSED_WINDOW);
-
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
     frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);
