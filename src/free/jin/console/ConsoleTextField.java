@@ -145,8 +145,10 @@ public class ConsoleTextField extends FixedJTextField{
               }
             }
                                   
-            if (newHistoryIndex == history.size())
-              return;
+            if (newHistoryIndex == history.size()){
+              getToolkit().beep();
+              break;
+            }
 
             setText((String)history.elementAt(currentHistoryIndex));
           }
@@ -154,7 +156,7 @@ public class ConsoleTextField extends FixedJTextField{
         case KeyEvent.VK_DOWN:
           if (evt.getModifiers()==0){
             if (currentHistoryIndex == -1)
-              return;
+              break;
 
             int newHistoryIndex = currentHistoryIndex;
             while (--newHistoryIndex >= 0){
@@ -168,6 +170,7 @@ public class ConsoleTextField extends FixedJTextField{
             if (newHistoryIndex == -1){
               setText(typedInString);
               currentHistoryIndex = -1;
+              getToolkit().beep();
             }
             else
               setText((String)history.elementAt(currentHistoryIndex));
