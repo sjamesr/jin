@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 import java.util.Hashtable;
+import java.util.StringTokenizer;
 import free.jin.plugin.Plugin;
 import free.jin.Seek;
 import free.jin.seek.event.SeekSelectionListener;
@@ -152,11 +153,13 @@ public class SoughtGraph extends JComponent{
 
 
   /**
-   * A cache of images we use to draw seeks. Maps property names to Images.
+   * An array whose indices specify the size of the seek images and whose values
+   * are Hashtables mapping seek type keys (Strings) to cached Images. The seek
+   * type keys are in the following format:
+   * "seek-image.rated/unrated.computer/human.variant"
    */
 
-  private final Hashtable imageCache = new Hashtable();
-
+  private final Hashtable [] seekImageCache;
 
 
 
@@ -185,6 +188,22 @@ public class SoughtGraph extends JComponent{
     }
 
     this.bgImage = bgImage;
+
+    String seekImageSizes = plugin.getProperty("seek-image.sizes");
+    StringTokenizer tokenizer = new StringTokenizer(seekImageSizes, ",");
+    int maxSize = 0;
+    while (tokenizer.hasMoreTokens()){
+      int size = Integer.parseInt(tokenizer.nextToken());
+      if (size > maxSize)
+        maxSize = size;
+    }
+
+    seekImageCache = new Hashtable[maxSize+1];
+    tokenizer = new StringTokenizer(seekImageSizes, ",");
+    while (tokenizer.hasMoreTokens()){
+      int size = Integer.parseInt(tokenizer.nextToken());
+      seekImageCache[size] = new Hashtable(10);
+    }
 
     enableEvents(MouseEvent.MOUSE_MOTION_EVENT_MASK|MouseEvent.MOUSE_EVENT_MASK);
   }
@@ -510,34 +529,86 @@ public class SoughtGraph extends JComponent{
 
 
 
+
+  /**
+   * Returns the Image that should be drawn for the specified Seek at the
+   * specified size.
+   */
+
+  private Image getSeekImage(Rectangle seekBounds, Seek seek){
+    System.out.println(seekBounds);
+    int size = Math.min(seekBounds.width, seekBounds.height);
+    if (size <= 0)
+      throw new IllegalArgumentException("Seek bounds size must be positive");
+
+    int index = -1;
+
+    if (size >= seekImageCache.length)
+      index = seekImageCache.length-1;
+    else if (seekImageCache[size] != null)
+      index = size;
+
+    if (index == -1){
+      for (int i = size; i > 0; i--)
+        if (seekImageCache[i] != null){
+          index = i;
+          break;
+        }
+    }
+
+    if (index == -1){
+      for (int i = size+1; i < seekImageCache.length; i++)
+        if (seekImageCache[i] != null){
+          index = i;
+          break;
+        }
+    }
+
+    if (index == -1)
+      throw new IllegalStateException("Couldn't find suitable seek images");
+
+    System.out.println(index);
+
+    Hashtable sizeImages = seekImageCache[index];
+
+    String playerType = seek.isSeekerComputer() ? "computer" : "human";
+    String ratedString = seek.isRated() ? "rated" : "unrated";
+    String imageKey = "seek-image."+ratedString+"."+playerType+"."+seek.getVariant();
+
+    Image image = (Image)sizeImages.get(imageKey);
+    if (image == null){
+      String imagesDir = plugin.getProperty("seek-image.directory");
+      String imageName = plugin.lookupProperty(imageKey);
+      if (imageName == null)
+        return null;
+
+      String imageFile = imagesDir+"/"+index+"/"+imageName;
+      image = getToolkit().getImage(SoughtGraph.class.getResource(imageFile));
+      try{
+        if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
+          return null;
+      } catch (InterruptedException e){}
+      sizeImages.put(imageKey, image);
+    }
+
+    return image;
+  }
+
+
   /**
    * Draws a single seek within the given bounds.
    */
 
   protected void drawSeek(Graphics g, Seek seek, Rectangle seekBounds){
-    String playerType = seek.isSeekerComputer() ? "computer" : "human";
-    String ratedString = seek.isRated() ? "rated" : "unrated";
-    String imageKey = "seek-image."+ratedString+"."+playerType+"."+seek.getVariant();
+    Image seekImage = getSeekImage(seekBounds, seek);
 
-    Image image = (Image)imageCache.get(imageKey);
-    if (image == null){
-      String imageName = plugin.lookupProperty(imageKey);
-      if (imageName != null){
-        image = getToolkit().getImage(SoughtGraph.class.getResource(imageName));
-        try{
-          if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
-            image = null;
-        } catch (InterruptedException e){}
-      }
-    }
-
-    if (image == null){
+    if (seekImage == null){
       g.setColor(Color.black);
       g.drawOval(seekBounds.x, seekBounds.y, seekBounds.width-1, seekBounds.height-1);
       return;
     }
 
-    g.drawImage(image, seekBounds.x, seekBounds.y, null);
+    g.drawImage(seekImage, seekBounds.x, seekBounds.y, null);
 
     /*
     Color color = StringParser.parseColor(plugin.lookupProperty("color."+seek.getVariant().getName()));
