@@ -900,13 +900,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     clicknclickMenuItem.addActionListener(inputModeListener);
 
     int draggedPieceStyle = getDraggedPieceStyle();
-    JRadioButtonMenuItem normalDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Normal Dragged Piece",
+    JRadioButtonMenuItem normalDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Follow Cursor",
       draggedPieceStyle == JBoard.NORMAL_DRAGGED_PIECE);
-    JRadioButtonMenuItem targetDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Target Cursor",
+    JRadioButtonMenuItem targetDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Square Outline",
       draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE);
 
-    normalDraggedPieceStyleMenuItem.setMnemonic('N');
-    targetDraggedPieceStyleMenuItem.setMnemonic('T');
+    normalDraggedPieceStyleMenuItem.setMnemonic('F');
+    targetDraggedPieceStyleMenuItem.setMnemonic('S');
 
     ButtonGroup draggedPieceStyleGroup = new ButtonGroup();
     draggedPieceStyleGroup.add(normalDraggedPieceStyleMenuItem);
