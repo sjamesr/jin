@@ -22,12 +22,18 @@
 package free.jin.chessclub.board;
 
 import javax.swing.*;
+import free.jin.event.*;
 import free.jin.board.BoardPanel;
 import free.jin.plugin.Plugin;
 import free.jin.Game;
 import free.chess.JBoard;
 import free.chess.Player;
+import free.chess.Square;
 import free.jin.chessclub.UserImageInternalFrame;
+import free.jin.chessclub.event.ChessclubGameListener;
+import free.jin.chessclub.event.ArrowEvent;
+import free.jin.chessclub.event.CircleEvent;
+import free.jin.chessclub.board.event.ArrowCircleListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.Cursor;
@@ -42,7 +48,17 @@ import java.net.MalformedURLException;
  * Extends BoardPanel to provide chessclub.com specific functionalities.
  */
 
-public class ChessclubBoardPanel extends BoardPanel implements MouseListener{
+public class ChessclubBoardPanel extends BoardPanel implements MouseListener, ChessclubGameListener, ArrowCircleListener{
+
+
+
+  /**
+   * We set this to true when we're handling a circle/arrow adding event from
+   * the server to avoid responding to the board's event when we add the
+   * circle/arrow to it.
+   */
+
+  private boolean handlingArrowCircleEvent = false;
 
 
 
@@ -58,6 +74,103 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener{
   }
 
 
+
+
+  /**
+   * Overrides createBoard(Game game) to return an instance of ChessclubJBoard.
+   */
+
+  protected JBoard createBoard(Game game){
+    return new ChessclubJBoard(game.getInitialPosition());
+  }
+
+
+
+
+  /**
+   * Override configureBoard(Game, JBoard) to add ourselves as an
+   * ArrowCircleListener to the board.
+   */
+
+  protected void configureBoard(Game game, JBoard board){
+    super.configureBoard(game, board);
+
+    if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed())
+      ((ChessclubJBoard)board).addArrowCircleListener(this);
+  }
+
+
+
+
+  /**
+   * Overrides moveMade(MoveMadeEvent) to clear the board of any arrows/circles.
+   */
+
+  public void moveMade(MoveMadeEvent evt){
+    super.moveMade(evt);
+
+    if (evt.getGame() != game)
+      return;
+
+    ((ChessclubJBoard)board).removeAllArrows();
+    ((ChessclubJBoard)board).removeAllCircles();
+  }
+
+
+
+
+  /**
+   * Overrides positionChanged(PositionChangedEvent) to clear the board of any
+   * arrows/circles.
+   */
+
+  public void positionChanged(PositionChangedEvent evt){
+    super.positionChanged(evt);
+
+    if (evt.getGame() != game)
+      return;
+
+    ((ChessclubJBoard)board).removeAllArrows();
+    ((ChessclubJBoard)board).removeAllCircles();
+  }
+
+
+
+
+
+  /**
+   * Overrides takebackOccurred(TakebackEvent) to clear the board of any
+   * arrows/circles.
+   */
+
+  public void takebackOccurred(TakebackEvent evt){
+    super.takebackOccurred(evt);
+
+    if (evt.getGame() != game)
+      return;
+
+    ((ChessclubJBoard)board).removeAllArrows();
+    ((ChessclubJBoard)board).removeAllCircles();
+  }
+
+
+
+
+
+  /**
+   * Overrides illegalMoveAttempted(IllegalMoveEvent) to clear the board of any
+   * arrows/circles.
+   */
+
+  public void illegalMoveAttempted(IllegalMoveEvent evt){
+    super.illegalMoveAttempted(evt);
+
+    if (evt.getGame() != game)
+      return;
+
+    ((ChessclubJBoard)board).removeAllArrows();
+    ((ChessclubJBoard)board).removeAllCircles();
+  }
 
 
   /**
@@ -129,6 +242,81 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener{
       frame.toFront();
     }
   }
+
+
+
+
+  /**
+   * Gets called when an arrow is added to the board (by the server).
+   */
+
+  public void arrowAdded(ArrowEvent evt){
+    handlingArrowCircleEvent = true;
+    ((ChessclubJBoard)getBoard()).removeArrow(evt.getFromSquare(), evt.getToSquare());
+    ((ChessclubJBoard)getBoard()).addArrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
+    handlingArrowCircleEvent = false;
+  }
+
+
+
+
+  /**
+   * Gets called when a circle is added to the board (by the server).
+   */
+
+  public void circleAdded(CircleEvent evt){
+    handlingArrowCircleEvent = true;
+    ((ChessclubJBoard)getBoard()).removeCircle(evt.getCircleSquare());
+    ((ChessclubJBoard)getBoard()).addCircle(evt.getCircleSquare(), Color.blue);
+    handlingArrowCircleEvent = false;
+  }
+
+
+
+
+  /**
+   * Gets called when an arrow is added on the board (on the client, not server). 
+   */
+
+  public void arrowAdded(ChessclubJBoard board, Square fromSquare, Square toSquare){
+    if (handlingArrowCircleEvent)
+      return;
+
+    plugin.getConnection().sendCommand("arrow "+fromSquare+" "+toSquare);
+  }
+
+
+
+  /**
+   * Gets called when an arrow is removed on the board (on the client, not the
+   * server.
+   */
+
+  public void arrowRemoved(ChessclubJBoard board, Square fromSquare, Square toSquare){}
+
+
+
+
+  /**
+   * Gets called when a circle is added (on the client, not the server).
+   */
+
+  public void circleAdded(ChessclubJBoard board, Square circleSquare){
+    if (handlingArrowCircleEvent)
+      return;
+
+    plugin.getConnection().sendCommand("circle "+circleSquare);
+  }
+
+
+
+  /**
+   * Gets called when a circle is removed (on the client, not the server).
+   */
+
+  public void circleRemoved(ChessclubJBoard board, Square circleSquare){}
+
+
 
 
 
