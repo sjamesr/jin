@@ -73,21 +73,11 @@ public class ChessclubServer extends Server{
    * Creates a guest <code>User</code>.
    */
 
-  public User createGuest(){
+  protected User createGuest(){
     Properties props = new Properties();
     props.put("login.username", "guest");
 
     return createUser(props, new Hashtable());
-  }
-
-
-
-  /**
-   * Returns true if the specified <code>User</code> is a guest.
-   */
-
-  public boolean isGuest(User user){
-    return "guest".equalsIgnoreCase(user.getUsername());
   }
 
 
