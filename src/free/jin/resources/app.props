@@ -1,0 +1,10 @@
+app.name = Jin
+app.version = 2.11 dev
+
+lf.extra.count = 3
+lf.extra.0.name = Kunststoff
+lf.extra.0.class = com.incors.plaf.kunststoff.KunststoffLookAndFeel
+lf.extra.1.name = 3D Look&Feel
+lf.extra.1.class = swing.addon.plaf.threeD.ThreeDLookAndFeel
+lf.extra.2.name = Metouia
+lf.extra.2.class = net.sourceforge.mlf.metouia.MetouiaLookAndFeel
