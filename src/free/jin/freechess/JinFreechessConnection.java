@@ -380,24 +380,18 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * of games that haven't started yet.
    */
 
-  private final Hashtable unstartedGameInfo = new Hashtable(1);
+  private final Hashtable unstartedGamesData = new Hashtable(1);
 
-
-
-  /**
-   * Maps game numbers to Game objects of ongoing games.
-   */
-
-  private final Hashtable ongoingGames = new Hashtable(5);
 
 
 
   /**
-   * Maps game numbers to last Style12Structs we're received for that game
-   * (only for ongoing games).
+   * Maps game numbers to InternalGameData objects of ongoing games.
    */
 
-  private final Hashtable lastStyle12Structs = new Hashtable(5);
+  private final Hashtable ongoingGamesData = new Hashtable(5);
+
+
 
 
 
@@ -418,7 +412,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processGameInfo(GameInfoStruct data){
-    unstartedGameInfo.put(new Integer(data.getGameNumber()), data);
+    unstartedGamesData.put(new Integer(data.getGameNumber()), data);
     
     return true;
   }
@@ -431,41 +425,43 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   protected boolean processStyle12(Style12Struct boardData){
     Integer gameNumber = new Integer(boardData.getGameNumber());
-    Game game = (Game)ongoingGames.get(gameNumber);
-    GameInfoStruct gameInfo = (GameInfoStruct)unstartedGameInfo.remove(gameNumber);
-    Style12Struct oldBoardData = (Style12Struct)lastStyle12Structs.put(gameNumber, boardData);
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+    GameInfoStruct unstartedGameInfo = (GameInfoStruct)unstartedGamesData.remove(gameNumber);
 
-    if (gameInfo != null) // A new game
-      game = startGame(gameInfo, boardData);
-    else if (game != null){ // A known game
-
-      // The server does that sometimes, to update clocks perhaps?
+    if (unstartedGameInfo != null) // A new game
+      gameData = startGame(unstartedGameInfo, boardData);
+    else if (gameData != null){ // A known game
+      Game game = gameData.game;
+      Style12Struct oldBoardData = gameData.boardData;
       int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
       if (game.isPlayed()){
-        if (plyDifference < 0)
-          issueTakeback(game, oldBoardData, boardData);
+        if (plyDifference < 0){
+          if (gameData.getMoveCount() < -plyDifference) // Can't issue takeback
+            changePosition(gameData, boardData);
+          else
+            issueTakeback(gameData, boardData);
+        }
         else if (plyDifference == 0){
 //          changePosition(game, oldBoardData, boardData);
-          System.out.println("*********** Position changed incompatibly ("+plyDifference+") **********");
           // This happens if you:
           // 1. Issue "refresh".
           // 2. Make an illegal move, because the server will re-send us the board (although we don't need it)
         }
         else if (plyDifference == 1){
           if (boardData.getMoveVerbose() != null)
-            makeMove(game, oldBoardData, boardData);
+            makeMove(gameData, boardData);
           else
-            changePosition(game, oldBoardData, boardData); // This shouldn't happen, but I'll leave it just in case
+            changePosition(gameData, boardData); // This shouldn't happen, but I'll leave it just in case
         }
         else if (plyDifference > 1){
-          changePosition(game, oldBoardData, boardData);
+          changePosition(gameData, boardData);
           // This happens if you:
           // 1. Issue "forward" with an argument of 2 or bigger.
         }
       }
       else{
-        changePosition(game, oldBoardData, boardData); // Since we don't have the move list, this is the best we can do
+        changePosition(gameData, boardData); // Since we don't have the move list, this is the best we can do
       }
     }
     else{ // Grr, the server started a game without sending us a GameInfo line.
@@ -476,17 +472,115 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         boardData.getInitialTime(), boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(), 0,
         -1, ' ', -1, ' ', false, false);
 
-      game = startGame(fakeGameInfo, boardData);
+      gameData = startGame(fakeGameInfo, boardData);
     }
 
-    if (game != null){
-      updateClocks(game, boardData);
+    if (gameData != null){
+      updateClocks(gameData, boardData);
+
+      Style12Struct oldBoardData = gameData.boardData;
+
       if ((oldBoardData != null) && (oldBoardData.isBoardFlipped() != boardData.isBoardFlipped()))
-        flipBoard(game, oldBoardData, boardData);
+        flipBoard(gameData, boardData);
+
+      gameData.boardData = boardData;
     }
 
     return true;
   }
+
+
+
+  /**
+   * A small class for keeping internal data about a game.
+   */
+
+  private static class InternalGameData{
+
+
+    /**
+     * The Game object representing the game.
+     */
+
+    public final Game game;
+
+
+
+    /**
+     * A list of Moves done in the game.
+     */
+
+    public Vector moveList = new Vector();
+
+
+
+    /**
+     * The last Style12Struct we got for this game.
+     */
+
+    public Style12Struct boardData = null;
+
+
+
+    /**
+     * Creates a new InternalGameData.
+     */
+
+    public InternalGameData(Game game){
+      this.game = game;
+    }
+
+
+
+    /**
+     * Returns the amount of moves made in the game (as far as we counted).
+     */
+
+    public int getMoveCount(){
+      return moveList.size();
+    }
+
+
+
+
+    /**
+     * Adds the specified move to the moves list.
+     */
+
+    public void addMove(Move move){
+      moveList.addElement(move);
+    }
+
+
+
+    /**
+     * Removes the last <code>count</code> moves from the movelist, if possible.
+     * Otherwise, throws an <code>IllegalArgumentException</code>.
+     */
+
+    public void removeLastMoves(int count){
+      if (count > moveList.size())
+        throw new IllegalArgumentException("Can't remove more elements than there are elements");
+
+      int first = moveList.size() - 1;
+      int last = moveList.size() - count;
+      for (int i = first; i >= last; i--)
+        moveList.removeElementAt(i);
+    }
+
+
+
+    /**
+     * Removes all the moves made in the game.
+     */
+
+    public void clearMoves(){
+      moveList.removeAllElements();
+    }
+
+
+  }
+
 
 
 
@@ -559,11 +653,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   /**
    * Called when a new game is starting. Responsible for creating the game on
-   * the client side and firing appropriate events. Returns the newly created
-   * game.
+   * the client side and firing appropriate events. Returns an InternalGameData
+   * instance for the newly created Game.
    */
 
-  private Game startGame(GameInfoStruct gameInfo, Style12Struct boardData){
+  private InternalGameData startGame(GameInfoStruct gameInfo, Style12Struct boardData){
     String categoryName = gameInfo.getGameCategory();
     WildVariant variant = getVariant(categoryName);
     if (variant == null){
@@ -616,11 +710,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       blackTime, blackInc, whiteRating, blackRating, gameID, categoryName, isRated, isPlayed,
       whiteTitles, blackTitles, initiallyFlipped, userPlayer);
 
-    ongoingGames.put(new Integer(gameInfo.getGameNumber()), game);
+    InternalGameData gameData = new InternalGameData(game);
+
+    ongoingGamesData.put(new Integer(gameInfo.getGameNumber()), gameData);
 
     listenerManager.fireGameEvent(new GameStartEvent(this, game));
 
-    return game;
+    return gameData;
   }
 
 
@@ -630,7 +726,10 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Gets called when a move is made. Fires an appropriate MoveMadeEvent.
    */
 
-  private void makeMove(Game game, Style12Struct oldBoardData, Style12Struct boardData){
+  private void makeMove(InternalGameData gameData, Style12Struct boardData){
+    Game game = gameData.game;
+    Style12Struct oldBoardData = gameData.boardData;
+
     String moveVerbose = boardData.getMoveVerbose();
     String moveSAN = boardData.getMoveSAN();
 
@@ -733,6 +832,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       if (moveToString(game, move).equals(moveToString(game, madeMove))) // Same move.
         unechoedGameMoves.removeElementAt(0); 
     }
+
+    gameData.addMove(move);
   }
 
 
@@ -742,7 +843,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate ClockAdjustmentEvent.
    */
 
-  private void updateClocks(Game game, Style12Struct boardData){
+  private void updateClocks(InternalGameData gameData, Style12Struct boardData){
+    Game game = gameData.game;
+
     int whiteTime = boardData.getWhiteTime();
     int blackTime = boardData.getBlackTime();
 
@@ -764,10 +867,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void closeGame(int gameNumber, int result){
     Integer gameID = new Integer(gameNumber);
-    Game game = (Game)ongoingGames.remove(gameID);
-    game.setResult(result);
-    if (game != null){
-      lastStyle12Structs.remove(gameID);
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.remove(gameID);
+    if (gameData != null){
+      Game game = gameData.game;
+
+      game.setResult(result);
       listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
     }
   }
@@ -778,8 +882,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate BoardFlipEvent.
    */
 
-  private void flipBoard(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
-    listenerManager.fireGameEvent(new BoardFlipEvent(this, game, newBoardData.isBoardFlipped()));
+  private void flipBoard(InternalGameData gameData, Style12Struct newBoardData){
+    listenerManager.fireGameEvent(new BoardFlipEvent(this, gameData.game, newBoardData.isBoardFlipped()));
   }
 
 
@@ -791,25 +895,29 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void illegalMoveAttempted(String moveString){
     Integer gameNumber = null; // We must find the played game, since the server doesn't provide its game number.
-    Game game = null; 
+    InternalGameData gameData = null; 
     Style12Struct boardData = null;
     
-    Enumeration gameNumbers = ongoingGames.keys();
+    Enumeration gameNumbers = ongoingGamesData.keys();
     while (gameNumbers.hasMoreElements()){
       gameNumber = (Integer)gameNumbers.nextElement();
-      Game nextGame = (Game)ongoingGames.get(gameNumber);
+      InternalGameData nextGameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+      Game nextGame = nextGameData.game;
       if (nextGame.getGameType() == Game.MY_GAME){
-        game = nextGame;
-        boardData = (Style12Struct)lastStyle12Structs.get(gameNumber);
+        gameData = nextGameData;
         break;
       }
     }
 
-    if (game == null) // We're not playing a game. Weird, but what can we do?
+    if (gameData == null) // We're not playing a game. Weird, but what can we do?
       return;
 
+    Game game = gameData.game;
+
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
-    if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) // Not a move we made (probably the user typed it in)
+
+    // Not a move we made (probably the user typed it in)
+    if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) 
       return;
 
     Move move = (Move)unechoedGameMoves.elementAt(0);
@@ -826,9 +934,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate TakebackEvent.
    */
 
-  private void issueTakeback(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
+  private void issueTakeback(InternalGameData gameData, Style12Struct newBoardData){
+    Style12Struct oldBoardData = gameData.boardData;
     int takebackCount = oldBoardData.getPlayedPlyCount() - newBoardData.getPlayedPlyCount();
-    listenerManager.fireGameEvent(new TakebackEvent(this, game, takebackCount));
+
+    listenerManager.fireGameEvent(new TakebackEvent(this, gameData.game, takebackCount));
+
+    gameData.removeLastMoves(takebackCount);
   }
 
 
@@ -838,7 +950,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate PositionChangedEvent.
    */
 
-  private void changePosition(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
+  private void changePosition(InternalGameData gameData, Style12Struct newBoardData){
+    Game game = gameData.game;
+
     Position newPos = game.getInitialPosition();
     newPos.setFEN(newBoardData.getBoardFEN());
     Player currentPlayer = playerForString(newBoardData.getCurrentPlayer());
@@ -847,6 +961,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     game.setInitialPosition(newPos);
 
     listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
+
+    gameData.clearMoves();
   }
 
 
@@ -1084,10 +1200,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   public void makeMove(Game game, Move move) throws IllegalArgumentException{
-    Enumeration gamesEnum = ongoingGames.elements();
+    Enumeration gamesDataEnum = ongoingGamesData.elements();
     boolean ourGame = false;
-    while (gamesEnum.hasMoreElements()){
-      if ((Game)gamesEnum.nextElement() == game){
+    while (gamesDataEnum.hasMoreElements()){
+      InternalGameData gameData = (InternalGameData)gamesDataEnum.nextElement();
+      if (gameData.game == game){
         ourGame = true;
         break;
       }
