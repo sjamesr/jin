@@ -908,7 +908,7 @@ public abstract class Preferences{
       if ((source == defaultDelegate) && mainDelegate.hasPreference(propertyName))
         return;
 
-      PropertyChangeEvent newEvt = new PropertyChangeEvent(this, propertyName, evt.getOldValue(), evt.getNewValue());
+      PropertyChangeEvent newEvt = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
       newEvt.setPropagationId(evt.getPropagationId());
 
       // Fire the event

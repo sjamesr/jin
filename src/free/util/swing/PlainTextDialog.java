@@ -44,13 +44,6 @@ public class PlainTextDialog extends JDialog{
 
 
 
-  /**
-   * The text.
-   */
-
-  private final String text;
-
-
 
   /**
    * The text area displaying the text.
@@ -77,7 +70,6 @@ public class PlainTextDialog extends JDialog{
     super(SwingUtils.frameForComponent(parent), title == null ? "" : title, true);
 
     this.title = title;
-    this.text = text;
 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 

@@ -1318,7 +1318,6 @@ public class JBoard extends JComponent{
     g.setFont(font);
     
     FontMetrics fm = g.getFontMetrics(font);
-    int fontWidth = fm.stringWidth("a");
     int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
 
     int dir = isFlipped() ? 1 : -1;

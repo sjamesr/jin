@@ -319,9 +319,6 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   private void createSettingsPanelsFromProperties(){
-    Color background = prefs.getColor("background");
-    boolean antialiasingValue = prefs.getBool("output-text.antialias", false);
-
     int categoriesCount = prefs.getInt("preferences.categories.count", 0);
 
     for (int i = 0; i < categoriesCount; i++){
@@ -342,8 +339,6 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         for (int categoryIndex = 0; categoryIndex < categories.length; categoryIndex++)
           categories[categoryIndex] = categoriesTokenizer.nextToken();
 
-        String mainCategory = categories[0];
-         
         categoryPanel = new CategoryPanel(categoryName, categories);
       }
 
@@ -462,25 +457,6 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       repaint(); // sigh
     }
   }
-
-  
-
-
-  
-  /**
-   * Refreshes the given TextStyleChooserPanel's settings from the properties of
-   * the given category.
-   */
-
-  private void updatePanel(TextStyleChooserPanel chooserPanel, String categoryName, Color background){
-    Color foreground = (Color)prefs.lookup("foreground." + categoryName, Color.white);
-    Font font = getCategoryFont(categoryName);
-
-    chooserPanel.setSelectedFont(font);
-    chooserPanel.setSelectedBackground(background);
-    chooserPanel.setSelectedForeground(foreground);
-  }
-
 
 
 

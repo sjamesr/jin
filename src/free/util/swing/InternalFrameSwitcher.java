@@ -43,14 +43,6 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
 
 
   /**
-   * The desktop pane.
-   */
-
-  private final JDesktopPane desktop;
-
-
-
-  /**
    * A vector of the current internal frames, in the right order.
    */
 
@@ -73,8 +65,6 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    */
 
   public InternalFrameSwitcher(JDesktopPane desktop){
-    this.desktop = desktop;
-
     desktop.addContainerListener(this);
   }
 

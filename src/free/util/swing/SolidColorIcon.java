@@ -95,7 +95,7 @@ public abstract class SolidColorIcon implements Icon{
    * Returns the color of the icon.
    */
 
-  private Color getColor(){
+  public Color getColor(){
     return color;
   }
 

@@ -22,20 +22,14 @@
 package free.jin.board.prefs;
 
 import javax.swing.*;
-import free.jin.event.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.awt.Container;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-import free.jin.Game;
 import free.jin.OptionPanel;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.plugin.BadChangesException;
-import free.util.AWTUtilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.chess.JBoard;

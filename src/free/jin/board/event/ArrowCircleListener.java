@@ -25,7 +25,6 @@ import java.util.EventListener;
 import free.jin.board.JinBoard;
 import free.jin.board.Arrow;
 import free.jin.board.Circle;
-import free.chess.Square;
 
 
 /**

@@ -55,20 +55,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
 
   /**
-   * The context.
-   */
-  
-  private final JinContext context;
-
-
-
-  /**
    * Our listener manager.
    */
 
   private final FreechessListenerManager listenerManager = new FreechessListenerManager(this);
-
-
 
 
 
@@ -79,8 +69,6 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
   public JinFreechessConnection(JinContext context, String username, String password){
     super(username, password);
-
-    this.context = context;
 
     setInterface(context.getAppName() + " " + context.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
@@ -715,7 +703,6 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     ChessMove move = (ChessMove)(Move.parseWarrenSmith(data.getMoveSmith(), pos, data.getMoveAlgebraic()));
     
     Square startSquare = move.getStartingSquare();
-    Square endSquare = move.getEndingSquare();
     ChessPiece movingPiece = (ChessPiece)((startSquare == null) ? null : pos.getPieceAt(startSquare));  
     
     pos.makeMove(move);
@@ -723,8 +710,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     
     String boardLexigraphic = pos.getLexigraphic();
     String currentPlayer = pos.getCurrentPlayer().isWhite() ? "W" : "B";
-    int doublePawnPushFile = (move instanceof ChessMove) ?
-      ((ChessMove)move).getDoublePawnPushFile() : -1;
+    int doublePawnPushFile = move.getDoublePawnPushFile();
     boolean kingMoved = movingPiece.isKing();
     boolean canWhiteCastleKingside =
       lastBoardData.canWhiteCastleKingside() && !kingMoved && !Square.getInstance(7, 0).equals(startSquare);
@@ -1816,7 +1802,6 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
         offer = (Pair)gameData.indicesToTakebackOffers.remove(new Integer(offerIndex));
         if (offer != null){
           Player player = (Player)offer.getFirst();
-          int takebackCount = ((Integer)offer.getSecond()).intValue();
           updateTakebackOffer(gameData, player, 0);
         }
       }

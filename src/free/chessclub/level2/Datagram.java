@@ -35,10 +35,6 @@ import free.util.TextUtilities;
 public class Datagram{
 
 
-  private static final boolean DEBUG = true;
-    // Are we still debugging this class?
-
-
 
   /**
    * The standard delimiter in datagrams. 
@@ -83,11 +79,6 @@ public class Datagram{
     
 
 
-
-
-
-
-
   /**
    * The length of DG_START, so that we don't have to get it every time.
    */
@@ -100,11 +91,6 @@ public class Datagram{
   private static final int DG_END_LENGTH = DG_END.length();
 
 
-  /**
-   * The length of STRING_END_1 , so that we don't have to get it every time.  
-   */  
-  private static final int STRING_END_1_LENGTH = STRING_END_1.length();
-
 
   /**
    * The length of STRING_START_1 , so that we don't have to get it every time.
@@ -112,6 +98,15 @@ public class Datagram{
   private static final int STRING_START_1_LENGTH = STRING_START_1.length();
 
 
+
+  /**
+   * The length of STRING_END_1 , so that we don't have to get it every time.  
+   */  
+//  private static final int STRING_END_1_LENGTH = STRING_END_1.length();
+  // Commented out to appease eclipse
+
+  
+  
   /**
    * The length of STRING_START_2 , so that we don't have to get it every time.
    */
@@ -121,8 +116,8 @@ public class Datagram{
   /**
    * The length of STRING_END_2 , so that we don't have to get it every time.
    */
-  private static final int STRING_END_2_LENGTH = STRING_END_1.length();
-
+//  private static final int STRING_END_2_LENGTH = STRING_END_1.length();
+  	// Commented out to appease eclipse
 
 
 

@@ -933,7 +933,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   public void keyPressed(KeyEvent evt){
     int keyCode = evt.getKeyCode();
     boolean isControlDown = evt.isControlDown();
-    boolean isShiftDown = evt.isShiftDown();
 
     if ((evt.getSource() == inputComponent)){
       if (evt.getID() == KeyEvent.KEY_PRESSED){

@@ -56,14 +56,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
   /**
-   * The context.
-   */
-  
-  private final JinContext context;
-
-
-
-  /**
    * Our listener manager.
    */
 
@@ -77,8 +69,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
   public JinChessclubConnection(JinContext context, String username, String password){
     super(username, password, System.out);
-
-    this.context = context;
 
     setInterface(context.getAppName() + " " + context.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
@@ -1089,7 +1079,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
       Position position = gameInfo.position;
-      WildVariant variant = game.getVariant();
       Move move = parseWarrenSmith(moveInfo.smithMove, position, moveInfo.algebraicMove); 
 
       position.makeMove(move);

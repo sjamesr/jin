@@ -66,14 +66,6 @@ public class LoginPanel extends DialogPanel{
 
 
   /**
-   * The component focused by default.
-   */
-
-  private JComponent defaultComponent = null;
-
-
-
-  /**
    * Creates a new <code>LoginPanel</code> with the specified initial
    * connection details.
    */

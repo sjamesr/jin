@@ -81,7 +81,6 @@ public class ChessclubJBoard extends JinBoard{
     Rectangle rect = squareToRect(0, 0, null);
 
     int arrowSize = calcArrowSize(rect.width, rect.height);
-    int circleSize = calcCircleSize(rect.width, rect.height);
 
     if ((tmpArrowFrom != null) && (tmpArrowTo != null) && !tmpArrowFrom.equals(tmpArrowTo))
       drawArrow(g, tmpArrowFrom, tmpArrowTo, arrowSize, getDefaultArrowColor());

@@ -25,7 +25,6 @@ import free.jin.event.*;
 import free.jin.board.*;
 import java.awt.Color;
 import free.jin.Game;
-import free.chess.Square;
 import free.jin.chessclub.event.ChessclubGameListener;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.CircleEvent;

@@ -137,7 +137,6 @@ public class PieceChooser extends JComponent implements ActionListener{
     JButton defaultButton = chooser.buttonForPiece(defaultPiece);
     dialog.getRootPane().setDefaultButton(defaultButton);
     dialog.pack();
-    Dimension size = dialog.getSize();
     Point parentLoc = parentComponent.getLocationOnScreen();
     // Try to position the default button under the mouse
     int locX = parentLoc.x + x - defaultButton.getX() - defaultButton.getWidth()/2;

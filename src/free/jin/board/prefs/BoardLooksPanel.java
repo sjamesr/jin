@@ -212,9 +212,6 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
 
     ChangeListener pieceColorChangeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        Object source = evt.getSource();
-        
-        // The controls should be disabled when the painter isn't colored
         ColoredPiecePainter painter =
           (ColoredPiecePainter)(BoardLooksPanel.this.previewBoard.getPiecePainter());
         painter.setWhiteColor(whiteColor.getColor());
@@ -233,8 +230,6 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     ChangeListener boardColorChangeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        Object source = evt.getSource();
-       
         // The controls should be disabled when the painter isn't colored
         ColoredBoardPainter painter =
           (ColoredBoardPainter)(BoardLooksPanel.this.previewBoard.getBoardPainter()); 

@@ -65,7 +65,7 @@ public class ConnectionDetails extends Struct{
     details.setStringProperty("password", password);
     details.setBooleanProperty("savePassword", savePassword);
     details.setStringProperty("hostname", hostname);
-    details.setProperty("ports", (int [])ports.clone());
+    details.setProperty("ports", ports.clone());
 
     return details;
   }
@@ -83,7 +83,7 @@ public class ConnectionDetails extends Struct{
     details.setBooleanProperty("isGuest", true);
     details.setStringProperty("username", username);
     details.setStringProperty("hostname", hostname);
-    details.setProperty("ports", (int [])ports.clone());
+    details.setProperty("ports", ports.clone());
 
     return details;
   }

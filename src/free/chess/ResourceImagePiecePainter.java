@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Hashtable;
 import free.util.IOUtilities;
-import free.util.ImageUtilities;
 import free.util.TextUtilities;
 
 

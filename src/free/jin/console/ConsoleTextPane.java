@@ -311,7 +311,6 @@ public class ConsoleTextPane extends JTextPane{
       try{
         int wordStart = getWordStart(pressedLocation);
         int wordEnd = getWordEnd(pressedLocation);
-        String text = getText();
         if (isOverText(evt.getX(), evt.getY(), wordStart, wordEnd)){
           selection = getDocument().getText(wordStart, wordEnd - wordStart);
           if (selection.trim().length() != 0) // Don't override current selection with whitespace selection
@@ -392,8 +391,6 @@ public class ConsoleTextPane extends JTextPane{
       return location;
 
     location -= lineStart;
-
-    int textLength = text.length();
 
     char locationChar = text.charAt(location);
     boolean isWhitespaceWord;
@@ -570,7 +567,7 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   private int clickCount = 0;
-  private long lastPressTime, lastReleaseTime;
+  private long lastReleaseTime;
 
 
 
@@ -624,8 +621,6 @@ public class ConsoleTextPane extends JTextPane{
       super.processMouseEvent(evt);
 
     int pressedLoc = viewToModel(evt.getPoint());
-    int selectionStart = getSelectionStart();
-    int selectionEnd = getSelectionEnd();
 
     if (pressedLoc != -1){
       try{
