@@ -24,6 +24,8 @@ package free.jin.freechess;
 import free.jin.LoginDialog;
 import free.jin.Server;
 import free.jin.User;
+import java.util.Properties;
+import java.util.Hashtable;
 
 
 /**
@@ -64,6 +66,30 @@ public class FreechessServer extends Server{
 
     return new FreechessLoginDialog(user);
   }
+
+
+
+  /**
+   * Creates a guest <code>User</code>.
+   */
+
+  public User createGuest(){
+    Properties props = new Properties();
+    props.put("login.username", "guest");
+
+    return createUser(props, new Hashtable());
+  }
+
+
+
+  /**
+   * Returns true if the specified <code>User</code> is a guest.
+   */
+
+  public boolean isGuest(User user){
+    return "guest".equalsIgnoreCase(user.getUsername());
+  }
+
 
 
 }
