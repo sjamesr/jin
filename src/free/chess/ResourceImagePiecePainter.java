@@ -143,10 +143,6 @@ public class ResourceImagePiecePainter extends ImagePiecePainter{
       pieceImages.put(size, pieces);
     }
 
-    try{
-      int [] results = ImageUtilities.preload(images, null);
-    } catch (InterruptedException e){}
-
     return new ResourceImagePiecePainter(pieceImages);
   }
 
