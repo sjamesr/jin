@@ -319,42 +319,7 @@ public class ConsoleTextField extends FixedJTextField{
   }
 
 
-
-
-  /**
-   * Overrides paste() to implement flattening the text to a single line.
-   */
-
-  public void paste(){
-    // Replace the contents of the clipboard with a flat version of the text, call super.paste()
-    // and then change the contents back.
-    Clipboard clipboard = getToolkit().getSystemClipboard();
-    Transferable content = clipboard.getContents(this);
-    if (content != null){
-      try{
-        if (content.isDataFlavorSupported(DataFlavor.stringFlavor)){
-          String data = (String)(content.getTransferData(DataFlavor.stringFlavor));
-          int index;
-          while ((index = data.indexOf("\r\n"))!=-1)
-            data = data.substring(0,index)+" "+data.substring(index+2);
   
-          data = data.replace('\n',' ');
-          data = data.replace('\r',' ');
-  
-          StringSelection tempContents = new StringSelection(data);
-          clipboard.setContents(tempContents, null);
-        }
-      } catch (UnsupportedFlavorException e){} // Shouldn't happen - we checked for it
-        catch (IOException e){e.printStackTrace();}
-    }
-
-    super.paste();
-
-    clipboard.setContents(content,null);
-  }
-
-
-
 
   /**
    * Sets the textfield to be ready to send a tell to the given player.
@@ -508,19 +473,9 @@ public class ConsoleTextField extends FixedJTextField{
     boolean isSelected = (getSelectedText() != null) && !"".equals(getSelectedText());
     cut.setEnabled(isSelected);
     copy.setEnabled(isSelected);
-
-    try{
-      Transferable transferable = getToolkit().getSystemClipboard().getContents(this);
-      if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)){
-        String clipContents = (String)transferable.getTransferData(DataFlavor.stringFlavor);
-        boolean hasPaste = (clipContents != null) && !"".equals(clipContents);     
-        paste.setEnabled(hasPaste);
-      }
-      else
-        paste.setEnabled(false);
-    } catch (UnsupportedFlavorException e){} // Shouldn't happen - we checked for it
-      catch (IOException e){e.printStackTrace();}
+    paste.setEnabled(true);
   }
+  
   
 
 }
