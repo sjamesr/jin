@@ -37,20 +37,10 @@ public class AboutPanel extends DialogPanel{
 
 
   /**
-   * The context.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * Creates a new <code>AboutPanel</code>.
    */
 
-  public AboutPanel(JinContext context){
-    this.context = context;
-
+  public AboutPanel(){
     createUI();
   }
 
@@ -67,11 +57,11 @@ public class AboutPanel extends DialogPanel{
 
 
   /**
-   * Displays this panel using the specified <code>UIProvider</code>.
+   * Displays this panel.
    */
 
-  public void display(UIProvider uiProvider){
-    super.askResult(uiProvider);
+  public void display(){
+    super.askResult();
   }
 
 
@@ -84,7 +74,8 @@ public class AboutPanel extends DialogPanel{
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
     Icon jinIcon = new ImageIcon(AboutPanel.class.getResource("resources/logo.gif"));
-    JLabel jinLabel = new JLabel(context.getAppName() + " " + context.getAppVersion(), jinIcon, JLabel.CENTER);
+    JLabel jinLabel = new JLabel(Jin.getInstance().getAppName() + " " 
+      + Jin.getInstance().getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
     jinLabel.setAlignmentX(CENTER_ALIGNMENT);
 
