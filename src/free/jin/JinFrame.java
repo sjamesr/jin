@@ -417,19 +417,6 @@ public class JinFrame extends JFrame implements ConnectionListener{
           }
         }
 
-    System.out.println("Closing connection");
-    try{
-      if (conn.isConnected()){
-        conn.exit();
-        conn.disconnect();
-      }
-    } catch (IOException e){
-        synchronized(System.err){
-          System.err.println("Failed to disconnect connection: "+conn);
-          e.printStackTrace();
-        }
-      } 
-
     User user = (User)connsToUsers.get(conn);
 
     if (Jin.isKnownUser(user)){
@@ -472,6 +459,19 @@ public class JinFrame extends JFrame implements ConnectionListener{
       System.out.println("Saving last user information");
       Jin.setProperty("last.user", userFilename);
     }
+
+    System.out.println("Closing connection");
+    try{
+      if (conn.isConnected()){
+        conn.exit();
+        conn.disconnect();
+      }
+    } catch (IOException e){
+        synchronized(System.err){
+          System.err.println("Failed to disconnect connection: "+conn);
+          e.printStackTrace();
+        }
+      } 
     
     System.out.println("Removing connection from mappings");
     connsToPlugins.remove(conn);
