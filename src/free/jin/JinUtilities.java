@@ -56,7 +56,7 @@ public class JinUtilities{
   static void saveFrameGeometry(JFrame frame, Preferences prefs, String prefNamePrefix){
     
     // Save bounds on screen
-    Point frameLocation = frame.getLocationOnScreen();
+    Point frameLocation = frame.isVisible() ? frame.getLocationOnScreen() : frame.getLocation();
     Dimension frameSize = frame.getSize();
     prefs.setRect(prefNamePrefix + ".bounds", new Rectangle(frameLocation, frameSize));
     
