@@ -104,7 +104,7 @@ public abstract class Plugin{
 
   public String getProperty(String propertyName){
     String val = getUserProperty(getID()+"."+propertyName);
-    return val == null ? context.getProperty(propertyName) : val;
+    return val == null ? getPluginProperty(propertyName) : val;
   }
 
 
