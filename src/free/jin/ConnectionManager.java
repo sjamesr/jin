@@ -23,6 +23,7 @@ package free.jin;
 
 import free.jin.plugin.PluginStartException;
 import free.util.Utilities;
+import free.util.TextUtilities;
 import free.util.PlatformUtils;
 
 
@@ -35,14 +36,6 @@ public class ConnectionManager{
 
 
   /**
-   * The context in which we're running.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * The current Session. Null when none.
    */
 
@@ -51,16 +44,17 @@ public class ConnectionManager{
 
 
   /**
-   * Creates a new <code>ConnectionManager</code> with the specified context.
+   * Creates a new <code>ConnectionManager</code>.
    */
 
-  public ConnectionManager(JinContext context){
-    this.context = context;
+  public ConnectionManager(){
+    
   }
 
 
 
   /**
+   * Displays UI which allows the user to login to one of the supported servers.
    * This method is invoked (usually by the class responsible for the start-up
    * of the application) when all the start up initialization (preferences,
    * ui factory etc.) has finished and it's ok to start the normal flow of the
@@ -68,89 +62,237 @@ public class ConnectionManager{
    */
 
   public void start(){
-    User lastUser = getLastUser();
+    Server server = findLoginServer();
+    if (server == null)
+      return;
+    
+    User user = findLoginUser(server);
+    
+    ConnectionDetails connDetails = findConnDetails(server, user);
+    if (connDetails == null)
+      return;
+    
+    user = connDetails.isGuest() ? 
+      server.getGuest() : Jin.getInstance().getUser(server, connDetails.getUsername());
+    if (user == null) // New user
+      user = new User(server, connDetails.getUsername());
 
-    if (lastUser == null)
-      showNewConnectionUI(); 
-    else      // Get server and connection details from last logged in user
-      showLoginInformationUI(lastUser.getServer(), lastUser.getPreferredConnDetails());
+    login(user, connDetails);
   }
-
-
-
+  
+  
+  
   /**
-   * Displays a server choice dialog and calls
-   * {@link #showLoginInformationUI(Server, ConnectionDetails)} with the result.
+   * Determines and returns the server we should login to, based on
+   * (in that order):
+   * <ol>
+   *   <li> Application parameters.
+   *   <li> Last logged in user.
+   *   <li> Sole supported server.
+   *   <li> Server choice panel displayed to the user.
+   * </ol>
+   * Returns <code>null</code> if all the above methods fail (implies that 
+   * the user canceled the server choice panel).
    */
-
-  public void showNewConnectionUI(){
-    Server [] servers = context.getServers();
-    if (context.getServers().length == 1) // Only one server available - use it
-      showLoginInformationUI(servers[0], null);
-    else{                                 // Ask the user which server to connect to
-      ServerChoicePanel serverChoicePanel = new ServerChoicePanel(servers);
-      Server server = serverChoicePanel.askServer(context.getUIProvider());
+   
+  private Server findLoginServer(){
+    Jin jin = Jin.getInstance();
+    
+    // Application parameters
+    String serverId = jin.getParameter("login.server");
+    if (serverId != null){
+      Server server = jin.getServerById(serverId);
+      if (server == null)
+        OptionPanel.error("Login Parameters Error", "Unknown server ID: " + serverId);
+      else
+        return server;
+    }
+    
+    // Last logged in user
+    User lastUser = getLastUser();
+    if (lastUser != null)
+      return lastUser.getServer();
+    
+    // Sole supported server
+    if (jin.getServers().length == 1)
+      return jin.getServers()[0];
+    
+    // Server choice panel
+    Server askedServer = new ServerChoicePanel().askServer();
+    if (askedServer != null)
+      return askedServer;
+    
+    return null;
+  }
+  
+  
+  
+  /**
+   * Determines and returns the user account we should login with, based on
+   * (in that order):
+   * <ol>
+   *   <li> Application parameters.
+   *   <li> Last logged in user.
+   * </ol>
+   * Returns <code>null</code> if all the above methods fail.
+   */
+   
+  private User findLoginUser(Server server){
+    Jin jin = Jin.getInstance();
+    
+    // Application parameters
+    boolean isGuest = new Boolean(jin.getParameter("login.guest")).booleanValue();
+    String username = jin.getParameter("login.username");
+    if (isGuest)
+      return server.getGuest();
+    else if (username != null){
+      User user = jin.getUser(server, username);
+      if (user == null) // New user
+        return new User(server, username);
+      else
+        return user;
+    }
+    
+    // Last logged in user
+    User lastUser = getLastUser();
+    if (lastUser != null)
+      return lastUser;
+    
+    return null;
+  }
+  
+  
+  
+  /**
+   * Determines the connection details we should use when logging in, based on
+   * (in that order, for each connection detail):
+   * <ol>
+   *   <li> Application parameters.
+   *   <li> Specified user.
+   *   <li> Specified server.
+   * </ol>
+   * Additionally, if the applications parameters allow displaying the login
+   * panel, any connection details modified by the user there override all
+   * others.
+   * Returns <code>null</code> if all the above methods fail (implies that the
+   * user canceled the login panel).
+   * The specified user may be <code>null</code>, but not the server.
+   */
+   
+  private ConnectionDetails findConnDetails(Server server, User user){
+    Jin jin = Jin.getInstance();
+    ConnectionDetails connDetails = user == null ? null : user.getPreferredConnDetails();
+    
+    String password = jin.getParameter("login.password");
+    if ((password == null) && (connDetails != null))
+      password = connDetails.getPassword();
+    
+    String savePassString = jin.getParameter("login.savepassword");
+    boolean savePassword = new Boolean(savePassString).booleanValue();
+    if ((savePassString == null) && (connDetails != null) && !connDetails.isGuest())
+      savePassword = connDetails.isSavePassword();
+    
+    String hostname = jin.getParameter("login.hostname");
+    if (hostname == null){
+      if (connDetails != null)
+        hostname = connDetails.getHost();
+      else
+        hostname = server.getDefaultHost();
+    }
+    
+    String portsString = jin.getParameter("login.ports");
+    int [] ports;
+    if (portsString != null)
+      ports = TextUtilities.parseIntList(portsString, ",");
+    else if (connDetails != null)
+        ports = connDetails.getPorts();
+    else
+      ports = server.getPorts();
+    
+    
+    if (user == null)
+      connDetails = null;
+    else if (user.isGuest())
+      connDetails = ConnectionDetails.createGuest(user.getUsername(), hostname, ports);
+    else
+      connDetails = ConnectionDetails.create(user.getUsername(), password, savePassword, hostname, ports);
+      
+    
+    // Must show the login dialog if the user is null
+    if ((user == null) || !(new Boolean(jin.getParameter("autologin")).booleanValue()))
+      connDetails = new LoginPanel(server, connDetails).askConnectionDetails();
+    
+    return connDetails; 
+  }
+  
+  
+  
+  /**
+   * Displays UI for creating a new connection.
+   */
+   
+  public void displayNewConnUI(){
+    Server server;
+    
+    Server [] servers = Jin.getInstance().getServers();
+    // Sole supported server
+    if (servers.length == 1)
+      server = servers[0];
+    else{  // Server choice panel
+      server = new ServerChoicePanel().askServer();
       if (server == null)
         return;
-
-      showLoginInformationUI(server, null);
     }
+    
+    displayNewConnUI(server, null);
   }
-
-
-
+  
+  
+  
   /**
-   * Displays the user a login dialog and logs in with the connection details
-   * he specifies by invoking {@link #login(Server, ConnectionDetails)}.
+   * Displays UI for creating a new connection to the specified server and
+   * with the specified default connection details. The default connection
+   * details may be <code>null</code>.
    */
-
-  public void showLoginInformationUI(Server server, ConnectionDetails defaultConnDetails){
-
-    // show login dialog
-    LoginPanel loginPanel = new LoginPanel(context, server, defaultConnDetails);
-    ConnectionDetails connDetails = loginPanel.askConnectionDetails(context.getUIProvider());
-
-    if (connDetails == null) // user canceled the dialog
+   
+  public void displayNewConnUI(Server server, ConnectionDetails defaultConnDetails){
+    ConnectionDetails connDetails = new LoginPanel(server, defaultConnDetails).askConnectionDetails();
+    if (connDetails == null)
       return;
-
-    if (connDetails.isGuest())
-      login(server.getGuest(), connDetails);
-    else{
-      User user = JinUtilities.getUser(context, server, connDetails.getUsername());
-      if (user == null)
-        user = new User(server, connDetails.getUsername());
-
-      login(user, connDetails);
-    }
+    
+    User user = connDetails.isGuest() ? 
+      server.getGuest() : Jin.getInstance().getUser(server, connDetails.getUsername());
+    if (user == null) // New user
+      user = new User(server, connDetails.getUsername());
+    
+    login(user, connDetails);
   }
-
-
-
+  
+  
+  
+  
   /**
-   * Logs on the specified account with the specified connection details.
+   * Initiates login for the specified user with the specified connection
+   * details. Neither value may be <code>null</code>.
    */
-
-  public void login(User user, ConnectionDetails connDetails){
+   
+  private void login(User user, ConnectionDetails connDetails){
     try{
-
-      session = new Session(context, user, connDetails);
-
-      context.getUIProvider().setConnected(true, session);
-
+      session = new Session(user, connDetails);
+      Jin.getInstance().getUIProvider().setConnected(true, session);
       new LoginThread(session).start();
-
     } catch (PluginStartException e){
         e.printStackTrace();
         Exception reason = e.getReason();
 
         String errorMessage = e.getMessage() + "\n" + 
           (reason == null ? "" : reason.getClass().getName() + ": " + reason.getMessage());
-        OptionPanel.error(context.getUIProvider(), "Error", errorMessage);
+        OptionPanel.error("Error", errorMessage);
       }
   }
-
-
-
+  
+  
+  
   /**
    * Closes the current session. The call is ignored if there is no current
    * session.
@@ -164,55 +306,32 @@ public class ConnectionManager{
     session.close();
 
     User user = session.getUser();
-    boolean storeUser = true;
     int connPort = session.getPort();
 
     if (connPort != -1){ // Actually connected
+      
       // Set preferred connection details for this account
       ConnectionDetails connDetails = session.getConnDetails().usePort(connPort);
       user.setPreferredConnDetails(connDetails);
 
-      if (!context.isSavePrefsCapable()){
-        if (!user.isGuest() && !JinUtilities.isKnownUser(context, user))
-          context.addUser(user);
-      }
-      else if (user.isGuest()){
-        // Microsoft VM returns "C:\windows\java" as the user.home directory.
-        // Since this is shared between all users of the computer, we warn the
-        // user about it.
-        if (PlatformUtils.isOldMicrosoftVM()){
-          Object result = OptionPanel.question(context.getUIProvider(), "Save Preferences?",
-            "Would you like to save the preferences for the guest account?\n" +
-            "Note that they will be shared with other users of this computer", OptionPanel.YES);
-          if (result != OptionPanel.YES)
-            storeUser = false;
+      // Add the user to the known users list
+      if (!user.isGuest() && !Jin.getInstance().isKnownUser(user)){
+        boolean rememberUser =
+          !Jin.getInstance().isSavePrefsCapable() ||
+          OptionPanel.question("Remember Account?", "Would you like Jin to remember the " 
+          + user.getUsername() + " account?", OptionPanel.YES) == OptionPanel.YES;
+          
+        if (rememberUser){
+          Jin.getInstance().addUser(user);
+          saveLastUser(user);
         }
       }
       else{
-        // Check whether it's a new account. If not, and the user wishes so, add it.
-        if (!JinUtilities.isKnownUser(context, user)){
-          Object result = OptionPanel.question(context.getUIProvider(), "Save Account?",
-            "Would you like to save the preferences for this account?", OptionPanel.YES);
-          if (result == OptionPanel.YES)
-            context.addUser(user);
-          else
-            storeUser = false;
-        }
+        user.markDirty();
       }
     }
-    else
-      storeUser = false;
 
-    // This needs to be called after the user has been added, but before
-    // his preference were saved, because it needs to know whether the user has
-    // been kept but may set its own preferences
-    context.getUIProvider().setConnected(false, session);
-
-    if (storeUser){
-      context.storeUser(user);
-      saveLastUser(user);
-    }
-
+    Jin.getInstance().getUIProvider().setConnected(false, session);
 
     session = null;
   }
@@ -235,18 +354,18 @@ public class ConnectionManager{
    */
 
   private User getLastUser(){
-    Preferences prefs = context.getPrefs();
+    Preferences prefs = Jin.getInstance().getPrefs();
     String serverId = prefs.getString("last-login.serverId", null);
     String username = prefs.getString("last-login.username", null);
 
     if (serverId == null)
       return null;
 
-    Server server = JinUtilities.getServerById(context, serverId);
+    Server server = Jin.getInstance().getServerById(serverId);
     if (username == null)
       return server.getGuest();
     else
-      return JinUtilities.getUser(context, server, username);
+      return Jin.getInstance().getUser(server, username);
   }
 
 
@@ -257,14 +376,14 @@ public class ConnectionManager{
    */
 
   private void saveLastUser(User user){
-    Preferences prefs = context.getPrefs();
+    Preferences prefs = Jin.getInstance().getPrefs();
     String serverId = user.getServer().getId();
     String oldServerId = prefs.getString("last-login.serverId", null);
 
     prefs.setString("last-login.serverId", serverId);
     if (!Utilities.areEqual(serverId, oldServerId))
       prefs.setString("last-login.username",
-        user.isGuest() || !JinUtilities.isKnownUser(context, user) ? null : user.getUsername());
+        user.isGuest() || !Jin.getInstance().isKnownUser(user) ? null : user.getUsername());
     else if (!user.isGuest())
       prefs.setString("last-login.username", user.getUsername());
   }
@@ -309,7 +428,7 @@ public class ConnectionManager{
         session.login();
       } catch (LoginException e){
           String errorMessage = "Error logging in:\n" + e.getMessage();
-          OptionPanel.error(context.getUIProvider(), "Login Error", errorMessage);
+          OptionPanel.error("Login Error", errorMessage);
         }
     }
 
