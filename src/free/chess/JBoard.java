@@ -128,6 +128,44 @@ public class JBoard extends JComponent{
 
 
   /**
+   * The constant for no move highlighting.
+   */
+
+  public static final int NO_MOVE_HIGHLIGHTING = 0;
+
+
+
+
+  /**
+   * The constant for move highlighting done by highlighting the source and
+   * target squares of the move.
+   */
+
+  public static final int SQUARE_MOVE_HIGHLIGHTING = 1;
+
+
+
+
+  /**
+   * The constant for move highlighting done by drawing an arrow from the source
+   * square to the target square.
+   */
+
+  public static final int ARROW_MOVE_HIGHLIGHTING = 2;
+
+
+
+
+  /**
+   * The color used for move highlighting.
+   */
+
+  private static final Color moveHighlightColor = Color.cyan.darker();
+
+
+
+
+  /**
    * The Position on the board.
    */
 
@@ -252,6 +290,15 @@ public class JBoard extends JComponent{
 
 
   /**
+   * The current move highlighting style.
+   */
+
+  private int moveHighlightingStyle = NO_MOVE_HIGHLIGHTING;
+
+
+
+
+  /**
    * Is the board flipped?
    */
 
@@ -265,6 +312,15 @@ public class JBoard extends JComponent{
    */
 
   private boolean isManualPromote = true;
+
+
+
+
+  /**
+   * The current highlighted move.
+   */
+  
+  private Move highlightedMove = null;
 
 
 
@@ -524,6 +580,81 @@ public class JBoard extends JComponent{
 
 
 
+  /**
+   * Sets the move highlighting style.
+   */
+
+  public void setMoveHighlightingStyle(int newStyle){
+    switch(newStyle){
+      case NO_MOVE_HIGHLIGHTING:
+      case SQUARE_MOVE_HIGHLIGHTING:
+      case ARROW_MOVE_HIGHLIGHTING:
+        break;
+      default:
+        throw new IllegalArgumentException("Illegal move highlighting style value: "+newStyle);
+    }
+
+    this.moveHighlightingStyle = newStyle;
+    if (highlightedMove != null)
+      repaint();
+  }
+
+
+
+
+  /**
+   * Returns the move highlighting style.
+   */
+
+  public int getMoveHighlightingStyle(){
+    return moveHighlightingStyle;
+  }
+
+
+
+
+  /**
+   * Sets the currently highlighted move, or <code>null</code> if no move
+   * should be highlighted.
+   */
+
+  public void setHighlightedMove(Move move){
+    repaintHighlighting();
+
+    highlightedMove = move;
+
+    repaintHighlighting();
+  }
+
+
+
+
+  /**
+   * Calculates the area that needs to be repainted for the current
+   * highlighting and repaints it.
+   */
+
+  private void repaintHighlighting(){
+    if ((moveHighlightingStyle == NO_MOVE_HIGHLIGHTING) || (highlightedMove == null))
+      return;
+
+    Square from = highlightedMove.getStartingSquare();
+    Square to = highlightedMove.getEndingSquare();
+
+    if ((from == null) || (to == null))
+      return;
+
+    if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
+      repaint(squareToRect(from, null));
+      repaint(squareToRect(to, null));
+    }
+    else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
+      repaint(squareToRect(from, null).union(squareToRect(to, null)));
+  }
+
+
+
+
 
   /**
    * Sets the board's flipped state. When the board is flipped, it displays the
@@ -664,8 +795,10 @@ public class JBoard extends JComponent{
 
     int draggedPieceStyle = getDraggedPieceStyle();
 
+    // Paint the board
     boardPainter.paintBoard(cacheGraphics, this, 0, 0, size.width, size.height);
 
+    // Paint the stationary pieces
     for (int file = 0; file < 8; file++)
       for (int rank = 0; rank < 8; rank++){
         Square curSquare = Square.getInstance(file, rank);
@@ -684,8 +817,25 @@ public class JBoard extends JComponent{
         piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
 
+    // Draw move highlighting
+    if ((moveHighlightingStyle != NO_MOVE_HIGHLIGHTING) && (highlightedMove != null)){
+      Square from = highlightedMove.getStartingSquare();
+      Square to = highlightedMove.getEndingSquare();
+      if ((from != null) && (to != null)){
+        if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
+          drawSquare(cacheGraphics, from, 2, moveHighlightColor);
+          drawSquare(cacheGraphics, to, 2, moveHighlightColor);
+        }
+        else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
+          drawArrow(cacheGraphics, from, to, 5, moveHighlightColor);
+      }
+    }
+
+    
+    // Allow PaintHooks to paint
     callPaintHooks(cacheGraphics);
 
+    // Paint the currently moved piece, or highlighted square
     if (movedPieceSquare != null){
       getMovedPieceRect(squareRect);
       if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
