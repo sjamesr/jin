@@ -27,6 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.util.Vector;
+import free.util.PaintHook;
 
 
 /**
@@ -130,6 +132,7 @@ public class JBoard extends JPanel{
 
 
 
+
   /**
    * The ChangeListener to the Position.
    */
@@ -158,6 +161,15 @@ public class JBoard extends JPanel{
    */
 
   private PiecePainter piecePainter;
+
+
+
+
+  /**
+   * PaintHooks.
+   */
+
+  private Vector paintHooks = null;
 
 
 
@@ -273,6 +285,36 @@ public class JBoard extends JPanel{
 
   public JBoard(){
     this(new Position());
+  }
+
+
+
+
+  /**
+   * Adds the given PaintHook to the list of PaintHooks which are called
+   * during the painting of this JBoard.
+   */
+
+  public void addPaintHook(PaintHook hook){
+     if (paintHooks == null)
+       paintHooks = new Vector(2);
+
+     paintHooks.addElement(hook);
+  }
+
+
+
+
+  /**
+   * Removes the given PaintHook from the list of PaintHooks which are called
+   * during the painting of this JBoard.
+   */
+
+  public void removePaintHook(PaintHook hook){
+    paintHooks.removeElement(hook);
+
+    if (paintHooks.size() == 0)
+      paintHooks = null;
   }
 
 
@@ -546,7 +588,8 @@ public class JBoard extends JPanel{
 
         piecePainter.paintPiece(piece, g, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
-      
+
+    callPaintHooks(g);
 
     if (movedPieceSquare!=null){
       if (draggedPieceStyle==NORMAL_DRAGGED_PIECE){
@@ -572,6 +615,21 @@ public class JBoard extends JPanel{
             break;
         }
       }
+    }
+  }
+
+
+
+
+  /**
+   * Calls all the registered PaintHooks.
+   */
+
+  private void callPaintHooks(Graphics g){
+    int size = paintHooks.size();
+    for (int i = 0; i < size; i++){
+      PaintHook hook = (PaintHook)paintHooks.elementAt(i);
+      hook.paint(this, g);
     }
   }
 
