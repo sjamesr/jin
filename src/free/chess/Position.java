@@ -79,6 +79,16 @@ public final class Position{
 
 
   /**
+   * A FEN representation of the position.
+   */
+
+  private String positionFEN;
+
+
+
+
+
+  /**
    * Only one ChangeEvent is needed per model instance since the
    * event's only (read-only) state is the source property.  The source
    * of events generated here is always "this".
@@ -319,7 +329,9 @@ public final class Position{
    */
 
   public void setFEN(String fen){
-    StringTokenizer fenTokenizer = new StringTokenizer(fen," ");
+    this.positionFEN = fen;
+
+    StringTokenizer fenTokenizer = new StringTokenizer(fen, " ");
     if (fenTokenizer.countTokens()!=6)
       throw new PositionFormatException("Wrong amount of fields");
       
@@ -328,7 +340,7 @@ public final class Position{
     if (ranks.countTokens()!=8)
       throw new PositionFormatException("Wrong amount of ranks");
 
-    for (int rank=7;rank>=0;rank--){
+    for (int rank = 7; rank >= 0; rank--){
       String rankString = ranks.nextToken();
       int file = 0;
       for (int i=0;i<rankString.length();i++){
@@ -338,7 +350,7 @@ public final class Position{
         char c = rankString.charAt(i);
         if (Character.isDigit(c)){
           int emptyFiles = Character.digit(c,10);
-          while (emptyFiles-->0){
+          while (emptyFiles-- > 0){
             setPieceAtImpl(null, Square.getInstance(file, rank));
             file++;
           }
@@ -365,6 +377,19 @@ public final class Position{
       setCurrentPlayerImpl(Player.BLACK_PLAYER);
     else
       throw new PositionFormatException("Wrong active color indicator: "+colorToMove);
+  }
+
+
+
+
+
+  /**
+   * Returns the FEN representation of this Position. May return
+   * <code>null</code> if the position wasn't set via the setFEN method.
+   */
+
+  public String getFEN(){
+    return positionFEN;
   }
 
 
@@ -430,11 +455,13 @@ public final class Position{
     if (!variant.equals(position.variant))
       throw new IllegalArgumentException("The WildVariants of the positions don't match");
 
-    for (int file=0;file<pieces.length;file++){
-      for (int rank=0;rank<pieces[file].length;rank++){
+    for (int file = 0; file < pieces.length; file++){
+      for (int rank = 0; rank < pieces[file].length; rank++){
         pieces[file][rank] = position.pieces[file][rank];
       }
     }
+
+    this.positionFEN = position.positionFEN;
 
     setCurrentPlayerImpl(position.getCurrentPlayer());
     fireStateChanged();
