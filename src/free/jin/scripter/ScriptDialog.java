@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import free.util.AWTUtilities;
-import free.util.WindowDisposingActionListener;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJTextField;
 import free.workarounds.FixedJComboBox;
 import free.util.TableLayout;
@@ -110,9 +110,7 @@ abstract class ScriptDialog extends JDialog{
     this.templateScript = templateScript;
     this.scripter = scripter;
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    ActionListener closer = new WindowDisposingActionListener(this);
-    getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(this);
   }
 
 

@@ -24,10 +24,7 @@ package free.jin;
 import javax.swing.*;
 import javax.swing.event.*;
 import free.util.*;
-import free.util.swing.LookAndFeelMenu;
-import free.util.swing.BackgroundChooser;
-import free.util.swing.AdvancedJDesktopPane;
-import free.util.swing.UrlDisplayingAction;
+import free.util.swing.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
@@ -418,9 +415,7 @@ public class JinFrameMenuBar extends JMenuBar{
       final JDialog dialog = new JDialog(jinFrame, targetPlugin.getName()+" preferences", true);
       dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-      KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-      ActionListener closer = new WindowDisposingActionListener(dialog);
-      dialog.getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+      SwingUtils.registerEscapeCloser(dialog);
 
       dialog.getContentPane().setLayout(new BorderLayout());
 
@@ -465,7 +460,7 @@ public class JinFrameMenuBar extends JMenuBar{
         }
       });
 
-      cancelButton.addActionListener(closer);
+      cancelButton.addActionListener(new WindowDisposingActionListener(dialog));
 
       applyButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){

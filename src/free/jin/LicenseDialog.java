@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 import free.util.*;
 import free.util.swing.LinkLabel;
 import free.util.swing.PlainTextDialog;
+import free.util.swing.SwingUtils;
 import java.io.IOException;
 
 
@@ -88,9 +89,7 @@ public class LicenseDialog extends JDialog{
 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    ActionListener closer = new WindowDisposingActionListener(this);
-    getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(this);
 
     createUI();
   }

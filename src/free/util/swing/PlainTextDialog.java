@@ -77,9 +77,7 @@ public class PlainTextDialog extends JDialog{
 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    ActionListener closer = new WindowDisposingActionListener(this);
-    getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(this);
 
     textArea = new FixedJTextArea(text, 20, 81);
 
