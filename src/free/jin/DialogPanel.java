@@ -154,14 +154,13 @@ public abstract class DialogPanel extends JPanel{
 
 
   /**
-   * Displays this <code>DialogPanel</code> using the specified
-   * <code>UIProvider</code> and returns the result. It is recommended for
-   * subclasses to add their own method to call this one but cast the result to
-   * the specific type.
+   * Displays this <code>DialogPanel</code> and returns the result. It is
+   * recommended for subclasses to add their own method to call this one but
+   * cast the result to the specific type.
    */
 
-  public Object askResult(UIProvider uiProvider){
-    uiProvider.showDialog(this, hintParent);
+  public Object askResult(){
+    Jin.getInstance().getUIProvider().showDialog(this, hintParent);
 
     if (resultSet)
       return result;
