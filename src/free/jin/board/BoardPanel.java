@@ -1386,15 +1386,30 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     // queuedMove.getPlayer() == realPosition.getCurrentPlayer() makes sure
     // that we only send the queued on the correct move, not when getting *any* response
-    if ((queuedMove != null) && (queuedMove.getPlayer() == realPosition.getCurrentPlayer())){ 
-      UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
-      isBoardPositionUpdating = true;
-      board.getPosition().copyFrom(realPosition);
-      board.getPosition().makeMove(queuedMove);
-      isBoardPositionUpdating = false;
-      moveEnRoute = queuedMove;
-      setQueuedMove(null);
-      fireUserMadeMove(evt2);
+    if ((queuedMove != null) && (queuedMove.getPlayer() == realPosition.getCurrentPlayer())){
+      Move premove = null;
+      try{
+        premove = game.getVariant().createMove(realPosition, queuedMove);
+        if (!checkLegality(realPosition, premove))
+          premove = null;
+      } catch (IllegalArgumentException e){}
+      if (premove == null){ // Illegal premove
+        isBoardPositionUpdating = true;
+        board.getPosition().copyFrom(realPosition);
+        isBoardPositionUpdating = false;
+        setQueuedMove(null);
+        playSound("IllegalMove");
+      }
+      else{
+        UserMoveEvent evt2 = new UserMoveEvent(this, premove);
+        isBoardPositionUpdating = true;
+        board.getPosition().copyFrom(realPosition);
+        board.getPosition().makeMove(premove);
+        isBoardPositionUpdating = false;
+        moveEnRoute = premove;
+        setQueuedMove(null);
+        fireUserMadeMove(evt2);
+      }
     }
     else
       moveEnRoute = null;
@@ -1402,6 +1417,23 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     timer.stop();
     updateClockActiveness();
     addMoveToListTable(move);
+  }
+
+
+
+
+  /**
+   * Returns false if the specified move is illegal.
+   */
+
+  protected boolean checkLegality(Position pos, Move move){
+    if (move instanceof ChessMove){
+      ChessMove cmove = (ChessMove)move;
+      if (pos.getCurrentPlayer() != move.getPlayer())
+        return false;
+    }
+
+    return true;
   }
 
 
