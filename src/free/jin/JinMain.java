@@ -289,10 +289,6 @@ public class JinMain implements JinContext{
       }
     });
     mainFrame.setVisible(true);
-    
-    // Bugfix - restoring maximum state only works once the frame is visible
-    // (at least under KDE, Mandrake 9.2)
-    restoreMainFrameGeometry();
   }
 
 
@@ -995,7 +991,11 @@ public class JinMain implements JinContext{
     Rectangle frameBounds = userPrefs.getRect("frame.bounds", defaultFrameBounds);
     frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
     mainFrame.setBounds(frameBounds);
-    
+
+    // Bugfix for Java bug 4464714 - setExtendedState only works once the
+    // the window is realized
+    mainFrame.pack();
+
     // Restore maximized state
     boolean vertMaximized = userPrefs.getBool("frame.maximized.vert", false);
     boolean horizMaximized = userPrefs.getBool("frame.maximized.horiz", false);
