@@ -233,10 +233,10 @@ public class JChessClock extends AbstractChessClock{
           sepString + TextUtilities.padStart(String.valueOf(minutes), '0', 2);  
       case MINUTE_SECOND_DISPLAY_MODE:
         return signString + TextUtilities.padStart(String.valueOf(60*hours+minutes), '0', 2) +
-          ":" + TextUtilities.padStart(String.valueOf(seconds), '0', 2);
+          "." + TextUtilities.padStart(String.valueOf(seconds), '0', 2);
       case SECOND_TENTHS_DISPLAY_MODE:
         return signString + TextUtilities.padStart(String.valueOf(60*hours+minutes), '0', 2) +
-          ":" + TextUtilities.padStart(String.valueOf(seconds), '0', 2) + "." +
+          "." + TextUtilities.padStart(String.valueOf(seconds), '0', 2) + "." +
           String.valueOf(tenths);
       default:
         throw new IllegalStateException("Bad display mode value: " + getDisplayMode()); 
