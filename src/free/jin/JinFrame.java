@@ -434,7 +434,7 @@ public class JinFrame extends JFrame{
     else{
       if (user.getUsername()!=null){ // Null means a guest.
         System.out.println("Querying user about creating a new account");
-        int result = JOptionPane.showConfirmDialog(this,"Would you like to create a new user named \""+user.getUsername()+"\"?","Create new user?",JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(this,"Would you like to save your \""+user.getUsername()+"\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
         if (result==JOptionPane.YES_OPTION){
           System.out.println("Creating new user, named "+user.getUsername());
           Jin.save(user);
