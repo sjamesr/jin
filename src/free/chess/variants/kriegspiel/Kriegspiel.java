@@ -149,7 +149,7 @@ public class Kriegspiel implements WildVariant{
     checkPosition(pos);
 
     if (endSquare==null){
-      return new KriegspielMove(stringRepresentation);
+      return new KriegspielMove(pos.getCurrentPlayer(), stringRepresentation);
     }
     else if (startSquare==null){
       return new KriegspielMove(pos, endSquare, stringRepresentation);
