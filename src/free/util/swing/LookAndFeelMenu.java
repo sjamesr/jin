@@ -110,7 +110,7 @@ public class LookAndFeelMenu extends JMenu{
 
     UIManager.addPropertyChangeListener(new LookAndFeelChangeListener());
 
-    setMnemonic(KeyEvent.VK_L);
+    setMnemonic('L');
   }
 
 
