@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import free.util.WindowDisposingActionListener;
+import free.util.AWTUtilities;
 
 
 /**
@@ -329,10 +330,8 @@ public class BackgroundChooser extends JDialog{
    */
 
   public void setVisible(boolean visible){
-    if (visible){
-      center();
-      setResizable(false);
-    }
+    if (visible)
+      AWTUtilities.centerWindow(this, getParent());
 
     super.setVisible(visible);
   }
@@ -373,20 +372,6 @@ public class BackgroundChooser extends JDialog{
 
   public int getChosenImageLayoutStyle(){
     return chosenImageLayoutStyle;
-  }
-
-
-
-
-  /**
-   * Centers the dialog over its parent.
-   */
-
-  private void center(){
-    pack();
-    Dimension size = getSize();
-    Rectangle parentBounds = getParent().getBounds();
-    setLocation(parentBounds.x + (parentBounds.width - size.width)/2, parentBounds.y + (parentBounds.height - size.height)/2);
   }
 
 
