@@ -30,7 +30,7 @@
 		<copy todir="${build.dir}">
 			<fileset dir="${source.dir}" excludes="**/*.java"/>
 		</copy>
-		<jar jarfile="${ouput.jar}"
+		<jar jarfile="${output.jar}"
 		     basedir="${build.dir}"
 			 compress="false"
 			 manifest="manifest.txt"
