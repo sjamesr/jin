@@ -1165,7 +1165,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   public void exit(){
-    sendCommand("exit");
+    sendCommand("$quit");
   }
 
 
