@@ -143,6 +143,10 @@ public class BackgroundChooser extends JDialog{
     JButton pickImage = new JButton("Pick image");
     JButton useDefault = new JButton("Use default");
 
+    pickColor.setMnemonic('c');
+    pickImage.setMnemonic('i');
+    useDefault.setMnemonic('d');
+
     pickColor.setDefaultCapable(false);
     pickImage.setDefaultCapable(false);
     useDefault.setDefaultCapable(false);
@@ -151,6 +155,10 @@ public class BackgroundChooser extends JDialog{
     final JRadioButton tileButton = new JRadioButton("tile", curStyle == AdvancedJDesktopPane.TILE);
     final JRadioButton stretchButton = new JRadioButton("stretch", curStyle == AdvancedJDesktopPane.STRETCH);
     final JRadioButton centerButton = new JRadioButton("center", curStyle == AdvancedJDesktopPane.CENTER);
+
+    tileButton.setMnemonic('t');
+    stretchButton.setMnemonic('s');
+    centerButton.setMnemonic('e');
 
     ButtonGroup group = new ButtonGroup();
     group.add(tileButton);
@@ -163,6 +171,7 @@ public class BackgroundChooser extends JDialog{
     boxesPanel.add(centerButton);
 
     JButton closeButton = new JButton("Close");
+    closeButton.setMnemonic('l');
 
     mainPanel.add(pickColor);
     mainPanel.add(pickImage);
