@@ -190,6 +190,28 @@ public class TextUtilities{
 
     return tokens;
   }
+  
+  
+  
+  /**
+   * Translates the specified resource name into the context of the specified
+   * class. Basically, this method returns the name of the resource you need to
+   * use when loading via a classloader, if via the specified class you would
+   * load it simply with <code>Class.getResource(resourceName)</code>.
+   */
+   
+  public static String translateResource(Class c, String resourceName){
+    String path = c.getName();
+    int dotIndex = path.lastIndexOf('.');
+    if (dotIndex != -1){
+      path = path.substring(0, dotIndex);
+      path = path.replace('.', '/') + '/' + resourceName;
+    }
+    else
+      return resourceName;
+    
+    return path;
+  }
 
 
 
