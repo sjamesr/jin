@@ -463,8 +463,8 @@ public class Jin{
         frameBounds = StringParser.parseRectangle(frameBoundsString);
       
       if (frameBounds == null){
-        mainFrame.setLocation(screenSize.width/8, screenSize.height/8);
-        mainFrame.setSize(screenSize.width*3/4, screenSize.height*3/4);
+        mainFrame.setLocation(screenSize.width/16, screenSize.height/16);
+        mainFrame.setSize(screenSize.width*7/8, screenSize.height*7/8);
       }
       else
         mainFrame.setBounds(frameBounds);
