@@ -57,7 +57,7 @@ public class ServerSpecificUserFileFilter extends FileFilter{
    */
 
   public boolean accept(File file){
-    return file.getName().endsWith("."+server.getProperty("name.short"));
+    return file.isDirectory() || file.getName().endsWith("."+server.getName());
   }
 
 
@@ -66,7 +66,7 @@ public class ServerSpecificUserFileFilter extends FileFilter{
    */
 
   public String getDescription(){
-    return server.getProperty("name.long")+" User Files (*."+server.getProperty("name.short")+")";
+    return server.getProperty("name.long")+" User Files (*."+server.getName()+")";
   }
 
 
