@@ -1,7 +1,7 @@
 /**
  * The workarounds library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The workarounds library is free software; you can redistribute
@@ -79,9 +79,9 @@ public class FixedJTextField extends JTextField{
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html 
 
     Cursor cursor = getCursor();
-    if (isEditable()&&((cursor==null)||(cursor.getType()!=Cursor.TEXT_CURSOR)))
+    if (isEditable() && ((cursor == null) || (cursor.getType() != Cursor.TEXT_CURSOR)))
       setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-    else if (!isEditable()&&((cursor==null)||(cursor.getType()!=Cursor.TEXT_CURSOR)))
+    else if (!isEditable() && ((cursor == null) || (cursor.getType() != Cursor.DEFAULT_CURSOR)))
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html 
