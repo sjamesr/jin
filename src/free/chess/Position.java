@@ -479,7 +479,7 @@ public final class Position{
    * @param piece The piece to put.
    * @param square The square where to put the piece.
    *
-   * @see #setPieceAt(Piece,Square);
+   * @see #setPieceAt(Piece, Square);
    */
   
   private void setPieceAtImpl(Piece piece, Square square){
@@ -498,7 +498,7 @@ public final class Position{
    * @param player The player whose turn it is next.
    */
 
-  public void setCurrentPlayerImpl(Player player){
+  private void setCurrentPlayerImpl(Player player){
     this.currentPlayer = player;
   }
 
