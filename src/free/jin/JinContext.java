@@ -172,6 +172,18 @@ public interface JinContext{
    */
 
   ConnectionManager getConnManager();
+  
+  
+  
+  /**
+   * Returns the text that should be displayed in the warning to the user when
+   * he chooses to save his password for future use. The text should explain
+   * where and how the user's password will be stored and ask him whether he is
+   * sure he wants to save it. The returned may contain newlines. The returned
+   * value may be <code>null</code>, in which case no warning is displayed.
+   */
+   
+  String getPasswordSaveWarning();
 
 
 
