@@ -35,6 +35,7 @@ import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
+import free.chess.variants.atomic.Atomic;
 
 
 /**
@@ -392,6 +393,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       return Suicide.getInstance();
     else if (categoryName.equals("losers"))
       return new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, categoryName);
+    else if (categoryName.equals("atomic"))
+      return Atomic.getInstance();
 
     // This means it's a fake variant we're using because the server hasn't told us the real one.
     else if (categoryName.equals("fake-variant"))
