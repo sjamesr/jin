@@ -99,6 +99,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Is this BoardPanel highlighting the user's moves, or only others' moves.
+   */
+
+  protected boolean highlightOwnMoves = false;
+
+
+
+  /**
    * The JBoard showing the current position.
    */
 
@@ -746,6 +754,27 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Updates the move highlighting on the board. The boolean argument specifies
+   * whether the last made move (on the board, not the real position) is a move
+   * made by the user and should therefore be ignored if
+   * isHighlightingOwnMoves() returns false. Note that the callers don't 
+   * really determine whether the last move is the user's - they only pass
+   * true when it's a move that has just been made by the user.
+   */
+
+  private void updateMoveHighlighting(boolean isOwnMove){
+    if ((displayedMoveNumber == 0) || (isOwnMove && !isHighlightingOwnMoves()))
+      board.setHighlightedMove(null);
+    else{
+      Move move = (Move)madeMoves.elementAt(displayedMoveNumber - 1);
+      board.setHighlightedMove(move);
+    }
+  }
+
+
+
+
+  /**
    * Creates the JScrollBar which controls the position displayed on the board.
    */
 
@@ -876,6 +905,32 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       revalidate();
     }
   }
+
+
+
+
+  /**
+   * Specifies whether the board should highlight the user's moves as well as
+   * others' moves. If the passed argument is <code>true</code>, the user's
+   * moves will be highlighted, if <code>false</code>, only others' moves.
+   */
+
+  public void setHighlightingOwnMoves(boolean highlightOwn){
+    this.highlightOwnMoves = highlightOwn;
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the board is highlighting the user's moves
+   * as well as others' moves. Returns <code>false</code> if it only highlights
+   * others' moves.
+   */
+
+  public boolean isHighlightingOwnMoves(){
+    return highlightOwnMoves;
+  } 
 
 
 
@@ -1016,11 +1071,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         isBoardPositionUpdating = false;
       }
     }
-    else
-      isMoveEnRoute = false;
 
-    if (shouldUpdateBoard)
+    if (shouldUpdateBoard){
       displayedMoveNumber = madeMoves.size();
+      updateMoveHighlighting(isMoveEnRoute);
+    }
+
+    isMoveEnRoute = false;
 
     if (queuedMove != null){
       UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
@@ -1056,6 +1113,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
 
+    updateMoveHighlighting(false);
+
     isMoveEnRoute = false; // We shouldn't keep state between 
     queuedMove = null;     // such drastic position changes
     if (!board.isEnabled())
@@ -1080,11 +1139,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     int takebackCount = evt.getTakebackCount();
     int numMadeMoves = madeMoves.size()-takebackCount;
-    for (int i=madeMoves.size()-1; i>=numMadeMoves; i--)
+    for (int i = madeMoves.size()-1; i >= numMadeMoves; i--)
       madeMoves.removeElementAt(i);
 
     realPosition.copyFrom(game.getInitialPosition());
-    for (int i=0; i<numMadeMoves; i++)
+    for (int i = 0; i < numMadeMoves; i++)
       realPosition.makeMove((Move)madeMoves.elementAt(i));
 
     isMoveEnRoute = false;
@@ -1097,6 +1156,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.getPosition().copyFrom(realPosition);
       isBoardPositionUpdating = false;
       displayedMoveNumber = madeMoves.size();
+      updateMoveHighlighting(false);
     }
 
     if (!board.isEnabled())
@@ -1358,6 +1418,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     displayedMoveNumber = moveNum;
     board.setEnabled(displayedMoveNumber == madeMoves.size());
 
+    updateMoveHighlighting(false);
+
     updatePositionScrollBar();
   }
 
@@ -1388,6 +1450,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       isBoardPositionUpdating = false;
       displayedMoveNumber = moveNum;
       board.setEnabled(displayedMoveNumber == madeMoves.size());
+
+      updateMoveHighlighting(false);
 
       updateMoveListTable();
     }
