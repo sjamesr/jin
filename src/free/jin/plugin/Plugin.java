@@ -172,28 +172,25 @@ public abstract class Plugin{
 
   /**
    * Sets the user property with the name equal to the plugin id plus "." plus 
-   * the given property name to the given value. The <code>userTriggered</code>
-   * parameter specifies whether this is a property change triggered explicitly
-   * by the user.
+   * the given property name to the given value.
    */
 
-  public void setProperty(String propertyName, String propertyValue, boolean userTriggered){
+  public void setProperty(String propertyName, String propertyValue){
     if (Utilities.areEqual(propertyValue, getProperty(propertyName)))
       return;
 
-    getUser().setProperty(getID()+"."+propertyName, propertyValue, userTriggered);
+    getUser().setProperty(getID()+"."+propertyName, propertyValue);
   }
 
 
 
 
   /**
-   * Sets the specified property to the specified integer value. The
-   * <code>userTriggered</code> argument specifies 
+   * Sets the specified property to the specified integer value.
    */
 
-  public void setIntegerProperty(String propertyName, int propertyValue, boolean userTriggered){
-    setProperty(propertyName, String.valueOf(propertyValue), userTriggered);
+  public void setIntegerProperty(String propertyName, int propertyValue){
+    setProperty(propertyName, String.valueOf(propertyValue));
   }
 
 

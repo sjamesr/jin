@@ -251,7 +251,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     maybeSetColorProperty("move-highlighting-color", moveHighlightingColorChooser.getColor());
     maybeSetColorProperty("drag-square-highlighting-color", dragSquareHighlightingColorChooser.getColor());
 
-    boardManager.refreshFromProperties(true);
+    boardManager.refreshFromProperties();
   }
 
 
@@ -266,7 +266,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     if (newValue.equals(getColorProperty(name, null)))
       return;
 
-    boardManager.setProperty(name, StringEncoder.encodeColor(newValue), true);
+    boardManager.setProperty(name, StringEncoder.encodeColor(newValue));
   }
 
 }

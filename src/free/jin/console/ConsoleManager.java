@@ -289,7 +289,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     copyOnSelectCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
-        getUser().setProperty(getID()+".copyOnSelect",copyOnSelectCB.isSelected() ? "true" : "false", true);
+        getUser().setProperty(getID()+".copyOnSelect",copyOnSelectCB.isSelected() ? "true" : "false");
       }
   
     });
@@ -539,10 +539,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     User user = getUser();
 
     boolean isMaximized = consoleFrame.isMaximum();
-    setProperty("maximized", String.valueOf(isMaximized), false);
+    setProperty("maximized", String.valueOf(isMaximized));
 
     boolean isIconified = consoleFrame.isIcon();
-    setProperty("iconified", String.valueOf(isIconified), false);
+    setProperty("iconified", String.valueOf(isIconified));
 
     // This is the only way to retrieve the "normal" bounds of the frame under
     // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
@@ -554,10 +554,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     Rectangle consoleFrameBounds = consoleFrame.getBounds();
     // If something bad happened, let's not save that state.
-    if ((consoleFrameBounds.width>10)&&(consoleFrameBounds.height>10))
-      setProperty("frame-bounds",StringEncoder.encodeRectangle(consoleFrameBounds),false);
+    if ((consoleFrameBounds.width > 10) && (consoleFrameBounds.height > 10))
+      setProperty("frame-bounds",StringEncoder.encodeRectangle(consoleFrameBounds));
 
-    setProperty("game-list-display-style", gameListDisplayStyle, true);
+    setProperty("game-list-display-style", gameListDisplayStyle);
   }
 
 

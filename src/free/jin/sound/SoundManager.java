@@ -135,7 +135,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void saveState(){
-    setProperty("on", isOn ? "true" : "false", true);
+    setProperty("on", isOn ? "true" : "false");
   }
 
 

@@ -638,18 +638,18 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       throw new BadChangesException("You must specify the name of the file into which the games will be logged", 
         allGamesLogFileField);
 
-    gameLogger.setProperty("logging.mode", loggingModeString, true);
+    gameLogger.setProperty("logging.mode", loggingModeString);
 
-    gameLogger.setProperty("logging.all.filename", allGamesLogFile, true);
+    gameLogger.setProperty("logging.all.filename", allGamesLogFile);
 
     DefaultListModel loggingRulesModel = (DefaultListModel)loggingRulesList.getModel();
     int rulesCount = loggingRulesModel.size();
-    gameLogger.setIntegerProperty("logging.rules.count", rulesCount, true);
+    gameLogger.setIntegerProperty("logging.rules.count", rulesCount);
     for (int i = 0; i < rulesCount; i++){
       LoggingRule rule = (LoggingRule)loggingRulesModel.elementAt(i);
-      gameLogger.setProperty("logging.rule-"+(i+1)+".name", rule.getName(), true);
-      gameLogger.setProperty("logging.rule-"+(i+1)+".condition", rule.getCondition(), true);
-      gameLogger.setProperty("logging.rule-"+(i+1)+".filename", rule.getFilename(), true);
+      gameLogger.setProperty("logging.rule-"+(i+1)+".name", rule.getName());
+      gameLogger.setProperty("logging.rule-"+(i+1)+".condition", rule.getCondition());
+      gameLogger.setProperty("logging.rule-"+(i+1)+".filename", rule.getFilename());
     }
 
     gameLogger.refreshFromProperties();

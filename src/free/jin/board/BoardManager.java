@@ -141,12 +141,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    *
    * @param moveInputStyle The new move input style. Possible values are defined
    * in <code>free.chess.JBoard</code>.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setMoveInputStyle(int moveInputStyle, boolean userTriggered){
-    setProperty("move-input-style", moveInputStyle == JBoard.CLICK_N_CLICK ? "click'n'click" : "drag'n'drop", userTriggered);
+  public void setMoveInputStyle(int moveInputStyle){
+    setProperty("move-input-style", moveInputStyle == JBoard.CLICK_N_CLICK ? "click'n'click" : "drag'n'drop");
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -175,12 +173,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    *
    * @param draggedPieceStyle The new dragged piece style. Possible values are
    * defined in <code>free.chess.JBoard</code>.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setDraggedPieceStyle(int draggedPieceStyle, boolean userTriggered){
-    setProperty("dragged-piece-style", draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal-cursor", userTriggered);
+  public void setDraggedPieceStyle(int draggedPieceStyle){
+    setProperty("dragged-piece-style", draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal-cursor");
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -209,12 +205,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * promotion piece.
    *
    * @param autoPromote <code>true</code> if promotion should be automatic.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setAutoPromote(boolean autoPromote, boolean userTriggered){
-    setProperty("auto-promote", String.valueOf(autoPromote), userTriggered);
+  public void setAutoPromote(boolean autoPromote){
+    setProperty("auto-promote", String.valueOf(autoPromote));
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -249,11 +243,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * 
    * @param moveHighlightingStyle The new move highlighting style. Possible
    * values are defined in <code>free.chess.JBoard</code>.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setMoveHighlightingStyle(int moveHighlightingStyle, boolean userTriggered){
+  public void setMoveHighlightingStyle(int moveHighlightingStyle){
     String moveHighlightingString;
     if (moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING)
       moveHighlightingString = "none";
@@ -263,7 +255,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       moveHighlightingString = "arrow";
     else
       throw new IllegalStateException("Unknown move higlighting style: "+moveHighlightingStyle);
-    setProperty("move-highlight.style", moveHighlightingString, userTriggered);
+    setProperty("move-highlight.style", moveHighlightingString);
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -295,12 +287,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * @param highlightOwnMoves <code>true</code> if own moves should be
    * highlighted as well as the opponent's moves. <code>false</code> if only
    * the opponent's moves should be highlighted.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setHighlightingOwnMoves(boolean highlightOwnMoves, boolean userTriggered){
-    setProperty("move-highlight.highlight-own", String.valueOf(highlightOwnMoves), userTriggered);
+  public void setHighlightingOwnMoves(boolean highlightOwnMoves){
+    setProperty("move-highlight.highlight-own", String.valueOf(highlightOwnMoves));
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -327,12 +317,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Sets the current move highlighting color to the specified value.
    *
    * @param moveHighlightingColor The new move highlighting color.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setMoveHighlightingColor(Color moveHighlightingColor, boolean userTriggered){
-    setProperty("move-highlighting-color", StringEncoder.encodeColor(moveHighlightingColor), userTriggered);
+  public void setMoveHighlightingColor(Color moveHighlightingColor){
+    setProperty("move-highlighting-color", StringEncoder.encodeColor(moveHighlightingColor));
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -359,12 +347,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Sets the drag square highlighting color to the specified value.
    *
    * @param dragSquareHighlightingColor The new drag square highlighting color.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor, boolean userTriggered){
-    setProperty("drag-square-highlighting-color", StringEncoder.encodeColor(dragSquareHighlightingColor), userTriggered);
+  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
+    setProperty("drag-square-highlighting-color", StringEncoder.encodeColor(dragSquareHighlightingColor));
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -444,12 +430,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Sets the current piece painter to be of the specified type.
    *
    * @param piecePainterClassName The class name of the PiecePainter.
-   * @param userTriggered <code>true</code> if the change was triggered directly
-   * by the user.
    */
 
-  public void setPiecePainterClassName(String piecePainterClassName, boolean userTriggered){
-    setProperty("piece-painter-class-name", piecePainterClassName, userTriggered);
+  public void setPiecePainterClassName(String piecePainterClassName){
+    setProperty("piece-painter-class-name", piecePainterClassName);
 
     PiecePainter piecePainter = getPiecePainter();
 
@@ -502,8 +486,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Sets the current board painter to be of the specified type.
    */
 
-  public void setBoardPainterClassName(String boardPainterClassName, boolean userTriggered){
-    setProperty("board-painter-class-name", boardPainterClassName, userTriggered);
+  public void setBoardPainterClassName(String boardPainterClassName){
+    setProperty("board-painter-class-name", boardPainterClassName);
 
     BoardPainter boardPainter = getBoardPainter();
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
@@ -601,9 +585,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       public void actionPerformed(ActionEvent evt){
         String actionCommand = evt.getActionCommand();
         if ("dragndrop".equals(actionCommand))
-          setMoveInputStyle(JBoard.DRAG_N_DROP, true);
+          setMoveInputStyle(JBoard.DRAG_N_DROP);
         else if ("clicknclick".equals(actionCommand))
-          setMoveInputStyle(JBoard.CLICK_N_CLICK, true);
+          setMoveInputStyle(JBoard.CLICK_N_CLICK);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
       }
@@ -633,9 +617,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         String actionCommand = evt.getActionCommand();
 
         if ("normal".equals(actionCommand))
-          setDraggedPieceStyle(JBoard.NORMAL_DRAGGED_PIECE, true);
+          setDraggedPieceStyle(JBoard.NORMAL_DRAGGED_PIECE);
         else if ("target".equals(actionCommand))
-          setDraggedPieceStyle(JBoard.CROSSHAIR_DRAGGED_PIECE, true);
+          setDraggedPieceStyle(JBoard.CROSSHAIR_DRAGGED_PIECE);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
       }
@@ -650,7 +634,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     autoQueenMenuItem.setMnemonic('A');
     autoQueenMenuItem.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        setAutoPromote(autoQueenMenuItem.isSelected(), true);
+        setAutoPromote(autoQueenMenuItem.isSelected());
       }
     });
 
@@ -702,11 +686,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         String actionCommand = evt.getActionCommand();
 
         if ("none".equals(actionCommand))
-          setMoveHighlightingStyle(JBoard.NO_MOVE_HIGHLIGHTING, true);
+          setMoveHighlightingStyle(JBoard.NO_MOVE_HIGHLIGHTING);
         else if ("square".equals(actionCommand))
-          setMoveHighlightingStyle(JBoard.SQUARE_MOVE_HIGHLIGHTING, true);
+          setMoveHighlightingStyle(JBoard.SQUARE_MOVE_HIGHLIGHTING);
         else if ("arrow".equals(actionCommand))
-          setMoveHighlightingStyle(JBoard.ARROW_MOVE_HIGHLIGHTING, true);
+          setMoveHighlightingStyle(JBoard.ARROW_MOVE_HIGHLIGHTING);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
       }
@@ -722,7 +706,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     highlightOwnMovesCheckBox.setMnemonic('H');
     highlightOwnMovesCheckBox.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        setHighlightingOwnMoves(highlightOwnMovesCheckBox.isSelected(), true);
+        setHighlightingOwnMoves(highlightOwnMovesCheckBox.isSelected());
       }
     });
     
@@ -753,7 +737,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        setPiecePainterClassName(button.getActionCommand(), true);
+        setPiecePainterClassName(button.getActionCommand());
       } 
     };
 
@@ -800,7 +784,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        setBoardPainterClassName(button.getActionCommand(), true);
+        setBoardPainterClassName(button.getActionCommand());
       } 
     };
 
@@ -839,16 +823,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * changes the preferences.
    */
 
-  public void refreshFromProperties(boolean userTriggered){
-    setMoveInputStyle(getMoveInputStyle(), userTriggered);
-    setDraggedPieceStyle(getDraggedPieceStyle(), userTriggered);
-    setAutoPromote(isAutoPromote(), userTriggered);
-    setMoveHighlightingStyle(getMoveHighlightingStyle(), userTriggered);
-    setHighlightingOwnMoves(isHighlightingOwnMoves(), userTriggered);
-    setMoveHighlightingColor(getMoveHighlightingColor(), userTriggered);
-    setDragSquareHighlightingColor(getDragSquareHighlightingColor(), userTriggered);
-    setPiecePainterClassName(getPiecePainter().getClass().getName(), userTriggered);
-    setBoardPainterClassName(getBoardPainter().getClass().getName(), userTriggered);
+  public void refreshFromProperties(){
+    setMoveInputStyle(getMoveInputStyle());
+    setDraggedPieceStyle(getDraggedPieceStyle());
+    setAutoPromote(isAutoPromote());
+    setMoveHighlightingStyle(getMoveHighlightingStyle());
+    setHighlightingOwnMoves(isHighlightingOwnMoves());
+    setMoveHighlightingColor(getMoveHighlightingColor());
+    setDragSquareHighlightingColor(getDragSquareHighlightingColor());
+    setPiecePainterClassName(getPiecePainter().getClass().getName());
+    setBoardPainterClassName(getBoardPainter().getClass().getName());
   }
 
 
@@ -1280,10 +1264,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     String prefix = getID()+".";
 
     boolean isMaximized = frame.isMaximum();
-    user.setProperty(prefix+"maximized-"+index, String.valueOf(isMaximized), false);
+    user.setProperty(prefix+"maximized-"+index, String.valueOf(isMaximized));
 
     boolean isIconified = frame.isIcon();
-    user.setProperty(prefix+"iconified-"+index, String.valueOf(isIconified), false);
+    user.setProperty(prefix+"iconified-"+index, String.valueOf(isIconified));
 
     // This is the only way to retrieve the "normal" bounds of the frame under
     // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
@@ -1296,10 +1280,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     Rectangle frameBounds = frame.getBounds();
     // If something bad happened, let's not save that state.
     if ((frameBounds.width>10)&&(frameBounds.height>10))
-      user.setProperty(prefix+"frame-bounds-"+index,StringEncoder.encodeRectangle(frameBounds), false);
+      user.setProperty(prefix + "frame-bounds-" + index, StringEncoder.encodeRectangle(frameBounds));
 
     Rectangle iconBounds = frame.getDesktopIcon().getBounds();
-    user.setProperty(prefix+"frame-icon-bounds-"+index,StringEncoder.encodeRectangle(iconBounds),false);
+    user.setProperty(prefix + "frame-icon-bounds-" + index, StringEncoder.encodeRectangle(iconBounds));
 
     internalFrames.setElementAt(null, index);
     frame.removeInternalFrameListener(this);

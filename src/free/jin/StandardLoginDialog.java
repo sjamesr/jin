@@ -615,7 +615,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
       while (propsEnum.hasMoreElements()){
         String key = (String)propsEnum.nextElement();
         String value = props.getProperty(key);
-        user.setProperty(key, value, true);
+        user.setProperty(key, value);
       }
     }
 

@@ -555,16 +555,16 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       String propertyName = (String)modifiedPropsEnum.nextElement();
       String propertyValue = (String)modifiedProps.get(propertyName);
       if (!consoleManager.lookupProperty(propertyName).equals(propertyValue))
-        consoleManager.setProperty(propertyName, propertyValue, true);
+        consoleManager.setProperty(propertyName, propertyValue);
     }
 
     String newSelectionColor = StringEncoder.encodeColor(selectionColorButton.getColor());
     if (!newSelectionColor.equals(consoleManager.lookupProperty("output-selection")))
-      consoleManager.setProperty("output-selection", newSelectionColor, true);
+      consoleManager.setProperty("output-selection", newSelectionColor);
 
     String newSelectedColor = StringEncoder.encodeColor(selectedColorButton.getColor());
     if (!newSelectedColor.equals(consoleManager.lookupProperty("output-selected")))
-      consoleManager.setProperty("output-selected", newSelectedColor, true);
+      consoleManager.setProperty("output-selected", newSelectedColor);
 
     consoleManager.refreshFromProperties();
   }

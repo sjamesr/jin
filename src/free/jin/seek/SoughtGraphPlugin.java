@@ -307,17 +307,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     Rectangle soughtGraphFrameBounds = soughtGraphFrame.getBounds();
     // If something bad happened, let's not save that state.
-    if ((soughtGraphFrameBounds.width>10)&&(soughtGraphFrameBounds.height>10))
-      user.setProperty(prefix+"frame-bounds",StringEncoder.encodeRectangle(soughtGraphFrameBounds),false);
+    if ((soughtGraphFrameBounds.width > 10) && (soughtGraphFrameBounds.height > 10))
+      user.setProperty(prefix+"frame-bounds",StringEncoder.encodeRectangle(soughtGraphFrameBounds));
 
     boolean isMaximized = soughtGraphFrame.isMaximum();
-    user.setProperty(prefix+"maximized", String.valueOf(isMaximized), false);
+    user.setProperty(prefix+"maximized", String.valueOf(isMaximized));
 
     boolean isIconified = soughtGraphFrame.isIcon();
-    user.setProperty(prefix+"iconified", String.valueOf(isIconified), false);
+    user.setProperty(prefix+"iconified", String.valueOf(isIconified));
 
     boolean isVisible = soughtGraphFrame.isVisible();
-    user.setProperty(prefix+"visible", String.valueOf(isVisible), false);
+    user.setProperty(prefix+"visible", String.valueOf(isVisible));
   }
 
 
