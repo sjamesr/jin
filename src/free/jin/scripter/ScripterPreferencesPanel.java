@@ -83,22 +83,28 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   private void addScript(){
-    ScriptTypeSelectionDialog scriptTypeChooser = new ScriptTypeSelectionDialog(this);
-    AWTUtilities.centerWindow(scriptTypeChooser, this);
-    String scriptType = scriptTypeChooser.askScriptType();
-    if (scriptType == null)
-      return;
-
-    ScriptDialog dialog = scriptDialogForType(scriptType, null);
-    if (dialog == null)
-      throw new IllegalStateException("Unknown script type: "+scriptType);
-
-    AWTUtilities.centerWindow(dialog, this);
-    Script script = dialog.askForScript();
-    if (script != null){
-      scriptsListModel.addElement(script);
-      fireStateChanged();
-    }
+    try{
+      ScriptTypeSelectionDialog scriptTypeChooser = new ScriptTypeSelectionDialog(this);
+      AWTUtilities.centerWindow(scriptTypeChooser, this);
+      String scriptType = scriptTypeChooser.askScriptType();
+      if (scriptType == null)
+        return;
+  
+      ScriptDialog dialog = scriptDialogForType(scriptType, null);
+      if (dialog == null)
+        throw new IllegalStateException("Unknown script type: "+scriptType);
+  
+      AWTUtilities.centerWindow(dialog, this);
+      Script script = dialog.askForScript();
+      if (script != null){
+        scriptsListModel.addElement(script);
+        fireStateChanged();
+      }
+    } finally{  
+        SwingUtilities.windowForComponent(this).toFront();
+        // Workaround for a fluxbox bug. See
+        // http://sourceforge.net/tracker/index.php?func=detail&aid=803455&group_id=50386&atid=459537
+      }
   }
 
 
@@ -109,19 +115,25 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   private void editScript(Script script){
-    String scriptType = script.getType();
-    ScriptDialog dialog = scriptDialogForType(scriptType, script);
-    if (dialog == null)
-      throw new IllegalStateException("Unknown script type: "+scriptType);
-
-    AWTUtilities.centerWindow(dialog, this);
-    Script editedScript = dialog.askForScript();
-    if (editedScript != null){
-      int index = scriptsListModel.indexOf(script);
-      scriptsListModel.removeElementAt(index);
-      scriptsListModel.insertElementAt(editedScript, index);
-      fireStateChanged();
-    }
+    try{
+      String scriptType = script.getType();
+      ScriptDialog dialog = scriptDialogForType(scriptType, script);
+      if (dialog == null)
+        throw new IllegalStateException("Unknown script type: "+scriptType);
+  
+      AWTUtilities.centerWindow(dialog, this);
+      Script editedScript = dialog.askForScript();
+      if (editedScript != null){
+        int index = scriptsListModel.indexOf(script);
+        scriptsListModel.removeElementAt(index);
+        scriptsListModel.insertElementAt(editedScript, index);
+        fireStateChanged();
+      }
+    } finally{
+        SwingUtilities.windowForComponent(this).toFront();
+        // Workaround for a fluxbox bug. See
+        // http://sourceforge.net/tracker/index.php?func=detail&aid=803455&group_id=50386&atid=459537
+      }
   }
 
 
