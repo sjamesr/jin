@@ -76,7 +76,7 @@ public class AboutPanel extends DialogPanel{
   private void createUI(){
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
-    Icon jinIcon = new ImageIcon(AboutPanel.class.getResource("resources/logo.gif"));
+    Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo.gif"));
     JLabel jinLabel = new JLabel(Jin.getInstance().getAppName() + " " 
       + Jin.getInstance().getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
@@ -89,7 +89,7 @@ public class AboutPanel extends DialogPanel{
 
     String copyright; 
     try{
-      copyright = IOUtilities.loadText(AboutPanel.class.getResource("legal/copyright.txt"));
+      copyright = IOUtilities.loadText(Jin.class.getResource("legal/copyright.txt"));
     } catch (java.io.IOException e){
         add(new JLabel("Unable to load copyright file"));
         return;

@@ -21,15 +21,23 @@
 
 package free.jin.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import free.jin.Jin;
+import free.util.AWTUtilities;
+import free.util.IOUtilities;
+import free.util.swing.LinkLabel;
+import free.util.swing.PlainTextDialog;
+import free.util.swing.UrlDisplayingAction;
 
-import free.util.swing.*;
-import free.util.*;
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.*;
 
 
 /**
@@ -154,7 +162,7 @@ public class LicensePanel extends DialogPanel{
       public void actionPerformed(ActionEvent evt){
         if (gplText == null){
           try{
-            gplText = IOUtilities.loadText(LicensePanel.class.getResource("legal/gpl.txt"));
+            gplText = IOUtilities.loadText(Jin.class.getResource("legal/gpl.txt"));
           } catch (IOException e){
               e.printStackTrace();
               return;
@@ -172,7 +180,7 @@ public class LicensePanel extends DialogPanel{
       public void actionPerformed(ActionEvent evt){
         if (lgplText == null){
           try{
-            lgplText = IOUtilities.loadText(LicensePanel.class.getResource("legal/lgpl.txt"));
+            lgplText = IOUtilities.loadText(Jin.class.getResource("legal/lgpl.txt"));
           } catch (IOException e){
               e.printStackTrace();
               return;
@@ -191,7 +199,7 @@ public class LicensePanel extends DialogPanel{
       public void actionPerformed(ActionEvent evt){
         if (jregexCopyrightText == null){
           try{
-            jregexCopyrightText = IOUtilities.loadText(LicensePanel.class.getResource("legal/jregex.txt"));
+            jregexCopyrightText = IOUtilities.loadText(Jin.class.getResource("legal/jregex.txt"));
           } catch (IOException e){
               e.printStackTrace();
               return;
@@ -210,7 +218,7 @@ public class LicensePanel extends DialogPanel{
       public void actionPerformed(ActionEvent evt){
         if (jgoodiesCopyrightText == null){
           try{
-            jgoodiesCopyrightText = IOUtilities.loadText(LicensePanel.class.getResource("legal/jgoodies.txt"));
+            jgoodiesCopyrightText = IOUtilities.loadText(Jin.class.getResource("legal/jgoodies.txt"));
           } catch (IOException e){
               e.printStackTrace();
               return;
@@ -229,7 +237,7 @@ public class LicensePanel extends DialogPanel{
       public void actionPerformed(ActionEvent evt){
         if (beanshellCopyrightText == null){
           try{
-            beanshellCopyrightText = IOUtilities.loadText(LicensePanel.class.getResource("legal/beanshell.txt"));
+            beanshellCopyrightText = IOUtilities.loadText(Jin.class.getResource("legal/beanshell.txt"));
           } catch (IOException e){
               e.printStackTrace();
               return;
