@@ -20,12 +20,11 @@
 	<PARAM NAME="loadPrefsURL" VALUE="prefs.php?loadPrefs">
 	<PARAM NAME="savePrefsURL" VALUE="prefs.php?savePrefs">
 	
-	<PARAM NAME="bgcolor" VALUE="ffffff">
+	<PARAM NAME="bgcolor" VALUE="<?php echo getBackgroundColor(); ?>">
+	<PARAM NAME="login.ports" VALUE="<?php echo getPort(); ?>">
 		
-	<PARAM NAME="login.ports" VALUE="5100">
-		
+	
 	<PARAM NAME="server.classname" VALUE="free.jin.chessclub.ChessclubServer">
-
 			   
 	<PARAM NAME="plugins.count" VALUE="5">
 	<PARAM NAME="plugins.0.classname" VALUE="free.jin.console.icc.ChessclubConsoleManager">
