@@ -837,7 +837,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       // We should really change all the parameters of the existing Game object instead,
       // but since BoardPanel doesn't currently support modifying them all...
       updateGame(game.getGameType(), gameNumber, whiteName, blackName, ratingCategoryString,
-        isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement,
+        isRated, 60*1000*whiteInitial, 1000*whiteIncrement, 60*1000*blackInitial, 1000*blackIncrement,
         isPlayedGame, whiteRating, blackRating, String.valueOf(gameID), whiteTitles, blackTitles);
     } catch (NoSuchGameException e){}
   }
@@ -914,7 +914,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       String ratingCategoryString, boolean isRated, int whiteInitial, int whiteIncrement,
       int blackInitial, int blackIncrement, boolean isPlayedGame, int whiteRating, 
       int blackRating, Object gameID, String whiteTitles, String blackTitles){
-
+        
     GameInfo gameInfo = removeGameInfo(gameNumber);
     Game game = gameInfo.game;
 
@@ -930,7 +930,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       whiteRating, blackRating, String.valueOf(gameNumber), ratingCategoryString, isRated,
       isPlayedGame, whiteTitles, blackTitles, game.isBoardInitiallyFlipped(),
       game.getUserPlayer());
-
+      
     GameInfo newGameInfo = new GameInfo(newGame, new Position(newGame.getInitialPosition()),
       gameInfo.numMovesToFollow);
     addGameInfo(gameNumber, newGameInfo);
