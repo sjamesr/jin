@@ -401,7 +401,7 @@ public class Jin{
         System.out.println("Creating new user, named "+user.getUsername());
         File serverDir = new File(usersDir, user.getServer().getID());
         userDir = new File(serverDir, user.getUsername());
-        if (!userDir.mkdirs()){
+        if ((!userDir.exists() || !userDir.isDirectory()) && !userDir.mkdirs()){
           JOptionPane.showMessageDialog(mainFrame, "Unable to create directory "+userDir, "Error", JOptionPane.ERROR_MESSAGE);
           return null;
         }
