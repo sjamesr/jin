@@ -1,3 +1,5 @@
 id = xboard
 name = Xboard
-classname = XboardPiecePainter
+classname = ImagePieceSetLoader
+size.pref = 64
+size.list = 21 25 29 33 37 40 45 49 54 58 64 72 87 95 108 116 129
