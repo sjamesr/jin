@@ -37,6 +37,6 @@ public interface ChatListener extends EventListener{
    * Gets called when a chat message arrives from the server.
    */
 
-  void chatMessageArrived(ChatEvent evt);
+  void chatMessageReceived(ChatEvent evt);
 
 }
