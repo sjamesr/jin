@@ -135,11 +135,11 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The constant for dragged piece style where no piece is being shown, but 
-   * instead the cursor becomes CROSSHAIR_CURSOR while dragging.
+   * The constant for dragged piece style where the square under the cursor is
+   * highlighted to indicate the target square.
    */
 
-  public static final int CROSSHAIR_DRAGGED_PIECE = 1;
+  public static final int HIGHLIGHT_TARGET_DRAGGED_PIECE = 1;
 
 
 
@@ -262,7 +262,8 @@ public class JBoard extends JComponent{
         }
       }
 
-      if ((getDraggedPieceStyle() == CROSSHAIR_DRAGGED_PIECE) && (movedPieceSquare != null))
+      if ((getDraggedPieceStyle() == HIGHLIGHT_TARGET_DRAGGED_PIECE) && 
+          (movedPieceSquare != null))
         repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
 
       if (movedPieceSquare != null){                        // We were dragging a piece
@@ -632,13 +633,13 @@ public class JBoard extends JComponent{
 
   /**
    * Sets the dragged piece style to the given style. Possible values are
-   * {@link #NORMAL_DRAGGED_PIECE} and {@link #CROSSHAIR_DRAGGED_PIECE}.
+   * {@link #NORMAL_DRAGGED_PIECE} and {@link #HIGHLIGHT_TARGET_DRAGGED_PIECE}.
    */
 
   public void setDraggedPieceStyle(int newStyle){
     switch(newStyle){
       case NORMAL_DRAGGED_PIECE:
-      case CROSSHAIR_DRAGGED_PIECE:
+      case HIGHLIGHT_TARGET_DRAGGED_PIECE:
         break;
       default:
         throw new IllegalArgumentException("Illegal dragged piece style value: "+newStyle);
@@ -934,8 +935,9 @@ public class JBoard extends JComponent{
 
   /**
    * Sets the color used for square highlighting when dragging a piece (such as
-   * what occurs when in CROSSHAIR_DRAGGED_PIECE mode) to the specified color.
-   * Passing <code>null</code> is equivalent to setting it to the default color.
+   * what occurs when in HIGHLIGHT_TARGET_DRAGGED_PIECE mode) to the specified
+   * color. Passing <code>null</code> is equivalent to setting it to the default
+   * color.
    */
 
   public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
@@ -952,7 +954,7 @@ public class JBoard extends JComponent{
   
   /**
    * Returns the color used for square highlighting when dragging a piece (such
-   * as what occurs when in CROSSHAIR_DRAGGED_PIECE mode).
+   * as what occurs when in HIGHLIGHT_TARGET_DRAGGED_PIECE mode).
    */
 
   public Color getDragSquareHighlightingColor(){
@@ -1026,8 +1028,6 @@ public class JBoard extends JComponent{
     repaint(squareToRect(movedPieceSquare, null));
     movedPieceSquare = null;
     movedPieceLoc = null;
-    if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-      setCursor(Cursor.getDefaultCursor());
   }
 
 
@@ -1116,7 +1116,7 @@ public class JBoard extends JComponent{
         Piece piece = position.getPieceAt(movedPieceSquare);
         piecePainter.paintPiece(piece, g, this, rect, false);
       }
-      else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE){
+      else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE){
         Square square = locationToSquare(rect.x, rect.y);
         if (square != null){ // May be null if mouse is dragged out of the board
           int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
@@ -1463,7 +1463,7 @@ public class JBoard extends JComponent{
       rect.x = movedPieceLoc.x - squareWidth/2;
       rect.y = movedPieceLoc.y - squareHeight/2;
     }
-    else if (getDraggedPieceStyle() == CROSSHAIR_DRAGGED_PIECE){
+    else if (getDraggedPieceStyle() == HIGHLIGHT_TARGET_DRAGGED_PIECE){
       rect.x = movedPieceLoc.x - (movedPieceLoc.x - rect.x)%squareWidth;
       rect.y = movedPieceLoc.y - (movedPieceLoc.y - rect.y)%squareHeight;
       
@@ -1616,9 +1616,6 @@ public class JBoard extends JComponent{
         }
         movedPieceLoc = new Point(x, y);
 
-        if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-          setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-
         repaint(helpRect = squareToRect(square, helpRect));
         if (draggedPieceStyle == NORMAL_DRAGGED_PIECE)
           repaint(helpRect = getMovedPieceRect(helpRect));
@@ -1712,7 +1709,6 @@ public class JBoard extends JComponent{
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
     board.setBorder(new javax.swing.border.MatteBorder(30, 40, 50, 60, Color.red));
-    // board.setDraggedPieceStyle(CROSSHAIR_DRAGGED_PIECE);
     board.setMoveInputStyle(CLICK_N_CLICK);
     board.setFlipped(true);
     board.setCoordsDisplayStyle(RIM_COORDS);
