@@ -39,14 +39,6 @@ public class PluginContext{
 
 
   /**
-   * The <code>JinContext</code>.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * The connection to the server.
    */
 
@@ -100,7 +92,6 @@ public class PluginContext{
   /**
    * Creates a new <code>PluginContext</code> with the specified information.
    *
-   * @param context The application's context.
    * @param conn The connection to the server.
    * @param user The account with the server.
    * @param plugins The plugins run in the session.
@@ -108,9 +99,9 @@ public class PluginContext{
    * <code>plugins</code> argument.
    */
 
-  public PluginContext(JinContext context, Connection conn, User user,
-      Plugin [] plugins, Preferences [] prefs, JinAction [] actions){
-    this.context = context;
+  public PluginContext(Connection conn, User user, Plugin [] plugins,
+      Preferences [] prefs, JinAction [] actions){
+        
     this.conn = conn;
     this.user = user;
     this.plugins = plugins;
@@ -120,15 +111,6 @@ public class PluginContext{
       this.actions.addElement(actions[i]);
   }
 
-
-
-  /**
-   * Returns the <code>JinContext</code> in which we're running.
-   */
-
-  public JinContext getJinContext(){
-    return context;
-  }
 
 
 
