@@ -601,13 +601,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
           issueTakeback(gameData, boardData);
       }
       else if (plyDifference == 0){
-        if (gameData.isBSetup)
-          changePosition(gameData, boardData);
         // This happens if you:
         // 1. Issue "refresh".
         // 2. Make an illegal move, because the server will re-send us the board
         //    (although we don't need it)
         // 3. Issue board setup commands.
+        // 4. Use "wname" or "bname" to change the names of the white or black
+        //    players.
       }
       else if (plyDifference == 1){
         if (boardData.getMoveVerbose() != null)
@@ -636,16 +636,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       gameData = startGame(fakeGameInfo, boardData);
     }
 
-    if (gameData != null){
-      updateClocks(gameData, boardData);
-
-      Style12Struct oldBoardData = gameData.boardData;
-
-      if ((oldBoardData != null) && (oldBoardData.isBoardFlipped() != boardData.isBoardFlipped()))
-        flipBoard(gameData, boardData);
-
-      gameData.boardData = boardData;
-    }
+    if (gameData != null)
+      updateGame(gameData, boardData);
 
     return true;
   }
@@ -986,8 +978,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     Position initPos = new Position(variant);
     initPos.setFEN(boardData.getBoardFEN());
-    Player currentPlayer = playerForString(boardData.getCurrentPlayer());
-    initPos.setCurrentPlayer(currentPlayer);
 
     String whiteName = boardData.getWhiteName();
     String blackName = boardData.getBlackName();
@@ -1011,6 +1001,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     boolean initiallyFlipped = boardData.isBoardFlipped();
 
+    Player currentPlayer = playerForString(boardData.getCurrentPlayer());
     Player userPlayer = null;
     if ((gameType == Game.MY_GAME) && isPlayed)
       userPlayer = boardData.isMyTurn() ? currentPlayer : currentPlayer.getOpponent();
@@ -1032,6 +1023,39 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       removeAllSeeks(); 
 
     return gameData;
+  }
+
+
+
+
+  /**
+   * Updates any game parameters that differ in the board data from the current
+   * game data.
+   */
+
+  private void updateGame(InternalGameData gameData, Style12Struct boardData){
+    Game game = gameData.game;
+    Style12Struct oldBoardData = gameData.boardData;
+
+    updateClocks(gameData, boardData); // Update the clocks
+
+    // Flip board
+    if ((oldBoardData != null) && (oldBoardData.isBoardFlipped() != boardData.isBoardFlipped()))
+      flipBoard(gameData, boardData);
+
+    // Change the position
+    if ((oldBoardData != null) && !oldBoardData.getBoardFEN().equals(boardData.getBoardFEN()))
+      changePosition(gameData, boardData);
+
+    game.setWhiteName(boardData.getWhiteName()); // Change white name
+    game.setBlackName(boardData.getBlackName()); // Change black name
+    game.setWhiteTime(1000 * boardData.getInitialTime()); // Change white's initial time
+    game.setWhiteInc(1000 * boardData.getIncrement()); // Change white's increment
+    game.setBlackTime(1000 * boardData.getInitialTime()); // Change black's initial time
+    game.setBlackInc(1000 * boardData.getIncrement()); // Change black's increment
+
+
+    gameData.boardData = boardData;
   }
 
 
@@ -1209,10 +1233,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     Position newPos = game.getInitialPosition();
     newPos.setFEN(newBoardData.getBoardFEN());
-    Player currentPlayer = playerForString(newBoardData.getCurrentPlayer());
-    newPos.setCurrentPlayer(currentPlayer);
 
-    game.setInitialPosition(newPos, newBoardData.getPlayedPlyCount());
+    game.setInitialPosition(newPos);
+    game.setPliesSinceStart(newBoardData.getPlayedPlyCount());
 
     listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
 
