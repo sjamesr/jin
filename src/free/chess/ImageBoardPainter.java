@@ -217,8 +217,8 @@ public class ImageBoardPainter implements BoardPainter{
         return;
 
       if (isScaled){
-        scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
-        scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
+        scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
+        scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
         try{
           ImageUtilities.preload(scaledLight);
           ImageUtilities.preload(scaledDark);
@@ -229,7 +229,7 @@ public class ImageBoardPainter implements BoardPainter{
       if ((scaled != null) && (scaled.getWidth(null) == width) && (scaled.getHeight(null) == height))
         return;
 
-      scaled = boardImage.getScaledInstance(width, height, Image.SCALE_FAST);
+      scaled = boardImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
       try{
         ImageUtilities.preload(scaled);
       } catch (InterruptedException e){}
