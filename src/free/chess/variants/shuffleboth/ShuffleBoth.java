@@ -64,7 +64,7 @@ public class ShuffleBoth extends ChesslikeGenericVariant{
    */
 
   private ShuffleBoth(){
-    super("----------------------------------------------------------------", "Shuffle Both");
+    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Shuffle Both");
   }
 
 
@@ -194,7 +194,7 @@ public class ShuffleBoth extends ChesslikeGenericVariant{
   public void init(Position pos){
     checkPosition(pos);
 
-    pos.setLexigraphic(createRandomInitialLexigraphic());
+    pos.setFEN(createRandomInitialFEN());
   }
 
 
@@ -204,82 +204,63 @@ public class ShuffleBoth extends ChesslikeGenericVariant{
   /**
    * Creates a random initial position subject to the constraints specified in
    * the rules of Shuffle Both. The position is encoded and returned in
-   * lexigraphic format.
+   * FEN format.
    */
 
-  private static String createRandomInitialLexigraphic(){
-    StringBuffer base = new StringBuffer("r------rpppppppp--------------------------------PPPPPPPPR------R");
+  private static String createRandomInitialFEN(){
+    String whitePieces = createRandomPieceRow();
+    String blackPieces = createRandomPieceRow().toLowerCase();
 
-    // Put black and white kings
-    base.setCharAt(randomBoolean() ? 3 : 4, 'k');
-    base.setCharAt(randomBoolean() ? 59 : 60, 'K');
+    return blackPieces + "/pppppppp/8/8/8/8/PPPPPPPP/" + whitePieces + " w KQkq - 0 1";
+  }
 
-    // Put the light squared black bishop
+
+
+
+  /**
+   * Creates and returns a random row of pieces, subject to the Shuffle Both
+   * rules.
+   */
+
+  private static String createRandomPieceRow(){
+    StringBuffer pieces = new StringBuffer("R------R");
+
+    // The king
+    pieces.setCharAt(randomBoolean() ? 3 : 4, 'K');
+
+    // The 1st bishop
     while(true){
-      int pos = randomInt(6)+1;
-      if ((pos%2==0)&&(base.charAt(pos)=='-')){
-        base.setCharAt(pos, 'b');
+      int pos = randomInt(6) + 1;
+      if ((pos%2 == 0) && (pieces.charAt(pos) == '-')){
+        pieces.setCharAt(pos, 'B');
         break;
       }
     } 
 
-    // Put the dark squared black bishop
+    // The 2nd bishop
     while(true){
-      int pos = randomInt(6)+1;
-      if ((pos%2==1)&&(base.charAt(pos)=='-')){
-        base.setCharAt(pos, 'b');
+      int pos = randomInt(6) + 1;
+      if ((pos%2 == 1) && (pieces.charAt(pos) == '-')){
+        pieces.setCharAt(pos, 'B');
         break;
       }
     } 
-
-    // Put the light squared white bishop
+    
+    // The queen
     while(true){
-      int pos = randomInt(6)+57;
-      if ((pos%2==1)&&(base.charAt(pos)=='-')){
-        base.setCharAt(pos, 'B');
-        break;
-      }
-    } 
-
-    // Put the dark squared white bishop
-    while(true){
-      int pos = randomInt(6)+57;
-      if ((pos%2==0)&&(base.charAt(pos)=='-')){
-        base.setCharAt(pos, 'B');
-        break;
-      }
-    } 
-
-    // Put the black queen
-    while(true){
-      int pos = randomInt(6)+1;
-      if (base.charAt(pos)=='-'){
-        base.setCharAt(pos, 'q');
+      int pos = randomInt(6) + 1;
+      if (pieces.charAt(pos) == '-'){
+        pieces.setCharAt(pos, 'Q');
         break;
       }
     }
 
-    // Put the white queen
-    while(true){
-      int pos = randomInt(6)+57;
-      if (base.charAt(pos)=='-'){
-        base.setCharAt(pos, 'Q');
-        break;
-      }
-    }
+    // The knights
+    for (int i = 1; i < 7; i++)
+      if (pieces.charAt(i) == '-')
+        pieces.setCharAt(i, 'N');
 
-    // Put the black knights
-    for (int i=1;i<7;i++)
-      if (base.charAt(i)=='-')
-        base.setCharAt(i, 'n');
-
-    // Put the white knights
-    for (int i=57;i<63;i++)
-      if (base.charAt(i)=='-')
-        base.setCharAt(i, 'N');
-
-
-    return base.toString();
+    return pieces.toString();
   }
 
 
