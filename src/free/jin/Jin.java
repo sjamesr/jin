@@ -50,8 +50,20 @@ public class Jin{
       Class.forName("free.workarounds.SwingFix");
     } catch (ClassNotFoundException e){
         e.printStackTrace();
-      } 
+      }
   }
+
+
+
+  /**
+   * Compatibility version for the user properties and server user settings
+   * files. Whenever the user.properties file contains a version different than 
+   * this, the user.properties and server user settings files will be
+   * deleted/ignored.
+   */
+
+  private static final String propsVersion = "1";
+  
 
 
   /**
@@ -122,20 +134,13 @@ public class Jin{
 
 
   /**
-   * Create all the necessary directories, if they don't exist.
+   * Create the jin settings directory.
    */
 
   static{
     if (!jinUserHome.exists()){
       if (!jinUserHome.mkdirs()){
         System.err.println("Failed to create directory "+jinUserHome.getAbsolutePath());
-        System.exit(1);
-      }
-    }
-
-    if (!usersDir.exists()){
-      if (!usersDir.mkdirs()){
-        System.err.println("Failed to create directory "+usersDir.getAbsolutePath());
         System.exit(1);
       }
     }
@@ -166,12 +171,34 @@ public class Jin{
         userProps.load(propsIn);
         propsIn.close();
       }
+
+      String savedPropsVersion = userProps.getProperty("props.version");
+      if ((savedPropsVersion == null) || !savedPropsVersion.equals(propsVersion)){
+        propsFile.delete();
+        IOUtilities.rmdir(usersDir);
+        userProps.clear();
+        userProps.put("props.version", propsVersion);
+      }
     } catch (IOException e){
         e.printStackTrace();
       }
   }
 
 
+
+
+  /**
+   * Creates the users directory.
+   */
+
+  static{
+    if (!usersDir.exists()){
+      if (!usersDir.mkdirs()){
+        System.err.println("Failed to create directory "+usersDir.getAbsolutePath());
+        System.exit(1);
+      }
+    }
+  }
 
 
   /**
