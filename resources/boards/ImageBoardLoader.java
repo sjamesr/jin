@@ -21,8 +21,8 @@
 
 import java.io.IOException;
 import free.chess.BoardPainter;
-import free.chess.art.ProxyBoardPainter;
-import free.chess.art.ResourceImageBoardPainter;
+import free.chess.ProxyBoardPainter;
+import free.chess.ResourceImageBoardPainter;
 
 
 /**
