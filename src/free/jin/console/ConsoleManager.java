@@ -347,7 +347,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
         else if (evt instanceof ChatEvent)
           chatMessageReceived((ChatEvent)evt);
       }
-      pausedEventsQueue.clear();
+      pausedEventsQueue.removeAllElements();
     }
   }
   
