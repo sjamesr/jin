@@ -281,8 +281,8 @@ public class JinMain implements JinContext{
         mainFrame.removeWindowListener(this);
         
         // Workaround - otherwise menu activation shortcuts don't work
-        // immediately
-        if (mainFrame.getJMenuBar() != null)
+        // immediately. Under OS X, in native menubar mode, this actually breaks things.
+        if ((mainFrame.getJMenuBar() != null) && !PlatformUtils.isMacOSX())
           mainFrame.getJMenuBar().requestFocus();
         
         connManager.start();
@@ -310,43 +310,58 @@ public class JinMain implements JinContext{
    * <code>prefsDir/resources/resType</code>.
    */
    
-   public ClassLoader [] loadResources(String resType){
-     Vector resources = new Vector();
-     
-     File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
-     File userResDir = new File(new File(prefsDir, "resources"), resType);
-                                
-     loadResources(jinResDir, resources);
-     loadResources(userResDir, resources);
-     
-     ClassLoader [] resArr = new ClassLoader[resources.size()];
-     resources.copyInto(resArr);
-     
-     return resArr;
-   }
-   
-   
-   
-   /**
-    * Loads resources from the specified directory, adding them to the
-    * specified <code>Vector</code>.
-    */
+  public ClassLoader [] loadResources(String resType){
+    Vector resources = new Vector();
     
-   private void loadResources(File dir, Vector v){
-     String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
-     if (filenames == null)
-       return;
-     
-     for (int i = 0; i < filenames.length; i++){
-       File resource = new File(dir, filenames[i]);
-       try{
-         v.addElement(new ZipClassLoader(resource));
-       } catch (IOException e){
-           System.out.println("Failed to load resource: " + resource);
-           e.printStackTrace();
-         }
-     }
-   }
+    File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
+    File userResDir = new File(new File(prefsDir, "resources"), resType);
+                            
+    loadResources(jinResDir, resources);
+    loadResources(userResDir, resources);
+    
+    ClassLoader [] resArr = new ClassLoader[resources.size()];
+    resources.copyInto(resArr);
+    
+    return resArr;
+  }
+   
+   
+   
+  /**
+   * Loads resources from the specified directory, adding them to the
+   * specified <code>Vector</code>.
+   */
+   
+  private void loadResources(File dir, Vector v){
+    String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
+    if (filenames == null)
+      return;
+    
+    for (int i = 0; i < filenames.length; i++){
+      File resource = new File(dir, filenames[i]);
+      try{
+        v.addElement(new ZipClassLoader(resource));
+      } catch (IOException e){
+          System.out.println("Failed to load resource: " + resource);
+          e.printStackTrace();
+        }
+    }
+  }
+   
+   
+   
+  /**
+   * Quits the application, possible asking the user to confirm quitting first.
+   */
+
+  public void quit(boolean askToConfirm){
+    Object result = askToConfirm ? 
+      OptionPanel.confirm(uiProvider, "Quit", "Quit Jin?", OptionPanel.OK) : OptionPanel.OK;
+    
+    if (result == OptionPanel.OK)
+      shutdown();
+  }
+   
     
 
  
@@ -944,11 +959,7 @@ public class JinMain implements JinContext{
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent evt){
-        Object result =
-          OptionPanel.confirm(uiProvider, "Exit", "Exit Jin?", OptionPanel.OK);
-
-        if (result == OptionPanel.OK)
-          shutdown();
+        quit(true);
       }
     });
 
@@ -1096,6 +1107,25 @@ public class JinMain implements JinContext{
           "Unable to save preferences into:\n" + userPrefsFile);
       }
   }
+  
+  
+  
+  /**
+   * The sole JinMain instance.
+   */
+   
+  private static JinMain app;
+  
+  
+  
+  /**
+   * Returns the JinMain instance.
+   */
+   
+  public static JinMain getApp(){
+    return app;
+  }
+  
 
 
 
@@ -1109,8 +1139,13 @@ public class JinMain implements JinContext{
       File prefsDir = new File(System.getProperty("user.home"), ".jin");
       createPreferencesDir(prefsDir);
 
-      JinMain app = new JinMain(prefsDir);
+      app = new JinMain(prefsDir);
+      
+      // Perform some plaform specific things.
+      doPlatformSpecificStuff();
+      
       app.start();
+      
     } catch (Throwable t){
         if (t instanceof ThreadDeath)
           throw (ThreadDeath)t;
@@ -1139,6 +1174,20 @@ public class JinMain implements JinContext{
     }
     else if (!dir.isDirectory())
       throw new IOException(dir.toString() + " exists but is not a directory");
+  }
+  
+  
+  
+  /**
+   * Performs some platform specific stuff.
+   */
+   
+  private static void doPlatformSpecificStuff(){
+    if (PlatformUtils.isMacOSX()){
+      try{
+        Class.forName("free.jin.MacOSXSpecific");
+      } catch (ClassNotFoundException e){}
+    }
   }
 
 
