@@ -99,7 +99,6 @@ public class ConsoleTextPane extends JTextPane{
     this.console = console;
 
     setEditable(false);
-    setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
 
     ToolTipManager tooltipManager = ToolTipManager.sharedInstance();
     if (!tooltipManager.isEnabled())
