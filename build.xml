@@ -12,6 +12,7 @@
 		<property name="build.dir" value="build" />
 		<property name="build.debug" value="yes" />
     <property name="build.compress" value="no" />
+    <property name="build.manifest" value="manifest.txt" />
 		
 		<property name="source.dir" value="src" />
 		<property name="classes.dir" value="classes" /> 
@@ -138,7 +139,7 @@
 		</condition>
 		
 		
-		<condition property="runDoUnixStuff">
+		<condition property="buildingForUnix">
 			<or>
 				<and>
 					<not>
@@ -153,7 +154,7 @@
 			</or>
 		</condition>
 
-		<condition property="runDoWindowsStuff">
+		<condition property="buildingForWindows">
 			<or>
 				<and>
 					<not>
@@ -168,7 +169,7 @@
 			</or>
 		</condition>
 		
-		<condition property="runDoMacOSXStuff">
+		<condition property="buildingForMacOSX">
 			<or>
 				<and>
 					<not>
@@ -183,7 +184,7 @@
 			</or>
 		</condition>
 		
-		<condition property="runDoAppletStuff">
+		<condition property="buildingApplet">
 			<or>
 				<isset property="applet" />
 				<and>
@@ -224,14 +225,15 @@
 
 
 		<!-- Fix CRLF in manifest.txt (for windows) -->
-		<fixcrlf srcdir="${user.dir}" includes="manifest.txt" />
+    <fixcrlf srcdir="${user.dir}" includes="${manifest}" />
+    
 
 		<!-- Jin classes -->
 		<jar jarfile="${build.dir}/jin.jar"
 		     basedir="${classes.dir}"
 		     includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/resources/**"
 		     compress="${build.compress}"
-		     manifest="manifest.txt"
+		     manifest="${build.manifest}"
 		/>
 
 
@@ -539,18 +541,18 @@
 	</target>
   
   
-  <!-- If the runDoAppletStuff property is set, extracts the file specified by
+  <!-- If the buildingApplet property is set, extracts the file specified by
        the resource.file property into a directory specified by the resource.name
        property and then deletes the file -->
-  <target name="extractResource" if="runDoAppletStuff">
+  <target name="extractResource" if="buildingApplet">
     <dirname file="${resource.file}" property="base-dir" />
     <unzip src="${resource.file}" dest="${base-dir}/${resource.name}" />
     <delete file="${resource.file}" />
   </target>
   
 	
-	<!-- If the property runDoUnixStuff is set, does things required for Unix -->
-	<target name="doUnixStuff" if="runDoUnixStuff">
+	<!-- If the property buildingForUnix is set, does things required for Unix -->
+	<target name="doUnixStuff" if="buildingForUnix">
 		<copy todir="${build.dir}">
 			<fileset dir="resources/os-specific/unix" includes="jin" />
 		</copy>
@@ -580,16 +582,16 @@
 	</target>
 
 
-	<!-- If the property runDoWindowsStuff is set, does things required for Windows -->
-	<target name="doWindowsStuff" if="runDoWindowsStuff">		
+	<!-- If the property buildingForWindows is set, does things required for Windows -->
+	<target name="doWindowsStuff" if="buildingForWindows">		
 		<copy todir="${build.dir}">
 			<fileset dir="resources/os-specific/windows" />
 		</copy>
 	</target>
 	
 	
-	<!-- If the property doMacOSXStuff is set, does things required for Mac OS X -->
-	<target name="doMacOSXStuff" if="runDoMacOSXStuff">
+	<!-- If the property buildingForMacOSX is set, does things required for Mac OS X -->
+	<target name="doMacOSXStuff" if="buildingForMacOSX">
 		<javac srcdir="resources/os-specific/macosx"
 		       destdir="${classes.dir}"
 		       includes="free/jin/MacOSXSpecific.java"
@@ -603,8 +605,8 @@
 	</target>
 	
 
-	<!-- If the property doAppletStuff is set, does things required for Applets -->
-	<target name="doAppletStuff" if="runDoAppletStuff">
+	<!-- If the property buildingApplet is set, does things required for Applets -->
+	<target name="doAppletStuff" if="buildingApplet">
 		<javac srcdir="resources/os-specific/applet"
 		       includes="DetectJava.java"
 		       debug="${build.debug}">
