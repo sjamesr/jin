@@ -94,16 +94,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * </UL>
    */
 
-  public synchronized void login() throws IOException{
-    super.login();
+  public void onLogin(){
+    super.onLogin();
 
-    execRunnable(new Runnable(){
-
-      public void run(){
-        fireLoggedIn();
-      }
-
-    });
+    fireLoggedIn();
 
     sendCommand("set-quietly wrap 0");
 
