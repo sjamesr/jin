@@ -68,6 +68,25 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
+   * Returns a Player object corresponding to the specified string. If the
+   * string is "W", returns <code>Player.WHITE</code>. If it's "B", returns
+   * <code>Player.BLACK</code>. Otherwise, throws an IllegalArgumentException.
+   */
+
+  public static Player playerForString(String s){
+    if (s.equals("B"))
+      return Player.BLACK_PLAYER;
+    else if (s.equals("W"))
+      return Player.WHITE_PLAYER;
+    else
+      throw new IllegalArgumentException("Bad player string: "+s);
+  }
+
+
+
+
+
+  /**
    * Returns our JinListenerManager.
    */
 
