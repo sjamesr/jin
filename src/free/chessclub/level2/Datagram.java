@@ -22,7 +22,8 @@
 
 package free.chessclub.level2;
 
-import free.util.TextUtilities;
+import free.util.FormatException;
+import java.util.Vector;
 
 
 /**
@@ -39,90 +40,29 @@ public class Datagram{
   /**
    * The standard delimiter in datagrams. 
    */
+   
   public static final char DG_DELIM = '\u0019'; 
     
 
+  
   /**
-   * A string specifying the start of a datagram.
+   * The start-of-datagram delimiter.
    */
-  public static final String DG_START = ""+DG_DELIM+"("; 
+   
+  public static final String DG_START = "" + DG_DELIM + "("; 
 
+  
 
   /**
-   * A string specifying the end of a datagram.
+   * The end-of-datagram delimiter.
    */
-  public static final String DG_END = ""+DG_DELIM+")";
+   
+  public static final String DG_END = "" + DG_DELIM + ")";
     
-  
-  /**
-   * A string specifying the start of a string (type 1).
-   */
-  private static final String STRING_START_1 = ""+DG_DELIM+"{";
-
-
-  /**
-   * A string specifying the end of a string (type 1).
-   */
-  private static final String STRING_END_1 = ""+DG_DELIM+"}";
-
-
-  /**
-   * A string specifying the start of a string (type 2).
-   */
-  private static final String STRING_START_2 = "{";
-    
-  
-  /**
-   * A string specifying the end of a string (type 2).
-   */
-  private static final String STRING_END_2 = "}";
-    
-
-
-  /**
-   * The length of DG_START, so that we don't have to get it every time.
-   */
-  private static final int DG_START_LENGTH = DG_START.length();
-
-
-  /**
-   * The length of DG_END, so that we don't have to get it every time.
-   */
-  private static final int DG_END_LENGTH = DG_END.length();
-
-
-
-  /**
-   * The length of STRING_START_1 , so that we don't have to get it every time.
-   */
-  private static final int STRING_START_1_LENGTH = STRING_START_1.length();
-
-
-
-  /**
-   * The length of STRING_END_1 , so that we don't have to get it every time.  
-   */  
-//  private static final int STRING_END_1_LENGTH = STRING_END_1.length();
-  // Commented out to appease eclipse
-
-  
-  
-  /**
-   * The length of STRING_START_2 , so that we don't have to get it every time.
-   */
-  private static final int STRING_START_2_LENGTH = STRING_START_2.length();
-
-
-  /**
-   * The length of STRING_END_2 , so that we don't have to get it every time.
-   */
-//  private static final int STRING_END_2_LENGTH = STRING_END_1.length();
-  	// Commented out to appease eclipse
-
 
 
 	/**
-	 * Definitions of all the DG type numbers. See their description at 
+	 * Definitions of all the DG type IDs. See their description at 
 	 * <a href="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
 	 */
 
@@ -240,283 +180,209 @@ public class Datagram{
   public static final int DG_WILD_KEY                = 116;
   public static final int DG_SET2                    = 124;
   public static final int DG_KNOWS_FISCHER_RANDOM    = 132;
+  
+  
+  
+  /**
+   * The maximum datagram ID.
+   */
+   
+  public static final int MAX_DG_ID = 132;
                          
 
+  
+  /**
+   * The ID of the datagram.
+   */
    
-  private final int dgNumber;
-    // The data type number of the datagram.
-
-  private final String [] arguments; 
-    // An array containing the arguments of the datagram.
-
-
-  private final byte [] content;
-    // A byte array containing the exact contents of the datagram.
-
-
-
-
+  private final int id;
+  
+  
+  
   /**
-   * Creates a new Datagram with the given data type number and the given
-   * arguments. This constructor should not be usually used on the client,
-   * but instead the parseDatagram(String) method should be used.
-   *
-   * @param dgNumber The data type number of the datagram.
-   * @param dgArguments An array of strings representing the arguments
-   * of the datagram.
+   * An array holding the datagram fields.
    */
 
-  public Datagram(final int dgNumber, final String [] dgArguments, byte [] content){
-    this.dgNumber = dgNumber;
-    if (dgArguments==null)
-      throw new NullPointerException();
-    this.arguments = dgArguments;
-    this.content = content;
+  private final String [] fields; 
+
+  
+  
+  /**
+   * Creates a new <code>Datagram</code> with the specified datagram id and  
+   * fields.
+   */
+
+  public Datagram(int id, String [] fields){
+    if (fields == null)
+      throw new IllegalArgumentException("Datagram fields may not be null");
+    
+    this.id = id;
+    this.fields = fields;
+  }
+
+  
+  
+  /**
+   * Returns the ID of the datagram.
+   */
+  
+  public int getId(){
+    return id;
+  }
+  
+
+  /**
+   * Returns the number of fields in this Datagram.
+   */
+
+  public int getFieldCount(){
+    return fields.length;
   }
 
 
-
-
-
+  
   /**
-   * Returns the number of arguments in this Datagram.
-   */
-
-  public int getArgumentCount(){
-    if (arguments==null)
-      throw new DatagramFormatException();
-    return arguments.length;
-  }
-
-
-  /**
-   * Returns an argument at the given index. The argument is returned as-is,
-   * meaning that if it is enclosed in some special delimiters, they will
-   * appear in the returned string.
-   *
-   * @param argumentIndex The index in the list of arguments of the requested 
-   * argument
+   * Returns the specified field, unparsed.
    */ 
 
-  public String getArgument(int argumentIndex){
-    if (arguments==null)
-      throw new DatagramFormatException();
-    return arguments[argumentIndex];
+  public String getField(int fieldIndex){
+    return fields[fieldIndex];
+  }
+
+
+
+  /**
+   * Returns the specified field parsed as a string.
+   */
+
+  public String getString(int fieldIndex){
+    return getField(fieldIndex);    
+  }
+
+
+
+  /**
+   * Returns the specified field parsed as an integer.
+   */
+
+  public int getInteger(int fieldIndex){
+    return Integer.parseInt(getField(fieldIndex));
+  }
+
+
+
+  /**
+   * Returns the specified field parsed as a long.
+   */
+
+  public long getLong(int fieldIndex){
+    return Long.parseLong(getField(fieldIndex));
+  }
+
+
+
+  /**
+   * Returns the specified field, parsed as a boolean.
+   * If the value of the field is "1", <code>true</code> is returned, otherwise
+   * <code>false</code> is returned.
+   */
+
+  public boolean getBoolean(int fieldIndex){
+    return getField(fieldIndex).equals("1");
   }
 
 
 
 
   /**
-   * Returns the argument at the specified index parsed as a string.
+   * Parses the specified string and returns a <code>Datagram</code> object
+   * corresponding to the datagram represented by that string.
    *
-   * @param argumentIndex The index in the list of arguments of the requested 
-   * argument
+   * @throws FormatException if the specified string cannot be parsed as a
+   * datagram because it is not in the proper format.
    */
 
-  public String getString(int argumentIndex){
-    String argument = getArgument(argumentIndex);    
-    return argument;
-  }
-
-
-
-
-  /**
-   * Returns the argument at the specified index parsed as an integer.
-   *
-   * @param argumentIndex The index in the list of arguments of the requested 
-   * argument
-   */
-
-  public int getInteger(int argumentIndex){
-    return Integer.parseInt(getArgument(argumentIndex));
-  }
-
-
-
-
-
-  /**
-   * Returns the argument at the specified index parsed as a long.
-   *
-   * @param argumentIndex The index in the list of arguments of the requested 
-   * argument
-   */
-
-  public long getLong(int argumentIndex){
-    return Long.parseLong(getArgument(argumentIndex));
-  }
-
-
-
-
-
-  /**
-   * Returns the argument at the specified index parsed as a boolean.
-   * If the value of the argument is "0", false is returned, otherwise
-   * true is returned.
-   *
-   * @param argumentIndex The index in the list of arguments of the requested
-   * argument.
-   */
-
-  public boolean getBoolean(int argumentIndex){
-    return getArgument(argumentIndex).equals("1");
-  }
-
-
-
-
-
-
-  /**
-   * Returns a byte array containing all the contents of the datagram, unparsed,
-   * not including the type or the space after it.
-   */
-
-  public byte [] getContent(){
-    return (byte [])content.clone();
-  }
-
-
-
-
-  /**
-   * Returns the datagram type number of this Datagram.
-   */
-
-  public int getType(){
-    return dgNumber;
-  }
-
-
-
-  /**
-   * Parses the given string and returns a Datagram object corresponding
-   * to the datagram represented by the string.
-   * Some datagrams contain unparseable data (DG_DIALOG_DATA and DG_SJI_AD for 
-   * example), since there is no way to know what these datagrams are, this method
-   * will be attempt to parse them. If they turn out to be in a really bad format (one which
-   * breaks the parser), the only way to obtain the information sent in the datagram 
-   * will be via the {@link #getContent()} method. Even if parsing succeeds, 
-   * the get<argumentType>(int) methods will probably return garbage. If parsing
-   * does not succeed, all get<argumentType>(int) methods will throw DatagramFormatException.
-   *
-   * @param datagram The string representing the datagram.
-   *
-   * @return The Datagram object representing the parsed datagram.
-   *
-   * @throws DatagramFormatException if the given string is formatted so badly,
-   * it doesn't even get recognized as a datagram (if there is no dgNumber for example).
-   */
-
-  public static Datagram parseDatagram(String datagram){
-    checkFormat(datagram);
-
-    datagram = datagram.substring(DG_START_LENGTH, datagram.length()-DG_END_LENGTH); // Strip DG_START and DG_END
-
-    int maxArgumentCount = 0;             
-    for (int i=0;i<datagram.length();i++) // Count the maximum possible amount of arguments.
-      if (datagram.charAt(i)==' ')        // The amount of arguments can't be less than the 
-        maxArgumentCount++;               // amount of spaces since they are the delimiters 
-
-    String [] args = new String[maxArgumentCount];
-    int argCount = 0;
-
-    StringBuffer buf = new StringBuffer(datagram);
-    int dgCode = Integer.parseInt(TextUtilities.nextToken(buf, " "));
-
-    while (true){
-      if (buf.length()==0)
-        break;
-
-      String token = TextUtilities.nextToken(buf, " ");
-
-      if (token.startsWith(STRING_START_1)){
-        if (token.endsWith(STRING_END_1))
-          token = token.substring(STRING_START_1_LENGTH, token.length()-STRING_START_1_LENGTH);
-        else{
-          token = token.substring(STRING_START_1_LENGTH)+" "+TextUtilities.nextToken(buf, STRING_END_1);
-        }
-      }
-      else if (token.startsWith(STRING_START_2)){
-        if (token.endsWith(STRING_END_2))
-          token = token.substring(STRING_START_2_LENGTH, token.length()-STRING_START_2_LENGTH);
-        else{
-          token = token.substring(STRING_START_2_LENGTH)+" "+TextUtilities.nextToken(buf, STRING_END_2);
-        }
-      }
-      else if (token.length()==0) // Skip trailing spaces
-        continue;
-      
-      args[argCount++] = token;
-    }
-
-    String [] dgArguments = new String[argCount];
-    for (int i=0;i<argCount;i++)
-      dgArguments[i] = args[i];
-
-    return new Datagram(dgCode, dgArguments, null);
-  }
-
-
-
-
-
-  /**
-   * Checks whether the given string represents a datagram in the expected
-   * format. Throws a DatagramFormatException if the format is wrong or
-   * simply returns is the format is ok.
-   *
-   * @param string The string to check for being in the expected format.
-   *
-   * @throws DatagramFormatException if the string does not represent a
-   * datagram in the expected format.
-   */
-
-  private static void checkFormat(String string){
-    if (!string.startsWith(DG_START))
-      throw new DatagramFormatException("The string ("+string+") does not start with \"^Y(\"");
-
-    if (!string.endsWith(DG_END))
-      throw new DatagramFormatException("The string ("+string+") does not end with \"^Y)\"");
-
+  public static Datagram parseDatagram(String dgString) throws FormatException{
     try{
-      String strippedDG = string.substring(DG_START_LENGTH, string.length()-DG_END_LENGTH);
-      Integer.parseInt(TextUtilities.nextToken(new StringBuffer(strippedDG), " "));
+      
+      // Check that it starts with DG_START
+      if (!dgString.startsWith(DG_START))
+        throw new DatagramFormatException("The string (" + dgString + ") does not start with \"^Y(\"");
+  
+      // Check that it ends with DG_END
+      if (!dgString.endsWith(DG_END))
+        throw new DatagramFormatException("The string (" + dgString + ") does not end with \"^Y)\"");
+  
+      // Strip DG_START and DG_END and add an extra space at the end to make it
+      // easier to parse
+      dgString = dgString.substring(2, dgString.length() - 2) + " "; 
+
+      int index = dgString.indexOf(' ');
+      int id = Integer.parseInt(dgString.substring(0, index));
+      
+      Vector fields = new Vector();
+      
+      index++;
+      int dgLength = dgString.length();
+      while (index < dgLength){
+        int startIndex, endIndex;
+        char firstChar = dgString.charAt(index); 
+        if (firstChar == '{'){ // The delimiters are { and }
+          startIndex = index + 1;
+          endIndex = dgString.indexOf('}', startIndex);
+          index = endIndex + 2; // "} "
+        }
+        else if (firstChar == DG_DELIM){ // The delimiters are ^Y{ and ^Y}
+          startIndex = index + 2;
+          endIndex = dgString.indexOf(DG_DELIM, startIndex);
+          index = endIndex + 3; // "^Y} "
+        }
+        else{ 
+          while (firstChar == ' '){ // Skip any extra spaces just in case
+            index++;
+            firstChar = dgString.charAt(index);
+          }
+          
+          startIndex = index;
+          endIndex = dgString.indexOf(' ', startIndex);
+          index = endIndex + 1;
+        }
+        
+        fields.addElement(dgString.substring(startIndex, endIndex));
+      }
+  
+      String [] fieldsArr = new String[fields.size()];
+      fields.copyInto(fieldsArr);
+  
+      return new Datagram(id, fieldsArr);
     } catch (NumberFormatException e){
-        throw new DatagramFormatException("The DG data type is not a decimal number");
+        throw new FormatException(e);
+      }
+      catch (StringIndexOutOfBoundsException e){
+        throw new FormatException(e);
       }
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * Converts this Datagram into a String.
-   *
-   * @return A string representation of this datagram.
+   * Returns a textual representation of this datagram.
    */
 
   public String toString(){
-    StringBuffer buf = new StringBuffer("[Datagram ID="+dgNumber+" Arguments: ");
-    int argumentCount = getArgumentCount();
+    StringBuffer buf = new StringBuffer("[Datagram ID=" + getId() + " Fields: ");
+    int fieldCount = getFieldCount();
 
-    if (argumentCount==0){
-      buf.append("None");
+    for (int i = 0; i < fieldCount - 1; i++){
+      buf.append("{" + getField(i) + "}");
+      buf.append(",");
     }
-    else{
-      for (int i=0;i<argumentCount;i++){
-        buf.append("{"+getArgument(i)+"}");
-        if (i<argumentCount-1)
-          buf.append(",");
-      }
-    }
+    buf.append("{" + getField(fieldCount - 1) + "}");
+    
     buf.append("]");
     return buf.toString();
   }
 
+  
 
 }
