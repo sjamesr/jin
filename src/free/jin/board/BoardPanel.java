@@ -27,7 +27,6 @@ import free.chess.*;
 import java.awt.*;
 import javax.swing.event.*;
 import free.jin.Game;
-import free.jin.JinConnection;
 import free.jin.plugin.Plugin;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
@@ -37,19 +36,14 @@ import free.chess.event.MoveEvent;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
-import free.util.swing.SolidColorOvalIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.AdjustmentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.border.EmptyBorder;
 import java.util.Vector;
-import java.util.Hashtable;
-import java.net.URL;
-import java.io.IOException;
 
 
 /**
@@ -478,10 +472,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void configureBoard(Game game, JBoard board){
     int moveInputMode;
-    if (game.getGameType()==Game.MY_GAME){
-      String username = plugin.getConnection().getUsername();
+    if (game.getGameType() == Game.MY_GAME){
       if (game.isPlayed())
-        if (game.getUserPlayer()==Player.WHITE_PLAYER)
+        if (game.getUserPlayer() == Player.WHITE_PLAYER)
           moveInputMode = JBoard.WHITE_PIECES_MOVE;
         else
           moveInputMode = JBoard.BLACK_PIECES_MOVE;
@@ -854,8 +847,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     setLayout(null); // See the doLayout() method
 
     add(board);
-
-    Dimension size = getSize();
 
     if (isVerticalLayout){
       topInfoBox = new JPanel();

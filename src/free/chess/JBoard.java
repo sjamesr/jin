@@ -193,7 +193,6 @@ public class JBoard extends JComponent{
     public void stateChanged(ChangeEvent evt){
       // Repaint only the parts that really need to be repainted by checking
       // which squares changed.
-      Dimension size = getSize();
       boolean checkMovingPieceSquare = (movedPieceSquare != null);
       Rectangle tmpRect = new Rectangle();
 
@@ -1255,9 +1254,6 @@ public class JBoard extends JComponent{
 
     int evtID = evt.getID();
 
-    Dimension size = getSize();
-    int squareWidth = size.width/8;
-    int squareHeight = size.height/8;
     int x = evt.getX();
     int y = evt.getY();
     int draggedPieceStyle = getDraggedPieceStyle();
@@ -1368,9 +1364,6 @@ public class JBoard extends JComponent{
 
     int evtID = evt.getID();
 
-    Dimension size = getSize();
-    int squareWidth = size.width/8;
-    int squareHeight = size.height/8;
     int x = evt.getX();
     int y = evt.getY();
     Square square = locationToSquare(x,y);

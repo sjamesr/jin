@@ -334,7 +334,6 @@ public class Jin{
       if (!userDir.isDirectory())
         throw new IOException("Path must be a directory");
 
-      String username = userDir.getName();
       File parent = new File(userDir.getParent());
       String serverID = parent.getName();
 

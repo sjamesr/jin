@@ -25,20 +25,16 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.event.*;
+import jregex.*;
 import javax.swing.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.io.IOException;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import free.jin.Jin;
 import free.jin.JinConnection;
 import free.jin.plugin.Plugin;
 import free.util.StringParser;
 import free.util.BrowserControl;
 import free.workarounds.FixUtils;
-import jregex.*;
 
 
 /**
@@ -85,8 +81,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   /**
    * The Plugin which uses us, we use its properties to determine all kinds of
-   * our properties (text colors etc.). TODO: Allow setting the properties
-   * separately from setting the user Plugin.
+   * our properties (text colors etc.).
    */
 
   protected final Plugin userPlugin;
@@ -181,7 +176,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   /**
    * Creates a new Console which is used by the given Plugin. The Console uses
    * various properties of the plugin to determine how do display text etc.
-   * TODO: Write a documentation of which properties it uses.
    */
 
   public Console(Plugin userPlugin){
@@ -463,8 +457,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     String inputSelected = getProperty("input-selected");
     if (inputSelected!=null)
       inputComponent.setSelectedTextColor(StringParser.parseColor(inputSelected));      
-
-    // TODO: How do we change the font so it affects correctly all the L&Fs ?
 
 
     int numLinkPatterns = Integer.parseInt(getProperty("output-link.num-patterns","0"));

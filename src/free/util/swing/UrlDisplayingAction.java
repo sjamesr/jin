@@ -25,7 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import java.awt.Frame;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.util.BrowserControl;
 

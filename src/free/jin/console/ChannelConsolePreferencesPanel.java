@@ -32,7 +32,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.StringParser;
-import free.util.StringEncoder;
 
 
 /**

@@ -31,7 +31,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import free.util.swing.IntegerStrictPlainDocument;
-import free.util.BrowserControl;
 import free.util.Utilities;
 
 

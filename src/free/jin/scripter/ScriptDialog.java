@@ -23,7 +23,6 @@ package free.jin.scripter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
 import java.util.Vector;
 import java.awt.event.ActionListener;

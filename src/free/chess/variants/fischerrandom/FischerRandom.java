@@ -21,10 +21,7 @@
 
 package free.chess.variants.fischerrandom;
 
-import java.io.*;
 import free.chess.*;
-import java.util.StringTokenizer;
-import free.util.IOUtilities;
 
 
 /**

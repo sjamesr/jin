@@ -78,11 +78,11 @@ public class BrowserControl{
         url = url.substring(0,url.length()-1)+"%"+Integer.toHexString(lastChar);
       }
       String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
-      Process p = Runtime.getRuntime().exec(cmd); 
+      Runtime.getRuntime().exec(cmd); 
     } 
     else if (isMacOS()){
       String [] commandLine = {"netscape", url}; 
-      Process process = Runtime.getRuntime().exec(commandLine); 
+      Runtime.getRuntime().exec(commandLine); 
     }
     else if (isLinux()){
       synchronized(BrowserControl.class){

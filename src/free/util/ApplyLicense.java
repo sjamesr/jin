@@ -298,7 +298,6 @@ public class ApplyLicense{
         }
       }
       out = new FileOutputStream(file); 
-      Writer writer = new BufferedWriter(new OutputStreamWriter(out));
       IOUtilities.pump(in, out);
     } finally{
         if (in != null)

@@ -21,7 +21,6 @@
 
 package free.jin;
 
-import java.io.*;
 import java.util.Properties;
 import java.util.Hashtable;
 import free.util.Utilities;

@@ -21,12 +21,10 @@
 
 package free.jin.freechess.console;
 
-import javax.swing.*;
 import free.jin.console.*;
 import free.jin.event.ChatEvent;
 import free.jin.console.ChannelConsolePreferencesPanel;
 import free.jin.plugin.PreferencesPanel;
-import java.util.StringTokenizer;
 
 
 /**

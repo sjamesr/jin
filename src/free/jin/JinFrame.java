@@ -24,7 +24,6 @@ package free.jin;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;

@@ -24,9 +24,7 @@ package free.util.audio;
 import sun.audio.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Hashtable;
 import free.util.BlockingQueue;
-import free.util.IOUtilities;
 
 
 /**

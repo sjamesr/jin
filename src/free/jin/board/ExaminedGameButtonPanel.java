@@ -22,9 +22,7 @@
 package free.jin.board;
 
 import javax.swing.*;
-import java.awt.Font;
 import java.awt.Insets;
-import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -131,8 +129,6 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected void createComponents(Plugin plugin, Game game){
-    JinConnection conn = plugin.getConnection();
-
     startButton = createStartGameButton(plugin, game);
     backwardButton = createBackwardButton(plugin, game);
     forwardButton = createForwardButton(plugin, game);

@@ -22,7 +22,6 @@
 package free.util.audio;
 
 import java.io.*;
-import java.util.Hashtable;
 import free.util.IOUtilities;
 
 

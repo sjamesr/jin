@@ -51,7 +51,6 @@ public class StringParser{
       throw new FormatException("Wrong Rectangle format: "+rectString);
     
     int x,y,width,height;
-    String token;
     try{
       x = Integer.parseInt(tokenizer.nextToken());
       y = Integer.parseInt(tokenizer.nextToken());

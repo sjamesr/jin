@@ -22,7 +22,6 @@
 package free.jin;
 
 import java.awt.Component;
-import java.util.Properties;
 
 
 /**

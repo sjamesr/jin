@@ -21,7 +21,6 @@
 
 package free.util.audio;
 
-import sun.audio.*;
 import java.io.*;
 import java.net.URL;
 import java.util.Vector;

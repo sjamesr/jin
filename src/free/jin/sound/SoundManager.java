@@ -26,7 +26,6 @@ import free.jin.event.*;
 import jregex.*;
 import free.jin.plugin.Plugin;
 import free.jin.JinConnection;
-import free.jin.FriendsJinConnection;
 import free.jin.Game;
 import java.util.Hashtable;
 import java.util.Enumeration;

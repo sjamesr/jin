@@ -268,7 +268,7 @@ public class ImageBoardPainter implements BoardPainter{
     scaleHint(width, height);
 
     if (boardImage == null){
-      Rectangle clipRect = g.getClipRect();
+      Rectangle clipRect = g.getClipBounds();
       Rectangle drawnRect = new Rectangle(x, y, width/8, height/8);
       int lwidth = lightImage.getWidth(null);
       int lheight = lightImage.getHeight(null);

@@ -23,10 +23,7 @@
 package free.chessclub;
 
 import java.io.*;
-import java.net.*;
-import java.awt.*;
 import java.util.*;
-import free.util.EventListenerList;
 import free.chessclub.level2.*;
 
 
@@ -2537,8 +2534,8 @@ public class ChessclubConnection extends free.util.Connection{
         String playerName = datagram.getString(1);
         String titles = datagram.getString(2);
         String message = datagram.getString(3);
-        processChannelTell(datagram.getInteger(0),datagram.getString(1),datagram.getString(2),
-          datagram.getString(3),convertChannelTellType(datagram.getInteger(4)));
+        processChannelTell(channel, playerName, titles, message,
+          convertChannelTellType(datagram.getInteger(4)));
         break;
       }
       case Datagram.DG_MATCH:{

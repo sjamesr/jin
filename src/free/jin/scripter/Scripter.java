@@ -321,7 +321,6 @@ public class Scripter extends Plugin{
    */
 
   private void loadScripts(){
-    JinConnection conn = getConnection();
     int scriptCount = getIntegerProperty("scripts.count", 0);
 
     for (int i = 0; i < scriptCount; i++){

@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
 import free.jin.event.JinListenerManager;
-import free.util.EventListenerList;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.fischerrandom.FischerRandom;
@@ -897,7 +896,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   private void illegalMoveAttempted(String moveString){
     Integer gameNumber = null; // We must find the played game, since the server doesn't provide its game number.
     InternalGameData gameData = null; 
-    Style12Struct boardData = null;
     
     Enumeration gameNumbers = ongoingGamesData.keys();
     while (gameNumbers.hasMoreElements()){

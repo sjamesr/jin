@@ -21,7 +21,6 @@
 
 package free.chess.event;
 
-import free.chess.*;
 import java.util.*;
 
 

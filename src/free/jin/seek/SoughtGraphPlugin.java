@@ -34,7 +34,6 @@ import free.jin.seek.event.SeekSelectionListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.util.StringParser;
 import free.util.StringEncoder;
-import free.util.GraphicsUtilities;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;

@@ -24,8 +24,6 @@ package free.util.swing;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
 import free.util.WindowDisposingActionListener;
 import free.util.AWTUtilities;
 import free.workarounds.FixedJTextArea;

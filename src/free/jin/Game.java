@@ -21,7 +21,6 @@
 
 package free.jin;
 
-import java.util.Hashtable;
 import free.chess.Position;
 import free.chess.WildVariant;
 import free.chess.Player;

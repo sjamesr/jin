@@ -21,12 +21,9 @@
 
 package free.jin.chessclub.console;
 
-import javax.swing.*;
 import free.jin.console.*;
 import free.jin.event.ChatEvent;
 import free.jin.plugin.PreferencesPanel;
-import java.io.IOException;
-import java.net.URL;
 
 
 /**
@@ -62,8 +59,6 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String title = evt.getSenderTitle();
     String message = evt.getMessage();
     Object forum = evt.getForum();
-
-    String translation;
 
     // Tells
     if (type.equals("tell"))

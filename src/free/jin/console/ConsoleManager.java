@@ -23,7 +23,6 @@ package free.jin.console;
 
 import free.jin.*;
 import free.jin.event.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -36,8 +35,6 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.util.StringParser;
 import free.util.StringEncoder;
-import free.util.GraphicsUtilities;
-import free.util.audio.AudioClip;
 import java.net.URL;
 
 
@@ -308,8 +305,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   public void refreshFromProperties(){
     console.refreshFromProperties();
-
-    // TODO: finish implementing for the rest of the properties.
   }
 
 
@@ -544,8 +539,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected void saveState(){
-    User user = getUser();
-
     boolean isMaximized = consoleFrame.isMaximum();
     setProperty("maximized", String.valueOf(isMaximized));
 

@@ -26,7 +26,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import javax.swing.text.BadLocationException;
 import free.util.TableLayout;
 import free.util.AWTUtilities;
 import free.util.IOUtilities;

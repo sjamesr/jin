@@ -35,10 +35,8 @@ import free.chess.variants.atomic.Atomic;
 import free.chessclub.ChessclubConnection;
 import free.chessclub.MoveStruct;
 import free.chessclub.level2.Datagram;
-import free.util.EventListenerList;
 import free.jin.chessclub.event.CircleEvent;
 import free.jin.chessclub.event.ArrowEvent;
-import free.jin.chessclub.event.ChessclubGameListener;
 import free.jin.chessclub.event.ChessEventEvent;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
@@ -49,7 +47,6 @@ import java.lang.reflect.Array;
 /**
  * An implementation of the JinConnection interface (and several subinterfaces) 
  * for the chessclub.com server.
- * TODO: document the tell types.
  */
 
 public class JinChessclubConnection extends ChessclubConnection implements JinConnection, 
@@ -865,7 +862,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     fireGameEvent(new GameStartEvent(this, newGame));
 
     Position position = newGameInfo.position;
-    WildVariant variant = newGame.getVariant();
     int numMoves = gameInfo.moves.size();
     for (int i = 0; i < numMoves; i++){
       Move move = (Move)gameInfo.moves.elementAt(i);
@@ -1031,7 +1027,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * Breaks the given move string (assuming it's in Smith Warren format) into
    * starting square, ending square and promotion target, and using WildVariant.parsePiece(String)
    * and WildVariant.createMove(Position, Square, Square, Piece) creates a Move object.
-   * TODO: Add support for the extended format (ala chessclub.com), like P@f7 or ? or ?xb1.
    */
 
   private Move parseWarrenSmith(String moveString, Position position, WildVariant variant, String moveSAN){
@@ -1385,7 +1380,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("resign"); // TODO: Check whether this works with simul games.
+    sendCommand("resign");
   }
 
 
@@ -1399,7 +1394,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("draw"); // TODO: Check whether this works with simul games.
+    sendCommand("draw");
   }
 
 
@@ -1424,7 +1419,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("abort"); // TODO: Check whether this works with simul games.
+    sendCommand("abort");
   }
 
 
@@ -1447,7 +1442,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("adjourn"); // TODO: Check whether this works with simul games.
+    sendCommand("adjourn");
   }
 
 
@@ -1913,8 +1908,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     String variantName = "w"+wildType;
     String ratingCategoryName = getRatingCategoryName(ratingCategory);
-
-    String command = curGameListInfo.command;
 
     String endExplanationString = getEndExplanationString(status, mode, color);
     int resultStatus;

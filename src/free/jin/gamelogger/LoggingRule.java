@@ -23,7 +23,6 @@ package free.jin.gamelogger;
 
 import bsh.Interpreter;
 import bsh.EvalError;
-import java.io.StringReader;
 
   
 /**

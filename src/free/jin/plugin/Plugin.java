@@ -23,7 +23,6 @@ package free.jin.plugin;
 
 import free.jin.*;
 import javax.swing.JMenu;
-import javax.swing.JPanel;
 import free.util.Utilities;
 import free.util.MemoryFile;
 

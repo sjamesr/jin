@@ -21,15 +21,7 @@
 
 package free.chess.art;
 
-import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
-import free.chess.ImagePiecePainter;
-import free.chess.PiecePainter;
-import free.chess.ChessPiece;
-import free.util.IOUtilities;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the pieces used

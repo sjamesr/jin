@@ -487,10 +487,6 @@ public class SoughtGraph extends JComponent{
     int twentyFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, twentyString, graphX-4, ratingStringHeight);
     int ratingStringFontSize = Math.min(Math.min(tenFontSize, fifteenFontSize), twentyFontSize);
     Font ratingStringFont = new Font(originalFont.getName(), originalFont.getStyle(), ratingStringFontSize);
-    FontMetrics ratingStringFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(ratingStringFont);
-    int tenStringWidth = ratingStringFontMetrics.stringWidth(tenString);
-    int fifteenStringWidth = ratingStringFontMetrics.stringWidth(fifteenString);
-    int twentyStringWidth = ratingStringFontMetrics.stringWidth(twentyString);
     g.setFont(ratingStringFont);
     int ratingStringX = 1;
     g.drawString(tenString, ratingStringX, (int)(graphY+graphHeight-6*slotHeight));
