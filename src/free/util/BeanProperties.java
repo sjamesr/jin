@@ -116,7 +116,8 @@ public class BeanProperties{
    */
 
   public void setProperty(String propertyName, Object propertyValue){
-    Object oldValue = props.put(propertyName, propertyValue);
+    Object oldValue = propertyValue == null ? 
+      props.remove(propertyName) : props.put(propertyName, propertyValue);
     firePropertyChanged(propertyName, oldValue, propertyValue);
   }
 
@@ -496,6 +497,17 @@ public class BeanProperties{
       return defaultValue;
     else
       return value.charValue();
+  }
+
+
+
+  /**
+   * Sets the property with the specified name to the specified
+   * <code>String</code>.
+   */
+
+  public void setStringProperty(String propertyName, String propertyValue){
+    setProperty(propertyName, propertyValue);
   }
 
 
