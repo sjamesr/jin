@@ -1,5 +1,5 @@
 defaultHost = chessclub.com
-hosts = chessclub.com queen.chessclub.com rook.chessclub.com special.chessclub.com
+hosts = chessclub.com queen.chessclub.com
 ports = 5000 23
 id = icc
 shortName = ICC
