@@ -28,8 +28,8 @@ import free.chess.art.VectorPiecePainter;
 /**
  * An implementation of PiecePainter which draws blitzin-like vector pieces.
  * Note that the vector pieces belong exlusively to chessclub.com - you may use
- * them only for products targeted specifically for chessclub.com. You may *not*
- * use them for any other purpose, commercial or otherwise.
+ * them only as part of Jin and only with the chessclub.com server. You may
+ * *not* use them for any other purpose, commercial or otherwise.
  */
 
 public class ChessclubVectorPiecePainter extends VectorPiecePainter{
