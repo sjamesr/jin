@@ -1,7 +1,7 @@
 <?php
 
 	$prefs_key = $_COOKIE["prefs_key"];
-	if ($prefs_key && mysql_connect("localhost", "root") && mysql_select_db("jin")){
+	if ($prefs_key && mysql_connect("localhost", "root") && mysql_select_db("@database_name@")){
 		
 		$result = mysql_query("SELECT PrefsBlob FROM Preferences WHERE CookieKey = '$prefs_key'");
 		$result = mysql_result($result, 0);

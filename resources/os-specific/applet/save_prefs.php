@@ -5,7 +5,7 @@
 		$prefs_key = $uploaded[0];
 		$is_done = $uploaded[count($uploaded) - 1];
 		
-		if ($prefs_key && ($is_done == "Done") && mysql_connect("localhost", "root") && mysql_select_db("jin")){
+		if ($prefs_key && ($is_done == "Done") && mysql_connect("localhost", "root") && mysql_select_db("@database_name@")){
 			$prefs_blob = addslashes(implode("\n", array_slice($uploaded, 1, count($uploaded) - 2)));
 			
 			if (!mysql_query("UPDATE Preferences SET PrefsBlob = '$prefs_blob' WHERE CookieKey = '$prefs_key'"))
