@@ -1770,6 +1770,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
             throw new IllegalStateException("Unrecognized move sending mode: "+moveSendingMode);
         }
       }
+      else if ("whitePieceColor".equals(propertyName) ||
+               "blackPieceColor".equals(propertyName) ||
+               "whiteOutlineColor".equals(propertyName) ||
+               "blackOutlineColor".equals(propertyName) ||
+               "lightSquareColor".equals(propertyName) ||
+               "darkSquareColor".equals(propertyName)){
+        board.repaint();
+      }
     }
   }
 
