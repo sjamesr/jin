@@ -249,7 +249,6 @@
   
 	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
-		<input message="Please specify ${server.name} database password:" addproperty="db_password" />
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}" 
 			         includes="jin.jar index.html prefs.php DetectJava.class libs/* libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
@@ -258,8 +257,6 @@
 			<filterset>
 				<filter token="old_java_url" value="applet.php?oldjava=1" />
 				<filter token="new_java_url" value="applet.php?oldjava=0" />
-				<filter token="db_name" value="jin_${server.name}" />
-				<filter token="db_pass" value="${db_password}" />
 			</filterset>
 		</copy>
 		<copy todir="${dir-to-tar}">
