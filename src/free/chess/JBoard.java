@@ -1138,7 +1138,7 @@ public class JBoard extends JComponent{
       Square from = highlightedMove.getStartingSquare();
       Square to = highlightedMove.getEndingSquare();
       
-      squareToRect(from, rect);
+      squareToRect(Square.getInstance(0, 0), rect); // Just a sample square
       int highlightSize = Math.max(2, Math.min(rect.width, rect.height)/12);
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == BOTH_SQUARES_MOVE_HIGHLIGHTING){
