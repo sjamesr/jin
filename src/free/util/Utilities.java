@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -16,10 +16,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with utillib library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
  */
 
 package free.util;
+
+import java.util.Hashtable;
 
 
 /**
@@ -48,6 +50,24 @@ public class Utilities{
       return false;
 
     return obj1.equals(obj2);
+  }
+
+
+
+
+  /**
+   * Maps the specified key to the specified value in the specified
+   * <code>Hashtable</code>. If the specified value is <code>null</code> any
+   * existing mapping of the specified key is removed from the
+   * <code>Hashtable</code>. The old value mapped to the specified key
+   * is returned, or <code>null</code> if no value was mapped to the key.
+   */
+
+  public static Object put(Hashtable table, Object key, Object value){
+    if (value == null)
+      return table.remove(key);
+    else
+      return table.put(key, value);
   }
 
 
