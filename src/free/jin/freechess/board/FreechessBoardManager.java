@@ -22,6 +22,7 @@
 package free.jin.freechess.board;
 
 import javax.swing.event.InternalFrameEvent;
+import free.freechess.Ivar;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
 import free.jin.freechess.JinFreechessConnection;
@@ -148,7 +149,7 @@ public class FreechessBoardManager extends BoardManager{
 
   public void setMoveSendingMode(int moveSendingMode){
     JinFreechessConnection conn = (JinFreechessConnection)getConnection();
-    conn.setPremove(moveSendingMode == PREMOVE_MOVE_SENDING_MODE);
+    conn.setIvarState(Ivar.PREMOVE, moveSendingMode == PREMOVE_MOVE_SENDING_MODE);
 
     super.setMoveSendingMode(moveSendingMode);
   }
