@@ -28,15 +28,19 @@ import java.awt.event.ContainerListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyAdapter;
+import javax.swing.event.InternalFrameListener;
+import javax.swing.event.InternalFrameEvent;
 
 
 /**
  * Implements decent switching between internal frames in a given
  * desktop pane. The main functionality of this class is tracking the order in
- * which the frames are traversed.
+ * which the frames are traversed. Note that this class doesn't automaticall
+ * switch between the frames - you need to listen to the appropriate events and
+ * call <code>selectNext</code> and <code>selectPrevious</code> yourself.
  */
 
-public class InternalFrameSwitcher implements ContainerListener{
+public class InternalFrameSwitcher implements ContainerListener, InternalFrameListener{
 
 
 
@@ -49,7 +53,7 @@ public class InternalFrameSwitcher implements ContainerListener{
 
 
   /**
-   * A vector of the current internal frames.
+   * A vector of the current internal frames, in the right order.
    */
 
   private final Vector frames = new Vector();
@@ -77,24 +81,7 @@ public class InternalFrameSwitcher implements ContainerListener{
   }
 
 
-
-  /**
-   * A dummy KeyListener used to workaround a bug.
-   */
-
-  private final KeyListener dummyKeyListener = new KeyAdapter(){};
-
-
-
-  /**
-   * Are we running under JDK 1.1?
-   */
-
-  private static final boolean isJava1_1 =
-    (System.getProperty("java.version").compareTo("1.2") < 0);
-
-
-
+  
   /**
    * Adds the added <code>JInternalFrame</code> to the list of frames.
    */
@@ -106,13 +93,8 @@ public class InternalFrameSwitcher implements ContainerListener{
     if (evt.getChild() instanceof JInternalFrame){
       JInternalFrame internalFrame = (JInternalFrame)evt.getChild();
 
-      // We do this because without this, the FocusManager isn't called.
-      // The call forces the frame to call enableEvents(AWTEvent.KEY_EVENT_MASK)
-      // and since that method is protected we can't call it directly.
-      if (isJava1_1)
-        internalFrame.addKeyListener(dummyKeyListener);
-
       frames.addElement(internalFrame);
+      internalFrame.addInternalFrameListener(this);
     }
   }
 
@@ -127,60 +109,51 @@ public class InternalFrameSwitcher implements ContainerListener{
       return;
 
 
-    // See comment in componentAdded(ContainerEvent)
     if (evt.getChild() instanceof JInternalFrame){
       JInternalFrame internalFrame = (JInternalFrame)evt.getChild();
 
-      if (isJava1_1)
-        internalFrame.addKeyListener(dummyKeyListener);
-
       frames.removeElement(internalFrame);
+      internalFrame.removeInternalFrameListener(this);
     }
   }
+  
+  
+  
+  /**
+   * Moves the source frame to the top of the frame list.
+   */
+  
+  public void internalFrameActivated(InternalFrameEvent e){
+    JInternalFrame f = e.getInternalFrame();
+    
+    frames.removeElement(f);
+    frames.insertElementAt(f, 0);
+  }
+  
+  
+  
+  // InternalFrameListener implementation
+  public void internalFrameClosed(InternalFrameEvent e){}
+  public void internalFrameClosing(InternalFrameEvent e){} 
+  public void internalFrameDeactivated(InternalFrameEvent e){} 
+  public void internalFrameDeiconified(InternalFrameEvent e){} 
+  public void internalFrameIconified(InternalFrameEvent e){}
+  public void internalFrameOpened(InternalFrameEvent e){} 
 
-
-
+ 
 
   /**
-   * Switches to the next frame, relative to the currently selected frame.
+   * Switches to the frame that should be selected next.
    */
 
   public void selectNext(){
-    JInternalFrame newSelectedFrame = null;
-
-    int framesCount = frames.size();
-    if (framesCount == 1)
-      newSelectedFrame = (JInternalFrame)frames.elementAt(0);
-    else if (framesCount != 0){
-      int selected = getSelected();
-      if (selected == -1){
-        for (int i = 0; i < framesCount; i++){
-          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-          if (frame.isVisible() && !frame.isIcon()){
-            newSelectedFrame = frame;
-            break;
-          }
-        }
-      }
-      else{
-        int i = (selected == framesCount - 1) ? 0 : selected + 1;
-        while (i != selected){
-          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-          if (frame.isVisible() && !frame.isIcon()){
-            newSelectedFrame = frame;
-            break;
-          }
-          i++;
-          if (i == framesCount)
-            i = 0;
-        }
-      }
-    }
-
-    if (newSelectedFrame != null){    
+    // JInternalFrame newSelectedFrame = null;
+    
+    if (!frames.isEmpty()){
+      JInternalFrame f = (JInternalFrame)frames.elementAt(frames.size() - 1);
       try{
         ignoreContainerEvents = true;
-        newSelectedFrame.setSelected(true);
+        f.setSelected(true);
         ignoreContainerEvents = false;
         return;
       } catch (PropertyVetoException e){}
@@ -190,46 +163,18 @@ public class InternalFrameSwitcher implements ContainerListener{
 
 
   /**
-   * Switches to the previous frame, relative to the currently selected frame.
+   * Switches to the previous selected frame.
    */
 
   public void selectPrevious(){
-    JInternalFrame newSelectedFrame = null;
-
-    
-    int framesCount = frames.size();
-    if (framesCount == 1)
-      newSelectedFrame = (JInternalFrame)frames.elementAt(0);
-    else if (framesCount != 0){
-      int selected = getSelected();
-      if (selected == -1){
-        for (int i = 0; i < framesCount; i++){
-          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-          if (frame.isVisible() && !frame.isIcon()){
-            newSelectedFrame = frame;
-            break;
-          }
-        }
-      }
-      else{
-        int i = (selected == 0) ? framesCount - 1 : selected - 1;
-        while (i != selected){
-          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-          if (frame.isVisible() && !frame.isIcon()){
-            newSelectedFrame = frame;
-            break;
-          }
-          i--;
-          if (i == -1)
-            i = framesCount - 1;
-        }
-      }
-    }
-
-    if (newSelectedFrame != null){    
+    if (!frames.isEmpty()){
+      Object f = frames.elementAt(0);
+      frames.removeElementAt(0);
+      frames.addElement(f);
+      
       try{
         ignoreContainerEvents = true;
-        newSelectedFrame.setSelected(true);
+        ((JInternalFrame)frames.elementAt(0)).setSelected(true);
         ignoreContainerEvents = false;
         return;
       } catch (PropertyVetoException e){}
@@ -237,22 +182,5 @@ public class InternalFrameSwitcher implements ContainerListener{
   }
 
 
-
-
-  /**
-   * Finds the currently selected frame's index or -1 if none.
-   */
-
-  private int getSelected(){
-    for (int i = 0; i < frames.size(); i++){
-      JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-      if (frame.isSelected())
-        return i;
-    }
-
-    return -1;
-  }
-
-
-
+  
 }
