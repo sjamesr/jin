@@ -1,3 +1,5 @@
+classname = free.jin.board.PieceSet
+
 id = eboard
 name = Eboard Vector
-classname = free.chess.EboardVectorPiecePainter
+piecePainter.classname = free.chess.EboardVectorPiecePainter

@@ -1,4 +1,6 @@
+classname = free.jin.board.PieceSet
+
 id = blitzin
 name = Blitzin Vector
-classname = BlitzinVectorPiecePainter
+piecePainter.classname = free.jin.board.icc.BlitzinVectorPiecePainter
 servers = icc
