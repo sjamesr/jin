@@ -329,6 +329,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setMoveSendingMode(PREMOVE_MOVE_SENDING_MODE);
     else
       setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
+    
+    String coordsDisplayStyleString = prefs.getString("coords-display-style", "none");
+    if ("rim".equals(coordsDisplayStyleString))
+      setCoordsDisplayStyle(JBoard.RIM_COORDS);
+    else if ("outside".equals(coordsDisplayStyleString))
+      setCoordsDisplayStyle(JBoard.OUTSIDE_COORDS);
+    else if ("every-square".equals(coordsDisplayStyleString))
+      setCoordsDisplayStyle(JBoard.EVERY_SQUARE_COORDS);
+    else
+      setCoordsDisplayStyle(JBoard.NO_COORDS);
 
     setPieceSet(prefs.getString("piece-set-id", null));
     setBoardPattern(prefs.getString("board-pattern-id", null));
@@ -776,6 +786,39 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     props.setIntegerProperty("moveSendingMode", moveSendingMode);
   }
+  
+  
+  
+  /**
+   * Returns the current coordinate display style.  Possible values are defined
+   * in <code>free.chess.JBoard</code>.
+   */
+   
+  public int getCoordsDisplayStyle(){
+    return props.getIntegerProperty("coordsDisplayStyle");
+  }
+  
+  
+  
+  
+  /**
+   * Sets the coordinate display style to the specified value. Possible values
+   * are defined in <code>free.chess.JBoard</code>.
+   */
+   
+  public void setCoordsDisplayStyle(int coordsDisplayStyle){
+    switch (coordsDisplayStyle){
+      case JBoard.NO_COORDS:
+      case JBoard.RIM_COORDS:
+      case JBoard.OUTSIDE_COORDS:
+      case JBoard.EVERY_SQUARE_COORDS:
+        break;
+      default:
+        throw new IllegalArgumentException("Unrecognized coordinates display style value: " + coordsDisplayStyle);
+    }
+    
+    props.setIntegerProperty("coordsDisplayStyle", coordsDisplayStyle);
+  }
 
 
 
@@ -842,21 +885,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public JMenu createPluginMenu(){
-    JMenu myMenu = new JMenu(getName());
+    JMenu menu = new JMenu(getName());
     
-    myMenu.add(createMoveInputMenu());
+    menu.add(createMoveInputMenu());
 
-    myMenu.add(createMoveHighlightingMenu());
+    menu.add(createMoveHighlightingMenu());
+    
+    menu.add(createCoordsMenu());
 
     JMenu pieceSetsMenu = createPieceSetsMenu();
     if (pieceSetsMenu != null)
-      myMenu.add(pieceSetsMenu);
+      menu.add(pieceSetsMenu);
 
     JMenu boardsMenu = createBoardsMenu();
     if (boardsMenu != null)
-      myMenu.add(boardsMenu);
+      menu.add(boardsMenu);
 
-    return myMenu;
+    return menu;
   }
 
 
@@ -1068,6 +1113,66 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveHighlightingMenu.add(highlightOwnMovesCheckBox);
 
     return moveHighlightingMenu;
+  }
+  
+  
+  
+  /**
+   * Creates and returns the "Coordinates" menu.
+   */
+   
+  protected JMenu createCoordsMenu(){
+    JMenu coordsMenu = new JMenu("Square Coordinates");
+    coordsMenu.setMnemonic('C');
+
+    int style = getCoordsDisplayStyle();
+    JRadioButtonMenuItem none = new JRadioButtonMenuItem("None", style == JBoard.NO_COORDS);
+    JRadioButtonMenuItem rim = new JRadioButtonMenuItem("On the Rim", style == JBoard.RIM_COORDS);
+    JRadioButtonMenuItem outside = new JRadioButtonMenuItem("Outside the Board", style == JBoard.OUTSIDE_COORDS);
+    JRadioButtonMenuItem every = new JRadioButtonMenuItem("In Every Square", style == JBoard.EVERY_SQUARE_COORDS);
+    
+    none.setMnemonic('N');
+    rim.setMnemonic('R');
+    outside.setMnemonic('O');
+    every.setMnemonic('E');
+    
+    none.setActionCommand("none");
+    rim.setActionCommand("rim");
+    outside.setActionCommand("outside");
+    every.setActionCommand("every");
+    
+    ActionListener coordsDisplayStyleListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String actionCommand = evt.getActionCommand();
+        
+        if ("none".equals(actionCommand))
+          setCoordsDisplayStyle(JBoard.NO_COORDS);
+        else if ("rim".equals(actionCommand))
+          setCoordsDisplayStyle(JBoard.RIM_COORDS);
+        else if ("outside".equals(actionCommand))
+          setCoordsDisplayStyle(JBoard.OUTSIDE_COORDS);
+        else if ("every".equals(actionCommand))
+          setCoordsDisplayStyle(JBoard.EVERY_SQUARE_COORDS);
+      }
+    };
+    
+    none.addActionListener(coordsDisplayStyleListener);
+    rim.addActionListener(coordsDisplayStyleListener);
+    outside.addActionListener(coordsDisplayStyleListener);
+    every.addActionListener(coordsDisplayStyleListener);
+    
+    ButtonGroup group = new ButtonGroup();
+    group.add(none);
+    group.add(rim);
+    group.add(outside);
+    group.add(every);
+    
+    coordsMenu.add(none);
+    coordsMenu.add(rim);
+    coordsMenu.add(outside);
+    coordsMenu.add(every);
+    
+    return coordsMenu;
   }
 
 
@@ -1490,15 +1595,26 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setString("dragged-piece-style",
       getDraggedPieceStyle() == JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal");
 
-    int moveHighlightingStyle = getMoveHighlightingStyle();
     String moveHighlightingString;
-    if (moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "none";
-    else if (moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "square";
-    else // if (moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "arrow";
+    switch (getMoveHighlightingStyle()){
+      case JBoard.NO_MOVE_HIGHLIGHTING: moveHighlightingString = "none"; break;
+      case JBoard.SQUARE_MOVE_HIGHLIGHTING: moveHighlightingString = "square"; break;
+      case JBoard.ARROW_MOVE_HIGHLIGHTING: moveHighlightingString = "arrow"; break;
+      default:
+        throw new IllegalStateException("Unrecognized move highlighting style: " + getMoveHighlightingStyle()); 
+    }
     prefs.setString("move-highlight.style", moveHighlightingString);
+    
+    String coordsDisplayStyleString;
+    switch (getCoordsDisplayStyle()){
+      case JBoard.NO_COORDS: coordsDisplayStyleString = "none"; break;
+      case JBoard.RIM_COORDS: coordsDisplayStyleString = "rim"; break;
+      case JBoard.OUTSIDE_COORDS: coordsDisplayStyleString = "outside"; break;
+      case JBoard.EVERY_SQUARE_COORDS: coordsDisplayStyleString = "every-square"; break;
+      default:
+        throw new IllegalStateException("Unrecognized coords display style: " + getCoordsDisplayStyle());
+    }
+    prefs.setString("coords-display-style", coordsDisplayStyleString);
 
     prefs.setBool("move-highlight.highlight-own", isHighlightingOwnMoves());
 

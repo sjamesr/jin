@@ -584,6 +584,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setMoveInputStyle(boardManager.getMoveInputStyle());
     board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
     board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
+    board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
     board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
@@ -1977,6 +1978,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
             throw new IllegalStateException("Unrecognized move sending mode: "+moveSendingMode);
         }
       }
+      else if ("coordsDisplayStyle".equals(propertyName))
+        board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
       else if ("whitePieceColor".equals(propertyName) ||
                "blackPieceColor".equals(propertyName) ||
                "whiteOutlineColor".equals(propertyName) ||
