@@ -80,7 +80,7 @@ public abstract class PreferencesPanel extends JPanel{
    * called by subclasses whenever the user changes one of the settings.
    */
 
-  protected void fireChangeEvent(){
+  protected void fireStateChanged(){
     Thread.dumpStack();
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){

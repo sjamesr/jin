@@ -122,7 +122,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     ChangeListener changeNotifyListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        fireChangeEvent();
+        fireStateChanged();
       }
     };
 
