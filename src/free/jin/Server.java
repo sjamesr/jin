@@ -35,7 +35,7 @@ import java.net.MalformedURLException;
 
 public abstract class Server{
 
-  
+
 
   /**
    * The properties of this server.
@@ -51,6 +51,13 @@ public abstract class Server{
 
   private URL website;
 
+
+
+  /**
+   * The guest <code>User</code> of this server. Loaded/created lazily.
+   */
+
+  private User guest = null;
 
 
 
@@ -111,11 +118,24 @@ public abstract class Server{
 
 
   /**
+   * Creates a new <code>User</code> with only the specified username.
+   */
+
+  public User createUser(String username){
+    Properties props = new Properties();
+    props.put("login.username", username);
+
+    return createUser(props);
+  }
+
+
+
+  /**
    * Creates and returns a <code>User</code> for this <code>Server</code> with
    * the specified <code>Properties</code> and no User files.
    */
 
-  public User createUser(Properties props){
+  protected User createUser(Properties props){
     return createUser(props, new Hashtable());
   }
 
@@ -128,25 +148,48 @@ public abstract class Server{
    * file's data.
    */
 
-  public User createUser(Properties props, Hashtable userFiles){
+  protected User createUser(Properties props, Hashtable userFiles){
     return new User(this, props, userFiles);
   }
 
 
 
-  /**
-   * Creates a guest <code>User</code>.
-   */
-
-  public abstract User createGuest();
-
-
 
   /**
-   * Returns true if the specified <code>User</code> is a guest.
+   * Returns the "guest" user <code>User</code>. Note that unlike the name
+   * implies, guest preferences are actually kept between sessions
+   * automatically.
    */
 
-  public abstract boolean isGuest(User user);
+  public User getGuest(){
+    if (guest == null){
+      guest = Jin.loadGuest(this);
+      if (guest == null)
+        guest = createGuest();
+    }
+
+    return guest;
+  }
+
+
+
+  /**
+   * Creates a new guest <code>User</code>.
+   */
+
+  protected abstract User createGuest();
+
+
+
+
+  /**
+   * Returns <code>true</code> if the specified <code>User</code> is the global
+   * guest account.
+   */
+
+  boolean isGuest(User user){
+    return user == guest;
+  }
 
 
 
@@ -157,6 +200,7 @@ public abstract class Server{
    */
 
   public abstract LoginDialog createLoginDialog();
+
 
 
 
