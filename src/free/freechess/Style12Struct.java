@@ -335,17 +335,6 @@ public class Style12Struct extends Struct{
 
 
   /**
-   * Returns the last made move, or <code>null</code> if none.
-   */
-
-  public Move getMove(){
-    return (Move)getProperty("Move");
-  }
-
-
-
-
-  /**
    * Returns the file of the double pawn push on the last move, or -1 if the
    * last move wasn't a double pawn push.
    */
