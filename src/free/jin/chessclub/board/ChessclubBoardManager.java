@@ -74,6 +74,8 @@ public class ChessclubBoardManager extends BoardManager{
 
   public void internalFrameActivated(InternalFrameEvent e){
     BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
+    if (boardPanel == null) // This means that the frame is in the process 
+      return;               // of being initialized and isn't ready yet.
 
     Game game = boardPanel.getGame();
     if (boardPanel.isActive()){
