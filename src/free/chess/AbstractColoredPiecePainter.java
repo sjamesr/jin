@@ -106,6 +106,16 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
 
   public AbstractColoredPiecePainter(Color whiteColor, Color blackColor,
       Color whiteOutline, Color blackOutline){
+    
+    if (whiteColor == null)
+      throw new IllegalArgumentException("Null white color");
+    if (blackColor == null)
+      throw new IllegalArgumentException("Null black color");
+    if (whiteOutline == null)
+      throw new IllegalArgumentException("Null white outline color");
+    if (blackOutline == null)
+      throw new IllegalArgumentException("Null black outline color");
+    
     this.whiteColor = whiteColor;
     this.blackColor = blackColor;
     this.whiteOutline = whiteOutline;
@@ -143,6 +153,9 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    */
 
   public void setWhiteColor(Color color){
+    if (color == null)
+      throw new IllegalArgumentException("Null color");
+    
     whiteColor = color;
   }
 
@@ -165,6 +178,9 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    */
 
   public void setBlackColor(Color color){
+    if (color == null)
+      throw new IllegalArgumentException("Null color");
+    
     blackColor = color;
   }
 
@@ -187,6 +203,9 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    */
 
   public void setWhiteOutline(Color color){
+    if (color == null)
+      throw new IllegalArgumentException("Null color");
+    
     whiteOutline = color;
   }
 
@@ -209,6 +228,9 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    */
 
   public void setBlackOutline(Color color){
+    if (color == null)
+      throw new IllegalArgumentException("Null color");
+    
     blackOutline = color;
   }
   
