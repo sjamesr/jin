@@ -39,6 +39,7 @@ import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
 import free.chess.variants.atomic.Atomic;
 import free.util.Pair;
+import free.util.TextUtilities;
 
 
 
@@ -989,8 +990,13 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     String categoryName = gameInfo.getGameCategory();
     WildVariant variant = getVariant(categoryName);
     if (variant == null){
-      processLine("This version of Jin does not support the wild variant ("+categoryName+") and is thus unable to display the game.");
-      processLine("Please activate the appropriate command to abort this game");
+      String starsPad = TextUtilities.padStart("", '*', categoryName.length()+2);
+      String spacePad = TextUtilities.padStart("", ' ', categoryName.length()+1) + "*";
+      processLine("********************************************************" + starsPad);
+      processLine("* This version of Jin does not support the wild variant " + categoryName + " *");
+      processLine("* and is thus unable to display the game. Please use the" + spacePad);
+      processLine("* appropriate command to close the game.                " + spacePad);
+      processLine("********************************************************" + starsPad);
       unsupportedGames.addElement(new Integer(gameInfo.getGameNumber()));
       return null;
     }
