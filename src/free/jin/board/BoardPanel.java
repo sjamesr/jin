@@ -1070,7 +1070,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void illegalMoveAttempted(IllegalMoveEvent evt){
-    if (evt.getGame()!=game)
+    if (evt.getGame() != game)
+      return;
+
+    if (!isMoveEnRoute) // We didn't make this move.
       return;
 
     isMoveEnRoute = false;
