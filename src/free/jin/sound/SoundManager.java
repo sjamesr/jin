@@ -331,9 +331,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     String sender = evt.getSender();
     String chatMessageType = type+"."+(forum == null ? "" : forum.toString())+"."+sender;
 
-    Enumeration enum = chatPatternsToFilenames.keys();
-    while (enum.hasMoreElements()){
-      Pattern regex = (Pattern)enum.nextElement();
+    Enumeration patterns = chatPatternsToFilenames.keys();
+    while (patterns.hasMoreElements()){
+      Pattern regex = (Pattern)patterns.nextElement();
       Matcher matcher = regex.matcher(chatMessageType);
       if (matcher.find()){
         String filename = (String)chatPatternsToFilenames.get(regex);
@@ -356,9 +356,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
     String line = evt.getText();
 
-    Enumeration enum = textPatternsToFilenames.keys();
-    while (enum.hasMoreElements()){
-      Pattern regex = (Pattern)enum.nextElement();
+    Enumeration patterns = textPatternsToFilenames.keys();
+    while (patterns.hasMoreElements()){
+      Pattern regex = (Pattern)patterns.nextElement();
       Matcher matcher = regex.matcher(line);
       if (matcher.find()){
         String filename = (String)textPatternsToFilenames.get(regex);
