@@ -59,6 +59,14 @@ public class LicenseDialog extends JDialog{
    */
 
   private String jregexCopyrightText = null;
+
+
+
+  /**
+   * The text of the BeanShell license/copyright notice, loaded lazily.
+   */
+
+  private String beanshellCopyrightText = null;
   
 
 
@@ -142,6 +150,24 @@ public class LicenseDialog extends JDialog{
       }
     };
 
+    ActionListener beanshellActionListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        if (beanshellCopyrightText == null){
+          try{
+            beanshellCopyrightText = IOUtilities.loadText(LicenseDialog.class.getResource("legal/beanshell.txt"));
+          } catch (IOException e){
+              JOptionPane.showMessageDialog(LicenseDialog.this, "Unable to load the text of the beanshell license, see http://www.beanshell.org/license.html for the text.", "Error", JOptionPane.ERROR_MESSAGE);
+              return;
+            }
+        }
+
+        JDialog textDialog = new LicenseTextDialog((Frame)getParent(), "The BeanShell License", beanshellCopyrightText);
+        AWTUtilities.centerWindow(textDialog, getParent());
+        textDialog.setVisible(true);
+      }
+    };
+
+
 
     JPanel jinPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
     jinPanel.add(new JLabel("<html>Jin is distributed under the&nbsp</html>"));
@@ -155,8 +181,8 @@ public class LicenseDialog extends JDialog{
     JPanel jinWebsitePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
     jinWebsitePanel.add(new JLabel("<html>More information about Jin is available at&nbsp</html>"));
     LinkLabel jinWebsiteLabel = new LinkLabel("the Jin website");
-    jinWebsiteLabel.setToolTipText("http://www.hightemplar.com/jin/");
-    jinWebsiteLabel.addActionListener(new URLActionListener("http://www.hightemplar.com/jin/"));
+    jinWebsiteLabel.setToolTipText("http://www.jinchess.com");
+    jinWebsiteLabel.addActionListener(new URLActionListener("http://www.jinchess.com"));
     jinWebsitePanel.add(jinWebsiteLabel);
     jinWebsitePanel.add(new JLabel("."));
     contentPane.add(jinWebsitePanel);
@@ -168,8 +194,8 @@ public class LicenseDialog extends JDialog{
     JPanel jregexPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     jregexPanel.add(new JLabel("<html>* Jin uses the&nbsp</html>"));
     LinkLabel jregexWebsiteLabel = new LinkLabel("jregex regular expression library");
-    jregexWebsiteLabel.setToolTipText("http://jregex.sourceforge.net/");
-    jregexWebsiteLabel.addActionListener(new URLActionListener("http://jregex.sourceforge.net/"));
+    jregexWebsiteLabel.setToolTipText("http://jregex.sourceforge.net");
+    jregexWebsiteLabel.addActionListener(new URLActionListener("http://jregex.sourceforge.net"));
     jregexPanel.add(jregexWebsiteLabel);
     jregexPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
     LinkLabel jregexLicenseLabel = new LinkLabel("BSD license");
@@ -177,6 +203,20 @@ public class LicenseDialog extends JDialog{
     jregexPanel.add(jregexLicenseLabel);
     jregexPanel.add(new JLabel("."));
     contentPane.add(jregexPanel);
+    contentPane.add(Box.createVerticalStrut(5));
+
+    JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    beanshellPanel.add(new JLabel("<html>* Jin uses the&nbsp</html>"));
+    LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
+    beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
+    beanshellWebsiteLabel.addActionListener(new URLActionListener("http://www.beanshell.org"));
+    beanshellPanel.add(beanshellWebsiteLabel);
+    beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel beanshellLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    beanshellLicenseLabel.addActionListener(beanshellActionListener);
+    beanshellPanel.add(beanshellLicenseLabel);
+    beanshellPanel.add(new JLabel("."));
+    contentPane.add(beanshellPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -368,6 +408,7 @@ public class LicenseDialog extends JDialog{
       textArea.setEditable(false);
       textArea.setLineWrap(true);
       textArea.setWrapStyleWord(true);
+      textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
       JScrollPane scrollPane = new JScrollPane(textArea);
       contentPane.add(scrollPane);
 
