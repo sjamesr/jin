@@ -40,7 +40,7 @@ public class FontSelectorPanel extends JPanel{
    * The textfield showing the currently selected font name.
    */
 
-  private final JTextField fontNameField = new JTextField();
+  private final JTextField fontNameField = new free.workarounds.FixedJTextField();
 
 
 
@@ -58,7 +58,7 @@ public class FontSelectorPanel extends JPanel{
    * The textfield showing the currently selected font size.
    */
 
-  private final JTextField fontSizeField = new JTextField(new IntegerStrictPlainDocument(1, 72), "", 2);
+  private final JTextField fontSizeField = new free.workarounds.FixedJTextField(new IntegerStrictPlainDocument(1, 72), "", 2);
 
 
 
