@@ -1108,8 +1108,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
           blackLabel.setAlignmentY(Component.TOP_ALIGNMENT);
           blackClock.setAlignmentY(Component.TOP_ALIGNMENT);
+          fullscreenButton.setAlignmentY(Component.TOP_ALIGNMENT);
 
           topInfoBox.add(whiteLabel);
+          topInfoBox.add(Box.createHorizontalStrut(10));
+          topInfoBox.add(fullscreenButton);
           topInfoBox.add(Box.createHorizontalGlue());
           topInfoBox.add(whiteClock);
 
@@ -1123,8 +1126,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
           blackLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
           blackClock.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+          fullscreenButton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
           topInfoBox.add(blackLabel);
+          topInfoBox.add(Box.createHorizontalStrut(10));
+          topInfoBox.add(fullscreenButton);
           topInfoBox.add(Box.createHorizontalGlue());
           topInfoBox.add(blackClock);
 
@@ -1139,6 +1145,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       else{
         whiteClock.setMaximumSize(new Dimension(Integer.MAX_VALUE, whiteClock.getPreferredSize().height));
         blackClock.setMaximumSize(new Dimension(Integer.MAX_VALUE, blackClock.getPreferredSize().height));
+
+        // This could have been changed in vertical layout mode
+        whiteLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        whiteClock.setAlignmentY(Component.CENTER_ALIGNMENT);
+        blackLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        blackClock.setAlignmentY(Component.CENTER_ALIGNMENT);
+        fullscreenButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         Box whiteLabelBox = Box.createHorizontalBox();
         whiteLabelBox.add(whiteLabel);
