@@ -21,9 +21,10 @@
 
 package free.jin.chessclub.console;
 
+import javax.swing.*;
 import free.jin.console.*;
 import free.jin.event.ChatEvent;
-import free.util.audio.AudioClip;
+import free.jin.plugin.PreferencesPanel;
 import java.io.IOException;
 import java.net.URL;
 
@@ -155,6 +156,31 @@ public class ChessclubConsoleManager extends ConsoleManager{
     while ((index = message.indexOf("\\b"))!=-1)
       message = message.substring(0,index)+message.substring(index+2);
     return forum+">"+message;
+  }
+
+
+
+
+  /**
+   * Overrides <code>hasPreverencesUI</code> to return <code>true</code>.
+   */
+
+  public boolean hasPreferencesUI(){
+    return true;
+  }
+
+
+
+
+  /**
+   * Return a JPanel containing UI which allows the user to modify the
+   * preferences of the console manager.
+   */
+
+  public PreferencesPanel getPreferencesUI(){
+    PreferencesPanel prefPanel = new ChessclubConsolePreferencesPanel(this);
+      
+    return prefPanel;
   }
 
 }
