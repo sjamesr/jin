@@ -67,7 +67,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    */
 
   private FischerRandom(){
-    super("----------------------------------------------------------------", "Fischer Random");
+    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Fischer Random");
   }
 
 
@@ -241,7 +241,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
   public void init(Position pos){
     checkPosition(pos);
 
-    pos.setLexigraphic(createRandomInitialLexigraphic());
+    pos.setFEN(createRandomInitialFEN());
   }
 
 
@@ -250,98 +250,88 @@ public class FischerRandom extends ChesslikeGenericVariant{
   /**
    * Creates a random initial position subject to the constraints specified in
    * the rules of Fischer Random. The position is encoded and returned in
-   * lexigraphic format.
+   * FEN format.
    */
 
-  private static String createRandomInitialLexigraphic(){
-    StringBuffer base = new StringBuffer("--------pppppppp--------------------------------PPPPPPPP--------");
+  private static String createRandomInitialFEN(){
+    StringBuffer pieces = new StringBuffer("--------");
 
-    int bishop1Pos, bishop2Pos;
+    int pos;
+
+    // First bishop
     while(true){
-      int pos = randomInt(8);
-      if ((pos%2==0)&&(base.charAt(pos)=='-')){
-        bishop1Pos = pos;
+      pos = randomInt(8);
+      if ((pos%2 == 0) && (pieces.charAt(pos) == '-')){
+        pieces.setCharAt(pos, 'B');
+        break;
+      }
+    }
+
+    // 2nd bishop
+    while(true){
+      pos = randomInt(8);
+      if ((pos%2 == 1) && (pieces.charAt(pos) == '-')){
+        pieces.setCharAt(pos, 'B');
         break;
       }
     } 
-    while(true){
-      int pos = randomInt(8);
-      if ((pos%2==1)&&(base.charAt(pos)=='-')){
-        bishop2Pos = pos;
-        break;
-      }
-    } 
-    base.setCharAt(bishop1Pos, 'b');
-    base.setCharAt(bishop2Pos, 'b');
 
-
-    int knight1Pos;
+    // 1st knight
     while (true){
-      int pos = randomInt(8);
-      if (base.charAt(pos)=='-'){
-        knight1Pos = pos;
+      pos = randomInt(8);
+      if (pieces.charAt(pos) == '-'){
+        pieces.setCharAt(pos, 'N');
         break;
       }
     }
-    base.setCharAt(knight1Pos, 'n');
 
-    int knight2Pos;
+    // 2nd knight
     while (true){
-      int pos = randomInt(8);
-      if (base.charAt(pos)=='-'){
-        knight2Pos = pos;
+      pos = randomInt(8);
+      if (pieces.charAt(pos) == '-'){
+        pieces.setCharAt(pos, 'N');
         break;
       }
     }
-    base.setCharAt(knight2Pos, 'n');
 
-    int queenPos;
+    // queen
     while (true){
-      int pos = randomInt(8);
-      if (base.charAt(pos)=='-'){
-        queenPos = pos;
+      pos = randomInt(8);
+      if (pieces.charAt(pos) == '-'){
+        pieces.setCharAt(pos, 'Q');
         break;
       }
     }
-    base.setCharAt(queenPos, 'q');
-
-
-    int pos = 0;
-    while (pos<6){
-      if (base.charAt(pos)=='-')
+    
+    // 1st rook
+    pos = 0;
+    while (pos < 6){
+      if (pieces.charAt(pos) == '-')
         break;
       pos++;
     }
-    int rook1Pos = pos++;
-    base.setCharAt(rook1Pos, 'r');
+    pieces.setCharAt(pos++, 'R');
 
-    while (pos<7){
-      if (base.charAt(pos)=='-')
+    // king
+    while (pos < 7){
+      if (pieces.charAt(pos) == '-')
         break;
       pos++;
     }
-    int kingPos = pos++;
-    base.setCharAt(kingPos, 'k');
+    pieces.setCharAt(pos++, 'K');
 
-    while (pos<8){
-      if (base.charAt(pos)=='-')
+    // 2nd rook
+    while (pos < 8){
+      if (pieces.charAt(pos)=='-')
         break;
       pos++;
     }
-    int rook2Pos = pos;
-    base.setCharAt(rook2Pos, 'r');
+    pieces.setCharAt(pos, 'R');
 
+    String whitePieces = pieces.toString();
+    String blackPieces = whitePieces.toLowerCase();
 
-    base.setCharAt(56+kingPos, 'K');
-    base.setCharAt(56+queenPos, 'Q');
-    base.setCharAt(56+rook1Pos, 'R');
-    base.setCharAt(56+rook2Pos, 'R');
-    base.setCharAt(56+bishop1Pos, 'B');
-    base.setCharAt(56+bishop2Pos, 'B');
-    base.setCharAt(56+knight1Pos, 'N');
-    base.setCharAt(56+knight2Pos, 'N');
-
-    return base.toString();
+    return blackPieces + "/pppppppp/8/8/8/8/PPPPPPPP/" + whitePieces + " w KQkq - 0 1";
   }
 
 
@@ -355,6 +345,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
   private static int randomInt(int max){
     return (int)(Math.random()*max);
   }
+
 
 
 
@@ -379,7 +370,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
       int file = startingSquare.getFile() + dir;
       int rank = startingSquare.getRank();
 
-      while ((file>=0)&&(file<=7)){
+      while ((file >= 0) && (file <= 7)){
         ChessPiece piece = (ChessPiece)pos.getPieceAt(file, rank);
         if (piece!=null){
           if (!piece.isRook() || !piece.isSameColorAs(movingPiece))
