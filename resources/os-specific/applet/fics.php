@@ -8,7 +8,7 @@
 
 <CENTER>
 <APPLET CODE="free.jin.JinApplet"
-        ARCHIVE="jin.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
+        ARCHIVE="jin.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/fics/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
 		WIDTH="400" HEIGHT="300">
 		
 	<PARAM NAME="port" value="5000">
@@ -33,18 +33,15 @@
 	<PARAM NAME="resources.pieces" VALUE="fics/eboard xboard">
 			   
 <!--
-
-	Uncomment this to allow saving preferences.
-	
+	Comment this out to disable saving preferences, if you don't have php or mysql.
+-->
 	<PARAM NAME="savePrefsUrl" VALUE="save_prefs.php">			   
 	<PARAM NAME="reserveSpaceUrl" VALUE="reserve_space.php">			   
 			   
 	<?php
 		require "load_prefs.php";
 	?>
-	
--->
-			   
+		   
 			   
 	Please enable Java to run Jin
 </APPLET>

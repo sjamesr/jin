@@ -8,7 +8,7 @@
 
 <CENTER>
 <APPLET CODE="free.jin.JinApplet"
-        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
+        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/icc/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
 		WIDTH="400" HEIGHT="300">
 		
 	<PARAM NAME="port" VALUE="5001">
@@ -33,9 +33,8 @@
 	<PARAM NAME="resources.pieces" VALUE="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard">
 			   
 <!--
-
-	Uncomment this to allow saving preferences.
-	
+	Comment this out to disable saving preferences, if you don't have php or mysql.
+-->
 	<PARAM NAME="savePrefsUrl" VALUE="save_prefs.php">			   
 	<PARAM NAME="reserveSpaceUrl" VALUE="reserve_space.php">			   
 			   
@@ -43,8 +42,6 @@
 		require "load_prefs.php";
 	?>
 	
--->
-
 			   
 	Please enable Java to run Jin
 </APPLET>
