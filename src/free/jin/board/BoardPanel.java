@@ -35,6 +35,7 @@ import free.jin.sound.SoundManager;
 import free.chess.event.MoveListener;
 import free.chess.event.MoveEvent;
 import free.workarounds.FixedJPanel;
+import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -619,9 +620,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JTable createMoveListTable(Game game, TableModel moveListTableModel){
-    JTable table = new JTable(moveListTableModel);
+    JTable table = new FixedJTable(moveListTableModel);
     table.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     table.setCellSelectionEnabled(true);
+    table.getTableHeader().setPreferredSize(new Dimension(150, 18));
     table.getTableHeader().setReorderingAllowed(false);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     return table;
