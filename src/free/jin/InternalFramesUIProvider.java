@@ -1023,6 +1023,11 @@ public class InternalFramesUIProvider implements UIProvider{
       double x = (contentPaneSize.width - margin - w)/2;
       double y = (contentPaneSize.height - margin - h)/2;
       
+      if ("actions".equals(pluginId) && "".equals(id)){
+        x = contentPaneSize.width - w;
+        y = 0;
+      }
+      
       return new RectDouble(x / contentPaneSize.width, y / contentPaneSize.height,
                             w / contentPaneSize.width, h / contentPaneSize.height);
     }
