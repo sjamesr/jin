@@ -22,6 +22,7 @@
 package free.workarounds;
 
 import java.awt.Component;
+import java.awt.Window;
 import javax.swing.JInternalFrame;
 import javax.swing.JRootPane;
 import javax.swing.JComponent;
@@ -145,12 +146,15 @@ public class FixedJInternalFrame extends JInternalFrame{
 
   /**
    * Returns the current focus owner of this JInternalFrame or null if it's not
-   * active.
+   * active or isn't displayable.
    */
 
   private Component findFocusOwner(){
     if (!isSelected()){
-      Component component = SwingUtilities.windowForComponent(this).getFocusOwner();
+      Window window = SwingUtilities.windowForComponent(this);
+      if (window == null)
+        return null;
+      Component component = window.getFocusOwner();
       return isAncestorOf(component) ? component : null;
         // The "null" case shouldn't happen, because we are selected, but just in case...
     }
