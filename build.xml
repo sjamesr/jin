@@ -2,6 +2,7 @@
 
 	<property name="source.dir" value="src"/>
 	<property name="build.dir" value="build/"/>	
+	<property name="docs.dir" value="docs"/>
 	<property name="output.jar" value="jin.jar" />
 	
 	<path id="compile.class.path">
@@ -12,12 +13,12 @@
 	</path>
 	
 	<target name="init">
-		<mkdir dir="${build.dir}"/>
 	</target>
 
 	<target name="dist" depends="init, compile, jar" />
 
 	<target name="compile" depends="init">
+		<mkdir dir="${build.dir}"/>
 		<javac srcdir="${source.dir}"
 		       destdir="${build.dir}"
 		       includes="free/**"
@@ -39,9 +40,20 @@
 			 manifest="manifest.txt"
 		/>
 	</target>
-	
+
+	<target name="docs" depends="init">
+		<mkdir dir="${docs.dir}"/>
+		<javadoc sourcepath="${source.dir}"
+		       packagenames="free.**"
+		       destdir="${docs.dir}"
+			   classpathref="compile.class.path"
+		/>
+	</target>
+
 	<target name="clean">
 		<delete dir="${build.dir}" />
+		<delete dir="${docs.dir}" />
 		<delete file="${output.jar}" />
 	</target>
+
 </project>
