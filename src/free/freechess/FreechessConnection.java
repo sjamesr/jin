@@ -27,9 +27,22 @@ import java.util.StringTokenizer;
 
 
 /**
- * This class implements an easy way to communicate with a freechess.org server.
- * It provides parsing of messages sent by the server and allows receiving
- * notifications of various events in an easy manner.
+ * <P>This class implements an easy way to communicate with a freechess.org
+ * server. It provides parsing of messages sent by the server and allows
+ * receiving notifications of various events in an easy manner.
+ * <P>Information usually arrives and is parsed/processed line by line.
+ * Usage usually involves overriding one of the many
+ * <code>processXXX(<arguments>)</code> methods and handling the arrived
+ * information. The boolean value returned by the
+ * <code>processXXX(<arguments>)</code> methods determines whether the arrived
+ * information has been processed completely and shouldn't be processed any
+ * further. Currently, returning <code>false</code> will mean that the line sent
+ * by the server will be sent to the <code>processLine(String)</code> method as
+ * well, but in the future "further processing" might include other procedures.
+ * Since by default, all the <code>processXXX(parsed data)</code> methods return
+ * <code>false</code>, the information usually handled by any methods you don't
+ * override will end up in <code>processLine(String)</code> which you can easily
+ * use for printing the output to the screen or a file.
  */
 
 public class FreechessConnection extends free.util.Connection implements Runnable{
@@ -175,7 +188,6 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
     sendCommand("set style "+style);
     sendCommand("set interface "+interfaceVar);
-    sendCommand("set bell 0");
     sendCommand("iset nowrap 1");
     sendCommand("iset lock 1");
   }
@@ -258,6 +270,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private void handleLine(String line){
+    if (handleGameInfo(line))
+      return;
+    if (handleStyle12(line))
+      return;
     if (handleChannelTell(line))
       return;
     if (handleLogin(line))
@@ -275,6 +291,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (handleTShout(line))
       return;
     if (handleCShout(line))
+      return;
+    if (handleAnnouncement(line))
       return;
     if (handleKibitz(line))
       return;
@@ -315,6 +333,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       loginLock.notify();
     }
 
+    processLine(line);
+
     return true;
   }
 
@@ -345,7 +365,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processPersonalTell(username, titles, message);
+    if (!processPersonalTell(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -357,7 +378,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a personal tell arrives. 
    */
 
-  protected void processPersonalTell(String username, String titles, String message){}
+  protected boolean processPersonalTell(String username, String titles, String message){return false;}
 
 
 
@@ -367,7 +388,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern sayPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?(\\[(\\d*)\\])? says: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?(\\[(\\d+)\\])? says: (.*)");
 
 
 
@@ -389,7 +410,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
     int gameNumber = gameNumberString == null ? -1 : Integer.parseInt(gameNumberString);
 
-    processSayTell(username, titles, gameNumber, message);
+    if (!processSayTell(username, titles, gameNumber, message))
+      processLine(line);
 
     return true;
   }
@@ -403,7 +425,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * specified.
    */
 
-  protected void processSayTell(String username, String titles, int gameNumber, String message){}
+  protected boolean processSayTell(String username, String titles, int gameNumber, String message){return false;}
 
 
 
@@ -432,7 +454,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processPTell(username, titles, message);
+    if (!processPTell(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -444,7 +467,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a "ptell" tell arrives. 
    */
 
-  protected void processPTell(String username, String titles, String message){}
+  protected boolean processPTell(String username, String titles, String message){return false;}
 
 
 
@@ -454,7 +477,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern channelTellPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\((\\d*)\\): (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\((\\d+)\\): (.*)");
 
 
 
@@ -476,7 +499,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
     int channelNumber = Integer.parseInt(channelNumberString);
 
-    processChannelTell(username, titles, channelNumber, message);
+    if (!processChannelTell(username, titles, channelNumber, message))
+      processLine(line);
 
     return true;
   }
@@ -488,7 +512,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a channel tell arrives. 
    */
 
-  protected void processChannelTell(String username, String titles, int channelNumber, String message){}
+  protected boolean processChannelTell(String username, String titles, int channelNumber, String message){return false;}
 
 
 
@@ -498,7 +522,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern kibitzPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]*)\\)\\[(\\d*)\\] kibitzes: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
 
 
 
@@ -522,7 +546,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     int rating = (ratingString != null) && !ratingString.equals("----") ? Integer.parseInt(ratingString) : -1;
     int gameNumber = Integer.parseInt(gameNumberString);
 
-    processKibitz(username, titles, rating, gameNumber, message);
+    if (!processKibitz(username, titles, rating, gameNumber, message))
+      processLine(line);
 
     return true;
   }
@@ -535,7 +560,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * -1 if the player is unrated or otherwise doesn't have a rating.
    */
 
-  protected void processKibitz(String username, String titles, int rating, int gameNumber, String message){}
+  protected boolean processKibitz(String username, String titles, int rating, int gameNumber, String message){return false;}
 
 
 
@@ -546,7 +571,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern whisperPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]*)\\)\\[(\\d*)\\] whispers: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
 
 
 
@@ -570,7 +595,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     int rating = (ratingString != null) && !ratingString.equals("----") ? Integer.parseInt(ratingString) : -1;
     int gameNumber = Integer.parseInt(gameNumberString);
 
-    processWhisper(username, titles, rating, gameNumber, message);
+    if (!processWhisper(username, titles, rating, gameNumber, message))
+      processLine(line);
 
     return true;
   }
@@ -583,7 +609,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * -1 if the player is unrated or otherwise doesn't have a rating.
    */
 
-  protected void processWhisper(String username, String titles, int rating, int gameNumber, String message){}
+  protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){return false;}
 
 
 
@@ -612,7 +638,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processShout(username, titles, message);
+    if (!processShout(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -624,7 +651,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a shout arrives. 
    */
 
-  protected void processShout(String username, String titles, String message){}
+  protected boolean processShout(String username, String titles, String message){return false;}
 
 
 
@@ -653,7 +680,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processIShout(username, titles, message);
+    if (!processIShout(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -665,7 +693,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when an "ishout" arrives. 
    */
 
-  protected void processIShout(String username, String titles, String message){}
+  protected boolean processIShout(String username, String titles, String message){return false;}
 
 
 
@@ -695,7 +723,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processTShout(username, titles, message);
+    if (!processTShout(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -707,7 +736,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a "tshout" arrives. 
    */
 
-  protected void processTShout(String username, String titles, String message){}
+  protected boolean processTShout(String username, String titles, String message){return false;}
 
 
 
@@ -737,7 +766,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String titles = matcher.group(2);
     String message = matcher.group(3);
 
-    processCShout(username, titles, message);
+    if (!processCShout(username, titles, message))
+      processLine(line);
 
     return true;
   }
@@ -749,7 +779,127 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * This method is called when a "cshout" arrives. 
    */
 
-  protected void processCShout(String username, String titles, String message){}
+  protected boolean processCShout(String username, String titles, String message){return false;}
+
+
+
+
+  /**
+   * The regular expression matching announcements.
+   */
+
+  private static final Pattern announcementPattern = 
+    new Pattern("^    \\*\\*ANNOUNCEMENT\\*\\* from ("+usernameRegex+"): (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is an announcement and
+   * to further process it if it is.
+   */
+
+  private boolean handleAnnouncement(String line){
+    Matcher matcher = announcementPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String message = matcher.group(2);
+
+    if (!processAnnouncement(username, message))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when an announcement arrives. 
+   */
+
+  protected boolean processAnnouncement(String username, String message){return false;}
+
+
+
+
+  /**
+   * The regular expression matching gameinfo lines.
+   */
+
+  private static final Pattern gameinfoPattern = new Pattern("^<g1> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a gameinfo line and
+   * to further process it if it is.
+   */
+
+  private boolean handleGameInfo(String line){
+    Matcher matcher = gameinfoPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    GameInfoStruct data = GameInfoStruct.parseGameInfoLine(line);
+
+    if (!processGameInfo(data))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a gameinfo line arrives. 
+   */
+
+  protected boolean processGameInfo(GameInfoStruct data){return false;}
+
+
+
+
+  
+  /**
+   * The regular expression matching style12 lines.
+   */
+
+  private static final Pattern style12Pattern = new Pattern("^<12> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a style12 line and
+   * to further process it if it is.
+   */
+
+  private boolean handleStyle12(String line){
+    Matcher matcher = style12Pattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    Style12Struct data = Style12Struct.parseStyle12Line(line);
+
+    if (!processStyle12(data))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a style12 line arrives. 
+   */
+
+  protected boolean processStyle12(Style12Struct data){return false;}
 
 
 
@@ -769,6 +919,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       StringBuffer buf = new StringBuffer();
       int b;
       mainLoop: while ((b = in.read()) != -1){
+        if (b == '\r')
+          System.out.print("\\r");
+        else if (b == '\n')
+          System.out.print("\\n");
         System.out.print((char)b);
         if (b == '\r')
           continue;
