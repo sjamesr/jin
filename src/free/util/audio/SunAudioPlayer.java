@@ -113,13 +113,13 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
 
   public void run(){
     try{
-      int timeToWait = 0;
+//      int timeToWait = 0;
       while (true){
-        if (timeToWait!=0)
-          Thread.sleep(timeToWait);
+//        if (timeToWait != 0)
+//          Thread.sleep(timeToWait);
         AudioClip clip = (AudioClip)clipQueue.pop();
         byte [] data = clip.getData();
-        timeToWait = data.length/8;
+//        timeToWait = data.length/8;
         try{
           NativeAudioStream audioStream = new NativeAudioStream(new ByteArrayInputStream(data));
           sun.audio.AudioPlayer.player.start(audioStream);
