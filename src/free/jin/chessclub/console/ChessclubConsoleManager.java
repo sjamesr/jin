@@ -39,7 +39,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
   /**
    * Overrides <code>chatMessageReceived(ChatEvent)</code> to notify the
-   * <code>ChessclubConsole</code> when tells are received.
+   * <code>Console</code> when tells are received.
    */
 
   public void chatMessageReceived(ChatEvent evt){
@@ -47,7 +47,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
     String type = evt.getType();
     if (type.equals("tell") || type.equals("say") || type.equals("atell"))
-      ((ChessclubConsole)console).tellReceived(evt.getSender());
+      console.tellReceived(evt.getSender());
   }
 
   
@@ -114,6 +114,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
   protected Console createConsole(){
     return new ChessclubConsole(this);
   }
+
 
 
 
