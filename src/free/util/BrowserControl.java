@@ -27,6 +27,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException; 
+import java.io.InputStream; 
 import java.io.InterruptedIOException;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -94,8 +95,13 @@ public class BrowserControl{
             environment = new Properties();
             try{
               Process env = Runtime.getRuntime().exec("env");
-              environment.load(env.getInputStream());
-            } catch (IOException e){}
+              InputStream in = env.getInputStream();
+              try{
+                environment.load(in);
+              } finally{
+                  in.close();
+                }
+            } catch (IOException e){e.printStackTrace();}
           }
         }
 
