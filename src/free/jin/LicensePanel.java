@@ -266,6 +266,20 @@ public class LicensePanel extends DialogPanel{
     add(beanshellPanel);
     add(Box.createVerticalStrut(5));
 
+    JPanel soxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    soxPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
+    LinkLabel soxWebsiteLabel = new LinkLabel("SoX - Sound eXchange commandline utility");
+    soxWebsiteLabel.setToolTipText("http://sox.sourceforge.net");
+    soxWebsiteLabel.addActionListener(new UrlDisplayingAction("http://sox.sourceforge.net"));
+    soxPanel.add(soxWebsiteLabel);
+    soxPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel soxLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    soxLicenseLabel.addActionListener(lgplActionListener);
+    soxPanel.add(soxLicenseLabel);
+    soxPanel.add(new JLabel("<html>.</html>"));
+    add(soxPanel);
+    add(Box.createVerticalStrut(5));
+    
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     xboardPanel.add(new JLabel("<html>Jin contains a piece set from&nbsp</html>"));
     LinkLabel xboardWebsiteLabel = new LinkLabel("xboard/winboard");
