@@ -251,7 +251,7 @@
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.php ${server.name}_oldjava.php detect_java.html DetectJava.class *.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
+			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.php ${server.name}_oldjava.php detect_java.html DetectJava.class load_prefs.php reserve_space.php save_prefs.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
       <filterset>
         <filter token="old_java_url" value="${server.name}_oldjava.php" />
         <filter token="new_java_url" value="${server.name}.php" />
