@@ -23,12 +23,10 @@ package free.jin;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import free.util.*;
 import free.util.swing.LookAndFeelMenu;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
-import free.util.WindowDisposingActionListener;
-import free.util.StringEncoder;
-import free.util.AWTUtilities;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import java.awt.event.ActionListener;
@@ -158,6 +156,7 @@ public class JinFrameMenuBar extends JMenuBar{
     add(connectionMenu = createConnectionMenu());
     add(new LookAndFeelMenu(jinFrame.getRootPane()));
     add(preferencesMenu = createPreferencesMenu());
+    add(createHelpMenu());
 
     setBorderPainted(true);
   }
@@ -266,10 +265,9 @@ public class JinFrameMenuBar extends JMenuBar{
 
       public void actionPerformed(ActionEvent evt){
         AdvancedJDesktopPane desktop = (AdvancedJDesktopPane)jinFrame.getDesktop();
-        Color defaultColor = UIManager.getColor("desktop");
         String wallpaperFilename = Jin.getProperty("desktop.wallpaper");
         File currentImageFile = wallpaperFilename == null ? null : new File(wallpaperFilename);
-        BackgroundChooser bChooser = new BackgroundChooser(jinFrame, desktop, null, AdvancedJDesktopPane.TILE, defaultColor, currentImageFile);
+        BackgroundChooser bChooser = new BackgroundChooser(jinFrame, desktop, null, AdvancedJDesktopPane.TILE, currentImageFile);
         bChooser.setVisible(true);
 
         Color chosenColor = bChooser.getChosenColor();
@@ -493,7 +491,7 @@ public class JinFrameMenuBar extends JMenuBar{
    */
 
   private void addPluginMenu(JMenu menu){
-    add(menu);
+    add(menu, 3);
     pluginMenus.addElement(menu);
   }
 
@@ -557,6 +555,55 @@ public class JinFrameMenuBar extends JMenuBar{
       connMenu.insert(menuItem, startSeparatorIndex+1);
       connectionMenuItems.addElement(menuItem);
     }
+  }
+
+
+
+
+  /**
+   * Creates and returns the "Help" menu.
+   */
+
+  protected JMenu createHelpMenu(){
+    JMenu helpMenu = new JMenu("Help");
+    helpMenu.setMnemonic('h');
+
+    JMenuItem websiteMenuItem = new JMenuItem("Jin Website");
+    websiteMenuItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String url = "http://www.hightemplar.com/jin/";
+        try{
+          BrowserControl.displayURL(url);
+        } catch (java.io.IOException e){
+            JOptionPane.showMessageDialog(jinFrame, "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
+          }
+      }
+    });
+    helpMenu.add(websiteMenuItem);
+
+    JMenuItem licenseMenuItem = new JMenuItem("Licensing and Copyrights...");
+    licenseMenuItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        JDialog licenseDialog = new LicenseDialog(jinFrame);
+        AWTUtilities.centerWindow(licenseDialog, jinFrame);
+        licenseDialog.setResizable(false);
+        licenseDialog.setVisible(true);
+      }
+    });
+    helpMenu.add(licenseMenuItem);
+
+    JMenuItem aboutMenuItem = new JMenuItem("About Jin...");
+    aboutMenuItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        JDialog aboutDialog = new AboutDialog(jinFrame);
+        AWTUtilities.centerWindow(aboutDialog, jinFrame);
+        aboutDialog.setResizable(false);
+        aboutDialog.setVisible(true);
+      }
+    });
+    helpMenu.add(aboutMenuItem);
+
+    return helpMenu;
   }
 
 
