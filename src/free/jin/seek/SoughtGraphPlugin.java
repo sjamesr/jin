@@ -22,6 +22,8 @@
 package free.jin.seek;
 
 import free.jin.SeekConnection;
+import free.jin.event.ConnectionEvent;
+import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
 import free.jin.event.SeekListener;
 import free.jin.plugin.*;
@@ -42,7 +44,7 @@ import java.net.URL;
  */
 
 public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelectionListener,
-    PluginUIListener{
+    PluginUIListener, ConnectionListener{
 
 
 
@@ -168,6 +170,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   protected void registerListeners(){
     soughtGraph.addSeekSelectionListener(this);
+    getConn().getListenerManager().addConnectionListener(this);
   }
 
 
@@ -182,6 +185,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     soughtGraph.removeSeekSelectionListener(this);
     conn.getSeekListenerManager().removeSeekListener(this); // Just in case.
+    getConn().getListenerManager().removeConnectionListener(this);
   }
 
 
@@ -214,7 +218,27 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void seekSelected(SeekSelectionEvent evt){
     ((SeekConnection)getConn()).acceptSeek(evt.getSeek());
   }
-
+  
+  
+  
+  /*
+   * ConnectionListener implementation.
+   */
+  
+  public void connectionAttempted(ConnectionEvent evt){}
+  public void connectionEstablished(ConnectionEvent evt){}
+  public void connectionLoggedIn(ConnectionEvent evt){}
+  
+  
+  
+  /**
+   * Remove all seeks on disconnection. This just seems to make more sense than
+   * leaving them on.   
+   */
+  
+  public void connectionLost(ConnectionEvent evt){
+    soughtGraph.removeAllSeeks();
+  }
 
 
   /**
