@@ -578,6 +578,7 @@ public class JinFrameMenuBar extends JMenuBar{
     helpMenu.setMnemonic('h');
 
     JMenuItem websiteMenuItem = new JMenuItem("Jin Website");
+    websiteMenuItem.setMnemonic('J');
     websiteMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String url = "http://www.hightemplar.com/jin/";
@@ -591,6 +592,7 @@ public class JinFrameMenuBar extends JMenuBar{
     helpMenu.add(websiteMenuItem);
 
     JMenuItem licenseMenuItem = new JMenuItem("Licensing and Copyrights...");
+    licenseMenuItem.setMnemonic('L');
     licenseMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         JDialog licenseDialog = new LicenseDialog(jinFrame);
@@ -602,6 +604,7 @@ public class JinFrameMenuBar extends JMenuBar{
     helpMenu.add(licenseMenuItem);
 
     JMenuItem aboutMenuItem = new JMenuItem("About Jin...");
+    aboutMenuItem.setMnemonic('A');
     aboutMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         JDialog aboutDialog = new AboutDialog(jinFrame);
