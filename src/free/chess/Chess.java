@@ -73,7 +73,7 @@ public final class Chess extends ChesslikeGenericVariant{
    */
 
   private Chess(){
-    super(INITIAL_POSITION_LEXIGRAPHIC, "Chess");
+    super(INITIAL_POSITION_FEN, "Chess");
   }
 
 

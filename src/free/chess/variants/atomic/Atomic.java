@@ -70,7 +70,7 @@ public class Atomic extends ChesslikeGenericVariant{
    */
 
   private Atomic(){
-    super(Chess.INITIAL_POSITION_LEXIGRAPHIC, "Atomic");
+    super(Chess.INITIAL_POSITION_FEN, "Atomic");
   }
 
 
