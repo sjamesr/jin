@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -24,13 +24,13 @@ package free.jin;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.io.*;
+import java.util.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;
 import free.util.ArrayEnumeration;
 import free.util.AWTUtilities;
-import java.io.*;
-import java.util.*;
 
 
 /**
@@ -72,27 +72,26 @@ public class JinFrame extends JFrame{
 
 
   /**
+   * The InternalFrameSwitcher responsible for switching between Jin's internal
+   * frames.
+   */
+
+  private final InternalFrameSwitcher internalFrameSwitcher;
+
+
+
+
+  /**
    * Creates a new JinFrame.
    */
 
   public JinFrame(){
     setJMenuBar(createJMenuBar());
 
-//    getToolkit().getSystemEventQueue().push(new EventQueue(){
-//
-//      protected void dispatchEvent(AWTEvent evt){
-//        super.dispatchEvent(evt);
-//
-//        if (evt instanceof KeyEvent){
-//          System.out.println("KeyEvent: "+evt);
-//          System.out.println("Focus owner: "+getFocusOwner());
-//          System.out.println();
-//        }
-//      }
-//
-//    });
-
     enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+
+    internalFrameSwitcher = new InternalFrameSwitcher(this);
+    javax.swing.FocusManager.setCurrentManager(new JinFocusManager(this));
   }
 
 
@@ -147,6 +146,17 @@ public class JinFrame extends JFrame{
 
 
   /**
+   * Returns the <code>InternalFrameSwitcher</code> responsible for switching
+   * between Jin's frames.
+   */
+
+  public InternalFrameSwitcher getInternalFrameSwitcher(){
+    return internalFrameSwitcher;
+  }
+
+
+
+  /**
    * Returns Jin's status bar.
    */
 
@@ -164,8 +174,6 @@ public class JinFrame extends JFrame{
   public JinFrameMenuBar getJinFrameMenuBar(){
     return (JinFrameMenuBar)super.getJMenuBar();
   }
-
-
 
 
 
