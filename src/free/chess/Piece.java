@@ -72,7 +72,7 @@ public abstract class Piece{
       default:
         throw new IllegalArgumentException("Unknown color constant: "+color);
     }
-    if (type==0)
+    if (type == 0)
       throw new IllegalArgumentException("Piece type may not be 0");
       
     this.val = color*type;
@@ -88,7 +88,7 @@ public abstract class Piece{
    */
 
   public boolean isOppositeColor(Piece piece){
-    return this.getColor()!=piece.getColor();
+    return this.getColor() != piece.getColor();
   }
 
 
@@ -99,7 +99,22 @@ public abstract class Piece{
    */
 
   public boolean isSameColor(Piece piece){
-    return this.getColor()==piece.getColor();
+    return this.getColor() == piece.getColor();
+  }
+
+
+
+
+
+  /**
+   * Returns the <code>Player</code> this piece belongs to.
+   */
+
+  public Player getPlayer(){
+    if (isWhite())
+      return Player.WHITE_PLAYER;
+    else
+      return Player.BLACK_PLAYER;
   }
 
 
