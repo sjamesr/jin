@@ -26,10 +26,11 @@ import javax.swing.Icon;
 
 
 /**
- * An implementation of the Icon interface which draws a solid color rectangle.
+ * An implementation of the Icon interface which draws a solid color icon.
+ * The actual drawing (the shape) is left to subclasses.
  */
 
-public class SolidColorIcon implements Icon{
+public abstract class SolidColorIcon implements Icon{
 
 
   
@@ -56,6 +57,11 @@ public class SolidColorIcon implements Icon{
    */
 
   public SolidColorIcon(Dimension size, Color color){
+    if (size == null)
+      throw new IllegalArgumentException("Size is null");
+    if (color == null)
+      throw new IllegalArgumentException("Color is null");
+
     this.size = new Dimension(size);
     this.color = color;
   }
@@ -86,13 +92,33 @@ public class SolidColorIcon implements Icon{
 
 
   /**
+   * Returns the color of the icon.
+   */
+
+  private Color getColor(){
+    return color;
+  }
+
+
+
+
+  /**
    * Paints a solid rectangle at the given coordinates.
    */
 
   public void paintIcon(Component component, Graphics g, int x, int y){
     g.setColor(color);
-    g.fillRect(x, y, size.width, size.height);
+    paintShape(component, g, x, y);
   }
 
+
+
+
+  /**
+   * Draws the actual shape of the icon. The color of the <code>Graphics</code>
+   * object is already set to the icon's color.
+   */
+
+  public abstract void paintShape(Component component, Graphics g, int x, int y);
 
 }
