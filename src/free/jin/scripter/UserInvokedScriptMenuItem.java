@@ -32,7 +32,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import free.util.WindowDisposingActionListener;
+import free.util.swing.SwingUtils;
 import free.util.AWTUtilities;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedTableColumn;
@@ -164,9 +164,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
     public VariablesDialog(Frame parent){
       super(parent, "Specify Variables for the Script", true);
 
-      KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-      ActionListener closer = new WindowDisposingActionListener(this);
-      this.getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+      SwingUtils.registerEscapeCloser(this);
 
       columnModel = new DefaultTableColumnModel();
       JComboBox typeChoice = new FixedJComboBox(VAR_TYPES);
