@@ -21,198 +21,82 @@
 
 package free.jin;
 
-import javax.swing.*;
-import java.util.Properties;
-import java.io.IOException;
-import free.jin.plugin.PluginInfo;
+import javax.swing.JApplet;
+import free.util.BrowserControl;
 
 
 
 /**
- * An applet based implementation of JinContext.
+ * An applet which runs Jin, via a <code>AppletJinContext</code>. This is just
+ * a small class responsible for creating an <code>AppletJinContext</code> and
+ * passing it the various applet events (start, stop, destroy).
  */
 
-public class JinApplet extends JApplet implements JinContext{
+public class JinApplet extends JApplet{
+  
+  
+  
+  /**
+   * The <code>AppletJinContext</code> we're running Jin with.
+   */
+   
+  private AppletJinContext context;
+  
+  
+  
+  /**
+   * The exception (Throwable, really) we got when trying to create the context,
+   * <code>null</code> if none.
+   */
+   
+  private Throwable contextCreationError;
 
-  
-  
-  /**
-   * The application properties.
-   */
-  
-  private final Properties appProps;
-  
-  
-  
-  /**
-   * User preferences.
-   */
-
-  private Preferences userPrefs;
-  
-  
-  
-  /**
-   * Creates a new instance of <code>JinApplet</code>.
-   */
-  
-  public JinApplet() throws IOException{
-    
-    // Load application properties.
-    appProps = JinUtilities.loadAppProps();
-  }
-  
   
 
   /**
-   * Initializes Jin.
+   * Creates an AppletJinContext.
    */
-  
+   
   public void init(){
+    super.init();
     
-    // Load user's preferences.
-    userPrefs = Preferences.load(this, "user");
-  }
-  
-  
-  
-  /**
-   * Starts Jin.
-   */
-  
-  public void start(){
     try{
-      userPrefs.save(System.out);
-    } catch (java.io.IOException e){}
+      BrowserControl.setAppletContext(getAppletContext());
+      context = new AppletJinContext(this);
+    } catch (Throwable t){
+        contextCreationError = t;
+      }
   }
   
   
-  /**
-   * 
-   */
   
-  public Preferences getPrefs(){
-    return null;
-  }
-  
-
   /**
-   * 
+   * Invokes the context's <code>start</code> method.
    */
-
-  public ClassLoader [] loadResources(String resourceType){
-    return null;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public void quit(boolean askToConfirm){
-  }
-
-
-
-  /**
-   * Returns the application name.
-   */
-
-  public String getAppName(){
-    return appProps.getProperty("app.name");
-  }
-
-
-
-  /**
-   * Returns the application version.
-   */
-
-  public String getAppVersion(){
-    return appProps.getProperty("app.version");
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public Server [] getServers(){
-    return null;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public PluginInfo [] getPlugins(Server server){
-    return null;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public ListModel getUsers(){
-    return null;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public boolean addUser(User user){
-    return false;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public boolean storeUser(User user){
-    return false;
-  }
-
-
-
-  /**
-   * 
-   */
-
-  public boolean removeUser(User user){
-    return false;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public UIProvider getUIProvider(){
-    return null;
-  }
-
-
-
-  /**
-   * 
-   */
-  
-  public ConnectionManager getConnManager(){
-    return null;
+   
+  public void start(){
+    super.start();
+    
+    if (context != null)
+      context.start();  
+    else{
+      contextCreationError.printStackTrace();
+      // TODO: Show error dialog
+    }
   }
   
-
+  
+  
+  /**
+   * Invokes the context's <code>quit</code> method with a <code>false</code>
+   * argument.
+   */
+   
+  public void stop(){
+    if (context != null)
+      context.quit(false);
+  }
+  
+  
   
 }
