@@ -425,7 +425,7 @@ public class JinFrameMenuBar extends JMenuBar{
 
       final PreferencesPanel prefPanel = targetPlugin.getPreferencesUI();
       JPanel prefWrapperPanel = new JPanel(new BorderLayout());
-      prefWrapperPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+      prefWrapperPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
       prefWrapperPanel.add(prefPanel, BorderLayout.CENTER);
       dialog.getContentPane().add(prefWrapperPanel, BorderLayout.CENTER);
 
@@ -464,11 +464,7 @@ public class JinFrameMenuBar extends JMenuBar{
         }
       });
 
-      cancelButton.addActionListener(new ActionListener(){
-        public void actionPerformed(ActionEvent evt){
-          dialog.dispose();
-        }
-      });
+      cancelButton.addActionListener(closer);
 
       applyButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
