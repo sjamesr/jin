@@ -1,3 +1,42 @@
+2.12.1
+
+* Fixed a bug in the main console preferences dialog which prevented users from
+  changing (almost) any of the settings there.
+* Vastly improved piece loading time and memory usage by not preloading all the
+  images of the piece set; duh.
+* On OS X version 10.2 Jin will use the inside-the-window menubar due to bugs
+  in the native OS X menubar with Java.
+* Added the JGoodies Looks: Windows, Plastic, Plastic 3D and Plastic XP.
+* Fixed a bug which may have caused problems if more than 5 people sent you a
+  tell during a single session.
+* Fixed a bug on OS X where if you closed Jin with the main window maximized,
+  the next time you ran it, the main window would not show at all.
+* The clock's text is now drawn in gray on "inactive" boards (either the game
+  has finished or you are looking at an isolated position from some game).
+* Added a "Download Extras" button on the board preferences panel (the
+  "Board Looks" tab) which currently sends the user's browser to
+  http://www.jinchess.com/extras/
+* Jin's output and error streams are now written into ~/.jin/log in addition
+  to stdout and stderr.
+* Made the size of the font for the board buttons a bit smaller.
+* Updated the arrows-circles script example on the website to work with
+  Jin 2.12.1
+* Implemented proper response to the unarrow and uncircle commands on ICC. Also,
+  (right) dragging another arrow where one already exists or (right) clicking
+  where a circle already exists will now remove the arrow or circle (and send
+  the corresponding unarrow/uncircle command to the server).
+* Trying to capture your own piece in standard chess will now be rejected
+  immediately, instead of sending to the server.
+* Fixed a bug where your clock would not resume ticking if you tried to make
+  an illegal move (only on ICC).
+* Move legality checking (which is still incomplete) is now applied to regular
+  moves too (in addition to premoves).
+* The "Moving in Advance" section on the move input panel for board preferences
+  will no longer be disabled during games (this was broken anyway). Instead, it
+  will give an error if you try to modify its settings while playing a game.
+  
+  
+
 2.12
 
 * Jin now allows the user to add custom piece sets and board patterns. The
