@@ -24,6 +24,7 @@ package free.util.swing;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.border.*;
 import free.util.AWTUtilities;
 
 
@@ -145,7 +146,9 @@ public class FontSelectorPanel extends JPanel{
     fontSizesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     previewPanelHolder = new JPanel(new BorderLayout());
-    previewPanelHolder.setBorder(new javax.swing.border.EtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+    Border outsideBorder = new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED);
+    Border insideBorder = new EmptyBorder(10, 10, 10, 10);
+    previewPanelHolder.setBorder(new CompoundBorder(outsideBorder, insideBorder));
 
     setPreviewPanel(new DefaultPreviewPanel(this));
 
@@ -309,7 +312,6 @@ public class FontSelectorPanel extends JPanel{
         listener.stateChanged(changeEvent);
       }
     }
-
   }
 
 
@@ -373,7 +375,6 @@ public class FontSelectorPanel extends JPanel{
       parent.addChangeListener(this);
 
       setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-      setPreferredSize(new Dimension(100, 40));
     }
 
 
