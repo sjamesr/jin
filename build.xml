@@ -410,6 +410,10 @@
 			<param name="board-pattern-id" value="winter" />
 		</antcall>
     
+		<!-- Red Marble -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="red-marble" />
+		</antcall>
 		
 	</target>
 	
