@@ -1090,7 +1090,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       Game game = gameInfo.game;
       Position position = gameInfo.position;
       WildVariant variant = game.getVariant();
-      Move move = parseWarrenSmith(moveInfo.smithMove, position, variant, moveInfo.algebraicMove); 
+      Move move = parseWarrenSmith(moveInfo.smithMove, position, moveInfo.algebraicMove); 
 
       position.makeMove(move);
       gameInfo.moves.addElement(move);
@@ -1119,42 +1119,24 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
   /**
-   * Breaks the given move string (assuming it's in Smith Warren format) into
-   * starting square, ending square and promotion target, and using WildVariant.parsePiece(String)
-   * and WildVariant.createMove(Position, Square, Square, Piece) creates a Move object.
+   * Converts the specified <code>moveSmith</code> string into a Move object.
    */
 
-  private Move parseWarrenSmith(String moveString, Position position, WildVariant variant, String moveSAN){
-    if (variant.equals(Kriegspiel.getInstance()) && (moveString.indexOf("?") != -1)){
-      if (moveString.equals("?")){ // Completely hidden
-        return variant.createMove(position, null, null, null, moveSAN);
+  private Move parseWarrenSmith(String moveSmith, Position position, String moveString){
+    WildVariant variant = position.getVariant();
+    
+    // Handle Kriegspiel
+    if (variant.equals(Kriegspiel.getInstance()) && (moveSmith.indexOf("?") != -1)){
+      if (moveSmith.equals("?")){ // Completely hidden
+        return variant.createMove(position, null, null, null, moveString);
       }
       else{
-        Square endSquare = Square.parseSquare(moveString.substring(2, 4));
-        return variant.createMove(position, null, endSquare, null, moveSAN);
+        Square endSquare = Square.parseSquare(moveSmith.substring(2, 4));
+        return variant.createMove(position, null, endSquare, null, moveString);
       }
     }
-    else{
-      char lastChar = moveString.charAt(moveString.length() - 1);
-      if (lastChar == 'c') // Short castling
-        return variant.createShortCastling(position);
-      else if (lastChar == 'C') // Long castling
-        return variant.createLongCastling(position);
-
-      Square startSquare = Square.parseSquare(moveString.substring(0, 2));
-      Square endSquare = Square.parseSquare(moveString.substring(2, 4));
-      
-      Piece promotionTarget = null;
-      if ("NBRQK".indexOf(lastChar) != -1){
-        // The 'K' can happen in Giveaway, where you can promote to a king
-        String promotionTargetString = String.valueOf(moveString.charAt(moveString.length() - 1));
-        if (position.getCurrentPlayer().isBlack())
-          promotionTargetString = promotionTargetString.toLowerCase();
-        promotionTarget = variant.parsePiece(promotionTargetString);
-      }
-
-      return variant.createMove(position, startSquare, endSquare, promotionTarget, moveSAN);
-    }
+    else
+      return Move.parseWarrenSmith(moveSmith, position, moveString);
   }
 
 
