@@ -124,7 +124,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    */
   
   public void internalFrameActivated(InternalFrameEvent e){
-    JInternalFrame f = e.getInternalFrame();
+    JInternalFrame f = (JInternalFrame)e.getSource();
     
     frames.removeElement(f);
     frames.insertElementAt(f, 0);
