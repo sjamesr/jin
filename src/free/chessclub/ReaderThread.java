@@ -171,9 +171,6 @@ public class ReaderThread extends Thread{
             }
           }
           else{
-            if (b==7) // Ignore beeps.
-              buf.setLength(buf.length() - 1);
-
             // Ignore the prompt, remove this line if it's possible to disable it
             if (buf.toString().equals("aics% ")) 
               continue outerLoop;
