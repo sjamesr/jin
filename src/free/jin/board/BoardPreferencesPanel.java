@@ -117,8 +117,17 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     whiteOutlineChooser = new ColorChooserButton("White pieces' outline", getColorProperty("white-outline-color", Color.black));
     blackOutlineChooser = new ColorChooserButton("Black pieces' outline", getColorProperty("black-outline-color", Color.white));
 
+    whiteColorChooser.setMnemonic('W');
+    blackColorChooser.setMnemonic('B');
+    whiteOutlineChooser.setMnemonic('h');
+    blackOutlineChooser.setMnemonic('k');
+
     lightColorChooser = new ColorChooserButton("Light squares", getColorProperty("light-square-color", new Color(255,207,144)));
     darkColorChooser = new ColorChooserButton("Dark squares", getColorProperty("dark-square-color", new Color(143,96,79)));
+
+    lightColorChooser.setMnemonic('L');
+    darkColorChooser.setMnemonic('D');
+
 
     ChangeListener changeNotifyListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
