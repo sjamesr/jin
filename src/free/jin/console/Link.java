@@ -21,6 +21,8 @@
 
 package free.jin.console;
 
+import javax.swing.text.Position;
+
 
 /**
  * An class encapsulating a link in a ConsoleTextPane. A Link consists of 2 integers
@@ -31,19 +33,18 @@ public class Link{
 
 
   /**
-   * The starting index of the link.
+   * The starting position of the link.
    */
 
-  private final int startIndex;
+  private final Position startPosition;
 
 
 
   /**
-   * The ending index of the link.
+   * The ending position of the link.
    */
 
-  private final int endIndex;
-
+  private final Position endPosition;
 
 
 
@@ -57,13 +58,13 @@ public class Link{
 
 
   /**
-   * Creates a new Link with the given start index, end index and Command to
-   * execute when the link is clicked.
+   * Creates a new Link with the given starting and ending positions and the 
+   * <code>Command</code> to execute when the link is clicked.
    */
 
-  public Link(int startIndex, int endIndex, Command command){
-    this.startIndex = startIndex;
-    this.endIndex = endIndex;
+  public Link(Position startPosition, Position endPosition, Command command){
+    this.startPosition = startPosition;
+    this.endPosition = endPosition;
     this.command = command;
   }
 
@@ -71,21 +72,21 @@ public class Link{
 
 
   /**
-   * Returns the starting index of the link in the text.
+   * Returns the starting <code>Position</code> of the link in the text.
    */
 
-  public int getStartIndex(){
-    return startIndex;
+  public Position getStartPosition(){
+    return startPosition;
   }
 
 
 
   /**
-   * Returns the ending index of the link in the text.
+   * Returns the ending <code>Position</code> of the link in the text.
    */
 
-  public int getEndIndex(){
-    return endIndex;
+  public Position getEndPosition(){
+    return endPosition;
   }
 
 
@@ -96,16 +97,6 @@ public class Link{
 
   public Command getCommand(){
     return command;
-  }
-
-
-
-  /**
-   * Returns a textual representation of this Link object.
-   */
-
-  public String getString(){
-    return getClass().getName()+"[startIndex="+getStartIndex()+";endIndex="+getEndIndex()+";command="+getCommand()+"]";
   }
 
 
