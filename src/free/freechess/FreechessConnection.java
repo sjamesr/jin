@@ -222,6 +222,20 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  /**
+   * Asks the server to re-send the seeks if the current state of seek
+   * information sending is "on". The call is ignored otherwise.
+   */
+
+  public synchronized final void askSeeksRefresh(){
+    if (seekInfoOn && isLoggedIn()){
+      sendCommand("iset seekinfo 1");
+      filterLine("seekinfo set.");
+    }
+  }
+
+
+
 
   /**
    * Logs in.
