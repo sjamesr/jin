@@ -522,14 +522,12 @@ public class ChessclubConnection extends free.util.Connection{
     // We need this to know the wild number to wild name mapping.
     setDGState(Datagram.DG_WILD_KEY, true);
     
-    setDGState(Datagram.DG_SJI_AD, true);
-
     // We need this to know which datagrams are actually on.
     setDGState(Datagram.DG_SET2, true);
   }
-  
-  
-  
+
+
+
   /**
    * Sets the given level2 datagram on or off. If the ChessclubConnection is
    * already logged in, then the <code>set-2 [DG number] [0/1]</code> string
