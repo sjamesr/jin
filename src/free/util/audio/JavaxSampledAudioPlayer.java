@@ -25,7 +25,7 @@ import javax.sound.sampled.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
+import java.util.Hashtable;
 import free.util.BlockingQueue;
 import free.util.PlatformUtils;
 import free.util.IOUtilities;
@@ -45,9 +45,9 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    */
 
   private Thread playerThread = null;
-
-
-
+  
+  
+  
   /**
    * A BlockingQueue of AudioClips queued for playing.
    */
@@ -88,6 +88,7 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    */
 
   public void run(){
+    SourceDataLine dataLine = null;
     while (true){
       try{
         AudioClip audioClip;
@@ -97,10 +98,40 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
           e.printStackTrace();
           return;
         }
-
-        Clip clip = createClip(audioClip);
-        clip.setFramePosition(0);
-        clip.start();
+        
+        byte [] data = audioClip.getData();
+        AudioFormat format = getFormatForPlaying(data);
+        data = convertAudioData(data, format);
+        
+        if (dataLine == null){
+          DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+          dataLine = (SourceDataLine)AudioSystem.getLine(info);
+        }
+        
+        if (!dataLine.isOpen())
+          dataLine.open(format);
+        
+        if (!format.matches(dataLine.getFormat())){
+          dataLine.close();
+          dataLine.open(format);
+        }
+        
+        long startTime = System.currentTimeMillis();
+        if (!dataLine.isRunning())
+          dataLine.start();
+        
+        dataLine.write(data, 0, data.length);
+        dataLine.drain();
+        
+        // Bugfix - drain() seems to return before the clip actually finished playing 
+        try{
+          double playTimeSec = (data.length/format.getFrameSize())/format.getFrameRate();
+          long timeToSleep = (long)(playTimeSec*1000 - (System.currentTimeMillis() - startTime));
+          
+          if (timeToSleep > 0)
+            Thread.sleep(timeToSleep);
+          dataLine.close();
+        } catch (InterruptedException e){e.printStackTrace();}
       } catch (IOException e){
         e.printStackTrace();
       } catch (UnsupportedAudioFileException e){
@@ -113,25 +144,6 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
     }
   }
 
-
-
-  /**
-   * Creates a Clip from the specified AudioClip.
-   */
-
-  private static Clip createClip(AudioClip audioClip)
-      throws LineUnavailableException, UnsupportedAudioFileException,
-      IOException{
-
-    byte [] data = audioClip.getData();
-    AudioFormat format = getFormatForPlaying(data);
-    data = convertAudioData(data, format);
-    DataLine.Info info = new DataLine.Info(Clip.class, format);
-    Clip clip = (Clip)AudioSystem.getLine(info);
-    clip.open(format, data, 0, data.length);
-
-    return clip;
-  }
 
 
 
