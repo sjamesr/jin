@@ -82,7 +82,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     setInterface(context.getAppName() + " " + context.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
-      "," + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
+      ", " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
 
     setStyle(12);
 

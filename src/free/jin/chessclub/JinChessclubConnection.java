@@ -82,7 +82,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
     setInterface(context.getAppName() + " " + context.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
-      "," + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
+      ", " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
   }
 
 
