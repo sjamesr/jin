@@ -1,0 +1,15 @@
+
+seek-image.sizes = intlist;5 7 9 11 13 15
+seek-image.directory = string;images
+seek-image.rated.human= string;rated_human_wild.gif
+seek-image.unrated.human= string;unrated_human_wild.gif
+seek-image.rated.computer= string;rated_comp_wild.gif
+seek-image.unrated.computer= string;unrated_comp_wild.gif
+seek-image.rated.human.Chess = string;rated_human.gif
+seek-image.unrated.human.Chess = string;unrated_human.gif
+seek-image.rated.computer.Chess = string;rated_comp.gif
+seek-image.unrated.computer.Chess = string;unrated_comp.gif
+
+fast-category.name = string;Bullet
+medium-category.name = string;Blitz
+slow-category.name = string;Standard
