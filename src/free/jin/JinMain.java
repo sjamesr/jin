@@ -988,7 +988,10 @@ public class JinMain implements JinContext{
    */
 
   private void saveMainFrameGeometry(){
-    userPrefs.setRect("frame.bounds", mainFrame.getBounds());
+    // Save bounds on screen
+    Point mainFrameLocation = mainFrame.getLocationOnScreen();
+    Dimension mainFrameSize = mainFrame.getSize();
+    userPrefs.setRect("frame.bounds", new Rectangle(mainFrameLocation, mainFrameSize));
     
     // Save maximized state
     int state = AWTUtilities.getExtendedFrameState(mainFrame);
@@ -1006,26 +1009,24 @@ public class JinMain implements JinContext{
     Dimension screenSize = mainFrame.getToolkit().getScreenSize();
     Rectangle defaultFrameBounds = new Rectangle(
       screenSize.width/16, screenSize.height/16, screenSize.width*7/8, screenSize.height*7/8);
+    
       
     // Restore bounds      
     Rectangle frameBounds = userPrefs.getRect("frame.bounds", defaultFrameBounds);
     frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
     mainFrame.setBounds(frameBounds);
 
+    
+    // Restore maximized state 
     boolean vertMaximized = userPrefs.getBool("frame.maximized.vert", false);
     boolean horizMaximized = userPrefs.getBool("frame.maximized.horiz", false);
 
-    if (vertMaximized || horizMaximized){
-      // Bugfix for Java bug 4464714 - setExtendedState only works once the
-      // the window is realized
-      mainFrame.pack();
-      // It's important not to call pack() on MS VM because it causes the window
-      // to become very small
-  
-      // Restore maximized state
-      int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
-      AWTUtilities.setExtendedFrameState(mainFrame, state);
-    }
+    // Bugfix for Java bug 4464714 - setExtendedState only works once the
+    // the window is realized.
+    mainFrame.addNotify();
+   
+    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
+    AWTUtilities.setExtendedFrameState(mainFrame, state);
   }
 
 
