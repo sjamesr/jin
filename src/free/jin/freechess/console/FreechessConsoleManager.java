@@ -71,7 +71,7 @@ public class FreechessConsoleManager extends ConsoleManager{
     String type = evt.getType();
     String sender = evt.getSender();
     String title = evt.getSenderTitle();
-    int rating = evt.getSenderRating();
+    String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
     String message = evt.getMessage();
     Object forum = evt.getForum();
 
