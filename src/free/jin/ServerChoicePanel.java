@@ -46,14 +46,14 @@ public class ServerChoicePanel extends DialogPanel{
 
 
   /**
-   * Creates a new <code>ServerChoicePanel</code> with the specified list of
-   * servers.
+   * Creates a new <code>ServerChoicePanel</code>.
    */
 
-  public ServerChoicePanel(Server [] serverList){
+  public ServerChoicePanel(){
     serverListModel = new DefaultListModel();
-    for (int i = 0; i < serverList.length; i++)
-      serverListModel.addElement(serverList[i]);
+    Server [] servers = Jin.getInstance().getServers();
+    for (int i = 0; i < servers.length; i++)
+      serverListModel.addElement(servers[i]);
 
     createUI();
   }
@@ -61,12 +61,11 @@ public class ServerChoicePanel extends DialogPanel{
 
 
   /**
-   * Displays this panel using the specified <code>UIProvider</code> and returns
-   * the selected server.
+   * Displays this panel and returns the selected server.
    */
 
-  public Server askServer(UIProvider uiProvider){
-    return (Server)super.askResult(uiProvider);
+  public Server askServer(){
+    return (Server)super.askResult();
   }
 
 
@@ -88,11 +87,11 @@ public class ServerChoicePanel extends DialogPanel{
   private void createUI(){
     final JList list = new JList(serverListModel);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setVisibleRowCount(Math.max(5, Math.min(serverListModel.getSize(), 10)));
 
     JScrollPane scrollPane = new JScrollPane(list);
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.setPreferredSize(new Dimension(300, 80));
 
     JLabel chooseLabel = new JLabel("Choose a server to connect to");
     chooseLabel.setDisplayedMnemonic('C');
