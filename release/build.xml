@@ -48,7 +48,7 @@
 		
 		<property name="release.dir" value="jin-${release.version}" />
     
-    <mkdir dir="${release.dir}" />
+		<mkdir dir="${release.dir}" />
 	</target>
 
 
@@ -57,7 +57,6 @@
 		<ant target="clean" dir="${jin.dir}" />
 		<echo message="Building Jin for ${release.platform}" />
 		<ant target="build" dir="${jin.dir}">
-		
 			<property name="release.platform" value="${release.platform}" />
 		</ant>
 	</target>
@@ -140,7 +139,7 @@
 		
 		<property name="release.osx.dir" value="${release.dir}/osx" />
     
-    <delete dir="${release.osx.dir}" />
+		<delete dir="${release.osx.dir}" />
 		<mkdir dir="${release.osx.dir}" />
 		
 		<antcall target="build">
@@ -204,7 +203,7 @@
 	<target name="applet" depends="init">
 		<echo message="Creating applet release" />
     
-    <taskdef resource="net/sf/antcontrib/antlib.xml" />
+		<taskdef resource="net/sf/antcontrib/antlib.xml" />
     
 		<property name="release.applet.dir" value="${release.dir}/applet" />
     
@@ -219,53 +218,53 @@
 		
 		<antcall target="build">
 			<param name="release.platform" value="applet" />
-      <param name="build.compress" value="yes" />
-      <param name="build.manifest" value="release/applet/manifest.txt" />
+			<param name="build.compress" value="yes" />
+			<param name="build.manifest" value="release/applet/manifest.txt" />
 		</antcall>
 
  		<propertyfile file="${source.dir}/free/jin/resources/app.props">
 			<entry key="app.name" value="Jin" />
 		</propertyfile>
     
-    <antcall target="create-applet-archive">
-      <param name="server.name" value="icc" />
-      <param name="server.file" value="chessclub.jar" />
-      <param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
-      <param name="pieces" value="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard" />
-    </antcall>
+		<antcall target="create-applet-archive">
+			<param name="server.name" value="icc" />
+			<param name="server.file" value="chessclub.jar" />
+			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
+			<param name="pieces" value="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard" />
+		</antcall>
 
-    <antcall target="create-applet-archive">
-      <param name="server.name" value="fics" />
-      <param name="server.file" value="freechess.jar" />
-      <param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
-      <param name="pieces" value="fics/eboard xboard" />
-    </antcall>
+		<antcall target="create-applet-archive">
+			<param name="server.name" value="fics" />
+			<param name="server.file" value="freechess.jar" />
+			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
+			<param name="pieces" value="fics/eboard xboard" />
+		</antcall>
 	</target>
   
   
   
-  <!-- Helper target for building an applet release. Builds a release for
-       the server specified by the server.name property -->
-  <target name="create-applet-archive">
+	<!-- Helper target for building an applet release. Builds a release for
+	     the server specified by the server.name property -->
+	<target name="create-applet-archive">
   
-		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
+	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.php ${server.name}_oldjava.php detect_java.html DetectJava.class load_prefs.php reserve_space.php save_prefs.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
-      <filterset>
-        <filter token="old_java_url" value="${server.name}_oldjava.php" />
-        <filter token="new_java_url" value="${server.name}.php" />
-        <filter token="database_name" value="jin_${server.name}" />
-      </filterset>
+			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.php ${server.name}_oldjava.php detect_java.html DetectJava.class load_prefs.php reserve_space.php save_prefs.php libs/** plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}" />
+			<filterset>
+				<filter token="old_java_url" value="${server.name}_oldjava.php" />
+				<filter token="new_java_url" value="${server.name}.php" />
+				<filter token="database_name" value="jin_${server.name}" />
+			</filterset>
 		</copy>
     
-    <foreach list="${boards}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
-      <param name="resource.type" value="boards" />
-    </foreach>
+		<foreach list="${boards}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
+			<param name="resource.type" value="boards" />
+		</foreach>
     
-    <foreach list="${pieces}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
-      <param name="resource.type" value="pieces" />
-    </foreach>
+		<foreach list="${pieces}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
+			<param name="resource.type" value="pieces" />
+		</foreach>
     
 		<property name="tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}.tar" />
 		<property name="gz" value="${tar}.gz" />
@@ -277,15 +276,15 @@
 		<delete dir="${dir-to-tar}" />
 		<delete file="${tar}" />
 		<property name="applet-${server.name}-archive" value="${gz}" />
-  </target>
+	</target>
   
   
-  <!-- A helper target for copying a specified list of resources -->
-  <target name="copy-applet-resources">
-    <copy todir="${dir-to-tar}">
-      <fileset dir="${build.dir}" includes="resources/${resource.type}/${resource.name}/**" /> 
-    </copy>
-  </target>
+	<!-- A helper target for copying a specified list of resources -->
+	<target name="copy-applet-resources">
+    	<copy todir="${dir-to-tar}">
+			<fileset dir="${build.dir}" includes="resources/${resource.type}/${resource.name}/**" /> 
+		</copy>
+	</target>
   
 
 	<!-- Source. Resulting file is ${src-archive} -->
@@ -294,7 +293,7 @@
 
 		<property name="release.src.dir" value="${release.dir}/src" />
     
-    <delete dir="${release.src.dir}" />
+		<delete dir="${release.src.dir}" />
 		<mkdir dir="${release.src.dir}" />
 		
 		<property name="src-archive-dir.name" value="jin-${release.version}" />
