@@ -338,7 +338,7 @@ public class SoughtGraph extends JComponent{
     Rectangle seekBounds = getSeekBounds(location.x, location.y, null);
     repaint(seekBounds.x, seekBounds.y, seekBounds.width, seekBounds.height);
 
-    if ((seek==curSeek)&&(curMouseLocation!=null)) // The !=null check is just in case.
+    if ((seek == curSeek) && (curMouseLocation != null)) // The !=null check is just in case.
       updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
   }
 
@@ -724,9 +724,14 @@ public class SoughtGraph extends JComponent{
 
   protected void updateCurrentSeek(int x, int y){
     Seek newSeek = seekAtLocation(x, y);
-    if (newSeek!=curSeek){
+    if (newSeek != curSeek){
       curSeek = newSeek;
       repaint(0, (int)(getHeight()*GRAPH_HEIGHT_PERCENTAGE), getWidth(), (int)(getHeight()*(1-GRAPH_HEIGHT_PERCENTAGE)));
+      
+      if (newSeek != null)
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      else
+        setCursor(Cursor.getDefaultCursor());
     }
   }
 
@@ -742,7 +747,7 @@ public class SoughtGraph extends JComponent{
   protected void processMouseMotionEvent(MouseEvent evt){
     super.processMouseMotionEvent(evt);
 
-    if (evt.getID()==MouseEvent.MOUSE_MOVED){
+    if (evt.getID() == MouseEvent.MOUSE_MOVED){
       updateCurrentSeek(evt.getX(), evt.getY());
       curMouseLocation = evt.getPoint();
     }
@@ -759,15 +764,16 @@ public class SoughtGraph extends JComponent{
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
 
-    if (evt.getID()==MouseEvent.MOUSE_EXITED){
+    if (evt.getID() == MouseEvent.MOUSE_EXITED){
       curSeek = null;
       curMouseLocation = null;
       repaint(0, (int)(getHeight()*GRAPH_HEIGHT_PERCENTAGE), getWidth(), (int)(getHeight()*(1-GRAPH_HEIGHT_PERCENTAGE)));
     }
-    if (evt.getID()==MouseEvent.MOUSE_ENTERED){
+    if (evt.getID() == MouseEvent.MOUSE_ENTERED){
       curMouseLocation = evt.getPoint();
+      setCursor(Cursor.getDefaultCursor());
     }
-    if (evt.getID()==MouseEvent.MOUSE_CLICKED){
+    if ((evt.getID() == MouseEvent.MOUSE_CLICKED) && (evt.getModifiers() == MouseEvent.BUTTON1_MASK)){
       Seek pressedSeek = seekAtLocation(evt.getX(), evt.getY());
       if (pressedSeek!=null)
         fireSeekSelectionEvent(new SeekSelectionEvent(this, pressedSeek));
