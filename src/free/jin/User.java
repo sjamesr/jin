@@ -197,6 +197,16 @@ public class User{
 
 
 
+  /**
+   * Returns <code>true</code> if this user is the global guest account.
+   */
+
+  public boolean isGuest(){
+    return getServer().isGuest(this);
+  }
+
+
+
 
   /**
    * Returns a textual representation of the user.
