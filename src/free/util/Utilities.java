@@ -23,6 +23,7 @@ package free.util;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -102,6 +103,17 @@ public class Utilities{
    */
    
   public static final String [] EMPTY_STRING_ARRAY = new String[0];
+  
+  
+  
+  /**
+   * An empty enumeration.
+   */
+  
+  public static final Enumeration EMPTY_ENUM = new Enumeration(){
+    public boolean hasMoreElements(){return false;}
+    public Object nextElement(){throw new NoSuchElementException();}
+  };
   
   
 
