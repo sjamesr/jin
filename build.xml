@@ -17,6 +17,13 @@
 	</path>
 
 
+  <!-- Removes things done by build -->
+	<target name="clean">
+		<delete dir="${classes.dir}" />
+		<delete dir="${build.dir}" />
+	</target>
+
+
 	<!-- This is just to compile everything, without jarring
 	     or placing things at appropriate locations -->
 	<target name="compile">
@@ -83,7 +90,42 @@
 		<copy todir="${libs.dir}">
 			<fileset dir="resources/libs" />
 		</copy>
+    
 
+    <!-- Check whether Unix -->    
+    <condition property="unix">
+      <and>
+        <os family="unix"/>
+        <not>
+          <os family="mac"/>
+        </not>
+      </and>
+    </condition>
+    
+    <!-- Check whether x86 -->
+    <condition property="x86">
+      <or>
+        <equals arg1="x86" arg2="${os.arch}" />
+        <equals arg1="i386" arg2="${os.arch}" />
+        <equals arg1="i486" arg2="${os.arch}" />
+        <equals arg1="i586" arg2="${os.arch}" />
+        <equals arg1="i686" arg2="${os.arch}" />
+      </or>
+    </condition>
+    
+    <!-- Check whether unix on x86 -->
+    <condition property="unixOnx86">
+      <and>
+        <isset property="unix" />
+        <isset property="x86" />
+      </and>
+    </condition>
+    
+    <!-- Call the task that copies stuff related to unix on x86 -->
+		<antcall target="doUnixOnx86Stuff" />
+    
+    
+    <!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
 			<fileset dir="${source.dir}" excludes="**/*.java **/*.html" />
 		</copy>
@@ -358,11 +400,6 @@
 		</jar>
 	</target>
 	
-	<target name="clean">
-		<delete dir="${classes.dir}" />
-		<delete dir="${build.dir}" />
-	</target>
-	
 	
 	<!-- Builds a single board pattern -->
 	<target name="buildBoardPattern">
@@ -371,6 +408,16 @@
 			<fileset dir="${res.dir}/boards/${board-pattern-id}" />
 		</jar>
 	</target>
+
+  <!-- If the property unixOnx86 is set, does things required for this platform -->
+  <target name="doUnixOnx86Stuff" if="unixOnx86">   
+    <copy todir="${build.dir}">
+      <fileset dir="resources/os-specific/unix/x86" />
+    </copy>
+    <chmod file="${build.dir}/sox" perm="a+x" />
+    <chmod file="${build.dir}/play" perm="a+x" />
+  </target>
+
 
 
 </project>
