@@ -418,6 +418,11 @@ public class ConnectionManager{
       } catch (LoginException e){
           String errorMessage = "Error logging in:\n" + e.getMessage();
           OptionPanel.error("Login Error", errorMessage);
+          
+          // Reopen the connection UI
+          User user = session.getUser();
+          closeSession();
+          displayNewConnUI(user);
         }
     }
 
