@@ -72,7 +72,7 @@ public class ChatEvent extends JinEvent{
 
 
   /**
-   * The messahe itself. Must be a non-null string.
+   * The message itself. Must be a non-null string.
    */
 
   private final String message;
