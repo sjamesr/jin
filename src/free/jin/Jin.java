@@ -518,7 +518,7 @@ public class Jin{
         if (t instanceof ThreadDeath)
           throw (ThreadDeath)t;
         t.printStackTrace();
-        System.exit(0);
+        System.exit(1);
       }
   }
 
