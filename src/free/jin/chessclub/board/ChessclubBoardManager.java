@@ -49,6 +49,14 @@ public class ChessclubBoardManager extends BoardManager{
 
 
 
+  /**
+   * The gameID of the primary/current game.
+   */
+
+  private Object primaryGameID = null;
+
+
+
 
   /**
    * Overrides BoardManager.createBoardPanel() to return a ChessclubBoardPanel.
@@ -75,10 +83,13 @@ public class ChessclubBoardManager extends BoardManager{
       Object gameID = game.getID();
       JinConnection conn = getConnection();
 
-      if ((myGamesCount > 1) && (gameType == Game.MY_GAME))
-        conn.sendCommand("goto "+gameID);
-      else
-        conn.sendCommand("primary "+gameID);
+      if (!gameID.equals(primaryGameID)){
+        if ((myGamesCount > 1) && (gameType == Game.MY_GAME))
+          conn.sendCommand("goto "+gameID);
+        else
+          conn.sendCommand("primary "+gameID);
+        primaryGameID = gameID;
+      }
     }
 
     super.internalFrameActivated(e);
