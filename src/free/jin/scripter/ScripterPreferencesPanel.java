@@ -26,8 +26,7 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.border.EmptyBorder;
-import free.workarounds.FixedJTextField;
-import free.workarounds.FixedJComboBox;
+import free.workarounds.FixedJTextArea;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.BadChangesException;
 import free.util.AWTUtilities;
@@ -324,10 +323,10 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      */
 
     private static final String commandsText =
-      "<html>Allows specifying a condition and a list of commands<br>"+
-      "which will be sent to the server when the condition is met.<br>"+
-      "This is the simplest script type and requires no previous<br>"+
-      "knowledge of any programming/scripting languages.</html>";
+      "Allows specifying a condition and a list of commands\n"+
+      "which will be sent to the server when the condition is met.\n"+
+      "This is the simplest script type and requires no previous\n"+
+      "knowledge of any programming/scripting languages.";
 
 
 
@@ -336,13 +335,13 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      */
 
     private static final String beanshellText =
-      "<html>Allows specifying a BeanShell script which will be run<br>"+
-      " when a certain event occurs. BeanShell is essentially a Java<br>"+
-      "source interpreter with certain scripting features. BeanShell<br>"+
-      "scripts are therefore simply small pieces of Java code that<br>"+
-      "can be run without compiling. For more information about<br>"+
-      " BeanShell see http://www.beanshell.org/<br>"+
-      "Use this script type if you have at least basic knowledge of Java.</html>";
+      "Allows specifying a BeanShell script which will be run\n"+
+      "when a certain event occurs. BeanShell is essentially a Java\n"+
+      "source interpreter with certain scripting features. BeanShell\n"+
+      "scripts are therefore simply small pieces of Java code that\n"+
+      "can be run without compiling. For more information about\n"+
+      "BeanShell see http://www.beanshell.org/. Use this script\n"+
+      "type if you have at least basic knowledge of Java.";
 
 
 
@@ -408,9 +407,11 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       boxesPanel.add(commands);
       boxesPanel.add(beanshell);
 
-      final JLabel typeExplanationLabel = new JLabel("Please select a script type.");
-      typeExplanationLabel.setPreferredSize(new Dimension(450, 150));
-      typeExplanationLabel.setVerticalAlignment(SwingConstants.TOP);
+      final JTextArea typeExplanationTextArea = new FixedJTextArea();
+      typeExplanationTextArea.setPreferredSize(new Dimension(370, 150));
+      typeExplanationTextArea.setFont(new Font("Serif", Font.PLAIN, 16));
+      typeExplanationTextArea.setEditable(false);
+      typeExplanationTextArea.setOpaque(false);
 
       ActionListener selectionListener = new ActionListener(){
         public void actionPerformed(ActionEvent evt){
@@ -423,7 +424,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
           else if ("beanshell".equals(scriptType))
             text = beanshellText;
 
-          typeExplanationLabel.setText(text);
+          typeExplanationTextArea.setText(text);
         }
       };
 
@@ -441,7 +442,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       cancel.addActionListener(closer);
 
       content.add(boxesPanel, BorderLayout.NORTH);
-      content.add(typeExplanationLabel, BorderLayout.CENTER);
+      content.add(typeExplanationTextArea, BorderLayout.CENTER);
       content.add(buttonsPanel, BorderLayout.SOUTH);
 
       this.getRootPane().setDefaultButton(next);
