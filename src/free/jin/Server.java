@@ -25,6 +25,8 @@ import java.util.Properties;
 import java.util.Hashtable;
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 
 /**
@@ -34,11 +36,20 @@ import java.io.IOException;
 public abstract class Server{
 
   
+
   /**
    * The properties of this server.
    */
 
   private Properties props;
+
+
+
+  /**
+   * The <code>URL</code> of the server's website.
+   */
+
+  private URL website;
 
 
 
@@ -48,7 +59,25 @@ public abstract class Server{
    */
 
   protected Server(){
+    
+  }
 
+
+
+  /**
+   * Initializes whatever the server needs. This is called immediately after
+   * instantiation and may be used as a constructor.
+   */
+
+  protected void init(Properties props){
+    this.props = props;
+
+    String urlString = props.getProperty("website.url");
+    try{
+      website = new URL(urlString);
+    } catch (MalformedURLException e){
+        throw new IllegalArgumentException("Bad URL for server's website: "+urlString);
+      }
   }
 
 
@@ -64,7 +93,7 @@ public abstract class Server{
     try{
       String classname = props.getProperty("classname");
       Server server = (Server)Class.forName(classname).newInstance();
-      server.props = props;
+      server.init(props);
       return server;
     } catch (InstantiationException e){
         e.printStackTrace();
@@ -184,11 +213,22 @@ public abstract class Server{
 
 
   /**
+   * Returns the URL of the server's website.
+   */
+
+  public URL getWebsite(){
+    return website;
+  }
+
+
+
+
+  /**
    * Returns a textual representation of this Server.
    */
 
   public String toString(){
-    return getLongName();
+    return getLongName()+" ("+getWebsite()+")";
   }
 
 }
