@@ -271,7 +271,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       filterLine("seekinfo set.");
       filterLine("seekremove set.");
     }
-
+    filterLine("lock set.");
   }
 
 
