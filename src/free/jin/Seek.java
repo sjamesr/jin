@@ -76,9 +76,9 @@ public class Seek{
    */
 
   public Seek(String seekID, String seeker, String seekerTitle, int rating, boolean isProvisional,
-      boolean isRegistered, boolean isComputer, WildVariant variant, String ratingCategoryString,
-      int time, int inc, boolean isRated, Player color, boolean isRatingLimited, int minRating, 
-      int maxRating, boolean isManualAccept, boolean isFormula){
+      boolean isRegistered, boolean isSeekerRated, boolean isComputer, WildVariant variant,
+      String ratingCategoryString, int time, int inc, boolean isRated, Player color, boolean isRatingLimited,
+      int minRating, int maxRating, boolean isManualAccept, boolean isFormula){
 
     setProperty("SeekID", seekID);
     setProperty("Seeker", seeker);
@@ -86,6 +86,7 @@ public class Seek{
     setProperty("SeekerRating", new Integer(rating));
     setProperty("IsProvisional", new Boolean(isProvisional));
     setProperty("IsRegistered", new Boolean(isRegistered));
+    setProperty("IsSeekerRated", new Boolean(isRegistered));
     setProperty("IsComputer", new Boolean(isComputer));
     setProperty("Variant", variant);
     setProperty("RatingCategoryString", ratingCategoryString);
@@ -227,6 +228,19 @@ public class Seek{
 
   public boolean isSeekerRegistered(){
     return getBooleanProperty("IsRegistered");
+  }
+
+
+
+
+
+  /**
+   * Returns <code>true</code> if the seeker is rated (has a rating),
+   * <code>false</code> otherwise.
+   */
+
+  public boolean isSeekerRated(){
+    return getBooleanProperty("IsSeekerRated");
   }
 
 
