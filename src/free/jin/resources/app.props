@@ -1,11 +1,22 @@
-
+app.version=2.12.1 dev
 app.name=Jin
-app.version=2.13 dev
 
-lf.extra.count=3
+lf.extra.count=7
 lf.extra.0.name=Kunststoff
 lf.extra.0.class=com.incors.plaf.kunststoff.KunststoffLookAndFeel
 lf.extra.1.name=Metouia
 lf.extra.1.class=net.sourceforge.mlf.metouia.MetouiaLookAndFeel
 lf.extra.2.name=Liquid
 lf.extra.2.class=com.birosoft.liquid.LiquidLookAndFeel
+lf.extra.3.name=ExtWindows
+lf.extra.3.minRequiredJava=1.4
+lf.extra.3.class=com.jgoodies.plaf.windows.ExtWindowsLookAndFeel
+lf.extra.4.name=Plastic
+lf.extra.4.minRequiredJava=1.4
+lf.extra.4.class=com.jgoodies.plaf.plastic.PlasticLookAndFeel
+lf.extra.5.name=Plastic 3D
+lf.extra.5.minRequiredJava=1.4
+lf.extra.5.class=com.jgoodies.plaf.plastic.Plastic3DLookAndFeel
+lf.extra.6.name=Plastic XP
+lf.extra.6.minRequiredJava=1.4
+lf.extra.6.class=com.jgoodies.plaf.plastic.PlasticXPLookAndFeel
