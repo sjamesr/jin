@@ -33,6 +33,7 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.board.event.UserMoveListener;
 import free.jin.board.event.UserMoveEvent;
+import free.jin.sound.SoundManager;
 import free.util.StringParser;
 import free.util.StringEncoder;
 import free.util.SingleItemEnumeration;
@@ -52,7 +53,49 @@ import java.net.URL;
  * to that.
  */
 
-public class BoardManager extends Plugin implements GameListener, UserMoveListener, VetoableChangeListener, InternalFrameListener{
+public class BoardManager extends Plugin implements GameListener, UserMoveListener,
+    VetoableChangeListener, InternalFrameListener{
+
+
+
+  /**
+   * The code for move sending mode where the user is not allowed to move his
+   * pieces when it's not his turn.
+   */
+
+  public static final int LEGAL_CHESS_MOVE_SENDING_MODE = 1;
+
+
+
+
+  /**
+   * The code for move sending mode where the user is allowed to pick up his
+   * pieces (more than once) and make moves when it's not his turn. The moves
+   * are then sent immediately to the server.
+   */
+
+  public static final int PREDRAG_MOVE_SENDING_MODE = 2;
+
+
+
+
+  /**
+   * The code for premove move sending mode. The user is allowed to pick up
+   * a piece and make a move when it's not his turn. The move is then not sent
+   * until it is the user's move. After making the "premove", the user cannot
+   * make additional "premoves".
+   */
+
+  public static final int PREMOVE_MOVE_SENDING_MODE = 3;
+
+
+
+
+  /**
+   * A reference to the sound manager, if one exists.
+   */
+
+  private SoundManager soundManager = null;
 
 
 
@@ -136,6 +179,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public void start(){
+    obtainSoundManager();
     initPreferences();
     registerConnListeners();
   }
@@ -152,6 +196,29 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     savePreferences();
   }
 
+
+
+
+  /**
+   * Obtains a reference to the SoundManager, if one exists.
+   */
+
+  private void obtainSoundManager(){
+    String pluginName = getProperty("sound-manager-plugin.name");
+    if (pluginName != null)
+      soundManager = (SoundManager)getPluginContext().getPlugin(pluginName);
+  }
+
+
+
+
+  /**
+   * Returns the <code>SoundManager</code>, or <code>null</code> if none exists.
+   */
+
+  public SoundManager getSoundManager(){
+    return soundManager;
+  }
 
 
 
@@ -180,10 +247,19 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       Boolean.valueOf(getProperty("move-highlight.highlight-own", "false")).booleanValue());
 
     setMoveHighlightingColor(
-      StringParser.parseColor(getProperty("move-highlighting-color", "00b2b2")));
+      StringParser.parseColor(getProperty("move-highlight.color", "00b2b2")));
 
     setDragSquareHighlightingColor(
       StringParser.parseColor(getProperty("drag-square-highlighting-color", "0000ff")));
+
+    String moveSendingModeString = getProperty("move-sending-mode", "legal-chess");
+    if ("legal-chess".equals(moveSendingModeString))
+      setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
+    else if ("premove".equals(moveSendingModeString))
+      setMoveSendingMode(PREMOVE_MOVE_SENDING_MODE);
+    else
+      setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
+
 
     setPiecePainter(getProperty("piece-painter-class-name"));
     setBoardPainter(getProperty("board-painter-class-name"));
@@ -549,6 +625,42 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
+   * Returns the current move sending mode.
+   */
+
+  public int getMoveSendingMode(){
+    return props.getIntegerProperty("moveSendingMode");
+  }
+
+
+
+
+  /**
+   * Sets the move sending mode to the specified value. Possible values are
+   * <UL>
+   *   <LI><code>LEGAL_CHESS_MOVE_SENDING_MODE</code>
+   *   <LI><code>PREDRAG_MOVE_SENDING_MODE</code>
+   *   <LI><code>PREMOVE_MOVE_SENDING_MODE</code>
+   * </UL>
+   */
+
+  public void setMoveSendingMode(int moveSendingMode){
+    switch(moveSendingMode){
+      case LEGAL_CHESS_MOVE_SENDING_MODE:
+      case PREDRAG_MOVE_SENDING_MODE:
+      case PREMOVE_MOVE_SENDING_MODE:
+        break;
+      default:
+        throw new IllegalArgumentException("Unrecognized value for move sending mode: " +
+          moveSendingMode);
+    }
+
+    props.setIntegerProperty("moveSendingMode", moveSendingMode);
+  }
+
+
+
+  /**
    * Returns an the current <code>PiecePainter</code>.
    */
 
@@ -644,7 +756,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     JRadioButtonMenuItem clicknclickMenuItem = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle == JBoard.CLICK_N_CLICK);
 
     dragndropMenuItem.setMnemonic('D');
-    dragndropMenuItem.setMnemonic('C');
+    clicknclickMenuItem.setMnemonic('C');
 
     ButtonGroup inputModeGroup = new ButtonGroup();
     inputModeGroup.add(dragndropMenuItem);
@@ -700,9 +812,53 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     normalDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
     targetDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
 
+    JRadioButtonMenuItem legalChess = new JRadioButtonMenuItem("Legal Chess");
+    JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Immediate Sending");
+    JRadioButtonMenuItem premove = new JRadioButtonMenuItem("Premove");
 
-    boolean isAutoPromote = isAutoPromote();
-    final JCheckBoxMenuItem autoQueenMenuItem = new JCheckBoxMenuItem("Auto Queen", isAutoPromote);
+    switch (getMoveSendingMode()){
+      case LEGAL_CHESS_MOVE_SENDING_MODE: legalChess.setSelected(true); break;
+      case PREDRAG_MOVE_SENDING_MODE: predrag.setSelected(true); break;
+      case PREMOVE_MOVE_SENDING_MODE: premove.setSelected(true); break;
+      default:
+        throw new IllegalStateException("Unrecognized move sending mode: "+getMoveSendingMode());
+    }
+
+    legalChess.setMnemonic('l');
+    predrag.setMnemonic('i');
+    premove.setMnemonic('r');
+
+    legalChess.setActionCommand("legalchess");
+    predrag.setActionCommand("predrag");
+    premove.setActionCommand("premove");
+
+    ActionListener moveSendingModeActionListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String actionCommand = evt.getActionCommand();
+
+        if ("legalchess".equals(actionCommand))
+          setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
+        else if ("predrag".equals(actionCommand))
+          setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
+        else if ("premove".equals(actionCommand))
+          setMoveSendingMode(PREMOVE_MOVE_SENDING_MODE);
+        else
+          throw new IllegalStateException("Unknown action command: "+actionCommand);
+      }
+    };
+
+    legalChess.addActionListener(moveSendingModeActionListener);
+    predrag.addActionListener(moveSendingModeActionListener);
+    premove.addActionListener(moveSendingModeActionListener);
+
+    ButtonGroup moveSendingModeButtonGroup = new ButtonGroup();
+    moveSendingModeButtonGroup.add(legalChess);
+    moveSendingModeButtonGroup.add(predrag);
+    moveSendingModeButtonGroup.add(premove);
+
+   
+    final JCheckBoxMenuItem autoQueenMenuItem =
+      new JCheckBoxMenuItem("Auto Queen", isAutoPromote());
     autoQueenMenuItem.setMnemonic('A');
     autoQueenMenuItem.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
@@ -715,6 +871,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveInputMenu.addSeparator();
     moveInputMenu.add(normalDraggedPieceStyleMenuItem);
     moveInputMenu.add(targetDraggedPieceStyleMenuItem);
+    moveInputMenu.addSeparator();
+    moveInputMenu.add(legalChess);
+    moveInputMenu.add(predrag);
+    moveInputMenu.add(premove);
     moveInputMenu.addSeparator();
     moveInputMenu.add(autoQueenMenuItem);
 
@@ -1393,6 +1553,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     setProperty("drag-square-highlighting-color",
       StringEncoder.encodeColor(getDragSquareHighlightingColor()));
+
+    int moveSendingMode = getMoveSendingMode();
+    String moveSendingModeString;
+    if (moveSendingMode == LEGAL_CHESS_MOVE_SENDING_MODE)
+      moveSendingModeString = "legal-chess";
+    else if (moveSendingMode == PREDRAG_MOVE_SENDING_MODE)
+      moveSendingModeString = "predrag";
+    else // if (moveSendingMode == PREMOVE_MOVE_SENDING_MODE)
+      moveSendingModeString = "premove";
+    setProperty("move-sending-mode", moveSendingModeString);
   }
 
 

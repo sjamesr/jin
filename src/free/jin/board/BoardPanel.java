@@ -64,6 +64,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
 
+  /**
+   * A reference to the sound manager, if one exists.
+   */
+
+  private final SoundManager soundManager;
+
+
 
   /**
    * The Game this BoardPanel is displaying.
@@ -104,6 +111,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   private boolean highlightOwnMoves;
+
+
+
+
+  /**
+   * The current move sending mode. Possible values are defined in
+   * <code>BoardManager</code>.
+   */
+
+  private int moveSendingMode;
 
   
   
@@ -331,6 +348,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     boardManager.addPropertyChangeListener(this);
 
     init(game);
+
+    soundManager = boardManager.getSoundManager();
   }
 
 
@@ -388,6 +407,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   protected void init(Game game){
     isFlipped = game.isBoardInitiallyFlipped();
     highlightOwnMoves = boardManager.isHighlightingOwnMoves();
+    moveSendingMode = boardManager.getMoveSendingMode();
     timer = createTimer(game);
     createComponents(game);
     
@@ -487,23 +507,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected void configureBoard(Game game, JBoard board){
-    int moveInputMode;
-    if (game.getGameType() == Game.MY_GAME)
-      if (game.isPlayed())
-        if (game.getUserPlayer() == Player.WHITE_PLAYER)
-          moveInputMode = JBoard.WHITE_PIECES_MOVE;
-        else
-          moveInputMode = JBoard.BLACK_PIECES_MOVE;
-      else 
-        moveInputMode = JBoard.CURRENT_PLAYER_MOVES; 
-    else // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
-      moveInputMode = JBoard.NO_PIECES_MOVE;
-
-    board.setMoveInputMode(moveInputMode);
-
     if (isFlipped())
       board.setFlipped(true);
 
+    board.setMoveInputMode(calcMoveInputMode(game));
     board.setPiecePainter(boardManager.getPiecePainter());
     board.setBoardPainter(boardManager.getBoardPainter());
     board.setMoveInputStyle(boardManager.getMoveInputStyle());
@@ -512,7 +519,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
     board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
-
 
     ActionListener escapeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -544,6 +550,27 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           BoardPanel.this.board.requestFocus();
       }
     });
+  }
+
+
+
+
+  /**
+   * Returns the move input mode that should be used for the specified game
+   * and move sending mode.
+   */
+
+  protected int calcMoveInputMode(Game game){
+    if (game.getGameType() == Game.MY_GAME)
+      if (game.isPlayed())
+        if (game.getUserPlayer() == Player.WHITE_PLAYER)
+          return JBoard.WHITE_PIECES_MOVE;
+        else
+          return JBoard.BLACK_PIECES_MOVE;
+      else 
+        return JBoard.CURRENT_PLAYER_MOVES; 
+    else // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
+      return JBoard.NO_PIECES_MOVE;
   }
 
 
@@ -1177,31 +1204,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Returns the SoundManager plugin this BoardPanel should use to produce game
-   * related sounds, or <code>null</code> if none should be used.
-   */
-
-  private SoundManager getSoundManager(){
-    String pluginName = boardManager.getProperty("sound-manager-plugin.name");
-    if (pluginName == null)
-      return null;
-
-    return (SoundManager)boardManager.getPluginContext().getPlugin(pluginName);
-  }
-
-
-
-
-  /**
    * Plays the sound for the given event name.
    */
 
   protected void playSound(String eventName){
-    SoundManager soundManager = getSoundManager();
-    if (soundManager == null)
-      return;
-
-    soundManager.playEventSound(eventName);
+    if (soundManager != null)
+      soundManager.playEventSound(eventName);
   }
 
 
@@ -1248,7 +1256,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     displayedMoveNumber = moveNum;
 
-    board.setEditable((queuedMove == null) && (displayedMoveNumber == madeMoves.size()));
+    if (displayedMoveNumber != madeMoves.size())
+      board.setEditable(false);
+    else if (moveSendingMode == BoardManager.PREMOVE_MOVE_SENDING_MODE)
+      board.setEditable(queuedMove == null);
+    else if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
+      board.setEditable(isUserTurn());
+    else if (moveSendingMode == BoardManager.PREDRAG_MOVE_SENDING_MODE)
+      board.setEditable(true);
+    else
+      throw new IllegalStateException("Unrecognized move sending mode: "+moveSendingMode);
   }
 
 
@@ -1261,6 +1278,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void gameStarted(GameStartEvent evt){
     if (evt.getGame() != game)
       return;
+
+    if (!isUserTurn() && (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE))
+      board.setEditable(false);
   }
 
 
@@ -1286,7 +1306,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     madeMoves.addElement(move);
     realPosition.makeMove(move);
 
-    if (!isMoveEnRoute()){ // This is not the server echoeing our own move
+    // This is not the server echoeing a move made on the board
+    // Note that this may still be a move done by the user (from the console).
+    if (!isMoveEnRoute()){
       if (evt.isNew())
         playAudioClipForMove(move);
 
@@ -1344,8 +1366,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     updateMoveHighlighting(false);
 
-    moveEnRoute = null;      // We shouldn't keep state between 
-    setQueuedMove(null);     // such drastic position changes
+    moveEnRoute = null;   // We shouldn't keep state between 
+    setQueuedMove(null);  // such drastic position changes
 
     updateClockActiveness();
     updateMoveListTable();
@@ -1529,7 +1551,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (source == board.getPosition()){
       playAudioClipForMove(move);
-      if (isMoveEnRoute() || !isUserTurn())
+      if ((moveSendingMode == BoardManager.PREMOVE_MOVE_SENDING_MODE) &&
+           (isMoveEnRoute() || !isUserTurn()))
         setQueuedMove(move);
       else{
         UserMoveEvent evt2 = new UserMoveEvent(this, evt.getMove());
@@ -1537,6 +1560,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         moveEnRoute = evt.getMove();
         timer.stop();
         updateClockActiveness();
+
+        if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
+          board.setEditable(false);
       }
     }
   }
@@ -1718,6 +1744,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
       else if ("highlightingOwnMoves".equals(propertyName))
         highlightOwnMoves = boardManager.isHighlightingOwnMoves();
+      else if ("moveSendingMode".equals(propertyName)){
+        moveSendingMode = boardManager.getMoveSendingMode();
+
+        if (displayedMoveNumber == madeMoves.size()){
+          if ((moveSendingMode == BoardManager.PREMOVE_MOVE_SENDING_MODE) || 
+              (moveSendingMode == BoardManager.PREDRAG_MOVE_SENDING_MODE))
+            board.setEditable(true);
+          else if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
+            board.setEditable(isUserTurn());
+          else
+            throw new IllegalStateException("Unrecognized move sending mode: "+moveSendingMode);
+        }
+      }
     }
   }
 
@@ -1745,6 +1784,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     this.isActive = false;
     board.getPosition().removeMoveListener(this);
     board.setMoveInputMode(JBoard.ALL_PIECES_MOVE);
+    board.setEditable(true);
   }
 
 
