@@ -21,19 +21,29 @@
 
 package free.jin.board;
 
-import free.jin.event.*;
-import java.awt.*;
 import free.chess.*;
-import java.util.*;
-import free.jin.plugin.*;
-import free.jin.*;
-import free.jin.board.event.UserMoveListener;
+import free.jin.Game;
+import free.jin.Preferences;
 import free.jin.board.event.UserMoveEvent;
+import free.jin.board.event.UserMoveListener;
+import free.jin.event.*;
+import free.jin.plugin.*;
+import free.jin.ui.OptionPanel;
+import free.jin.ui.PreferencesPanel;
+import free.jin.ui.UIProvider;
 import free.util.BeanProperties;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -986,7 +996,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   private PluginUIContainer createNewBoardContainer(){
-    PluginUIContainer boardContainer = createContainer(String.valueOf(containers.size()));
+    PluginUIContainer boardContainer = 
+      createContainer(String.valueOf(containers.size()), UIProvider.SELF_MANAGED_CONTAINER_MODE);
 
     containers.addElement(boardContainer);
 
@@ -994,7 +1005,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (iconImageURL!= null)
       boardContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
 
-    boardContainer.setCloseOperation(PluginUIContainer.DO_NOTHING_ON_CLOSE);
     boardContainer.addPluginUIListener(this);
 
     return boardContainer;
@@ -1157,7 +1167,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       Object result = OptionPanel.OK;
       if (shouldAsk)
-        result = OptionPanel.confirm("Select an option", question, OptionPanel.OK);
+        result = OptionPanel.confirm(boardPanel, "Select an option", question, OptionPanel.OK);
 
       if (result == OptionPanel.OK){
         getConn().quitGame(game);
