@@ -72,6 +72,14 @@ public class Session{
    */
 
   private final Plugin [] plugins;
+  
+  
+  
+  /**
+   * The plugin context in this session.
+   */
+  
+  private PluginContext pluginContext;
 
 
 
@@ -174,7 +182,7 @@ public class Session{
     }
 
     // Create plugin context
-    PluginContext pluginContext = 
+    pluginContext = 
       new PluginContext(conn, getUser(), plugins, pluginPrefs, actions);
 
     // Set context on plugins
@@ -244,6 +252,16 @@ public class Session{
 
   public synchronized Plugin [] getPlugins(){
     return (plugins == null) ? null : (Plugin [])plugins.clone();
+  }
+  
+  
+  
+  /**
+   * Returns the <code>PluginContext</code> for this session.
+   */
+  
+  public PluginContext getPluginContext(){
+    return pluginContext;
   }
 
 
