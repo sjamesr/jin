@@ -100,6 +100,17 @@ public abstract class Plugin{
 
     return prefs;
   }
+  
+  
+  
+  /**
+   * Returns the extensions of the specified type. See
+   * <code>JinContext.loadExtensions</code> for more information.
+   */
+   
+  public ClassLoader [] loadExtensions(String extensionType){
+    return context.getJinContext().loadExtensions(extensionType); 
+  }
 
 
 
