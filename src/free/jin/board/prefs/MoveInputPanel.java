@@ -26,9 +26,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import free.jin.OptionPanel;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
+import free.jin.ui.OptionPanel;
 import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
@@ -226,7 +226,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       public void actionPerformed(ActionEvent evt){
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
-          OptionPanel.error("Unable to change setting",
+          OptionPanel.error(MoveInputPanel.this, "Unable to change setting",
             "Moving in advance settings may not be modified while playing a game");
             
           disallowMoveInAdvance.setSelected(

@@ -21,9 +21,9 @@
 
 package free.jin.board.prefs;
 
-import free.jin.PreferencesPanel;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
+import free.jin.ui.PreferencesPanel;
 
 
 /**
