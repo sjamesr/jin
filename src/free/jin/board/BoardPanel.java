@@ -128,8 +128,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   /**
    * The actual position in the game, this may differ than the one on the board
-   * because the one on the board may include illegal moves not yet rejected by
-   * the user.
+   * because the one on the board may include moves not yet inspected by the
+   * server.
    */
 
   protected final Position realPosition;
@@ -991,9 +991,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       isMoveEnRoute = false;
 
 
-    if (queuedMove!=null){
+    if (queuedMove != null){
       UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
       isBoardPositionUpdating = true;
+      board.getPosition().copyFrom(realPosition);
       board.getPosition().makeMove(queuedMove);
       isBoardPositionUpdating = false;
       queuedMove = null;
