@@ -24,20 +24,14 @@ package free.jin;
 import java.util.Hashtable;
 import free.chess.WildVariant;
 import free.chess.Player;
+import free.util.Struct;
+
 
 /**
  * A representation of a seek - a request for a player to play a game
  */
 
-public class Seek{
-
-
-  /**
-   * All of the seek properties are kept in this Hashtable. There are just too
-   * many of them to be confortably kept in instance variables :-)
-   */
-
-  private final Hashtable gameProperties = new Hashtable(100, 0.25f);
+public class Seek extends Struct{
 
 
 
@@ -80,85 +74,26 @@ public class Seek{
       String ratingCategoryString, int time, int inc, boolean isRated, Player color, boolean isRatingLimited,
       int minRating, int maxRating, boolean isManualAccept, boolean isFormula){
 
-    setProperty("SeekID", seekID);
-    setProperty("Seeker", seeker);
-    setProperty("SeekerTitle", seekerTitle);
-    setProperty("SeekerRating", new Integer(rating));
-    setProperty("IsProvisional", new Boolean(isProvisional));
-    setProperty("IsRegistered", new Boolean(isRegistered));
-    setProperty("IsSeekerRated", new Boolean(isRegistered));
-    setProperty("IsComputer", new Boolean(isComputer));
+    setStringProperty("SeekID", seekID);
+    setStringProperty("Seeker", seeker);
+    setStringProperty("SeekerTitle", seekerTitle);
+    setIntegerProperty("SeekerRating", rating);
+    setBooleanProperty("IsProvisional", isProvisional);
+    setBooleanProperty("IsRegistered", isRegistered);
+    setBooleanProperty("IsSeekerRated", isRegistered);
+    setBooleanProperty("IsComputer", isComputer);
     setProperty("Variant", variant);
-    setProperty("RatingCategoryString", ratingCategoryString);
-    setProperty("Time", new Integer(time));
-    setProperty("Inc", new Integer(inc));
-    setProperty("IsRated", new Boolean(isRated));
-    if (color!=null)
+    setStringProperty("RatingCategoryString", ratingCategoryString);
+    setIntegerProperty("Time", time);
+    setIntegerProperty("Inc", inc);
+    setBooleanProperty("IsRated", isRated);
+    if (color != null)
       setProperty("Color", color);
-    setProperty("IsRatingLimited", new Boolean(isRatingLimited));
-    setProperty("MinRating", new Integer(minRating));
-    setProperty("MaxRating", new Integer(maxRating));
-    setProperty("IsManualAccept", new Boolean(isManualAccept));
-    setProperty("IsFormula", new Boolean(isFormula));
-  }
-
-
-
-
-  /**
-   * Sets the value of the given property. A property may not have its value reset.
-   */
-
-  protected final void setProperty(Object property, Object propertyValue){
-    Object oldValue = gameProperties.put(property, propertyValue);
-    if (oldValue!=null){
-      gameProperties.put(property, oldValue);
-      throw new IllegalArgumentException("A property's value may not be reset - attempted to reset the value of "+property);
-    }
-  }
-
-
-
-
-  /**
-   * Returns the value of the given property.
-   */
-
-  protected final Object getProperty(Object property){
-    return gameProperties.get(property);
-  }
-
-
-
-
-  /**
-   * Returns the value of the given integer property.
-   */
-
-  protected final int getIntegerProperty(Object property){
-    return ((Integer)getProperty(property)).intValue();
-  }
-
-
-
-
-  /**
-   * Returns the value of the given string property.
-   */
-
-  protected final String getStringProperty(Object property){
-    return (String)getProperty(property);
-  }
-
-
-
-
-  /**
-   * Returns the value of the given boolean property.
-   */
-
-  protected final boolean getBooleanProperty(Object property){
-    return ((Boolean)getProperty(property)).booleanValue();
+    setBooleanProperty("IsRatingLimited", isRatingLimited);
+    setIntegerProperty("MinRating", minRating);
+    setIntegerProperty("MaxRating", maxRating);
+    setBooleanProperty("IsManualAccept", isManualAccept);
+    setBooleanProperty("IsFormula", isFormula);
   }
 
 
