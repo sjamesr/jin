@@ -98,7 +98,7 @@ public class Jin{
    * Jin and all plugins should only write to that directory.
    */
 
-  public static final File jinUserHome = new File(System.getProperty("user.home"), ".jin");
+  private static final File jinUserHome = new File(System.getProperty("user.home"), ".jin");
 
 
 
@@ -107,7 +107,8 @@ public class Jin{
    * The folder where the settings of Users are kept.
    */
 
-  public static final File usersDir = new File(jinUserHome, "users");
+  private static final File usersDir = new File(jinUserHome, "users");
+
 
   
 
@@ -199,7 +200,7 @@ public class Jin{
       while (serversTokenizer.hasMoreTokens()){
         String serverResourceName = serversTokenizer.nextToken();
         Server server = Server.load(Jin.class.getResourceAsStream(serverResourceName));
-        servers.put(server.getName(), server);
+        servers.put(server.getID(), server);
       }
     } catch (IOException e){
         System.err.println("Unable to load the server list:");
@@ -216,14 +217,25 @@ public class Jin{
 
 
   /**
-   * Creates the users directory.
+   * Creates the users directories.
    */
 
   static{
     if (!usersDir.exists()){
       if (!usersDir.mkdirs()){
-        System.err.println("Unable to create directory "+usersDir.getAbsolutePath());
+        System.err.println("Unable to create directory " + usersDir);
         System.exit(1);
+      }
+
+      Server [] servers = getServers();
+      for (int i = 0; i < servers.length; i++){
+        Server server = servers[i];
+        String dirName = server.getID();
+        File dir = new File(usersDir, dirName);
+        if (!dir.mkdirs()){
+          System.err.println("Unable to create directory " + dir);
+          System.exit(1);
+        }
       }
     }
   }
@@ -320,18 +332,18 @@ public class Jin{
         throw new FileNotFoundException(file.toString());
 
       String filename = file.getName();
+      if (!"settings".equals(filename))
+        throw new IllegalArgumentException("Bad path specified: "+path);
 
-      int dotIndex = filename.lastIndexOf(".");
-      if (dotIndex == -1)
-        throw new IllegalArgumentException("Bad path");
+      File parent = new File(file.getParent());
+      String username = parent.getName();
+      parent = new File(parent.getParent());
+      String serverID = parent.getName();
 
-      String username = filename.substring(0, dotIndex);
-      String serverName = filename.substring(dotIndex+1);
-
-      Server server = getServer(serverName);
+      Server server = getServer(serverID);
       if (server == null){
         JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+file+
-         "\nBecause "+serverName+" is not a known server", "Error", JOptionPane.ERROR_MESSAGE);
+         "\nBecause "+serverID+" is not a known server", "Error", JOptionPane.ERROR_MESSAGE);
         return null;
       }
 
@@ -353,25 +365,29 @@ public class Jin{
 
   /**
    * Saves the given User. If this is yet an unknown User and the user doesn't
-   * abort the save, it is added to the list of known users. Returns
-   * <code>true</code> if the <code>User</code> was successfully saved,
-   * <code>false</code> otherwise.
-   *
-   * @throws IOException if an I/O error occurs while saving the user's
-   * settings.
+   * abort the save, it is added to the list of known users. If the process
+   * fails for some reason, an appropriate message is displayed to the user, so
+   * the caller needn't worry about that.
    */
 
-  public static boolean save(User user){
+  public static void save(User user){
     File file = (File)userFiles.get(user);
     if (file == null){
       System.out.println("Querying user about creating a new account");
       int result = JOptionPane.showConfirmDialog(getMainFrame(), "Would you like to save your \"" + user.getUsername() + "\" profile?", "Save profile?", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.YES_OPTION){
         System.out.println("Creating new user, named "+user.getUsername());
-        file = new File(usersDir, user.getUsername()+"."+user.getServer().getName());
+        File serverDir = new File(usersDir, user.getServer().getID());
+        File userDir = new File(serverDir, user.getUsername());
+        if (!userDir.mkdirs()){
+          JOptionPane.showMessageDialog(mainFrame, "Unable to create directory "+userDir, "Error", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
+
+        file = new File(userDir, "settings");
       }
       else
-        return false;
+        return;
     }
 
     try{
@@ -382,10 +398,8 @@ public class Jin{
       userFiles.put(user, file);
     } catch (IOException e){
         JOptionPane.showMessageDialog(mainFrame, "Unable to save user file into:\n"+file, "Error", JOptionPane.ERROR_MESSAGE);
-        return false;
+        return;
       }
-
-    return true;
   }
 
 
@@ -409,12 +423,12 @@ public class Jin{
 
 
   /**
-   * Returns the server with the given name, or null if the server with the
+   * Returns the server with the given id, or null if the server with the
    * given name is not supported.
    */
 
-  public static Server getServer(String serverName){
-    return (Server)servers.get(serverName);
+  public static Server getServer(String serverID){
+    return (Server)servers.get(serverID);
   }
 
 
