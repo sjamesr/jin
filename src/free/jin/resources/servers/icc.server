@@ -1,0 +1,7 @@
+
+default.user = resources/servers/default_user.icc
+name = icc
+name.short = icc
+name.long = Internet Chess Club
+
+login.dialog.classname = free.jin.chessclub.ChessclubLoginDialog

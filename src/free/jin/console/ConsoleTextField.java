@@ -1,0 +1,241 @@
+/**
+ * Jin - a chess client for internet chess servers.
+ * More information is available at http://www.hightemplar.com/jin/.
+ * Copyright (C) 2002 Alexander Maryanovsky.
+ * All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+package free.jin.console;
+
+import free.workarounds.FixedJTextField;
+import java.awt.event.KeyEvent;
+import java.awt.event.FocusEvent;
+import java.awt.datatransfer.*;
+import java.util.Vector;
+
+
+/**
+ * The JTextField used as the input component in a Console.
+ * Implements the following:
+ * <UL>
+ *   <LI> On ENTER, adds the text to the Console and clears itself.
+ *   <LI> On CTRL+ENTER, the command is issued as a special command processed
+ *        by the Console.
+ *   <LI> On SHIFT+ENTER, the command is issued as a blanked command - it's not
+ *        echoed to the console nor is it saved into the history.
+ *   <LI> On ESCAPE, clears itself.
+ *   <LI> Keeps a history of commands traversable with the UP and DOWN keys.
+ *   <LI> On CTRL+R, reverses the currently selected text (Watauba feature).
+ * </UL>
+ */
+
+public class ConsoleTextField extends FixedJTextField{
+
+
+  /**
+   * The Console we're a part of.
+   */
+
+  protected final Console console;
+
+
+
+  /**
+   * The history of all the commands entered by the user.
+   */
+  
+  private final Vector history = new Vector();
+
+
+
+  /**
+   * The index of the history entry currently displayed, -1 if the
+   * string currently displayed is not in the history.
+   */
+
+  private int currentHistoryIndex = -1;
+
+
+
+  /**
+   * The string that keeps the text the user typed in before he started
+   * traversing the history buffer.
+   */
+
+  private String typedInString = "";
+
+
+
+
+  /**
+   * Creates a new ConsoleTextField for the given Console.
+   */
+
+  public ConsoleTextField(Console console){
+    this.console = console;
+
+    enableEvents(KeyEvent.KEY_EVENT_MASK|FocusEvent.FOCUS_EVENT_MASK);
+  }
+
+
+
+
+
+  /**
+   * Processes the KeyEvent.
+   */
+
+  protected void processComponentKeyEvent(KeyEvent evt){
+    super.processComponentKeyEvent(evt); // We want the listeners to get the 
+                                         // event before we clear the text.
+
+    if (evt.getID()==KeyEvent.KEY_PRESSED){
+      switch(evt.getKeyCode()){
+        case KeyEvent.VK_ENTER:
+          String command = getText();
+          long modifiers = 0;
+          if (evt.isShiftDown())
+            modifiers |= Command.BLANKED_MASK;
+          if (evt.isControlDown())
+            modifiers |= Command.SPECIAL_MASK;
+          
+          if ((modifiers&Command.BLANKED_MASK)==0){
+            history.removeElement(command);
+            history.insertElementAt(command,0);
+          }
+
+          typedInString = "";
+          setText(typedInString);
+          currentHistoryIndex = -1;
+
+          console.issueCommand(new Command(command, modifiers));
+          break;
+        case KeyEvent.VK_ESCAPE:
+          if (evt.getModifiers()==0){
+            typedInString = "";
+            setText("");
+            currentHistoryIndex = -1;
+          }
+          break;
+        case KeyEvent.VK_UP:
+          if (evt.getModifiers()==0){
+            if (currentHistoryIndex == -1)
+              typedInString = getText();
+
+            int newHistoryIndex = currentHistoryIndex;
+            while (++newHistoryIndex < history.size()){
+              String historyItem = (String)history.elementAt(newHistoryIndex);
+              if (historyItem.startsWith(typedInString)){
+                currentHistoryIndex = newHistoryIndex;
+                break;
+              }
+            }
+                                  
+            if (newHistoryIndex == history.size())
+              return;
+
+            setText((String)history.elementAt(currentHistoryIndex));
+          }
+          break;
+        case KeyEvent.VK_DOWN:
+          if (evt.getModifiers()==0){
+            if (currentHistoryIndex == -1)
+              return;
+
+            int newHistoryIndex = currentHistoryIndex;
+            while (--newHistoryIndex >= 0){
+              String historyItem = (String)history.elementAt(newHistoryIndex);
+              if (historyItem.startsWith(typedInString)){
+                currentHistoryIndex = newHistoryIndex;
+                break;
+              }
+            }
+
+            if (newHistoryIndex == -1){
+              setText(typedInString);
+              currentHistoryIndex = -1;
+            }
+            else
+              setText((String)history.elementAt(currentHistoryIndex));
+          }
+          break;
+        case KeyEvent.VK_R:
+          if (evt.isControlDown()){ // Watauba feature :-)
+            String curText = getText();
+            String selectedText = getSelectedText();
+            String reversedSelectedText = new StringBuffer(selectedText).reverse().toString();
+            int selectionStart = getSelectionStart();
+            int selectionEnd = getSelectionEnd();
+            setText(curText.substring(0,selectionStart)+reversedSelectedText+curText.substring(selectionEnd));
+            setSelectionStart(selectionStart);
+            setSelectionEnd(selectionEnd);
+          }
+      }
+    }
+  }
+
+
+
+
+
+  /**
+   * Processes the Focus Events of this ConsoleTextField.
+   */
+
+  protected void processFocusEvent(FocusEvent evt){
+    int oldSelectionStart = getSelectionStart();
+    int oldSelectionEnd = getSelectionEnd();
+    super.processFocusEvent(evt);
+    if (evt.getID()==FocusEvent.FOCUS_GAINED){
+      setSelectionStart(oldSelectionStart);
+      setSelectionEnd(oldSelectionEnd);
+    }
+  }
+
+
+
+
+  /**
+   * Overrides paste() to implement flattening the text to a single line.
+   */
+
+  public void paste(){
+    // Replace the contents of the clipboard with a flat version of the text, call super.paste()
+    // and then change the contents back.
+    Clipboard clipboard = getToolkit().getSystemClipboard();
+    Transferable content = clipboard.getContents(this);
+    if (content != null){
+      try{
+        String data = (String)(content.getTransferData(DataFlavor.stringFlavor));
+        int index;
+        while ((index = data.indexOf("\r\n"))!=-1)
+          data = data.substring(0,index)+" "+data.substring(index+2);
+
+        data = data.replace('\n',' ');
+        data = data.replace('\r',' ');
+
+        StringSelection tempContents = new StringSelection(data);
+        clipboard.setContents(tempContents, null);
+      } catch (Exception e){}
+    }
+
+    super.paste();
+
+    clipboard.setContents(content,null);
+  }
+
+}

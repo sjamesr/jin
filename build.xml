@@ -1,0 +1,77 @@
+<project name="Jin2" default="dist">
+
+	<property name="build.compiler" value="modern"/>
+	<property name="source.dir" value="src"/>
+	<property name="build.dir" value="build/"/>	
+	
+	<path id="compile.class.path">
+		<pathelement path="."/>
+		<pathelement path="timestamping.jar"/>
+		<pathelement path="jregex.jar"/>
+		<pathelement path="swingall.jar"/>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+	</target>
+	
+	<target name="dist" depends="init, compile, jar" />
+
+	<target name="compile" depends="init, compile_chessclub,compile_chesslib,compile_util,compile_workarounds">
+		<javac srcdir="${source.dir}"
+		       destdir="${build.dir}"
+		       includes="free/jin/**"
+			   classpathref="compile.class.path"
+		/>
+	</target>
+	
+	<target name="compile_chessclub" depends="init">
+		<javac srcdir="${source.dir}"
+		       destdir="${build.dir}"
+		       includes="free/chessclub/**"
+			   classpathref="compile.class.path"			   
+		/>
+	</target>
+	
+	<target name="compile_chesslib" depends="init">
+		<javac srcdir="${source.dir}"
+		       destdir="${build.dir}"
+		       includes="free/chess/**"
+			   classpathref="compile.class.path"			   
+		/>
+	</target>
+	
+	<target name="compile_util" depends="init">
+		<javac srcdir="${source.dir}"
+		       destdir="${build.dir}"
+		       includes="free/util/**"
+			   classpathref="compile.class.path"			   
+		/>
+	</target>
+	
+	<target name="compile_workarounds" depends="init">
+		<javac srcdir="${source.dir}"
+		       destdir="${build.dir}"
+		       includes="free/workarounds/**"
+			   classpathref="compile.class.path"			   
+		/>
+	</target>
+	
+	<target name="jar" depends="init, compile">
+		<copy todir="${build.dir}/sounds">
+			<fileset dir="sounds"/>
+		</copy>
+		<copy todir="${build.dir}">
+			<fileset dir="${source.dir}" excludes="**/*.java"/>			
+		</copy>
+		<jar jarfile="jin.jar"
+		     basedir="${build.dir}"
+			 compress="false"
+			 manifest="manifest.txt"
+		/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+</project>

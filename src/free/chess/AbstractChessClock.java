@@ -1,0 +1,112 @@
+/**
+ * Jin - a chess client for internet chess servers.
+ * More information is available at http://www.hightemplar.com/jin/.
+ * Copyright (C) 2002 Alexander Maryanovsky.
+ * All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+package free.chess;
+
+import javax.swing.JComponent;
+
+
+/**
+ * The abstract superclass of all components who display a chess clock (one part
+ * of it).
+ */
+
+public abstract class AbstractChessClock extends JComponent{
+
+
+
+  /**
+   * The time displayed by this JChessClock, in milliseconds.
+   */
+
+  private int time;
+
+
+
+  /**
+   * Is the clock currently active (the current turn belongs to the owner of this
+   * clock).
+   */
+
+  private boolean isActive = false;
+
+
+
+
+  /**
+   * Creates a new AbstractChessClock with the given initial amount of time 
+   * (in milliseconds) on it.
+   */
+
+  public AbstractChessClock(int time){
+    this.time = time;
+  }
+
+
+
+
+  /**
+   * Sets the time displayed by this AbstractChessClock, in milliseconds.
+   */
+
+  public void setTime(int time){
+    this.time = time;
+    repaint();
+  }
+
+
+
+
+  /**
+   * Returns the time displayed by this AbstractChessClock, in milliseconds.
+   */
+
+  public int getTime(){
+    return time;
+  }
+
+
+
+
+  /**
+   * Sets the active flag of this AbstractChessClock. The clock should be set
+   * to be active when its owner is also the owner of the current turn.
+   */
+
+  public void setActive(boolean isActive){
+    this.isActive = isActive;
+  }
+
+
+
+
+  /**
+   * Returns true if this AbstractChessClock is active, false otherwise.
+   */
+
+  public boolean isActive(){
+    return isActive;
+  }
+
+
+
+
+}
