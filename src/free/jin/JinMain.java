@@ -258,6 +258,9 @@ public class JinMain implements JinContext{
 
     // Create the main frame
     mainFrame = createMainFrame();
+    
+    // Restore the main frame geometry
+    restoreMainFrameGeometry();
 
     // Create the UI manager
     uiProvider = new InternalFramesUIProvider(this, TopLevelContainer.getFor(mainFrame));
@@ -280,6 +283,10 @@ public class JinMain implements JinContext{
       }
     });
     mainFrame.setVisible(true);
+    
+    // Bugfix - restoring maximum state only works once the frame is visible
+    // (at least under KDE, Mandrake 9.2)
+    restoreMainFrameGeometry();
   }
 
 
@@ -869,17 +876,9 @@ public class JinMain implements JinContext{
 
   private JFrame createMainFrame(){
     JFrame frame = new JFrame();
-
-    Toolkit toolkit = frame.getToolkit();
-    Dimension screenSize = toolkit.getScreenSize();
-    Rectangle defaultFrameBounds = new Rectangle(
-      screenSize.width/16, screenSize.height/16, screenSize.width*7/8, screenSize.height*7/8);
-    Rectangle frameBounds = userPrefs.getRect("frame.bounds", defaultFrameBounds);
-    frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
-
-    frame.setBounds(frameBounds);
+    
     frame.setTitle(appProps.getProperty("frame.title", "Jin"));
-    frame.setIconImage(toolkit.getImage(getClass().getResource("resources/icon.gif")));
+    frame.setIconImage(frame.getToolkit().getImage(getClass().getResource("resources/icon.gif")));
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent evt){
@@ -929,6 +928,34 @@ public class JinMain implements JinContext{
 
   private void saveMainFrameGeometry(){
     userPrefs.setRect("frame.bounds", mainFrame.getBounds());
+    
+    // Save maximized state
+    int state = AWTUtilities.getExtendedFrameState(mainFrame);
+    userPrefs.setBool("frame.maximized.vert", (state & Frame.MAXIMIZED_VERT) != 0);
+    userPrefs.setBool("frame.maximized.horiz", (state & Frame.MAXIMIZED_HORIZ) != 0);
+  }
+  
+  
+  
+  /**
+   * Restores the main frame geometry from user preferences.
+   */
+   
+  private void restoreMainFrameGeometry(){
+    Dimension screenSize = mainFrame.getToolkit().getScreenSize();
+    Rectangle defaultFrameBounds = new Rectangle(
+      screenSize.width/16, screenSize.height/16, screenSize.width*7/8, screenSize.height*7/8);
+      
+    // Restore bounds      
+    Rectangle frameBounds = userPrefs.getRect("frame.bounds", defaultFrameBounds);
+    frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : defaultFrameBounds;
+    mainFrame.setBounds(frameBounds);
+    
+    // Restore maximized state
+    boolean vertMaximized = userPrefs.getBool("frame.maximized.vert", false);
+    boolean horizMaximized = userPrefs.getBool("frame.maximized.horiz", false);
+    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
+    AWTUtilities.setExtendedFrameState(mainFrame, state);
   }
 
 
