@@ -201,7 +201,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     configurePiecePainter(piecePainter);
 
-    String boardPainterClassName = getProperty("board-painter-class-name");
+    String boardPainterClassName = getProperty("board-class-name");
     if (boardPainterClassName != null){
       try{
         boardPainter = (BoardPainter)Class.forName(boardPainterClassName).newInstance();
@@ -298,8 +298,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     myMenu.add(createMoveInputMenu());
 
     JMenu pieceSetsMenu = createPieceSetsMenu();
-    if (pieceSetsMenu!=null)
+    if (pieceSetsMenu != null)
       myMenu.add(pieceSetsMenu);
+
+    JMenu boardsMenu = createBoardsMenu();
+    if (boardsMenu != null)
+      myMenu.add(boardsMenu);
 
     return myMenu;
   }
@@ -385,7 +389,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Creates and returns the piece "Piece Sets" menu. This may return null so
+   * Creates and returns the "Piece Sets" menu. This may return null so
    * that no such menu is displayed. The default implementation will return null
    * if less than 2 piece sets are specified in parameters.
    */
@@ -432,6 +436,54 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
+   * Creates and returns the "Boards" menu. This may return null so
+   * that no such menu is displayed. The default implementation will return null
+   * if less than 2 piece sets are specified in parameters.
+   */
+
+  protected JMenu createBoardsMenu(){
+    int boardCount = Integer.parseInt(getProperty("board-count", "0"));
+    if (boardCount<2)
+      return null;
+
+    ActionListener boardChangeListener = new ActionListener(){
+
+      public void actionPerformed(ActionEvent evt){
+        AbstractButton button = (AbstractButton)evt.getSource();
+        String boardPainterClassName = button.getActionCommand();
+        setProperty("board-class-name", boardPainterClassName, true);
+        updateBoard();
+      } 
+    };
+
+    JMenu boardsMenu = new JMenu("Boards");
+    ButtonGroup boardsCheckBoxGroup = new ButtonGroup();
+    for (int i=0;i<boardCount;i++){
+      String board = getProperty("board-"+i);
+      StringTokenizer tokenizer = new StringTokenizer(board,";");
+      String boardName = tokenizer.nextToken();
+      String className = tokenizer.nextToken();
+      if (board==null){
+        System.err.println("Board with index "+i+" is not specified");
+        continue;
+      }
+      JCheckBoxMenuItem menuCheckBox = new JCheckBoxMenuItem(boardName);
+      menuCheckBox.setActionCommand(className);
+      if (className.equals(boardPainter.getClass().getName()))
+        menuCheckBox.setSelected(true);
+      menuCheckBox.addActionListener(boardChangeListener);
+      boardsCheckBoxGroup.add(menuCheckBox);
+      boardsMenu.add(menuCheckBox);
+    }
+    
+    return boardsMenu;
+  }
+
+
+
+
+
+  /**
    * Rereads the plugin/user properties and changes the assosiated board
    * manager's settings accordingly. This method should be called when the user
    * changes the preferences.
@@ -439,7 +491,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public void refreshFromProperties(){
     updatePieceSet();
-    updateBoardPainter();
+    updateBoard();
 
     // TODO: finish implementing for the rest of the properties.
   }
@@ -486,8 +538,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Updates the board painter from properties.
    */
 
-  protected void updateBoardPainter(){
-    String boardPainterClassName = getProperty("board-painter-class-name");
+  protected void updateBoard(){
+    String boardPainterClassName = getProperty("board-class-name");
     try{
       if (boardPainterClassName == null)
         boardPainter = new DefaultBoardPainter();
