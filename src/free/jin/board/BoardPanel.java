@@ -375,7 +375,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     // Fullscreen mode is broken under Java 1.5.0, see
     // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5085648
     if (PlatformUtils.isMacOSX() ||
-        (Boolean.getBoolean("java.version.applet") && PlatformUtils.isJavaBetterThan("1.5"))){
+        ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))){
       fullscreenButton.setEnabled(false);
       fullscreenButton.setToolTipText("Fullscreen board mode is unavailable on your system");
     }

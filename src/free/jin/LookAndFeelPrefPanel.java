@@ -71,7 +71,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     
     // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
     // Remove this when Sun fixes it.
-    if (Boolean.getBoolean("java.version.applet") && PlatformUtils.isJavaBetterThan("1.5")){
+    if ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5")){
       int gtkIndex = -1;
       for (int i = 0; i < lnfs.length; i++){
         if (lnfs[i].classname.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")){
