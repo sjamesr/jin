@@ -54,6 +54,25 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
+
+  /**
+   * A hashtable mapping class names to already loaded PiecePainters.
+   */
+
+  private final Hashtable loadedPiecePainters = new Hashtable();
+
+
+
+
+  /**
+   * A hashtable mapping class names to already loaded BoardPainters.
+   */
+
+  private final Hashtable loadedBoardPainters = new Hashtable();
+
+
+
+
   /**
    * A Hashtable mapping Game objects to BoardPanel objects which are currently
    * used.
@@ -102,11 +121,30 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
+   * The current PiecePainter.
+   */
+
+  private PiecePainter piecePainter;
+
+
+
+  /**
+   * The current BoardPainter.
+   */
+
+  private BoardPainter boardPainter;
+
+
+
+
+  /**
    * Starts this plugin.
    */
 
   public void start(){
     registerConnListeners();
+    setPiecePainter(getProperty("piece-painter-class-name"));
+    setBoardPainter(getProperty("board-painter-class-name"));
   }
 
 
@@ -118,6 +156,136 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void stop(){
     unregisterConnListeners();
     removeBoards();
+    savePreferences();
+  }
+
+
+
+
+  /**
+   * Returns an instance of the specified PiecePainter class or
+   * <code>null</code> if can't.
+   */
+
+  private PiecePainter getPiecePainter(String className){
+    if (className == null)
+      return null;
+
+    PiecePainter piecePainter = (PiecePainter)loadedPiecePainters.get(className);
+
+    if (piecePainter == null){
+      try{
+        piecePainter = (PiecePainter)Class.forName(className).newInstance();
+      } catch (ClassNotFoundException e){
+          System.err.println("Unable to find class "+className);
+        }
+        catch (InstantiationException e){
+          System.err.println("Unable to instantiate class "+className); 
+        }
+        catch (IllegalAccessException e){
+          System.err.println("Unable to instantiate class "+className+" due to access restrictions."); 
+        }
+        catch (ClassCastException e){
+          System.err.println("Unable to cast "+className+" into PiecePainter"); 
+        }
+    }
+
+    if (piecePainter == null)
+      return null;
+
+    loadedPiecePainters.put(className, piecePainter);
+
+    configurePiecePainter(piecePainter);
+
+    return piecePainter;
+  }
+
+
+
+  /**
+   * Configures the given PiecePainter to prepare it for usage.
+   */
+
+  protected void configurePiecePainter(PiecePainter piecePainter){
+    if (piecePainter instanceof ColoredPiecePainter){
+      ColoredPiecePainter coloredPiecePainter = (ColoredPiecePainter)piecePainter;
+
+      String whiteColor = getProperty("white-piece-color"); 
+      String blackColor = getProperty("black-piece-color"); 
+      String whiteOutline = getProperty("white-outline-color"); 
+      String blackOutline = getProperty("black-outline-color"); 
+
+      if (whiteColor != null)
+        coloredPiecePainter.setWhiteColor(StringParser.parseColor(whiteColor));
+      if (blackColor != null)
+        coloredPiecePainter.setBlackColor(StringParser.parseColor(blackColor));
+      if (whiteOutline != null)
+        coloredPiecePainter.setWhiteOutline(StringParser.parseColor(whiteOutline));
+      if (blackOutline != null)
+        coloredPiecePainter.setBlackOutline(StringParser.parseColor(blackOutline));
+    }
+  }
+
+
+
+
+  /**
+   * Returns an instance of the specified BoardPainter class or
+   * <code>null</code> if can't.
+   */
+
+  private BoardPainter getBoardPainter(String className){
+    if (className == null)
+      return null;
+
+    BoardPainter boardPainter = (BoardPainter)loadedBoardPainters.get(className);
+
+    if (boardPainter == null){
+      try{
+        boardPainter = (BoardPainter)Class.forName(className).newInstance();
+      } catch (ClassNotFoundException e){
+          System.err.println("Unable to find class "+className);
+        }
+        catch (InstantiationException e){
+          System.err.println("Unable to instantiate class "+className); 
+        }
+        catch (IllegalAccessException e){
+          System.err.println("Unable to instantiate class "+className+" due to access restrictions."); 
+        }
+        catch (ClassCastException e){
+          System.err.println("Unable to cast "+className+" into BoardPainter"); 
+        }
+    }
+
+    if (boardPainter == null)
+      return null;
+
+    loadedBoardPainters.put(className, boardPainter);
+
+    configureBoardPainter(boardPainter);
+
+    return boardPainter;
+  }
+
+
+
+
+  /**
+   * Configures the given BoardPainter preparing it to be used.
+   */
+
+  protected void configureBoardPainter(BoardPainter boardPainter){
+    if (boardPainter instanceof ColoredBoardPainter){
+      ColoredBoardPainter coloredBoardPainter = (ColoredBoardPainter)boardPainter;
+
+      String lightColor = getProperty("light-square-color");
+      String darkColor = getProperty("dark-square-color");
+
+      if (lightColor != null)
+        coloredBoardPainter.setLightColor(StringParser.parseColor(lightColor));
+      if (darkColor != null)
+        coloredBoardPainter.setDarkColor(StringParser.parseColor(darkColor));
+    }
   }
 
 
@@ -362,35 +530,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Returns an instance of the current PiecePainter.
+   * Returns an the current <code>PiecePainter</code>.
    */
 
   public PiecePainter getPiecePainter(){
-    PiecePainter piecePainter = null;
-
-    String piecePainterClassName = getProperty("piece-painter-class-name");
-    if (piecePainterClassName != null){
-      try{
-        piecePainter = (PiecePainter)Class.forName(piecePainterClassName).newInstance();
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to find class "+piecePainterClassName+", will use the default piece painter.");
-        }
-        catch (InstantiationException e){
-          System.err.println("Unable to instantiate class "+piecePainterClassName+", will use the default piece painter."); 
-        }
-        catch (IllegalAccessException e){
-          System.err.println("Unable to instantiate class "+piecePainterClassName+" due to access restrictions, will use the default piece painter."); 
-        }
-        catch (ClassCastException e){
-          System.err.println("Unable to cast "+piecePainterClassName+" into PiecePainter"); 
-        }
-    }
-
-    if (piecePainter == null)
-      piecePainter = new DefaultPiecePainter();
-
-    configurePiecePainter(piecePainter);
-
     return piecePainter;
   }
 
@@ -398,29 +541,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Configures the given PiecePainter before it's used.
+   * Returns the current <code>BoardPainter</code>.
    */
 
-  protected void configurePiecePainter(PiecePainter piecePainter){
-    if (piecePainter instanceof ColoredPiecePainter){
-      ColoredPiecePainter coloredPiecePainter = (ColoredPiecePainter)piecePainter;
-
-      String whiteColor = getProperty("white-piece-color"); 
-      String blackColor = getProperty("black-piece-color"); 
-      String whiteOutline = getProperty("white-outline-color"); 
-      String blackOutline = getProperty("black-outline-color"); 
-
-      if (whiteColor != null)
-        coloredPiecePainter.setWhiteColor(StringParser.parseColor(whiteColor));
-      if (blackColor != null)
-        coloredPiecePainter.setBlackColor(StringParser.parseColor(blackColor));
-      if (whiteOutline != null)
-        coloredPiecePainter.setWhiteOutline(StringParser.parseColor(whiteOutline));
-      if (blackOutline != null)
-        coloredPiecePainter.setBlackOutline(StringParser.parseColor(blackOutline));
-    }
+  public BoardPainter getBoardPainter(){
+    return boardPainter;
   }
-
 
 
 
@@ -431,10 +557,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * @param piecePainterClassName The class name of the PiecePainter.
    */
 
-  public void setPiecePainterClassName(String piecePainterClassName){
-    setProperty("piece-painter-class-name", piecePainterClassName);
-
-    PiecePainter piecePainter = getPiecePainter();
+  public void setPiecePainter(String className){
+    piecePainter = getPiecePainter(className);
 
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
@@ -447,74 +571,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Returns an instance of the current board painter.
-   */
-
-  public BoardPainter getBoardPainter(){
-    BoardPainter boardPainter = null;
-
-    String boardPainterClassName = getProperty("board-painter-class-name");
-    if (boardPainterClassName != null){
-      try{
-        boardPainter = (BoardPainter)Class.forName(boardPainterClassName).newInstance();
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to find class "+boardPainterClassName+", will use the default board painter.");
-        }
-        catch (InstantiationException e){
-          System.err.println("Unable to instantiate class "+boardPainterClassName+", will use the default board painter."); 
-        }
-        catch (IllegalAccessException e){
-          System.err.println("Unable to instantiate class "+boardPainterClassName+" due to access restrictions, will use the default board painter."); 
-        }
-        catch (ClassCastException e){
-          System.err.println("Unable to cast "+boardPainterClassName+" into BoardPainter"); 
-        }
-    }
-    if (boardPainter == null)
-      boardPainter = new DefaultBoardPainter();
-
-     configureBoardPainter(boardPainter);
-
-     return boardPainter;
-  }
-
-
-
-
-  /**
    * Sets the current board painter to be of the specified type.
    */
 
-  public void setBoardPainterClassName(String boardPainterClassName){
-    setProperty("board-painter-class-name", boardPainterClassName);
+  public void setBoardPainter(String className){
+    boardPainter = getBoardPainter(className);
 
-    BoardPainter boardPainter = getBoardPainter();
     Enumeration boardPanels = boardPanelsToInternalFrames.keys();
     while (boardPanels.hasMoreElements()){
       BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
       boardPanel.getBoard().setBoardPainter(boardPainter);
-    }
-  }
-
-
-
-
-
-  /**
-   * Configures the given BoardPainter before it's used.
-   */
-
-  protected void configureBoardPainter(BoardPainter boardPainter){
-    if (boardPainter instanceof ColoredBoardPainter){
-      ColoredBoardPainter coloredBoardPainter = (ColoredBoardPainter)boardPainter;
-
-      String lightColor = getProperty("light-square-color");
-      String darkColor = getProperty("dark-square-color");
-
-      if (lightColor != null)
-        coloredBoardPainter.setLightColor(StringParser.parseColor(lightColor));
-      if (darkColor != null)
-        coloredBoardPainter.setDarkColor(StringParser.parseColor(darkColor));
     }
   }
 
@@ -729,27 +795,26 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   protected JMenu createPieceSetsMenu(){
     int pieceSetCount = Integer.parseInt(getProperty("piece-set-count", "0"));
-    if (pieceSetCount<2)
+    if (pieceSetCount < 2)
       return null;
 
     ActionListener pieceSetListener = new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        setPiecePainterClassName(button.getActionCommand());
+        setPiecePainter(button.getActionCommand());
       } 
     };
 
-    PiecePainter piecePainter = getPiecePainter();
     JMenu pieceSetsMenu = new JMenu("Piece Sets");
     pieceSetsMenu.setMnemonic('P');
     ButtonGroup pieceSetsCheckBoxGroup = new ButtonGroup();
-    for (int i=0;i<pieceSetCount;i++){
+    for (int i = 0; i < pieceSetCount; i++){
       String pieceSet = getProperty("piece-set-"+i);
-      StringTokenizer tokenizer = new StringTokenizer(pieceSet,";");
+      StringTokenizer tokenizer = new StringTokenizer(pieceSet, ";");
       String pieceSetName = tokenizer.nextToken();
       String className = tokenizer.nextToken();
-      if (pieceSet==null){
+      if (pieceSet == null){
         System.err.println("Piece set with index "+i+" is not specified");
         continue;
       }
@@ -776,27 +841,26 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   protected JMenu createBoardsMenu(){
     int boardCount = Integer.parseInt(getProperty("board-count", "0"));
-    if (boardCount<2)
+    if (boardCount < 2)
       return null;
 
     ActionListener boardChangeListener = new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        setBoardPainterClassName(button.getActionCommand());
+        setBoardPainter(button.getActionCommand());
       } 
     };
 
-    BoardPainter boardPainter = getBoardPainter();
     JMenu boardsMenu = new JMenu("Boards");
     boardsMenu.setMnemonic('B');
     ButtonGroup boardsCheckBoxGroup = new ButtonGroup();
-    for (int i=0;i<boardCount;i++){
+    for (int i = 0 ; i < boardCount; i++){
       String board = getProperty("board-"+i);
-      StringTokenizer tokenizer = new StringTokenizer(board,";");
+      StringTokenizer tokenizer = new StringTokenizer(board, ";");
       String boardName = tokenizer.nextToken();
       String className = tokenizer.nextToken();
-      if (board==null){
+      if (board == null){
         System.err.println("Board with index "+i+" is not specified");
         continue;
       }
@@ -830,8 +894,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setHighlightingOwnMoves(isHighlightingOwnMoves());
     setMoveHighlightingColor(getMoveHighlightingColor());
     setDragSquareHighlightingColor(getDragSquareHighlightingColor());
-    setPiecePainterClassName(getPiecePainter().getClass().getName());
-    setBoardPainterClassName(getBoardPainter().getClass().getName());
+    setPiecePainter(getProperty("piece-painter-class-name"));
+    setBoardPainter(getProperty("board-painter-class-name"));
   }
 
 
@@ -933,12 +997,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     boardFrameContentPane.setLayout(new BorderLayout());
     boardFrameContentPane.add(boardPanel, BorderLayout.CENTER);
 
-    boardFrame.setVisible(true);
-
-    boardFrameContentPane.invalidate();
-    boardFrameContentPane.validate();
-
-
     /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
        reason I do this instead of adding an InternalFrameListener like a sane person. */
     boardFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -1018,7 +1076,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     internalFramesToBoardPanels.put(boardFrame, boardPanel);
     boardPanelsToInternalFrames.put(boardPanel, boardFrame);
-		
+
+    if (!boardFrame.isVisible())
+      boardFrame.setVisible(true);
+
     boardFrame.toFront();
     try{
       boardFrame.setSelected(true);
@@ -1331,6 +1392,18 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public PreferencesPanel getPreferencesUI(){
     return new BoardPreferencesPanel(this);
+  }
+
+
+
+
+  /**
+   * Saves the user preferences.
+   */
+
+  protected void savePreferences(){
+    setProperty("piece-painter-class-name", piecePainter.getClass().getName());    
+    setProperty("board-painter-class-name", boardPainter.getClass().getName());
   }
 
 
