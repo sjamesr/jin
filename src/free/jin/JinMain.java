@@ -298,7 +298,54 @@ public class JinMain implements JinContext{
   public Preferences getPrefs(){
     return userPrefs;
   }
-
+  
+  
+  
+  /**
+   * Returns the extensions for the specified extension type. Extensions are
+   * assumed to be zip or jar files and are looked up in two directories:
+   * <code>jinDir/extensions/extType</code> and
+   * <code>prefsDir/extensions/extType</code>.
+   */
+   
+   public ClassLoader [] loadExtensions(String extType){
+     Vector extensions = new Vector();
+     
+     File jinExtDir = new File(new File(jinDir, "extensions"), extType);
+     File userExtDir = new File(new File(prefsDir, "extensions"), extType);
+                                
+     loadExtensions(jinExtDir, extensions);
+     loadExtensions(userExtDir, extensions);
+     
+     ClassLoader [] extsArr = new ClassLoader[extensions.size()];
+     extensions.copyInto(extsArr);
+     
+     return extsArr;
+   }
+   
+   
+   
+   /**
+    * Loads extensions from the specified directory, adding them to the
+    * specified <code>Vector</code>.
+    */
+    
+   private void loadExtensions(File dir, Vector v){
+     String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
+     if (filenames == null)
+       return;
+     
+     for (int i = 0; i < filenames.length; i++){
+       File extension = new File(dir, filenames[i]);
+       try{
+         v.addElement(new ZipClassLoader(extension));
+       } catch (IOException e){
+           System.out.println("Failed to load extension: " + extension);
+           e.printStackTrace();
+         }
+     }
+   }
+    
 
  
   /**
@@ -533,12 +580,7 @@ public class JinMain implements JinContext{
    */
 
   private Properties loadAppProps() throws IOException{
-    InputStream in = getClass().getResourceAsStream("resources/app.props");
-    try{
-      return IOUtilities.loadProperties(in);
-    } finally{
-        in.close();
-      }
+    return IOUtilities.loadProperties(getClass().getResourceAsStream("resources/app.props"));
   }
 
 
@@ -632,7 +674,6 @@ public class JinMain implements JinContext{
     if (serverDefIn == null)
       throw new FileNotFoundException("Unable to find server definition file in " + jar);
     Properties serverDef = IOUtilities.loadProperties(serverDefIn);
-    serverDefIn.close();
 
     String classname = serverDef.getProperty("classname");
     if (classname == null)
@@ -743,9 +784,7 @@ public class JinMain implements JinContext{
       System.err.println(jar + " does not contain a plugin definition file");
       return null;
     }
-
     Properties pluginDef = IOUtilities.loadProperties(pluginDefIn);
-    pluginDefIn.close();
 
     String classname = pluginDef.getProperty("classname");
     if (classname == null){
