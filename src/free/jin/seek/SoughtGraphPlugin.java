@@ -123,7 +123,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void stop(){
-    saveState();
     unregisterListeners();
     closeSoughtGraph();
   }
@@ -163,14 +162,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (isMaximized){
       try{
         soughtGraphFrame.setMaximum(true);
-      } catch (java.beans.PropertyVetoException e){}
+      } catch (PropertyVetoException e){}
     }
 
     boolean isIconified = Boolean.valueOf(getProperty("iconified", "false")).booleanValue();
     if (isIconified){
       try{
         soughtGraphFrame.setIcon(true);
-      } catch (java.beans.PropertyVetoException e){}
+      } catch (PropertyVetoException e){}
     }
 
     JComponent icon = soughtGraphFrame.getDesktopIcon();
@@ -180,8 +179,23 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       icon.setBounds(iconBounds);
     }
 
+    boolean isSelected = Boolean.valueOf(getProperty("selected", "true")).booleanValue();
+
     if (Boolean.valueOf(getProperty("visible", "true")).booleanValue())
-      showSoughtGraphFrame(Boolean.valueOf(getProperty("selected", "true")).booleanValue());
+      showSoughtGraphFrame(isSelected);
+
+    if (isSelected){
+      // We can't do this immediately because if some other plugin adds another frame
+      // afterwards, our frame will lose selection.
+      SwingUtilities.invokeLater(new Runnable(){
+        public void run(){
+          try{
+            soughtGraphFrame.toFront();
+            soughtGraphFrame.setSelected(true);
+          } catch (PropertyVetoException e){}
+        }
+      });
+    }
 
 
     /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
@@ -263,21 +277,21 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (soughtGraphFrame.getParent() != null)
       return;
 
-    getPluginContext().getMainFrame().getDesktop().add(soughtGraphFrame);
-
     try{ 
+      getPluginContext().getMainFrame().getDesktop().add(soughtGraphFrame);
       soughtGraphFrame.setVisible(true);
 
       if (bringToFront)
         soughtGraphFrame.toFront();
+      else
+        soughtGraphFrame.toBack();
 
-      // The documentation of JInternalFrame recommends not to do this,
+      // The documentation of JInternalFrame says not to do this,
       // but this seems to be the only way to get the isClosed flag of a JInternalFrame
       // set to false.
       soughtGraphFrame.setClosed(false);
 
-      if (bringToFront)
-        soughtGraphFrame.setSelected(true);
+      soughtGraphFrame.setSelected(bringToFront);
     } catch (PropertyVetoException e){}
 
     // It may be null if the graph is shown before it's created.
@@ -335,7 +349,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Saves the state of this plugin into the user's properties.
    */
 
-  protected void saveState(){
+  public void saveState(){
     Rectangle soughtGraphFrameBounds = soughtGraphFrame.getBounds();
     // If something bad happened, let's not save that state.
     if ((soughtGraphFrameBounds.width > 10) && (soughtGraphFrameBounds.height > 10))
