@@ -1101,6 +1101,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         whiteLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
         blackLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
 
+        fullscreenButton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
         if (flipped){
           whiteLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
@@ -1108,7 +1109,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
           blackLabel.setAlignmentY(Component.TOP_ALIGNMENT);
           blackClock.setAlignmentY(Component.TOP_ALIGNMENT);
-          fullscreenButton.setAlignmentY(Component.TOP_ALIGNMENT);
 
           topInfoBox.add(whiteLabel);
           topInfoBox.add(Box.createHorizontalStrut(10));
@@ -1126,7 +1126,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
           blackLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
           blackClock.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-          fullscreenButton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
           topInfoBox.add(blackLabel);
           topInfoBox.add(Box.createHorizontalStrut(10));
