@@ -26,7 +26,7 @@ import free.util.TextUtilities;
 
 /**
  * Represents a datagram sent by the chessclub.com server in the format 
- * described at <a href=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
+ * described at <a HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
  * This class defines methods useful for parsing a datagram and retrieving
  * arguments from it.
  */
@@ -127,7 +127,7 @@ public class Datagram{
 
 	/**
 	 * Definitions of all the DG type numbers. See their description at 
-	 * <a href=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
+	 * <a href="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
 	 */
 
   public static final int DG_WHO_AM_I						     = 0;

@@ -310,7 +310,7 @@ public final class Position{
   /**
    * Sets this Position to represent the position described by the given string
    * in FEN format. The FEN format is described at 
-   * <A HREF=http://www.very-best.de/pgn-spec.htm#16.1>http://www.very-best.de/pgn-spec.htm#16.1</A>.
+   * <A HREF="http://www.very-best.de/pgn-spec.htm#16.1">http://www.very-best.de/pgn-spec.htm#16.1</A>.
    * The characters describing pieces aren't limited to the chess set (like in
    * FEN), but are determined by the WildVariant of this position.
    *

@@ -28,7 +28,7 @@ package free.chessclub;
  * on the sending of that information is on. For example, if DG_MOVE_SMITH is off,
  * a MoveStruct arriving within a DG_SEND_MOVES datagram will contain an invalid
  * (garbage) smithMove field. See
- * <A HREF=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
+ * <A HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
  * for information which settings turn on sending which fields.
  */
 

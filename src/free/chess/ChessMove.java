@@ -134,7 +134,7 @@ public class ChessMove extends Move{
 
   /**
    * Returns a string representing this move in the notation invented by
-   * Warren Smith. Refer to <A HREF=http://www.chessclub.com/chessviewer/smith.html>http://www.chessclub.com/chessviewer/smith.html</A>
+   * Warren Smith. Refer to <A HREF="http://www.chessclub.com/chessviewer/smith.html">http://www.chessclub.com/chessviewer/smith.html</A>
    * for a description of the notation.
    *
    * @return a string representing this move in the Warren Smith notation.

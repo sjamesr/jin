@@ -33,7 +33,7 @@ import free.chessclub.level2.*;
  * This class is responsible for connecting to the chessclub.com
  * server, logging on and further processing of information as it
  * arrives from the server. Before using this class you should read 
- * <A HREF=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
+ * <A HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
  * which describes ICC server's output. All the processXXX methods receive arguments
  * with the meaning and format described there unless specified otherwise
  * in the method documentation.
@@ -883,7 +883,7 @@ public class ChessclubConnection extends free.util.Connection{
    * contains a valid value only if the datagram that sets its sending is on.
    * For example, ratings[BULLET] and ratingTypes[BULLET] will only contain 
    * correct values if DG_BULLET is on, otherwise they will contain meaningless values.
-   * See <A HREF=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
+   * See <A HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
    * for an explanation on which datagrams turn on/off which fields.
    */
 
@@ -1399,7 +1399,7 @@ public class ChessclubConnection extends free.util.Connection{
   /**
    * Gets called when a DG_ILLEGAL_MOVE datagram arrives. Reason codes are
    * given in
-   * <A HREF=ftp://ftp.chessclub.com/pub/icc/formats/formats.txt>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
+   * <A HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</A>
    */
 
   protected void processIllegalMove(int gameNumber, String moveString, int reasonCode){
@@ -1735,7 +1735,7 @@ public class ChessclubConnection extends free.util.Connection{
 
   /**
    * Gets called when a DG_FEN datagram arrives.
-   * <A HREF=http://www.research.digital.com/SRC/personal/Tim_Mann/Standard>http://www.research.digital.com/SRC/personal/Tim_Mann/Standard</A>
+   * <A HREF="http://www.very-best.de/pgn-spec.htm#16.1">http://www.very-best.de/pgn-spec.htm#16.1</A>
    * has a description of FEN.
    */
 
