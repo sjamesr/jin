@@ -38,10 +38,20 @@ public interface JinContext{
 
 
   /**
+   * Returns the value of the parameter with the specified name, as it was
+   * passed to Jin.
+   */
+   
+  String getParameter(String paramName);
+  
+  
+  
+  /**
    * Returns the application-wide user preferences.
    */
 
   Preferences getPrefs();
+  
   
   
   
@@ -69,27 +79,12 @@ public interface JinContext{
   
   
   /**
-   * Quits the application, possible asking the user to confirm quitting first.
-   * This method doesn't necessarily return.
+   * Quits the application. This method doesn't necessarily return.
+   * Note that the instance of Jin will no longer exist when this method is
+   * invoked.
    */
 
-  void quit(boolean askToConfirm);
-
-
-
-  /**
-   * Returns the name of the application.
-   */
-
-  String getAppName();
-
-
-
-  /**
-   * Returns the client version.
-   */
-
-  String getAppVersion();
+  void shutdown();
 
 
 
@@ -98,6 +93,23 @@ public interface JinContext{
    */
 
   Server [] getServers();
+  
+  
+  
+  /**
+   * Returns a list of known users (accounts on known servers).
+   */
+   
+  User [] getUsers();
+  
+  
+  
+  /**
+   * Informs the context of the list of known users. This is needed so that the
+   * context can store the users on-exit. 
+   */
+   
+  void setUsers(User [] users);
 
 
   
@@ -120,48 +132,6 @@ public interface JinContext{
 
 
   /**
-   * Returns the list of known users. This list will be updated as users are
-   * added or removed, so you may register listeners with it if you wish to be
-   * notified. The list does not include guest users.
-   */
-
-  ListModel getUsers();
-
-
-
-  /**
-   * Adds the specified user to the list of known accounts and returns whether
-   * successful. It is the implementation's responsibility to notify the user if
-   * adding fails, before returning. The specified user may not be a guest.
-   */
-
-  boolean addUser(User user);
-
-
-
-  /**
-   * Saves the specified user's information and returns whether successful. The
-   * specified user must be a known account. It is the implementation's
-   * responsibility to notify the user if storing fails, before returning. The
-   * specified user may be a guest.
-   */
-
-  boolean storeUser(User user);
-
-
-
-  /**
-   * Removes the specified user from the list of known accounts and returns
-   * whether successful. It is the implementation's responsibility to notify the
-   * user if removing fails, before returning. The specified user may not be a
-   * guest.
-   */
-
-  boolean removeUser(User user);
-  
-  
-  
-  /**
    * Returns whether this context is capable of saving preferences.
    */
    
@@ -169,22 +139,6 @@ public interface JinContext{
 
   
 
-  /**
-   * Returns the UI provider.
-   */
-
-  UIProvider getUIProvider();
-
-
-
-  /**
-   * Returns the connection manager.
-   */
-
-  ConnectionManager getConnManager();
-  
-  
-  
   /**
    * Returns the text that should be displayed in the warning to the user when
    * he chooses to save his password for future use. The text should explain
