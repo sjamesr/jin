@@ -702,7 +702,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
     boolean highlightOwnMoves = isHighlightingOwnMoves();
-    final JCheckBoxMenuItem highlightOwnMovesCheckBox = new JCheckBoxMenuItem("Highlight own moves", highlightOwnMoves);
+    final JCheckBoxMenuItem highlightOwnMovesCheckBox = new JCheckBoxMenuItem("Highlight Own Moves", highlightOwnMoves);
     highlightOwnMovesCheckBox.setMnemonic('H');
     highlightOwnMovesCheckBox.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
