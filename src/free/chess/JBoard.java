@@ -642,7 +642,7 @@ public class JBoard extends JComponent{
    */
 
   private void callPaintHooks(Graphics g){
-    int size = paintHooks.size();
+    int size = paintHooks == null ? 0 : paintHooks.size();
     for (int i = 0; i < size; i++){
       PaintHook hook = (PaintHook)paintHooks.elementAt(i);
       hook.paint(this, g);
