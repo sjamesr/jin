@@ -49,14 +49,27 @@ public abstract class JinAction implements ActionListener{
   
 
   /**
-   * Sets the action's context.
+   * Sets the action's context. Returns whether the context is supported.
    */
    
-  public void setContext(ActionContext context){
+  public boolean setContext(ActionContext context){
     if (this.context != null)
-      throw new IllegalArgumentException("ActionContext already set");
+      throw new IllegalStateException("ActionContext already set");
     
     this.context = context;
+    
+    return isContextSupported(context);
+  }
+  
+  
+  
+  /**
+   * Returns whether the specified context is supported by this action. The
+   * default implementation always returns <code>true</code>. 
+   */
+   
+  protected boolean isContextSupported(ActionContext context){
+    return true;
   }
   
   
@@ -120,7 +133,7 @@ public abstract class JinAction implements ActionListener{
   }
   
   
-   
+  
   /**
    * Invokes the action.
    */
