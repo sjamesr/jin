@@ -1,0 +1,9 @@
+defaultHost = chessclub.com
+hosts = chessclub.com queen.chessclub.com rook.chessclub.com special.chessclub.com
+ports = 5000 23
+id = icc
+shortName = ICC
+longName = Internet Chess Club
+website = http://www.chessclub.com
+registrationPage = http://www.chessclub.com/register
+passwordRetrievalPage = http://www.chessclub.com/mailpassword
