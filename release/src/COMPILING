@@ -1,0 +1,7 @@
+To compile Jin, you will need to get Jakarta Ant from
+http://ant.apache.org/. Once you've downloaded and installed it,
+simply type "ant" in the directory where the build.xml file is. This will first
+compile Jin, putting all the compiled classes in a newly created "classes"
+directory and then package it up, making it ready to run in the "build"
+directory. You can then run Jin by changing into the "build" directory and
+running "java -jar jin.jar".
