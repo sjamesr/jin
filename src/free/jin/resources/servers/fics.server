@@ -9,4 +9,4 @@ login.hosts = freechess.org
 login.hostname = freechess.org
 login.port = 5000
 
-plugins = FreechessConsoleManager; FreechessSoundManager; FreechessBoardManager; FreechessSoughtGraphPlugin; FreechessGameLogger
+plugins = FreechessConsoleManager; FreechessSoundManager; FreechessBoardManager; FreechessSoughtGraphPlugin; FreechessGameLogger; FreechessScripter
