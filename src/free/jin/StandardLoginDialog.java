@@ -423,7 +423,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
   /**
    * Creates the "Guests" panel, the panel with options for guests.
    *
-   * @parentDialog The dialog to which the panel will be added.
+   * @param parentDialog The dialog to which the panel will be added.
    */
 
   public Component createGuestsPanel(final JDialog parentDialog){
@@ -478,7 +478,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
   /**
    * Creates the "Advanced Options" panel.
    *
-   * @parentDialog The dialog to which the panel will be added.
+   * @param parentDialog The dialog to which the panel will be added.
    */
 
   public Component createAdvancedOptionsPanel(final JDialog parentDialog){
@@ -545,9 +545,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * Creates and returns a "Forgot your password?" button. This method should
-   * return null if there is no password retrieving functionality on the server.
-   * The default implementation returns a simple JButton with the label
+   * Creates and returns a button labeled "Forgot your password?". This method
+   * should return null if there is no password retrieving functionality on the
+   * server. The default implementation returns a simple JButton with the label
    * "Forgot your password?".
    */
 
@@ -561,8 +561,8 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * This method is called when the "Forgot your password?" button is pressed
-   * or an equivalent action is taken by the user.
+   * This method is called when the button allowing the user to retrieve his
+   * password is pressed or an equivalent action is taken by the user.
    */
 
   protected abstract void forgotPasswordActionPerformed();
@@ -628,7 +628,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
   /**
    * Creates the "Members" panel, the panel with options for members.
    *
-   * @parentDialog The dialog to which the panel will be added.
+   * @param parentDialog The dialog to which the panel will be added.
    */
 
   public Component createMembersPanel(final JDialog parentDialog){
@@ -745,7 +745,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * Creates the panel with the "Cancel" button - the button that cancels the
    * connection.
    *
-   * @parentDialog The dialog to which the panel will be added.
+   * @param parentDialog The dialog to which the panel will be added.
    */
 
   public Component createCancelButtonPanel(final JDialog parentDialog){
