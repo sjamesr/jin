@@ -510,9 +510,9 @@ public class Jin{
       users.copyInto(usersArr);
       context.setUsers(usersArr);
 
-      instance = null;
-      
       context.shutdown();
+      
+      instance = null;
     }
   }
   
