@@ -30,7 +30,7 @@ import java.util.Vector;
  * item is pushed.
  * <P><B>NOTE:</B> This class is thread safe.
  *
- * @author  Alexander Maryanovsky.
+ * @author Alexander Maryanovsky.
  */
 
 public class BlockingQueue implements Cloneable{
@@ -233,7 +233,7 @@ public class BlockingQueue implements Cloneable{
    * Returns a shallow copy of this BlockingQueue.
    */
 
-  public Object clone(){
+  public synchronized Object clone(){
     BlockingQueue copy = new BlockingQueue();
     Enumeration enum = getElements();
     while (enum.hasMoreElements()){
