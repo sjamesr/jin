@@ -72,6 +72,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     setIvarState(Ivar.GAMEINFO, true);
     setIvarState(Ivar.SHOWOWNSEEK, true);
+    setIvarState(Ivar.MOVECASE, true);
     setIvarState(Ivar.LOCK, true);
   }
 
