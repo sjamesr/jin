@@ -1800,11 +1800,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (source == board.getPosition()){
       playAudioClipForMove(move);
-      if ((moveSendingMode == BoardManager.PREMOVE_MOVE_SENDING_MODE) &&
-           (isMoveEnRoute() || !isUserTurn()))
+      if (game.isPlayed() && (moveSendingMode == BoardManager.PREMOVE_MOVE_SENDING_MODE) &&
+          (isMoveEnRoute() || !isUserTurn()))
         setQueuedMove(move);
       else{
-        if (checkLegality(realPosition, move)){
+        if ((!game.isPlayed()) || checkLegality(realPosition, move)){
           UserMoveEvent evt2 = new UserMoveEvent(this, move);
           fireUserMadeMove(evt2);
           moveEnRoute = evt.getMove();
