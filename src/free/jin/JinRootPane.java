@@ -21,12 +21,9 @@
 
 package free.jin;
 
-import javax.swing.JRootPane;
-import java.awt.Container;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.MediaTracker;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.MatteBorder;
 import free.util.swing.AdvancedJDesktopPane;
 import free.util.StringParser;
 
@@ -38,11 +35,31 @@ import free.util.StringParser;
 public class JinRootPane extends JRootPane{
 
 
+
   /**
    * The JinFrame assosiated with this JinRootPane.
    */
 
   private final JinFrame jinFrame;
+
+
+
+
+  /**
+   * The DesktopPane.
+   */
+
+  private AdvancedJDesktopPane desktop;
+
+
+
+
+  /**
+   * The statusbar.
+   */
+
+  private JPanel statusbar;
+
 
 
   /**
@@ -53,12 +70,15 @@ public class JinRootPane extends JRootPane{
     this.jinFrame = jinFrame;
   }
 
+
   
   /**
    * Creates the content pane - a JinContentPane.
    */
 
   public Container createContentPane(){
+    Container contentPane = new JPanel(new BorderLayout());
+
     String bgColorString = Jin.getProperty("desktop.background.color");
     Color bgColor = bgColorString==null ? null : StringParser.parseColor(bgColorString);
 
@@ -83,7 +103,7 @@ public class JinRootPane extends JRootPane{
       wallpaperLayout = AdvancedJDesktopPane.CENTER;
 
 
-    AdvancedJDesktopPane desktop = new AdvancedJDesktopPane();
+    desktop = new AdvancedJDesktopPane();
     desktop.setBackground(bgColor);
     desktop.setWallpaper(wallpaper);
     desktop.setWallpaperLayoutStyle(wallpaperLayout);
@@ -91,7 +111,38 @@ public class JinRootPane extends JRootPane{
     String dragMode = Jin.getProperty("desktop.dragMode","outline");
     desktop.putClientProperty("JDesktopPane.dragMode", dragMode);
 
+    contentPane.add(BorderLayout.CENTER, desktop);
+
+    statusbar = new JPanel();
+    statusbar.setLayout(new BoxLayout(statusbar, BoxLayout.X_AXIS));
+    statusbar.setBorder(new MatteBorder(1, 0, 0, 0, Color.white));
+    contentPane.add(BorderLayout.SOUTH, statusbar);
+
+    return contentPane;
+  }
+
+
+
+
+  /**
+   * Returns the JDesktopPane.
+   */
+
+  public JDesktopPane getDesktop(){
     return desktop;
   }
+
+
+
+
+  /**
+   * Returns the status bar.
+   */
+
+  public JPanel getStatusbar(){
+    return statusbar;
+  }
+
+
 
 }

@@ -120,7 +120,18 @@ public class JinFrame extends JFrame{
    */
 
   public JDesktopPane getDesktop(){
-    return (JDesktopPane)getContentPane();
+    return ((JinRootPane)getRootPane()).getDesktop();
+  }
+
+
+
+
+  /**
+   * Returns Jin's status bar.
+   */
+
+  public JPanel getStatusbar(){
+    return ((JinRootPane)getRootPane()).getStatusbar();
   }
 
 
@@ -133,6 +144,8 @@ public class JinFrame extends JFrame{
   public JinFrameMenuBar getJinFrameMenuBar(){
     return (JinFrameMenuBar)super.getJMenuBar();
   }
+
+
 
 
 
@@ -268,7 +281,9 @@ public class JinFrame extends JFrame{
     pluginsEnum = plugins.elements();
     while (pluginsEnum.hasMoreElements()){
       Plugin plugin = (Plugin)pluginsEnum.nextElement();
-      pluginsMenu.add(plugin.createPluginMenu());
+      JMenu pluginMenu = plugin.createPluginMenu();
+      if (pluginMenu != null)
+        pluginsMenu.add(pluginMenu);
     }
     menubar.invalidate();
     menubar.validate();
