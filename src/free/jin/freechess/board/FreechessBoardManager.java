@@ -28,7 +28,9 @@ import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
 import free.jin.freechess.JinFreechessConnection;
 import free.jin.Game;
+import free.jin.JinConnection;
 import free.jin.event.GameStartEvent;
+import free.jin.event.GameEndEvent;
 
 
 /**
@@ -40,10 +42,18 @@ public class FreechessBoardManager extends BoardManager{
 
 
   /**
-   * The current primary game.
+   * The current primary (observed) game.
    */
 
-  private Object primaryGameID = null;
+  private Object primaryObservedGameID = null;
+
+
+
+  /**
+   * The current primary (played) game.
+   */
+
+  private Object primaryPlayedGameID = null;
 
 
 
@@ -68,11 +78,22 @@ public class FreechessBoardManager extends BoardManager{
   public void internalFrameActivated(InternalFrameEvent e){
     BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(e.getSource());
     Game game = boardPanel.getGame();
-    if ((game.getGameType() != Game.ISOLATED_BOARD) && boardPanel.isActive()){
-      Object gameID = game.getID();
-      if (!gameID.equals(primaryGameID)){
-        getConnection().sendCommand("primary "+gameID);
-        primaryGameID = gameID;
+    Object gameID = game.getID();
+    if (boardPanel.isActive()){
+      int gameType = game.getGameType();
+      JinConnection conn = getConnection();
+
+      if (gameType == Game.OBSERVED_GAME){
+        if (!gameID.equals(primaryObservedGameID)){
+          conn.sendCommand("primary "+gameID);
+          primaryObservedGameID = gameID;
+        }
+      }
+      else if (gameType == Game.MY_GAME){
+        if (!gameID.equals(primaryPlayedGameID)){
+          conn.sendCommand("goboard "+gameID);
+          primaryPlayedGameID = gameID;
+        }
       }
     }
 
@@ -81,15 +102,39 @@ public class FreechessBoardManager extends BoardManager{
 
 
   /**
-   * Overrides the superclass' method to set <code>primaryGameID</code>
-   * properly.
+   * Overrides the superclass' method to set <code>primaryObservedGameID</code>
+   * and <code>primaryPlayedGameID</code> properly.
    */
 
   public void gameStarted(GameStartEvent evt){
-    if (evt.getGame().getGameType() != Game.ISOLATED_BOARD)
-      primaryGameID = evt.getGame().getID();
+    int gameType = evt.getGame().getGameType();
+    Object gameID = evt.getGame().getID();
+
+    if ((gameType == Game.OBSERVED_GAME) && (primaryObservedGameID == null))
+      primaryObservedGameID = gameID;
+    else if ((gameType == Game.MY_GAME) && (primaryPlayedGameID == null))
+      primaryPlayedGameID = gameID;
 
     super.gameStarted(evt);
+  }
+
+
+
+  /**
+   * Overrides the superclass' method to set <code>primaryObservedGameID</code>
+   * and <code>primaryPlayedGameID</code> properly.
+   */
+
+  public void gameEnded(GameEndEvent evt){
+    int gameType = evt.getGame().getGameType();
+    Object gameID = evt.getGame().getID();
+
+    if ((gameType == Game.OBSERVED_GAME) && gameID.equals(primaryObservedGameID))
+      primaryObservedGameID = null;
+    else if ((gameType == Game.MY_GAME) && gameID.equals(primaryPlayedGameID))
+      primaryPlayedGameID = null;
+
+    super.gameEnded(evt);
   }
 
 
