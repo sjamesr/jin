@@ -735,7 +735,7 @@ public class Game{
    */
 
   public int getResult(){
-    Integer result = (Integer)props.getProperty("result");    
+    Integer result = (Integer)props.getProperty("result", null);
     if (result == null)
       return GAME_IN_PROGRESS;
     return result.intValue();
