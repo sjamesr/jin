@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -495,13 +495,15 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Refreshed the console by re-reading the plugin/user properties and
+   * Refreshes the console by re-reading the plugin/user properties and
    * adjusting the assosiated console properties accordingly. This is useful
    * to call after a user changes the preferences.
    */
 
   public void refreshFromProperties(){
     init();
+    outputComponent.refreshFromProperties();
+    inputComponent.refreshFromProperties();
   }
 
 
@@ -572,7 +574,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
           BoundedRangeModel verticalScrollModel = outputScrollPane.getVerticalScrollBar().getModel();
           verticalScrollModel.setValue(verticalScrollModel.getMaximum());
           didScrollToBottom = true;
-          outputScrollPane.getViewport().putClientProperty("EnableWindowBlit",Boolean.TRUE); // Enable blitting again
+          outputScrollPane.getViewport().putClientProperty("EnableWindowBlit", Boolean.TRUE); 
+          // Enable blitting again
 //          outputComponent.repaint(); Not sure why this is needed
         }
         else{
