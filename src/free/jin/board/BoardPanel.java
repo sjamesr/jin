@@ -44,16 +44,15 @@ import java.util.Vector;
 
 
 /**
- * A component which displays a chess board and all related information, such
- * as opponents' names, clock, opponents' ratings etc. This class only recognizes
- * the Game properties described in the {@link free.jin.Game} class. The
- * {@link free.jin.board.AdvancedBoardPanel} also knows the properties described
- * by {@link free.jin.AdvancedGame}.
- * To use BoardPanel, you must add it as a GameListener to some source of GameEvents,
- * or alternatively, call the methods defined in GameListener directly.
+ * A panel which displays a chess board and all related information, such
+ * as opponents' names, clock, opponents' ratings etc. 
+ * To use BoardPanel, you must register it as a GameListener to some source of
+ * GameEvents, or alternatively, call the methods defined in GameListener
+ * directly.
  */
 
-public class BoardPanel extends FixedJPanel implements MoveListener, GameListener, ActionListener, AdjustmentListener{
+public class BoardPanel extends FixedJPanel implements MoveListener, GameListener, 
+    ActionListener, AdjustmentListener{
 
 
   /**
@@ -457,7 +456,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JBoard createBoard(Game game){
-    return new JBoard(game.getInitialPosition());
+    return new JinBoard(game.getInitialPosition());
   }
 
 
@@ -492,17 +491,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     ActionListener escapeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         JBoard board = BoardPanel.this.board;
-        System.out.println("Invoked");
         if (board.isMovingPiece())
           board.cancelMovingPiece();
         else if (queuedMove != null){
-
-          queuedMove = null;
+          setQueuedMove(null);
           board.getPosition().copyFrom(realPosition);
           if (isMoveEnRoute())
             board.getPosition().makeMove(moveEnRoute);
-          if (!board.isEditable())
-            board.setEditable(true);
         }
       }
     };
@@ -1207,6 +1202,25 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Sets the queued move to the specified Move. Null is a valid value, which
+   * clears the queued move.
+   */
+
+  private void setQueuedMove(Move move){
+    if (queuedMove != null)
+      board.setShaded(queuedMove.getEndingSquare(), false);
+
+    queuedMove = move;
+    if (queuedMove != null)
+      board.setShaded(queuedMove.getEndingSquare(), true);
+
+    board.setEditable((queuedMove == null) && (displayedMoveNumber == madeMoves.size()));
+  }
+
+
+
+
+  /**
    * GameListener implementation. 
    */
 
@@ -1263,14 +1277,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.getPosition().makeMove(queuedMove);
       isBoardPositionUpdating = false;
       moveEnRoute = queuedMove;
-      queuedMove = null;
+      setQueuedMove(null);
       fireUserMadeMove(evt2);
     }
     else
       moveEnRoute = null;
-
-    if (!board.isEditable())
-      board.setEditable(true);
 
     timer.stop();
     updateClockActiveness();
@@ -1300,11 +1311,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     updateMoveHighlighting(false);
 
-    moveEnRoute = null;    // We shouldn't keep state between 
-    queuedMove = null;     // such drastic position changes
-
-    if (!board.isEditable())
-      board.setEditable(true);
+    moveEnRoute = null;      // We shouldn't keep state between 
+    setQueuedMove(null);     // such drastic position changes
 
     updateClockActiveness();
     updateMoveListTable();
@@ -1333,7 +1341,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       realPosition.makeMove((Move)madeMoves.elementAt(i));
 
     moveEnRoute = null;
-    queuedMove = null;
+    setQueuedMove(null);
 
     // Try not to change the board if possible. If, however we were displaying the position
     // after a move that was taken back, we have to update the board.
@@ -1344,9 +1352,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       displayedMoveNumber = madeMoves.size();
       updateMoveHighlighting(false);
     }
-
-    if (!board.isEditable())
-      board.setEditable(true);
 
     updateClockActiveness();
     updateMoveListTable();
@@ -1369,14 +1374,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       return;             // It could've been sent by one of the other plugins.
 
     moveEnRoute = null;
-    queuedMove = null;
+    setQueuedMove(null);
 
     isBoardPositionUpdating = true;
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
-
-    if (!board.isEditable())
-      board.setEditable(true);
 
     updateClockActiveness();
     displayedMoveNumber = madeMoves.size();
@@ -1496,10 +1498,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (source == board.getPosition()){
       playAudioClipForMove(move);
-      if (isMoveEnRoute() || !isUserTurn()){
-        queuedMove = move;
-        board.setEditable(false);
-      }
+      if (isMoveEnRoute() || !isUserTurn())
+        setQueuedMove(move);
       else{
         UserMoveEvent evt2 = new UserMoveEvent(this, evt.getMove());
         fireUserMadeMove(evt2);
