@@ -1680,38 +1680,6 @@ public class JBoard extends JComponent{
 
 
   /**
-   * Returns the preferred size of this JBoard. The PiecePainter is consulted
-   * when determining the preferred size. If it returns a Dimension that has
-   * no area (width<=0 or height<=0), the BoardPainter is consulted. If it returns 
-   * a Dimension with no area too, some acceptable size in which width==height 
-   * is returned.
-   */
-
-  public Dimension getPreferredSize(){
-    Dimension piecePrefSize = getPiecePainter().getPreferredPieceSize();
-    if ((piecePrefSize.width<=0)||(piecePrefSize.height<=0)){
-      Dimension boardPrefSize = getBoardPainter().getPreferredBoardSize();
-      if ((boardPrefSize.width<=0)||(boardPrefSize.height<=0))
-        return new Dimension(400,400);
-      else return boardPrefSize;
-    }
-    else return new Dimension(piecePrefSize.width*8, piecePrefSize.height*8);
-  }
-
-
-
-  /**
-   * Returns the minimum size of this JBoard. This method returns the minimum
-   * reasonable size of a chess board - about 80x80.
-   */
-
-  public Dimension getMinimumSize(){
-    return new Dimension(80,80);
-  }
-  
-
-
-  /**
    * Displays a simple <code>JFrame</code> with a <code>JBoard</code>.
    */
 
