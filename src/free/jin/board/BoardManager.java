@@ -280,9 +280,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected void registerConnListeners(){
-    JinConnection conn = getConnection();
+    JinListenerManager listenerManager = getConnection().getJinListenerManager();
 
-    conn.addGameListener(this);
+    listenerManager.addGameListener(this);
   }
 
 
@@ -596,9 +596,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected void unregisterConnListeners(){
-    JinConnection conn = getConnection();
+    JinListenerManager listenerManager = getConnection().getJinListenerManager();
 
-    conn.removeGameListener(this);
+    listenerManager.removeGameListener(this);
   } 
 
 
@@ -658,7 +658,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     boardPanel.getBoard().setBoardPainter(boardPainter);
 
     boardPanel.addUserMoveListener(this);
-    getConnection().addGameListener(boardPanel);
+    getConnection().getJinListenerManager().addGameListener(boardPanel);
     gamesToBoardPanels.put(game, boardPanel);
 
     JInternalFrame boardFrame;
@@ -870,7 +870,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void gameEnded(GameEndEvent evt){
     BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.remove(evt.getGame());
     if (boardPanel != null){
-      getConnection().removeGameListener(boardPanel);
+      getConnection().getJinListenerManager().removeGameListener(boardPanel);
       boardPanel.removeUserMoveListener(this);
       boardPanel.setInactive();
       JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.get(boardPanel);
