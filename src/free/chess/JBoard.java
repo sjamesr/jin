@@ -22,10 +22,11 @@
 package free.chess;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.Vector;
@@ -274,7 +275,7 @@ public class JBoard extends JComponent{
    * The current move input mode.
    */
 
-  private int moveInputMode = NO_PIECES_MOVE;
+  private int moveInputMode = ALL_PIECES_MOVE;
 
 
 
@@ -415,7 +416,10 @@ public class JBoard extends JComponent{
 
     setOpaque(true);
     setDoubleBuffered(false); // We're double buffering ourselves.
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    enableEvents(MouseEvent.MOUSE_EVENT_MASK |
+                 MouseEvent.MOUSE_MOTION_EVENT_MASK |
+                 KeyEvent.KEY_EVENT_MASK);
+    registerKeyboardActions();
   }
 
 
@@ -438,6 +442,35 @@ public class JBoard extends JComponent{
 
   public JBoard(){
     this(new Position());
+  }
+
+
+
+
+  /**
+   * Registers all the keyboard actions for this <code>JBoard</code>.
+   */
+
+  protected void registerKeyboardActions(){
+    // Release the currently dragged/moved piece on ESCAPE
+    ActionListener releasePieceListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        if (movedPieceSquare != null){
+          repaint(getMovedPieceRect(null));
+          repaint(squareToRect(movedPieceSquare, null));
+          movedPieceSquare = null;
+          movedPieceLoc = null;
+          movedPieceSquare = null;
+          if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
+            setCursor(Cursor.getDefaultCursor());
+          
+        }
+      }
+    };
+    
+    registerKeyboardAction(releasePieceListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+    registerKeyboardAction(releasePieceListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
   }
 
 
@@ -1247,12 +1280,11 @@ public class JBoard extends JComponent{
     if (!isEnabled())
       return;
 
-    if (!SwingUtilities.isLeftMouseButton(evt)) 
-      return;
-
-    int inputStyle = getMoveInputStyle();
+    boolean isLeftMouseButton = SwingUtilities.isLeftMouseButton(evt);
 
     int evtID = evt.getID();
+
+    int inputStyle = getMoveInputStyle();
 
     int x = evt.getX();
     int y = evt.getY();
@@ -1271,10 +1303,14 @@ public class JBoard extends JComponent{
 
     Rectangle helpRect = null;
 
-    if ((evtID==MouseEvent.MOUSE_PRESSED)||((evtID==MouseEvent.MOUSE_RELEASED)&&(inputStyle==DRAG_N_DROP))){
-      if (movedPieceSquare==null){
-        if (evtID==MouseEvent.MOUSE_RELEASED) // This happens if the user tries to drag an empty square into a piece.
+    if (isLeftMouseButton && ((evtID == MouseEvent.MOUSE_PRESSED) ||
+       ((evtID == MouseEvent.MOUSE_RELEASED) && (inputStyle == DRAG_N_DROP)))){
+      if (movedPieceSquare == null){
+
+        // This happens if the user tries to drag an empty square into a piece.
+        if (evtID == MouseEvent.MOUSE_RELEASED) 
           return;
+
         movedPieceSquare = square;
         Piece piece = position.getPieceAt(movedPieceSquare);
         if ((piece == null) || (!canBeMoved(piece))){
@@ -1297,9 +1333,10 @@ public class JBoard extends JComponent{
 
       }
       else{
-        // We don't need to modify the location of the piece on a non motion mouse event, do we?
-        // I commented it out because it causes a bug if you drop a piece while quickly moving the mouse.
-        // The location of the piece is updated without the old position being repainted, which creates
+        // We don't need to modify the location of the piece on a non motion
+        // mouse event, do we? I commented it out because it causes a bug if you
+        // drop a piece while quickly moving the mouse. The location of the piece
+        // is updated without the old position being repainted, which creates
         // garbage on the screen.
 //        movedPieceLoc.x = x; 
 //        movedPieceLoc.y = y;
@@ -1332,7 +1369,7 @@ public class JBoard extends JComponent{
 
         movedPieceSquare = null;
         movedPieceLoc = null;
-        if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE)
+        if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
           setCursor(Cursor.getDefaultCursor());
       }
     }
@@ -1355,14 +1392,14 @@ public class JBoard extends JComponent{
     if (!isEnabled())
       return;
 
-    if (!SwingUtilities.isLeftMouseButton(evt)) 
+    int evtID = evt.getID();
+
+    if ((evtID == MouseEvent.MOUSE_DRAGGED) && !SwingUtilities.isLeftMouseButton(evt)) 
       return;
 
     int inputStyle = getMoveInputStyle();
     if (movedPieceSquare == null)
       return;
-
-    int evtID = evt.getID();
 
     int x = evt.getX();
     int y = evt.getY();
@@ -1373,7 +1410,8 @@ public class JBoard extends JComponent{
 
     Rectangle helpRect = null;
 
-    if ((evtID==MouseEvent.MOUSE_DRAGGED)||((evtID==MouseEvent.MOUSE_MOVED)&&(inputStyle==CLICK_N_CLICK))){
+    if ((evtID == MouseEvent.MOUSE_DRAGGED) ||
+       ((evtID == MouseEvent.MOUSE_MOVED) && (inputStyle == CLICK_N_CLICK))){
       repaint(helpRect = getMovedPieceRect(helpRect));
       movedPieceLoc.x = x;
       movedPieceLoc.y = y;
@@ -1417,6 +1455,23 @@ public class JBoard extends JComponent{
 
   public Dimension getMinimumSize(){
     return new Dimension(80,80);
+  }
+
+
+
+
+  /**
+   * Displays a simple <code>JFrame</code> with a <code>JBoard</code>.
+   */
+
+  public static void main(String [] args){
+    javax.swing.JFrame frame = new javax.swing.JFrame("JBoard Test");
+    frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+    frame.getContentPane().setLayout(new java.awt.BorderLayout());
+    JBoard board = new JBoard();
+    frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
+    frame.setBounds(50, 50, 300, 300);
+    frame.setVisible(true);
   }
 
 
