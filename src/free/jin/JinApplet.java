@@ -642,19 +642,15 @@ public class JinApplet extends Applet implements JinContext{
                          getPrefsUploadUrl().getProtocol().equals("https");
       
       if (isSecure)
-        return "Your password will be stored on the server and transferred to the applet\n" +
-               "in encrypted form. This is reasonably safe, but your password will still" +
-               "be visible via the \"View Page Source\" option in your browser.\n"+
-               "Are you sure you want your password saved?";
+        return null;
       else
         return "Your password will be stored on the server and transferred to the applet\n" +
-               "as plain text HTML - anyone with access to a router or proxy between your\n" +
-               "computer and the server will be able to view your password. This is\n" +
-               "dangerous and advised against.\n" +
+               "as plain text - anyone with access to a router or proxy between your\n" +
+               "computer and the server will be able to view your password.\n" +
                "Are you sure you want your password saved?";
     } catch (MalformedURLException e){
         e.printStackTrace();
-        return "Your password will not be stored at all.";
+        return "Error: Your password will may not be stored due to a problem.";
       }
   }
   
