@@ -86,7 +86,7 @@ public class Giveaway extends ChesslikeGenericVariant{
    */
 
   private Giveaway(){
-    super(Chess.INITIAL_POSITION_LEXIGRAPHIC, "Giveaway");
+    super(Chess.INITIAL_POSITION_FEN, "Giveaway");
   }
 
 
