@@ -148,29 +148,44 @@ public class InternalFrameSwitcher implements ContainerListener{
    */
 
   public void selectNext(){
+    JInternalFrame newSelectedFrame = null;
+
     int framesCount = frames.size();
-    if (framesCount <= 1)
-      return;
-
-    int selected = getSelected();
-    if (selected == -1)
-      return;
-
-    int i = (selected == framesCount - 1) ? 0 : selected + 1;
-    while (i != selected){
-      JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-      if (frame.isVisible() && !frame.isIcon()){
-        try{
-          ignoreContainerEvents = true;
-          frame.setSelected(true);
-          ignoreContainerEvents = false;
-          return;
-        } catch (PropertyVetoException e){}
+    if (framesCount == 1)
+      newSelectedFrame = (JInternalFrame)frames.elementAt(0);
+    else if (framesCount != 0){
+      int selected = getSelected();
+      if (selected == -1){
+        for (int i = 0; i < framesCount; i++){
+          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
+          if (frame.isVisible() && !frame.isIcon()){
+            newSelectedFrame = frame;
+            break;
+          }
+        }
       }
-      
-      i++;
-      if (i == framesCount)
-        i = 0;
+      else{
+        int i = (selected == framesCount - 1) ? 0 : selected + 1;
+        while (i != selected){
+          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
+          if (frame.isVisible() && !frame.isIcon()){
+            newSelectedFrame = frame;
+            break;
+          }
+          i++;
+          if (i == framesCount)
+            i = 0;
+        }
+      }
+    }
+
+    if (newSelectedFrame != null){    
+      try{
+        ignoreContainerEvents = true;
+        newSelectedFrame.setSelected(true);
+        ignoreContainerEvents = false;
+        return;
+      } catch (PropertyVetoException e){}
     }
   }
 
@@ -181,29 +196,45 @@ public class InternalFrameSwitcher implements ContainerListener{
    */
 
   public void selectPrevious(){
+    JInternalFrame newSelectedFrame = null;
+
+    
     int framesCount = frames.size();
-    if (framesCount <= 1)
-      return;
-
-    int selected = getSelected();
-    if (selected == -1)
-      return;
-
-    int i = (selected == 0) ? framesCount - 1 : selected - 1;
-    while (i != selected){
-      JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
-      if (frame.isVisible() && !frame.isIcon()){
-        try{
-          ignoreContainerEvents = true;
-          frame.setSelected(true);
-          ignoreContainerEvents = false;
-          return;
-        } catch (PropertyVetoException e){}
+    if (framesCount == 1)
+      newSelectedFrame = (JInternalFrame)frames.elementAt(0);
+    else if (framesCount != 0){
+      int selected = getSelected();
+      if (selected == -1){
+        for (int i = 0; i < framesCount; i++){
+          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
+          if (frame.isVisible() && !frame.isIcon()){
+            newSelectedFrame = frame;
+            break;
+          }
+        }
       }
+      else{
+        int i = (selected == 0) ? framesCount - 1 : selected - 1;
+        while (i != selected){
+          JInternalFrame frame = (JInternalFrame)frames.elementAt(i);
+          if (frame.isVisible() && !frame.isIcon()){
+            newSelectedFrame = frame;
+            break;
+          }
+          i--;
+          if (i == -1)
+            i = framesCount - 1;
+        }
+      }
+    }
 
-      i--;
-      if (i == -1)
-        i = framesCount - 1;
+    if (newSelectedFrame != null){    
+      try{
+        ignoreContainerEvents = true;
+        newSelectedFrame.setSelected(true);
+        ignoreContainerEvents = false;
+        return;
+      } catch (PropertyVetoException e){}
     }
   }
 
