@@ -26,7 +26,7 @@ package free.util;
  * Thrown when the format of something is wrong.
  */
 
-public class FormatException extends Exception{
+public class FormatException extends RuntimeException{
 
 
 
