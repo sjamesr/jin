@@ -437,42 +437,41 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       Style12Struct oldBoardData = gameData.boardData;
       int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
-      if (game.isPlayed()){
-        if (plyDifference < 0){
-          if (gameData.getMoveCount() < -plyDifference) // Can't issue takeback
-            changePosition(gameData, boardData);
-          else
-            issueTakeback(gameData, boardData);
-        }
-        else if (plyDifference == 0){
-//          changePosition(game, oldBoardData, boardData);
-          // This happens if you:
-          // 1. Issue "refresh".
-          // 2. Make an illegal move, because the server will re-send us the board (although we don't need it)
-        }
-        else if (plyDifference == 1){
-          if (boardData.getMoveVerbose() != null)
-            makeMove(gameData, boardData);
-          else
-            changePosition(gameData, boardData); // This shouldn't happen, but I'll leave it just in case
-        }
-        else if (plyDifference > 1){
+      if (plyDifference < 0){
+        if (gameData.getMoveCount() < -plyDifference) // Can't issue takeback
           changePosition(gameData, boardData);
-          // This happens if you:
-          // 1. Issue "forward" with an argument of 2 or bigger.
-        }
+        else
+          issueTakeback(gameData, boardData);
       }
-      else{
-        changePosition(gameData, boardData); // Since we don't have the move list, this is the best we can do
+      else if (plyDifference == 0){
+//          changePosition(game, oldBoardData, boardData);
+        // This happens if you:
+        // 1. Issue "refresh".
+        // 2. Make an illegal move, because the server will re-send us the board
+        //    (although we don't need it)
+      }
+      else if (plyDifference == 1){
+        if (boardData.getMoveVerbose() != null)
+          makeMove(gameData, boardData);
+        else
+          changePosition(gameData, boardData); 
+          // This shouldn't happen, but I'll leave it just in case
+      }
+      else if (plyDifference > 1){
+        changePosition(gameData, boardData);
+        // This happens if you:
+        // 1. Issue "forward" with an argument of 2 or bigger.
       }
     }
     else{ // Grr, the server started a game without sending us a GameInfo line.
           // Currently happens if you start examining a game (26.08.2002)
 
-      // We have no choice but to fake the data, since the server simply doesn't send us this information.
-      GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(), false, "fake-variant", false, false, false,
-        boardData.getInitialTime(), boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(), 0,
-        -1, ' ', -1, ' ', false, false);
+      // We have no choice but to fake the data, since the server simply doesn't
+      // send us this information.
+      GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(),
+        false, "fake-variant", false, false, false, boardData.getInitialTime(),
+        boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(),
+        0, -1, ' ', -1, ' ', false, false);
 
       gameData = startGame(fakeGameInfo, boardData);
     }
