@@ -606,7 +606,7 @@ public class Jin{
       String title = getProperty("frame.title", "Jin");
       mainFrame.setTitle(title);
 
-      URL iconURL = Jin.class.getResource("resources/jinicon.gif");
+      URL iconURL = Jin.class.getResource(getProperty("icon"));
       Image iconImage = Toolkit.getDefaultToolkit().getImage(iconURL);
       if (iconImage != null)
         mainFrame.setIconImage(iconImage);
