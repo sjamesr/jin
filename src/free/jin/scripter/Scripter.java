@@ -596,8 +596,8 @@ public class Scripter extends Plugin{
 
     protected void runScripts(JinEvent evt, String eventSubtype, Object [][] vars){
       String [] supportedSubtypes = getEventSubtypesImpl();
-      if (((eventSubtype == null) && (supportedSubtypes != null)) || 
-            !Utilities.isElementOf(supportedSubtypes, eventSubtype)){
+      if ((supportedSubtypes != null) && ((eventSubtype == null) ||
+                                         !Utilities.isElementOf(supportedSubtypes, eventSubtype))){
         System.err.println("Unknown event subtype occurred: "+eventSubtype);
         return;
       }
