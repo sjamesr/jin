@@ -813,7 +813,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     targetDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
 
     JRadioButtonMenuItem legalChess = new JRadioButtonMenuItem("Legal Chess");
-    JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Immediate Sending");
+    JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Predrag");
     JRadioButtonMenuItem premove = new JRadioButtonMenuItem("Premove");
 
     switch (getMoveSendingMode()){
@@ -825,8 +825,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     }
 
     legalChess.setMnemonic('l');
-    predrag.setMnemonic('i');
-    premove.setMnemonic('r');
+    predrag.setMnemonic('p');
+    premove.setMnemonic('m');
 
     legalChess.setActionCommand("legalchess");
     predrag.setActionCommand("predrag");
