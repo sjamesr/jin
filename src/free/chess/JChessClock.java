@@ -225,10 +225,10 @@ public class JChessClock extends AbstractChessClock{
     time -= tenths*100;
 
     String signString = isNegative ? "-" : "";
-
-    switch (getDisplayMode()){
+    
+    switch (getActualDisplayMode()){
       case HOUR_MINUTE_DISPLAY_MODE:
-        String sepString = (Math.abs(tenths) > 4) || !isActive() ? ":" : " "; 
+        String sepString = (Math.abs(tenths) > 4) || !isRunning() ? ":" : " "; 
         return signString + String.valueOf(hours) + 
           sepString + TextUtilities.padStart(String.valueOf(minutes), '0', 2);  
       case MINUTE_SECOND_DISPLAY_MODE:
