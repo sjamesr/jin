@@ -162,6 +162,27 @@ public class ConsoleTextField extends FixedJTextField{
 
 
 
+  /**
+   * Processes the key event.
+   */
+
+  protected void processKeyEvent(KeyEvent evt){
+    int keyCode = evt.getKeyCode();
+    boolean isShiftDown = evt.isShiftDown();
+    boolean isMetaDown = evt.isMetaDown();
+
+    if (evt.getID() == KeyEvent.KEY_PRESSED){
+      if (((keyCode == KeyEvent.VK_INSERT) && isShiftDown) || // The shift-insert keybinding
+          ((keyCode == KeyEvent.VK_V) && isMetaDown)){        // The Command-v keybinding
+        paste();
+        evt.consume(); // We don't want to paste twice.
+      }
+    }
+
+    super.processKeyEvent(evt);
+  }
+
+
 
   /**
    * Processes the KeyEvent.
@@ -171,14 +192,18 @@ public class ConsoleTextField extends FixedJTextField{
     super.processComponentKeyEvent(evt); // We want the listeners to get the 
                                          // event before we clear the text.
 
-    if (evt.getID()==KeyEvent.KEY_PRESSED){
-      switch(evt.getKeyCode()){
+
+    boolean isControlDown = evt.isShiftDown();
+    boolean isShiftDown = evt.isShiftDown();
+
+    if (evt.getID() == KeyEvent.KEY_PRESSED){
+      switch (evt.getKeyCode()){
         case KeyEvent.VK_ENTER:
           String command = getText();
           long modifiers = 0;
-          if (evt.isShiftDown())
+          if (isShiftDown)
             modifiers |= Command.BLANKED_MASK;
-          if (evt.isControlDown())
+          if (isControlDown)
             modifiers |= Command.SPECIAL_MASK;
           
           if ((modifiers&Command.BLANKED_MASK)==0){
@@ -193,14 +218,14 @@ public class ConsoleTextField extends FixedJTextField{
           console.issueCommand(new Command(command, modifiers));
           break;
         case KeyEvent.VK_ESCAPE:
-          if (evt.getModifiers()==0){
+          if (evt.getModifiers() == 0){
             typedInString = "";
             setText("");
             currentHistoryIndex = -1;
           }
           break;
         case KeyEvent.VK_UP:
-          if (evt.getModifiers()==0){
+          if (evt.getModifiers() == 0){
             if (currentHistoryIndex == -1)
               typedInString = getText();
 
@@ -222,7 +247,7 @@ public class ConsoleTextField extends FixedJTextField{
           }
           break;
         case KeyEvent.VK_DOWN:
-          if (evt.getModifiers()==0){
+          if (evt.getModifiers() == 0){
             if (currentHistoryIndex == -1){
               getToolkit().beep();
               break;
@@ -246,7 +271,7 @@ public class ConsoleTextField extends FixedJTextField{
           }
           break;
         case KeyEvent.VK_R:
-          if (evt.isControlDown()){ // Watauba feature :-)
+          if (isControlDown){ // Watauba feature :-)
             String curText = getText();
             String selectedText = getSelectedText();
             String reversedSelectedText = new StringBuffer(selectedText).reverse().toString();
