@@ -2001,6 +2001,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().removeMoveListener(this);
     board.setMoveInputMode(JinBoard.ALL_PIECES_MOVE);
     board.setEditable(true);
+    
+    if (whiteClock instanceof JChessClock){
+      ((JChessClock)whiteClock).setActiveForeground(Color.lightGray);
+      ((JChessClock)whiteClock).setInactiveForeground(Color.gray);
+    }
+    if (blackClock instanceof JChessClock){
+      ((JChessClock)blackClock).setActiveForeground(Color.lightGray);
+      ((JChessClock)blackClock).setInactiveForeground(Color.gray);
+    }
   }
 
 
