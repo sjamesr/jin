@@ -4,6 +4,12 @@
 		<fileset dir="resources/libs">
 			<include name="*.jar"/>
 		</fileset>
+		<fileset dir="resources/libs/icc">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="resources/libs/fics">
+			<include name="*.jar"/>
+		</fileset>
 	</path>
 
 
