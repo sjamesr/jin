@@ -26,7 +26,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -782,9 +782,9 @@ public class AppletJinContext implements JinContext{
           
           
           URL savePrefsUrl = new URL(applet.getDocumentBase(), applet.getParameter("savePrefsUrl"));
-          HttpURLConnection conn = (HttpURLConnection)savePrefsUrl.openConnection();
+          URLConnection conn = savePrefsUrl.openConnection();
           conn.setDoOutput(true);
-          conn.setRequestMethod("POST");
+          // conn.setRequestMethod("POST");
           conn.setRequestProperty("Content-type", "application/binary");
           
           DataOutputStream out = new DataOutputStream(conn.getOutputStream());
