@@ -209,7 +209,7 @@ public class LicenseDialog extends JDialog{
     LinkLabel jinGPLLabel = new LinkLabel("GNU General Public License");
     jinGPLLabel.addActionListener(gplActionListener);
     jinPanel.add(jinGPLLabel);
-    jinPanel.add(new JLabel("."));
+    jinPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(jinPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
@@ -219,7 +219,7 @@ public class LicenseDialog extends JDialog{
     jinWebsiteLabel.setToolTipText("http://www.jinchess.com");
     jinWebsiteLabel.addActionListener(new URLActionListener("http://www.jinchess.com"));
     jinWebsitePanel.add(jinWebsiteLabel);
-    jinWebsitePanel.add(new JLabel("."));
+    jinWebsitePanel.add(new JLabel("<html>.</html>"));
     contentPane.add(jinWebsitePanel);
 
     contentPane.add(Box.createVerticalStrut(10));
@@ -227,7 +227,7 @@ public class LicenseDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(10));
 
     JPanel jregexPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    jregexPanel.add(new JLabel("<html>* Jin uses the&nbsp</html>"));
+    jregexPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
     LinkLabel jregexWebsiteLabel = new LinkLabel("jregex regular expression library");
     jregexWebsiteLabel.setToolTipText("http://jregex.sourceforge.net");
     jregexWebsiteLabel.addActionListener(new URLActionListener("http://jregex.sourceforge.net"));
@@ -236,12 +236,12 @@ public class LicenseDialog extends JDialog{
     LinkLabel jregexLicenseLabel = new LinkLabel("BSD license");
     jregexLicenseLabel.addActionListener(jregexActionListener);
     jregexPanel.add(jregexLicenseLabel);
-    jregexPanel.add(new JLabel("."));
+    jregexPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(jregexPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    beanshellPanel.add(new JLabel("<html>* Jin uses the&nbsp</html>"));
+    beanshellPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
     LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
     beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
     beanshellWebsiteLabel.addActionListener(new URLActionListener("http://www.beanshell.org"));
@@ -250,12 +250,12 @@ public class LicenseDialog extends JDialog{
     LinkLabel beanshellLicenseLabel = new LinkLabel("GNU Lesser General Public License");
     beanshellLicenseLabel.addActionListener(beanshellActionListener);
     beanshellPanel.add(beanshellLicenseLabel);
-    beanshellPanel.add(new JLabel("."));
+    beanshellPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(beanshellPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    xboardPanel.add(new JLabel("<html>* Jin contains a piece set from&nbsp</html>"));
+    xboardPanel.add(new JLabel("<html>Jin contains a piece set from&nbsp</html>"));
     LinkLabel xboardWebsiteLabel = new LinkLabel("xboard/winboard");
     xboardWebsiteLabel.setToolTipText("http://www.tim-mann.org/xboard.html");
     xboardWebsiteLabel.addActionListener(new URLActionListener("http://www.tim-mann.org/xboard.html"));
@@ -264,12 +264,12 @@ public class LicenseDialog extends JDialog{
     LinkLabel xboardLicenseLabel = new LinkLabel("GNU General Public License");
     xboardLicenseLabel.addActionListener(gplActionListener);
     xboardPanel.add(xboardLicenseLabel);
-    xboardPanel.add(new JLabel("."));
+    xboardPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(xboardPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel eboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    eboardPanel.add(new JLabel("<html>* Jin includes a piece set from&nbsp</html>"));
+    eboardPanel.add(new JLabel("<html>Jin includes a piece set from&nbsp</html>"));
     LinkLabel eboardWebsiteLabel = new LinkLabel("eboard");
     eboardWebsiteLabel.setToolTipText("http://eboard.sourceforge.net/");
     eboardWebsiteLabel.addActionListener(new URLActionListener("http://eboard.sourceforge.net/"));
@@ -278,12 +278,12 @@ public class LicenseDialog extends JDialog{
     LinkLabel eboardLicenseLabel = new LinkLabel("GNU General Public License");
     eboardLicenseLabel.addActionListener(gplActionListener);
     eboardPanel.add(eboardLicenseLabel);
-    eboardPanel.add(new JLabel("."));
+    eboardPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(eboardPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel blitzinPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    blitzinPanel.add(new JLabel("<html>* Jin includes piece sets, boards and sounds from&nbsp</html>"));
+    blitzinPanel.add(new JLabel("<html>Jin includes piece sets, boards and sounds from&nbsp</html>"));
     LinkLabel blitzinWebsiteLabel = new LinkLabel("Internet Chess Club's Blitzin");
     blitzinWebsiteLabel.setToolTipText("http://www.chessclub.com/interface/download_w32.html");
     blitzinWebsiteLabel.addActionListener(new URLActionListener("http://www.chessclub.com/interface/download_w32.html"));
@@ -293,7 +293,7 @@ public class LicenseDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel kunststoffPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    kunststoffPanel.add(new JLabel("<html>* Jin is distributed with the&nbsp</html>"));
+    kunststoffPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
     LinkLabel kunststoffWebsiteLabel = new LinkLabel("Kunststoff Look And Feel");
     kunststoffWebsiteLabel.setToolTipText("http://www.incors.org/");
     kunststoffWebsiteLabel.addActionListener(new URLActionListener("http://www.incors.org/"));
@@ -302,12 +302,12 @@ public class LicenseDialog extends JDialog{
     LinkLabel kunststoffLicenseLabel = new LinkLabel("GNU Lesser General Public License");
     kunststoffLicenseLabel.addActionListener(lgplActionListener);
     kunststoffPanel.add(kunststoffLicenseLabel);
-    kunststoffPanel.add(new JLabel("."));
+    kunststoffPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(kunststoffPanel);
     contentPane.add(Box.createVerticalStrut(5));
 
     JPanel threeDlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    threeDlfPanel.add(new JLabel("<html>* Jin is distributed with the&nbsp</html>"));
+    threeDlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
     LinkLabel threeDlfWebsiteLabel = new LinkLabel("3D Look And Feel");
     threeDlfWebsiteLabel.setToolTipText("http://www.markus-hillenbrand.de/3dlf/index.html");
     threeDlfWebsiteLabel.addActionListener(new URLActionListener("http://www.markus-hillenbrand.de/3dlf/index.html"));
@@ -316,9 +316,18 @@ public class LicenseDialog extends JDialog{
     LinkLabel threeDlfLicenseLabel = new LinkLabel("GNU General Public License");
     threeDlfLicenseLabel.addActionListener(gplActionListener);
     threeDlfPanel.add(threeDlfLicenseLabel);
-    threeDlfPanel.add(new JLabel("."));
+    threeDlfPanel.add(new JLabel("<html>.</html>"));
     contentPane.add(threeDlfPanel);
+    contentPane.add(Box.createVerticalStrut(5));
 
+    JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by Denis DesLauriers, licensed under the&nbsp</html>"));
+    LinkLabel logoLicenseLabel = new LinkLabel("GNU General Public License");
+    logoLicenseLabel.addActionListener(gplActionListener);
+    denisDesLauriersPanel.add(logoLicenseLabel);
+    denisDesLauriersPanel.add(new JLabel("<html>.</html>"));
+    contentPane.add(denisDesLauriersPanel);
+    
 
     contentPane.add(Box.createVerticalStrut(15));
 
