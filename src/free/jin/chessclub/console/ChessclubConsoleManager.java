@@ -46,7 +46,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     super.chatMessageReceived(evt);
 
     String type = evt.getType();
-    if (type.equals("tell") || type.equals("say") || type.equals("atell"))
+    if (type.equals("tell") || type.equals("say") || type.equals("atell") || type.equals("ptell"))
       console.tellReceived(evt.getSender());
   }
 
@@ -71,7 +71,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     else if (type.equals("say"))
       return sender+title+" says: "+message;
     else if (type.equals("ptell"))
-      return "Your partner tells you: "+message;
+      return sender+title+" (your partner) tells you: "+message;
     else if (type.equals("qtell"))
       return parseQTell(evt);
     else if (type.equals("atell"))
