@@ -54,7 +54,7 @@ a different username.";
 	<?php
 		if (!$isGuest){
 			echo "<PARAM NAME=\"savePrefsUrl\" VALUE=\"?savePrefs\">\n\t";
-			echo "<PARAM NAME=\"prefsSaveKey\" VALUE=\"" . genPrefsSaveKey($userid) . ">\n\t";
+			echo "<PARAM NAME=\"prefsSaveKey\" VALUE=\"" . genPrefsSaveKey($userid) . "\">\n\t";
 			echo loadPrefs($userid);
 		}
 	?>
