@@ -1164,6 +1164,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * Returns the game board.
+   */
+
+  public JinBoard getBoard(){
+    return board;
+  }
+
+
+
+
+  /**
    * Returns the title the parent frame or internal frame of this BoardPanel
    * should have. Whoever adds the BoardPanel may consult with this method.
    */
