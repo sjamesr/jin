@@ -128,10 +128,8 @@ public class FixedJInternalFrame extends JInternalFrame{
         if (previousFocusedComponent != null)
           previousFocusedComponent.requestFocus();
         else{
-          Component contentPane = getContentPane();
-          if (!((contentPane instanceof JComponent) &&
-                ((JComponent)contentPane).requestDefaultFocus()))
-            contentPane.requestFocus();
+          if (!requestDefaultFocus())
+            requestFocus();
         }
       }
     }
