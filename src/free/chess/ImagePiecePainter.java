@@ -24,17 +24,24 @@ package free.chess;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Enumeration;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.io.IOException;
 import free.util.ImageUtilities;
+import free.util.TextUtilities;
+import free.util.IOUtilities;
 
 
 /**
  * An implementation of PiecePainter which paints images.
  */
 
-public class ImagePiecePainter implements PiecePainter{
+public class ImagePiecePainter implements ResourcePiecePainter{
 
 
+  
   /**
    * The ImageFilter we use to create shaded images.
    */
@@ -48,7 +55,7 @@ public class ImagePiecePainter implements PiecePainter{
    * are Hashtables mapping Pieces to Images.
    */
 
-  private final Hashtable [] pieceImages;
+  private Hashtable [] pieceImages;
 
 
 
@@ -56,9 +63,20 @@ public class ImagePiecePainter implements PiecePainter{
    * Same as pieceImages only for shaded images.
    */
 
-  private final Hashtable [] shadedPieceImages;
+  private Hashtable [] shadedPieceImages;
 
 
+  
+  /**
+   * A no-arg constructor, so that this piece painter can be used as a
+   * <code>ResourcePiecePainter</code>.
+   */
+   
+  public ImagePiecePainter(){
+     
+  }
+  
+  
 
   /**
    * Creates a new ImagePiecePainter with the specified piece images.
@@ -108,6 +126,84 @@ public class ImagePiecePainter implements PiecePainter{
       }
     }
   }
+  
+  
+  
+  /**
+   * Loads the piece images from the specified URL. The structure at the
+   * specified url is described below.
+   * A properties file named "definition" must be located at the base URL.
+   * That file should contain the following three properties:
+   * <ul>
+   *   <li><code>image.type</code>: Specifies the extension (type) of the
+   *       images - gif, png etc. If this is not specified, "gif" is assumed.
+   *   <li><code>size.pref</code>: Specifies the preferred size of the piece
+   *       set, in pixels.
+   *   <li><code>size.list</code>: A list of sizes of all the available piece
+   *       images, in increasing order, separated by spaces.
+   * </ul> 
+   * Directories with names corresponding to the sizes must be present at the
+   * base URL and in those directories resources named
+   * <code>[color char][piece char].[extension]</code> where
+   * <code>[color char]</code> is either 'w' or 'b' (for black or white),
+   * <code>[piece char]</code> is one of 'k', 'q', 'r', 'b', 'n'
+   * or 'p'. The images for all twelve pieces must be present there and they
+   * must have the correct size.
+   */
+   
+  public void load(URL url) throws IOException{
+    URL defURL = new URL(url, "definition");
+    Properties def = IOUtilities.loadProperties(defURL);
+    if (def == null)
+      throw new IOException("Unable to load " + defURL);
+    
+    String ext = def.getProperty("ext", "gif");
+    int [] sizes = TextUtilities.parseIntList(def.getProperty("size.list"), " ");
+    
+    this.pieceImages = new Hashtable[sizes[sizes.length - 1] + 1];
+    this.shadedPieceImages = new Hashtable[sizes[sizes.length - 1] + 1];
+    
+    Piece [] pieces = new Piece[]{ChessPiece.WHITE_KING, ChessPiece.BLACK_KING,
+      ChessPiece.WHITE_QUEEN, ChessPiece.BLACK_QUEEN, ChessPiece.WHITE_ROOK,
+      ChessPiece.BLACK_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.BLACK_BISHOP,
+      ChessPiece.WHITE_KNIGHT, ChessPiece.BLACK_KNIGHT, ChessPiece.WHITE_PAWN,
+      ChessPiece.BLACK_PAWN};
+      
+    String [] pieceNames = 
+      new String[]{"wk", "bk", "wq", "bq", "wr", "br", "wb", "bb", "wn", "bn", "wp", "bp"};
+    
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Hashtable pieceImages = new Hashtable(sizes.length*5/4);
+    int imagesCount = 0;
+    for (int i = 0; i < sizes.length; i++){
+      int size = sizes[i];
+      
+      Hashtable normal = new Hashtable(15);
+      Hashtable shaded = new Hashtable(15);
+
+      for (int j = 0; j < pieces.length; j++)
+        addImage(toolkit, url, pieces[j], size, pieceNames[j], ext, normal, shaded); 
+
+      this.pieceImages[size] = normal;
+      this.shadedPieceImages[size] = shaded;
+    }
+  }
+  
+  
+  
+  /**
+   * Loads and maps the specified image and its shaded version in the specified
+   * hashtables.
+   */
+   
+   private void addImage(Toolkit toolkit, URL url, Piece piece, int size,
+      String name, String ext, Hashtable normal, Hashtable shaded) throws MalformedURLException{
+        
+    Image normalImage = toolkit.getImage(new URL(url, size + "/" + name + "." + ext));
+    Image shadedImage = shadeImage(normalImage);
+    normal.put(piece, normalImage);
+    shaded.put(piece, shadedImage);
+   }
 
 
 
