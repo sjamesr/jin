@@ -21,7 +21,12 @@
 
 package free.jin;
 
-import javax.swing.JApplet;
+import javax.swing.*;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import free.util.BrowserControl;
 import free.util.audio.AppletContextAudioPlayer;
 
@@ -33,7 +38,7 @@ import free.util.audio.AppletContextAudioPlayer;
  * passing it the various applet events (start, stop, destroy).
  */
 
-public class JinApplet extends JApplet{
+public class JinApplet extends JApplet implements ActionListener{
   
   
   
@@ -46,13 +51,36 @@ public class JinApplet extends JApplet{
   
   
   /**
-   * The exception (Throwable, really) we got when trying to create the context,
-   * <code>null</code> if none.
+   * A button which starts and stops Jin.
    */
    
-  private Throwable contextCreationError;
-
+  private JButton startStopButton;
   
+  
+  
+  /**
+   * A label that informs the user that the applet is starting.
+   */
+   
+  private JLabel startingLabel;
+  
+  
+  
+  /**
+   * The text on the start/stop button when it starts Jin. 
+   */
+  
+  private final String START_JIN_TEXT = "Start Jin";
+  
+  
+  
+  /**
+   * The text on the start/stop button when it stops Jin. 
+   */
+  
+  private final String STOP_JIN_TEXT = "Stop Jin";
+  
+
 
   /**
    * Creates an AppletJinContext.
@@ -61,45 +89,158 @@ public class JinApplet extends JApplet{
   public void init(){
     super.init();
     
+    BrowserControl.setAppletContext(getAppletContext());
+    AppletContextAudioPlayer.setAppletContext(getAppletContext());
+    
+    startStopButton = new JButton(START_JIN_TEXT);
+    startingLabel = new JLabel("");
+    createUI();
+    
+    startStopButton.addActionListener(this);
+  }
+  
+  
+  
+  /**
+   * <code>ActionListener</code> implementation for the start/stop button.
+   */
+   
+  public void actionPerformed(ActionEvent evt){
+    if (startStopButton.getText().equals(START_JIN_TEXT)){
+      startStopButton.setText(STOP_JIN_TEXT);
+      startingLabel.setText("Starting Jin, please wait...");
+        
+      SwingUtilities.invokeLater(new Runnable(){
+        public void run(){
+          startJin();
+        }
+      });
+    }
+    else if (startStopButton.getText().equals(STOP_JIN_TEXT)){
+      context.quit(false);
+    }
+    else
+      throw new IllegalStateException("Wrong text on start/stop button");
+  }
+  
+  
+  
+  /**
+   * Creates and starts <code>AppletJinContext</code>.
+   */
+   
+  private void startJin(){
     try{
-      BrowserControl.setAppletContext(getAppletContext());
-      AppletContextAudioPlayer.setAppletContext(getAppletContext());
-      
       context = new AppletJinContext(this);
+      context.start();
+      startingLabel.setText("");
     } catch (Throwable t){
-        contextCreationError = t;
+        t.printStackTrace();
+        createErrorUI(t);
       }
   }
   
   
   
   /**
-   * Invokes the context's <code>start</code> method.
+   * This method is called by AppletJinContext when Jin is closed.
    */
    
-  public void start(){
-    super.start();
+  void closed(){
+    context = null;
+    startStopButton.setText(START_JIN_TEXT);
+  }
+   
+  
+  
+  
+  /**
+   * Creates the user interface of the applet.
+   */
+   
+  private void createUI(){
+    JPanel contentPane = new JPanel();
+    contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     
-    if (context != null)
-      context.start();  
-    else{
-      contextCreationError.printStackTrace();
-      // TODO: Show error dialog
-    }
+    JLabel label1 = new JLabel("Do not leave this page or close the browser while");
+    JLabel label2 = new JLabel("Jin is running - doing so will cause it to be closed");
+    JLabel label3 = new JLabel("immediately, losing all information within.");
+    
+    label1.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    label2.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    label3.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    
+    contentPane.add(Box.createVerticalGlue());
+    contentPane.add(label1);
+    contentPane.add(label2);
+    contentPane.add(label3);
+    contentPane.add(Box.createVerticalStrut(30));
+    
+    JPanel buttonPanel = new JPanel(new FlowLayout());
+    buttonPanel.add(startStopButton);
+    
+    contentPane.add(buttonPanel);
+    contentPane.add(Box.createVerticalStrut(30));
+    contentPane.add(startingLabel);
+    contentPane.add(Box.createVerticalGlue());
+    
+    setContentPane(contentPane);
   }
   
   
   
   /**
-   * Invokes the context's <code>quit</code> method with a <code>false</code>
-   * argument.
+   * Creates UI which informs the user that the specified error has occurred.
+   */
+   
+  private void createErrorUI(Throwable t){
+    // The UI is AWT because we need native components so 
+    // that the user can copy/paste the error text.
+    setRootPaneCheckingEnabled(false);
+    
+    removeAll();
+    
+    setLayout(new BorderLayout());
+    
+    add(new Label("An error has occurred when running Jin:"), BorderLayout.NORTH);
+    
+    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+    t.printStackTrace(new PrintStream(buf));
+    TextArea stackTraceArea = new TextArea(buf.toString());
+
+    add(stackTraceArea, BorderLayout.CENTER);
+    doLayout();
+  }
+  
+
+
+  
+  /**
+   * Invokes the context's <code>applet_start</code> method.
+   */
+  
+  public void start(){
+    super.start();
+    
+    if (context != null)
+      context.applet_start();
+  }
+  
+  
+  
+  
+  /**
+   * Invokes the context's <code>applet_stop</code> method.
    */
    
   public void stop(){
+    super.stop();
+    
     if (context != null)
-      context.stop();
+      context.applet_stop();
   }
   
   
   
 }
+
