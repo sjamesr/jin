@@ -199,8 +199,8 @@ public class Jin{
       StringTokenizer serversTokenizer = new StringTokenizer(new String(buf.toByteArray(), "8859_1"), "\n\r");
 
       while (serversTokenizer.hasMoreTokens()){
-        String serverResourceName = serversTokenizer.nextToken();
-        Server server = Server.load(Jin.class.getResourceAsStream(serverResourceName));
+        String serverFileName = serversTokenizer.nextToken();
+        Server server = Server.load(Jin.class.getResourceAsStream("resources/servers/"+serverFileName));
         servers.put(server.getID(), server);
       }
     } catch (IOException e){
@@ -360,7 +360,8 @@ public class Jin{
         for (int i = 0; i < filesCount; i++){
           String filename = in.readUTF();
           int filesize = in.readInt();
-          IOUtilities.pump(in, buf, filesize);
+          if (IOUtilities.pump(in, buf, filesize) != filesize)
+            throw new EOFException("EOF while reading user-file: "+filename);
           byte [] data = buf.toByteArray();
           buf.reset();
           MemoryFile memFile = new MemoryFile(data);
@@ -375,6 +376,7 @@ public class Jin{
 
       return user;
     } catch (IOException e){
+        e.printStackTrace();
         JOptionPane.showMessageDialog(mainFrame, "Unable to load user file from:\n"+userDir, "Error", JOptionPane.ERROR_MESSAGE);
         return null;
       }
@@ -433,6 +435,7 @@ public class Jin{
             memFile.writeTo(out);
           }
         }
+        out.close();
       }
 
       userDirs.put(user, userDir);
