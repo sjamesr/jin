@@ -1,3 +1,6 @@
 id = bookup
 name = Bookup
-classname = BookupPiecePainter
+classname = ImagePieceSetLoader
+servers = icc
+size.pref = 64
+size.list = 24 28 32 38 46 54 64 76 
