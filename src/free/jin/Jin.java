@@ -429,6 +429,11 @@ public class Jin{
         UIManager.installLookAndFeel("Kunststoff", "com.incors.plaf.kunststoff.KunststoffLookAndFeel");
       } catch (ClassNotFoundException e){}
 
+      try{
+        Class.forName("swing.addon.plaf.threeD.ThreeDLookAndFeel");
+        UIManager.installLookAndFeel("3D Look&Feel", "swing.addon.plaf.threeD.ThreeDLookAndFeel");
+      } catch (ClassNotFoundException e){}
+
       mainFrame = new JinFrame();
 
       String lnf = getProperty("default.lf");
