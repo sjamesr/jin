@@ -24,6 +24,8 @@ package free.jin.board;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import free.jin.plugin.PreferencesPanel;
 import free.util.swing.ColorChooserButton;
 import free.util.StringEncoder;
@@ -117,6 +119,19 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
     lightColorChooser = new ColorChooserButton("Light squares", getColorProperty("light-square-color", new Color(255,207,144)));
     darkColorChooser = new ColorChooserButton("Dark squares", getColorProperty("dark-square-color", new Color(143,96,79)));
+
+    ChangeListener changeNotifyListener = new ChangeListener(){
+      public void stateChanged(ChangeEvent evt){
+        fireChangeEvent();
+      }
+    };
+
+    whiteColorChooser.addChangeListener(changeNotifyListener);
+    blackColorChooser.addChangeListener(changeNotifyListener);
+    whiteOutlineChooser.addChangeListener(changeNotifyListener);
+    blackOutlineChooser.addChangeListener(changeNotifyListener);
+    lightColorChooser.addChangeListener(changeNotifyListener);
+    darkColorChooser.addChangeListener(changeNotifyListener);
 
     createUI();
   }
