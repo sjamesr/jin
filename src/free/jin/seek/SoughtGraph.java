@@ -355,7 +355,7 @@ public class SoughtGraph extends JComponent{
 
     int graphX = (int)(width*(1-GRAPH_WIDTH_PERCENTAGE))+1;
     int graphY = 0;
-    int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE)-1;
+    int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE);
     int graphHeight = (int)(height*GRAPH_HEIGHT_PERCENTAGE);
 
     double slotWidth = ((double)graphWidth)/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
@@ -366,10 +366,10 @@ public class SoughtGraph extends JComponent{
     rect.width = (int)slotWidth;
     rect.height = (int)slotHeight;
 
-    if (x >= BULLET_SLOTS)
-      rect.x++;
-    if (x >= BULLET_SLOTS + BLITZ_SLOTS)
-      rect.x++;
+//    if (x >= BULLET_SLOTS)
+//      rect.x++;
+//    if (x >= BULLET_SLOTS + BLITZ_SLOTS)
+//      rect.x++;
 
     return rect;
   }
@@ -412,8 +412,12 @@ public class SoughtGraph extends JComponent{
     int graphWidth = (int)(width*GRAPH_WIDTH_PERCENTAGE);
     int graphHeight = (int)(height*GRAPH_HEIGHT_PERCENTAGE);
 
-    int slotWidth = graphWidth/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
-    int slotHeight = graphHeight/RATING_SLOTS;
+    double slotWidth = ((double)graphWidth)/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
+    double slotHeight = ((double)graphHeight)/RATING_SLOTS;
+
+    int bulletWidth = (int)(slotWidth*BULLET_SLOTS);
+    int blitzWidth = (int)(slotWidth*BLITZ_SLOTS);
+    int standardWidth = (int)(slotWidth*STANDARD_SLOTS);
 
     // The axises
     g.setColor(fg);
@@ -427,10 +431,12 @@ public class SoughtGraph extends JComponent{
     g.setColor(lightFG);
     
     // The line separating bullet from blitz.
-    g.drawLine(graphX+slotWidth*BULLET_SLOTS, graphY, graphX+slotWidth*BULLET_SLOTS, graphY+graphHeight);
+    int bbX = (int)(graphX+BULLET_SLOTS*slotWidth);
+    g.drawLine(bbX, graphY, bbX, graphY+graphHeight);
 
     // The line separating blitz from standard.
-    g.drawLine(graphX+slotWidth*(BULLET_SLOTS+BLITZ_SLOTS), graphY, graphX+slotWidth*(BULLET_SLOTS+BLITZ_SLOTS), graphY+graphHeight);
+    int bsX = (int)(graphX+(BULLET_SLOTS+BLITZ_SLOTS)*slotWidth);
+    g.drawLine(bsX, graphY, bsX, graphY+graphHeight);
 
 
     g.setColor(fg);
@@ -441,9 +447,9 @@ public class SoughtGraph extends JComponent{
     String blitzString = "Blitz";
     String standardString = "Standard";
     int timeStringHeight = (height-(graphY+graphHeight))/2;
-    int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, bulletString, BULLET_SLOTS*slotWidth, timeStringHeight);
-    int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, blitzString, BLITZ_SLOTS*slotWidth, timeStringHeight);
-    int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, standardString, STANDARD_SLOTS*slotWidth, timeStringHeight);
+    int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, bulletString, bulletWidth, timeStringHeight);
+    int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, blitzString, blitzWidth, timeStringHeight);
+    int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(originalFont, standardString, standardWidth, timeStringHeight);
     int timeStringFontSize = Math.min(Math.min(bulletFontSize, blitzFontSize), standardFontSize);
     Font timeStringFont = new Font(originalFont.getName(), originalFont.getStyle(), timeStringFontSize);
     FontMetrics timeStringFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(timeStringFont);
@@ -452,9 +458,9 @@ public class SoughtGraph extends JComponent{
     int standardStringWidth = timeStringFontMetrics.stringWidth(standardString);
     g.setFont(timeStringFont);
     int timeStringY = graphY+graphHeight+timeStringFontMetrics.getMaxAscent()+1;
-    g.drawString(bulletString, graphX+(BULLET_SLOTS*slotWidth-bulletStringWidth)/2, timeStringY);
-    g.drawString(blitzString, graphX+BULLET_SLOTS*slotWidth+(BLITZ_SLOTS*slotWidth-blitzStringWidth)/2, timeStringY);
-    g.drawString(standardString, graphX+(BULLET_SLOTS+BLITZ_SLOTS)*slotWidth+(STANDARD_SLOTS*slotWidth-standardStringWidth)/2, timeStringY);
+    g.drawString(bulletString, graphX+(bulletWidth-bulletStringWidth)/2, timeStringY);
+    g.drawString(blitzString, graphX+bulletWidth+(blitzWidth-blitzStringWidth)/2, timeStringY);
+    g.drawString(standardString, graphX+bulletWidth+blitzWidth+(standardWidth-standardStringWidth)/2, timeStringY);
 
     // The "1000", "1500" and "2000" strings.
     String tenString = "1000";
@@ -472,9 +478,9 @@ public class SoughtGraph extends JComponent{
     int twentyStringWidth = ratingStringFontMetrics.stringWidth(twentyString);
     g.setFont(ratingStringFont);
     int ratingStringX = 1;
-    g.drawString(tenString, ratingStringX, graphY+graphHeight-6*slotHeight);
-    g.drawString(fifteenString, ratingStringX, graphY+graphHeight-16*slotHeight);
-    g.drawString(twentyString, ratingStringX, graphY+graphHeight-26*slotHeight);
+    g.drawString(tenString, ratingStringX, (int)(graphY+graphHeight-6*slotHeight));
+    g.drawString(fifteenString, ratingStringX, (int)(graphY+graphHeight-16*slotHeight));
+    g.drawString(twentyString, ratingStringX, (int)(graphY+graphHeight-26*slotHeight));
 
     // The current seek description string.
     if (curSeek!=null){
@@ -633,10 +639,10 @@ public class SoughtGraph extends JComponent{
     double slotWidth = ((double)graphWidth)/(BULLET_SLOTS+BLITZ_SLOTS+STANDARD_SLOTS);
     double slotHeight = ((double)graphHeight)/RATING_SLOTS;
 
-    if (x - graphX >= graphWidth * BULLET_SLOTS)
-      x--;
-    if (x - graphX >= graphWidth * (BULLET_SLOTS + BLITZ_SLOTS))
-      x--;
+//    if (x - graphX >= graphWidth * BULLET_SLOTS)
+//      x--;
+//    if (x - graphX >= graphWidth * (BULLET_SLOTS + BLITZ_SLOTS))
+//      x--;
 
     int i = (int)((x-graphX)/slotWidth);
     int j = (int)((graphY+graphHeight-y)/slotHeight);

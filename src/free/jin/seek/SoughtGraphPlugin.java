@@ -166,7 +166,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     if (bounds==null){
 //      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
-      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 460);
+      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
     }
     else
       soughtGraphFrame.setBounds(bounds);
