@@ -185,7 +185,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     String allGamesLogFile = gameLogger.getLogFileForAll();
     Vector loggingRules = gameLogger.getLoggingRules();
 
-    logNoneButton = new JRadioButton("Don't Log Games");
+    logNoneButton = new JRadioButton("Do Not Log Games");
     logAllButton = new JRadioButton("Log All Games to File:");
     useRulesButton = new JRadioButton("Specify Logging Rules");
 
@@ -360,25 +360,30 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex != -1){
-          rulesListModel.removeElementAt(selectedIndex);
-          if (selectedIndex < rulesListModel.size())
-            loggingRulesList.setSelectedIndex(selectedIndex);
-          else if (rulesListModel.size() != 0)
-            loggingRulesList.setSelectedIndex(selectedIndex - 1);
-          else{
-            // Needed because of a bug in earlier versions of swing which causes ListSelectionEvents
-            // not to be fired for events when no index is selected.
-            try{
-              ignoreRuleFieldsDocumentChange = true;
-              rulenameField.setText("");
-              filenameField.setText("");
-              conditionField.setText("");
-            } finally{
-                ignoreRuleFieldsDocumentChange = false;
-              }
+          String ruleName = ((LoggingRule)rulesListModel.getElementAt(selectedIndex)).getName();
+          int result = JOptionPane.showConfirmDialog(GameLoggerPreferencesPanel.this, 
+            "Are you sure you want to delete the rule \""+ruleName+"\"?", "Confirm rule deletion", JOptionPane.YES_NO_OPTION);
+          if (result == JOptionPane.YES_OPTION){
+            rulesListModel.removeElementAt(selectedIndex);
+            if (selectedIndex < rulesListModel.size())
+              loggingRulesList.setSelectedIndex(selectedIndex);
+            else if (rulesListModel.size() != 0)
+              loggingRulesList.setSelectedIndex(selectedIndex - 1);
+            else{
+              // Needed because of a bug in earlier versions of swing which causes ListSelectionEvents
+              // not to be fired for events when no index is selected.
+              try{
+                ignoreRuleFieldsDocumentChange = true;
+                rulenameField.setText("");
+                filenameField.setText("");
+                conditionField.setText("");
+              } finally{
+                  ignoreRuleFieldsDocumentChange = false;
+                }
+            }
+              
+            fireStateChanged();
           }
-            
-          fireStateChanged();
         }
       }
     });
