@@ -1,0 +1,8 @@
+defaultHost = freechess.org
+hosts = freechess.org
+ports = 5000 23
+id = fics
+shortName = FICS
+longName = Free Internet Chess Server
+website = http://www.freechess.org
+registrationPage = http://www.freechess.org/Register/index.html
