@@ -44,16 +44,17 @@ public interface JinContext{
   
   
   /**
-   * Loads and returns the extensions of the specified type. Extensions are
-   * typically used when there is a need to allow the user to add resources
-   * which Jin (or a plugin) then uses. For example, this mechanism is used for
-   * loading piece sets and boards by the board manager plugin. A
-   * <code>JinContext</code> implementation may then look for piece set "packs"
-   * in some predefined directories, allowing the user to add/remove piece sets
-   * simply by adding/deleting files from those directories.
+   * Loads and returns the resources of the specified type. Resources are
+   * typically used when there is a need to allow the user (or some other
+   * 3rd party) to add his own customizations to Jin (or a plugin). For
+   * example, this mechanism is used for loading piece sets and boards by
+   * the board manager plugin. A <code>JinContext</code> implementation
+   * may then look for piece set "packs" in some predefined directories,
+   * allowing the user to add/remove piece sets simply by adding/deleting
+   * files from those directories.
    */
    
-  ClassLoader [] loadExtensions(String extensionType);
+  ClassLoader [] loadResources(String resourceType);
   
   
   

@@ -229,7 +229,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
    
   protected void loadPieceSets() throws PluginStartException{
-    ClassLoader [] pieceSetLoaders = loadExtensions("pieces");
+    ClassLoader [] pieceSetLoaders = loadResources("pieces");
 
     try{
       String resourceName = 
@@ -263,7 +263,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
    
   protected void loadBoardPatterns() throws PluginStartException{
-    ClassLoader [] boardLoaders = loadExtensions("boards");
+    ClassLoader [] boardLoaders = loadResources("boards");
 
     try{
       String resourceName = 

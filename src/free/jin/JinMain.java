@@ -302,45 +302,45 @@ public class JinMain implements JinContext{
   
   
   /**
-   * Returns the extensions for the specified extension type. Extensions are
+   * Returns all the resources for the specified resource type. Resources are
    * assumed to be zip or jar files and are looked up in two directories:
-   * <code>jinDir/extensions/extType</code> and
-   * <code>prefsDir/extensions/extType</code>.
+   * <code>jinDir/resources/resType</code> and
+   * <code>prefsDir/resources/resType</code>.
    */
    
-   public ClassLoader [] loadExtensions(String extType){
-     Vector extensions = new Vector();
+   public ClassLoader [] loadResources(String resType){
+     Vector resources = new Vector();
      
-     File jinExtDir = new File(new File(jinDir, "extensions"), extType);
-     File userExtDir = new File(new File(prefsDir, "extensions"), extType);
+     File jinResDir = new File(new File(jinDir, "resources"), resType);
+     File userResDir = new File(new File(prefsDir, "resources"), resType);
                                 
-     loadExtensions(jinExtDir, extensions);
-     loadExtensions(userExtDir, extensions);
+     loadResources(jinResDir, resources);
+     loadResources(userResDir, resources);
      
-     ClassLoader [] extsArr = new ClassLoader[extensions.size()];
-     extensions.copyInto(extsArr);
+     ClassLoader [] resArr = new ClassLoader[resources.size()];
+     resources.copyInto(resArr);
      
-     return extsArr;
+     return resArr;
    }
    
    
    
    /**
-    * Loads extensions from the specified directory, adding them to the
+    * Loads resources from the specified directory, adding them to the
     * specified <code>Vector</code>.
     */
     
-   private void loadExtensions(File dir, Vector v){
+   private void loadResources(File dir, Vector v){
      String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
      if (filenames == null)
        return;
      
      for (int i = 0; i < filenames.length; i++){
-       File extension = new File(dir, filenames[i]);
+       File resource = new File(dir, filenames[i]);
        try{
-         v.addElement(new ZipClassLoader(extension));
+         v.addElement(new ZipClassLoader(resource));
        } catch (IOException e){
-           System.out.println("Failed to load extension: " + extension);
+           System.out.println("Failed to load resource: " + resource);
            e.printStackTrace();
          }
      }

@@ -104,12 +104,12 @@ public abstract class Plugin{
   
   
   /**
-   * Returns the extensions of the specified type. See
-   * <code>JinContext.loadExtensions</code> for more information.
+   * Returns the resources of the specified type. See
+   * <code>JinContext.loadResources</code> for more information.
    */
    
-  public ClassLoader [] loadExtensions(String extensionType){
-    return context.getJinContext().loadExtensions(extensionType); 
+  public ClassLoader [] loadResources(String resourceType){
+    return context.getJinContext().loadResources(resourceType); 
   }
 
 
