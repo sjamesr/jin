@@ -502,7 +502,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * A Hashtable mapping gameNumbers to GameInfo objects about ongoing games.
    */
 
-  private final Hashtable gameNumbersToGameInfo = new Hashtable();
+  private final Hashtable gameNumbersToGameInfo = new Hashtable(1);
   
 
 
@@ -515,7 +515,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    * fire the game started event.
    */
 
-  private final Hashtable nonStartedGames = new Hashtable(); 
+  private final Hashtable nonStartedGames = new Hashtable(1); 
+
+
+
+
+  /**
+   * A Hashtable mapping Game objects to Vectors of moves which were sent for
+   * these games but the server didn't tell us yet whether the move is legal
+   * or not.
+   */
+
+  private final Hashtable unechoedMoves = new Hashtable(1);
 
 
 
@@ -834,7 +845,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   protected void updateGame(int gameType, int gameNumber, String whiteName, String blackName,
       String ratingCategoryString, boolean isRated, int whiteInitial, int whiteIncrement,
       int blackInitial, int blackIncrement, boolean isPlayedGame, int whiteRating, 
-      int blackRating, String gameID, String whiteTitles, String blackTitles){
+      int blackRating, Object gameID, String whiteTitles, String blackTitles){
 
     GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
     Game game = gameInfo.game;
@@ -854,7 +865,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     Position position = newGameInfo.position;
     WildVariant variant = newGame.getVariant();
     int numMoves = gameInfo.moves.size();
-    for (int i=0;i<numMoves;i++){
+    for (int i = 0; i < numMoves; i++){
       Move move = (Move)gameInfo.moves.elementAt(i);
 
       position.makeMove(move);
@@ -940,10 +951,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
 
-      if (gameInfo==null) // Game wasn't set up properly, probably because the wild variant is not supported.
+      if (gameInfo == null) // Game wasn't set up properly, probably because the wild variant is not supported.
         return;
 
       Game game = gameInfo.game;
+      unechoedMoves.remove(game);
 
       fireGameEvent(new GameEndEvent(this, game));
     }
@@ -995,10 +1007,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       fireGameEvent(new MoveMadeEvent(this, game, move));
 
-      if (gameInfo.numMovesToFollow>0){
+      if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
-        if ((gameInfo.numMovesToFollow==0)&&(gameInfo.game.getGameType()==Game.ISOLATED_BOARD)){
+        if ((gameInfo.numMovesToFollow == 0) && (gameInfo.game.getGameType() == Game.ISOLATED_BOARD)){
           fireGameEvent(new GameEndEvent(this, game));
+        }
+      }
+      else{
+        Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
+        if ((unechoedGameMoves != null) && (unechoedGameMoves.size() != 0)){ // Looks like it's our move.
+          Move madeMove = (Move)unechoedGameMoves.elementAt(0);
+          if (moveToString(game, move).equals(moveToString(game, madeMove))) // Same move.
+            unechoedGameMoves.removeElementAt(0); 
         }
       }
     } catch (NoSuchGameException e){}
@@ -1105,19 +1125,16 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
-      Position position = gameInfo.position;
-      WildVariant variant = game.getVariant();
 
-      Move illegalMove;
-      Square startSquare = Square.parseSquare(moveString.substring(0,2));
-      Square endSquare = Square.parseSquare(moveString.substring(2,4));
-      Piece promotionTarget = null;
-      if (moveString.length()>4){
-        promotionTarget = ChessPiece.fromShortString(moveString.substring(5));
+      Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
+      if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) // Not a move we made (probably the user typed it in)
+        return;
+
+      Move move = (Move)unechoedGameMoves.elementAt(0);
+      if (moveToString(game, move).equals(moveString)){ // Our move
+        unechoedGameMoves.removeAllElements();
+        fireGameEvent(new IllegalMoveEvent(this, game, move));
       }
-      illegalMove = variant.createMove(position, startSquare, endSquare, promotionTarget, null);
-
-      fireGameEvent(new IllegalMoveEvent(this, game, illegalMove));
     } catch (NoSuchGameException e){}
   }
 
@@ -1257,11 +1274,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
   /**
    * Depending on the type of the game, issues either "unobserve <gameNumber>",
-   * "unexamine" or "resign <gameNumber>" command.
+   * "unexamine" or "resign" command.
    */
 
   public void quitGame(Game game){
-    String id = game.getID();
+    Object id = game.getID();
     switch (game.getGameType()){
       case Game.MY_GAME:
         if (game.isPlayed())
@@ -1281,26 +1298,54 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Makes the given move in the given game. Throws an IllegalArgumentException
-   * if the WildVariant to which the type of the move corresponds isn't supported
-   * by the chessclub.com server. Note: if you modify the string sent to the server,
-   * you also need to modify the processIllegalMove() method because it reconstructs
-   * a Move object from that string.
+   * Makes the given move in the given game.
    */
 
   public void makeMove(Game game, Move move) throws IllegalArgumentException{
-    if (move instanceof ChessMove){
-      ChessMove chessMove = (ChessMove)move;
-      String moveString = chessMove.getStartingSquare().toString()+chessMove.getEndingSquare().toString();
-      if (chessMove.isPromotion()){
-        sendCommand(moveString+"="+chessMove.getPromotionTarget().toShortString());
+    Enumeration gameInfoEnum = gameNumbersToGameInfo.elements();
+    boolean ourGame = false;
+    while (gameInfoEnum.hasMoreElements()){
+      GameInfo gameInfo = (GameInfo)gameInfoEnum.nextElement();
+      if (gameInfo.game == game){
+        ourGame = true;
+        break;
       }
+    }
+
+    if (!ourGame)
+      throw new IllegalArgumentException("The specified Game object was not created by this JinConnection or the game has ended.");
+
+    sendCommand(moveToString(game, move));
+
+    Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
+    if (unechoedGameMoves == null){
+      unechoedGameMoves = new Vector(2);
+      unechoedMoves.put(game, unechoedGameMoves);
+    }
+    unechoedGameMoves.addElement(move);
+  }
+
+
+
+
+  /**
+   * Converts the given move into a string we can send to the server.
+   */
+
+  private static String moveToString(Game game, Move move){
+    WildVariant variant = game.getVariant();
+    if (move instanceof ChessMove){
+      ChessMove cmove = (ChessMove)move;
+      String s = cmove.getStartingSquare().toString() + cmove.getEndingSquare().toString();
+      if (cmove.isPromotion())
+        return s + "=" + variant.pieceToString(cmove.getPromotionTarget());
       else
-        sendCommand(moveString);
+        return s;
     }
     else
       throw new IllegalArgumentException("Unsupported Move type: "+move.getClass());
   }
+
 
 
 
@@ -1316,6 +1361,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       throw new IllegalArgumentException("The given game must be of type Game.MY_GAME and a played one");
   }
 
+
+
+
+  /**
+   * Throws an IllegalArgumentException if the given Game is not of type 
+   * Game.MY_GAME or is a played game. Otherwise, simply returns.
+   */
+
+  private void checkGameMineAndExamined(Game game){
+    if ((game.getGameType() != Game.MY_GAME)||game.isPlayed())
+      throw new IllegalArgumentException("The given game must be of type Game.MY_GAME and an examined one");
+  }
 
 
 
@@ -1403,6 +1460,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void goBackward(Game game, int plyCount){
+    checkGameMineAndExamined(game);
+
     sendCommand("backward "+plyCount);
   }
 
@@ -1416,6 +1475,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void goForward(Game game, int plyCount){
+    checkGameMineAndExamined(game);
+
     sendCommand("forward "+plyCount);
   }
 
@@ -1427,6 +1488,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void goToBeginning(Game game){
+    checkGameMineAndExamined(game);
+
     sendCommand("backward 9999");
   }
 
@@ -1437,6 +1500,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
    */
 
   public void goToEnd(Game game){
+    checkGameMineAndExamined(game);
+
     sendCommand("forward 9999");
   }
 
