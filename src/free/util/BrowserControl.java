@@ -18,12 +18,14 @@
  * along with utillib library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-// Taken from http://www.javaworld.com/javaworld/javatips/jw-javatip66.html
-
+ 
 package free.util;
 
+// Originally adapted from
+// http://www.javaworld.com/javaworld/javatips/jw-javatip66.html
+
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException; 
@@ -34,21 +36,18 @@ import java.util.StringTokenizer;
 
 /** 
  * A simple, static class to display a URL in the system browser.
- * Under Unix, the system browser is hard-coded to be 'netscape'. 
- * Netscape must be in your PATH for this to work. This has been 
- * tested with the following platforms: AIX, HP-UX and Solaris.
- * Under Windows, this will bring up the default browser under windows, 
- * usually either Netscape or Microsoft IE. The default browser is 
- * determined by the OS. This has been tested under Windows 95/98/NT.
- * 
- * Examples:
- * BrowserControl.displayURL("http://www.javaworld.com") 
- * BrowserControl.displayURL("file://c:\\docs\\index.html") 
- * BrowserContorl.displayURL("file:///user/joe/index.html"); 
- * 
- * Note - you must include the url type -- either "http://" or 
- * "file://". 
- */ 
+ * <UL>
+ *   <LI> Windows - The default browser will be opened via
+ *        <code>rundll32 url.dll,FileProtocolHandler url</code>
+ *   <LI> Linux - The browser specified by the BROWSER environment variable
+ *        will be used. Use <code>%s</code> in its value to specify where the
+ *        URL will be inserted. If $BROWSER is not specified, mozilla is used.
+ *   <LI> Mac OS X - The <code>open</code> command is used to open the url in
+ *        the default browser.
+ *   <LI> Classic MacOS - Netscape is used.
+ *   <LI> Unix - Mozilla is used.
+ * </UL>
+ */
 
 public class BrowserControl{ 
 
@@ -73,7 +72,7 @@ public class BrowserControl{
 
   public static boolean displayURL(String url){
     try{
-      if (isWindows()){ 
+      if (isWindows()){
         if (url.endsWith(".html")||url.endsWith(".htm")){
 
           // url-encode the last character because windows refuses to display URLs
@@ -84,9 +83,13 @@ public class BrowserControl{
         }
         String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
         Runtime.getRuntime().exec(cmd); 
-      } 
+      }
+      else if (isMacOSX()){
+        String [] commandLine = new String[]{"open", url};
+        Runtime.getRuntime().exec(commandLine);
+      }
       else if (isMacOS()){
-        String [] commandLine = {"netscape", url}; 
+        String [] commandLine = new String[]{"netscape", url}; 
         Runtime.getRuntime().exec(commandLine); 
       }
       else if (isLinux()){
@@ -106,8 +109,9 @@ public class BrowserControl{
         }
 
         String browsers = environment.getProperty("BROWSER");
-        if (browsers == null)
-          return false;
+        if ((browsers == null) || ("".equals(browsers))){
+          return tryMozilla(url);
+        }
 
         StringTokenizer tokenizer = new StringTokenizer(browsers, ":");
         if (!tokenizer.hasMoreTokens())
@@ -125,43 +129,52 @@ public class BrowserControl{
           commandline = browser+" "+url;
         Runtime.getRuntime().exec(commandline);
       }
-      else{ 
-        // Too many unix platforms to check, so we'll just assume it *is* unix.
-        // Under Unix, Netscape has to be running for the "-remote" 
-        // command to work. So, we try sending the command and 
-        // check for an exit value. If the return value is 0, 
-        // it worked, otherwise we need to start the browser. 
-
-        // cmd = 'netscape -remote openURL(http://www.javaworld.com)' 
-        String cmd = "netscape -remote -raise openURL("+url+")"; 
-        Process p = Runtime.getRuntime().exec(cmd); 
-
-        try{ 
-          // wait for exit code -- if it's 0, command worked, 
-          // otherwise we need to start the browser up. 
-          int exitCode = p.waitFor(); 
-
-          if (exitCode != 0){ 
-            // Command failed, start up the browser 
-        
-            // cmd = 'netscape http://www.javaworld.com' 
-            cmd = "netscape " + url; 
-            p = Runtime.getRuntime().exec(cmd); 
-          } 
-        } 
-        catch(InterruptedException x){ 
-          System.err.println("Error bringing up browser, cmd='" + cmd + "'"); 
-          System.err.println("Caught: " + x); 
-          throw new InterruptedIOException(x.getMessage());
-        }
+      else{
+        return tryMozilla(url);
       } 
     } catch (IOException e){
         return false;
       }
 
     return true;
-  } 
-
+  }
+  
+  
+  
+  
+  /**
+   * Tries to open the specified URL in mozilla.
+   */
+   
+  public static boolean tryMozilla(String url){
+    try{
+      String [] cmd = new String[]{"mozilla", "-remote",  "openURL("+url+", new-tab)"}; 
+      Process p = Runtime.getRuntime().exec(cmd);
+      if (p == null)
+        return false;
+  
+      try{ 
+        // wait for exit code -- if it's 0, command worked, 
+        // otherwise we need to start the browser up. 
+        int exitCode = p.waitFor(); 
+  
+        if (exitCode != 0){
+          // Command failed, start up the browser
+          cmd = new String[]{"mozilla ", url}; 
+          p = Runtime.getRuntime().exec(cmd);
+        } 
+      } 
+      catch(InterruptedException x){ 
+        System.err.println("Error bringing up browser, cmd='" + cmd + "'"); 
+        System.err.println("Caught: " + x); 
+        throw new InterruptedIOException(x.getMessage());
+      }
+    } catch (IOException e){
+        return false;
+      }
+    
+    return true;
+  }
 
 
 
@@ -230,14 +243,28 @@ public class BrowserControl{
   public static boolean isMacOS(){ 
     String os = System.getProperty("os.name"); 
 
-    if ((os!=null) && os.toLowerCase().startsWith("mac"))
-      return true; 
-    else 
-      return false; 
+    return ((os!=null) && os.toLowerCase().startsWith("mac"));
   } 
 
 
+  
+  
+  /** 
+   * Tries to determine whether this application is running under MacOS 
+   * by examing the "os.name" property. Returns <code>true</code> if the value
+   * of the "os.name" property starts (case insensitively) with the string
+   * "mac".
+   * 
+   * @return true if this application is running under MacOS .
+   */ 
 
+  public static boolean isMacOSX(){ 
+    String os = System.getProperty("os.name"); 
+
+    return ((os != null) && os.equals("Mac OS X"));
+  } 
+
+  
 
 
   /** 
@@ -318,6 +345,46 @@ public class BrowserControl{
 
     AWTUtilities.centerWindow(dialog, parent);
     dialog.setVisible(true);
+  }
+  
+  
+ 
+  /**
+   * Displays a small awt dialog to test URL opening.
+   */
+  
+  public static void main(String [] args){
+    Frame f = new Frame("BrowserControl Test");
+    f.setLocation(100, 100);
+    f.setLayout(new BorderLayout());
+    Panel p = new Panel(new FlowLayout());
+    p.add(new Label("URL: "));
+    final TextField tf = new TextField(50);
+    p.add(tf);
+    f.add(p, BorderLayout.CENTER);
+    Button b = new Button("Open URL");
+    ActionListener actionListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        displayURL(tf.getText());
+      }
+    };
+    
+    b.addActionListener(actionListener);
+    tf.addActionListener(actionListener);
+    
+    Panel p2 = new Panel(new FlowLayout());
+    p2.add(b);
+    f.add(p2, BorderLayout.SOUTH);
+    
+    
+    f.pack();
+    f.setVisible(true);
+    
+    f.addWindowListener(new WindowAdapter(){
+      public void windowClosing(WindowEvent evt){
+        System.exit(0);
+      }
+    });
   }
 
 
