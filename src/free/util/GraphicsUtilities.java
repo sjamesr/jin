@@ -36,8 +36,8 @@ public class GraphicsUtilities{
    * will fit into the given size. This method uses the default toolkit.
    */
 
-  public static int getMaxFittingFontSize(Font font, String string, Dimension size){
-    return getMaxFittingFontSize(font, string, size.width, size.height);
+  public static int getMaxFittingFontSize(Graphics g, Font font, String string, Dimension size){
+    return getMaxFittingFontSize(g, font, string, size.width, size.height);
   }
 
   
@@ -47,29 +47,38 @@ public class GraphicsUtilities{
    * will fit into the given size. This method uses the default toolkit.
    */
 
-  public static int getMaxFittingFontSize(Font font, String string, int width, int height){
+  public static int getMaxFittingFontSize(Graphics g, Font font, String string, int width, int height){
     int minSize = 0;
     int maxSize = 72;
     int curSize = 36;
 
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-
-    while (maxSize-minSize>2){
-      FontMetrics fm = toolkit.getFontMetrics(new Font(font.getName(),font.getStyle(),curSize));
+    while (maxSize - minSize > 2){
+      FontMetrics fm = g.getFontMetrics(new Font(font.getName(), font.getStyle(), curSize));
       int fontWidth = fm.stringWidth(string);
       int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
 
-      if ((fontWidth>width)||(fontHeight>height)){
+      if ((fontWidth > width) || (fontHeight > height)){
         maxSize = curSize;
-        curSize = (maxSize+minSize)/2;
+        curSize = (maxSize + minSize) / 2;
       }
       else{
         minSize = curSize;
-        curSize = (minSize+maxSize)/2;
+        curSize = (minSize + maxSize) / 2;
       }
     }
 
     return curSize;
+  }
+  
+  
+  
+  
+  /**
+   * Returns the <code>FontMetrics</code> for the specified <code>Font</code>.  
+   */
+  
+  public static FontMetrics getFontMetrics(Font font){
+    return Toolkit.getDefaultToolkit().getFontMetrics(font); // DEPRECATED    
   }
 
 

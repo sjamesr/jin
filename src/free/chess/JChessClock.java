@@ -277,8 +277,8 @@ public class JChessClock extends AbstractChessClock{
    * width and height.
    */
 
-  protected Font findLargestFittingFont(String text, int width, int height, Font font){
-    int maxSize = GraphicsUtilities.getMaxFittingFontSize(font, text, new Dimension(width, height));
+  protected Font findLargestFittingFont(String text, int width, int height, Graphics g, Font font){
+    int maxSize = GraphicsUtilities.getMaxFittingFontSize(g, font, text, new Dimension(width, height));
     return new Font(font.getName(), font.getStyle(), maxSize);
   }
   
@@ -297,8 +297,8 @@ public class JChessClock extends AbstractChessClock{
       lastSize.width = getWidth();
       lastSize.height = getHeight();
 
-      lastFont = findLargestFittingFont(text, lastSize.width, lastSize.height, getFont());
-      lastFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(lastFont);
+      lastFont = findLargestFittingFont(text, lastSize.width, lastSize.height, g, getFont());
+      lastFontMetrics = g.getFontMetrics(lastFont);
     }
 
     g.setColor(isActive() ? getActiveBackground() : getInactiveBackground());
@@ -322,7 +322,7 @@ public class JChessClock extends AbstractChessClock{
     String text = createTimeString(getTime());
     Font font = getFont();
     Font prefFont = new Font(font.getName(),font.getStyle(),50);
-    FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(prefFont);
+    FontMetrics fm = GraphicsUtilities.getFontMetrics(prefFont);
     int fontWidth = fm.stringWidth(text);
     int fontHeight = fm.getAscent() + fm.getDescent();
     return new Dimension(fontWidth, fontHeight);
@@ -339,7 +339,7 @@ public class JChessClock extends AbstractChessClock{
     String text = createTimeString(getTime());
     Font font = getFont();
     Font prefFont = new Font(font.getName(),font.getStyle(),12);
-    FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(prefFont);
+    FontMetrics fm = GraphicsUtilities.getFontMetrics(prefFont);
     int fontWidth = fm.stringWidth(text);
     int fontHeight = fm.getAscent() + fm.getDescent();
     return new Dimension(fontWidth, fontHeight);

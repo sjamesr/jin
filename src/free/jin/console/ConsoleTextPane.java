@@ -28,6 +28,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Keymap;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Utilities;
+import free.util.GraphicsUtilities;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -615,7 +616,7 @@ public class ConsoleTextPane extends JTextPane{
     if (orientation==SwingConstants.HORIZONTAL)
       return super.getScrollableUnitIncrement(viewRect, orientation, direction);
 
-    FontMetrics metrics = Toolkit.getDefaultToolkit().getFontMetrics(getFont());
+    FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
     return metrics.getHeight();
   }
 
