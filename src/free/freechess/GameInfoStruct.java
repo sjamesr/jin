@@ -141,8 +141,12 @@ public class GameInfoStruct extends Struct{
     assertToken(tokens, "rt");
     String whiteRatingString = tokens.nextToken(); // White's rating + provshow character
     String blackRatingString = tokens.nextToken(); // Black's rating + provshow character
-    int whiteRating = Integer.parseInt(whiteRatingString.substring(0, whiteRatingString.length() - 1));
-    int blackRating = Integer.parseInt(blackRatingString.substring(0, blackRatingString.length() - 1));
+    if (!Character.isDigit(whiteRatingString.charAt(whiteRatingString.length() - 1)))
+      whiteRatingString = whiteRatingString.substring(0, whiteRatingString.length() - 1);
+    if (!Character.isDigit(blackRatingString.charAt(blackRatingString.length() - 1)))
+      blackRatingString = blackRatingString.substring(0, blackRatingString.length() - 1);
+    int whiteRating = Integer.parseInt(whiteRatingString);
+    int blackRating = Integer.parseInt(blackRatingString);
 
     assertToken(tokens, "ts");
     boolean isWhiteTimesealed = parseBoolean(tokens.nextToken()); // Is white timesealed?
