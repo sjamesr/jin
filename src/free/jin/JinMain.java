@@ -1131,6 +1131,8 @@ public class JinMain implements JinContext{
 
   public static void main(String [] args){
     try{
+      osxMenubarFix();
+      
       File prefsDir = new File(System.getProperty("user.home"), ".jin");
       createPreferencesDir(prefsDir);
 
@@ -1169,6 +1171,20 @@ public class JinMain implements JinContext{
     }
     else if (!dir.isDirectory())
       throw new IOException(dir.toString() + " exists but is not a directory");
+  }
+  
+  
+  
+  /**
+   * Set the value of the apple.laf.useScreenMenuBar system property depending
+   * on the Java VM we're running in. Versions prior to 1.4.2 seem to be broken
+   * with the native OS X menubar.
+   */
+   
+  private static void osxMenubarFix(){
+    String javaVersion = System.getProperty("java.version");
+    System.getProperties().put("apple.laf.useScreenMenuBar",
+      javaVersion.compareTo("1.4.2") >= 0 ? "true" : "false");
   }
   
   
