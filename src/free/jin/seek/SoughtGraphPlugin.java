@@ -74,7 +74,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * The JCheckBoxMenuItem indicating whether the sought graph is visible.
    */
 
-  private JCheckBoxMenuItem visibleCB; 
+  private JRadioButtonMenuItem visibleCB; 
 
 
 
@@ -83,7 +83,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * The JCheckBoxMenuItem indicating whether the sought graph is invisible.
    */
 
-  private JCheckBoxMenuItem nonVisibleCB;
+  private JRadioButtonMenuItem nonVisibleCB;
 
 
 
@@ -373,7 +373,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
-    visibleCB = new JCheckBoxMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
+    visibleCB = new JRadioButtonMenuItem("Graph shown", new Boolean(getProperty("visible","true")).booleanValue());
     visibleCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
@@ -388,7 +388,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
     });
 
-    nonVisibleCB = new JCheckBoxMenuItem("Graph hidden", !visibleCB.isSelected());
+    nonVisibleCB = new JRadioButtonMenuItem("Graph hidden", !visibleCB.isSelected());
 
     ButtonGroup visibilityGroup = new ButtonGroup();
     visibilityGroup.add(visibleCB);

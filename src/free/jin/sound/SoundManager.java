@@ -34,7 +34,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -141,20 +141,20 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
     
-    JCheckBoxMenuItem onMenu = new JCheckBoxMenuItem("Sound on", isOn);
+    JRadioButtonMenuItem onMenu = new JRadioButtonMenuItem("Sound on", isOn);
     onMenu.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
-        isOn = ((JCheckBoxMenuItem)(evt.getSource())).getState();
+        isOn = ((JRadioButtonMenuItem)(evt.getSource())).isSelected();
       }
       
     });
 
-    JCheckBoxMenuItem offMenu = new JCheckBoxMenuItem("Sound off", !isOn);
+    JRadioButtonMenuItem offMenu = new JRadioButtonMenuItem("Sound off", !isOn);
     offMenu.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
-        isOn = !((JCheckBoxMenuItem)(evt.getSource())).getState();
+        isOn = !((JRadioButtonMenuItem)(evt.getSource())).isSelected();
       }
       
     });
