@@ -182,6 +182,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     this.userPlugin = userPlugin;
 
     this.outputComponent = createOutputComponent();
+    configureOutputComponent(outputComponent);
     this.outputScrollPane = createOutputScrollPane(outputComponent);
     this.inputComponent = createInputComponent();
 
@@ -200,12 +201,22 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Creates the JTextPane to which the server's textual output goes.
+   * Creates the <code>ConsoleTextPane</code> to which the server's textual
+   * output goes.
    */
 
   protected ConsoleTextPane createOutputComponent(){
-    final ConsoleTextPane textPane = new ConsoleTextPane(this);
+    return new ConsoleTextPane(this);
+  }
 
+
+
+
+  /**
+   * Configures the output component to be used with this console.
+   */
+
+  protected void configureOutputComponent(final ConsoleTextPane textPane){
     // Seriously hack the caret for our own purposes (desired scrolling and selecting).
     Caret caret = new DefaultCaret(){
       public void focusLost(FocusEvent e) {
@@ -304,8 +315,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     });
 
     textPane.setCaret(caret);
-
-    return textPane;
   }
 
 
