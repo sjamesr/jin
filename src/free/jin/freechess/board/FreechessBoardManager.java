@@ -85,13 +85,13 @@ public class FreechessBoardManager extends BoardManager{
 
       if (gameType == Game.OBSERVED_GAME){
         if (!gameID.equals(primaryObservedGameID)){
-          conn.sendCommand("primary "+gameID);
+          conn.sendCommand("$$primary "+gameID);
           primaryObservedGameID = gameID;
         }
       }
       else if (gameType == Game.MY_GAME){
         if (!gameID.equals(primaryPlayedGameID)){
-          conn.sendCommand("goboard "+gameID);
+          conn.sendCommand("$$goboard "+gameID);
           primaryPlayedGameID = gameID;
         }
       }
