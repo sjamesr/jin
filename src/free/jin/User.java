@@ -62,6 +62,14 @@ public class User{
    */
 
   private final Hashtable files;
+  
+  
+  
+  /**
+   * True when this user has been modified but hasn't been saved yet.
+   */
+   
+  private boolean isDirty;
 
 
 
@@ -211,6 +219,28 @@ public class User{
       prefs.setString("login.password", savePassword ? details.getPassword() : "");
     }
   }
+  
+  
+  
+  /**
+   * Marks this user as dirty, meaning that it has been modified, but hasn't
+   * been saved yet.
+   */
+   
+  public void markDirty(){
+    isDirty = true;
+  }
+  
+  
+  
+  /**
+   * Returns whether this user is dirty.
+   */
+   
+  public boolean isDirty(){
+    return isDirty; 
+  }
+  
 
 
 }
