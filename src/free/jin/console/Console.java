@@ -206,7 +206,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
-
+    
     init();
   }
 
@@ -242,7 +242,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   protected void configureOutputComponent(final ConsoleTextPane textPane){
     // Seriously hack the caret for our own purposes (desired scrolling and selecting).
     Caret caret = new DefaultCaret(){
-      public void focusLost(FocusEvent e) {
+      public void focusLost(FocusEvent e){
         this.setVisible(false);
       }
 
@@ -263,31 +263,19 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       }
 
       private boolean dragging = false;
-      private boolean realDrag = false;
 
       public void mousePressed(MouseEvent e){
         dragging = true;
-        realDrag = false;
         super.mousePressed(e);
       }
 
       public void mouseReleased(MouseEvent e){
         dragging = false;
         super.mouseReleased(e);
-        if (realDrag&&isCopyOnSelect())
-          requestDefaultFocus();
-      }
-
-      public void mouseDragged(MouseEvent e){
-        realDrag = true;
-        super.mouseDragged(e);
-      }
-
-      public void mouseClicked(MouseEvent e){
-        super.mouseClicked(e);
         if (isCopyOnSelect())
           requestDefaultFocus();
       }
+
 
       protected void moveCaret(MouseEvent e){
         Point pt = new Point(e.getX(), e.getY());
@@ -937,8 +925,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Processes Key pressed events from the components we're registered as listeners for.
-   * The default implementation is registered to listen to the input component.
+   * Processes Key pressed events from the components we're registered as
+   * listeners for. The default implementation is registered to listen to the
+   * input component.
    */
 
   public void keyPressed(KeyEvent evt){
@@ -999,9 +988,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Processes Key released events from the components we're registered as listeners for.
-   * The default implementation is registered to listen to the output and to the
-   * input component.
+   * Processes Key released events from the components we're registered as
+   * listeners for. The default implementation is registered to listen to the
+   * output and to the input component.
    */
 
   public void keyReleased(KeyEvent evt){}
@@ -1010,36 +999,12 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Processes Key typed events from the components we're registered as listeners for.
-   * The default implementation is registered to listen to the output and to the
-   * input component.
+   * Processes Key typed events from the components we're registered as
+   * listeners for. The default implementation is registered to listen to the
+   * output and to the input component.
    */
 
-  public void keyTyped(KeyEvent evt){
-    if (SwingUtilities.isDescendingFrom(evt.getComponent(), outputComponent)){
-      if (evt.getKeyChar() != FixUtils.CHAR_UNDEFINED){
-
-        if ((evt.getSource() != outputComponent) || isCopyOnSelect()){
-          // We request the focus in invokeLater because we want the key event
-          // processing to finish while the correct component still has focus.
-          SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-              requestDefaultFocus();
-            }
-          });
-
-          KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
-
-          KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
-
-          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
-        }
-      }
-    }
-  }
+  public void keyTyped(KeyEvent evt){}
 
 
 
