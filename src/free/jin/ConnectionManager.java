@@ -72,12 +72,7 @@ public class ConnectionManager{
     if (connDetails == null)
       return;
     
-    user = connDetails.isGuest() ? 
-      server.getGuest() : Jin.getInstance().getUser(server, connDetails.getUsername());
-    if (user == null) // New user
-      user = new User(server, connDetails.getUsername());
-
-    login(user, connDetails);
+    login(connDetails);
   }
   
   
@@ -180,47 +175,41 @@ public class ConnectionManager{
    */
    
   private ConnectionDetails findConnDetails(Server server, User user){
+    if (user == null)
+      return new LoginPanel(server).askConnectionDetails();
+      
     Jin jin = Jin.getInstance();
-    ConnectionDetails connDetails = user == null ? null : user.getPreferredConnDetails();
+    ConnectionDetails connDetails = user.getPreferredConnDetails();
     
     String password = jin.getParameter("login.password");
-    if ((password == null) && (connDetails != null))
+    if (password == null)
       password = connDetails.getPassword();
     
     String savePassString = jin.getParameter("login.savepassword");
     boolean savePassword = new Boolean(savePassString).booleanValue();
-    if ((savePassString == null) && (connDetails != null) && !connDetails.isGuest())
+    if ((savePassString == null) && !connDetails.isGuest())
       savePassword = connDetails.isSavePassword();
     
     String hostname = jin.getParameter("login.hostname");
     if (hostname == null){
-      if (connDetails != null)
-        hostname = connDetails.getHost();
-      else
-        hostname = server.getDefaultHost();
+      hostname = connDetails.getHost();
     }
     
     String portsString = jin.getParameter("login.ports");
     int [] ports;
     if (portsString != null)
       ports = TextUtilities.parseIntList(portsString, ",");
-    else if (connDetails != null)
-        ports = connDetails.getPorts();
     else
-      ports = server.getPorts();
+      ports = connDetails.getPorts();
     
     
-    if (user == null)
-      connDetails = null;
-    else if (user.isGuest())
-      connDetails = ConnectionDetails.createGuest(user.getUsername(), hostname, ports);
+    if (user.isGuest())
+      connDetails = ConnectionDetails.createGuest(server, user.getUsername(), hostname, ports);
     else
-      connDetails = ConnectionDetails.create(user.getUsername(), password, savePassword, hostname, ports);
+      connDetails = ConnectionDetails.create(server, user, user.getUsername(), password, savePassword, hostname, ports);
       
-    
-    // Must show the login dialog if the user is null
-    if ((user == null) || !(new Boolean(jin.getParameter("autologin")).booleanValue()))
-      connDetails = new LoginPanel(server, connDetails).askConnectionDetails();
+    if (!(new Boolean(jin.getParameter("autologin")).booleanValue()))
+      connDetails = new LoginPanel(connDetails).askConnectionDetails();
     
     return connDetails; 
   }
@@ -228,7 +217,7 @@ public class ConnectionManager{
   
   
   /**
-   * Displays UI for creating a new connection.
+   * Displays UI for creating a new connection (from scratch).
    */
    
   public void displayNewConnUI(){
@@ -244,41 +233,40 @@ public class ConnectionManager{
         return;
     }
     
-    displayNewConnUI(server, null);
-  }
-  
-  
-  
-  /**
-   * Displays UI for creating a new connection to the specified server and
-   * with the specified default connection details. The default connection
-   * details may be <code>null</code>.
-   */
-   
-  public void displayNewConnUI(Server server, ConnectionDetails defaultConnDetails){
-    ConnectionDetails connDetails = new LoginPanel(server, defaultConnDetails).askConnectionDetails();
-    if (connDetails == null)
+    ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
+      
+    if (connDetails == null) // user canceled the dialog
       return;
     
-    User user = connDetails.isGuest() ? 
-      server.getGuest() : Jin.getInstance().getUser(server, connDetails.getUsername());
-    if (user == null) // New user
-      user = new User(server, connDetails.getUsername());
+    login(connDetails);
+  }
+  
+  
+  
+  /**
+   * Displays UI for connecting with the specified account.
+   */
+   
+  public void displayNewConnUI(User user){
+    ConnectionDetails connDetails = 
+      new LoginPanel(user.getPreferredConnDetails()).askConnectionDetails();
+      
+    if (connDetails == null) // user canceled the dialog
+      return;
     
-    login(user, connDetails);
+    login(connDetails);
   }
   
   
   
   
   /**
-   * Initiates login for the specified user with the specified connection
-   * details. Neither value may be <code>null</code>.
+   * Initiates login with the specified connection details.
    */
    
-  private void login(User user, ConnectionDetails connDetails){
+  private void login(ConnectionDetails connDetails){
     try{
-      session = new Session(user, connDetails);
+      session = new Session(connDetails);
       Jin.getInstance().getUIProvider().setConnected(true, session);
       new LoginThread(session).start();
     } catch (PluginStartException e){
