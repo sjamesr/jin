@@ -175,14 +175,18 @@ public class User{
 
 
   /**
-   * Sets this user's property with the given name to the given value.
+   * Sets this user's property with the given name to the given value, or, if
+   * the specified property value is null, removes the property.
    * 
    * @param propertyName The name of the property.
    * @param propertyValue The new value of the property.
    */
 
   public void setProperty(String propertyName, String propertyValue){
-    props.put(propertyName, propertyValue);
+    if (propertyValue == null)
+      props.remove(propertyName);
+    else
+      props.put(propertyName, propertyValue);
   }
 
 
