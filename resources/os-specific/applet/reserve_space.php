@@ -1,4 +1,5 @@
 <?php
+	$submit = $_POST['submit'];
 	if ($submit && mysql_connect("localhost", "root") && mysql_select_db("jin")){
 		
 		// Create the Preferences table if it doesn't exist yet
@@ -18,7 +19,10 @@
 		}
 		
 		
-		// Check username/password.
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		// Check username/password here.
+		
 		$authenticated = true;
 		
 		$username = strtolower($username);
@@ -81,7 +85,7 @@
 		?>
 		
 		<P>Please provide your username and password to reserve space for preferences:
-		<P><form method="post" action="<?php echo $PHP_SELF?>">
+		<P><form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 	
 		<table>
 			<tr><td>Username:</td><td><input type="Text" name="username"></td></tr>
