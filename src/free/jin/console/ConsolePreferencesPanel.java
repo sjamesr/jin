@@ -30,7 +30,7 @@ import javax.swing.event.ChangeEvent;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.Preferences;
 
@@ -83,7 +83,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * The selection color choosing button.
    */
 
-  private ColorChooserButton selectionColorButton;
+  private ColorChooser selectionColorButton;
 
 
 
@@ -92,7 +92,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * The selected text color choosing button.
    */
 
-  private ColorChooserButton selectedColorButton;
+  private ColorChooser selectedColorButton;
 
 
 
@@ -300,7 +300,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     defaultSettingsPanel = new CategoryPanel("Default Settings", defaultSettingsChooserPanel, new String[]{""});
     defaultSettingsPanel.setLayout(new BorderLayout(5, 5));
     defaultSettingsPanel.add(defaultSettingsChooserPanel, BorderLayout.CENTER);
-    JPanel selectionColorPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+    JPanel selectionColorPanel = new JPanel(new GridLayout(1, 2, 15, 5));
     selectionColorPanel.add(selectionColorButton);
     selectionColorPanel.add(selectedColorButton);
     defaultSettingsPanel.add(selectionColorPanel, BorderLayout.SOUTH);
@@ -376,13 +376,13 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
   /**
-   * Creates and returns the <code>ColorChooserButton</code> used for choosing
+   * Creates and returns the <code>ColorChooser</code> used for choosing
    * the color of the selection.
    */
 
-  protected ColorChooserButton createSelectionColorButton(){
+  protected ColorChooser createSelectionColorButton(){
     Color selectionColor = prefs.getColor("output-selection");
-    ColorChooserButton button = new ColorChooserButton("Selection", selectionColor);
+    ColorChooser button = new ColorChooser("Selection:", selectionColor);
     button.setMnemonic('l');
 
     return button;
@@ -392,13 +392,13 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
   /**
-   * Creates and returns the <code>ColorChooserButton</code> used for choosing
+   * Creates and returns the <code>ColorChooser</code> used for choosing
    * the color of selected text.
    */
 
-  protected ColorChooserButton createSelectedColorButton(){
+  protected ColorChooser createSelectedColorButton(){
     Color selectedColor = prefs.getColor("output-selected");
-    ColorChooserButton button = new ColorChooserButton("Selected Text", selectedColor);
+    ColorChooser button = new ColorChooser("Selected Text:", selectedColor);
     button.setMnemonic('e');
 
     return button;

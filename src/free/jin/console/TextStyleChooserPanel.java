@@ -25,7 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.util.swing.FontSelectorPanel;
 import bsh.Interpreter;
 import bsh.EvalError;
@@ -49,19 +49,19 @@ public class TextStyleChooserPanel extends JPanel{
 
 
   /**
-   * The ColorChooserButton used to select the foreground color.
+   * The ColorChooser used to select the foreground color.
    */
 
-  private final ColorChooserButton foregroundChooser;
+  private final ColorChooser foregroundChooser;
 
 
 
 
   /**
-   * The ColorChooserButton used to select the background color.
+   * The ColorChooser used to select the background color.
    */
 
-  private final ColorChooserButton backgroundChooser;
+  private final ColorChooser backgroundChooser;
 
 
 
@@ -92,10 +92,10 @@ public class TextStyleChooserPanel extends JPanel{
     };
     int [] fontSizes = new int[]{5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
     fontSelector = allowAntialiasingSelection ? new FontSelectorPanel(fontSizes, fontOptions) : new FontSelectorPanel(fontSizes);
-    foregroundChooser = new ColorChooserButton("Foreground", initForegroundColor);
+    foregroundChooser = new ColorChooser("Foreground:", initForegroundColor);
     foregroundChooser.setMnemonic('F');
     if (allowBackgroundSelection){
-      backgroundChooser = new ColorChooserButton("Background", initBackgroundColor);
+      backgroundChooser = new ColorChooser("Background:", initBackgroundColor);
       backgroundChooser.setMnemonic('k');
     }
     else
@@ -141,11 +141,8 @@ public class TextStyleChooserPanel extends JPanel{
   private void createUI(){
     setLayout(new BorderLayout(5,5));
 
-    LayoutManager colorChooserPanelLayout;
-    if (backgroundChooser == null)
-      colorChooserPanelLayout = new FlowLayout();
-    else
-      colorChooserPanelLayout = new GridLayout(1, 2, 5, 5);
+    LayoutManager colorChooserPanelLayout = (backgroundChooser == null) ?
+      colorChooserPanelLayout = new FlowLayout() : new GridLayout(1, 2, 15, 5);
 
     JPanel colorChooserPanel = new JPanel(colorChooserPanelLayout);
     colorChooserPanel.add(foregroundChooser);
