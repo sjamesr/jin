@@ -60,4 +60,24 @@ public class Utilities{
 
 
 
+  /**
+   * Returns <code>true</code> if the specified object is an element of the
+   * specified array. The specified array may not be <code>null</code>. The
+   * specified object may be null, in which case this method will return true if
+   * one of the indices in the array is empty (contains <code>null</code>).
+   */
+
+  public static boolean isElementOf(Object [] array, Object item){
+    if (array == null)
+      throw new IllegalArgumentException("The specified array may not be null");
+
+    for (int i = 0; i < array.length; i++)
+      if (areEqual(item, array[i]))
+        return true;
+
+    return false;
+  }
+
+
+
 }
