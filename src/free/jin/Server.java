@@ -67,9 +67,9 @@ public interface Server{
    */
 
   String getDefaultHost();
-
-
-
+  
+  
+  
   /**
    * Returns the list of hostnames of all the hosts for this server. This may
    * not be <code>null</code> or empty.
@@ -80,11 +80,34 @@ public interface Server{
 
 
   /**
+   * Sets the host to which to connect. This overrides the default settings of
+   * the server and forces <code>getDefaultHost</code> to return the argument
+   * passed to this method and <code>getHosts</code> to return an array
+   * containing a single element - the argument passed to this method. This is
+   * used when Jin is run in applet mode to force connection to the originating
+   * host of the applet.
+   */
+   
+  void setHost(String host);
+
+
+
+  /**
    * Returns a list of the ports on which the server is listening, in the order
    * they should be tried.
    */
 
   int [] getPorts();
+  
+  
+  
+  /**
+   * Sets the port on which to connect to this server. This overrides the
+   * default settings of the server and forces <code>getPorts</code> to return
+   * an array with a single element - the value passed to this function.
+   */
+   
+  void setPort(int port);
 
 
 
