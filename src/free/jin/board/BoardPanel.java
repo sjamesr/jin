@@ -26,13 +26,12 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import free.chess.*;
+import free.chess.event.*;
 import free.jin.event.*;
 import free.jin.Game;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
 import free.jin.sound.SoundManager;
-import free.chess.event.MoveListener;
-import free.chess.event.MoveEvent;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
@@ -489,6 +488,24 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     moveListTableModel = createMoveListTableModel(game);
     moveListTable = createMoveListTable(game, moveListTableModel);
     moveListTableScrollPane = createMoveListTableScrollPane(game, moveListTable);
+    
+    board.addMoveProgressListener(new MoveProgressListener(){
+      public void moveMakingStarted(MoveProgressEvent evt){
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run(){
+            boardManager.setOtherPluginsPaused(true);
+          }
+        });
+      }
+      
+      public void moveMakingEnded(MoveProgressEvent evt){
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run(){
+            boardManager.setOtherPluginsPaused(false);
+          }
+        });
+      }
+    });
 
     moveListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
      
