@@ -195,7 +195,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     add(outputScrollPane, BorderLayout.CENTER);
     add(inputComponent, BorderLayout.SOUTH);
 
-//    outputComponent.addKeyListener(this);
+    outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
 
@@ -1067,14 +1067,15 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     if (SwingUtilities.isDescendingFrom(evt.getComponent(), outputComponent)){
       if (evt.getKeyChar() != FixUtils.CHAR_UNDEFINED){
 
-        // We request the focus in invokeLater because we want the key event
-        // processing to finish while the correct component still has focus.
-        SwingUtilities.invokeLater(new Runnable(){
-          public void run(){
-            requestDefaultFocus();
-          }
-        });
-
+        if ((evt.getSource() != outputComponent) || isCopyOnSelect()){
+          // We request the focus in invokeLater because we want the key event
+          // processing to finish while the correct component still has focus.
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              requestDefaultFocus();
+            }
+          });
+        }
 
         KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
         Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
