@@ -146,12 +146,10 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
    */
 
   public JinConnection createConnection(){
-    String hostname = resultUser.getProperty("login.hostname");
-    int port = Integer.parseInt(resultUser.getProperty("login.port"));
-    String username = resultUser.getUsername();
-    String password = resultUser.getProperty("login.password");
-    if (password == null)
-      password = new String(passwordField.getPassword());
+    String hostname = (String)hostnameBox.getSelectedItem();
+    int port = Integer.parseInt(portField.getText());
+    String username = usernameField.getText();
+    String password = new String(passwordField.getPassword());
 
     return new JinChessclubConnection(hostname, port, username, password);
   }

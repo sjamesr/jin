@@ -404,6 +404,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
     resultUser.setProperty("login.hostname", (String)hostnameBox.getSelectedItem());
     resultUser.setProperty("login.port", portField.getText());
 
+    usernameField.setText(resultUser.getUsername());
+    passwordField.setText(resultUser.getProperty("login.password"));
+
     proceed();
   }
 
