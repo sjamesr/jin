@@ -64,6 +64,16 @@ public class TextStyleChooserPanel extends JPanel{
 
 
 
+
+  /**
+   * The sole ChangeEvent we need.
+   */
+
+  private final ChangeEvent changeEvent = new ChangeEvent(this);
+
+
+
+
   /**
    * Creates a new TextStyleChooserPanel with the given initial font,
    * foreground and background colors. The <code>allowBackgroundSelection</code>
@@ -91,12 +101,20 @@ public class TextStyleChooserPanel extends JPanel{
         fontSelector.getPreviewPanel().setForeground(foregroundChooser.getColor());
         if (backgroundChooser != null)
           fontSelector.getPreviewPanel().setBackground(backgroundChooser.getColor());
+
+        fireChangeEvent();
       }
     };
 
     foregroundChooser.addChangeListener(colorChangeListener);
     if (backgroundChooser != null)
       backgroundChooser.addChangeListener(colorChangeListener);
+
+    fontSelector.addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent evt){
+        fireChangeEvent();
+      }
+    });
   }
 
 
@@ -120,6 +138,48 @@ public class TextStyleChooserPanel extends JPanel{
 
     add(BorderLayout.CENTER, fontSelector);
     add(BorderLayout.SOUTH, colorChooserPanel);
+  }
+
+
+
+
+
+  /**
+   * Adds a ChangeListener to the list of listeners receiving notifications when
+   * one of the text properties changes.
+   */
+
+  public void addChangeListener(ChangeListener listener){
+    listenerList.add(ChangeListener.class, listener);
+  }
+
+
+
+
+  /**
+   * Removes the given Changelistener from the list of listeners receiving
+   * notifications when one of the text properties changes.
+   */
+
+  public void removeChangeListener(ChangeListener listener){
+    listenerList.remove(ChangeListener.class, listener);
+  }
+
+
+
+
+  /**
+   * Fires a ChangeEvent to all interested listeners.
+   */
+
+  protected void fireChangeEvent(){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ChangeListener.class){
+        ChangeListener listener = (ChangeListener)listeners[i+1];
+        listener.stateChanged(changeEvent);
+      }
+    }
   }
 
 
@@ -177,6 +237,11 @@ public class TextStyleChooserPanel extends JPanel{
     fontSelector.getPreviewPanel().setBackground(color);
     if (backgroundChooser != null)
       backgroundChooser.setColor(color);
+    else{
+      // In this case the event isn't fired automatically because the 
+      // backgroundChooser isn't there to fire one to use.
+      fireChangeEvent();
+    }
   }
 
 
