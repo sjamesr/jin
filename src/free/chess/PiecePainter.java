@@ -24,6 +24,7 @@ package free.chess;
 import java.awt.Graphics;
 import java.awt.image.ImageObserver;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 
 /**
  * An interface classes that know how to paint chess pieces should implement.
@@ -33,8 +34,8 @@ public interface PiecePainter{
 
 
   /**
-   * Hints this PiecePainter that the next paintPiece calls will probably be with
-   * the given width and height. If relevant, the PiecePainter can use this
+   * Hints this PiecePainter that the next paintPiece calls will probably be
+   * with the given width and height. If relevant, the PiecePainter can use this
    * call to pre-scale the drawn images.
    */
 
@@ -44,8 +45,8 @@ public interface PiecePainter{
 
 
   /**
-   * Returns the preferred size of the pieces. Should return a dimension that has
-   * no area (width<=0 or height<=0) if this PiecePainter doesn't have a 
+   * Returns the preferred size of the pieces. Should return a dimension that
+   * has no area (width<=0 or height<=0) if this PiecePainter doesn't have a 
    * preferred piece size.
    */
 
@@ -54,10 +55,12 @@ public interface PiecePainter{
 
 
   /**
-   * Paints the given piece at the given coordinates on the given Graphics object
-   * scaled to the given size.
+   * Paints the given piece at the given coordinates on the given
+   * <code>Graphics</code> object scaled to the given size.
+   * The <code>shaded</code> argument specifies whether the piece should be
+   * drawn in a special, shaded manner.
    */
 
-  void paintPiece(Piece piece, Graphics g, ImageObserver observer, int x, int y, int width, int height);
+  void paintPiece(Piece piece, Graphics g, ImageObserver observer, Rectangle rect, boolean shaded);
 
 }
