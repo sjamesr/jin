@@ -55,7 +55,7 @@ public class FreechessConsoleManager extends ConsoleManager{
     super.chatMessageReceived(evt);
 
     String type = evt.getType();
-    if (type.equals("tell") || type.equals("say")/* || type.equals("atell")*/)
+    if (type.equals("tell") || type.equals("say") || type.equals("ptell"))
       console.tellReceived(evt.getSender());
   }
 
@@ -70,13 +70,37 @@ public class FreechessConsoleManager extends ConsoleManager{
   protected String translateChat(ChatEvent evt){
     String type = evt.getType();
     String sender = evt.getSender();
-    String titles = evt.getSenderTitle();
+    String title = evt.getSenderTitle();
     String message = evt.getMessage();
     Object forum = evt.getForum();
 
     // Tells
     if (type.equals("tell"))
-      return sender+titles+" tells you: "+message;
+      return sender+title+" tells you: "+message;
+    else if (type.equals("say"))
+      return sender+title+" says: "+message;
+    else if (type.equals("ptell"))
+      return sender+title+" (your partner) tells you: "+message;
+
+    // Channel tells
+    else if (type.equals("channel-tell"))
+      return sender+title+"("+forum+"): "+message;
+
+    // Kibitzes and whispers
+    else if (type.equals("kibitz"))
+      return sender+title+"["+forum+"] kibitzes: "+message;
+    else if (type.equals("whisper"))
+      return sender+title+"["+forum+"] whispers: "+message;
+
+    // Shouts
+    else if (type.equals("shout"))
+      return sender+title+" shouts: "+message;
+    else if (type.equals("ishout"))
+      return "--> "+sender+title+" "+message;
+    else if (type.equals("tshout"))
+      return ":"+sender+title+" t-shouts: "+message;
+    else if (type.equals("cshout"))
+      return sender+title+" c-shouts: "+message;
 
     return evt.toString();
   }

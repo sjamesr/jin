@@ -158,6 +158,114 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processSayTell(String username, String titles, int gameNumber, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "say", username, (titles == null ? "" : titles), message, new Integer(gameNumber)));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processPTell(String username, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", username, (titles == null ? "" : titles), message, null));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processChannelTell(String username, String titles, int channelNumber, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", username, (titles == null ? "" : titles), message, new Integer(channelNumber)));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processKibitz(String username, String titles, int rating, int gameNumber, String message){
+    if (titles == null)
+      titles = "";
+    if (rating != -1)
+      titles = titles+"("+rating+")";
+
+    listenerManager.fireChatEvent(new ChatEvent(this, "kibitz", username, titles, message, new Integer(gameNumber)));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processWhisper(String username, String titles, int rating, int gameNumber, String message){
+    if (titles == null)
+      titles = "";
+    if (rating != -1)
+      titles = titles+"("+rating+")";
+
+    listenerManager.fireChatEvent(new ChatEvent(this, "whisper", username, titles, message, new Integer(gameNumber)));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processShout(String username, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "shout", username, (titles == null ? "" : titles), message, null));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processIShout(String username, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", username, (titles == null ? "" : titles), message, null));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processTShout(String username, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", username, (titles == null ? "" : titles), message, null));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate ChatEvent.
+   */
+
+  protected void processCShout(String username, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", username, (titles == null ? "" : titles), message, null));
+  }
+
+
+
 
   /**
    * Sends the "exit" command to the server.
