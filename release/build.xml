@@ -251,10 +251,11 @@
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.html ${server.name}_oldjava.html detect_java.html DetectJava.class *.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
+			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.php ${server.name}_oldjava.php detect_java.html DetectJava.class *.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
       <filterset>
-        <filter token="old_java_url" value="${server.name}_oldjava.html"/>
-        <filter token="new_java_url" value="${server.name}.html"/>
+        <filter token="old_java_url" value="${server.name}_oldjava.php" />
+        <filter token="new_java_url" value="${server.name}.php" />
+        <filter token="database_name" value="jin_${server.name}" />
       </filterset>
 		</copy>
     
