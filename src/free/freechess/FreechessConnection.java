@@ -1518,7 +1518,17 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern NOT_YOUR_TURN_REGEX =
-    new Pattern("^(It is not your move.)$");
+    new Pattern("^(It is not your move\\.)$");
+    
+    
+    
+  /**
+   * The regular expression matching lines specifying that the user attempted to
+   * make a move while the game is paused.
+   */
+  
+  private static final Pattern MOVED_WHEN_GAME_PAUSED = 
+    new Pattern("^(The clock is paused, use \"unpause\" to resume\\.)$");
 
 
 
@@ -1529,11 +1539,14 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleIllegalMove(String line){
-    if (!(line.startsWith("Illegal move ") || line.equals("It is not your move.")))
+    if (!(line.startsWith("Illegal move ") ||
+          line.equals("It is not your move.") ||
+          line.equals("The clock is paused, use \"unpause\" to resume.")))
       return false;
     
     Matcher illegalMoveMatcher = ILLEGAL_MOVE_REGEX.matcher(line);
     Matcher notYourTurnMatcher = NOT_YOUR_TURN_REGEX.matcher(line);
+    Matcher movedWhenGamePausedMatcher = MOVED_WHEN_GAME_PAUSED.matcher(line);
 
     if (illegalMoveMatcher.matches()){
       String moveString = illegalMoveMatcher.group(1);
@@ -1551,6 +1564,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       if (!processIllegalMove(moveString, reason))
         processLine(line);
 
+      return true;
+    }
+    else if (movedWhenGamePausedMatcher.matches()){
+      String moveString = null;
+      String reason = movedWhenGamePausedMatcher.group(1);
+      
+      if (!processIllegalMove(moveString, reason))
+        processLine(line);
+      
       return true;
     }
 
