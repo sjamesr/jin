@@ -55,6 +55,16 @@ public class ExtensionFileFilter extends FileFilter{
 
 
 
+  /**
+   * <code>true</code> if the file filter is case sensitive, <code>false</code>
+   * otherwise.
+   */
+
+  private final boolean isCaseSensitive;
+
+
+
+
 
 
   /**
@@ -67,8 +77,8 @@ public class ExtensionFileFilter extends FileFilter{
    * of files it accepts.
    */
 
-  public ExtensionFileFilter(String fileFilterName, String endString){
-    this(fileFilterName, new String[]{endString});
+  public ExtensionFileFilter(String fileFilterName, String endString, boolean isCaseSensitive){
+    this(fileFilterName, new String[]{endString}, isCaseSensitive);
   }
 
 
@@ -85,13 +95,14 @@ public class ExtensionFileFilter extends FileFilter{
    * of files it accepts.
    */
 
-  public ExtensionFileFilter(String fileFilterName, String [] endStrings){
+  public ExtensionFileFilter(String fileFilterName, String [] endStrings, boolean isCaseSensitive){
     this.endStrings = new String[endStrings.length];
     for (int i=0;i<endStrings.length;i++){
       this.endStrings[i] = endStrings[i];
     }
 
     this.name = fileFilterName;
+    this.isCaseSensitive = isCaseSensitive;
   }
 
 
@@ -107,7 +118,14 @@ public class ExtensionFileFilter extends FileFilter{
       return true;
 
     for (int i = 0; i < endStrings.length; i++){
-      if (file.getName().endsWith(endStrings[i]))
+      String endString = endStrings[i];
+      String filename = file.getName();
+      String filenameEnd = filename.substring(filename.length() - endString.length());
+      if (isCaseSensitive){
+        if (filenameEnd.equals(endString))
+          return true;
+      }
+      else if (filenameEnd.equalsIgnoreCase(endString))
         return true;
     }
     return false;
