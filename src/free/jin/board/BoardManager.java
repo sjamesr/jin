@@ -37,6 +37,7 @@ import free.jin.board.event.UserMoveEvent;
 import free.util.StringParser;
 import free.util.StringEncoder;
 import free.util.GraphicsUtilities;
+import free.util.SingleItemEnumeration;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
@@ -55,7 +56,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * A Hashtable mapping Game objects to BoardPanel objects which are currently used.
+   * A Hashtable mapping Game objects to BoardPanel objects which are currently
+   * used.
    */
 
   protected final Hashtable gamesToBoardPanels = new Hashtable();
@@ -64,8 +66,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * A list of JInternalFrames which are still on the screen but contain inactive
-   * BoardPanels.
+   * A list of JInternalFrames which are still on the screen but contain
+   * inactive BoardPanels.
    */
 
   protected final Vector unusedInternalFrames = new Vector();
@@ -101,74 +103,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * The current move input style.
-   */
-
-  protected int moveInputStyle;
-
-
-
-
-  /**
-   * The current dragged piece style.
-   */
-
-  protected int draggedPieceStyle;
-
-
-
-
-  /**
-   * The current move highlighting style.
-   */
-
-  protected int moveHighlightingStyle;
-
-
-
-
-  /**
-   * Are we highlighting our own moves?
-   */
-
-  protected boolean highlightOwnMoves;
-
-
-
-
-  /**
-   * Are we in auto promotion mode?
-   */
-
-  protected boolean autoPromote;
-
-
-
-
-  /**
-   * The current piece set.
-   */
-
-  protected PiecePainter piecePainter;
-
-
-
-
-  /**
-   * The current board.
-   */
-
-  protected BoardPainter boardPainter;
-
-
-
-
-  /**
    * Starts this plugin.
    */
 
   public void start(){
-    init();
     registerConnListeners();
   }
 
@@ -179,7 +117,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public void stop(){
-    saveState();
     unregisterConnListeners();
     removeBoards();
   }
@@ -188,26 +125,265 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Initializes all kinds of variables and other stuff. This is called from the
-   * start() method.
+   * Returns the current move input style. Possible values are defined in
+   * <code>free.chess.JBoard</code>.
    */
 
-  protected void init(){
-    moveInputStyle = "click'n'click".equals(getProperty("move-input-style")) ? JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP;
-    draggedPieceStyle = "target-cursor".equals(getProperty("dragged-piece-style")) ? JBoard.CROSSHAIR_DRAGGED_PIECE : JBoard.NORMAL_DRAGGED_PIECE;
-    autoPromote = Boolean.valueOf(getProperty("auto-promote", "false")).booleanValue();
+  public int getMoveInputStyle(){
+    return "click'n'click".equals(getProperty("move-input-style")) ? JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP;
+  }
 
+
+
+
+  /**
+   * Sets the move input style to the specified value.
+   *
+   * @param moveInputStyle The new move input style. Possible values are defined
+   * in <code>free.chess.JBoard</code>.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setMoveInputStyle(int moveInputStyle, boolean userTriggered){
+    setProperty("move-input-style", moveInputStyle == JBoard.CLICK_N_CLICK ? "click'n'click" : "drag'n'drop", userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setMoveInputStyle(moveInputStyle);
+    }
+  }
+
+
+
+
+  /**
+   * Returns the current dragged piece style. Possible values defined in
+   * <code>free.chess.JBoard</code>.
+   */
+
+  public int getDraggedPieceStyle(){
+    return "target-cursor".equals(getProperty("dragged-piece-style")) ? JBoard.CROSSHAIR_DRAGGED_PIECE : JBoard.NORMAL_DRAGGED_PIECE;
+  }
+
+
+
+
+  /**
+   * Sets the dragged piece style to the specified value.
+   *
+   * @param draggedPieceStyle The new dragged piece style. Possible values are
+   * defined in <code>free.chess.JBoard</code>.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setDraggedPieceStyle(int draggedPieceStyle, boolean userTriggered){
+    setProperty("dragged-piece-style", draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal-cursor", userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setDraggedPieceStyle(draggedPieceStyle);
+    }
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if promotable pieces are automatically promoted
+   * to the default promotion piece. Otherwise, returns <code>false</code>
+   */
+
+  public boolean isAutoPromote(){
+    return Boolean.valueOf(getProperty("auto-promote", "false")).booleanValue();
+  }
+
+
+
+
+  /**
+   * Sets whether promotable pieces are promoted automatically to the default
+   * promotion piece.
+   *
+   * @param autoPromote <code>true</code> if promotion should be automatic.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setAutoPromote(boolean autoPromote, boolean userTriggered){
+    setProperty("auto-promote", String.valueOf(autoPromote), userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setManualPromote(!autoPromote);
+    }
+  }
+
+
+
+
+  /**
+   * Returns the current move highlighting style. Posssible values are defined
+   * in <code>free.chess.JBoard</code>.
+   */
+
+  public int getMoveHighlightingStyle(){
     String moveHighlightingStyleString = getProperty("move-highlight.style", "square");
     if ("square".equals(moveHighlightingStyleString))
-      moveHighlightingStyle = JBoard.SQUARE_MOVE_HIGHLIGHTING;
+      return JBoard.SQUARE_MOVE_HIGHLIGHTING;
     else if ("arrow".equals(moveHighlightingStyleString))
-      moveHighlightingStyle = JBoard.ARROW_MOVE_HIGHLIGHTING;
+      return JBoard.ARROW_MOVE_HIGHLIGHTING;
     else
-      moveHighlightingStyle = JBoard.NO_MOVE_HIGHLIGHTING;
+      return JBoard.NO_MOVE_HIGHLIGHTING;
+  }
 
-    highlightOwnMoves = Boolean.valueOf(getProperty("move-highlight.highlight-own", "false")).booleanValue();
 
-    String piecePainterClassName = getProperty("piece-set-class-name");
+
+
+  /**
+   * Sets the current move highlighting style to the specified value.
+   * 
+   * @param moveHighlightingStyle The new move highlighting style. Possible
+   * values are defined in <code>free.chess.JBoard</code>.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setMoveHighlightingStyle(int moveHighlightingStyle, boolean userTriggered){
+    String moveHighlightingString;
+    if (moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING)
+      moveHighlightingString = "none";
+    else if (moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING)
+      moveHighlightingString = "square";
+    else if (moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING)
+      moveHighlightingString = "arrow";
+    else
+      throw new IllegalStateException("Unknown move higlighting style: "+moveHighlightingStyle);
+    setProperty("move-highlight.style", moveHighlightingString, userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setMoveHighlightingStyle(moveHighlightingStyle);
+    }
+  }
+
+
+
+
+
+  /**
+   * Returns <code>true</code> if own moves are highlighted as well as the
+   * opponent's moves. Returns <code>false</code> if only the opponent's moves
+   * are highlighted (if move highlighting is enabled of course). 
+   */
+
+  public boolean isHighlightingOwnMoves(){
+    return Boolean.valueOf(getProperty("move-highlight.highlight-own", "false")).booleanValue();
+  }
+
+
+
+
+  /**
+   * Sets whether own moves will be highlighted.
+   *
+   * @param highlightOwnMoves <code>true</code> if own moves should be
+   * highlighted as well as the opponent's moves. <code>false</code> if only
+   * the opponent's moves should be highlighted.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setHighlightingOwnMoves(boolean highlightOwnMoves, boolean userTriggered){
+    setProperty("move-highlight.highlight-own", String.valueOf(highlightOwnMoves), userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.setHighlightingOwnMoves(highlightOwnMoves);
+    }
+  }
+
+
+
+
+  /**
+   * Returns the current move highlighting color.
+   */
+
+  public Color getMoveHighlightingColor(){
+    return StringParser.parseColor(getProperty("move-highlighting-color", "00b2b2"));
+  }
+
+
+
+
+  /**
+   * Sets the current move highlighting color to the specified value.
+   *
+   * @param moveHighlightingColor The new move highlighting color.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setMoveHighlightingColor(Color moveHighlightingColor, boolean userTriggered){
+    setProperty("move-highlighting-color", StringEncoder.encodeColor(moveHighlightingColor), userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setMoveHighlightingColor(moveHighlightingColor);
+    }
+  }
+
+
+
+
+  /**
+   * Returns the current drag square highlighting color.
+   */
+
+  public Color getDragSquareHighlightingColor(){
+    return StringParser.parseColor(getProperty("drag-square-highlighting-color", "0000ff"));
+  }
+
+
+
+
+  /**
+   * Sets the drag square highlighting color to the specified value.
+   *
+   * @param dragSquareHighlightingColor The new drag square highlighting color.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor, boolean userTriggered){
+    setProperty("drag-square-highlighting-color", StringEncoder.encodeColor(dragSquareHighlightingColor), userTriggered);
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setDragSquareHighlightingColor(dragSquareHighlightingColor);
+    }
+  }
+
+
+
+
+  /**
+   * Returns an instance of the current PiecePainter.
+   */
+
+  public PiecePainter getPiecePainter(){
+    PiecePainter piecePainter = null;
+
+    String piecePainterClassName = getProperty("piece-painter-class-name");
     if (piecePainterClassName != null){
       try{
         piecePainter = (PiecePainter)Class.forName(piecePainterClassName).newInstance();
@@ -224,32 +400,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
           System.err.println("Unable to cast "+piecePainterClassName+" into PiecePainter"); 
         }
     }
+
     if (piecePainter == null)
       piecePainter = new DefaultPiecePainter();
 
     configurePiecePainter(piecePainter);
 
-    String boardPainterClassName = getProperty("board-class-name");
-    if (boardPainterClassName != null){
-      try{
-        boardPainter = (BoardPainter)Class.forName(boardPainterClassName).newInstance();
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to find class "+boardPainterClassName+", will use the default board painter.");
-        }
-        catch (InstantiationException e){
-          System.err.println("Unable to instantiate class "+boardPainterClassName+", will use the default board painter."); 
-        }
-        catch (IllegalAccessException e){
-          System.err.println("Unable to instantiate class "+boardPainterClassName+" due to access restrictions, will use the default board painter."); 
-        }
-        catch (ClassCastException e){
-          System.err.println("Unable to cast "+boardPainterClassName+" into BoardPainter"); 
-        }
-    }
-    if (boardPainter == null)
-      boardPainter = new DefaultBoardPainter();
-
-     configureBoardPainter(boardPainter);
+    return piecePainter;
   }
 
 
@@ -276,6 +433,83 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         coloredPiecePainter.setWhiteOutline(StringParser.parseColor(whiteOutline));
       if (blackOutline != null)
         coloredPiecePainter.setBlackOutline(StringParser.parseColor(blackOutline));
+    }
+  }
+
+
+
+
+
+  /**
+   * Sets the current piece painter to be of the specified type.
+   *
+   * @param piecePainterClassName The class name of the PiecePainter.
+   * @param userTriggered <code>true</code> if the change was triggered directly
+   * by the user.
+   */
+
+  public void setPiecePainterClassName(String piecePainterClassName, boolean userTriggered){
+    setProperty("piece-painter-class-name", piecePainterClassName, userTriggered);
+
+    PiecePainter piecePainter = getPiecePainter();
+
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setPiecePainter(piecePainter);
+    }
+  }
+
+
+
+
+  /**
+   * Returns an instance of the current board painter.
+   */
+
+  public BoardPainter getBoardPainter(){
+    BoardPainter boardPainter = null;
+
+    String boardPainterClassName = getProperty("board-painter-class-name");
+    if (boardPainterClassName != null){
+      try{
+        boardPainter = (BoardPainter)Class.forName(boardPainterClassName).newInstance();
+      } catch (ClassNotFoundException e){
+          System.err.println("Unable to find class "+boardPainterClassName+", will use the default board painter.");
+        }
+        catch (InstantiationException e){
+          System.err.println("Unable to instantiate class "+boardPainterClassName+", will use the default board painter."); 
+        }
+        catch (IllegalAccessException e){
+          System.err.println("Unable to instantiate class "+boardPainterClassName+" due to access restrictions, will use the default board painter."); 
+        }
+        catch (ClassCastException e){
+          System.err.println("Unable to cast "+boardPainterClassName+" into BoardPainter"); 
+        }
+    }
+    if (boardPainter == null)
+      boardPainter = new DefaultBoardPainter();
+
+     configureBoardPainter(boardPainter);
+
+     return boardPainter;
+  }
+
+
+
+
+  /**
+   * Sets the current board painter to be of the specified type.
+   */
+
+  public void setBoardPainterClassName(String boardPainterClassName, boolean userTriggered){
+    setProperty("board-painter-class-name", boardPainterClassName, userTriggered);
+
+    BoardPainter boardPainter = getBoardPainter();
+    Enumeration boardPanels = boardPanelsToInternalFrames.keys();
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      boardPanel.getBoard().setBoardPainter(boardPainter);
     }
   }
 
@@ -349,100 +583,84 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     JMenu moveInputMenu = new JMenu("Move Input");
     moveInputMenu.setMnemonic('M');
 
-    JRadioButtonMenuItem dragndrop = new JRadioButtonMenuItem("Drag'n'Drop", moveInputStyle == JBoard.DRAG_N_DROP);
-    JRadioButtonMenuItem clicknclick = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle == JBoard.CLICK_N_CLICK);
+    int moveInputStyle = getMoveInputStyle();
+    JRadioButtonMenuItem dragndropMenuItem = new JRadioButtonMenuItem("Drag'n'Drop", moveInputStyle == JBoard.DRAG_N_DROP);
+    JRadioButtonMenuItem clicknclickMenuItem = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle == JBoard.CLICK_N_CLICK);
 
-    dragndrop.setMnemonic('D');
-    dragndrop.setMnemonic('C');
+    dragndropMenuItem.setMnemonic('D');
+    dragndropMenuItem.setMnemonic('C');
 
     ButtonGroup inputModeGroup = new ButtonGroup();
-    inputModeGroup.add(dragndrop);
-    inputModeGroup.add(clicknclick);
+    inputModeGroup.add(dragndropMenuItem);
+    inputModeGroup.add(clicknclickMenuItem);
 
-    dragndrop.setActionCommand("dragndrop");
-    clicknclick.setActionCommand("clicknclick");
+    dragndropMenuItem.setActionCommand("dragndrop");
+    clicknclickMenuItem.setActionCommand("clicknclick");
 
     ActionListener inputModeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String actionCommand = evt.getActionCommand();
         if ("dragndrop".equals(actionCommand))
-          moveInputStyle = JBoard.DRAG_N_DROP;
+          setMoveInputStyle(JBoard.DRAG_N_DROP, true);
         else if ("clicknclick".equals(actionCommand))
-          moveInputStyle = JBoard.CLICK_N_CLICK;
+          setMoveInputStyle(JBoard.CLICK_N_CLICK, true);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
-
-        Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-        while (boardPanels.hasMoreElements()){
-          BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-          boardPanel.getBoard().setMoveInputStyle(moveInputStyle);
-        }
       }
     };
 
-    dragndrop.addActionListener(inputModeListener);
-    clicknclick.addActionListener(inputModeListener);
+    dragndropMenuItem.addActionListener(inputModeListener);
+    clicknclickMenuItem.addActionListener(inputModeListener);
 
+    int draggedPieceStyle = getDraggedPieceStyle();
+    JRadioButtonMenuItem normalDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Normal Dragged Piece",
+      draggedPieceStyle == JBoard.NORMAL_DRAGGED_PIECE);
+    JRadioButtonMenuItem targetDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Target Cursor",
+      draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE);
 
-    JRadioButtonMenuItem normalDraggedPieceStyle = new JRadioButtonMenuItem("Normal Dragged Piece",
-      draggedPieceStyle==JBoard.NORMAL_DRAGGED_PIECE);
-    JRadioButtonMenuItem targetDraggedPieceStyle = new JRadioButtonMenuItem("Target Cursor",
-      draggedPieceStyle==JBoard.CROSSHAIR_DRAGGED_PIECE);
-
-    normalDraggedPieceStyle.setMnemonic('N');
-    targetDraggedPieceStyle.setMnemonic('T');
+    normalDraggedPieceStyleMenuItem.setMnemonic('N');
+    targetDraggedPieceStyleMenuItem.setMnemonic('T');
 
     ButtonGroup draggedPieceStyleGroup = new ButtonGroup();
-    draggedPieceStyleGroup.add(normalDraggedPieceStyle);
-    draggedPieceStyleGroup.add(targetDraggedPieceStyle);
+    draggedPieceStyleGroup.add(normalDraggedPieceStyleMenuItem);
+    draggedPieceStyleGroup.add(targetDraggedPieceStyleMenuItem);
 
-    normalDraggedPieceStyle.setActionCommand("normal");
-    targetDraggedPieceStyle.setActionCommand("target");
+    normalDraggedPieceStyleMenuItem.setActionCommand("normal");
+    targetDraggedPieceStyleMenuItem.setActionCommand("target");
 
     ActionListener draggedPieceStyleListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String actionCommand = evt.getActionCommand();
 
         if ("normal".equals(actionCommand))
-          draggedPieceStyle = JBoard.NORMAL_DRAGGED_PIECE;
+          setDraggedPieceStyle(JBoard.NORMAL_DRAGGED_PIECE, true);
         else if ("target".equals(actionCommand))
-          draggedPieceStyle = JBoard.CROSSHAIR_DRAGGED_PIECE;
+          setDraggedPieceStyle(JBoard.CROSSHAIR_DRAGGED_PIECE, true);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
-
-        Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-        while (boardPanels.hasMoreElements()){
-          BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-          boardPanel.getBoard().setDraggedPieceStyle(draggedPieceStyle);
-        }
       }
     };
 
-    normalDraggedPieceStyle.addActionListener(draggedPieceStyleListener);
-    targetDraggedPieceStyle.addActionListener(draggedPieceStyleListener);
+    normalDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
+    targetDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
 
 
-    final JCheckBoxMenuItem alwaysQueen = new JCheckBoxMenuItem("Auto Queen", autoPromote);
-    alwaysQueen.setMnemonic('A');
-    alwaysQueen.addChangeListener(new ChangeListener(){
+    boolean isAutoPromote = isAutoPromote();
+    final JCheckBoxMenuItem autoQueenMenuItem = new JCheckBoxMenuItem("Auto Queen", isAutoPromote);
+    autoQueenMenuItem.setMnemonic('A');
+    autoQueenMenuItem.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        autoPromote = alwaysQueen.isSelected();
-
-        Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-        while (boardPanels.hasMoreElements()){
-          BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-          boardPanel.getBoard().setManualPromote(!autoPromote);
-        }
+        setAutoPromote(autoQueenMenuItem.isSelected(), true);
       }
     });
 
-    moveInputMenu.add(dragndrop);
-    moveInputMenu.add(clicknclick);
+    moveInputMenu.add(dragndropMenuItem);
+    moveInputMenu.add(clicknclickMenuItem);
     moveInputMenu.addSeparator();
-    moveInputMenu.add(normalDraggedPieceStyle);
-    moveInputMenu.add(targetDraggedPieceStyle);
+    moveInputMenu.add(normalDraggedPieceStyleMenuItem);
+    moveInputMenu.add(targetDraggedPieceStyleMenuItem);
     moveInputMenu.addSeparator();
-    moveInputMenu.add(alwaysQueen);
+    moveInputMenu.add(autoQueenMenuItem);
 
     return moveInputMenu;
   }
@@ -455,73 +673,62 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected JMenu createMoveHighlightingMenu(){
+    int moveHighlightingStyle = getMoveHighlightingStyle();
     JMenu moveHighlightingMenu =  new JMenu("Move Highlighting");
     moveHighlightingMenu.setMnemonic('H');
-
-    JRadioButtonMenuItem noMoveHighlightingStyle = new JRadioButtonMenuItem("No Highlighting",
+    
+    JRadioButtonMenuItem noMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("No Highlighting",
       moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem squareMoveHighlightingStyle = new JRadioButtonMenuItem("Square Highlighting",
+    JRadioButtonMenuItem squareMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Square Highlighting",
       moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem arrowMoveHighlightingStyle = new JRadioButtonMenuItem("Arrow Highlighting",
+    JRadioButtonMenuItem arrowMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Arrow Highlighting",
       moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
 
-    noMoveHighlightingStyle.setMnemonic('N');
-    squareMoveHighlightingStyle.setMnemonic('S');
-    arrowMoveHighlightingStyle.setMnemonic('A');
+    noMoveHighlightingStyleMenuItem.setMnemonic('N');
+    squareMoveHighlightingStyleMenuItem.setMnemonic('S');
+    arrowMoveHighlightingStyleMenuItem.setMnemonic('A');
 
     ButtonGroup moveHighlightStyleGroup = new ButtonGroup();
-    moveHighlightStyleGroup.add(noMoveHighlightingStyle);
-    moveHighlightStyleGroup.add(squareMoveHighlightingStyle);
-    moveHighlightStyleGroup.add(arrowMoveHighlightingStyle);
+    moveHighlightStyleGroup.add(noMoveHighlightingStyleMenuItem);
+    moveHighlightStyleGroup.add(squareMoveHighlightingStyleMenuItem);
+    moveHighlightStyleGroup.add(arrowMoveHighlightingStyleMenuItem);
 
-    noMoveHighlightingStyle.setActionCommand("none");
-    squareMoveHighlightingStyle.setActionCommand("square");
-    arrowMoveHighlightingStyle.setActionCommand("arrow");
+    noMoveHighlightingStyleMenuItem.setActionCommand("none");
+    squareMoveHighlightingStyleMenuItem.setActionCommand("square");
+    arrowMoveHighlightingStyleMenuItem.setActionCommand("arrow");
 
     ActionListener moveHighlightingStyleListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String actionCommand = evt.getActionCommand();
 
         if ("none".equals(actionCommand))
-          moveHighlightingStyle = JBoard.NO_MOVE_HIGHLIGHTING;
+          setMoveHighlightingStyle(JBoard.NO_MOVE_HIGHLIGHTING, true);
         else if ("square".equals(actionCommand))
-          moveHighlightingStyle = JBoard.SQUARE_MOVE_HIGHLIGHTING;
+          setMoveHighlightingStyle(JBoard.SQUARE_MOVE_HIGHLIGHTING, true);
         else if ("arrow".equals(actionCommand))
-          moveHighlightingStyle = JBoard.ARROW_MOVE_HIGHLIGHTING;
+          setMoveHighlightingStyle(JBoard.ARROW_MOVE_HIGHLIGHTING, true);
         else
           throw new IllegalStateException("Unknown action command: "+actionCommand);
-
-        Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-        while (boardPanels.hasMoreElements()){
-          BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-          boardPanel.getBoard().setMoveHighlightingStyle(moveHighlightingStyle);
-        }
       }
     };
 
-    noMoveHighlightingStyle.addActionListener(moveHighlightingStyleListener);
-    squareMoveHighlightingStyle.addActionListener(moveHighlightingStyleListener);
-    arrowMoveHighlightingStyle.addActionListener(moveHighlightingStyleListener);
+    noMoveHighlightingStyleMenuItem.addActionListener(moveHighlightingStyleListener);
+    squareMoveHighlightingStyleMenuItem.addActionListener(moveHighlightingStyleListener);
+    arrowMoveHighlightingStyleMenuItem.addActionListener(moveHighlightingStyleListener);
 
 
+    boolean highlightOwnMoves = isHighlightingOwnMoves();
     final JCheckBoxMenuItem highlightOwnMovesCheckBox = new JCheckBoxMenuItem("Highlight own moves", highlightOwnMoves);
     highlightOwnMovesCheckBox.setMnemonic('H');
     highlightOwnMovesCheckBox.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        highlightOwnMoves = highlightOwnMovesCheckBox.isSelected();
-
-        Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-        while (boardPanels.hasMoreElements()){
-          BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-          boardPanel.setHighlightingOwnMoves(highlightOwnMoves);
-        }
+        setHighlightingOwnMoves(highlightOwnMovesCheckBox.isSelected(), true);
       }
     });
-
     
-    moveHighlightingMenu.add(noMoveHighlightingStyle);
-    moveHighlightingMenu.add(squareMoveHighlightingStyle);
-    moveHighlightingMenu.add(arrowMoveHighlightingStyle);
+    moveHighlightingMenu.add(noMoveHighlightingStyleMenuItem);
+    moveHighlightingMenu.add(squareMoveHighlightingStyleMenuItem);
+    moveHighlightingMenu.add(arrowMoveHighlightingStyleMenuItem);
     moveHighlightingMenu.addSeparator();
     moveHighlightingMenu.add(highlightOwnMovesCheckBox);
 
@@ -546,12 +753,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        String piecePainterClassName = button.getActionCommand();
-        setProperty("piece-set-class-name", piecePainterClassName, true);
-        updatePieceSet();
+        setPiecePainterClassName(button.getActionCommand(), true);
       } 
     };
 
+    PiecePainter piecePainter = getPiecePainter();
     JMenu pieceSetsMenu = new JMenu("Piece Sets");
     pieceSetsMenu.setMnemonic('P');
     ButtonGroup pieceSetsCheckBoxGroup = new ButtonGroup();
@@ -594,12 +800,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       public void actionPerformed(ActionEvent evt){
         AbstractButton button = (AbstractButton)evt.getSource();
-        String boardPainterClassName = button.getActionCommand();
-        setProperty("board-class-name", boardPainterClassName, true);
-        updateBoard();
+        setBoardPainterClassName(button.getActionCommand(), true);
       } 
     };
 
+    BoardPainter boardPainter = getBoardPainter();
     JMenu boardsMenu = new JMenu("Boards");
     boardsMenu.setMnemonic('B');
     ButtonGroup boardsCheckBoxGroup = new ButtonGroup();
@@ -634,107 +839,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * changes the preferences.
    */
 
-  public void refreshFromProperties(){
-    updatePieceSet();
-    updateBoard();
-
-    // TODO: finish implementing for the rest of the properties.
-  }
-
-
-
-
-  /**
-   * Updates the piece painter from properties.
-   */
-
-  protected void updatePieceSet(){
-    String piecePainterClassName = getProperty("piece-set-class-name");
-    try{
-      if (piecePainterClassName == null)
-        piecePainter = new DefaultPiecePainter();
-      else
-        piecePainter = (PiecePainter)Class.forName(piecePainterClassName).newInstance();
-      configurePiecePainter(piecePainter);
-
-      Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-      while (boardPanels.hasMoreElements()){
-        BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-        boardPanel.getBoard().setPiecePainter(piecePainter);
-      }
-    } catch (ClassNotFoundException e){
-        System.err.println("Unable to find class "+piecePainterClassName);
-      }
-      catch (InstantiationException e){
-        System.err.println("Unable to instantiate class "+piecePainterClassName); 
-      }
-      catch (IllegalAccessException e){
-        System.err.println("Unable to instantiate class "+piecePainterClassName+" due to access restrictions"); 
-      }
-      catch (ClassCastException e){
-        System.err.println("Unable to cast "+piecePainterClassName+" into PiecePainter"); 
-      }
-  }
-
-
-
-
-  /**
-   * Updates the board painter from properties.
-   */
-
-  protected void updateBoard(){
-    String boardPainterClassName = getProperty("board-class-name");
-    try{
-      if (boardPainterClassName == null)
-        boardPainter = new DefaultBoardPainter();
-      else
-        boardPainter = (BoardPainter)Class.forName(boardPainterClassName).newInstance();
-      configureBoardPainter(boardPainter);
-
-      Enumeration boardPanels = boardPanelsToInternalFrames.keys();
-      while (boardPanels.hasMoreElements()){
-        BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
-        boardPanel.getBoard().setBoardPainter(boardPainter);
-      }
-    } catch (ClassNotFoundException e){
-        System.err.println("Unable to find class "+boardPainterClassName);
-      }
-      catch (InstantiationException e){
-        System.err.println("Unable to instantiate class "+boardPainterClassName); 
-      }
-      catch (IllegalAccessException e){
-        System.err.println("Unable to instantiate class "+boardPainterClassName+" due to access restrictions"); 
-      }
-      catch (ClassCastException e){
-        System.err.println("Unable to cast "+boardPainterClassName+" into BoardPainter"); 
-      }
-  }
-
-
-
-
-  /**
-   * Saves the current properties of the BoardManager into the user properties.
-   */
-
-  protected void saveState(){
-    setProperty("move-input-style", moveInputStyle == JBoard.CLICK_N_CLICK ? "click'n'click" : "drag'n'drop", true);
-    setProperty("dragged-piece-style", draggedPieceStyle==JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal-cursor", true);
-    setProperty("auto-promote", String.valueOf(autoPromote), true);
-
-    String moveHighlightingString;
-    if (moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "none";
-    else if (moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "square";
-    else if (moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING)
-      moveHighlightingString = "arrow";
-    else
-      throw new IllegalStateException("Unknown move higlighting style: "+moveHighlightingStyle);
-    setProperty("move-highlight.style", moveHighlightingString, true);
-
-    setProperty("move-highlight.highlight-own", String.valueOf(highlightOwnMoves), true);
+  public void refreshFromProperties(boolean userTriggered){
+    setMoveInputStyle(getMoveInputStyle(), userTriggered);
+    setDraggedPieceStyle(getDraggedPieceStyle(), userTriggered);
+    setAutoPromote(isAutoPromote(), userTriggered);
+    setMoveHighlightingStyle(getMoveHighlightingStyle(), userTriggered);
+    setHighlightingOwnMoves(isHighlightingOwnMoves(), userTriggered);
+    setMoveHighlightingColor(getMoveHighlightingColor(), userTriggered);
+    setDragSquareHighlightingColor(getDragSquareHighlightingColor(), userTriggered);
+    setPiecePainterClassName(getPiecePainter().getClass().getName(), userTriggered);
+    setBoardPainterClassName(getBoardPainter().getClass().getName(), userTriggered);
   }
 
 
@@ -770,7 +884,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     gamesToBoardPanels.clear();
 
     int numUnusedFrames = unusedInternalFrames.size();
-    for (int i=0;i<numUnusedFrames;i++){
+    for (int i = 0; i < numUnusedFrames; i++){
       JInternalFrame frame = (JInternalFrame)unusedInternalFrames.elementAt(i);
       frame.dispose();
     }
@@ -793,44 +907,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Gets called when a game starts. Creates a new BoardPanel and a JInternalFrame
-   * to put it in and displays it.
+   * Gets called when a game starts. Creates a new BoardPanel and a
+   * JInternalFrame to put it in and displays it.
    */
 
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
     BoardPanel boardPanel = createBoardPanel(game);
-    boardPanel.getBoard().setMoveInputStyle(moveInputStyle);
-    boardPanel.getBoard().setDraggedPieceStyle(draggedPieceStyle);
-    boardPanel.getBoard().setMoveHighlightingStyle(moveHighlightingStyle);
-    boardPanel.getBoard().setManualPromote(!autoPromote);
-    boardPanel.getBoard().setPiecePainter(piecePainter);
-    boardPanel.getBoard().setBoardPainter(boardPainter);
-
-    boardPanel.setHighlightingOwnMoves(highlightOwnMoves);
-
-    boardPanel.addUserMoveListener(this);
-    getConnection().getJinListenerManager().addGameListener(boardPanel);
-    gamesToBoardPanels.put(game, boardPanel);
-
-    JInternalFrame boardFrame;
-    if (unusedInternalFrames.isEmpty()){
-      boardFrame = createNewBoardFrame(boardPanel);
-    }
-    else{
-      boardFrame = reuseBoardFrame(boardPanel);
-    }
-
-    boardFrame.setTitle(boardPanel.getTitle());
-    boardFrame.repaint(); // It doesn't seem to repaint itself automatically.
-
-    internalFramesToBoardPanels.put(boardFrame, boardPanel);
-    boardPanelsToInternalFrames.put(boardPanel, boardFrame);
-		
-    boardFrame.toFront();
-    try{
-      boardFrame.setSelected(true);
-    } catch (java.beans.PropertyVetoException e){} // Ignore.
+    initBoardPanel(game, boardPanel);
 
     // Artificially invoke this, since it would not get called otherwise
     // (we're already in the middle of the dispatching of that event).
@@ -922,6 +1006,75 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     BoardPanel boardPanel = new BoardPanel(this, game);
 
     return boardPanel;
+  }
+
+
+
+  
+  /**
+   * Initializes the given BoardPanel, making it ready for use.
+   */
+
+  protected void initBoardPanel(Game game, BoardPanel boardPanel){
+    setBoardPanelSettings(new SingleItemEnumeration(boardPanel));
+
+    boardPanel.addUserMoveListener(this);
+    getConnection().getJinListenerManager().addGameListener(boardPanel);
+    gamesToBoardPanels.put(game, boardPanel);
+
+    JInternalFrame boardFrame;
+    if (unusedInternalFrames.isEmpty()){
+      boardFrame = createNewBoardFrame(boardPanel);
+    }
+    else{
+      boardFrame = reuseBoardFrame(boardPanel);
+    }
+
+    boardFrame.setTitle(boardPanel.getTitle());
+    boardFrame.repaint(); // It doesn't seem to repaint itself automatically.
+
+    internalFramesToBoardPanels.put(boardFrame, boardPanel);
+    boardPanelsToInternalFrames.put(boardPanel, boardFrame);
+		
+    boardFrame.toFront();
+    try{
+      boardFrame.setSelected(true);
+    } catch (java.beans.PropertyVetoException e){} // Ignore.
+  }
+
+
+
+
+  /**
+   * Sets the various settings of the given Enumeration of BoardPanels to the
+   * current settings.
+   */
+
+  protected void setBoardPanelSettings(Enumeration boardPanels){
+    int moveInputStyle = getMoveInputStyle();
+    int draggedPieceStyle = getDraggedPieceStyle();
+    int moveHighlightingStyle = getMoveHighlightingStyle();
+    boolean autoPromote = isAutoPromote();
+    PiecePainter piecePainter = getPiecePainter();
+    BoardPainter boardPainter = getBoardPainter();
+    Color moveHighlightColor = getMoveHighlightingColor();
+    Color dragSquareHighlightColor = getDragSquareHighlightingColor();
+    boolean isHighlightingOwnMoves = isHighlightingOwnMoves();
+
+    while (boardPanels.hasMoreElements()){
+      BoardPanel boardPanel = (BoardPanel)boardPanels.nextElement();
+      JBoard board = boardPanel.getBoard();
+      board.setMoveInputStyle(moveInputStyle);
+      board.setDraggedPieceStyle(draggedPieceStyle);
+      board.setMoveHighlightingStyle(moveHighlightingStyle);
+      board.setManualPromote(!autoPromote);
+      board.setPiecePainter(piecePainter);
+      board.setBoardPainter(boardPainter);
+      board.setMoveHighlightingColor(moveHighlightColor);
+      board.setDragSquareHighlightingColor(dragSquareHighlightColor);
+
+      boardPanel.setHighlightingOwnMoves(isHighlightingOwnMoves);
+    }
   }
 
 
@@ -1128,7 +1281,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     Rectangle frameBounds = frame.getBounds();
     // If something bad happened, let's not save that state.
     if ((frameBounds.width>10)&&(frameBounds.height>10))
-      user.setProperty(prefix+"frame-bounds-"+index,StringEncoder.encodeRectangle(frameBounds),false);
+      user.setProperty(prefix+"frame-bounds-"+index,StringEncoder.encodeRectangle(frameBounds), false);
 
     Rectangle iconBounds = frame.getDesktopIcon().getBounds();
     user.setProperty(prefix+"frame-icon-bounds-"+index,StringEncoder.encodeRectangle(iconBounds),false);
