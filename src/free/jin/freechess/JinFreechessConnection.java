@@ -393,24 +393,32 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     else if (game != null){ // A known game
 
       // The server does that sometimes, to update clocks perhaps?
-      if (boardData.getMoveVerbose() != null){
-        int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
+      int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
+      if (game.isPlayed()){
         if (plyDifference < 0)
           issueTakeback(game, oldBoardData, boardData);
         else if (plyDifference == 0){
-//          changePosition(game, oldBoard, boardData);
-          System.out.println("Position changed incompatibly ("+plyDifference+")");
-          // I'm not sure this ever happens.
+//          changePosition(game, oldBoardData, boardData);
+          System.out.println("*********** Position changed incompatibly ("+plyDifference+") **********");
+          // This happens if you:
+          // 1. Issue "refresh".
+          // 2. Make an illegal move, because the server will re-send us the board (although we don't need it)
         }
-        else if (plyDifference == 1)
-          makeMove(game, oldBoardData, boardData);
+        else if (plyDifference == 1){
+          if (boardData.getMoveVerbose() != null)
+            makeMove(game, oldBoardData, boardData);
+          else
+            changePosition(game, oldBoardData, boardData); // This shouldn't happen, but I'll leave it just in case
+        }
         else if (plyDifference > 1){
-//          changePosition(game, oldBoard, boardData);
-          System.out.println("Position changed incompatibly ("+plyDifference+")");
-          // I'm not sure this ever happens.
+          changePosition(game, oldBoardData, boardData);
+          // This happens if you:
+          // 1. Issue "forward" with an argument of 2 or bigger.
         }
-
+      }
+      else{
+        changePosition(game, oldBoardData, boardData); // Since we don't have the move list, this is the best we can do
       }
     }
     else{ // Grr, the server started a game without sending us a GameInfo line.
@@ -708,6 +716,24 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   private void issueTakeback(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
     int takebackCount = oldBoardData.getPlayedPlyCount() - newBoardData.getPlayedPlyCount();
     listenerManager.fireGameEvent(new TakebackEvent(this, game, takebackCount));
+  }
+
+
+
+
+  /**
+   * Fires an appropriate PositionChangedEvent.
+   */
+
+  private void changePosition(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
+    Position newPos = game.getInitialPosition();
+    newPos.setLexigraphic(newBoardData.getBoardLexigraphic());
+    Player currentPlayer = playerForString(newBoardData.getCurrentPlayer());
+    newPos.setCurrentPlayer(currentPlayer);
+
+    game.setInitialPosition(newPos);
+
+    listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
   }
 
 
