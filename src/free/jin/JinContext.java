@@ -139,6 +139,14 @@ public interface JinContext{
    */
 
   boolean removeUser(User user);
+  
+  
+  
+  /**
+   * Returns whether this context is capable of saving preferences.
+   */
+   
+  boolean isSavePrefsCapable();
 
   
 
