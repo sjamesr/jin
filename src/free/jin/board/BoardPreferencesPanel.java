@@ -206,7 +206,7 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     highlightPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
     JPanel notePanel = new JPanel(new BorderLayout());
-    notePanel.add(new JLabel("* - Note that the color preferences only affect vector pieces and the solid color board"), BorderLayout.CENTER);
+    notePanel.add(new JLabel("* - Color preferences only affect vector pieces and the solid color board"), BorderLayout.CENTER);
 
     add(piecesPanel);
     add(Box.createVerticalStrut(10));
