@@ -180,7 +180,7 @@ public class JinFrameMenuBar extends JMenuBar{
     final JMenu connMenu = new JMenu("Connection");
     connMenu.setMnemonic(KeyEvent.VK_C);
 
-    JMenuItem newConn = new JMenuItem("New Connection");
+    JMenuItem newConn = new JMenuItem("New Connection...");
     newConn.setMnemonic(KeyEvent.VK_N);
     newConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
     newConn.addActionListener(new ActionListener(){
@@ -193,7 +193,7 @@ public class JinFrameMenuBar extends JMenuBar{
     connectionMenuItems.addElement(newConn);
 
 
-    JMenuItem openConn = new JMenuItem("Open Connection");
+    JMenuItem openConn = new JMenuItem("Open Connection...");
     openConn.setMnemonic(KeyEvent.VK_O);
     openConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
     openConn.addActionListener(new ActionListener(){
