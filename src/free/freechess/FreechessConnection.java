@@ -593,7 +593,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern kibitzPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
 
 
 
@@ -642,7 +642,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern whisperPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
 
 
 
