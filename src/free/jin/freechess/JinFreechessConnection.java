@@ -461,6 +461,27 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   }
 
 
+
+  /**
+   * Finds the game played by the user. Returns the game number, or null if the
+   * user currently doesn't play a game.
+   */
+
+  private Integer findMyGame(){
+    Enumeration gameNumbers = ongoingGamesData.keys();
+    while (gameNumbers.hasMoreElements()){
+      Integer gameNumber = (Integer)gameNumbers.nextElement();
+      InternalGameData nextGameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+      Game nextGame = nextGameData.game;
+      if (nextGame.getGameType() == Game.MY_GAME)
+        return gameNumber;
+    }
+
+    return null;
+  }
+
+
+
   /**
    * Saves the GameInfoStruct until we receive enough info to fire a
    * GameStartEvent.
@@ -491,18 +512,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
       if (plyDifference < 0){
         if ((gameData.getMoveCount() < -plyDifference) || // Can't issue takeback
-            ((boardData.getPlayedPlyCount() == 0) && !gameData.game.isPlayed()))
-            // This special check is for cases when you start in examine mode, make a few moves
-            // and then enter bsetup mode - the ply count is set to 0, but we want to change the
-            // position, not issue a takeback.
+            gameData.isBSetup)
           changePosition(gameData, boardData);
-        else{
-          
+        else
           issueTakeback(gameData, boardData);
-        }
       }
       else if (plyDifference == 0){
-        if (!gameData.game.isPlayed()) // Examined
+        if (gameData.isBSetup)
           changePosition(gameData, boardData);
         // This happens if you:
         // 1. Issue "refresh".
@@ -554,6 +570,24 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
+   * Changes the bsetup state of the game.
+   */
+
+  protected boolean processBSetupMode(boolean entered){
+    Integer gameNumber = findMyGame();
+    if (gameNumber == null) // We're not playing a game. Weird, but what can we do?
+      return false;
+
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+    gameData.isBSetup = entered;
+
+    return false;
+  }
+
+
+
+
+  /**
    * A small class for keeping internal data about a game.
    */
 
@@ -581,6 +615,14 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
      */
 
     public Style12Struct boardData = null;
+
+
+
+    /**
+     * Is this game in bsetup mode?
+     */
+
+    public boolean isBSetup = false;
 
 
 
@@ -968,23 +1010,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   private void illegalMoveAttempted(String moveString){
-    Integer gameNumber = null; // We must find the played game, since the
-                               // server doesn't provide its game number.
-    InternalGameData gameData = null; 
-    
-    Enumeration gameNumbers = ongoingGamesData.keys();
-    while (gameNumbers.hasMoreElements()){
-      gameNumber = (Integer)gameNumbers.nextElement();
-      InternalGameData nextGameData = (InternalGameData)ongoingGamesData.get(gameNumber);
-      Game nextGame = nextGameData.game;
-      if (nextGame.getGameType() == Game.MY_GAME){
-        gameData = nextGameData;
-        break;
-      }
-    }
+    Integer gameNumber = findMyGame(); 
+      // We must find the played game, since the server doesn't provide its game number.
 
-    if (gameData == null) // We're not playing a game. Weird, but what can we do?
+    if (gameNumber == null) // We're not playing a game. Weird, but what can we do?
       return;
+
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
 
     Game game = gameData.game;
 
@@ -1041,9 +1073,14 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
 
     gameData.clearMoves();
+
+    // We do this because moves in bsetup mode cause position change events, not move events
+    if (gameData.isBSetup){
+      Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
+      if ((unechoedGameMoves != null) && (unechoedGameMoves.size() != 0))
+        unechoedGameMoves.removeElementAt(0); 
+    }
   }
-
-
 
 
 
