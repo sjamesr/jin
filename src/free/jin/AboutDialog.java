@@ -66,7 +66,7 @@ public class AboutDialog extends JDialog{
     setContentPane(contentPane);
 
     Icon jinIcon = new ImageIcon(AboutDialog.class.getResource("resources/jinicon.gif"));
-    JLabel jinLabel = new JLabel("Jin", jinIcon, JLabel.CENTER);
+    JLabel jinLabel = new JLabel(Jin.getAppName()+" "+Jin.getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
     jinLabel.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -84,18 +84,21 @@ public class AboutDialog extends JDialog{
       }
     StringTokenizer copyrightLines = new StringTokenizer(copyright, "\r\n");
 
+    Font font = new Font("SansSerif", Font.PLAIN, 12);
     while (copyrightLines.hasMoreTokens()){
       String line = copyrightLines.nextToken();
-      JLabel label = new JLabel(line, JLabel.CENTER);
+      JLabel label = new JLabel(line.trim(), JLabel.CENTER);
       label.setAlignmentX(CENTER_ALIGNMENT);
+      label.setFont(font);
       contentPane.add(label);
     }
 
     contentPane.add(Box.createVerticalStrut(10));
 
-    JLabel loveLabel = new JLabel("This program is dedicated to my Love", JLabel.CENTER);
+    JLabel loveLabel = new JLabel("This program is dedicated to my Love.", JLabel.CENTER);
     loveLabel.setAlignmentX(CENTER_ALIGNMENT);
     contentPane.add(loveLabel);
+    loveLabel.setFont(font);
 
     contentPane.add(Box.createVerticalStrut(10));
 
