@@ -354,7 +354,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     });
 
     JButton deleteRuleButton = new JButton("Delete Rule");
-    deleteRuleButton.setMnemonic('e');
+    deleteRuleButton.setMnemonic('t');
     deleteRuleButton.setDefaultCapable(false);
     deleteRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
