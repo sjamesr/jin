@@ -171,9 +171,9 @@ public class FullscreenPanel extends FixedJPanel{
       JFrame frame = new JFrame(AWTUtilities.frameForComponent(this).getTitle());
 
       Method setUndecorated = 
-        Frame.class.getDeclaredMethod("setUndecorated", new Class[]{Boolean.TYPE});
+        Frame.class.getDeclaredMethod("setUndecorated", new Class[]{boolean.class});
       Method setResizable = 
-        Frame.class.getDeclaredMethod("setResizable", new Class[]{Boolean.TYPE});
+        Frame.class.getDeclaredMethod("setResizable", new Class[]{boolean.class});
 
       setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
       setResizable.invoke(frame, new Object[]{Boolean.FALSE});
