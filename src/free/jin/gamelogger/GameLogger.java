@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;
+import free.jin.plugin.PreferencesPanel;
 import free.jin.JinConnection;
 import free.jin.PGNJinConnection;
 import free.jin.Game;
@@ -46,6 +47,32 @@ import bsh.EvalError;
  */
 
 public class GameLogger extends Plugin implements GameListener{
+
+
+
+  /**
+   * The code for the logging mode when no games are logged.
+   */
+
+  public static final int LOG_NONE = 0;
+
+
+
+  /**
+   * The code for the logging mode when all games are logged into one file.
+   */
+
+  public static final int LOG_ALL = 1;
+
+
+
+  /**
+   * The code for the logging mode when logging rules apply.
+   */
+
+  public static final int USE_RULES = 2;
+
+
 
 
 
@@ -77,23 +104,29 @@ public class GameLogger extends Plugin implements GameListener{
 
 
   /**
-   * An array of conditions for logging games. The n-th item specifies that a
-   * game matching it should be logged into the file specified by the n-th item
-   * in the <code>loggingFilenames</code> array.
+   * The current logging mode.
    */
 
-  private String [] loggingConditions = null;
+  private int loggingMode;
 
 
 
 
   /**
-   * An array of file names specifying the files into which games should be
-   * logged.
+   * The filename of the file to log to when the logging setting is to log all
+   * games.
    */
 
-  private String [] loggingFilenames = null;
+  private String allGamesLogFile;
 
+
+
+
+  /**
+   * A Vector of LoggingRules.
+   */
+
+  private Vector loggingRules;
   
 
 
@@ -110,6 +143,49 @@ public class GameLogger extends Plugin implements GameListener{
 
     super.setContext(context);
   }
+
+
+
+
+  /**
+   * Returns the current logging mode. Possible values are
+   * <code>LOG_NONE</code>, <code>LOG_ALL</code> and <code>USE_RULES</code>.
+   */
+
+  public int getLoggingMode(){
+    return loggingMode;
+  }
+
+
+
+
+  /**
+   * Returns the name of the file into which the games are saved under the
+   * <code>LOG_ALL</code> logging mode. This may return <code>null</code> if the
+   * user never specified such a file.
+   */
+
+  public String getLogFileForAll(){
+    return allGamesLogFile;
+  }
+
+
+
+
+  /**
+   * Returns a deep copy of the <code>loggingRules</code> Vector.
+   */
+
+  public Vector getLoggingRules(){
+    Vector rules = new Vector(loggingRules.size());
+    for (int i = 0; i < loggingRules.size(); i++){
+      LoggingRule rule = (LoggingRule)loggingRules.elementAt(i);
+      rules.addElement(new LoggingRule(rule));
+    }
+
+    return rules;
+  }
+
 
 
 
@@ -167,18 +243,36 @@ public class GameLogger extends Plugin implements GameListener{
 
 
   /**
-   * Loads the conditions for logging games and the file names to which the
-   * games should be logged.
+   * Loads the logging mode and logging rules.
    */
 
   private void loadLoggingConditions(){
-    int conditionsCount = getIntegerProperty("logging.conditions.count", 0);
-    loggingConditions = new String[conditionsCount];
-    loggingFilenames = new String[conditionsCount];
+    String loggingModeString = getProperty("logging.mode", "none");
+    if ("rules".equalsIgnoreCase(loggingModeString))
+      loggingMode = USE_RULES;
+    else if ("all".equalsIgnoreCase(loggingModeString))
+      loggingMode = LOG_ALL;
+    else
+      loggingMode = LOG_NONE;
 
-    for (int i = 0; i < conditionsCount; i++){
-      loggingConditions[i] = getProperty("logging.condition-"+(i+1));
-      loggingFilenames[i] = getProperty("logging.filename-"+(i+1));
+    allGamesLogFile = getProperty("logging.all.filename");
+    if ((allGamesLogFile == null) && (loggingMode == LOG_ALL))
+      loggingMode = LOG_NONE;
+      
+
+    int rulesCount = getIntegerProperty("logging.rules.count", 0);
+    loggingRules = new Vector(rulesCount);
+
+    for (int i = 0; i < rulesCount; i++){
+      String name = getProperty("logging.rule-"+(i+1)+".name");
+      String condition = getProperty("logging.rule-"+(i+1)+".condition");
+      String filename = getProperty("logging.rule-"+(i+1)+".filename");
+
+      try{
+        loggingRules.addElement(new LoggingRule(name, condition, filename));
+      } catch (EvalError e){
+          e.printStackTrace();
+        }
     }
   }
 
@@ -186,8 +280,46 @@ public class GameLogger extends Plugin implements GameListener{
 
 
   /**
+   * Rereads all the user/plugin preferences. This method should be called when
+   * the user changes his preferences.
+   */
+
+  public void refreshFromProperties(){
+    loadLoggingConditions();
+  }
+
+
+
+
+
+  /**
+   * Returns an array of all the variables available to be used in the logging
+   * rule condition and their possible values. Each element in the returned
+   * array is an array by itself, of length 2 where the first element is the
+   * variable name and the 2nd is its possible value, as a string.
+   */
+
+  static String [][] getAvailableVars(){
+    return new String[][]{
+      {"category", "\"Blitz\""},
+      {"rating", "1800"},
+      {"time", "10"},
+      {"inc", "2"},
+      {"etime", "2.5"},
+      {"rated", "true"},
+      {"opponent", "\"AlexTheGreat\""},
+      {"title", "\"gm\""},
+      {"moves", "40"},
+      {"result", "\"win\""},
+    };
+  }
+
+
+
+
+  /**
    * Returns an array of names of the files into which the specified game should
-   * be logged. Returns <code>null</code> if the specified game should not be 
+   * be logged. Returns <code>null</code> if the specified game should not be
    * logged at all.
    */
 
@@ -195,25 +327,27 @@ public class GameLogger extends Plugin implements GameListener{
     GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
 
     Vector files = new Vector();
-    for (int i = 0; i < loggingConditions.length; i++){
-      String condition = loggingConditions[i];
+    for (int i = 0; i < loggingRules.size(); i++){
+      LoggingRule rule = (LoggingRule)loggingRules.elementAt(i);
+      String condition = rule.getCondition();
       Interpreter bsh = new Interpreter();
       boolean isUserWhite = game.getUserPlayer().isWhite();
       try{
-        bsh.set("variant", game.getVariant().getName());
+        bsh.set("category", game.getRatingCategoryString().intern());
         bsh.set("rating", isUserWhite ? game.getBlackRating() : game.getWhiteRating());
-        bsh.set("time", isUserWhite ? game.getWhiteTime() : game.getBlackRating());
+        bsh.set("time", (isUserWhite ? game.getWhiteTime() : game.getBlackTime())/(1000*60));
         bsh.set("inc", isUserWhite ? game.getWhiteInc() : game.getBlackInc());
         bsh.set("etime", isUserWhite ? (game.getWhiteTime() + 2*game.getWhiteInc()/3) : 
                                        (game.getBlackTime() + 2*game.getBlackInc()/3));
         bsh.set("rated", game.isRated());
-        bsh.set("title", isUserWhite ? game.getBlackTitles() : game.getWhiteTitles());
+        bsh.set("opponent", (isUserWhite ? game.getBlackName() : game.getWhiteName()).intern());
+        bsh.set("title", (isUserWhite ? game.getBlackTitles() : game.getWhiteTitles()).intern());
         bsh.set("moves", gameInfo.movelist.size());
-        bsh.set("result", getResultString(isUserWhite, game.getResult()));
+        bsh.set("result", getResultString(isUserWhite, game.getResult()).intern());
 
         boolean result = ((Boolean)bsh.eval(condition)).booleanValue();
         if (result)
-          files.addElement(loggingFilenames[i]);
+          files.addElement(rule.getFilename());
       } catch (EvalError e){
           e.printStackTrace();
         }
@@ -298,21 +432,20 @@ public class GameLogger extends Plugin implements GameListener{
       }
 
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)));
-      out.writeBytes("[Event \"Casual Game\"]\n");
-      out.writeBytes("[Site \""+getUser().getServer().getLongName()+"\"]\n");
-      out.writeBytes("[Date \""+dateFormat.format(gameInfo.gameStartDate)+"\"]\n");
-      out.writeBytes("[Round \"-\"]\n");
-      out.writeBytes("[White \""+game.getWhiteName()+"\"]\n");
-      out.writeBytes("[Black \""+game.getBlackName()+"\"]\n");
-      out.writeBytes("[Result \""+resultString+"\"]\n");
-      out.writeBytes("[Time \""+timeFormat.format(gameInfo.gameStartDate)+"\"]\n");
-      if (!game.isTimeOdds()){
-        out.writeBytes("[TimeControl \""+game.getWhiteTime()/1000+"+"+game.getWhiteInc()+"\"]\n");
-      }
-      out.writeBytes("[Mode \"ICS\"]\n");
+      writeTag(out, "Event", "Casual Game");
+      writeTag(out, "Site", getUser().getServer().getLongName());
+      writeTag(out, "Date", dateFormat.format(gameInfo.gameStartDate));
+      writeTag(out, "Round", "-");
+      writeTag(out, "White", game.getWhiteName());
+      writeTag(out, "Black", game.getBlackName());
+      writeTag(out, "Result", resultString);
+      writeTag(out, "Time", timeFormat.format(gameInfo.gameStartDate));
+      if (!game.isTimeOdds())
+        writeTag(out, "TimeControl", game.getWhiteTime()/1000+"+"+game.getWhiteInc());
+      writeTag(out, "Mode", "ICS");
       if (!gameInfo.initPos.getFEN().equals(Chess.INITIAL_POSITION_FEN)){
-        out.writeBytes("[SetUp \"1\"]\n");
-        out.writeBytes("[FEN \""+gameInfo.initPos.getFEN()+"\"]\n");
+        writeTag(out, "SetUp", "1");
+        writeTag(out, "FEN", gameInfo.initPos.getFEN());
       }
 
       out.writeBytes("\n");
@@ -374,6 +507,18 @@ public class GameLogger extends Plugin implements GameListener{
 
 
 
+
+  /**
+   * Writes the specified pgn tag with the specified value to the specified
+   * output stream.
+   */
+
+  private static void writeTag(DataOutputStream out, String tagName, String tagValue) throws IOException{
+    out.writeBytes("["+tagName+" \""+tagValue+"\"]\n");
+  }
+
+
+
   
   /**
    * Starts logging the moves.
@@ -397,8 +542,10 @@ public class GameLogger extends Plugin implements GameListener{
     Game game = evt.getGame();
     if (canLog(game)){
       String [] filenames = getFilesToLogInto(game);
-      for (int i = 0; i < filenames.length; i++)
-        log(game, filenames[i]);
+      if (filenames != null){
+        for (int i = 0; i < filenames.length; i++)
+          log(game, filenames[i]);
+      }
     }
     gamesToGameInfo.remove(game);
   }
@@ -456,6 +603,30 @@ public class GameLogger extends Plugin implements GameListener{
   public void illegalMoveAttempted(IllegalMoveEvent evt){}
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
+
+
+
+
+
+  /**
+   * Return a PreferencesPanel for changing GameLogger's settings.
+   */
+
+  public PreferencesPanel getPreferencesUI(){
+    return new GameLoggerPreferencesPanel(this);
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> that the game logger does feature a preferences
+   * panel.
+   */
+
+  public boolean hasPreferencesUI(){
+    return true;
+  }
 
 
 
