@@ -137,18 +137,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
-  /**
-   * Sets the premove ivar to the specified state.
-   */
-
-  public synchronized void setPremove(boolean val){
-    if (isLoggedIn()){
-      sendCommand("iset premove " + (val ? "1" : "0"));
-      filterLine("premove " + (val ? "" : "un") + "set.");
-    }
-  }
-
-
 
 
   /**
@@ -157,9 +145,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   public void onLogin(){
-    sendCommand("set bell 0");
-    sendCommand("iset gameinfo 1");
-    sendCommand("iset showownseek 1");
+    sendCommand("$set bell 0");
+    sendCommand("$iset gameinfo 1");
+    sendCommand("$iset showownseek 1");
 
     filterLine("Bell off.");
     filterLine("gameinfo set.");
@@ -1207,7 +1195,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
-    sendCommand("play "+seek.getID());
+    sendCommand("$play "+seek.getID());
   }
 
 
@@ -1233,12 +1221,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     switch (game.getGameType()){
       case Game.MY_GAME:
         if (game.isPlayed())
-          sendCommand("resign");
+          sendCommand("$resign");
         else
-          sendCommand("unexamine");
+          sendCommand("$unexamine");
         break;
       case Game.OBSERVED_GAME:
-        sendCommand("unobserve "+id);
+        sendCommand("$unobserve "+id);
         break;
       case Game.ISOLATED_BOARD:
         break;
@@ -1309,7 +1297,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("resign");
+    sendCommand("$resign");
   }
 
 
@@ -1322,7 +1310,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("draw");
+    sendCommand("$draw");
   }
 
 
@@ -1346,7 +1334,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("abort");
+    sendCommand("$abort");
   }
 
 
@@ -1369,7 +1357,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("adjourn");
+    sendCommand("$adjourn");
   }
 
 
@@ -1383,7 +1371,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void goBackward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
-    sendCommand("backward "+plyCount);
+    sendCommand("$backward "+plyCount);
   }
 
 
@@ -1398,7 +1386,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void goForward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
-    sendCommand("forward "+plyCount);
+    sendCommand("$forward "+plyCount);
   }
 
 
@@ -1411,7 +1399,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void goToBeginning(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("backward 999");
+    sendCommand("$backward 999");
   }
 
 
@@ -1423,7 +1411,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void goToEnd(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("forward 999");
+    sendCommand("$forward 999");
   }
 
 

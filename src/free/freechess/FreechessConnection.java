@@ -106,6 +106,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * <code>true</code> when the premove ivar is on, <code>false</code> when off.
+   */
+
+  private boolean isPremove = false;
+
+
+
+
+  /**
    * A Hashtable of Strings specifying lines that need to be filtered out.
    */
 
@@ -169,8 +178,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   public final synchronized void setStyle(int style){
     this.style = style;
+
     if (isLoggedIn()){
-      sendCommand("set style "+style);
+      sendCommand("$set style "+style);
       filterLine("Style "+style+" set.");
     }
   }
@@ -210,8 +220,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     seekInfoOn = state;
 
     if (isLoggedIn()){
-      sendCommand("iset seekinfo " + (seekInfoOn ? "1" : "0"));
-//      sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0"));
+      sendCommand("$$iset seekinfo " + (seekInfoOn ? "1" : "0"));
+//      sendCommand("$$iset seekremove " + (seekInfoOn ? "1" : "0"));
       // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
 
       filterLine("seekinfo "+(seekInfoOn ? "" : "un") + "set.");
@@ -240,10 +250,39 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   public final synchronized void askSeeksRefresh(){
     if (seekInfoOn && isLoggedIn()){
-      sendCommand("iset seekinfo 1");
+      sendCommand("$$iset seekinfo 1");
       filterLine("seekinfo set.");
     }
   }
+
+
+
+
+  /**
+   * Sets the premove ivar to the specified state. If logged in, sends the
+   * appropriate command immediately. Otherwise, the variable will be set on
+   * login. The default is false.
+   */
+
+  public synchronized void setPremove(boolean val){
+    isPremove = val;
+
+    if (isLoggedIn()){
+      sendCommand("$$iset premove " + (val ? "1" : "0"));
+      filterLine("premove " + (val ? "" : "un") + "set.");
+    }
+  }
+
+
+
+  /**
+   * Returns <code>true</code> if the premove ivar is on.
+   */
+
+  public synchronized boolean isPremove(){
+    return isPremove;
+  }
+
 
 
 
@@ -282,19 +321,24 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   protected void onLogin(){
     super.onLogin();
 
-    sendCommand("iset nowrap 1");
-    sendCommand("set style "+style);
-    sendCommand("set interface "+interfaceVar);
-    sendCommand("set ptime 0");
-    sendCommand("iset defprompt"); // Sets it to the default, which we filter out.
-    sendCommand("iset ms 1");
-    sendCommand("iset nohighlight 1");
+    int style = this.style;
+    String interfaceVar = this.interfaceVar;
+    boolean isPremove = isPremove();
+
+    sendCommand("$iset nowrap 1");
+    sendCommand("$set style "+style);
+    sendCommand("$set interface "+interfaceVar);
+    sendCommand("$set ptime 0");
+    sendCommand("$iset defprompt"); // Sets it to the default, which we filter out.
+    sendCommand("$iset ms 1");
+    sendCommand("$iset nohighlight 1");
     if (seekInfoOn){
-      sendCommand("iset seekinfo 1");
-//      sendCommand("iset seekremove 1"); 
+      sendCommand("$iset seekinfo 1");
+//      sendCommand("$iset seekremove 1"); 
       // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
     }
-    sendCommand("iset lock 1");
+    sendCommand("$iset premove " + (isPremove ? "1" : "0"));
+    sendCommand("$iset lock 1");
 
     filterLine("Style "+style+" set.");
     filterLine("Your prompt will now not show the time.");
@@ -306,6 +350,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       filterLine("seekinfo set.");
 //      filterLine("seekremove set.");
     }
+    filterLine("premove " + (isPremove ? "" : "un") + "set.");
     filterLine("lock set.");
   }
 
@@ -1050,7 +1095,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a gameinfo line is received. To turn gameinfo
-   * lines on, use <code>sendCommand("iset gameinfo 1")</code>
+   * lines on, use <code>sendCommand("$iset gameinfo 1")</code>
    */
 
   protected boolean processGameInfo(GameInfoStruct data){return false;}
@@ -1131,7 +1176,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a delta board line is received. To turn delta
-   * board on, use <code>sendCommand("iset compressmove 1")</code>. Note,
+   * board on, use <code>sendCommand("$iset compressmove 1")</code>. Note,
    * however, that it will disable the sending of a full board (like a style12
    * board) in some cases.
    */
