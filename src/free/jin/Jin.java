@@ -31,6 +31,7 @@ import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Properties;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -47,10 +48,14 @@ public class Jin{
   
   
   /**
-   * The sole Jin instance.
+   * Maps <code>ThreadGroup</code>s to <code>Jin</code> instances.
+   * This map is used to determine the correct Jin instance to return from
+   * <code>Jin.getInstance()</code>. We don't use a simple instance because
+   * Jin may be run more than once in the same JVM (such as in the case of an
+   * applet).
    */
    
-  private static Jin instance = null;
+  private static final Hashtable instances = new Hashtable();
   
   
   
@@ -138,10 +143,15 @@ public class Jin{
    */
    
   public synchronized static void createInstance(JinContext context){
+    ThreadGroup tgroup = Thread.currentThread().getThreadGroup();
+    Jin instance = (Jin)instances.get(tgroup);
+    
     if (instance != null)
       throw new IllegalStateException("Jin instance already exists");
     
     instance = new Jin(context);
+    
+    instances.put(tgroup, instance);
   }
   
   
@@ -151,6 +161,8 @@ public class Jin{
    */
    
   public synchronized static Jin getInstance(){
+    Jin instance = (Jin)instances.get(Thread.currentThread().getThreadGroup());
+    
     if (instance == null)
       throw new IllegalStateException("Jin instance doesn't yet exist");
     
@@ -509,8 +521,8 @@ public class Jin{
       User [] usersArr = new User[users.size()];
       users.copyInto(usersArr);
       context.setUsers(usersArr);
-  
-      instance = null;      
+
+      instances.remove(Thread.currentThread().getThreadGroup());
       
       context.shutdown();
     }
