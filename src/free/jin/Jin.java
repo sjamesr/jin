@@ -139,19 +139,44 @@ public class Jin{
   
   
   /**
+   * Returns the object we use for identifying this instance of jin (the
+   * application, not the class). We use this to locate the Jin instance, of
+   * which there may be more than one (such as when running more than once as an
+   * applet).
+   */
+  
+  private static Object getInstanceKey(){
+    if (PlatformUtils.isOldMicrosoftVM())
+      return Jin.class;
+    else
+      return Thread.currentThread().getThreadGroup();
+    
+    // IE throws a SecurityException when trying to access the thread group.
+    // I would simply catch the SecurityException and then return Jin.class
+    // but the problem is that IE is inconsistent about throwing that exception
+    
+    // Failing the threadgroup, try use our class as the key.
+    // Maybe whoever is running us is smart enough to use separate class 
+    // instances in separate jin instances, and if not, then at least jin will
+    // run once.
+  }
+  
+  
+  
+  /**
    * Creates the sole Jin instance, with the specified context.
    */
    
   public synchronized static void createInstance(JinContext context){
-    ThreadGroup tgroup = Thread.currentThread().getThreadGroup();
-    Jin instance = (Jin)instances.get(tgroup);
+    Object instanceKey = getInstanceKey();
+    Jin instance = (Jin)instances.get(instanceKey);
     
     if (instance != null)
       throw new IllegalStateException("Jin instance already exists");
     
     instance = new Jin(context);
     
-    instances.put(tgroup, instance);
+    instances.put(instanceKey, instance);
   }
   
   
@@ -161,7 +186,7 @@ public class Jin{
    */
    
   public synchronized static Jin getInstance(){
-    Jin instance = (Jin)instances.get(Thread.currentThread().getThreadGroup());
+    Jin instance = (Jin)instances.get(getInstanceKey());
     
     if (instance == null)
       throw new IllegalStateException("Jin instance doesn't yet exist");
@@ -522,7 +547,7 @@ public class Jin{
       users.copyInto(usersArr);
       context.setUsers(usersArr);
 
-      instances.remove(Thread.currentThread().getThreadGroup());
+      instances.remove(getInstanceKey());
       
       context.shutdown();
     }
