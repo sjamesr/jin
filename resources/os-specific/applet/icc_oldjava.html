@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> Jin Applet </TITLE>
+</HEAD>
+
+<BODY>
+
+<CENTER>
+<APPLET CODE="free.jin.JinApplet"
+        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar"
+		WIDTH="400" HEIGHT="300">
+		
+	<PARAM NAME="port" VALUE="5001">
+		
+	<PARAM NAME="server.classname"
+	           VALUE="free.jin.chessclub.ChessclubServer">
+			   
+	<PARAM NAME="plugins.count" VALUE="3">
+			   
+	<PARAM NAME="plugins.0.classname"
+	           VALUE="free.jin.console.icc.ChessclubConsoleManager">
+
+	<PARAM NAME="plugins.1.classname"
+	           VALUE="free.jin.board.icc.ChessclubBoardManager">
+			   
+	<PARAM NAME="plugins.2.classname"
+	           VALUE="free.jin.seek.icc.ChessclubSoughtGraphPlugin">
+			   
+			   
+	Please enable Java to run Jin
+</APPLET>
+</CENTER>
+
+</BODY>
