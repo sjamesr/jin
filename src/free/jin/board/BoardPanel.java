@@ -439,8 +439,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   /**
    * This method is called by the constructor, it's meant to initialize all the
-   * components and add them. The default implementation calls 3 methods - 
-   * createComponents(Game), createTimer(Game) and addComponents(Game, boolean).
+   * components and add them.
    */
 
   protected void init(Game game){
