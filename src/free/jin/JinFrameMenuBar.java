@@ -22,12 +22,16 @@
 package free.jin;
 
 import free.util.swing.LookAndFeelMenu;
+import free.util.swing.BackgroundChooser;
+import free.util.swing.AdvancedJDesktopPane;
+import free.util.StringEncoder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 import java.awt.Component;
+import java.awt.Color;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.util.Enumeration;
@@ -116,8 +120,8 @@ public class JinFrameMenuBar extends JMenuBar{
     this.jinFrame = jinFrame;
 
     add(createConnectionMenu());
-    // The look and feel menu
     add(new LookAndFeelMenu(jinFrame.getRootPane()));
+    add(createPreferencesMenu());
   }
 
 
@@ -204,6 +208,57 @@ public class JinFrameMenuBar extends JMenuBar{
 
     return connMenu;
   } 
+
+
+
+
+
+  /**
+   * Creates the Preferences menu.
+   */
+
+  public JMenu createPreferencesMenu(){
+    final JMenu prefsMenu = new JMenu("Preferences");
+
+    JMenuItem backgroundMenuItem = new JMenuItem("Background");
+    backgroundMenuItem.addActionListener(new ActionListener(){
+
+      public void actionPerformed(ActionEvent evt){
+        AdvancedJDesktopPane desktop = (AdvancedJDesktopPane)jinFrame.getDesktop();
+        Color defaultColor = UIManager.getColor("desktop");
+        BackgroundChooser bChooser = new BackgroundChooser(jinFrame, desktop, null, AdvancedJDesktopPane.CENTER, defaultColor);
+        bChooser.setVisible(true);
+
+        Color chosenColor = bChooser.getChosenColor();
+        File chosenImageFile = bChooser.getChosenImageFile();
+        int chosenLayoutStyle = bChooser.getChosenImageLayoutStyle();
+
+        Jin.setProperty("desktop.background.color", chosenColor == null ? null : StringEncoder.encodeColor(chosenColor));
+
+        Jin.setProperty("desktop.wallpaper", chosenImageFile == null ? null : chosenImageFile.getAbsolutePath());
+
+        switch (chosenLayoutStyle){
+          case AdvancedJDesktopPane.CENTER:
+            Jin.setProperty("desktop.wallpaper.layout", "center");
+            break;
+          case AdvancedJDesktopPane.TILE:
+            Jin.setProperty("desktop.wallpaper.layout", "tile");
+            break;
+          case AdvancedJDesktopPane.STRETCH:
+            Jin.setProperty("desktop.wallpaper.layout", "stretch");
+            break;
+          case -1:
+            Jin.setProperty("desktop.wallpaper.layout", null);
+            break;
+        }
+      }
+
+    });
+
+    prefsMenu.add(backgroundMenuItem);
+
+    return prefsMenu;
+  }
 
 
 
