@@ -1,6 +1,6 @@
 <?php
 
-	require_once 'server.php';
+	require_once 'jin_server.php';
 
 	
 	// Connects to the database and creates (if needed) the various tables
