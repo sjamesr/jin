@@ -1,4 +1,4 @@
-The condition specifies in which cases the game will be logged. The condition
+  The condition specifies in which cases the game will be logged. The condition
 must be a valid Java boolean expression. While it may sound a bit scary at
 first, it is really quite easy - all you have to do is write down a list of
 simple conditions, such as "rating > 2000" or "time > 15", surround them with
@@ -6,7 +6,7 @@ brackets and then connect them with either "&&" or "||" strings, where "&&"
 stands for "and" and "||" stands for "or".
 
 
-Here are several examples so you see how easy it is:
+Here are some examples so you see how easy it is:
 
 "(inc == 0) || (time > 15)"
   Means that the increment of the game must be 0 or the time more than 15 (or
@@ -50,9 +50,9 @@ Important things to remember:
   actual conditions should not be surrounded with them.
 
 
-If you're still feeling stumped, I suggest you either use the "Log all games"
-option and later choose yourself which games you want to keep or ask for help
-at the appropriate room/channel on the server.
+  If you're still feeling stumped, I suggest you either use the "Log all games"
+option and later choose yourself which games you want to keep or ask for help at
+the appropriate room/channel on the server.
 
 
 A list of the available variables and their meanings:
@@ -80,7 +80,7 @@ opponent      | The handle/nickname of the          | AlexTheGreat, Kiebitz,
               | opponent. Remember that this is     | GuestCKSB, guest123,
               | case sensitive.                     | crafty
 --------------|-------------------------------------|---------------------------
-title         | The title(s) of the opponent. This  | "GM", "C", "U", "SR * TM",
+title         | The title(s) of the opponent. This  | "GM", "C", "U", "SR * TM"
               | is server specific. Should be used  |
               | like so:                            |
               | "title.indexOf("GM") != -1"         |
