@@ -458,7 +458,7 @@ public class JinFrameMenuBar extends JMenuBar{
         }
       });
 
-      cancelButton.addActionListener(new WindowDisposingActionListener(dialog));
+      cancelButton.addActionListener(new WindowDisposingListener(dialog));
 
       applyButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){

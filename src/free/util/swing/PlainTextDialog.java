@@ -24,7 +24,7 @@ package free.util.swing;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import free.util.WindowDisposingActionListener;
+import free.util.WindowDisposingListener;
 import free.util.AWTUtilities;
 import free.workarounds.FixedJTextArea;
   
@@ -124,7 +124,7 @@ public class PlainTextDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(20));
 
     JButton closeButton = new JButton("OK");
-    closeButton.addActionListener(new WindowDisposingActionListener(this));
+    closeButton.addActionListener(new WindowDisposingListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);
     contentPane.add(closeButton);

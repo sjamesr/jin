@@ -24,7 +24,7 @@ package free.jin;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import free.util.WindowDisposingActionListener;
+import free.util.WindowDisposingListener;
 import free.util.swing.SwingUtils;
 import free.util.IOUtilities;
 import java.util.StringTokenizer;
@@ -103,7 +103,7 @@ public class AboutDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(10));
 
     JButton closeButton = new JButton("OK");
-    closeButton.addActionListener(new WindowDisposingActionListener(this));
+    closeButton.addActionListener(new WindowDisposingListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);
     contentPane.add(closeButton);

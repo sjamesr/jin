@@ -30,7 +30,7 @@ import free.util.swing.IntegerStrictPlainDocument;
 import free.util.swing.SwingUtils;
 import free.util.TextUtilities;
 import free.util.AWTUtilities;
-import free.util.WindowDisposingActionListener;
+import free.util.WindowDisposingListener;
 
 
 
@@ -677,7 +677,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     JButton button = new JButton("Cancel");
     button.setDefaultCapable(false);
-    button.addActionListener(new WindowDisposingActionListener(dialog));
+    button.addActionListener(new WindowDisposingListener(dialog));
 
     panel.add(button);
 

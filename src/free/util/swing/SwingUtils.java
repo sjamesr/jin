@@ -25,7 +25,7 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.awt.Window;
-import free.util.WindowDisposingActionListener;
+import free.util.WindowDisposingListener;
 
 
 /**
@@ -53,7 +53,7 @@ public class SwingUtils{
     JRootPane rootPane = container.getRootPane();
     Window window = SwingUtilities.windowForComponent(rootPane);
 
-    ActionListener closer = new WindowDisposingActionListener(window);
+    ActionListener closer = new WindowDisposingListener(window);
     rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
 
