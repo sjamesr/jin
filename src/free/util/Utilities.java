@@ -22,6 +22,7 @@
 package free.util;
 
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 
 /**
@@ -109,6 +110,30 @@ public class Utilities{
     }
     if (arr.length > 0)
       buf.setLength(buf.length() - 2); // get rid of the extra "; "
+
+    return buf.toString();
+  }
+
+
+
+
+  /**
+   * Converts the specified <code>Hashtable</code> into a string by putting
+   * each key and value on a separate line (separated by '\n') and an arrow
+   * (" -> ") between them.
+   */
+
+  public static String hashtableToString(Hashtable hashtable){
+    StringBuffer buf = new StringBuffer();
+    Enumeration keys = hashtable.keys();
+    while (keys.hasMoreElements()){
+      Object key = keys.nextElement();
+      Object value = hashtable.get(key);
+      buf.append(key.toString());
+      buf.append(" -> ");
+      buf.append(value.toString());
+      buf.append("\n");
+    }
 
     return buf.toString();
   }
