@@ -35,7 +35,7 @@ import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.plugin.BadChangesException;
 import free.util.AWTUtilities;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.chess.JBoard;
 
@@ -93,7 +93,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the highlight target square color.
    */
    
-  protected final ColorChooserButton highlightColor;
+  protected final ColorChooser highlightColor;
   
   
   
@@ -120,16 +120,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   protected final JRadioButton premove;
-  
-  
-  
-  /**
-   * The container holding all of the highlight color selection UI. This is
-   * needed so that it can be disabled when the move visualization mode is
-   * not "highlight target square".
-   */
-   
-  private Container highlightColorPanel;
   
   
   
@@ -198,7 +188,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     pieceFollowsCursor.addActionListener(moveVisualizationListener);
     highlightTargetSquare.addActionListener(moveVisualizationListener);
     
-    highlightColor = new ColorChooserButton(boardManager.getDragSquareHighlightingColor());
+    highlightColor = new ColorChooser("Highlight color:", boardManager.getDragSquareHighlightingColor());
+    highlightColor.setMnemonic('t');
     highlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setDragSquareHighlightingColor(
@@ -241,10 +232,10 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
 
     highlightTargetSquare.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        AWTUtilities.setContainerEnabled(highlightColorPanel, highlightTargetSquare.isSelected());
+        highlightColor.setEnabled(highlightTargetSquare.isSelected());
       }
     });
-    AWTUtilities.setContainerEnabled(highlightColorPanel, highlightTargetSquare.isSelected());
+    highlightColor.setEnabled(highlightTargetSquare.isSelected());
     
     
     JPanel topPanel = new PreferredSizedPanel();
@@ -395,27 +386,13 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       BorderFactory.createTitledBorder("Move Visualization"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
-    JLabel highlightColorLabel = new JLabel("Highlight color:");
-    highlightColorLabel.setLabelFor(highlightColor);
-    highlightColorLabel.setDisplayedMnemonic('t');
-    
-    JPanel highlightColorPanel = new JPanel();
-    highlightColorPanel.setLayout(new BoxLayout(highlightColorPanel, BoxLayout.X_AXIS));
-    highlightColorPanel.add(Box.createHorizontalStrut(5));
-    highlightColorPanel.add(highlightColorLabel);
-    highlightColorPanel.add(Box.createHorizontalStrut(20));
-    highlightColorPanel.add(highlightColor);
-    highlightColorPanel.add(Box.createHorizontalGlue());
-    
-    this.highlightColorPanel = highlightColorPanel;
-    
     pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);    
     highlightTargetSquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightColorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    highlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     panel.add(pieceFollowsCursor);
     panel.add(highlightTargetSquare);
-    panel.add(highlightColorPanel);
+    panel.add(highlightColor);
     panel.add(Box.createVerticalGlue());
     
     return panel;

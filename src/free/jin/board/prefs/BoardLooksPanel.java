@@ -27,7 +27,7 @@ import java.awt.*;
 import free.jin.plugin.BadChangesException;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.TableLayout;
 import free.util.AWTUtilities;
@@ -58,7 +58,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the white piece's color.
    */
    
-  protected final ColorChooserButton whiteColor; 
+  protected final ColorChooser whiteColor; 
   
 
 
@@ -66,7 +66,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the black piece's color.
    */
    
-  protected final ColorChooserButton blackColor;
+  protected final ColorChooser blackColor;
   
   
   
@@ -74,7 +74,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the white piece's outline color.
    */
    
-  protected final ColorChooserButton whiteOutline;
+  protected final ColorChooser whiteOutline;
   
   
   
@@ -82,7 +82,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the black piece's outline color.
    */
    
-  protected final ColorChooserButton blackOutline; 
+  protected final ColorChooser blackOutline; 
 
   
   
@@ -98,7 +98,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the board's dark squares' color.
    */
    
-  protected final ColorChooserButton darkSquares;
+  protected final ColorChooser darkSquares;
    
   
 
@@ -106,7 +106,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the board's light squares' color.
    */
    
-  protected final ColorChooserButton lightSquares;
+  protected final ColorChooser lightSquares;
   
   
   
@@ -140,12 +140,19 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     pieceSets = new JList(boardManager.getAvailablePieceSets());
     boardPatterns = new JList(boardManager.getAvailableBoardPatterns());
-    whiteColor = new ColorChooserButton(boardManager.getWhitePieceColor());
-    blackColor = new ColorChooserButton(boardManager.getBlackPieceColor());
-    whiteOutline = new ColorChooserButton(boardManager.getWhiteOutlineColor());
-    blackOutline = new ColorChooserButton(boardManager.getBlackOutlineColor());
-    darkSquares = new ColorChooserButton(boardManager.getDarkSquareColor());
-    lightSquares = new ColorChooserButton(boardManager.getLightSquareColor());
+    whiteColor = new ColorChooser("White color:", boardManager.getWhitePieceColor());
+    blackColor = new ColorChooser("Black color:", boardManager.getBlackPieceColor());
+    whiteOutline = new ColorChooser("White outline:", boardManager.getWhiteOutlineColor());
+    blackOutline = new ColorChooser("Black outline:", boardManager.getBlackOutlineColor());
+    darkSquares = new ColorChooser("Dark squares:", boardManager.getDarkSquareColor());
+    lightSquares = new ColorChooser("Light squares:", boardManager.getLightSquareColor());
+    
+    whiteColor.setMnemonic('W');
+    blackColor.setMnemonic('B');
+    whiteOutline.setMnemonic('t');
+    blackOutline.setMnemonic('k');
+    darkSquares.setMnemonic('D');
+    lightSquares.setMnemonic('L');
     
     JComponent piecesPanel = createPiecesUI();
     JComponent boardPanel = createBoardUI();
@@ -312,31 +319,11 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     
-    JLabel whiteColorLabel = new JLabel("White color:");
-    whiteColorLabel.setDisplayedMnemonic('W');
-    whiteColorLabel.setLabelFor(whiteColor);
-    
-    JLabel blackColorLabel = new JLabel("Black color:");
-    blackColorLabel.setDisplayedMnemonic('B');
-    blackColorLabel.setLabelFor(blackColor);
-    
-    JLabel whiteOutlineLabel = new JLabel("White outline:");
-    whiteOutlineLabel.setDisplayedMnemonic('t');
-    whiteOutlineLabel.setLabelFor(whiteOutline);
-    
-    JLabel blackOutlineLabel = new JLabel("Black outline:");
-    blackOutlineLabel.setDisplayedMnemonic('k');
-    blackOutlineLabel.setLabelFor(blackOutline);
-    
-    JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(2, 20, 5));
+    JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(1, 0, 5));
     colorsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    colorsPanel.add(whiteColorLabel);
     colorsPanel.add(whiteColor);
-    colorsPanel.add(blackColorLabel);
     colorsPanel.add(blackColor);
-    colorsPanel.add(whiteOutlineLabel);
     colorsPanel.add(whiteOutline);
-    colorsPanel.add(blackOutlineLabel);
     colorsPanel.add(blackOutline);
     
     piecesPanel.add(pieceSetLabel);
@@ -378,19 +365,9 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     boardPatterns.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     boardPatterns.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     
-    JLabel darkSquaresLabel = new JLabel("Dark squares:");
-    darkSquaresLabel.setDisplayedMnemonic('D');
-    darkSquaresLabel.setLabelFor(darkSquares);
-    
-    JLabel lightSquaresLabel = new JLabel("Light squares:");
-    lightSquaresLabel.setDisplayedMnemonic('L');
-    lightSquaresLabel.setLabelFor(lightSquares);
-    
-    JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(2, 20, 5));
+    JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(1, 0, 5));
     colorsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    colorsPanel.add(darkSquaresLabel);    
     colorsPanel.add(darkSquares);    
-    colorsPanel.add(lightSquaresLabel);    
     colorsPanel.add(lightSquares);
 
     boardPanel.add(patternLabel);

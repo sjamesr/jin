@@ -30,7 +30,7 @@ import java.awt.event.ActionEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.plugin.BadChangesException;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.chess.event.MoveListener;
 import free.chess.event.MoveEvent;
@@ -89,15 +89,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the move highlighting color.
    */
    
-  private final ColorChooserButton highlightColor;
-  
-  
-  
-  /**
-   * The label for the move highlighting color chooser.
-   */
-   
-  private final JLabel highlightColorLabel;
+  private final ColorChooser highlightColor;
   
   
   
@@ -125,9 +117,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     
     highlightOwnMoves = new JCheckBox("Highlight your own moves", boardManager.isHighlightingOwnMoves());
     
-    highlightColor = new ColorChooserButton(boardManager.getMoveHighlightingColor());
-    highlightColorLabel = new JLabel("Highlight color:");
-    highlightColorLabel.setLabelFor(highlightColor);
+    highlightColor = new ColorChooser("Highlight color:", boardManager.getMoveHighlightingColor());
     
     ButtonGroup group = new ButtonGroup();
     group.add(none);
@@ -140,15 +130,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     bothSquares.setMnemonic('B');
     arrow.setMnemonic('A');
     highlightOwnMoves.setMnemonic('H');
-    highlightColorLabel.setDisplayedMnemonic('c');
-    
-    JPanel highlightColorPanel = new JPanel();
-    highlightColorPanel.setLayout(new BoxLayout(highlightColorPanel, BoxLayout.X_AXIS));
-    highlightColorPanel.add(Box.createHorizontalStrut(5));
-    highlightColorPanel.add(highlightColorLabel);
-    highlightColorPanel.add(Box.createHorizontalStrut(20));
-    highlightColorPanel.add(highlightColor);
-    highlightColorPanel.add(Box.createHorizontalGlue());
+    highlightColor.setMnemonic('c');
     
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -164,14 +146,14 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     bothSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     arrow.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     highlightOwnMoves.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightColorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    highlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     contentPanel.add(none);
     contentPanel.add(targetSquare);
     contentPanel.add(bothSquares);
     contentPanel.add(arrow);
     contentPanel.add(highlightOwnMoves);
-    contentPanel.add(highlightColorPanel);
+    contentPanel.add(highlightColor);
     contentPanel.add(Box.createVerticalGlue());
     
     contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -184,7 +166,6 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
         
         highlightOwnMoves.setEnabled(!none.isSelected());
         highlightColor.setEnabled(!none.isSelected());
-        highlightColorLabel.setEnabled(!none.isSelected());
         
         fireStateChanged();
       }

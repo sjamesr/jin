@@ -30,7 +30,7 @@ import java.awt.event.ActionEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.plugin.BadChangesException;
-import free.util.swing.ColorChooserButton;
+import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 
 
@@ -79,15 +79,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
    * The color chooser for color of the square coordinates' text.
    */
    
-  private final ColorChooserButton coordsColor;
-  
-  
-  
-  /**
-   * The label for the coords' text color chooser. 
-   */
-   
-  private final JLabel coordsColorLabel;
+  private final ColorChooser coordsColor;
   
   
   
@@ -105,9 +97,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     outside = new JRadioButton("Outside the board", coordsDisplayStyle == JBoard.OUTSIDE_COORDS);
     everySquare = new JRadioButton("In every square", coordsDisplayStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
     
-    coordsColor = new ColorChooserButton(boardManager.getCoordsDisplayColor());
-    coordsColorLabel = new JLabel("Coordinates' text color:");
-    coordsColorLabel.setLabelFor(coordsColor);
+    coordsColor = new ColorChooser("Coordinates' text color:", boardManager.getCoordsDisplayColor());
     
     ButtonGroup group = new ButtonGroup();
     group.add(none);
@@ -119,15 +109,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     rim.setMnemonic('r');
     outside.setMnemonic('O');
     everySquare.setMnemonic('I');
-    coordsColorLabel.setDisplayedMnemonic('C');
-    
-    JPanel coordsColorPanel = new JPanel();
-    coordsColorPanel.setLayout(new BoxLayout(coordsColorPanel, BoxLayout.X_AXIS));
-    coordsColorPanel.add(Box.createHorizontalStrut(5));
-    coordsColorPanel.add(coordsColorLabel);
-    coordsColorPanel.add(Box.createHorizontalStrut(20));
-    coordsColorPanel.add(coordsColor);
-    coordsColorPanel.add(Box.createHorizontalGlue());
+    coordsColor.setMnemonic('C');
     
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -142,13 +124,13 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     rim.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     outside.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     everySquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    coordsColorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    coordsColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     contentPanel.add(none);
     contentPanel.add(rim);
     contentPanel.add(outside);
     contentPanel.add(everySquare);
-    contentPanel.add(coordsColorPanel);
+    contentPanel.add(coordsColor);
     contentPanel.add(Box.createVerticalGlue());
     
     contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
