@@ -72,6 +72,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   protected String gameListDisplayStyle;
 
+
+
+
+  /**
+   * True as long as we haven't logged on to the server.
+   */
+
+  private boolean didNotLogon = true;
   
 
 
@@ -148,8 +156,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
           if (getConnection().isConnected())
             result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), "Really close this window and log out?", "Select an option", JOptionPane.YES_NO_OPTION);
+
           if (result==JOptionPane.YES_OPTION){
-            if (getConnection().isConnected())
+            if (getConnection().isConnected() || didNotLogon)
               getPluginContext().getMainFrame().closeConnection(getConnection());
             closeConsole();
           }
@@ -428,6 +437,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   public void connectionLoggedIn(ConnectionEvent evt){
     consoleFrame.setTitle("Main Console - "+getConnection().getUsername()+" on "+getUser().getServer().getProperty("name.long"));    
     consoleFrame.repaint(); // The title doesn't repaint itself.
+
+    didNotLogon = false;
   }
 
 
