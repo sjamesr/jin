@@ -143,6 +143,22 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
+   * Preloads the given image and returns it. This method is here to make it
+   * easier to create specific subclasses with no-args constructors and allowing
+   * them to preload images.
+   */
+
+  protected static Image preload(Image image){
+    try{
+      ImageUtilities.preload(image);
+    } catch (InterruptedException e){}
+    return image;
+  }
+
+
+
+
+  /**
    * Returns the Image this ImageBoardPainter uses to draw the board, or null
    * if it uses two images (one for light squares and one for dark ones)
    * instead.
