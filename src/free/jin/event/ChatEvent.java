@@ -39,16 +39,72 @@ import free.jin.Connection;
  */
 
 public class ChatEvent extends JinEvent{
+  
+  
+  
+  /**
+   * The constant for chat which doesn't fit into one of the other categories.
+   */
+   
+  public static final int OTHER_CHAT_CATEGORY = -1;
+  
+  
+  
+  /**
+   * The constant for person-to-person chat.
+   */
+   
+  public static final int PERSON_TO_PERSON_CHAT_CATEGORY = 0;
+  
+  
+  
+  /**
+   * The constant for in-game chat.
+   */
+   
+  public static final int GAME_CHAT_CATEGORY = 1;
+  
+  
+  
+  /**
+   * The constant for chat which is sent to all (or almost all) players.
+   */
+   
+  public static final int BROADCAST_CHAT_CATEGORY = 2;
+  
+  
+  
+  /**
+   * The constant for chat belonging to a certain "room" or "channel" which
+   * players can choose to be in.
+   */
+   
+  public static final int ROOM_CHAT_CATEGORY = 3;
+  
+  
+  
+  /**
+   * The constant for chat associated with a certain tournament.
+   */
+   
+  public static final int TOURNEY_CHAT_CATEGORY = 4;
 
 
 
   /**
-   * The type of the ChatEvent. This is something server specific and thus should
-   * only be handled by server specific classes.
+   * The type of the ChatEvent. This is something server specific and thus
+   * should only be handled by server specific classes.
    */
 
   private final String type;
-
+  
+  
+  
+  /**
+   * The category of this chat event.
+   */
+   
+  private final int category;
 
 
 
@@ -57,7 +113,6 @@ public class ChatEvent extends JinEvent{
    */
 
   private final String sender;
-
 
 
 
@@ -70,7 +125,6 @@ public class ChatEvent extends JinEvent{
 
 
 
-
   /**
    * The rating of the player who sent the string, -1 if unknown.
    */
@@ -79,13 +133,11 @@ public class ChatEvent extends JinEvent{
 
 
 
-
   /**
    * The message itself. Must be a non-null string.
    */
 
   private final String message;
-
 
 
 
@@ -100,29 +152,43 @@ public class ChatEvent extends JinEvent{
 
 
 
-
-
   /**
-   * Creates a new ChatEvent with the given type, sender, sender titles, sender
-   * rating (-1 if unknown), message and forum.
+   * Creates a new ChatEvent with the given type, category, sender, sender
+   * titles, sender rating (-1 if unknown), message and forum. Note that the
+   * list of possible chat categories is not final (and will never be such).
+   * If your chat type belongs to a category which does not exist yet, contact
+   * the person responsible for the code and ask him to add a new category. In
+   * the meanwhile (or if you are happy with it), use
+   * <code>UNCATEGORIZED_CHAT</code>
    */
 
-  public ChatEvent(Connection conn, String type, String sender, String senderTitle,
+  public ChatEvent(Connection conn, String type, int category, String sender, String senderTitle,
       int senderRating, String message, Object forum){
     super(conn);
 
     if (type == null)
       throw new IllegalArgumentException("ChatEvent type may not be null");
+    
+    switch (category){
+      case OTHER_CHAT_CATEGORY:
+      case PERSON_TO_PERSON_CHAT_CATEGORY:
+      case GAME_CHAT_CATEGORY:
+      case BROADCAST_CHAT_CATEGORY:
+      case ROOM_CHAT_CATEGORY:
+      case TOURNEY_CHAT_CATEGORY:
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown chat category value: " + category);
+    }
 
     this.type = type;
+    this.category = category;
     this.sender = sender;
     this.senderTitle = senderTitle;
     this.senderRating = senderRating;
     this.message = message;
     this.forum = forum;
   }
-
-
 
 
 
@@ -134,7 +200,18 @@ public class ChatEvent extends JinEvent{
   public String getType(){
     return type;
   }
-
+  
+  
+  
+  /**
+   * Returns the category of the chat. Note that the list of possible categories
+   * is not final (and will never be), so don't make your code assume that the
+   * category is one of the current categories.
+   */
+   
+  public int getCategory(){
+    return category;
+  }
 
 
 
@@ -148,7 +225,6 @@ public class ChatEvent extends JinEvent{
 
 
 
-
   /**
    * Returns the title of the player who sent the message.
    */
@@ -156,7 +232,6 @@ public class ChatEvent extends JinEvent{
   public String getSenderTitle(){
     return senderTitle;
   }
-
 
 
 
@@ -170,7 +245,6 @@ public class ChatEvent extends JinEvent{
 
 
 
-
   /**
    * Returns the message itself.
    */
@@ -181,21 +255,20 @@ public class ChatEvent extends JinEvent{
 
 
 
-
-
   /**
-   * Returns the forum on which the message was sent. This may be null
-   * for messages that are one-on-one (such as personal tells) or are
-   * sent to everyone (such as shouts). For channel tells this is an Integer
-   * specifying the channel number, for kibitzes/whispers, the game number. Since
-   * this value is somewhat server specific, it should be handled by a server
-   * specific class.
+   * Returns the forum on which the message was sent. The forum identifies a
+   * certain instance of a chat type. For room/channel tells this is a
+   * <code>String/Integer</code> specifying the room/channel name/number.
+   * For kibitzes and whispers, the game number. For chat types with only a
+   * single instance (such as shouts, announcements) or where the instance is
+   * already identified by the sender (personal tells) this is
+   * <code>null</code>. This value is somewhat server specific, it should
+   * probably be handled by server specific code.
    */
 
   public Object getForum(){
     return forum;
   }
-
 
 
 
@@ -207,6 +280,6 @@ public class ChatEvent extends JinEvent{
     return getClass().getName()+"[Sender="+getSender()+";Title="+getSenderTitle()+";Forum="+getForum()+";Message="+getMessage()+"]";
   } 
   
-  
 
+  
 }
