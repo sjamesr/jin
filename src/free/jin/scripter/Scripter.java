@@ -229,7 +229,7 @@ public class Scripter extends Plugin{
       throw new IllegalArgumentException(""+script+" is of an unsupported/unknown event type ("+eventType+")");
 
     if (dispatcher instanceof UserInvokedScriptDispatcher)
-      menu.add(new UserInvokedScriptMenuItem(script, getUIProvider()));
+      menu.add(new UserInvokedScriptMenuItem(script));
 
     dispatcher.addScript(script);
   }
