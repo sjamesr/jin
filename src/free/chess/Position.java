@@ -26,6 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import java.util.StringTokenizer;
+import free.util.Utilities;
 
 
 /**
@@ -329,8 +330,6 @@ public final class Position{
    */
 
   public void setFEN(String fen){
-    this.positionFEN = fen;
-
     StringTokenizer fenTokenizer = new StringTokenizer(fen, " ");
     if (fenTokenizer.countTokens()!=6)
       throw new PositionFormatException("Wrong amount of fields");
@@ -377,6 +376,8 @@ public final class Position{
       setCurrentPlayerImpl(Player.BLACK_PLAYER);
     else
       throw new PositionFormatException("Wrong active color indicator: "+colorToMove);
+
+    this.positionFEN = fen;
   }
 
 
@@ -385,7 +386,9 @@ public final class Position{
 
   /**
    * Returns the FEN representation of this Position. May return
-   * <code>null</code> if the position wasn't set via the setFEN method.
+   * <code>null</code> if the current position wasn't set via the setFEN method.
+   * Note that as soon as the position is changed after setFEN was called, this
+   * method will return <code>null</code>.
    */
 
   public String getFEN(){
@@ -461,9 +464,10 @@ public final class Position{
       }
     }
 
-    this.positionFEN = position.positionFEN;
-
     setCurrentPlayerImpl(position.getCurrentPlayer());
+
+    this.positionFEN = position.positionFEN;
+    
     fireStateChanged();
   }
 
@@ -484,6 +488,7 @@ public final class Position{
   
   private void setPieceAtImpl(Piece piece, Square square){
     pieces[square.getFile()][square.getRank()] = piece;
+    positionFEN = null;
   }
 
 
@@ -500,6 +505,7 @@ public final class Position{
 
   private void setCurrentPlayerImpl(Player player){
     this.currentPlayer = player;
+    positionFEN = null;
   }
 
 
@@ -612,6 +618,63 @@ public final class Position{
   }
 
 
+
+
+  /**
+   * Returns true iff the specified <code>Position</code> is the same as this
+   * one.
+   */
+
+  public boolean equals(Position pos){
+    if (!variant.equals(pos.variant))
+      return false;
+
+    if (!currentPlayer.equals(pos.currentPlayer))
+      return false;
+
+    for (int file = 0; file < pieces.length; file++)
+      for (int rank = 0; rank < pieces[file].length; rank++)
+        if (!Utilities.areEqual(pieces[file][rank], pos.pieces[file][rank]))
+          return false;
+
+    return true;
+  }
+
+
+
+
+  /**
+   * Returns true iff the specified object is a <code>Position</code> and
+   * represents the same position as this one.
+   */
+
+  public boolean equals(Object obj){
+    if (!(obj instanceof Position))
+      return false;
+
+    return equals((Position)obj);
+  }
+
+
+
+
+  /**
+   * Returns the hashcode of this position.
+   */
+
+  public int hashCode(){
+    int result = 17;
+    result = 37*result + variant.hashCode();
+    result = 37*result + currentPlayer.hashCode();
+    for (int file = 0; file < pieces.length; file++)
+      for (int rank = 0; rank < pieces[file].length; rank++){
+        Piece piece = pieces[file][rank];
+        int c = (piece == null) ? 0 : piece.hashCode();
+        result = 37*result + c;
+      }
+
+    return result;
+  }
 
 
 
