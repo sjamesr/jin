@@ -23,13 +23,16 @@ package free.jin;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.Hashtable;
 import free.util.Utilities;
+import free.util.MemoryFile;
 
 
 /**
- * A holder for the user's settings and preferences. Throughout the documentation,
- * the actual user is referred to as "user" (lowercase 'u') and a User object is
- * referred to as "User" (uppercase 'u'). 
+ * A holder for the user's settings and preferences. Throughout the
+ * documentation (unless I forgot/mistyped), the actual user is referred to as
+ * "user" (lowercase 'u') and a <code>User</code> object is referred to as
+ * "User" (uppercase 'u'). 
  */
 
 public class User{
@@ -52,84 +55,84 @@ public class User{
 
 
 
-  
-  /**
-   * Has any of the properties of this User been modified explicitly by the user
-   * since it was loaded or last saved.
-   */
-
-  private boolean isUserModified = false;
-
-
-
 
   /**
-   * Creates a new <code>User</code> with the specified <code>Server</code> and
-   * properties.
+   * Maps "file" names to instances of <code>MemoryFile</code> which contain the
+   * data of those files. This allows plugins to write data which cannot fit in
+   * the User's settings and then read it.
    */
 
-  User(Server server, Properties props){
+  private final Hashtable userFiles;
+
+
+
+
+  /**
+   * Creates a new <code>User</code> with the specified <code>Server</code>,
+   * properties and user files.
+   */
+
+  User(Server server, Properties props, Hashtable userFiles){
     if (server == null)
       throw new IllegalArgumentException("The specified Server object may not be null");
     if (props == null)
-      throw new IllegalArgumentException("The specified Properties object may not be null");
+      props = new Properties();
+    if (userFiles == null)
+      userFiles = new Hashtable();
 
     this.server = server;
     this.props = props;
+    this.userFiles = userFiles;
   }
 
 
 
 
   /**
-   * Loads and returns a <code>User</code> object from the specified
-   * InputStream.
+   * Returns the User's properties.
    */
 
-  static User read(Server server, InputStream in) throws IOException{
-    Properties props = new Properties();
-    props.load(in);
-    return new User(server, props);
+  Properties getProperties(){
+    return props;
   }
 
 
 
 
   /**
-   * Writes this User into the given OutputStream. The <code>isModified</code> 
-   * flag of this User is <B>not</B> cleared.
+   * Returns the Hashtable mapping user "file" names to
+   * <code>MemoryFile</code> instances holding the data of those
+   * "files".
    */
 
-  void write(OutputStream out) throws IOException{
-    props.save(out, getUsername()+"'s properties for "+getServer().getLongName());
-  }
-
-
-
-
-
-  /**
-   * Returns true if any of the properties of this User have been modified
-   * explicitly by the user since it was loaded or saved. This is used for
-   * example to determine whether to ask the user whether to save the User into
-   * a file.
-   */
-
-  public boolean isUserModified(){
-    return isUserModified;
+  Hashtable getUserFiles(){
+    return userFiles;
   }
 
 
 
 
   /**
-   * Clears the <code>isUserModified</code> flag.
+   * Returns a <code>MemoryFile</code> with the specified name. Returns
+   * <code>null</code> if no <code>MemoryFile</code> with the specified name
+   * exists.
    */
 
-  void clearUserModified(){
-    isUserModified = false;
+  public MemoryFile getFile(String name){
+    return (MemoryFile)userFiles.get(name);
   }
-  
+
+
+
+  /**
+   * Adds the specified <code>MemoryFile</code> to this User's files under the
+   * specified name. If a <code>MemoryFile</code> under the specified name
+   * already exists, it is removed and returned by this method.
+   */
+
+  public MemoryFile putFile(String name, MemoryFile file){
+    return (MemoryFile)Utilities.put(userFiles, name, file);
+  }
 
 
 
@@ -187,36 +190,15 @@ public class User{
 
   /**
    * Sets this user's property with the given name to the given value.
-   * The change is considered "user triggered".
    * 
    * @param propertyName The name of the property.
    * @param propertyValue The new value of the property.
    */
 
   public void setProperty(String propertyName, String propertyValue){
-    setProperty(propertyName, propertyValue, true);
+    props.put(propertyName, propertyValue);
   }
 
-
-
-
-  /**
-   * Sets this user's property with the given name to the given value.
-   * 
-   * @param propertyName The name of the property.
-   * @param propertyValue The new value of the property.
-   * @param userChange Whether this is a change of property triggered explicitly
-   * by the user.
-   */
-
-  public void setProperty(String propertyName, String propertyValue, boolean userChange){
-    Object oldValue = props.put(propertyName, propertyValue);
-    if (userChange && !Utilities.areEqual(oldValue, propertyValue))
-      isUserModified = true;
-  }
-
-
- 
 
 
   /**
