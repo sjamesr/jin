@@ -109,6 +109,28 @@ public class ColorChooserButton extends JComponent implements ActionListener{
 
 
 
+  /**
+   * Sets the mnemonic.
+   */
+
+  public void setMnemonic(char mnemonic){
+    button.setMnemonic(mnemonic);
+  } 
+
+
+
+
+  /**
+   * Sets the mnemonic.
+   */
+
+  public void setMnemonic(int mnemonic){
+    button.setMnemonic(mnemonic);
+  }
+
+
+
+
 
   /**
    * Adds a ChangeListener to the list of listeners receiving notifications when
