@@ -90,7 +90,8 @@ public class TextStyleChooserPanel extends JPanel{
       FontSelectorPanel.createItalicFontOption(),
       new FontSelectorPanel.BooleanFontOption("Antialias", 'A', initAntialiasingValue)
     };
-    fontSelector = allowAntialiasingSelection ? new FontSelectorPanel(fontOptions) : new FontSelectorPanel();
+    int [] fontSizes = new int[]{5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
+    fontSelector = allowAntialiasingSelection ? new FontSelectorPanel(fontSizes, fontOptions) : new FontSelectorPanel(fontSizes);
     foregroundChooser = new ColorChooserButton("Foreground", initForegroundColor);
     foregroundChooser.setMnemonic('F');
     if (allowBackgroundSelection){
@@ -382,6 +383,7 @@ public class TextStyleChooserPanel extends JPanel{
     public void setAntialias(boolean antialias){
       this.antialias = antialias;
     }
+    
 
   }
   
