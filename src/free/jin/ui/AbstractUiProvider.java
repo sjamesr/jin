@@ -251,7 +251,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   protected void restoreFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix, RectDouble defaultFrameBounds){
     Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     Rectangle realDefaultBounds = 
-        defaultFrameBounds.scale(screenSize.getWidth(), screenSize.getHeight()).toRect();
+        defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
     
     // Restore bounds      
     Rectangle frameBounds = prefs.getRect(prefNamePrefix + "bounds", realDefaultBounds);
