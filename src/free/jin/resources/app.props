@@ -1,8 +1,10 @@
 app.name = Jin
 app.version = 2.12 dev
 
-lf.extra.count = 2
+lf.extra.count = 3
 lf.extra.0.name = Kunststoff
 lf.extra.0.class = com.incors.plaf.kunststoff.KunststoffLookAndFeel
 lf.extra.1.name = Metouia
 lf.extra.1.class = net.sourceforge.mlf.metouia.MetouiaLookAndFeel
+lf.extra.2.name = Liquid
+lf.extra.2.class = com.birosoft.liquid.LiquidLookAndFeel
