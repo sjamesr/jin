@@ -113,7 +113,6 @@ public class FixedJTextField extends JTextField{
 
   protected void updateInactiveColor(){
     String lnfClassName = UIManager.getLookAndFeel().getClass().getName();
-    System.out.println(lnfClassName);
     if (lnfClassName.equals("com.sun.java.swing.plaf.windows.WindowsLookAndFeel")){
       Color inactiveBackground = UIManager.getColor("TextField.inactiveBackground");
       if (inactiveBackground == null){
