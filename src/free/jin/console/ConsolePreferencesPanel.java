@@ -139,7 +139,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   protected void addCategoryPanel(CategoryPanel panel){
     categoryPanels.addElement(panel);
-
+    
     TextStyleChooserPanel textStyleChooser = panel.getTextStyleChooser();
     if (textStyleChooser != null)
       textStyleChooser.addChangeListener(settingsChangeListener);
@@ -192,6 +192,9 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   protected void updatePropertiesFrom(CategoryPanel categoryPanel){
     TextStyleChooserPanel textStyleChooser = categoryPanel.getTextStyleChooser();
+    if (textStyleChooser == null)
+      throw new IllegalStateException("Updating preferences from a " +
+                                      "nondisplayed category panel");  
 
     if (categoryPanel == defaultSettingsPanel){
       prefs.setColor("output-selection", selectionColorButton.getColor());
@@ -237,6 +240,9 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     for (int i = 0; i < categoryPanels.size(); i++){
       CategoryPanel panel = (CategoryPanel)categoryPanels.elementAt(i);
       TextStyleChooserPanel textStyleChooser = panel.getTextStyleChooser();
+      if (textStyleChooser == null)
+        continue;
+      
       String mainCategory = panel.getMainCategory();
 
       Font font = getCategoryFont(mainCategory);
@@ -260,6 +266,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   protected void createSettingsPanels(){
     createDefaultSettingsPanel();
+   
     createSettingsPanelsFromProperties();
   }
 
@@ -336,14 +343,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
           categories[categoryIndex] = categoriesTokenizer.nextToken();
 
         String mainCategory = categories[0];
-
-        Font font = getCategoryFont(mainCategory);
-        Color foreground = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
-          
-        TextStyleChooserPanel textStyleChooserPanel = new TextStyleChooserPanel(font, foreground, background, antialiasingValue, false, false);
-        categoryPanel = new CategoryPanel(categoryName, textStyleChooserPanel, categories);
-        categoryPanel.setLayout(new BorderLayout());
-        categoryPanel.add(textStyleChooserPanel, BorderLayout.CENTER);
+         
+        categoryPanel = new CategoryPanel(categoryName, categories);
       }
 
       addCategoryPanel(categoryPanel);
@@ -450,6 +451,11 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     categoryPanelHolder.removeAll();
     currentCategoryPanel = panel;
     if (currentCategoryPanel != null){
+      currentCategoryPanel.createTextStyleChooser();
+      TextStyleChooserPanel textStyleChooser = panel.getTextStyleChooser();
+      textStyleChooser.addChangeListener(settingsChangeListener);
+      
+      
       categoryPanelHolder.add(currentCategoryPanel, BorderLayout.CENTER);
       invalidate();
       validate();
@@ -543,7 +549,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * An extension of JPanel which also holds category information.
    */
 
-  protected static class CategoryPanel extends JPanel{
+  protected class CategoryPanel extends JPanel{
     
 
     /**
@@ -558,7 +564,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
      * The TextStyleChooserPanel in this panel.
      */
 
-    private final TextStyleChooserPanel textStyleChooser;
+    private TextStyleChooserPanel textStyleChooser = null;
 
 
 
@@ -568,8 +574,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
      */
 
     private final String [] categories;
-
-
+    
+    
 
     /**
      * Creates a new CategoryPanel with the specified long category name,
@@ -579,9 +585,27 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
      * settings is the first element (at index zero) in the categories array.
      */
 
-    public CategoryPanel(String categoryName, TextStyleChooserPanel textStyleChooser, String [] categories){
+    public CategoryPanel(String categoryName, TextStyleChooserPanel textStyleChooser,
+        String [] categories){
       this.categoryName = categoryName;
       this.textStyleChooser = textStyleChooser;
+      this.categories = categories;
+    }
+    
+    
+    
+    /**
+     * Creates a new CategoryPanel with the specified long category name,
+     * a list of category IDs (short names) that need to be modified when the
+     * TextStyleChooserPanel's settings change and a lazily created
+     * TextStyleChooserPanel. The "main" category, which is the category used to
+     * display the settings is the first element (at index zero) in the
+     * categories array.
+     */
+     
+    public CategoryPanel(String categoryName, String [] categories){
+ 
+      this.categoryName = categoryName;
       this.categories = categories;
     }
 
@@ -589,11 +613,33 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
     /**
-     * Returns the TetxStyleChooser in this panel.
+     * Returns the TextStyleChooser in this panel, or <code>null</code> if it
+     * hasn't been created yet.
      */
 
     public TextStyleChooserPanel getTextStyleChooser(){
       return textStyleChooser;
+    }
+    
+    
+    
+    /**
+     * Creates the TextStyleChooserPanel.
+     */
+     
+    public void createTextStyleChooser(){
+      if (textStyleChooser == null){
+        String mainCategory = getMainCategory();
+        
+        Color bg = prefs.getColor("background");
+        boolean antialias = prefs.getBool("output-text.antialias", false);
+        Font font = getCategoryFont(mainCategory);
+        Color fg = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
+        
+        textStyleChooser = new TextStyleChooserPanel(font, fg, bg, antialias, false, false);
+        setLayout(new BorderLayout());
+        add(textStyleChooser, BorderLayout.CENTER);
+      }
     }
 
 
