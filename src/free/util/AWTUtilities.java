@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -47,6 +47,24 @@ public class AWTUtilities{
     Point parentLocation = parent.getLocationOnScreen();
 
     target.setLocation(parentLocation.x + (parentSize.width - size.width)/2, parentLocation.y + (parentSize.height - size.height)/2);
+  }
+
+
+
+
+  /**
+   * Returns the parent Frame of the specified <code>Component</code> or
+   * <code>null</code> if none exists.
+   */
+
+  public static Frame frameForComponent(Component component){
+    while (component != null){
+      if (component instanceof Frame)
+        return (Frame)component;
+      component = component.getParent();
+    }
+
+    return null;
   }
 
 
