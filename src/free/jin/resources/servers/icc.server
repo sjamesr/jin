@@ -9,4 +9,6 @@ login.hosts = chessclub.com;queen.chessclub.com;rook.chessclub.com;special.chess
 login.hostname = chessclub.com
 login.port = 5000
 
+website.url = http://www.chessclub.com
+
 plugins = ChessclubConsoleManager; ChessclubSoundManager; ChessclubBoardManager; ChessclubSoughtGraphPlugin; ChessclubGameLogger; ChessclubScripter
