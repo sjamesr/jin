@@ -454,11 +454,15 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    
   private JButton createButton(String text, char mnemonic){
     JButton button = new JButton(text);
-    button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
     button.setMnemonic(mnemonic);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
+    
+    Font defaultFont = UIManager.getFont("Button.font");
+    int fontSize = Math.max(14, defaultFont.getSize());
+    button.setFont(new Font(defaultFont.getFamily(), Font.BOLD, fontSize));
+    
 
     return button;
   }
