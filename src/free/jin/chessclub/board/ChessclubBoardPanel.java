@@ -25,6 +25,7 @@ import javax.swing.*;
 import free.jin.event.*;
 import free.jin.board.BoardPanel;
 import free.jin.board.BoardManager;
+import free.jin.board.JinBoard;
 import free.jin.Game;
 import free.chess.JBoard;
 import free.chess.Player;
@@ -33,7 +34,7 @@ import free.jin.chessclub.UserImageInternalFrame;
 import free.jin.chessclub.event.ChessclubGameListener;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.CircleEvent;
-import free.jin.chessclub.board.event.ArrowCircleListener;
+import free.jin.board.event.ArrowCircleListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.Cursor;
@@ -48,7 +49,8 @@ import java.net.MalformedURLException;
  * Extends BoardPanel to provide chessclub.com specific functionalities.
  */
 
-public class ChessclubBoardPanel extends BoardPanel implements MouseListener, ChessclubGameListener, ArrowCircleListener{
+public class ChessclubBoardPanel extends BoardPanel implements MouseListener,
+  ChessclubGameListener, ArrowCircleListener{
 
 
 
@@ -81,7 +83,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    * Overrides createBoard(Game game) to return an instance of ChessclubJBoard.
    */
 
-  protected JBoard createBoard(Game game){
+  protected JinBoard createBoard(Game game){
     return new ChessclubJBoard(game.getInitialPosition());
   }
 
@@ -89,16 +91,16 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
 
 
   /**
-   * Override configureBoard(Game, JBoard) to add ourselves as an
+   * Override configureBoard(Game, JinBoard) to add ourselves as an
    * ArrowCircleListener to the board.
    */
 
-  protected void configureBoard(Game game, JBoard board){
+  protected void configureBoard(Game game, JinBoard board){
     super.configureBoard(game, board);
 
     if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed()){
-      ((ChessclubJBoard)board).addArrowCircleListener(this);
-      ((ChessclubJBoard)board).setArrowCircleEnabled(true);
+      board.addArrowCircleListener(this);
+      board.setArrowCircleEnabled(true);
     }
     else
       ((ChessclubJBoard)board).setArrowCircleEnabled(false);
@@ -310,7 +312,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    * Gets called when an arrow is added on the board (on the client, not server). 
    */
 
-  public void arrowAdded(ChessclubJBoard board, Square fromSquare, Square toSquare){
+  public void arrowAdded(JinBoard board, Square fromSquare, Square toSquare){
     if (handlingArrowCircleEvent)
       return;
 
@@ -324,7 +326,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    * server.
    */
 
-  public void arrowRemoved(ChessclubJBoard board, Square fromSquare, Square toSquare){}
+  public void arrowRemoved(JinBoard board, Square fromSquare, Square toSquare){}
 
 
 
@@ -333,7 +335,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    * Gets called when a circle is added (on the client, not the server).
    */
 
-  public void circleAdded(ChessclubJBoard board, Square circleSquare){
+  public void circleAdded(JinBoard board, Square circleSquare){
     if (handlingArrowCircleEvent)
       return;
 
@@ -346,7 +348,7 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    * Gets called when a circle is removed (on the client, not the server).
    */
 
-  public void circleRemoved(ChessclubJBoard board, Square circleSquare){}
+  public void circleRemoved(JinBoard board, Square circleSquare){}
 
 
 
