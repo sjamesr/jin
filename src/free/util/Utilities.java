@@ -114,4 +114,25 @@ public class Utilities{
   }
 
 
+
+
+  /**
+   * Returns the maximum element in the specified integer array.
+   */
+
+  public static int max(int [] arr){
+    if (arr == null)
+      throw new IllegalArgumentException("The specified array may not be null");
+    if (arr.length == 0)
+      throw new IllegalArgumentException("The specified array must have at least one element");
+
+    int n = arr[0];
+    for (int i = 1; i < arr.length; i++)
+      if (arr[i] > n)
+        n = arr[i];
+
+    return n;
+  }
+
+
 }
