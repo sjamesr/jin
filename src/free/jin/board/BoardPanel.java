@@ -313,7 +313,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   private Move queuedMove = null;
-
+  
+  
+  
+  /**
+   * The time when we sent the last user's move to the server. We need this
+   * because if the move was illegal, we need to know how much time it spent
+   * in transit to subtract that time from the player's clock (we can't count
+   * on getting a clock update from the server).
+   */
+   
+  private long sentMoveTimestamp = -1;
 
 
 
@@ -1372,6 +1382,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     else
       return "Was "+game.toString();
   }
+  
+  
+  
+  /**
+   * Returns the specified player's clock.
+   */
+   
+  protected AbstractChessClock getClockForPlayer(Player player){
+    return player.isWhite() ? whiteClock : blackClock;
+  }
+  
 
 
 
@@ -1382,14 +1403,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected void updateClockActiveness(){
-    if (board.getPosition().getCurrentPlayer().equals(Player.WHITE_PLAYER)){
-      whiteClock.setActive(true);
-      blackClock.setActive(false);
-    }
-    else{
-      blackClock.setActive(true);
-      whiteClock.setActive(false);
-    }
+    Player curPlayer = board.getPosition().getCurrentPlayer();
+    AbstractChessClock curClock = getClockForPlayer(curPlayer);
+    AbstractChessClock oppClock = getClockForPlayer(curPlayer.getOpponent());
+    
+    curClock.setActive(true);
+    oppClock.setActive(false);
   }
 
 
@@ -1554,13 +1573,23 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Returns false if the specified move is illegal.
+   * Returns <code>true</code> if the specified move is legal and
+   * <code>false</code>. for some illegal moves. Note that this method doesn't
+   * currently fully check move legality. Instead, it only detects some
+   * obviously illegal moves so that they can be rejected immediately, instead
+   * of wasting time by sending them to the server.
    */
 
   protected boolean checkLegality(Position pos, Move move){
     if (move instanceof ChessMove){
       ChessMove cmove = (ChessMove)move;
-      if (pos.getCurrentPlayer() != move.getPlayer())
+      
+      // Trying to move a piece that isn't your own.
+      if (pos.getCurrentPlayer() != cmove.getPlayer())
+        return false;
+      
+      // Trying to capture your own piece
+      if (cmove.isCapture() && (cmove.getCapturedPiece().getPlayer() == pos.getCurrentPlayer()))
         return false;
     }
 
@@ -1656,6 +1685,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
 
+    // Subtract the time spent on sending the move from the player's clock
+    // and restart the it.
+    AbstractChessClock playersClock = getClockForPlayer(board.getPosition().getCurrentPlayer());
+    playersClock.setTime((int)(playersClock.getTime() - (System.currentTimeMillis() - sentMoveTimestamp)));
+    playersClock.setRunning(true);
+    
     updateClockActiveness();
     setDisplayedMove(madeMoves.size());
     updateMoveListTable();
@@ -1767,11 +1802,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
            (isMoveEnRoute() || !isUserTurn()))
         setQueuedMove(move);
       else{
-        UserMoveEvent evt2 = new UserMoveEvent(this, evt.getMove());
+        UserMoveEvent evt2 = new UserMoveEvent(this, move);
         fireUserMadeMove(evt2);
         moveEnRoute = evt.getMove();
-        whiteClock.setRunning(false);
-        blackClock.setRunning(false);
+        
+        // Stop the clock of the player who moved
+        getClockForPlayer(move.getPlayer()).setRunning(false);
+        
+        // Remember the time when it was stopped because if the move is illegal
+        // we will need to restart the clock with the correct amount of time
+        // (including the time the move spent in transit).
+        sentMoveTimestamp = System.currentTimeMillis();
+        
+        // Update clock activeness
         updateClockActiveness();
 
         if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
