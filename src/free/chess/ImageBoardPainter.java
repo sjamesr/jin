@@ -23,6 +23,7 @@ package free.chess;
 
 import java.awt.*;
 import java.awt.image.ImageObserver;
+import free.util.ImageUtilities;
 
 
 /**
@@ -90,6 +91,17 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
+   * True if the light and dark images should be scaled, false if sliced.
+   * Only relevant if boardImage is null.
+   */
+
+  private final boolean isScaled;
+
+
+
+
+
+  /**
    * Creates a new ImageBoardPainter which paints the board with the given Image.
    */
 
@@ -97,6 +109,7 @@ public class ImageBoardPainter implements BoardPainter{
     this.boardImage = boardImage;
     this.lightImage = null;
     this.darkImage = null;
+    isScaled = false;
   }
 
 
@@ -105,18 +118,24 @@ public class ImageBoardPainter implements BoardPainter{
   /**
    * Creates a new ImageBoardPainter which paints light squares by using the
    * given light image and dark squares by using the given light image.
+   * There are two options for using the images. One is having them scaled and
+   * fitted into each square - this means that all squares will look the same.
+   * For this option, you should provide relatively small images, around 60x60.
+   * The second option is to have the images used by pieces - each square will
+   * contain a different, unscaled portion of the large given image. For this
+   * option you should provide a large image - 200x200 to 300x300 is a good
+   * idea. If you don't, all the squares will look about the same. Since in the
+   * case the images are too small, the implementation will tile them, the
+   * second option can also be used if you have very small images with
+   * repeating, tileable patterns. The <code>isScaled</code> argument specified
+   * which option is chosen, <code>true</code> for scaling (first option) and
+   * <code>false</code> for slicing/tiling.
    */
 
-  public ImageBoardPainter(Image lightImage, Image darkImage){
-    MediaTracker tracker = new MediaTracker(new Canvas());
+  public ImageBoardPainter(Image lightImage, Image darkImage, boolean isScaled){
     this.lightImage = lightImage;
     this.darkImage = darkImage;
-    tracker.addImage(lightImage, 0);
-    tracker.addImage(darkImage, 0);
-    try{
-      tracker.waitForAll();
-    } catch (InterruptedException e){}
-    System.out.println("width="+lightImage.getWidth(null)+" height="+lightImage.getWidth(null));
+    this.isScaled = isScaled;
     this.boardImage = null;
   }
 
@@ -161,6 +180,19 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
+   * Returns <code>true</code> if the light and dark images are scaled, false
+   * if they are sliced/tiled. This is only applicable if we're in the two-image
+   * mode.
+   */
+
+  public boolean isScaled(){
+    return isScaled;
+  }
+
+
+
+
+  /**
    * Starts scaling the board image.
    */
 
@@ -169,24 +201,22 @@ public class ImageBoardPainter implements BoardPainter{
       if ((scaledLight != null) && (scaledLight.getWidth(null) == width/8) && (scaledLight.getHeight(null) == height/8))
         return;
 
-      scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
-      scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
-      MediaTracker tracker = new MediaTracker(new Canvas());
-      tracker.addImage(scaledLight, 0);
-      tracker.addImage(scaledDark, 0);
-      try{
-        tracker.waitForAll();
-      } catch (InterruptedException e){}
+      if (isScaled){
+        scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
+        scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_FAST);
+        try{
+          ImageUtilities.preload(scaledLight);
+          ImageUtilities.preload(scaledDark);
+        } catch (InterruptedException e){}
+      }
     }
     else{
       if ((scaled != null) && (scaled.getWidth(null) == width) && (scaled.getHeight(null) == height))
         return;
 
       scaled = boardImage.getScaledInstance(width, height, Image.SCALE_FAST);
-      MediaTracker tracker = new MediaTracker(new Canvas());
-      tracker.addImage(scaled, 0);
       try{
-        tracker.waitForAll();
+        ImageUtilities.preload(scaled);
       } catch (InterruptedException e){}
     } 
   }
@@ -200,12 +230,16 @@ public class ImageBoardPainter implements BoardPainter{
 
   public Dimension getPreferredBoardSize(){
     if (boardImage == null){
-      int width = lightImage.getWidth(null) * 8;
-      int height = lightImage.getHeight(null) * 8;
-      return new Dimension(width, height);
+      int width = lightImage.getWidth(null);
+      int height = lightImage.getHeight(null);
+      if (isScaled)
+        return new Dimension(width*8, height*8);
+      else
+        return new Dimension(width, height*2);
     }
     return new Dimension(boardImage.getWidth(null), boardImage.getHeight(null)); 
   }
+
 
 
 
@@ -220,19 +254,44 @@ public class ImageBoardPainter implements BoardPainter{
     if (boardImage == null){
       Rectangle clipRect = g.getClipRect();
       Rectangle drawnRect = new Rectangle(x, y, width/8, height/8);
+      int lwidth = lightImage.getWidth(null);
+      int lheight = lightImage.getHeight(null);
+      int dwidth = darkImage.getWidth(null);
+      int dheight = darkImage.getHeight(null);
       for (int file = 0; file < 8; file++, drawnRect.x += width/8){
         drawnRect.y = y;
         for (int rank = 7; rank >= 0; rank--, drawnRect.y += height/8){
           if (!drawnRect.intersects(clipRect))
             continue;
           
-          if ((file+rank) % 2 == 0)
-            g.drawImage(scaledDark, drawnRect.x, drawnRect.y, observer);
-          else
-            g.drawImage(scaledLight, drawnRect.x, drawnRect.y, observer);
+          if ((file+rank) % 2 == 0){
+            if (isScaled)
+              g.drawImage(scaledDark, drawnRect.x, drawnRect.y, observer);
+            else{
+              g.setClip(clipRect.intersection(drawnRect));
+              int imgX = Math.max(0, file * (dwidth - drawnRect.width)/7);
+              int imgY = Math.max(0, ((7-rank)/2) * (dheight - drawnRect.height)/3);
+              for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += dwidth)
+                for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += dheight)
+                  g.drawImage(darkImage, offx - imgX, offy - imgY, observer);
+            }
+          }
+          else{
+            if (isScaled)
+              g.drawImage(scaledLight, drawnRect.x, drawnRect.y, observer);
+            else{
+              g.setClip(clipRect.intersection(drawnRect));
+              int imgX = Math.max(0, file * (lwidth - drawnRect.width)/7);
+              int imgY = Math.max(0, ((7-rank)/2) * (lheight - drawnRect.height)/3);
+              for (int offx = drawnRect.x; offx < drawnRect.x+drawnRect.width; offx += lwidth)
+                for (int offy = drawnRect.y; offy < drawnRect.y+drawnRect.height; offy += lheight)
+                  g.drawImage(lightImage, offx - imgX, offy - imgY, observer);
+            }
+          }
         }
       }
-        
+
+      g.setClip(clipRect);
     }
     else{
       g.drawImage(scaled, x, y, observer);
