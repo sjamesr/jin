@@ -24,8 +24,11 @@ package free.workarounds;
 import javax.swing.JTextField;
 import javax.swing.text.Document;
 import javax.swing.UIManager;
+import javax.swing.BoundedRangeModel;
 import java.awt.Cursor;
 import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 
@@ -41,6 +44,8 @@ import java.awt.event.ActionListener;
  *        JTextField displays multiple Line</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4174290.html">
  *        Disabled JTextField background should be control colour in Windows L&F</A>.
+ *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4137845.html">
+ *         JTextField draws out of bounds</A>.
  * </UL>
  */
 
@@ -70,6 +75,32 @@ public class FixedJTextField extends JTextField{
   public FixedJTextField(String text, int columns){
     super(text, columns);
   }
+
+
+
+  //
+  // When more text is in the textfield than fits, the textfield will draw some
+  // of the text under the border (which is not inside the clip rectangle),
+  // which causes the first (or last) visible character to be painted only
+  // partially.
+  //
+  // http://developer.java.sun.com/developer/bugParade/bugs/4137845.html
+  // 
+
+  public void scrollRectToVisible(Rectangle r) {
+    Insets i = getInsets();
+    javax.swing.BoundedRangeModel visibility = getHorizontalVisibility();
+    int x = r.x + visibility.getValue() - i.left;
+    if (x < visibility.getValue()) {
+      // Scroll to the left
+      visibility.setValue(x);
+    } else if(x > visibility.getValue() + visibility.getExtent()) {
+      // Scroll to the right
+      visibility.setValue(x - visibility.getExtent());
+    }
+  }
+
+  // http://developer.java.sun.com/developer/bugParade/bugs/4137845.html
 
 
 
