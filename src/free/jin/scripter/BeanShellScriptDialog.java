@@ -62,7 +62,7 @@ class BeanShellScriptDialog extends ScriptDialog{
    */
 
   public BeanShellScriptDialog(Component parent, Scripter scripter, BeanShellScript templateScript){
-    super(parent, "New BeanShell Script", scripter, templateScript);
+    super(parent, "BeanShell Script", scripter, templateScript);
 
     createUI();
   }
