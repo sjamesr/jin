@@ -410,17 +410,6 @@
 		<!-- Piece sets -->
 		<mkdir dir="${resources.dir}/pieces" />
 		
-		<!-- Blitzin Vector -->
-		<jar jarfile="${resources.dir}/pieces/blitzin.jar" compress="false">
-			<fileset dir="${classes.dir}/pieces/blitzin" includes="**" />
-			<fileset dir="${res.dir}/pieces/blitzin"
-			         excludes="**.java" />
-		</jar>
-    <antcall target="extractResource">
-      <param name="resource.file" value="${resources.dir}/pieces/blitzin.jar" />
-      <param name="resource.name" value="blitzin" />
-    </antcall>
-
 		
 		<!-- Eboard Vector - this one is special because it's the default set --> 
 		<jar jarfile="${resources.dir}/pieces/eboard.jar" compress="false">
@@ -431,8 +420,12 @@
       <param name="resource.file" value="${resources.dir}/pieces/eboard.jar" />
       <param name="resource.name" value="eboard" />
     </antcall>
+    
+		<!-- Blitzin Vector -->
+		<antcall target="buildImagePieceSet">
+			<param name="piece-set-id" value="blitzin" />
+		</antcall>
 
-		
 		<!-- Xboard -->
 		<antcall target="buildImagePieceSet">
 			<param name="piece-set-id" value="xboard" />
@@ -523,7 +516,6 @@
 	<target name="buildImagePieceSet">
     <property name="resource.file" value="${resources.dir}/pieces/${piece-set-id}.zip" />
 		<zip destfile="${resource.file}" compress="false">
-			<fileset dir="${classes.dir}/pieces" includes="ImagePieceSetLoader*.class" />
 			<fileset dir="${res.dir}/pieces/${piece-set-id}" />
 		</zip>
     <antcall target="extractResource">
