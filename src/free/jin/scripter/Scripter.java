@@ -390,6 +390,7 @@ public class Scripter extends Plugin{
       String scriptName = props.getProperty("name");
       String scriptType = props.getProperty("type");
       String eventType = props.getProperty("event-type");
+      boolean enabled = "true".equals(props.getProperty("enabled"));
       String eventSubtypesCount = props.getProperty("event-subtype.count");
       String [] eventSubtypes = null;
       if (eventSubtypesCount != null){
@@ -400,9 +401,10 @@ public class Scripter extends Plugin{
 
       PluginContext context = getPluginContext();
 
+      Script script;
       if ("beanshell".equals(scriptType)){
         String code = props.getProperty("code");
-        return new BeanShellScript(context, scriptName, eventType, eventSubtypes, code);
+        script = new BeanShellScript(context, scriptName, eventType, eventSubtypes, code);
       }
       else if ("commands".equals(scriptType)){
         String condition = props.getProperty("condition");
@@ -410,10 +412,13 @@ public class Scripter extends Plugin{
         String [] commands = new String[commandCount];
         for (int i = 0; i < commandCount; i++)
           commands[i] = props.getProperty("command-"+i);
-        return new CommandScript(context, scriptName, eventType, eventSubtypes, condition, commands);
+        script = new CommandScript(context, scriptName, eventType, eventSubtypes, condition, commands);
       }
       else
         return null;
+      script.setEnabled(enabled);
+
+      return script;
     } catch (IOException e){
         e.printStackTrace();
         return null;
@@ -439,6 +444,7 @@ public class Scripter extends Plugin{
     props.put("name", script.getName());
     props.put("type", scriptType);
     props.put("event-type", script.getEventType());
+    props.put("enabled", script.isEnabled() ? "true" : "false");
 
     String [] eventSubtypes = script.getEventSubtypes();
     if (eventSubtypes != null){
