@@ -320,7 +320,7 @@ public class BackgroundChooser extends JDialog{
     else
       supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg"};
 
-    fileChooser.setFileFilter(new ExtensionFileFilter("Image files", supportedImageTypes));
+    fileChooser.setFileFilter(new ExtensionFileFilter("Image files", supportedImageTypes, false));
     fileChooser.setFileHidingEnabled(true);
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fileChooser.setMultiSelectionEnabled(false);
