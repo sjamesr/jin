@@ -510,6 +510,10 @@ public class JinFrameMenuBar extends JMenuBar{
       remove(menu);
       index--;
     }
+
+    invalidate();
+    validate();
+    repaint();
   }
 
   
