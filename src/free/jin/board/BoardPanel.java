@@ -469,18 +469,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void configureBoard(Game game, JBoard board){
     int moveInputMode;
-    if (game.getGameType() == Game.MY_GAME){
+    if (game.getGameType() == Game.MY_GAME)
       if (game.isPlayed())
         if (game.getUserPlayer() == Player.WHITE_PLAYER)
           moveInputMode = JBoard.WHITE_PIECES_MOVE;
         else
           moveInputMode = JBoard.BLACK_PIECES_MOVE;
-      else
-        moveInputMode = JBoard.ALL_PIECES_MOVE; 
-    }
-    else{ // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
+      else 
+        moveInputMode = JBoard.CURRENT_PLAYER_MOVES; 
+    else // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
       moveInputMode = JBoard.NO_PIECES_MOVE;
-    }
 
     board.setMoveInputMode(moveInputMode);
 
@@ -947,48 +945,59 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       gameLabelBox.add(gameLabel);
       gameLabelBox.add(Box.createHorizontalGlue());
 
-      infoBox = new JPanel();
-      infoBox.setBorder(new EmptyBorder(5,5,5,5));
-      infoBox.setLayout(new BoxLayout(infoBox, BoxLayout.Y_AXIS));
+      JPanel upperBox = new JPanel(null);
+      upperBox.setLayout(new BoxLayout(upperBox, BoxLayout.Y_AXIS));
+      JPanel middleBox = new JPanel(null);
+      middleBox.setLayout(new BoxLayout(middleBox, BoxLayout.Y_AXIS));
+      JPanel bottomBox = new JPanel(null);
+      bottomBox.setLayout(new BoxLayout(bottomBox, BoxLayout.Y_AXIS));
 
       if (flipped){
-        infoBox.add(whiteLabelBox);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(whiteClock);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(gameLabelBox);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(positionScrollBar);
-        infoBox.add(Box.createVerticalStrut(5));
-        infoBox.add(moveListTableScrollPane);
-        infoBox.add(Box.createVerticalStrut(10));
+        upperBox.add(whiteLabelBox);
+        upperBox.add(Box.createVerticalStrut(10));
+        upperBox.add(whiteClock);
+        middleBox.add(Box.createVerticalStrut(10));
+        middleBox.add(gameLabelBox);
+        middleBox.add(Box.createVerticalStrut(10));
+        middleBox.add(positionScrollBar);
+        middleBox.add(Box.createVerticalStrut(5));
+        middleBox.add(moveListTableScrollPane);
+        middleBox.add(Box.createVerticalStrut(10));
         if (buttonPanel != null){
-          infoBox.add(buttonPanel);
-          infoBox.add(Box.createVerticalStrut(10));
+          middleBox.add(buttonPanel);
+          middleBox.add(Box.createVerticalStrut(10));
         }
-        infoBox.add(blackClock);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(blackLabelBox);
+        bottomBox.add(blackClock);
+        bottomBox.add(Box.createVerticalStrut(10));
+        bottomBox.add(blackLabelBox);
       }
       else{
-        infoBox.add(blackLabelBox);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(blackClock);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(gameLabelBox);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(positionScrollBar);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(moveListTableScrollPane);
-        infoBox.add(Box.createVerticalStrut(10));
-        if (buttonPanel!=null){
-          infoBox.add(buttonPanel);
-          infoBox.add(Box.createVerticalStrut(10));
+        upperBox.add(blackLabelBox);
+        upperBox.add(Box.createVerticalStrut(10));
+        upperBox.add(blackClock);
+        middleBox.add(Box.createVerticalStrut(10));
+        middleBox.add(gameLabelBox);
+        middleBox.add(Box.createVerticalStrut(10));
+        middleBox.add(positionScrollBar);
+        middleBox.add(Box.createVerticalStrut(10));
+        middleBox.add(moveListTableScrollPane);
+        middleBox.add(Box.createVerticalStrut(10));
+        if (buttonPanel != null){
+          middleBox.add(buttonPanel);
+          middleBox.add(Box.createVerticalStrut(10));
         }
-        infoBox.add(whiteClock);
-        infoBox.add(Box.createVerticalStrut(10));
-        infoBox.add(whiteLabelBox);
+        bottomBox.add(whiteClock);
+        bottomBox.add(Box.createVerticalStrut(10));
+        bottomBox.add(whiteLabelBox);
       }
+      infoBox = new JPanel(null);
+      infoBox.setBorder(new EmptyBorder(5, 5, 5, 5));
+      infoBox.setLayout(new BorderLayout());
+
+      infoBox.add(upperBox, BorderLayout.NORTH);
+      infoBox.add(middleBox, BorderLayout.CENTER);
+      infoBox.add(bottomBox, BorderLayout.SOUTH);
+
       add(infoBox);
     }
 
