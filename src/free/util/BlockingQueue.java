@@ -25,10 +25,10 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 /**
- * A blocking queue, one that always "contains" elements.
+ * <P>A blocking queue, one that always "contains" elements.
  * If it is in fact empty, the pop() and peek() method will block until an
- * item is pushed. <br>
- * <B>NOTE:</B> This class is thread safe. <br>
+ * item is pushed.
+ * <P><B>NOTE:</B> This class is thread safe.
  *
  * @author  Alexander Maryanovsky.
  */
