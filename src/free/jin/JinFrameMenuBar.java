@@ -370,7 +370,7 @@ public class JinFrameMenuBar extends JMenuBar{
    */
 
   private static String descriptionForUser(User user){
-    return user.getUsername()+"."+user.getServer().getName();
+    return user.getUsername()+" on "+user.getServer().getName();
   } 
 
 
