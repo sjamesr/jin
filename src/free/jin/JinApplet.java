@@ -136,6 +136,8 @@ public class JinApplet extends Applet implements JinContext{
       if (bgColorString != null)
         setBackground(new Color(0xff000000 | Integer.parseInt(bgColorString, 16)));
       
+      params.put("login.hostname", getDocumentBase().getHost());
+      
       setLayout(new FlowLayout());
       add(new UserAuthPanel());
     } catch (Throwable t){
@@ -204,9 +206,7 @@ public class JinApplet extends Applet implements JinContext{
     
     Server server = (Server)Class.forName(className).newInstance();
     
-    URL documentBase = getDocumentBase(); 
-    server.setHost("file".equals(documentBase.getProtocol()) ?
-      "localhost" : documentBase.getHost());
+    server.setHost(getDocumentBase().getHost());
       
     String portString = getParameter("port");
     if (portString != null) 
@@ -678,7 +678,8 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   private URL getPrefsDownloadUrl() throws MalformedURLException{
-    return new URL(getDocumentBase(), getParameter("loadPrefsURL"));    
+    URL url = new URL(getDocumentBase(), getParameter("loadPrefsURL"));
+    return new URL(getParameter("prefsProtocol"), url.getHost(), url.getPort(), url.getFile());
   }
   
 
@@ -688,7 +689,8 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   private URL getPrefsUploadUrl() throws MalformedURLException{
-    return new URL(getDocumentBase(), getParameter("savePrefsURL"));    
+    URL url = new URL(getDocumentBase(), getParameter("savePrefsURL"));
+    return new URL(getParameter("prefsProtocol"), url.getHost(), url.getPort(), url.getFile());
   }
 
 
