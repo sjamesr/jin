@@ -180,10 +180,8 @@ public class SoughtGraph extends JComponent{
     Image bgImage = bgImageFilename == null ? null :
       getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
     if (bgImage != null){
-      try{
-        if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
-          bgImage = null;
-      } catch (InterruptedException e){}
+      if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
+        bgImage = null;
     }
 
     this.bgImage = bgImage;
@@ -618,10 +616,8 @@ public class SoughtGraph extends JComponent{
 
       String imageFile = "images/"+index+"/"+imageName;
       image = getToolkit().getImage(SoughtGraph.class.getResource(imageFile));
-      try{
-        if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
-          return null;
-      } catch (InterruptedException e){}
+      if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
+        return null;
       sizeImages.put(imageKey, image);
     }
 

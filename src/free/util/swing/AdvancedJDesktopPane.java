@@ -23,6 +23,7 @@ package free.util.swing;
 
 import java.awt.*;
 import javax.swing.JDesktopPane;
+import free.util.ImageUtilities;
 
 
 /**
@@ -85,12 +86,7 @@ public class AdvancedJDesktopPane extends JDesktopPane{
     this.wallpaper = wallpaper;
 
     if (wallpaper != null){
-      try{
-        free.util.ImageUtilities.preload(wallpaper);
-      } catch (InterruptedException e){
-          e.printStackTrace();
-        }
-      if ((wallpaper.getWidth(null) <= 0) || (wallpaper.getHeight(null) <= 0))
+      if (ImageUtilities.preload(wallpaper) != ImageUtilities.COMPLETE)
         wallpaper = null;
     }
 

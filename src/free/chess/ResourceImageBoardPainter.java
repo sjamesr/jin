@@ -118,9 +118,7 @@ public class ResourceImageBoardPainter extends ImageBoardPainter{
     if ("single".equals(type)){
       Image boardImage = toolkit.getImage(cl.getResource(path + "board." + ext));
       
-      try{
-        ImageUtilities.preload(boardImage);
-      } catch (InterruptedException e){}
+      ImageUtilities.preload(boardImage);
       
       return new ResourceImageBoardPainter(boardImage);
     }
@@ -128,9 +126,7 @@ public class ResourceImageBoardPainter extends ImageBoardPainter{
       Image lightImage = toolkit.getImage(cl.getResource(path + "light." + ext));
       Image darkImage = toolkit.getImage(cl.getResource(path + "dark." + ext));
 
-      try{      
-        ImageUtilities.preload(new Image[]{lightImage, darkImage}, null);
-      } catch (InterruptedException e){}
+      ImageUtilities.preload(new Image[]{lightImage, darkImage}, null);
       
       boolean isScaled = def.getProperty("scaleSquares", "false").equalsIgnoreCase("true");
       return new ResourceImageBoardPainter(lightImage, darkImage, isScaled);

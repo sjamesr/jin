@@ -147,12 +147,12 @@ public class ImageBoardPainter implements BoardPainter{
    * them to preload images.
    */
 
-  protected static Image preload(Image image){
-    try{
-      ImageUtilities.preload(image);
-    } catch (InterruptedException e){}
-    return image;
-  }
+  // protected static Image preload(Image image){
+  //   try{
+  //     ImageUtilities.preload(image);
+  //   } catch (InterruptedException e){}
+  //   return image;
+  // }
 
 
 
@@ -219,10 +219,9 @@ public class ImageBoardPainter implements BoardPainter{
       if (isScaled){
         scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
         scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
-        try{
-          ImageUtilities.preload(scaledLight);
-          ImageUtilities.preload(scaledDark);
-        } catch (InterruptedException e){}
+        
+        ImageUtilities.preload(scaledLight);
+        ImageUtilities.preload(scaledDark);
       }
     }
     else{
@@ -230,9 +229,7 @@ public class ImageBoardPainter implements BoardPainter{
         return;
 
       scaled = boardImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-      try{
-        ImageUtilities.preload(scaled);
-      } catch (InterruptedException e){}
+      ImageUtilities.preload(scaled);
     } 
   }
 
