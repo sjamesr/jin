@@ -1003,8 +1003,9 @@ public class JBoard extends JComponent{
         piecePainter.paintPiece(piece, g, this, squareRect, false);
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE){
-        drawSquare(g, locationToSquare(squareRect.x, squareRect.y), 2,
-          getDragSquareHighlightingColor());
+        Square square = locationToSquare(squareRect.x, squareRect.y);
+        if (square != null) // Maybe be null if mouse is dragged out of the board
+          drawSquare(g, square, 2, getDragSquareHighlightingColor());
       }
     }
   }
