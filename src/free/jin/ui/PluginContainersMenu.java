@@ -32,11 +32,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSeparator;
+import javax.swing.*;
 
 
 
@@ -86,13 +84,22 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   
   
   /**
+   * The list of all menu items (including the separator) in this menu.
+   * We manage our own list because on every add/remove of an item we need to
+   * rebuild the real menu. That we have to do because
+   * JMenu.add(Component, int index) is completely broken under Swing 1.1.1. 
+   */
+  
+  private final Vector items = new Vector();
+  
+  
+  
+  /**
    * The position of the separator between checkboxes for showing/hiding
    * containers and radio buttons for activating containers. -1 if none.
    */
   
   private int sepIndex = -1;
-  
-  
   
   
   /**
@@ -111,12 +118,30 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    */
   
   public PluginContainersMenu(Enumeration existingContainers, String text, int mnemonic){
-    
     super(text);
     setMnemonic(mnemonic);
     
     while (existingContainers.hasMoreElements())
       pluginContainerAdded((AbstractPluginUIContainer)existingContainers.nextElement());
+  }
+  
+  
+  
+  /**
+   * Synchronizes our own item list with what the menu thinks it has for
+   * children.
+   */
+  
+  private void syncMenus(){
+    removeAll();
+    
+    for (int i = 0; i < items.size(); i++){
+      Object item = items.elementAt(i);
+      if (item instanceof JMenuItem)
+        add((JMenuItem)item);
+      else if (item instanceof JSeparator)
+        addSeparator();
+    }
   }
   
   
@@ -160,14 +185,17 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    */
   
   private void addShowCheckBox(JCheckBoxMenuItem item){
-    if (sepIndex != -1) // separator already exists
-      add(item, sepIndex++);
+    if (sepIndex != -1){ // separator already exists
+      items.insertElementAt(item, sepIndex++);
+    }
     else if (activeRadioButtonsToContainers.size() != 0){ // need to insert separator
-      add(item, 0);
-      add(new JSeparator(), sepIndex = 1);
+      items.insertElementAt(item, 0);
+      items.insertElementAt(new JSeparator(), sepIndex = 1);
     }
     else // separator not needed yet
-      add(item);
+      items.addElement(item);
+    
+    syncMenus();
   }
   
   
@@ -177,15 +205,17 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    */
   
   private void removeShowCheckBox(JCheckBoxMenuItem item){
-    remove(item);
+    items.removeElement(item);
     
     if (sepIndex != -1)
       sepIndex--;
     
     if (sepIndex == 0){ // the separator is first
-      remove(0);        // remove the separator
+      items.removeElementAt(0);        // remove the separator
       sepIndex = -1;
     }
+    
+    syncMenus();
   }
   
   
@@ -197,13 +227,16 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   
   private void addActiveRadioButton(JRadioButtonMenuItem item){
     if (sepIndex != -1) // separator already exists
-      add(item);
+      items.addElement(item);
     else if (visCheckBoxesToContainers.size() != 0){ // need to insert separator
-      add(new JSeparator(), sepIndex = getItemCount());
-      add(item);
+      sepIndex = items.size();
+      items.addElement(new JSeparator());
+      items.addElement(item);
     }
     else // separator not needed yet
-      add(item);
+      items.addElement(item);
+    
+    syncMenus();
   }
   
   
@@ -213,12 +246,14 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    */
   
   private void removeActiveRadioButton(JRadioButtonMenuItem item){
-    remove(item);
+    items.removeElement(item);
     
-    if ((sepIndex != -1) && (sepIndex == getItemCount() - 1)){  // the separator is last
-      remove(sepIndex);                   // remove the separator
+    if ((sepIndex != -1) && (sepIndex == items.size() - 1)){  // the separator is last
+      items.removeElementAt(sepIndex);                   // remove the separator
       sepIndex = -1;
     }
+    
+    syncMenus();
   }
   
   
