@@ -21,17 +21,25 @@
 
 package free.jin.console;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.event.*;
-import jregex.*;
-import javax.swing.event.*;
-import java.util.Hashtable;
-import java.util.Vector;
 import free.jin.Connection;
 import free.jin.Preferences;
 import free.util.BrowserControl;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
+import javax.swing.text.*;
+
+import jregex.MatchIterator;
+import jregex.MatchResult;
+import jregex.Pattern;
+import jregex.PatternSyntaxException;
 
 
 /**
@@ -190,15 +198,50 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     this.outputScrollPane = createOutputScrollPane(outputComponent);
     this.inputComponent = createInputComponent();
     
-    setLayout(new BorderLayout());
-    add(outputScrollPane, BorderLayout.CENTER);
-    add(inputComponent, BorderLayout.SOUTH);
+    registerKeyboardAction(clearingActionListener, 
+        KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+    createUI();
     
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
     
     init();
+  }
+  
+  
+  
+  /**
+   * An action listener which clears the console.
+   */
+  
+  private final ActionListener clearingActionListener = new ActionListener(){
+    public void actionPerformed(ActionEvent evt){
+      clear();
+    }
+  };
+  
+  
+  
+  /**
+   * Creates the UI (layout) of this console.
+   */
+  
+  private void createUI(){
+    JButton clearButton = new JButton("Clear Console");
+    clearButton.addActionListener(clearingActionListener);
+    clearButton.setRequestFocusEnabled(false);
+    
+    JPanel bottomPanel = new JPanel(new BorderLayout());
+    bottomPanel.add(inputComponent, BorderLayout.CENTER);
+    bottomPanel.add(clearButton, BorderLayout.EAST);
+
+    
+    setLayout(new BorderLayout());
+    add(outputScrollPane, BorderLayout.CENTER);
+    add(bottomPanel, BorderLayout.SOUTH);
   }
 
 
@@ -522,9 +565,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Returns true if selected text will be copied into the clipboard on selection.
-   * Returns false otherwise. This checks the value of the "copyOnSelect"
-   * property
+   * Returns whether text will be copied into the clipboard on selection.
    */
 
   protected boolean isCopyOnSelect(){
