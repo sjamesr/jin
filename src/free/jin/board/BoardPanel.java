@@ -1026,6 +1026,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.getPosition().copyFrom(realPosition);
     isBoardPositionUpdating = false;
 
+    isMoveEnRoute = false; // We shouldn't keep state between 
+    queuedMove = null;     // such drastic position changes
+    if (!board.isEnabled())
+      board.setEnabled(true);
+
     displayedMoveNumber = 0;
     updateMoveListTable();
     updatePositionScrollBar();
