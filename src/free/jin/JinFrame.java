@@ -438,6 +438,7 @@ public class JinFrame extends JFrame{
    */
 
   protected void processFocusEvent(FocusEvent evt){
+    super.processFocusEvent(evt);
     if (evt.getID()==FocusEvent.FOCUS_GAINED){
       getDesktop().requestDefaultFocus();
     }
