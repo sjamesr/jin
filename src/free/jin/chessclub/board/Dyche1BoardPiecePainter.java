@@ -25,10 +25,10 @@ import java.io.IOException;
 import free.chess.art.ResourceImagePiecePainter;
 
 /**
- * An implementation of <code>PiecePainter</code> which draws the bookup piece
- * set from blitzin. Note that the vector pieces belong exlusively to
- * chessclub.com - you may use them only as part of Jin and only with the
- * chessclub.com server. You may *not* use them for any other purpose, 
+ * An implementation of <code>PiecePainter</code> which draws the dyche1 piece
+ * set from blitzin. Note that the piece set belongs exlusively to
+ * chessclub.com - you may use it only as part of Jin and only with the
+ * chessclub.com server. You may *not* use it for any other purpose, 
  * commercial or otherwise.
  */
 
@@ -55,7 +55,7 @@ public class Dyche1BoardPiecePainter extends ResourceImagePiecePainter{
 
 
   /**
-   * Creates a new BookupBoardPiecePainter.
+   * Creates a new Dyche1BoardPiecePainter.
    */
 
   public Dyche1BoardPiecePainter() throws IOException{

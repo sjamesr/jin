@@ -34,9 +34,9 @@ import free.util.IOUtilities;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the bookup piece
- * set from blitzin. Note that the vector pieces belong exlusively to
- * chessclub.com - you may use them only as part of Jin and only with the
- * chessclub.com server. You may *not* use them for any other purpose, 
+ * set from blitzin. Note that the piece set belongs exlusively to
+ * chessclub.com - you may use it only as part of Jin and only with the
+ * chessclub.com server. You may *not* use it for any other purpose, 
  * commercial or otherwise.
  */
 
