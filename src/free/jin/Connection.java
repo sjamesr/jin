@@ -24,6 +24,7 @@ package free.jin;
 import java.io.IOException;
 import free.jin.event.*;
 import free.chess.Move;
+import free.chess.WildVariant;
 
 
 /**
@@ -124,7 +125,6 @@ public interface Connection{
 
 
 
-
   /**
    * Returns the <code>ListenerManager</code> for this <code>Connection</code>.
    * Via this object, you can register and unregister listeners for various
@@ -132,7 +132,6 @@ public interface Connection{
    */
 
   ListenerManager getListenerManager();
-
 
 
 
@@ -146,14 +145,12 @@ public interface Connection{
 
 
 
-
   /**
    * Returns a message describing the error that occurred during the login
    * procedure, if any.
    */
 
   String getLoginErrorMessage();
-
 
 
 
@@ -166,14 +163,11 @@ public interface Connection{
 
 
 
-
   /**
    * Disconnects from the server.
    */
 
   void disconnect() throws IOException;
-
-
 
 
 
@@ -183,7 +177,6 @@ public interface Connection{
    */
 
   String getUsername();
-
 
 
 
@@ -198,15 +191,20 @@ public interface Connection{
 
 
 
-
   /**
    * Sends the command closing the session to the server - this is usually "quit",
    * or "exit".
    */
 
   void exit();
-
-
+  
+  
+  
+  /**
+   * Returns a list of support wild variants.
+   */
+   
+  WildVariant [] getSupportedVariants();
 
 
 
@@ -221,14 +219,12 @@ public interface Connection{
 
 
 
-
   /**
    * Makes the given move in the given Game. The specified <code>Game</code>
    * must be an instance created by this <code>Connection</code>.
    */
 
   void makeMove(Game game, Move move);
-
 
 
 
@@ -248,7 +244,6 @@ public interface Connection{
    */
 
   void requestDraw(Game game);
-
 
 
 
@@ -277,7 +272,6 @@ public interface Connection{
    */
 
   boolean isAdjournSupported();
-
 
 
 
@@ -333,7 +327,6 @@ public interface Connection{
 
   
 
-
   /**
    * Goes back the given amount of plies in the given game. If the given amount
    * of plies is bigger than the amount of plies since the beginning of the game,
@@ -344,7 +337,6 @@ public interface Connection{
 
 
 
-
   /**
    * Goes forward the given amount of plies in the given game. If the given amount
    * of plies is bigger than the amount of plies remaining until the end of the
@@ -352,7 +344,6 @@ public interface Connection{
    */
 
   void goForward(Game game, int plyCount);
-
 
 
 
