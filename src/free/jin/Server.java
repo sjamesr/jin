@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 
 
-
 /**
  * This class encapsulates the various properties of a chess server. I haven't
  * yet decided whether it should be solely used as is and backed up by a 
@@ -43,16 +42,6 @@ public class Server{
    */
 
   private final Properties props = new Properties();
-
-
-
-
-  /**
-   * The template for user creation for this server.
-   */
-
-  private User defaultUser;
-
 
 
 
@@ -75,10 +64,6 @@ public class Server{
     Server server = new Server();
     server.props.load(serverIn);
 
-    String defaultUserResourceName = server.props.getProperty("default.user");
-    InputStream defaultUserInputStream = Server.class.getResourceAsStream(defaultUserResourceName);
-    server.defaultUser = new User(defaultUserInputStream);
-
     return server;
   }
 
@@ -90,7 +75,7 @@ public class Server{
    */
 
   public User createDefaultUser(){
-    return new User(defaultUser);
+    return new User(this);
   }
 
 
@@ -115,6 +100,7 @@ public class Server{
       }
     return null;
   } 
+
 
 
 
