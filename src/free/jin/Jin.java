@@ -140,7 +140,7 @@ public class Jin{
     restoreFrameGeometry(mainFrame, "frame");
 
     // Create the UI manager
-    uiProvider = new InternalFramesUIProvider(this, TopLevelContainer.getFor(mainFrame, mainFrame.getTitle()));
+    uiProvider = new MdiUiProvider(this, TopLevelContainer.getFor(mainFrame, mainFrame.getTitle()));
 
     // Create the connection manager
     connManager = new ConnectionManager();
