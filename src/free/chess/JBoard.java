@@ -160,7 +160,17 @@ public class JBoard extends JComponent{
    * The color used for move highlighting.
    */
 
-  private static final Color moveHighlightColor = Color.cyan.darker();
+  private Color moveHighlightColor = Color.cyan.darker();
+
+
+
+
+  /**
+   * The color used for highlighting the square when in CROSSHAIR_DRAGGED_PIECE
+   * mode.
+   */
+
+  private Color crosshairDragHighlightColor = Color.blue;
 
 
 
@@ -494,7 +504,7 @@ public class JBoard extends JComponent{
     }
     int oldStyle = moveInputStyle;
     moveInputStyle = newStyle;
-    firePropertyChange("moveInputStyle",oldStyle, newStyle);
+    firePropertyChange("moveInputStyle", oldStyle, newStyle);
   }
 
 
@@ -635,6 +645,7 @@ public class JBoard extends JComponent{
    */
 
   private void repaintHighlighting(){
+    int moveHighlightingStyle = getMoveHighlightingStyle();
     if ((moveHighlightingStyle == NO_MOVE_HIGHLIGHTING) || (highlightedMove == null))
       return;
 
@@ -752,6 +763,53 @@ public class JBoard extends JComponent{
 
 
 
+
+  /**
+   * Sets the color used for move highlighting to the specified color.
+   */
+
+  public void setMoveHighlightColor(Color moveHighlightColor){
+    this.moveHighlightColor = moveHighlightColor;
+    repaint();
+  }
+
+
+
+
+  /**
+   * Returns the color used for move highlighting.
+   */
+
+  public Color getMoveHighlightColor(){
+    return moveHighlightColor;
+  }
+
+
+
+
+  /**
+   * Sets the color used for square highlighting when in CROSSHAIR_DRAGGED_PIECE
+   * mode to the specified color.
+   */
+
+  public void setCrosshairDragHighlightColor(Color crosshairDragHighlightColor){
+    this.crosshairDragHighlightColor = crosshairDragHighlightColor;
+    repaint();
+  }
+
+
+
+  /**
+   * Returns the color used for square highlighting when in
+   * CROSSHAIR_DRAGGED_PIECE mode.
+   */
+
+  public Color getCrosshairDragHighlightColor(){
+    return crosshairDragHighlightColor;
+  }
+
+   
+
   
   /**
    * Paints this JBoard on the given Graphics object.
@@ -794,6 +852,7 @@ public class JBoard extends JComponent{
     PiecePainter piecePainter = getPiecePainter();
 
     int draggedPieceStyle = getDraggedPieceStyle();
+    int moveHighlightingStyle = getMoveHighlightingStyle();
 
     // Paint the board
     boardPainter.paintBoard(cacheGraphics, this, 0, 0, size.width, size.height);
@@ -823,11 +882,11 @@ public class JBoard extends JComponent{
       Square to = highlightedMove.getEndingSquare();
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
-          drawSquare(cacheGraphics, from, 2, moveHighlightColor);
-          drawSquare(cacheGraphics, to, 2, moveHighlightColor);
+          drawSquare(cacheGraphics, from, 2, getMoveHighlightColor());
+          drawSquare(cacheGraphics, to, 2, getMoveHighlightColor());
         }
         else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
-          drawArrow(cacheGraphics, from, to, 5, moveHighlightColor);
+          drawArrow(cacheGraphics, from, to, 5, getMoveHighlightColor());
       }
     }
 
@@ -843,7 +902,7 @@ public class JBoard extends JComponent{
         piecePainter.paintPiece(piece, cacheGraphics, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
       else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-        drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, Color.blue);
+        drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, getCrosshairDragHighlightColor());
     }
 
     componentGraphics.drawImage(cacheImage, 0, 0, null);
@@ -1191,7 +1250,7 @@ public class JBoard extends JComponent{
             Piece promotionTarget;
             if (isManualPromote()){
               isShowingModalDialog = true;
-              promotionTarget = PieceChooser.showPieceChooser(this, promotionTargets, piecePainter, promotionTargets[0]);
+              promotionTarget = PieceChooser.showPieceChooser(this, promotionTargets, getPiecePainter(), promotionTargets[0]);
               isShowingModalDialog = false;
             }
             else
@@ -1285,9 +1344,9 @@ public class JBoard extends JComponent{
    */
 
   public Dimension getPreferredSize(){
-    Dimension piecePrefSize = piecePainter.getPreferredPieceSize();
+    Dimension piecePrefSize = getPiecePainter().getPreferredPieceSize();
     if ((piecePrefSize.width<=0)||(piecePrefSize.height<=0)){
-      Dimension boardPrefSize = boardPainter.getPreferredBoardSize();
+      Dimension boardPrefSize = getBoardPainter().getPreferredBoardSize();
       if ((boardPrefSize.width<=0)||(boardPrefSize.height<=0))
         return new Dimension(400,400);
       else return boardPrefSize;
