@@ -242,7 +242,7 @@ public class Jin{
       InputStream serverListInputStream = Jin.class.getResourceAsStream("resources/servers/list.txt");
       ByteArrayOutputStream buf = new ByteArrayOutputStream();
       IOUtilities.pump(serverListInputStream, buf);
-      StringTokenizer serversTokenizer = new StringTokenizer(new String(buf.toByteArray(), "8859_1"), "\n");
+      StringTokenizer serversTokenizer = new StringTokenizer(new String(buf.toByteArray(), "8859_1"), "\n\r");
 
       while (serversTokenizer.hasMoreTokens()){
         String serverResourceName = serversTokenizer.nextToken();
@@ -445,6 +445,17 @@ public class Jin{
 
   public static Server getServer(String serverName){
     return (Server)servers.get(serverName);
+  }
+
+
+
+
+  /**
+   * Returns a string describing the name and version of the interface.
+   */
+
+  public static String getInterfaceName(){
+    return getProperty("name")+" "+getProperty("version")+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")";
   }
 
 
