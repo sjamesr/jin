@@ -32,7 +32,7 @@
 		<dirname property="jin.dir" file="." />
 		<property name="build.dir" value="${jin.dir}/build" />
 		<property name="build.compiler" value="jikes" />
-		<property name="debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
+		<property name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
 		<property name="source.dir" value="${jin.dir}/src" />
 		<property name="win.setup.maker" value="makensis.exe" />
 		<property name="cf.host" value="cf-shell.sourceforge.net" />
@@ -215,6 +215,7 @@
 		
 		<antcall target="build">
 			<param name="release.platform" value="applet" />
+      <param name="build.compress" value="yes" />
 		</antcall>
 
  		<propertyfile file="${source.dir}/free/jin/resources/app.props">
@@ -241,7 +242,7 @@
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.html ${server.name}_oldjava.html detect_java.html DetectJava.class libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
+			<fileset dir="${build.dir}" includes="jin.jar ${server.name}.html ${server.name}_oldjava.html detect_java.html DetectJava.class *.php libs/** plugins/* plugins/${server.name}/* servers/${server.file}" />
       <filterset>
         <filter token="old_java_url" value="${server.name}_oldjava.html"/>
         <filter token="new_java_url" value="${server.name}.html"/>
