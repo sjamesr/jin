@@ -21,14 +21,16 @@
 
 package free.jin.actions;
 
-import javax.swing.*;
-import free.jin.plugin.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import free.jin.action.JinAction;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.ui.UIProvider;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 
 /**
@@ -57,52 +59,11 @@ public class ActionsPlugin extends Plugin{
   
   
   /**
-   * The radio button indicating the actions ui container is visible. 
-   */
-   
-  private final JRadioButtonMenuItem shownButton; 
-    
-  
-
-  /**
-   * The radio button indicating the actions ui container is invisible. 
-   */
-   
-  private final JRadioButtonMenuItem hiddenButton;
-  
-  
-  
-  /**
    * Creates a new <code>ActionsPlugin</code>.
    */
    
   public ActionsPlugin(){
-    shownButton = new JRadioButtonMenuItem("Action Buttons Shown"); 
-    hiddenButton = new JRadioButtonMenuItem("Action Buttons Hidden");
     
-    shownButton.setMnemonic('S');
-    hiddenButton.setMnemonic('H');
-    
-    ButtonGroup bGroup = new ButtonGroup();
-    bGroup.add(shownButton);
-    bGroup.add(hiddenButton);
-    
-    shownButton.setActionCommand("show");
-    hiddenButton.setActionCommand("hide");
-
-    ActionListener visibilityListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        String actionCommand = evt.getActionCommand();
-        boolean isVisible = "show".equals(actionCommand);
-        buttonContainer.setVisible(isVisible);
-      }
-    };
-
-    shownButton.addActionListener(visibilityListener);
-    hiddenButton.addActionListener(visibilityListener);
-    
-    menu.add(shownButton);
-    menu.add(hiddenButton);
   }
    
 
@@ -136,12 +97,6 @@ public class ActionsPlugin extends Plugin{
     
     addActionButtons();
     addActionMenuItems();
-    
-    if (getPrefs().getBool("visible", true))
-      buttonContainer.setVisible(true);
-    else
-      hiddenButton.setSelected(true);
-      // In the "true" case, the button is made selected by the listener.
   }
   
   
@@ -151,20 +106,8 @@ public class ActionsPlugin extends Plugin{
    */
    
   private PluginUIContainer createButtonContainer(){
-    PluginUIContainer container = createContainer("");
+    PluginUIContainer container = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
     container.setTitle("Actions");
-    container.setCloseOperation(PluginUIContainer.HIDE_ON_CLOSE);
-    
-    container.addPluginUIListener(new PluginUIAdapter(){
-      public void pluginUIShown(PluginUIEvent evt){
-        if (!shownButton.isSelected())
-          shownButton.setSelected(true);
-      }
-      public void pluginUIHidden(PluginUIEvent evt){
-        if (!hiddenButton.isSelected())
-          hiddenButton.setSelected(true);
-      }
-    });
     
     return container;
   }
