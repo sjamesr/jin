@@ -22,8 +22,12 @@
 package free.jin;
 
 import free.jin.plugin.PluginStartException;
-import free.util.Utilities;
+import free.jin.ui.LoginPanel;
+import free.jin.ui.OptionPanel;
+import free.jin.ui.ServerChoicePanel;
+import free.util.EventListenerList;
 import free.util.TextUtilities;
+import free.util.Utilities;
 
 
 /**
@@ -39,6 +43,14 @@ public class ConnectionManager{
    */
 
   private Session session = null;
+  
+  
+  
+  /**
+   * The model whose state matches whether a session is currently established.
+   */
+  
+  private final EventListenerList listenerList = new EventListenerList();
 
 
 
@@ -49,9 +61,9 @@ public class ConnectionManager{
   public ConnectionManager(){
     
   }
-
-
-
+  
+  
+  
   /**
    * Displays UI which allows the user to login to one of the supported servers.
    * This method is invoked (usually by the class responsible for the start-up
@@ -266,7 +278,7 @@ public class ConnectionManager{
   private void login(ConnectionDetails connDetails){
     try{
       session = new Session(connDetails);
-      Jin.getInstance().getUIProvider().setConnected(true, session);
+      fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
       new LoginThread(session).start();
     } catch (PluginStartException e){
         e.printStackTrace();
@@ -295,7 +307,7 @@ public class ConnectionManager{
     User user = session.getUser();
     int connPort = session.getPort();
 
-    if (connPort != -1){ // Actually connected
+    if (connPort != -1){ // A connection really was established
       
       // Set preferred connection details for this account
       ConnectionDetails connDetails = session.getConnDetails().usePort(connPort);
@@ -319,9 +331,11 @@ public class ConnectionManager{
       }
     }
 
-    Jin.getInstance().getUIProvider().setConnected(false, session);
+    Session tempSession = session;
 
     session = null;
+    
+    fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSED, tempSession));
   }
 
 
@@ -332,6 +346,50 @@ public class ConnectionManager{
 
   public Session getSession(){
     return session;
+  }
+  
+  
+  
+  /**
+   * Adds a session listener.
+   */
+  
+  public void addSessionListener(SessionListener l){
+    listenerList.add(SessionListener.class, l);
+  }
+  
+  
+  
+  /**
+   * Removes a session listener.
+   */
+  
+  public void removeSessionListener(SessionListener l){
+    listenerList.remove(SessionListener.class, l);
+  }
+  
+  
+  
+  /**
+   * Fires a session event.
+   */
+  
+  private void fireSessionEvent(SessionEvent evt){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == SessionListener.class){
+        SessionListener listener = (SessionListener)listeners[i+1];
+        switch (evt.getId()){
+          case SessionEvent.SESSION_ESTABLISHED:
+            listener.sessionEstablished(evt);
+            break;
+          case SessionEvent.SESSION_CLOSED:
+            listener.sessionClosed(evt);
+            break;
+        }
+      }
+    }
+    
   }
 
 
