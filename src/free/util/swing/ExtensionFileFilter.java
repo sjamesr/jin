@@ -143,7 +143,7 @@ public class ExtensionFileFilter extends FileFilter{
     for (int i = 0; i < endStrings.length; i++)
       buf.append("*" + endStrings[i] + ", ");
     buf.setLength(buf.length() - 2);
-    return name+"("+buf.toString()+")";
+    return name+" ("+buf.toString()+")";
   }
 
 
