@@ -145,6 +145,17 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
 
 
+  /**
+   * The currently selected index in the rules list. We need to keep this in
+   * order to be able to roll back if the user tries to change the selection
+   * when the current selection is incomplete.
+   */
+
+  private int rulesListSelectedIndex = -1;
+
+
+
+
 
   /**
    * A DocumentListener we register with all text components that require a
@@ -272,19 +283,18 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     loggingRulesList = new JList(rulesListModel);
     loggingRulesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     loggingRulesList.addListSelectionListener(new ListSelectionListener(){
-      private int selectedIndex = -1;
       private boolean ignoreSelectionChange = false;
       public void valueChanged(ListSelectionEvent evt){
         if (evt.getValueIsAdjusting())
           return;
         if (ignoreSelectionChange)
           return;
-        if ((selectedIndex != -1) && (selectedIndex < rulesListModel.size())){
+        if ((rulesListSelectedIndex != -1) && (rulesListSelectedIndex < rulesListModel.size())){
           try{
-            updateRuleFromUI(selectedIndex);
+            updateRuleFromUI(rulesListSelectedIndex);
           } catch (BadChangesException e){
               ignoreSelectionChange = true;
-              loggingRulesList.setSelectedIndex(selectedIndex);
+              loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
               ignoreSelectionChange = false;
               JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(), "Error", 
                 JOptionPane.ERROR_MESSAGE);
@@ -293,10 +303,10 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
               return;
             }
         }
-        selectedIndex = loggingRulesList.getSelectedIndex();
+        rulesListSelectedIndex = loggingRulesList.getSelectedIndex();
         try{
           ignoreRuleFieldsDocumentChange = true;
-          if (selectedIndex == -1){
+          if (rulesListSelectedIndex == -1){
             rulenameField.setText("");
             filenameField.setText("");
             conditionField.setText("");
@@ -332,6 +342,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     addRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
+        System.out.println("Selected index: "+selectedIndex);
         if (selectedIndex != -1){
           try{
             updateRuleFromUI(selectedIndex);
@@ -343,7 +354,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
               return;
             }
         }
-        rulesListModel.addElement("Specify name");
+        rulesListModel.addElement("New Logging Rule");
         loggingRulesList.setSelectedIndex(rulesListModel.size() - 1);
 
         rulenameField.setText("");
@@ -360,7 +371,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex != -1){
-          String ruleName = ((LoggingRule)rulesListModel.getElementAt(selectedIndex)).getName();
+          String ruleName = rulesListModel.getElementAt(selectedIndex).toString();
           int result = JOptionPane.showConfirmDialog(GameLoggerPreferencesPanel.this, 
             "Are you sure you want to delete the rule \""+ruleName+"\"?", "Confirm rule deletion", JOptionPane.YES_NO_OPTION);
           if (result == JOptionPane.YES_OPTION){
@@ -377,10 +388,13 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
                 rulenameField.setText("");
                 filenameField.setText("");
                 conditionField.setText("");
+                rulesListSelectedIndex = -1;
               } finally{
                   ignoreRuleFieldsDocumentChange = false;
                 }
             }
+
+            loggingRulesList.setSelectedIndex(-1);
               
             fireStateChanged();
           }
@@ -430,7 +444,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         if (selectedItem instanceof String){
           String text = rulenameField.getText();
           if (text.length() == 0)
-            rulesListModel.setElementAt("Specify name", loggingRulesList.getSelectedIndex());
+            rulesListModel.setElementAt("New Logging Rule", loggingRulesList.getSelectedIndex());
           else
             rulesListModel.setElementAt(text, loggingRulesList.getSelectedIndex());
         }
@@ -595,8 +609,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       errorComponent = filenameField;
     }
     else if ((ruleString == null) || (ruleString.length() == 0)){
-      errorMessage = "You must specify the logging condition";
-      errorComponent = conditionField;
+      ruleString = "true";
+      conditionField.setText(ruleString);
     }
 
     if (errorMessage != null)
