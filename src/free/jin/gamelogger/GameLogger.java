@@ -512,7 +512,7 @@ public class GameLogger extends Plugin implements GameListener{
       out.close();
     } catch (IOException e){
         e.printStackTrace();
-        OptionPanel.error(getUIProvider(), "I/O Error", "Unable to log game:\n" + e.getMessage());
+        OptionPanel.error("I/O Error", "Unable to log game:\n" + e.getMessage());
       }
   }
 
