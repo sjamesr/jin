@@ -182,9 +182,9 @@ public class BackgroundChooser extends JDialog{
     closeButtonPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
     closeButtonPanel.add(closeButton);
 
-    contentPane.add(BorderLayout.NORTH, mainPanel);
-    contentPane.add(BorderLayout.CENTER, new JSeparator());
-    contentPane.add(BorderLayout.SOUTH, closeButtonPanel);
+    contentPane.add(mainPanel, BorderLayout.NORTH);
+    contentPane.add(new JSeparator(), BorderLayout.CENTER);
+    contentPane.add(closeButtonPanel, BorderLayout.SOUTH);
 
     pickColor.addActionListener(new ActionListener(){
 

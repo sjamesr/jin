@@ -336,11 +336,11 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
     defaultSettingsPanel = new CategoryPanel("Default Settings", defaultSettingsChooserPanel, new String[]{""});
     defaultSettingsPanel.setLayout(new BorderLayout(5, 5));
-    defaultSettingsPanel.add(BorderLayout.CENTER, defaultSettingsChooserPanel);
+    defaultSettingsPanel.add(defaultSettingsChooserPanel, BorderLayout.CENTER);
     JPanel selectionColorPanel = new JPanel(new GridLayout(1, 2, 5, 5));
     selectionColorPanel.add(selectionColorButton);
     selectionColorPanel.add(selectedColorButton);
-    defaultSettingsPanel.add(BorderLayout.SOUTH, selectionColorPanel);
+    defaultSettingsPanel.add(selectionColorPanel, BorderLayout.SOUTH);
 
     addCategoryPanel(defaultSettingsPanel);
     selectionColorButton.addChangeListener(settingsChangeListener);
@@ -385,7 +385,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         TextStyleChooserPanel textStyleChooserPanel = new TextStyleChooserPanel(font, foreground, background, false);
         categoryPanel = new CategoryPanel(categoryName, textStyleChooserPanel, categories);
         categoryPanel.setLayout(new BorderLayout());
-        categoryPanel.add(BorderLayout.CENTER, textStyleChooserPanel);
+        categoryPanel.add(textStyleChooserPanel, BorderLayout.CENTER);
       }
 
       addCategoryPanel(categoryPanel);
@@ -464,8 +464,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     JLabel textTypeLabel = new JLabel("Text type", JLabel.CENTER);
     textTypeLabel.setDisplayedMnemonic('t');
     textTypeLabel.setLabelFor(categoryList);
-    listPanel.add(BorderLayout.NORTH, textTypeLabel);
-    listPanel.add(BorderLayout.CENTER, scrollPane);
+    listPanel.add(textTypeLabel, BorderLayout.NORTH);
+    listPanel.add(scrollPane, BorderLayout.CENTER);
 
     categoryList.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
@@ -474,8 +474,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       }
     });
 
-    add(BorderLayout.WEST, listPanel);
-    add(BorderLayout.CENTER, categoryPanelHolder);
+    add(listPanel, BorderLayout.WEST);
+    add(categoryPanelHolder, BorderLayout.CENTER);
 
     // The call propagates to the registered selection listener which sets the current panel properly
     categoryList.setSelectedIndex(0);
@@ -492,7 +492,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     categoryPanelHolder.removeAll();
     currentCategoryPanel = panel;
     if (currentCategoryPanel != null){
-      categoryPanelHolder.add(BorderLayout.CENTER, currentCategoryPanel);
+      categoryPanelHolder.add(currentCategoryPanel, BorderLayout.CENTER);
       invalidate();
       validate();
       repaint(); // sigh

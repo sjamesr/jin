@@ -207,10 +207,10 @@ public class FontSelectorPanel extends JPanel{
     JLabel fontNameLabel = new JLabel("Font name", JLabel.CENTER);
     fontNameLabel.setDisplayedMnemonic('n');
     fontNameLabel.setLabelFor(fontNameField);
-    fontNameLabelAndField.add(BorderLayout.NORTH, fontNameLabel);
-    fontNameLabelAndField.add(BorderLayout.SOUTH, fontNameField);
-    fontNamePanel.add(BorderLayout.NORTH, fontNameLabelAndField);
-    fontNamePanel.add(BorderLayout.CENTER, fontNamesListScrollPane);
+    fontNameLabelAndField.add(fontNameLabel, BorderLayout.NORTH);
+    fontNameLabelAndField.add(fontNameField, BorderLayout.SOUTH);
+    fontNamePanel.add(fontNameLabelAndField, BorderLayout.NORTH);
+    fontNamePanel.add(fontNamesListScrollPane, BorderLayout.CENTER);
 
     JPanel fontSizePanel = new JPanel(new BorderLayout());
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
@@ -218,13 +218,13 @@ public class FontSelectorPanel extends JPanel{
     JLabel fontSizeLabel = new JLabel("Font size", JLabel.CENTER);
     fontSizeLabel.setDisplayedMnemonic('s');
     fontSizeLabel.setLabelFor(fontSizeField);
-    fontSizeLabelAndField.add(BorderLayout.NORTH, fontSizeLabel);
-    fontSizeLabelAndField.add(BorderLayout.SOUTH, fontSizeField);
-    fontSizePanel.add(BorderLayout.NORTH, fontSizeLabelAndField);
-    fontSizePanel.add(BorderLayout.CENTER, fontSizesListScrollPane);
+    fontSizeLabelAndField.add(fontSizeLabel, BorderLayout.NORTH);
+    fontSizeLabelAndField.add(fontSizeField, BorderLayout.SOUTH);
+    fontSizePanel.add(fontSizeLabelAndField, BorderLayout.NORTH);
+    fontSizePanel.add(fontSizesListScrollPane, BorderLayout.CENTER);
 
-    topPanel.add(BorderLayout.CENTER, fontNamePanel);
-    topPanel.add(BorderLayout.EAST, fontSizePanel);
+    topPanel.add(fontNamePanel, BorderLayout.CENTER);
+    topPanel.add(fontSizePanel, BorderLayout.EAST);
 
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
 
@@ -232,8 +232,8 @@ public class FontSelectorPanel extends JPanel{
     checkBoxesPanel.add(boldCheckBox);
     checkBoxesPanel.add(italicCheckBox);
 
-    bottomPanel.add(BorderLayout.WEST, checkBoxesPanel);
-    bottomPanel.add(BorderLayout.CENTER, previewPanelHolder);
+    bottomPanel.add(checkBoxesPanel, BorderLayout.WEST);
+    bottomPanel.add(previewPanelHolder, BorderLayout.CENTER);
 
     add(topPanel);
     add(Box.createVerticalStrut(10));
@@ -340,7 +340,7 @@ public class FontSelectorPanel extends JPanel{
 
     previewPanel = component;
     if (previewPanel != null)
-      previewPanelHolder.add(BorderLayout.CENTER, previewPanel);
+      previewPanelHolder.add(previewPanel, BorderLayout.CENTER);
   }
 
 

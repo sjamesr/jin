@@ -142,8 +142,8 @@ public class TextStyleChooserPanel extends JPanel{
     if (backgroundChooser != null)
       colorChooserPanel.add(backgroundChooser);
 
-    add(BorderLayout.CENTER, fontSelector);
-    add(BorderLayout.SOUTH, colorChooserPanel);
+    add(fontSelector, BorderLayout.CENTER);
+    add(colorChooserPanel, BorderLayout.SOUTH);
   }
 
 

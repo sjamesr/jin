@@ -102,12 +102,12 @@ public class JinRootPane extends JRootPane{
     String dragMode = Jin.getProperty("desktop.dragMode","outline");
     desktop.putClientProperty("JDesktopPane.dragMode", dragMode);
 
-    contentPane.add(BorderLayout.CENTER, desktop);
+    contentPane.add(desktop, BorderLayout.CENTER);
 
     statusbar = new JPanel();
     statusbar.setLayout(new BoxLayout(statusbar, BoxLayout.X_AXIS));
     statusbar.setBorder(new MatteBorder(1, 0, 0, 0, Color.white));
-    contentPane.add(BorderLayout.SOUTH, statusbar);
+    contentPane.add(statusbar, BorderLayout.SOUTH);
 
     return contentPane;
   }

@@ -96,7 +96,7 @@ public class ColorChooserButton extends JComponent implements ActionListener{
     button = new JButton(text, new SolidColorIcon(iconSize, initialColor));
 
     setLayout(new BorderLayout());
-    add(BorderLayout.CENTER, button);
+    add(button, BorderLayout.CENTER);
 
     button.setHorizontalTextPosition(JButton.LEADING);
     button.setDefaultCapable(false);

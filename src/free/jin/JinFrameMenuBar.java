@@ -421,11 +421,11 @@ public class JinFrameMenuBar extends JMenuBar{
       final PreferencesPanel prefPanel = targetPlugin.getPreferencesUI();
       JPanel prefWrapperPanel = new JPanel(new BorderLayout());
       prefWrapperPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-      prefWrapperPanel.add(BorderLayout.CENTER, prefPanel);
-      dialog.getContentPane().add(BorderLayout.CENTER, prefWrapperPanel);
+      prefWrapperPanel.add(prefPanel, BorderLayout.CENTER);
+      dialog.getContentPane().add(prefWrapperPanel, BorderLayout.CENTER);
 
       JPanel bottomPanel = new JPanel(new BorderLayout());
-      bottomPanel.add(BorderLayout.CENTER, new JSeparator(JSeparator.HORIZONTAL));
+      bottomPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.CENTER);
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
       JButton okButton = new JButton("OK");
@@ -445,7 +445,7 @@ public class JinFrameMenuBar extends JMenuBar{
       buttonPanel.add(okButton);
       buttonPanel.add(cancelButton);
       buttonPanel.add(applyButton);
-      bottomPanel.add(BorderLayout.SOUTH, buttonPanel);
+      bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
 
       okButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
@@ -467,7 +467,7 @@ public class JinFrameMenuBar extends JMenuBar{
         }
       });
 
-      dialog.getContentPane().add(BorderLayout.SOUTH, bottomPanel);
+      dialog.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
       dialog.getRootPane().setDefaultButton(okButton);
 
       AWTUtilities.centerWindow(dialog, jinFrame);

@@ -181,10 +181,10 @@ public class ChannelConsolePreferencesPanel extends ConsolePreferencesPanel{
       chNumberPanel.add(new JLabel("Channel number"));
       chNumberPanel.add(channelNumberField);
       JPanel chNumberAndSeparatorPanel = new JPanel(new BorderLayout(5, 5));
-      chNumberAndSeparatorPanel.add(BorderLayout.NORTH, chNumberPanel);
-      chNumberAndSeparatorPanel.add(BorderLayout.CENTER, new JSeparator(JSeparator.HORIZONTAL));
-      this.add(BorderLayout.NORTH, chNumberAndSeparatorPanel);
-      this.add(BorderLayout.CENTER, textStyleChooser);
+      chNumberAndSeparatorPanel.add(chNumberPanel, BorderLayout.NORTH);
+      chNumberAndSeparatorPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.CENTER);
+      this.add(chNumberAndSeparatorPanel, BorderLayout.NORTH);
+      this.add(textStyleChooser, BorderLayout.CENTER);
     }
 
 

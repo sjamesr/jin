@@ -118,8 +118,8 @@ public class UserImageInternalFrame extends JInternalFrame{
 
     imagePanel.add(new ImageComponent());
 
-    getContentPane().add(BorderLayout.CENTER, imagePanel);
-    getContentPane().add(BorderLayout.SOUTH, submitButton);
+    getContentPane().add(imagePanel, BorderLayout.CENTER);
+    getContentPane().add(submitButton, BorderLayout.SOUTH);
 
     submitButton.addActionListener(new ActionListener(){
 

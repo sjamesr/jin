@@ -28,22 +28,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Keymap;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Utilities;
-import java.util.StringTokenizer;
 import java.util.Vector;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.IOException;
-import free.util.BrowserControl;
-import java.util.Properties;
-import java.awt.peer.*;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.awt.image.ColorModel;
-import java.awt.datatransfer.Clipboard;
-import java.net.URL;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 
 
 /**
