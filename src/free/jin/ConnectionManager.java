@@ -21,9 +21,6 @@
 
 package free.jin;
 
-import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import free.jin.plugin.PluginStartException;
 import free.util.Utilities;
 

@@ -26,7 +26,6 @@ import free.jin.Preferences;
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
-import free.jin.plugin.Plugin;
 
 
 /**

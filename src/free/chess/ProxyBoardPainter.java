@@ -21,7 +21,6 @@
 
 package free.chess;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Component;
 

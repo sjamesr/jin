@@ -35,8 +35,6 @@ import javax.swing.event.ListSelectionListener;
 import free.jin.DialogPanel;
 import free.jin.UIProvider;
 import free.jin.OptionPanel;
-import free.util.swing.SwingUtils;
-import free.util.AWTUtilities;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedTableColumn;
 import free.workarounds.FixedJTable;
@@ -120,8 +118,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
      * The available variable types.
      */
 
-    private final String [] VAR_TYPES = new String[]{"String", "Integer", "Boolean", "Real"};
-
+    private final String [] varTypes = new String[]{"String", "Integer", "Boolean", "Real"};
 
     
 
@@ -156,7 +153,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
     public VariablesPanel(){
       columnModel = new DefaultTableColumnModel();
-      JComboBox typeChoice = new FixedJComboBox(VAR_TYPES);
+      JComboBox typeChoice = new FixedJComboBox(varTypes);
       typeChoice.setEditable(false);
       TableColumn typeColumn = 
         new FixedTableColumn(0, 100, new DefaultTableCellRenderer(), new DefaultCellEditor(typeChoice));
@@ -172,7 +169,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       columnModel.addColumn(valueColumn);
 
       tableModel = new DefaultTableModel(1, 3);
-      tableModel.setValueAt(VAR_TYPES[0], 0, 0);
+      tableModel.setValueAt(varTypes[0], 0, 0);
 
       createUI();
     }
@@ -252,7 +249,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
 
       add.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          tableModel.addRow(new Object[]{VAR_TYPES[0], null, null});
+          tableModel.addRow(new Object[]{varTypes[0], null, null});
         }
       });
 

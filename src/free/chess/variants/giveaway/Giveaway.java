@@ -44,7 +44,7 @@ public class Giveaway extends ChesslikeGenericVariant{
    * to in Giveaway.
    */
 
-  private static final ChessPiece [] whitePromotionTargets = 
+  private static final ChessPiece [] WHITE_PROMOTION_TARGETS = 
     new ChessPiece[]{ChessPiece.WHITE_QUEEN, ChessPiece.WHITE_ROOK, 
                      ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT, ChessPiece.WHITE_KING};
 
@@ -56,7 +56,7 @@ public class Giveaway extends ChesslikeGenericVariant{
    * to in Giveaway.
    */
 
-  private static final ChessPiece [] blackPromotionTargets = 
+  private static final ChessPiece [] BLACK_PROMOTION_TARGETS = 
     new ChessPiece[]{ChessPiece.BLACK_QUEEN, ChessPiece.BLACK_ROOK, 
                      ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT, ChessPiece.BLACK_KING};
 
@@ -67,7 +67,7 @@ public class Giveaway extends ChesslikeGenericVariant{
    * The sole instance of this class.
    */
 
-  private static final Giveaway instance = new Giveaway();
+  private static final Giveaway INSTANCE = new Giveaway();
 
 
 
@@ -76,7 +76,7 @@ public class Giveaway extends ChesslikeGenericVariant{
    */
 
   public static Giveaway getInstance(){
-    return instance;
+    return INSTANCE;
   }
 
 
@@ -105,10 +105,10 @@ public class Giveaway extends ChesslikeGenericVariant{
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
 
     if ((endingSquare.getRank()==7)&&(movingPiece==ChessPiece.WHITE_PAWN))
-      return (Piece [])whitePromotionTargets.clone();
+      return (Piece [])WHITE_PROMOTION_TARGETS.clone();
 
     if ((endingSquare.getRank()==0)&&(movingPiece==ChessPiece.BLACK_PAWN))
-      return (Piece [])blackPromotionTargets.clone();
+      return (Piece [])BLACK_PROMOTION_TARGETS.clone();
 
     return null;
   }

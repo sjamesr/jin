@@ -22,7 +22,6 @@
 package free.util;
 
 import java.io.InputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 

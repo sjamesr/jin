@@ -50,7 +50,7 @@ abstract class ScriptDialog extends JDialog{
    * The default string we show in the event type choice.
    */
 
-  private static final String selectEventTypeString = "Select Event Type";
+  private static final String SELECT_EVENT_TYPE_STRING = "Select Event Type";
 
 
 
@@ -141,7 +141,7 @@ abstract class ScriptDialog extends JDialog{
 
   protected final void createUI(){
     String defaultScriptName = (templateScript == null ? "" : templateScript.getName());
-    String defaultEventType = (templateScript == null ? selectEventTypeString : templateScript.getEventType());
+    String defaultEventType = (templateScript == null ? SELECT_EVENT_TYPE_STRING : templateScript.getEventType());
     String [] defaultSelectedSubtypes = 
       (templateScript == null ? new String[0] : templateScript.getEventSubtypes());
 
@@ -151,7 +151,7 @@ abstract class ScriptDialog extends JDialog{
 
     final JComboBox eventTypeChoice = new FixedJComboBox(eventTypes);
     eventTypeChoice.setEditable(false);
-    eventTypeChoice.addItem(selectEventTypeString);
+    eventTypeChoice.addItem(SELECT_EVENT_TYPE_STRING);
     eventTypeChoice.setSelectedItem(defaultEventType);
 
     final JPanel subtypesPanel = new JPanel(new TableLayout(2));
@@ -288,7 +288,7 @@ abstract class ScriptDialog extends JDialog{
           return;
         }
 
-        if (selectEventTypeString.equals(eventType)){
+        if (SELECT_EVENT_TYPE_STRING.equals(eventType)){
           JOptionPane.showMessageDialog(ScriptDialog.this, "You must specify an event type", "Missing Option", JOptionPane.ERROR_MESSAGE);
           return;
         }
@@ -333,7 +333,7 @@ abstract class ScriptDialog extends JDialog{
   private void updateSubtypesPanel(JPanel panel, String eventType, String [] selectedSubtypes){
     panel.removeAll();
 
-    if (!selectEventTypeString.equals(eventType)){
+    if (!SELECT_EVENT_TYPE_STRING.equals(eventType)){
       String [] subtypes = scripter.getEventSubtypes(eventType);
       if (subtypes != null){
         for (int i = 0; i < subtypes.length; i++){

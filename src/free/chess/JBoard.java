@@ -27,7 +27,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
 import java.util.Vector;
 import free.util.PaintHook;
 import free.util.Utilities;
@@ -232,13 +231,6 @@ public class JBoard extends JComponent{
   
   
   
-  /**
-   * Our listener list.
-   */
-   
-  private final EventListenerList listenerList = new EventListenerList();
-
-
 
   /**
    * The ChangeListener to the Position.

@@ -30,7 +30,6 @@ import java.util.Vector;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import javax.swing.JOptionPane;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.PluginStartException;
@@ -76,7 +75,7 @@ public class GameLogger extends Plugin implements GameListener{
    * The DateFormat used for formatting the Date pgn tag.
    */
 
-  private static final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+  private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
 
 
@@ -85,7 +84,7 @@ public class GameLogger extends Plugin implements GameListener{
    * The DateFormat used for formatting the Time pgn tag.
    */
 
-  private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+  private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
 
 
@@ -444,14 +443,14 @@ public class GameLogger extends Plugin implements GameListener{
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)));
       writeTag(out, "Event", "Casual Game");
       writeTag(out, "Site", getUser().getServer().getLongName());
-      writeTag(out, "Date", dateFormat.format(gameInfo.gameStartDate));
+      writeTag(out, "Date", DATE_FORMAT.format(gameInfo.gameStartDate));
       writeTag(out, "Round", "-");
       writeTag(out, "White", game.getWhiteName());
       writeTag(out, "Black", game.getBlackName());
       writeTag(out, "WhiteElo", whiteRatingString);
       writeTag(out, "BlackElo", blackRatingString);
       writeTag(out, "Result", resultString);
-      writeTag(out, "Time", timeFormat.format(gameInfo.gameStartDate));
+      writeTag(out, "Time", TIME_FORMAT.format(gameInfo.gameStartDate));
       if (!game.isTimeOdds())
         writeTag(out, "TimeControl", game.getWhiteTime()/1000+"+"+game.getWhiteInc());
       writeTag(out, "Mode", "ICS");

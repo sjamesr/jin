@@ -36,7 +36,7 @@ public class Ivar{
    * Maps ivar indices to ivars.
    */
 
-  private final static Hashtable indexToIvar = new Hashtable();
+  private final static Hashtable INDEX_TO_IVAR = new Hashtable();
 
 
 
@@ -44,7 +44,7 @@ public class Ivar{
    * Maps ivar names to ivars.
    */
 
-  private final static Hashtable nameToIvar = new Hashtable();
+  private final static Hashtable NAME_TO_IVAR = new Hashtable();
 
 
 
@@ -363,15 +363,15 @@ public class Ivar{
     this.name = name;
     this.index = index;
 
-    Object ivar = indexToIvar.put(new Integer(index), this);
+    Object ivar = INDEX_TO_IVAR.put(new Integer(index), this);
     if (ivar != null){
-      indexToIvar.put(new Integer(index), ivar);
+      INDEX_TO_IVAR.put(new Integer(index), ivar);
       throw new IllegalArgumentException("The index "+index+" is already taken by "+ivar);
     }
 
-    ivar = nameToIvar.put(name, this);
+    ivar = NAME_TO_IVAR.put(name, this);
     if (ivar != null){
-      nameToIvar.put(name, ivar);
+      NAME_TO_IVAR.put(name, ivar);
       throw new IllegalArgumentException("The name "+name+" is already taken by "+ivar);
     }
   }
@@ -404,7 +404,7 @@ public class Ivar{
    */
 
   public static Ivar getByIndex(int index){
-    return (Ivar)indexToIvar.get(new Integer(index));
+    return (Ivar)INDEX_TO_IVAR.get(new Integer(index));
   }
 
 
@@ -416,7 +416,7 @@ public class Ivar{
   public static Ivar getByName(String name){
     name = name.toLowerCase();
 
-    return (Ivar)nameToIvar.get(name);
+    return (Ivar)NAME_TO_IVAR.get(name);
   }
 
 

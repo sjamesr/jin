@@ -524,15 +524,7 @@ public class Scripter extends Plugin{
     private final Vector scripts = new Vector();
 
 
-
-    /**
-     * An empty array.
-     */
-
-    private final String [] EMPTY_ARRAY = new String[0];
-
-
-
+    
     /**
      * The constructor. If we don't do this, jikes declares the constructor with
      * default access for some reason.

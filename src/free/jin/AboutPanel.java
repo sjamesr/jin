@@ -23,9 +23,6 @@ package free.jin;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import free.util.WindowDisposingListener;
-import free.util.swing.SwingUtils;
 import free.util.IOUtilities;
 import java.util.StringTokenizer;
 

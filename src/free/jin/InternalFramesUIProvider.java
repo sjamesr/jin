@@ -162,11 +162,11 @@ public class InternalFramesUIProvider implements UIProvider{
 
     int layoutStyle;
     if ("scale".equals(layout))
-      layoutStyle = desktop.SCALE;
+      layoutStyle = AdvancedJDesktopPane.SCALE;
     else if ("tile".equals(layout))
-      layoutStyle = desktop.TILE;
+      layoutStyle = AdvancedJDesktopPane.TILE;
     else
-      layoutStyle = desktop.CENTER;
+      layoutStyle = AdvancedJDesktopPane.CENTER;
 
     if (bgColor != null)
       desktop.setBackground(bgColor);

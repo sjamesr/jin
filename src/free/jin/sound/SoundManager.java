@@ -49,7 +49,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Maps sound filenames to AudioClips loaded from those filenames.
    */
 
-  protected final static Hashtable filenamesToAudioClips = new Hashtable();
+  protected final static Hashtable FILENAMES_TO_AUDIO_CLIPS = new Hashtable();
 
 
   
@@ -229,11 +229,11 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
         String pattern = prefs.getString(type + "-pattern-" + i);
         Pattern regex = new Pattern(pattern);
         
-        if (!filenamesToAudioClips.containsKey(filename)){
+        if (!FILENAMES_TO_AUDIO_CLIPS.containsKey(filename)){
           URL url = getClass().getResource(filename);
           if (url == null)
             continue;
-          filenamesToAudioClips.put(filename, new AudioClip(url));
+          FILENAMES_TO_AUDIO_CLIPS.put(filename, new AudioClip(url));
         }
 
         map.put(regex, filename);
@@ -313,7 +313,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   protected void unloadSounds(){
     chatPatternsToFilenames.clear();
-    filenamesToAudioClips.clear();
+    FILENAMES_TO_AUDIO_CLIPS.clear();
   }
 
 
@@ -338,7 +338,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
       Matcher matcher = regex.matcher(chatMessageType);
       if (matcher.find()){
         String filename = (String)chatPatternsToFilenames.get(regex);
-        AudioClip clip = (AudioClip)filenamesToAudioClips.get(filename);
+        AudioClip clip = (AudioClip)FILENAMES_TO_AUDIO_CLIPS.get(filename);
         clip.play();
       }
     } 
@@ -363,7 +363,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
       Matcher matcher = regex.matcher(line);
       if (matcher.find()){
         String filename = (String)textPatternsToFilenames.get(regex);
-        AudioClip clip = (AudioClip)filenamesToAudioClips.get(filename);
+        AudioClip clip = (AudioClip)FILENAMES_TO_AUDIO_CLIPS.get(filename);
         clip.play();
       }
     } 

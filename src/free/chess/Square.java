@@ -38,9 +38,7 @@ public class Square{
    * The pool of unique immutable instances of Square.
    */
 
-  private static final Square [][] pool = new Square[8][8];
-
-
+  private static final Square [][] POOL = new Square[8][8];
 
 
 
@@ -52,15 +50,11 @@ public class Square{
 
 
 
-
-
   /**
    * The rank of the square.
    */
 
   private final int rank;
-
-
 
 
 
@@ -74,12 +68,6 @@ public class Square{
     this.file = (byte)file;
     this.rank = (byte)rank;
   }
-
-
-
-
-
-
 
 
 
@@ -98,13 +86,10 @@ public class Square{
     if ((file < 0) || (file > 7) || (rank<0) || (rank > 7))
       throw new SquareFormatException("file and rank must be in the range [0-7] "+
                                       "(file:" + file + " rank:" + rank + ")");
-    if (pool[file][rank] == null)
-      pool[file][rank] = new Square(file,rank);
-    return pool[file][rank];
+    if (POOL[file][rank] == null)
+      POOL[file][rank] = new Square(file,rank);
+    return POOL[file][rank];
   }
-
-
-
 
 
 
@@ -131,10 +116,6 @@ public class Square{
 
 
 
-
-
-
-
   /**
    * Returns the file of this Square, a value in the range [0-7].
    */
@@ -145,11 +126,6 @@ public class Square{
 
 
 
-
-
-
-
-
   /**
    * Returns the rank of this Square, a value in the range [0-7].
    */ 
@@ -157,11 +133,6 @@ public class Square{
   public int getRank(){
     return rank;
   }
-
-
-
-
-
 
 
 
@@ -176,10 +147,6 @@ public class Square{
 
 
 
-
-
-
-
   /**
    * Returns a character representing the rank of this Square.
    * The returned character will be in the range ['1'-'8'].
@@ -188,11 +155,6 @@ public class Square{
   public char getRankChar(){
     return (char)('1'+getRank());
   }
-
-
-
-
-
 
 
 
@@ -208,7 +170,6 @@ public class Square{
     buff[1] = getRankChar();
     return new String(buff);
   }
-
 
 
 
@@ -235,7 +196,6 @@ public class Square{
 
 
 
-
   /**
    * Returns <code>true</code> if this square is the same as the square with
    * the given file and rank.
@@ -246,5 +206,5 @@ public class Square{
   }
 
 
+  
 }
-

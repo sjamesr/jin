@@ -29,14 +29,11 @@ import jregex.*;
 import javax.swing.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import free.jin.Connection;
 import free.jin.Preferences;
-import free.jin.plugin.Plugin;
 import free.util.BrowserControl;
-import free.workarounds.FixUtils;
 
 
 /**
@@ -128,7 +125,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting URLs.
    */
 
-  private static final Pattern urlRegex = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"!?]");
+  private static final Pattern URL_REGEX = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"!?]");
 
 
 
@@ -136,7 +133,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting emails.
    */
 
-  private static final Pattern emailRegex = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"?]+");
+  private static final Pattern EMAIL_REGEX = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"?]+");
 
 
   
@@ -677,7 +674,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     AttributeSet emailAttributes = attributesForTextType("link.email");
     AttributeSet commandAttributes = attributesForTextType("link.command");
 
-    MatchIterator urlMatches = urlRegex.matcher(text).findAll();
+    MatchIterator urlMatches = URL_REGEX.matcher(text).findAll();
     while (urlMatches.hasMore()){
       MatchResult result = urlMatches.nextMatch();
       int matchStart = result.start();
@@ -693,7 +690,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       outputComponent.addLink(link);
     }
 
-    MatchIterator emailMatches = emailRegex.matcher(text).findAll();
+    MatchIterator emailMatches = EMAIL_REGEX.matcher(text).findAll();
     while (emailMatches.hasMore()){
       MatchResult result = emailMatches.nextMatch();
       int matchStart = result.start();

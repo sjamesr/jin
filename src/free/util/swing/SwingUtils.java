@@ -41,7 +41,7 @@ public class SwingUtils{
    * The ESCAPE keystroke we use to close a dialog/window.
    */
 
-  private static final KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);  
+  private static final KeyStroke CLOSE_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);  
 
 
 
@@ -56,7 +56,7 @@ public class SwingUtils{
     Window window = SwingUtilities.windowForComponent(rootPane);
 
     ActionListener closer = new WindowDisposingListener(window);
-    rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    rootPane.registerKeyboardAction(closer, CLOSE_KEYSTROKE, JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
 
 

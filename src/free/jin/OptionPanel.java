@@ -105,7 +105,7 @@ public class OptionPanel extends DialogPanel{
    * The standard order of the predefined options.
    */
 
-  private static final Object [] optionOrder = new Object[]{OK, YES, NO, CANCEL};
+  private static final Object [] OPTION_ORDER = new Object[]{OK, YES, NO, CANCEL};
 
 
 
@@ -280,11 +280,11 @@ public class OptionPanel extends DialogPanel{
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 2));
     buttonPanel.setOpaque(false);
 
-    for (int i = 0; i < optionOrder.length; i++){
-      if (!Utilities.contains(options, optionOrder[i]))
+    for (int i = 0; i < OPTION_ORDER.length; i++){
+      if (!Utilities.contains(options, OPTION_ORDER[i]))
         continue;
 
-      Object option = optionOrder[i];
+      Object option = OPTION_ORDER[i];
       JButton button = new JButton(option.toString());
       button.addActionListener(new ClosingListener(option));
       if (option == defaultOption)

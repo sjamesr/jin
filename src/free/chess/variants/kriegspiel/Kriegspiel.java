@@ -33,32 +33,12 @@ import free.chess.*;
 public class Kriegspiel implements WildVariant{
 
 
-  /**
-   * An array containing WHITE_QUEEN, WHITE_ROOK, WHITE_BISHOP and WHITE_KNIGHT.
-   * These are the pieces to which a white pawn can be promoted.
-   */
-
-  private static final ChessPiece [] whitePromotionTargets = new ChessPiece[]{ChessPiece.WHITE_QUEEN,
-    ChessPiece.WHITE_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT};
-
-
-
-  /**
-   * An array containing BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP and BLACK_KNIGHT.
-   * These are the pieces to which a black pawn can be promoted.
-   */
-
-  private static final ChessPiece [] blackPromotionTargets = new ChessPiece[]{ChessPiece.BLACK_QUEEN,
-    ChessPiece.BLACK_ROOK, ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT};
-
-
-
 
   /**
    * The sole instance of this class.
    */
 
-  private static Kriegspiel instance = new Kriegspiel();
+  private static final Kriegspiel INSTANCE = new Kriegspiel();
 
 
 
@@ -68,7 +48,7 @@ public class Kriegspiel implements WildVariant{
    */
 
   public static Kriegspiel getInstance(){
-    return instance;
+    return INSTANCE;
   }
 
 

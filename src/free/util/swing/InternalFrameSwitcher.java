@@ -26,8 +26,6 @@ import java.beans.PropertyVetoException;
 import java.util.Vector;
 import java.awt.event.ContainerListener;
 import java.awt.event.ContainerEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyAdapter;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.InternalFrameEvent;
 

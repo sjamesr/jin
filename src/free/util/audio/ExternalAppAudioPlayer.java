@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2004 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -24,7 +24,6 @@ package free.util.audio;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
-import java.io.File;
 import free.util.BlockingQueue;
 import free.util.IOUtilities;
 

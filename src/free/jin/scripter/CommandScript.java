@@ -24,7 +24,6 @@ package free.jin.scripter;
 import jregex.*;
 import bsh.EvalError;
 import bsh.Interpreter;
-import free.jin.plugin.PluginContext;
 import free.jin.Connection;
 import free.jin.event.JinEvent;
 

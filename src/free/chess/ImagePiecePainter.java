@@ -39,7 +39,7 @@ public class ImagePiecePainter implements PiecePainter{
    * The ImageFilter we use to create shaded images.
    */
 
-  private static final ImageFilter shadingFilter = new ShadingFilter();
+  private static final ImageFilter SHADING_FILTER = new ShadingFilter();
 
 
 
@@ -118,7 +118,7 @@ public class ImagePiecePainter implements PiecePainter{
 
   protected Image shadeImage(Image image){
     Image shadedImage = Toolkit.getDefaultToolkit().createImage(
-      new FilteredImageSource(image.getSource(), shadingFilter));
+      new FilteredImageSource(image.getSource(), SHADING_FILTER));
     return shadedImage;
   }
 

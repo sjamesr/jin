@@ -22,9 +22,7 @@
 package free.jin.plugin;
 
 import free.jin.*;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import free.util.ArrayEnumeration;
 import free.util.Utilities;
 
 

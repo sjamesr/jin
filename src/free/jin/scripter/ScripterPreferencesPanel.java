@@ -336,7 +336,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      * Text explaining the "commands" script type.
      */
 
-    private static final String commandsText =
+    private static final String COMMANDS_TEXT =
       "Allows specifying a condition and a list of commands\n"+
       "which will be sent to the server when the condition is met.\n"+
       "This is the simplest script type and requires no previous\n"+
@@ -348,7 +348,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      * Text explaining the "beanshell" script type.
      */
 
-    private static final String beanshellText =
+    private static final String BEANSHELL_TEXT =
       "Allows specifying a BeanShell script which will be run\n"+
       "when a certain event occurs. BeanShell is essentially a Java\n"+
       "source interpreter with certain scripting features. BeanShell\n"+
@@ -364,7 +364,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      * area.
      */
      
-    private final String [] expTexts = new String[]{commandsText, beanshellText};
+    private final String [] expTexts = new String[]{COMMANDS_TEXT, BEANSHELL_TEXT};
 
 
 
@@ -470,9 +470,9 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
 
           String text = null;
           if ("commands".equals(scriptType))
-            text = commandsText;
+            text = COMMANDS_TEXT;
           else if ("beanshell".equals(scriptType))
-            text = beanshellText;
+            text = BEANSHELL_TEXT;
 
           typeExplanationTextArea.setText(text);
         }

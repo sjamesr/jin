@@ -95,7 +95,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The button border for the offered state.
    */
 
-  private static final Border offeredStateBorder = 
+  private static final Border OFFERED_STATE_BORDER = 
     new EmptyBorder(STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE);
 
 
@@ -103,7 +103,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The button border for the offer state.
    */
 
-  private static final Border offerStateBorder = 
+  private static final Border OFFER_STATE_BORDER = 
     new EmptyBorder(STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE);
 
 
@@ -112,7 +112,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The button border for the claim state.
    */
 
-  private static final Border claimStateBorder =
+  private static final Border CLAIM_STATE_BORDER =
     new LineBorder(Color.orange, STATE_BORDER_SIZE);
 
 
@@ -121,7 +121,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The button border for the accept state.
    */
 
-  private static final Border acceptStateBorder = 
+  private static final Border ACCEPT_STATE_BORDER = 
     new LineBorder(Color.green.darker(), STATE_BORDER_SIZE);
 
 
@@ -474,22 +474,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     
     switch (state){
       case OFFERED_STATE:{
-        drawButtonPanel.setBorder(offeredStateBorder);
+        drawButtonPanel.setBorder(OFFERED_STATE_BORDER);
         break;
       }
       case OFFER_STATE:{
         drawButton.setToolTipText("Offer a draw");
-        drawButtonPanel.setBorder(offerStateBorder);
+        drawButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
         drawButton.setToolTipText("Claim a draw");
-        drawButtonPanel.setBorder(claimStateBorder);
+        drawButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
         drawButton.setToolTipText("Accept a draw");
-        drawButtonPanel.setBorder(acceptStateBorder);
+        drawButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
@@ -512,22 +512,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     switch (state){
       case OFFERED_STATE:{
-        abortButtonPanel.setBorder(offeredStateBorder);
+        abortButtonPanel.setBorder(OFFERED_STATE_BORDER);
         break;
       }
       case OFFER_STATE:{
         abortButton.setToolTipText("Offer to abort the game");
-        abortButtonPanel.setBorder(offerStateBorder);
+        abortButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
         abortButton.setToolTipText("Abort the game");
-        abortButtonPanel.setBorder(claimStateBorder);
+        abortButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
         abortButton.setToolTipText("Agree to abort the game");
-        abortButtonPanel.setBorder(acceptStateBorder);
+        abortButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
@@ -550,22 +550,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     switch (state){
       case OFFERED_STATE:{
-        adjournButtonPanel.setBorder(offeredStateBorder);
+        adjournButtonPanel.setBorder(OFFERED_STATE_BORDER);
         break;
       }
       case OFFER_STATE:{
         adjournButton.setToolTipText("Offer to adjourn the game");
-        adjournButtonPanel.setBorder(offerStateBorder);
+        adjournButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
         adjournButton.setToolTipText("Adjourn the game");
-        adjournButtonPanel.setBorder(claimStateBorder);
+        adjournButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
         adjournButton.setToolTipText("Agree to adjourn the game");
-        adjournButtonPanel.setBorder(acceptStateBorder);
+        adjournButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
@@ -587,22 +587,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     switch (state){
       case OFFERED_STATE:{
-        takeback1ButtonPanel.setBorder(offeredStateBorder);
+        takeback1ButtonPanel.setBorder(OFFERED_STATE_BORDER);
         break;
       }
       case OFFER_STATE:{
         takeback1Button.setToolTipText("Offer to take back a move");
-        takeback1ButtonPanel.setBorder(offerStateBorder);
+        takeback1ButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
         takeback1Button.setToolTipText("Take back a move");
-        takeback1ButtonPanel.setBorder(claimStateBorder);
+        takeback1ButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
         takeback1Button.setToolTipText("Agree to take back a move");
-        takeback1ButtonPanel.setBorder(acceptStateBorder);
+        takeback1ButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
@@ -627,22 +627,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     switch (state){
       case OFFERED_STATE:{
-        takebackNButtonPanel.setBorder(offeredStateBorder);
+        takebackNButtonPanel.setBorder(OFFERED_STATE_BORDER);
         break;
       }
       case OFFER_STATE:{
         takebackNButton.setToolTipText("Offer to take back " + plyCount + " moves");
-        takebackNButtonPanel.setBorder(offerStateBorder);
+        takebackNButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
         takebackNButton.setToolTipText("Take back " + plyCount + " moves");
-        takebackNButtonPanel.setBorder(claimStateBorder);
+        takebackNButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
         takebackNButton.setToolTipText("Agree to take back " + plyCount + " moves");
-        takebackNButtonPanel.setBorder(acceptStateBorder);
+        takebackNButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:

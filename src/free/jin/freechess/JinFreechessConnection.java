@@ -337,8 +337,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Regex for matching tourney tell qtells.
    */
 
-  private static final Pattern tourneyTellPattern =
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(T(\\d+)\\): (.*)");
+  private static final Pattern TOURNEY_TELL_REGEX =
+    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\(T(\\d+)\\): (.*)");
 
 
 
@@ -348,7 +348,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
   protected boolean processQTell(String message){
     ChatEvent evt;
-    Matcher matcher = tourneyTellPattern.matcher(message);
+    Matcher matcher = TOURNEY_TELL_REGEX.matcher(message);
     if (matcher.matches()){
       String sender = matcher.group(1);
       String title = matcher.group(2);

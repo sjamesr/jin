@@ -57,7 +57,7 @@ public class ColorChooser extends JComponent implements ActionListener{
    * The icon's size.
    */
 
-  private static final Dimension iconSize = new Dimension(30, 20);
+  private static final Dimension ICON_SIZE = new Dimension(30, 20);
 
 
 
@@ -94,7 +94,7 @@ public class ColorChooser extends JComponent implements ActionListener{
    */
 
   public ColorChooser(String text, Color initialColor){
-    button = new JButton(new SolidColorRectangleIcon(iconSize, initialColor));
+    button = new JButton(new SolidColorRectangleIcon(ICON_SIZE, initialColor));
     label = new JLabel(text);
 
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -203,7 +203,7 @@ public class ColorChooser extends JComponent implements ActionListener{
 
   public void setColor(Color color){
     this.color = color;
-    button.setIcon(new SolidColorRectangleIcon(iconSize, color));
+    button.setIcon(new SolidColorRectangleIcon(ICON_SIZE, color));
     fireStateChanged();
   }
 

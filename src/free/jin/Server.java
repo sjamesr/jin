@@ -21,8 +21,6 @@
 
 package free.jin;
 
-import java.net.URL;
-
 
 /**
  * Defines the interface that needs to be implemented in order to support a

@@ -25,7 +25,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.*;
 import free.workarounds.FixedJPanel;
-import free.util.AWTUtilities;
 
 
 /**
@@ -41,7 +40,7 @@ public class FullscreenPanel extends FixedJPanel{
    * Are we running under JDK 1.3 or earlier?
    */
 
-  private static final boolean isFullscreenAPIAvailable =
+  private static final boolean IS_FULLSCREEN_API_AVAILABLE =
     (System.getProperty("java.version").compareTo("1.4") >= 0);
 
 
@@ -169,7 +168,7 @@ public class FullscreenPanel extends FixedJPanel{
   private void makeFullscreen(){
     remove(target);
 
-    if (isFullscreenAPIAvailable)
+    if (IS_FULLSCREEN_API_AVAILABLE)
       fullscreenWindow = setRealFullscreen();
     else
       fullscreenWindow = setFakeFullscreen();
@@ -257,7 +256,7 @@ public class FullscreenPanel extends FixedJPanel{
   private void makeNormal(){
     fullscreenWindow.getContentPane().remove(target);
 
-    if (isFullscreenAPIAvailable)
+    if (IS_FULLSCREEN_API_AVAILABLE)
       makeRealNormal();
     else
       makeFakeNormal();

@@ -27,7 +27,6 @@ import free.util.swing.*;
 import free.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.border.EmptyBorder;
 import java.io.IOException;
 
 

@@ -21,7 +21,6 @@
 
 package free.jin;
 
-import javax.swing.JMenu;
 import java.awt.Component;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;

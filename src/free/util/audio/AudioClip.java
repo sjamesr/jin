@@ -52,7 +52,7 @@ public class AudioClip{
    * see if they succeed.
    */
 
-  private static final String [] playerClassnames;
+  private static final String [] PLAYER_CLASSNAMES;
 
 
 
@@ -83,7 +83,7 @@ public class AudioClip{
     } catch (Exception e){
         e.printStackTrace();
       }
-    playerClassnames = classnames;
+    PLAYER_CLASSNAMES = classnames;
   }
 
 
@@ -134,8 +134,8 @@ public class AudioClip{
         return;
       }
 
-      for (int i=0;i<playerClassnames.length;i++){
-        String classname = playerClassnames[i];
+      for (int i=0;i<PLAYER_CLASSNAMES.length;i++){
+        String classname = PLAYER_CLASSNAMES[i];
         try{
           Class playerClass = Class.forName(classname);
           AudioPlayer player = (AudioPlayer)playerClass.newInstance();

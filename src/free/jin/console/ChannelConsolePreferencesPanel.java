@@ -27,7 +27,6 @@ import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.Vector;
-import java.util.StringTokenizer;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import free.util.swing.IntegerStrictPlainDocument;

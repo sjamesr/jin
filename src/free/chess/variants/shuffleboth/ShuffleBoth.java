@@ -46,7 +46,7 @@ public class ShuffleBoth extends BothSidesCastlingVariant{
    * The sole instance of this class.
    */
 
-  private static final ShuffleBoth instance = new ShuffleBoth();
+  private static final ShuffleBoth INSTANCE = new ShuffleBoth();
 
 
 
@@ -55,7 +55,7 @@ public class ShuffleBoth extends BothSidesCastlingVariant{
    */
 
   public static ShuffleBoth getInstance(){
-    return instance;
+    return INSTANCE;
   }
 
 

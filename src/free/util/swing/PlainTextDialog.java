@@ -25,7 +25,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import free.util.WindowDisposingListener;
-import free.util.AWTUtilities;
 import free.workarounds.FixedJTextArea;
   
   

@@ -82,7 +82,7 @@ public class JinMain implements JinContext{
    * The current directory. This should be the Jin directory.
    */
 
-  private static final File jinDir = new File(System.getProperty("user.dir"));
+  private static final File JIN_DIR = new File(System.getProperty("user.dir"));
 
 
 
@@ -306,14 +306,14 @@ public class JinMain implements JinContext{
   /**
    * Returns all the resources for the specified resource type. Resources are
    * assumed to be zip or jar files and are looked up in two directories:
-   * <code>jinDir/resources/resType</code> and
+   * <code>JIN_DIR/resources/resType</code> and
    * <code>prefsDir/resources/resType</code>.
    */
    
    public ClassLoader [] loadResources(String resType){
      Vector resources = new Vector();
      
-     File jinResDir = new File(new File(jinDir, "resources"), resType);
+     File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
      File userResDir = new File(new File(prefsDir, "resources"), resType);
                                 
      loadResources(jinResDir, resources);
@@ -629,7 +629,7 @@ public class JinMain implements JinContext{
 
   private DelegatingClassLoader createLibsClassLoader() throws IOException{
     DelegatingClassLoader libsLoader = new DelegatingClassLoader();
-    File libDir = new File(jinDir, "libs");
+    File libDir = new File(JIN_DIR, "libs");
     checkDirectoryExists(libDir);
 
     String [] jars = libDir.list(new ExtensionFilenameFilter(".jar"));
@@ -651,7 +651,7 @@ public class JinMain implements JinContext{
   private Server [] loadServers() throws IOException, ClassNotFoundException,
       InstantiationException, IllegalAccessException{
 
-    File serversDir = new File(jinDir, "servers");
+    File serversDir = new File(JIN_DIR, "servers");
     checkDirectoryExists(serversDir);
 
     String [] jars = serversDir.list(new ExtensionFilenameFilter(".jar"));
@@ -725,7 +725,7 @@ public class JinMain implements JinContext{
       plugins.put(servers[i], new Vector());
 
     // plugins that are shared between all users - usually the ones that come with Jin
-    loadPlugins(plugins, new File(jinDir, "plugins")); 
+    loadPlugins(plugins, new File(JIN_DIR, "plugins")); 
 
     // user specific plugins, from his own preferences directory
     loadPlugins(plugins, new File(prefsDir, "plugins"));

@@ -50,7 +50,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * These are the pieces to which a white pawn can be promoted.
    */
 
-  private static final ChessPiece [] whitePromotionTargets = new ChessPiece[]{ChessPiece.WHITE_QUEEN, ChessPiece.WHITE_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT};
+  private static final ChessPiece [] WHITE_PROMOTION_TARGETS = new ChessPiece[]{ChessPiece.WHITE_QUEEN, ChessPiece.WHITE_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT};
 
 
 
@@ -59,7 +59,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * These are the pieces to which a black pawn can be promoted.
    */
 
-  private static final ChessPiece [] blackPromotionTargets = new ChessPiece[]{ChessPiece.BLACK_QUEEN, ChessPiece.BLACK_ROOK, ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT};
+  private static final ChessPiece [] BLACK_PROMOTION_TARGETS = new ChessPiece[]{ChessPiece.BLACK_QUEEN, ChessPiece.BLACK_ROOK, ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT};
 
 
 
@@ -430,10 +430,10 @@ public class ChesslikeGenericVariant implements WildVariant{
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
 
     if ((endingSquare.getRank()==7)&&(movingPiece==ChessPiece.WHITE_PAWN))
-      return (Piece [])whitePromotionTargets.clone();
+      return (Piece [])WHITE_PROMOTION_TARGETS.clone();
 
     if ((endingSquare.getRank()==0)&&(movingPiece==ChessPiece.BLACK_PAWN))
-      return (Piece [])blackPromotionTargets.clone();
+      return (Piece [])BLACK_PROMOTION_TARGETS.clone();
 
     return null;
   }

@@ -30,8 +30,80 @@ import java.util.Enumeration;
  */
 
 public class Utilities{
+  
+  
+  
+  /**
+   * A 0-length Object array.
+   */
+   
+  public static final Object [] EMPTY_ARRAY = new Object[0];
 
 
+
+  /**
+   * A 0-length long array.
+   */
+   
+  public static final long [] EMPTY_LONG_ARRAY = new long[0];
+
+
+
+  /**
+   * A 0-length int array.
+   */
+   
+  public static final int [] EMPTY_INT_ARRAY = new int[0];
+  
+
+  
+  /**
+   * A 0-length short array.
+   */
+   
+  public static final short [] EMPTY_SHORT_ARRAY = new short[0];
+
+  
+
+  /**
+   * A 0-length byte array.
+   */
+   
+  public static final byte [] EMPTY_BYTE_ARRAY = new byte[0];
+  
+  
+  
+  /**
+   * A 0-length char array.
+   */
+   
+  public static final char [] EMPTY_CHAR_ARRAY = new char[0];
+
+
+
+  /**
+   * A 0-length double array.
+   */
+   
+  public static final double [] EMPTY_DOUBLE_ARRAY = new double[0];
+  
+
+
+  /**
+   * A 0-length float array.
+   */
+   
+  public static final float [] EMPTY_FLOAT_ARRAY = new float[0];
+
+
+
+  /**
+   * A 0-length String array.
+   */
+   
+  public static final String [] EMPTY_STRING_ARRAY = new String[0];
+  
+  
 
   /**
    * Returns <code>true</code> if the two specified objects are the same.

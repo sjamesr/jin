@@ -45,7 +45,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * The sole instance of this class.
    */
 
-  private static final FischerRandom instance = new FischerRandom();
+  private static final FischerRandom INSTANCE = new FischerRandom();
 
 
 
@@ -54,7 +54,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    */
 
   public static FischerRandom getInstance(){
-    return instance;
+    return INSTANCE;
   }
 
 

@@ -21,7 +21,6 @@
 
 package free.jin.board.fics;
 
-import javax.swing.*;
 import free.jin.board.BoardPanel;
 import free.jin.board.BoardManager;
 import free.jin.Game;

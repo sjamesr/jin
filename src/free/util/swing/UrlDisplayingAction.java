@@ -23,7 +23,6 @@ package free.util.swing;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import free.util.BrowserControl;

@@ -51,7 +51,7 @@ public class Atomic extends ChesslikeGenericVariant{
    * The sole instance of this class.
    */
 
-  private static final Atomic instance = new Atomic();
+  private static final Atomic INSTANCE = new Atomic();
 
 
 
@@ -60,7 +60,7 @@ public class Atomic extends ChesslikeGenericVariant{
    */
 
   public static Atomic getInstance(){
-    return instance;
+    return INSTANCE;
   }
 
 

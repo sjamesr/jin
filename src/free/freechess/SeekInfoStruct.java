@@ -40,7 +40,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for an unregistered player.
    */
 
-  public static int UNREGISTERED = 0x1;
+  public static final int UNREGISTERED = 0x1;
 
 
 
@@ -49,7 +49,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for a computer player.
    */
 
-  public static int COMPUTER = 0x2;
+  public static final int COMPUTER = 0x2;
 
 
 
@@ -58,7 +58,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for a GM.
    */
 
-  public static int GM = 0x4;
+  public static final int GM = 0x4;
 
 
 
@@ -67,7 +67,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for an IM.
    */
 
-  public static int IM = 0x8;
+  public static final int IM = 0x8;
 
 
 
@@ -76,7 +76,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for an FM.
    */
 
-  public static int FM = 0x10;
+  public static final int FM = 0x10;
 
 
 
@@ -85,7 +85,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for a WGM.
    */
 
-  public static int WGM = 0x20;
+  public static final int WGM = 0x20;
 
 
 
@@ -94,7 +94,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for a WIM.
    */
 
-  public static int WIM = 0x40;
+  public static final int WIM = 0x40;
 
 
 
@@ -103,7 +103,7 @@ public class SeekInfoStruct extends Struct{
    * The bit mask for a WFM.
    */
 
-  public static int WFM = 0x80;
+  public static final int WFM = 0x80;
 
 
 

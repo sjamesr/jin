@@ -23,7 +23,6 @@ package free.jin;
 
 import java.util.Properties;
 import java.io.IOException;
-import java.util.StringTokenizer;
 import free.util.IOUtilities;
 import free.util.TextUtilities;
 

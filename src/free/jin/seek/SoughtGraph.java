@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 import free.jin.plugin.Plugin;
 import free.jin.Seek;
 import free.jin.Preferences;

@@ -224,7 +224,7 @@ public class ConsoleTextPane extends JTextPane{
    * taller than Short.MAX_VALUE pixels.
    */
 
-  private static final boolean isJava2 =
+  private static final boolean IS_JAVA2 =
     System.getProperty("java.version").compareTo("1.2") >= 0;
 
 
@@ -233,7 +233,7 @@ public class ConsoleTextPane extends JTextPane{
    * Is this a Windows 95/98/Me machine?
    */
 
-  private static final boolean isOldWindows =
+  private static final boolean IS_OLD_WINDOWS =
     System.getProperty("os.name").startsWith("Windows") &&
     (System.getProperty("os.version").compareTo("5.0") < 0) &&
     !System.getProperty("os.name").startsWith("Windows NT");
@@ -245,7 +245,7 @@ public class ConsoleTextPane extends JTextPane{
    * Is this a Solaris machine?
    */
 
-  private static final boolean isSolaris =
+  private static final boolean IS_SOLARIS =
     System.getProperty("os.name").startsWith("Solaris") ||
     System.getProperty("os.name").startsWith("SunOS");
 
@@ -257,8 +257,8 @@ public class ConsoleTextPane extends JTextPane{
    * than Short.MAX_VALUE pixels?
    */
 
-  private static final boolean shouldUse16BitGraphicsHack = 
-    !isJava2 && (isOldWindows || isSolaris);
+  private static final boolean SHOULD_USE_16_BIT_GRAPHICS_HACK = 
+    !IS_JAVA2 && (IS_OLD_WINDOWS || IS_SOLARIS);
 
 
 
@@ -271,7 +271,7 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   public void reshape(int x, int y, int width, int height){
-    if ((height > Short.MAX_VALUE) && shouldUse16BitGraphicsHack){
+    if ((height > Short.MAX_VALUE) && SHOULD_USE_16_BIT_GRAPHICS_HACK){
       try{
         // Remove lines until our preferred height is less than Short.MAX_VALUE
         Document document = getDocument();

@@ -22,7 +22,6 @@
 package free.chess;
 
 import java.awt.*;
-import free.chess.ColoredPiecePainter;
 import free.chess.Piece;
 import free.chess.ChessPiece;
                                                 
