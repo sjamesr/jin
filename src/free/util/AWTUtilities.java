@@ -144,7 +144,26 @@ public class AWTUtilities{
         catch (InvocationTargetException e){e.printStackTrace();}
     }
   }
+  
+  
+  
+  /**
+   * Enables or disables all the components within the specified container.
+   * 
+   * This is a rather hacky method - it doesn't work well if there are both
+   * enabled and disabled components in the container.
+   */
 
+  public static void setContainerEnabled(Container container, boolean enabled){
+    Component [] children = container.getComponents();
+    for (int i = 0; i < children.length; i++){
+      Component child = children[i];
+      child.setEnabled(enabled);
+      if (child instanceof Container)
+        setContainerEnabled((Container)child, enabled);
+    }
+  }
+  
 
 
 }
