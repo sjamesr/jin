@@ -28,12 +28,14 @@ import java.util.Vector;
 
 
 /**
- * A fix of JTextField. Fixes the following bugs:
+ * A fix of JComboBox. Fixes the following bugs:
  * <UL>
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html">
  *        Ibeam cursor not appearing on JTextComponents in editmode</A>.
  *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4269430.html">
- *        JComboBox - Should match preferred height of JTextField</A>
+ *        JComboBox - Should match preferred height of JTextField</A>.
+ *   <LI> <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4513773.html">
+ *        requestFocus on an editable JComboBox sends focus to the combobox button</A>.
  * </UL>
  */
 
@@ -98,6 +100,19 @@ public class FixedJComboBox extends JComboBox{
       editorComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4262163.html //
+
+  }
+
+
+
+
+  public void requestFocus(){
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4513773.html
+
+    getEditor().getEditorComponent().requestFocus();
+
+    // http://developer.java.sun.com/developer/bugParade/bugs/4513773.html
 
   }
 
