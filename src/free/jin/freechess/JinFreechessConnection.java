@@ -378,7 +378,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     
     if (categoryName.startsWith("wild/")){
-      String wildId = categoryName.substring("wild/.".length());
+      String wildId = categoryName.substring("wild/".length());
       if (wildId.equals("0") || wildId.equals("1"))
         return new BothSidesCastlingVariant(Chess.INITIAL_POSITION_FEN, categoryName);
       else if (wildId.equals("2") || wildId.equals("3"))
