@@ -951,14 +951,18 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
 
-      if (gameInfo == null) // Game wasn't set up properly, probably because the wild variant is not supported.
+      // Game wasn't set up properly, probably because the wild variant is not supported.
+      if (gameInfo == null) 
         return;
 
       Game game = gameInfo.game;
       unechoedMoves.remove(game);
 
-      int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
-      if (game.getResult() == Game.GAME_IN_PROGRESS) // Make sure the game doesn't stay in progress...
+      int result = 
+        (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+
+      // Make sure the game doesn't stay in progress...
+      if (game.getResult() == Game.GAME_IN_PROGRESS) 
         game.setResult(result);
 
       fireGameEvent(new GameEndEvent(this, game, result));
@@ -967,25 +971,35 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       int newGameType = (playerState == OBSERVING) ? Game.OBSERVED_GAME : Game.MY_GAME;
 
       if (gameExists(gameNumber)){
-        try{
-          GameInfo gameInfo = getGameInfo(gameNumber);
-          Game game = gameInfo.game;
+         // This code:
+         // A. Doesn't seem necessary as the game becoming an examined game at the end
+         //    is already handled by processMyGameResult.
+         // B. Is wrong because it sends unnecessary updates for example at the
+         //    beginning of a game when the server notifies about our relation
+         //    to the game. 
 
-          updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(), game.getRatingCategoryString(),
-            game.isRated(), game.getWhiteTime(), game.getWhiteInc(), game.getBlackTime(),
-            game.getBlackInc(), game.isPlayed(), game.getWhiteRating(), game.getBlackRating(), game.getID(),
-            game.getWhiteTitles(), game.getBlackTitles());
-        } catch (NoSuchGameException e){
-            throw new Error("This isn't supposed to happen - we checked that the game exists");
-          }
+//        try{
+//          GameInfo gameInfo = getGameInfo(gameNumber);
+//          Game game = gameInfo.game;
+//
+//          updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
+//            game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
+//            game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), game.isPlayed(),
+//            game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
+//            game.getBlackTitles());
+//        } catch (NoSuchGameException e){
+//            throw new IllegalStateException("This isn't supposed to happen - we checked that the game exists");
+//          }
       }
-      else{ // The game doesn't exist, either because it's a non started game or a game that wasn't set up properly (usually 
-            // happens for non-supported variants.
+      else{ // The game doesn't exist, either because it's a non started game or a game 
+            // that wasn't set up properly (usually happens for non-supported variants).
 
         if (existsNonStarted(gameNumber)) // This way we know it's a non-started game.
           putPropertyForNonStarted(gameNumber, "GameType", new Integer(newGameType));
-        else // A datagram for a game that wasn't processed, probably because the variant is not supported.
+        else 
           return;
+          // A datagram for a game that wasn't processed, probably 
+          // because the variant is not supported.
       }
     }
   }
@@ -1284,7 +1298,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     switch (game.getGameType()){
       case Game.MY_GAME:
         if (game.isPlayed())
-          sendCommand("resign");
+          resign(game);
         else
           sendCommand("unexamine");
         break;
@@ -1317,7 +1331,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (!ourGame)
       throw new IllegalArgumentException("The specified Game object was not created by this JinConnection or the game has ended.");
 
-    sendCommand(moveToString(game, move));
+    // Using "; primary <gamenum> ; <movestring>" is the closest we can currently
+    // get to making sure that the move is made on the correct board.
+    sendCommand("; primary " + game.getID() + " ; "+moveToString(game, move));
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if (unechoedGameMoves == null){
@@ -1387,7 +1403,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("resign");
+    sendCommand("; primary "+game.getID()+" ; resign");
   }
 
 
@@ -1401,7 +1417,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("draw");
+    sendCommand("; primary "+game.getID()+" ; draw");
   }
 
 
@@ -1426,7 +1442,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("abort");
+    sendCommand("; primary "+game.getID()+" ; abort");
   }
 
 
@@ -1449,7 +1465,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("adjourn");
+    sendCommand("; primary "+game.getID()+" ; adjourn");
   }
 
 
