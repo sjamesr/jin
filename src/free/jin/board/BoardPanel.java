@@ -745,10 +745,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void addMoveToListTable(Move move){
     DefaultTableModel model = (DefaultTableModel)moveListTableModel;
+    int movesSinceStart = game.getPliesSinceStart()/2;
     int rowCount = moveListTable.getRowCount();
     if ((rowCount == 0) || move.getPlayer().isWhite()){
       model.setNumRows(++rowCount);
-      model.setValueAt(rowCount+".", rowCount-1, 0);
+      model.setValueAt((rowCount + movesSinceStart)+".", rowCount-1, 0);
     }
     if (move.getPlayer().isWhite())
       model.setValueAt(move, rowCount-1, 1);
@@ -786,12 +787,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void updateMoveListTable(){
     DefaultTableModel model = (DefaultTableModel)moveListTableModel;
+    int movesSinceStart = game.getPliesSinceStart()/2;
     int moveCount = madeMoves.size();
     boolean isFirstMoveBlack = (moveCount > 0) && ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
     int numRows = isFirstMoveBlack ? 1+moveCount/2 : (moveCount+1)/2;
     model.setNumRows(numRows);
     for (int i = 0; i < numRows; i++)
-      model.setValueAt((i+1)+".", i, 0);
+      model.setValueAt((i + 1 + movesSinceStart)+".", i, 0);
 
     int row = 0;
     int column = isFirstMoveBlack ? 2 : 1;
