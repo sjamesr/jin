@@ -64,20 +64,6 @@ public class JinMain implements JinContext{
 
 
   /**
-   * Causes the <code>free.workarounds.SwingFix</code> class to be loaded.
-   */
-
-  static{
-    try{
-      Class.forName("free.workarounds.SwingFix");
-    } catch (ClassNotFoundException e){
-        e.printStackTrace();
-      }
-  }
-
-
-
-  /**
    * The current directory. This should be the Jin directory.
    */
 
@@ -254,6 +240,9 @@ public class JinMain implements JinContext{
 
     // Restore the look and feel
     restoreLookAndFeel();
+    
+    // Apply Swing fixes
+    fixSwing();
 
     // Create the main frame
     mainFrame = createMainFrame();
@@ -1053,9 +1042,9 @@ public class JinMain implements JinContext{
       String minRequiredJavaVer = appProps.getProperty("lf.extra." + i + ".minRequiredJava", "0");
       if (PlatformUtils.isJavaBetterThan(minRequiredJavaVer)){
         try{
-          Class.forName(className).newInstance();
+          Class.forName(className);
           UIManager.installLookAndFeel(name, className);
-        } catch (Exception e){
+        } catch (ClassNotFoundException e){
             System.err.println("Unable to load class " + className + " for the " + name + " look and feel");
           }
       }
@@ -1083,6 +1072,20 @@ public class JinMain implements JinContext{
     try{
       UIManager.setLookAndFeel(lfClassName);
     } catch (Exception e){}
+  }
+  
+
+
+  /**
+   * Applies various swing fixes.
+   */
+   
+  private static void fixSwing(){
+    try{
+      Class.forName("free.workarounds.SwingFix");
+    } catch (ClassNotFoundException e){
+        e.printStackTrace();
+      }
   }
 
 
