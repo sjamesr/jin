@@ -25,7 +25,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import free.jin.plugin.*;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginContext;
+import free.jin.plugin.UnsupportedContextException;
+import free.jin.event.ConnectionListener;
+import free.jin.event.ConnectionEvent;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.Method;
@@ -36,7 +40,7 @@ import java.lang.reflect.Field;
  * Jin's main frame.
  */
 
-public class JinFrame extends JFrame{
+public class JinFrame extends JFrame implements ConnectionListener{
 
 
   
@@ -365,6 +369,27 @@ public class JinFrame extends JFrame{
 
     // Map the connection to the user.
     connsToUsers.put(conn, user);
+
+    conn.getJinListenerManager().addConnectionListener(this);
+  }
+
+
+
+
+  /**
+   * ConnectionListener implementation.
+   */
+
+  public void connectionEstablished(ConnectionEvent evt){}
+  public void connectionLoggedIn(ConnectionEvent evt){}
+
+
+  /**
+   * Gets called when the connection to the server is lost.
+   */
+
+  public void connectionLost(ConnectionEvent evt){
+    closeConnection(evt.getConnection());
   }
 
 
@@ -455,6 +480,8 @@ public class JinFrame extends JFrame{
     System.out.println("Modifying menubar");
     JinFrameMenuBar menubar = getJinFrameMenuBar();
     menubar.disconnected(conn);
+
+    conn.getJinListenerManager().removeConnectionListener(this);
 
     // Bugfix
     menubar.repaint();
