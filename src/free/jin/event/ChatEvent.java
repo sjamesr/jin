@@ -72,6 +72,15 @@ public class ChatEvent extends JinEvent{
 
 
   /**
+   * The rating of the player who sent the string, -1 if unknown.
+   */
+
+  private final int senderRating;
+
+
+
+
+  /**
    * The message itself. Must be a non-null string.
    */
 
@@ -94,12 +103,12 @@ public class ChatEvent extends JinEvent{
 
 
   /**
-   * Creates a new ChatEvent with the given type, sender, sender titles, 
-   * message and forum.
+   * Creates a new ChatEvent with the given type, sender, sender titles, sender
+   * rating (-1 if unknown), message and forum.
    */
 
-  public ChatEvent(JinConnection conn, String type, String sender, String senderTitle, 
-                   String message, Object forum){
+  public ChatEvent(JinConnection conn, String type, String sender, String senderTitle,
+      int senderRating, String message, Object forum){
     super(conn);
 
     if (type == null)
@@ -108,6 +117,7 @@ public class ChatEvent extends JinEvent{
     this.type = type;
     this.sender = sender;
     this.senderTitle = senderTitle;
+    this.senderRating = senderRating;
     this.message = message;
     this.forum = forum;
   }
@@ -145,6 +155,17 @@ public class ChatEvent extends JinEvent{
 
   public String getSenderTitle(){
     return senderTitle;
+  }
+
+
+
+
+  /**
+   * Returns the rating of the sender, or -1 if unknown.
+   */
+
+  public int getSenderRating(){
+    return senderRating;
   }
 
 
