@@ -21,23 +21,30 @@
 
 package free.util.swing;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
 
 /**
- * A button which displays a color and when pressed, opens a JColorChooser and
- * allows the user to select a different color.
+ * A color chooser component which displays a button and the currently selected
+ * color. When the button is pressed, it opens a JColorChooser and allows the
+ * user to select a different color.
  */
 
-public class ColorChooserButton extends JButton implements ActionListener{
+public class ColorChooserButton extends JComponent implements ActionListener{
+
+
+
+  /**
+   * The button we're using.
+   */
+
+  private final JButton button;
+
 
 
 
@@ -68,6 +75,7 @@ public class ColorChooserButton extends JButton implements ActionListener{
 
 
 
+
   /**
    * Creates a new ColorChooserButton with no text and the given initial color.
    */
@@ -85,21 +93,26 @@ public class ColorChooserButton extends JButton implements ActionListener{
    */
 
   public ColorChooserButton(String text, Color initialColor){
-    super(text, new SolidColorIcon(iconSize, initialColor));
+    button = new JButton(text, new SolidColorIcon(iconSize, initialColor));
 
-    setHorizontalTextPosition(JButton.LEADING);
+    setLayout(new BorderLayout());
+    add(BorderLayout.CENTER, button);
+
+    button.setHorizontalTextPosition(JButton.LEADING);
+    button.setDefaultCapable(false);
 
     color = initialColor;
 
-    addActionListener(this);
+    button.addActionListener(this);
   }
+
 
 
 
 
   /**
    * Adds a ChangeListener to the list of listeners receiving notifications when
-   * the selected color changes.
+   * one of the text properties changes.
    */
 
   public void addChangeListener(ChangeListener listener){
@@ -111,7 +124,7 @@ public class ColorChooserButton extends JButton implements ActionListener{
 
   /**
    * Removes the given Changelistener from the list of listeners receiving
-   * notifications when the selected color changes.
+   * notifications when one of the text properties changes.
    */
 
   public void removeChangeListener(ChangeListener listener){
@@ -125,7 +138,7 @@ public class ColorChooserButton extends JButton implements ActionListener{
    * Fires a ChangeEvent to all interested listeners.
    */
 
-  protected void fireChangeEvent(){
+  protected void fireStateChanged(){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChangeListener.class){
@@ -133,11 +146,11 @@ public class ColorChooserButton extends JButton implements ActionListener{
         listener.stateChanged(changeEvent);
       }
     }
-
   }
 
-
-
+  
+  
+  
   /**
    * Returns the currently selected color.
    */
@@ -155,8 +168,8 @@ public class ColorChooserButton extends JButton implements ActionListener{
 
   public void setColor(Color color){
     this.color = color;
-    setIcon(new SolidColorIcon(iconSize, color));
-    fireChangeEvent();
+    button.setIcon(new SolidColorIcon(iconSize, color));
+    fireStateChanged();
   }
 
 
