@@ -97,6 +97,53 @@ public class AWTUtilities{
     else
       return Toolkit.getDefaultToolkit().getFontList();
   }
+  
+  
+  
+  /**
+   * Returns the state of the specified frame, as specified by
+   * <code>Frame.getExtendedState()</code> if running under JDK 1.4 or later,
+   * otherwise returns 0. The call to <code>Frame.getExtendedState()</code> is
+   * done via reflection to avoid runtime errors.
+   */
+   
+  public static int getExtendedFrameState(Frame frame){
+    if (System.getProperty("java.version").compareTo("1.4") >= 0){
+      try{
+        Class frameClass = Class.forName("java.awt.Frame");
+        Method getExtendedStateMethod = frameClass.getMethod("getExtendedState", null);
+        Integer state = (Integer)getExtendedStateMethod.invoke(frame, new Object[0]);
+        return state.intValue();
+      } catch (ClassNotFoundException e){e.printStackTrace();}
+        catch (NoSuchMethodException e){e.printStackTrace();}
+        catch (IllegalAccessException e){e.printStackTrace();}
+        catch (InvocationTargetException e){e.printStackTrace();}
+    }
+    
+    return 0;
+  }
+  
+  
+  
+  /**
+   * Sets the state of the specified frame, as specified by
+   * <code>Frame.setExtendedState</code> if running in JDK 1.4 or later,
+   * otherwise does nothing. The call to <code>Frame.setExtendedState()</code>
+   * is done via reflection to avoid runtime errors. 
+   */
+   
+  public static void setExtendedFrameState(Frame frame, int state){
+    if (System.getProperty("java.version").compareTo("1.4") >= 0){
+      try{
+        Class frameClass = Class.forName("java.awt.Frame");
+        Method setExtendedStateMethod = frameClass.getMethod("setExtendedState", new Class[]{int.class});
+        setExtendedStateMethod.invoke(frame, new Object[]{new Integer(state)});
+      } catch (ClassNotFoundException e){e.printStackTrace();}
+        catch (NoSuchMethodException e){e.printStackTrace();}
+        catch (IllegalAccessException e){e.printStackTrace();}
+        catch (InvocationTargetException e){e.printStackTrace();}
+    }
+  }
 
 
 
