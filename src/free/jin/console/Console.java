@@ -1075,16 +1075,16 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
               requestDefaultFocus();
             }
           });
+
+          KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
+
+          KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
+
+          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
         }
-
-        KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
-
-        KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
-
-        KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
       }
     }
   }
