@@ -141,6 +141,13 @@ public class JBoard extends JComponent{
   private ChangeListener positionChangeListener = new ChangeListener(){
     
     public void stateChanged(ChangeEvent evt){
+      if (movedPieceSquare != null){                        // We were dragging a piece
+        if (position.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging is no longer there
+          movedPieceSquare = null;
+          movedPieceLoc = null;
+        }
+      }
+
       repaint();
     }
 
