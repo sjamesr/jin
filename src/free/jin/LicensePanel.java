@@ -345,7 +345,22 @@ public class LicensePanel extends DialogPanel{
     metouialfPanel.add(new JLabel("<html>.</html>"));
     add(metouialfPanel);
     add(Box.createVerticalStrut(5));
-
+    
+    JPanel liquidlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    liquidlfPanel.add(new JLabel("<html>Jin is distributed with the&nbsp</html>"));
+    LinkLabel liquidlfWebsiteLabel = new LinkLabel("Liquid Look and Feel");
+    liquidlfWebsiteLabel.setToolTipText("http://liquidlnf.sourceforge.net/");
+    liquidlfWebsiteLabel.addActionListener(
+      new UrlDisplayingAction("http://liquidlnf.sourceforge.net/"));
+    liquidlfPanel.add(liquidlfWebsiteLabel);
+    liquidlfPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel liquidlfLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    liquidlfLicenseLabel.addActionListener(lgplActionListener);
+    liquidlfPanel.add(liquidlfLicenseLabel);
+    liquidlfPanel.add(new JLabel("<html>.</html>"));
+    add(liquidlfPanel);
+    add(Box.createVerticalStrut(5));
+    
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by&nbsp</html>"));
     LinkLabel denisDesLauriersWebsiteLabel = new LinkLabel("Denis DesLauriers");
