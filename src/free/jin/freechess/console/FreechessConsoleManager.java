@@ -81,6 +81,8 @@ public class FreechessConsoleManager extends ConsoleManager{
       return sender+title+" says: "+message;
     else if (type.equals("ptell"))
       return sender+title+" (your partner) tells you: "+message;
+    else if (type.equals("qtell"))
+      return ":"+message;
 
     // Channel tells
     else if (type.equals("channel-tell"))

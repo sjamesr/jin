@@ -54,7 +54,7 @@ public class FreechessScripter extends Scripter{
 
   private class ChatScriptDispatcher extends ScriptDispatcher implements ChatListener{
 
-    private final String [] subtypes = new String[]{"Personal Tell", "(BugHouse) Partner Tell", "Shout", "T-Shout", "C-Shout", "Announcement", "Channel Tell", "Kibitz", "Whisper"};
+    private final String [] subtypes = new String[]{"Personal Tell", "(BugHouse) Partner Tell", "Shout", "T-Shout", "C-Shout", "Announcement", "Channel Tell", "Kibitz", "Whisper", "QTell"};
 
     private final Hashtable chatTypesToSubtypeNames = new Hashtable();
 
@@ -70,6 +70,7 @@ public class FreechessScripter extends Scripter{
       chatTypesToSubtypeNames.put("channel-tell", subtypes[6]);
       chatTypesToSubtypeNames.put("kibitz", subtypes[7]);
       chatTypesToSubtypeNames.put("whisper", subtypes[8]);
+      chatTypesToSubtypeNames.put("qtell", subtypes[9]);
     }                                          
 
     protected String [] getEventSubtypesImpl(){return subtypes;}
@@ -109,14 +110,14 @@ public class FreechessScripter extends Scripter{
 
       if (type.equals("tell") || type.equals("say") || type.equals("ptell") || 
           type.equals("shout") || type.equals("ishout") || type.equals("tshout") ||
-          type.equals("cshout") || type.equals("announcement"))
+          type.equals("cshout") || type.equals("announcement") || type.equals("qtell"))
         return null;
       else if (type.equals("channel-tell"))
         return new Object[]{"channel", forum};
       else if (type.equals("kibitz") || type.equals("whisper"))
         return new Object[]{"gameNumber", forum};
       else
-        throw new IllegalStateException("Unknown chat type: "+type);
+        return null;
     }
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
