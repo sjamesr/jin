@@ -129,11 +129,13 @@ public class BackgroundChooser extends JDialog{
    */
   
   private void createUI(){
+    boolean allowImageSelection = hasAccessToFileSystem();
+    
     JPanel contentPane = new JPanel(new BorderLayout(10, 10));
     setContentPane(contentPane);
     contentPane.setBorder(new javax.swing.border.EmptyBorder(15, 10, 15, 10));
 
-    JPanel mainPanel = new JPanel(new GridLayout(4, 1, 10, 10));
+    JPanel mainPanel = new JPanel(new GridLayout(allowImageSelection ? 4 : 2, 1, 10, 10));
     mainPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
 
     JButton pickColor = new JButton("Pick Color");
@@ -168,8 +170,10 @@ public class BackgroundChooser extends JDialog{
     boxesPanel.add(centerButton);
 
     mainPanel.add(pickColor);
-    mainPanel.add(pickImage);
-    mainPanel.add(boxesPanel);
+    if (allowImageSelection){
+      mainPanel.add(pickImage);
+      mainPanel.add(boxesPanel);
+    }
     mainPanel.add(useDefault);
 
     JButton closeButton = new JButton("Close");
@@ -200,61 +204,63 @@ public class BackgroundChooser extends JDialog{
       }
 
     });
-
-    final JFileChooser fileChooser = createImageFileChooser();
-
-    pickImage.addActionListener(new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        int val = fileChooser.showOpenDialog(BackgroundChooser.this);
-        if (val == JFileChooser.APPROVE_OPTION){
-          File pic = fileChooser.getSelectedFile();
-          if ((pic != null) && pic.exists()){
-            chosenImageFile = pic;
-            desktop.setWallpaper(Toolkit.getDefaultToolkit().getImage(pic.getAbsolutePath()));
+    
+    if (allowImageSelection){
+      final JFileChooser fileChooser = createImageFileChooser();
+  
+      pickImage.addActionListener(new ActionListener(){
+  
+        public void actionPerformed(ActionEvent evt){
+          int val = fileChooser.showOpenDialog(BackgroundChooser.this);
+          if (val == JFileChooser.APPROVE_OPTION){
+            File pic = fileChooser.getSelectedFile();
+            if ((pic != null) && pic.exists()){
+              chosenImageFile = pic;
+              desktop.setWallpaper(Toolkit.getDefaultToolkit().getImage(pic.getAbsolutePath()));
+            }
           }
         }
-      }
-
-    });
-
-
-    useDefault.addActionListener(new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        chosenColor = null;
-        chosenImageFile = null;
-        chosenImageLayoutStyle = -1;
-
-        desktop.setBackground(UIManager.getColor("desktop"));
-        desktop.setWallpaper(defaultImage);
-        desktop.setWallpaperLayoutStyle(defaultImageLayoutStyle);
-      }
-
-    });
-
-
-    ActionListener imageLayoutListener = new ActionListener(){
-
-      public void actionPerformed(ActionEvent evt){
-        Object src = evt.getSource();
-        int style = -1;
-        if (src == tileButton)
-          style = AdvancedJDesktopPane.TILE;
-        else if (src == scaleButton)
-          style = AdvancedJDesktopPane.SCALE;
-        else if (src == centerButton)
-          style = AdvancedJDesktopPane.CENTER;
-
-        desktop.setWallpaperLayoutStyle(style);
-        chosenImageLayoutStyle = style;
-      }
-
-    };
-
-    tileButton.addActionListener(imageLayoutListener);
-    scaleButton.addActionListener(imageLayoutListener);
-    centerButton.addActionListener(imageLayoutListener);
+  
+      });
+  
+  
+      useDefault.addActionListener(new ActionListener(){
+  
+        public void actionPerformed(ActionEvent evt){
+          chosenColor = null;
+          chosenImageFile = null;
+          chosenImageLayoutStyle = -1;
+  
+          desktop.setBackground(UIManager.getColor("desktop"));
+          desktop.setWallpaper(defaultImage);
+          desktop.setWallpaperLayoutStyle(defaultImageLayoutStyle);
+        }
+  
+      });
+  
+  
+      ActionListener imageLayoutListener = new ActionListener(){
+  
+        public void actionPerformed(ActionEvent evt){
+          Object src = evt.getSource();
+          int style = -1;
+          if (src == tileButton)
+            style = AdvancedJDesktopPane.TILE;
+          else if (src == scaleButton)
+            style = AdvancedJDesktopPane.SCALE;
+          else if (src == centerButton)
+            style = AdvancedJDesktopPane.CENTER;
+  
+          desktop.setWallpaperLayoutStyle(style);
+          chosenImageLayoutStyle = style;
+        }
+  
+      };
+  
+      tileButton.addActionListener(imageLayoutListener);
+      scaleButton.addActionListener(imageLayoutListener);
+      centerButton.addActionListener(imageLayoutListener);
+    }
 
     closeButton.addActionListener(new ActionListener(){
 
@@ -266,6 +272,22 @@ public class BackgroundChooser extends JDialog{
 
 
     getRootPane().setDefaultButton(closeButton);
+  }
+  
+  
+  
+  /**
+   * Determines whether we have access to the filesystem.
+   */
+   
+  private boolean hasAccessToFileSystem(){
+    try{
+      SecurityManager securityManager = System.getSecurityManager();
+      if (securityManager != null)
+        securityManager.checkRead(System.getProperty("user.home"));
+    } catch (SecurityException e){return false;}
+    
+    return true;
   }
 
 
