@@ -119,7 +119,7 @@ public class ChessclubScripter extends Scripter{
       else if (type.equals("kibitz") || type.equals("whisper"))
         return new Object[]{"gameNumber", forum};
       else
-        throw new IllegalStateException("Unknown chat type: "+type);
+        return null;
     }
 
 
