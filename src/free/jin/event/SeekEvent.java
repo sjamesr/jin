@@ -22,7 +22,7 @@
 package free.jin.event;
 
 import free.jin.event.JinEvent;
-import free.jin.JinConnection;
+import free.jin.SeekJinConnection;
 import free.jin.Seek;
 
 
@@ -73,7 +73,7 @@ public class SeekEvent extends JinEvent{
    * Creates a new SeekEvent with the given source JinConnection.
    */
 
-  public SeekEvent(JinConnection conn, int id, Seek seek){
+  public SeekEvent(SeekJinConnection conn, int id, Seek seek){
     super(conn);
 
     switch(id){
