@@ -5,4 +5,4 @@ login.hosts = chessclub.com;queen.chessclub.com;rook.chessclub.com;special.chess
 login.hostname = chessclub.com
 login.port = 5000
 
-plugins=ChessclubConsoleManager;SoundManager;ChessclubBoardManager;SoughtGraphPlugin
+plugins=ChessclubConsoleManager;ChessclubSoundManager;ChessclubBoardManager;SoughtGraphPlugin
