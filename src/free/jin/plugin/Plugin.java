@@ -97,8 +97,11 @@ public abstract class Plugin{
    */
 
   public Preferences getPrefs(){
-    if (prefs == null)
-      prefs = context.getPreferences(this);
+    if (prefs == null){
+      Preferences pluginPrefs = context.getPreferences(this);
+      Preferences userPrefs = getUser().getPrefs();
+      prefs = Preferences.createBackedUp(Preferences.createWrapped(userPrefs, getId() + "."), pluginPrefs);
+    }
 
     return prefs;
   }

@@ -183,24 +183,11 @@ public class PluginContext{
 
 
   /**
-   * Returns the <code>Preferences</code> the specified plugin should use. Note
-   * that these aren't the plugin's preferences - these are wrapped user
-   * preferences with a prefix of the plugin's id and backed up by the plugin's
-   * own preferences.
+   * Returns the <code>Preferences</code> of the specified plugin.
    */
 
   public synchronized Preferences getPreferences(Plugin plugin){
-    Preferences result = (Preferences)pluginsToPreferences.get(plugin);
-    if (result == null){
-      Preferences pluginPrefs = prefs[Utilities.indexOf(plugins, plugin)];
-      Preferences userPrefs = user.getPrefs();
-      String pluginId = plugin.getId();
-      result = Preferences.createBackedUp(Preferences.createWrapped(userPrefs, pluginId + "."), pluginPrefs);
-
-      pluginsToPreferences.put(plugin, result);
-    }
-
-    return result;
+    return prefs[Utilities.indexOf(plugins, plugin)];
   }
   
   
