@@ -97,6 +97,30 @@ public class LicenseDialog extends JDialog{
 
 
 
+  /**
+   * The component to get the focus.
+   */
+
+  private Component focusComponent;
+
+
+
+  /**
+   * A workaround for ESCAPE not working in this dialog, under MS VM at least,
+   * because we assign tooltips to some of the labels which makes them grab the
+   * focus.
+   */
+
+  public void paint(Graphics g){
+    super.paint(g);
+
+    if (focusComponent != null){
+      focusComponent.requestFocus();
+      focusComponent = null;
+    }
+  }
+
+
 
   /**
    * Creates the user interface.
@@ -106,7 +130,6 @@ public class LicenseDialog extends JDialog{
     JPanel contentPane = new JPanel();
     contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-    setContentPane(contentPane);
 
     ActionListener gplActionListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -300,16 +323,19 @@ public class LicenseDialog extends JDialog{
 
     contentPane.add(Box.createVerticalStrut(15));
 
-    JButton closeButton = new JButton("Close");
-    closeButton.setMnemonic('C');
-    closeButton.addActionListener(new ActionListener(){
+    JButton okButton = new JButton("OK");
+    okButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         dispose();
       }
     });
-    closeButton.setAlignmentX(CENTER_ALIGNMENT);
-    getRootPane().setDefaultButton(closeButton);
-    contentPane.add(closeButton);
+    okButton.setAlignmentX(CENTER_ALIGNMENT);
+    contentPane.add(okButton);
+
+    setContentPane(contentPane);
+    getRootPane().setDefaultButton(okButton);
+
+    focusComponent = okButton;
   }
 
 
