@@ -593,7 +593,7 @@ public class JinFrameMenuBar extends JMenuBar{
     websiteMenuItem.setMnemonic('J');
     websiteMenuItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        String url = "http://www.hightemplar.com/jin/";
+        String url = "http://www.jinchess.com";
         try{
           BrowserControl.displayURL(url);
         } catch (java.io.IOException e){
@@ -614,6 +614,20 @@ public class JinFrameMenuBar extends JMenuBar{
       }
     });
     helpMenu.add(licenseMenuItem);
+
+    JMenuItem reportBugMenuItem = new JMenuItem("Report a bug");
+    reportBugMenuItem.setMnemonic('R');
+    reportBugMenuItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String url = "https://sourceforge.net/tracker/?group_id=50386&atid=459537";
+        try{
+          BrowserControl.displayURL(url);
+        } catch (java.io.IOException e){
+            JOptionPane.showMessageDialog(jinFrame, "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
+          }
+      }
+    });
+    helpMenu.add(reportBugMenuItem);
 
     JMenuItem aboutMenuItem = new JMenuItem("About Jin...");
     aboutMenuItem.setMnemonic('A');
