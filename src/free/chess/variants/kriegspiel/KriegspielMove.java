@@ -42,14 +42,6 @@ public class KriegspielMove extends Move{
 
 
   /**
-   * The ending square in case of a partially hidden move.
-   */
-
-  private final Square endingSquare;
-
-
-
-  /**
    * The square where the piece moved in case of a partially hidden move.
    */
 
@@ -70,7 +62,6 @@ public class KriegspielMove extends Move{
   public KriegspielMove(Player player, String stringRepresentation){
     super(null, null, player, stringRepresentation);
 
-    this.endingSquare = null;
     this.capturedPiece = null;
   }
 
@@ -89,10 +80,9 @@ public class KriegspielMove extends Move{
   public KriegspielMove(Position pos, Square endingSquare, String stringRepresentation){
     super(null, endingSquare, pos.getCurrentPlayer(), stringRepresentation);
 
-    this.endingSquare = endingSquare;
     this.capturedPiece = (ChessPiece)pos.getPieceAt(endingSquare);
 
-    if (capturedPiece==null)
+    if (capturedPiece == null)
       throw new IllegalArgumentException("A partially hidden move must be a capture");
   }
 
@@ -106,7 +96,7 @@ public class KriegspielMove extends Move{
    */
 
   public boolean isCompletelyHidden(){
-    return endingSquare==null;
+    return super.getEndingSquare() == null;
   }
 
 
@@ -133,7 +123,7 @@ public class KriegspielMove extends Move{
     if (isCompletelyHidden())
       throw new IllegalStateException("The move must be at least partially visible for the ending square to be known");
 
-    return endingSquare;
+    return super.getEndingSquare();
   }
 
 
