@@ -26,6 +26,7 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Vector;
 import free.jin.event.GameAdapter;
 import free.jin.event.GameListener;
 import free.jin.event.OfferEvent;
@@ -34,6 +35,7 @@ import free.jin.Game;
 import free.jin.Connection;
 import free.jin.plugin.Plugin;
 import free.workarounds.FixedJPanel;
+import free.util.TableLayout;
 
 
 /**
@@ -45,6 +47,14 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
 
 
+  /**
+   * The offered state - when the offer has already been made by the user.
+   */
+   
+  protected static final int OFFERED_STATE = 0;
+  
+  
+  
   /**
    * The offer state - when the user can merely offer an abort/adjourn/draw by
    * pressing the corresponding button.
@@ -71,8 +81,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
   protected static final int ACCEPT_STATE = 3;
 
-
-
+  
+  
   /**
    * The size of the state border.
    */
@@ -80,6 +90,13 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   private static final int STATE_BORDER_SIZE = 5;
 
 
+
+  /**
+   * The button border for the offered state.
+   */
+
+  private static final Border offeredStateBorder = 
+    new EmptyBorder(STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE);
 
 
   /**
@@ -95,7 +112,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The button border for the claim state.
    */
 
-  private static final Border claimStateBorder = new LineBorder(Color.orange, STATE_BORDER_SIZE);
+  private static final Border claimStateBorder =
+    new LineBorder(Color.orange, STATE_BORDER_SIZE);
 
 
 
@@ -197,6 +215,38 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
 
   private JPanel adjournButtonPanel;
+  
+  
+  
+  /**
+   * The takeback (1) button.
+   */
+   
+  protected JButton takeback1Button;
+  
+  
+  
+  /**
+   * The button for the border of the takeback (1) button.
+   */
+   
+  private JPanel takeback1ButtonPanel;
+  
+  
+  
+  /**
+   * The multiple takeback button.
+   */
+   
+  protected JButton takebackNButton;
+  
+  
+  
+  /**
+   * The button for the border of the multiple takeback button.
+   */
+   
+  private JPanel takebackNButtonPanel;
 
 
 
@@ -211,15 +261,19 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     public void offerUpdated(OfferEvent evt){
       if (evt.getGame() != game)
         return;
-
+      
       // getUserPlayer shouldn't return null here because this panel should only
       // be used for games played by the user.
-      if (evt.getPlayer().equals(game.getUserPlayer().getOpponent())){
-        switch (evt.getOfferId()){
-          case OfferEvent.DRAW_OFFER: drawOfferUpdate(evt.isOffered()); break;
-          case OfferEvent.ABORT_OFFER: abortOfferUpdate(evt.isOffered()); break;
-          case OfferEvent.ADJOURN_OFFER: adjournOfferUpdate(evt.isOffered()); break;
-        }
+      boolean isOppsOffer = evt.getPlayer().equals(game.getUserPlayer().getOpponent());
+      switch (evt.getOfferId()){
+        case OfferEvent.DRAW_OFFER:
+          drawOfferUpdate(isOppsOffer, evt.isOffered()); break;
+        case OfferEvent.ABORT_OFFER:
+          abortOfferUpdate(isOppsOffer, evt.isOffered()); break;
+        case OfferEvent.ADJOURN_OFFER:
+          adjournOfferUpdate(isOppsOffer, evt.isOffered()); break;
+        case OfferEvent.TAKEBACK_OFFER:
+          takebackOfferUpdate(isOppsOffer, evt.isOffered(), evt.getTakebackCount()); break;
       }
 
       super.offerUpdated(evt);
@@ -229,6 +283,17 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       if (evt.getGame() != game)
         return;
 
+      drawButton.setEnabled(false);
+      resignButton.setEnabled(false);
+      if (abortButton != null)
+        abortButton.setEnabled(false);
+      if (adjournButton != null)
+        adjournButton.setEnabled(false);
+      if (takeback1Button != null)
+        takeback1Button.setEnabled(false);
+      if (takebackNButton != null)
+        takebackNButton.setEnabled(false);
+      
       plugin.getConn().getListenerManager().removeGameListener(this);
 
       super.gameEnded(evt);
@@ -269,6 +334,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     setAbortState(OFFER_STATE);
     setAdjournState(OFFER_STATE);
     setResignState(CLAIM_STATE);
+    setTakeback1State(OFFER_STATE);
+    setTakebackNState(OFFER_STATE, 2);
 
     plugin.getConn().getListenerManager().addGameListener(gameListener);
   }
@@ -280,8 +347,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * Gets called when the state of the draw offer (by the opponent) changes.
    */
 
-  protected void drawOfferUpdate(boolean isOffered){
-    setDrawState(isOffered ? ACCEPT_STATE : OFFER_STATE);
+  protected void drawOfferUpdate(boolean isOppsOffer, boolean isOffered){
+    setDrawState(isOffered ? (isOppsOffer ? ACCEPT_STATE : OFFERED_STATE) : OFFER_STATE);
   }
 
 
@@ -290,8 +357,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * Gets called when the state of the abort offer (by the opponent) changes.
    */
 
-  protected void abortOfferUpdate(boolean isOffered){
-    setAbortState(isOffered ? ACCEPT_STATE : OFFER_STATE);
+  protected void abortOfferUpdate(boolean isOppsOffer, boolean isOffered){
+    setAbortState(isOffered ? (isOppsOffer ? ACCEPT_STATE : OFFERED_STATE) : OFFER_STATE);
   }
 
 
@@ -300,11 +367,67 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * Gets called when the state of the adjourn offer (by the opponent) changes.
    */
 
-  protected void adjournOfferUpdate(boolean isOffered){
-    setAdjournState(isOffered ? ACCEPT_STATE : OFFER_STATE);
+  protected void adjournOfferUpdate(boolean isOppsOffer, boolean isOffered){
+    setAdjournState(isOffered ? (isOppsOffer ? ACCEPT_STATE : OFFERED_STATE) : OFFER_STATE);
   }
-
-
+  
+  
+  
+  /**
+   * A list of the ply counts for all of the user's current outstanding
+   * takeback offers.
+   */
+   
+  private final Vector userTakebacks = new Vector();
+  
+  
+  
+  /**
+   * A list of the ply counts for all of the opponent's current outstanding
+   * takeback offers.
+   */
+   
+  private final Vector oppTakebacks = new Vector();
+  
+  
+  
+  /**
+   * Gets called when the state of the takeback offer (by the opponent) changes.
+   */
+   
+  protected void takebackOfferUpdate(boolean isOppsOffer, boolean isOffered, int plyCount){
+    Vector offers = isOppsOffer ? oppTakebacks : userTakebacks;
+    if (isOffered)
+      offers.addElement(new Integer(plyCount));
+    else
+      offers.removeElement(new Integer(plyCount));
+    
+    int newState;
+    int plies;
+    if (oppTakebacks.isEmpty()){
+      if (userTakebacks.isEmpty()){
+        newState = OFFER_STATE;
+        plies = plyCount;
+      }
+      else{
+        Integer lastOffer = (Integer)userTakebacks.elementAt(userTakebacks.size() - 1);
+        newState = OFFERED_STATE;
+        plies = lastOffer.intValue();
+      }
+    }
+    else{
+      Integer lastOffer = (Integer)oppTakebacks.elementAt(oppTakebacks.size() - 1);
+      newState = ACCEPT_STATE;
+      plies = lastOffer.intValue();
+    }
+    
+    if (plies == 1)
+      setTakeback1State(newState);
+    else
+      setTakebackNState(newState, newState == OFFER_STATE ? 2 : plies);
+  }
+   
+  
 
 
   /**
@@ -314,93 +437,46 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   protected void createComponents(Plugin plugin, Game game){
     Connection conn = plugin.getConn();
 
-    resignButton = createResignButton(plugin, game);
-    drawButton = createDrawButton(plugin, game);
-    abortButton = conn.isAbortSupported() ? createAbortButton(plugin, game) : null;
-    adjournButton = conn.isAdjournSupported() ? createAdjournButton(plugin, game) : null;
+    resignButton = createButton("Resign", 'r');
+    drawButton = createButton("Draw", 'd');
+    abortButton = conn.isAbortSupported() ? createButton("Abort", 'a') : null;
+    adjournButton = conn.isAdjournSupported() ? createButton("Adjourn", 'j') : null;
+    takeback1Button = conn.isTakebackSupported() ? createButton("Takeback", 't') : null;
+    takebackNButton = conn.isMultipleTakebackSupported() ?
+      createButton("Takeback 2", 'k') : null;
   }
 
 
 
-
   /**
-   * Creates the "Resign" button.
+   * Creates a button with the specified text, mnemonic and action command.
    */
-
-  protected JButton createResignButton(Plugin plugin, Game game){
-    JButton button = new JButton("Resign");
+   
+  private JButton createButton(String text, char mnemonic){
+    JButton button = new JButton(text);
     button.setFont(new Font("SansSerif", Font.BOLD, 15));
     button.addActionListener(this);
-    button.setMnemonic('r');
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-    
-
-    return button;
-  }
-
-
-
-
-  /**
-   * Creates the "Draw" button.
-   */
-
-  protected JButton createDrawButton(Plugin plugin, Game game){
-    JButton button = new JButton("Draw");
-    button.setFont(new Font("SansSerif", Font.BOLD, 15));
-    button.addActionListener(this);
-    button.setMnemonic('d');
+    button.setMnemonic(mnemonic);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
     return button;
   }
-
-
-
-
-  /**
-   * Creates the "Abort" button.
-   */
-
-  protected JButton createAbortButton(Plugin plugin, Game game){
-    JButton button = new JButton("Abort");
-    button.setFont(new Font("SansSerif", Font.BOLD, 15));
-    button.addActionListener(this);
-    button.setMnemonic('a');
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
-  }
-
-
-
-
-  /**
-   * Creates the "Adjourn" button.
-   */
-
-  protected JButton createAdjournButton(Plugin plugin, Game game){
-    JButton button = new JButton("Adjourn");
-    button.setFont(new Font("SansSerif", Font.BOLD, 15));
-    button.addActionListener(this);
-    button.setMnemonic('j');
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
-  }
-
-
-
+  
+  
+  
   /**
    * Sets the draw button's state to the specified value.
    */
 
   protected void setDrawState(int state){
+    drawButton.setEnabled(state != OFFERED_STATE);
+    
     switch (state){
+      case OFFERED_STATE:{
+        drawButtonPanel.setBorder(offeredStateBorder);
+        break;
+      }
       case OFFER_STATE:{
         drawButton.setToolTipText("Offer a draw");
         drawButtonPanel.setBorder(offerStateBorder);
@@ -431,8 +507,14 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   protected void setAbortState(int state){
     if (abortButton == null)
       return;
+    
+    abortButton.setEnabled(state != OFFERED_STATE);    
 
     switch (state){
+      case OFFERED_STATE:{
+        abortButtonPanel.setBorder(offeredStateBorder);
+        break;
+      }
       case OFFER_STATE:{
         abortButton.setToolTipText("Offer to abort the game");
         abortButtonPanel.setBorder(offerStateBorder);
@@ -463,8 +545,14 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   protected void setAdjournState(int state){
     if (adjournButton == null)
       return;
+    
+    adjournButton.setEnabled(state != OFFERED_STATE);    
 
     switch (state){
+      case OFFERED_STATE:{
+        adjournButtonPanel.setBorder(offeredStateBorder);
+        break;
+      }
       case OFFER_STATE:{
         adjournButton.setToolTipText("Offer to adjourn the game");
         adjournButtonPanel.setBorder(offerStateBorder);
@@ -484,7 +572,84 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         throw new IllegalArgumentException("Unrecognized state: "+state);
     }
   }
+  
+  
+  
+  /**
+   * Sets the state of the takeback (1) button to the specified state.
+   */
+   
+  protected void setTakeback1State(int state){
+    if (takeback1Button == null)
+      return;
+    
+    takeback1Button.setEnabled(state != OFFERED_STATE);    
 
+    switch (state){
+      case OFFERED_STATE:{
+        takeback1ButtonPanel.setBorder(offeredStateBorder);
+        break;
+      }
+      case OFFER_STATE:{
+        takeback1Button.setToolTipText("Offer to take back a move");
+        takeback1ButtonPanel.setBorder(offerStateBorder);
+        break;
+      }
+      case CLAIM_STATE:{
+        takeback1Button.setToolTipText("Take back a move");
+        takeback1ButtonPanel.setBorder(claimStateBorder);
+        break;
+      }
+      case ACCEPT_STATE:{
+        takeback1Button.setToolTipText("Agree to take back a move");
+        takeback1ButtonPanel.setBorder(acceptStateBorder);
+        break;
+      }
+      default:
+        throw new IllegalArgumentException("Unrecognized state: "+state);
+    }
+  }
+
+  
+  
+  /**
+   * Sets the state of the takeback (1) button to the specified state.
+   */
+   
+  protected void setTakebackNState(int state, int plyCount){
+    if (takebackNButton == null)
+      return;
+    
+    takebackNButton.setEnabled(state != OFFERED_STATE);
+    takebackNButton.setText("Takeback " + plyCount);
+    takebackNButton.setActionCommand(String.valueOf(plyCount));
+    
+
+    switch (state){
+      case OFFERED_STATE:{
+        takebackNButtonPanel.setBorder(offeredStateBorder);
+        break;
+      }
+      case OFFER_STATE:{
+        takebackNButton.setToolTipText("Offer to take back " + plyCount + " moves");
+        takebackNButtonPanel.setBorder(offerStateBorder);
+        break;
+      }
+      case CLAIM_STATE:{
+        takebackNButton.setToolTipText("Take back " + plyCount + " moves");
+        takebackNButtonPanel.setBorder(claimStateBorder);
+        break;
+      }
+      case ACCEPT_STATE:{
+        takebackNButton.setToolTipText("Agree to take back " + plyCount + " moves");
+        takebackNButtonPanel.setBorder(acceptStateBorder);
+        break;
+      }
+      default:
+        throw new IllegalArgumentException("Unrecognized state: "+state);
+    }
+  }
+  
 
 
   /**
@@ -516,41 +681,39 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
 
   protected void addComponents(Plugin plugin, Game game){
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-    resignButtonPanel = new JPanel(new BorderLayout());
-    resignButtonPanel.add(resignButton, BorderLayout.CENTER);
+    setLayout(new TableLayout(2, 5, 5));
 
     drawButtonPanel = new JPanel(new BorderLayout());
     drawButtonPanel.add(drawButton, BorderLayout.CENTER);
+    add(drawButtonPanel);
 
-    Box upperBox = Box.createHorizontalBox();
-    upperBox.add(drawButtonPanel);
-    upperBox.add(Box.createHorizontalStrut(10));
-    upperBox.add(resignButtonPanel);
+    resignButtonPanel = new JPanel(new BorderLayout());
+    resignButtonPanel.add(resignButton, BorderLayout.CENTER);
+    add(resignButtonPanel);
 
-    add(upperBox);
-
-    if ((abortButton != null) || (adjournButton != null)){
-      Box lowerBox = Box.createHorizontalBox();
-      if (abortButton != null){
-        abortButtonPanel = new JPanel(new BorderLayout());
-        abortButtonPanel.add(abortButton, BorderLayout.CENTER);
-
-        lowerBox.add(abortButtonPanel);
-        lowerBox.add(Box.createHorizontalStrut(10));
-      }
-      if (adjournButton != null){
-        adjournButtonPanel = new JPanel(new BorderLayout());
-        adjournButtonPanel.add(adjournButton, BorderLayout.CENTER);
-
-        lowerBox.add(adjournButtonPanel);
-      }
-
-      add(Box.createVerticalStrut(10));
-      add(lowerBox);
+    if (abortButton != null){    
+      abortButtonPanel = new JPanel(new BorderLayout());
+      abortButtonPanel.add(abortButton, BorderLayout.CENTER);
+      add(abortButtonPanel);
+    }
+    
+    if (adjournButton != null){
+      adjournButtonPanel = new JPanel(new BorderLayout());
+      adjournButtonPanel.add(adjournButton, BorderLayout.CENTER);
+      add(adjournButtonPanel);
+    }
+    
+    if (takeback1Button != null){
+      takeback1ButtonPanel = new JPanel(new BorderLayout());
+      takeback1ButtonPanel.add(takeback1Button, BorderLayout.CENTER);
+      add(takeback1ButtonPanel);
     }
 
+    if (takebackNButton != null){
+      takebackNButtonPanel = new JPanel(new BorderLayout());
+      takebackNButtonPanel.add(takebackNButton, BorderLayout.CENTER);
+      add(takebackNButtonPanel);
+    }
   }
 
 
@@ -564,22 +727,24 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     Object source = evt.getSource();
 
     Connection conn = plugin.getConn();
-    if (source==resignButton){
+    if (source == resignButton){
       int result = JOptionPane.showConfirmDialog(parentComponent, "Are you sure you want to resign?", "Resign?", JOptionPane.YES_NO_OPTION);
-      if (result==JOptionPane.YES_OPTION)
+      if (result == JOptionPane.YES_OPTION)
         conn.resign(game);
     }
-    else if (source==drawButton){
+    else if (source == drawButton)
       conn.requestDraw(game);
-    }
-    else if (source==abortButton){
+    else if (source == abortButton)
       conn.requestAbort(game);
-    }
-    else if (source==adjournButton){
+    else if (source == adjournButton)
       conn.requestAdjourn(game);
+    else if (source == takeback1Button)
+      conn.requestTakeback(game);
+    else if (source == takebackNButton){
+      int plies = Integer.parseInt(takebackNButton.getActionCommand());
+      conn.requestTakeback(game, plies);
     }
   }
-
 
 
 
