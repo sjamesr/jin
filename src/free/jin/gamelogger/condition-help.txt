@@ -27,7 +27,7 @@ Important things to remember:
   its left are true. It is usually referred to as "and/or", by people other than
   mathematicians and computer scientists.
 
-* Remember is to use "==" for an equal sign, and not "=", because "=" in Java
+* Remember to use "==" for an equal sign, and not "=", because "=" in Java
   stands for assignment, not equality, so "rating = 2000", for example,
   assigns the variable "rating" the value 2000, instead of checking whether the
   rating is 2000).
@@ -47,7 +47,7 @@ Important things to remember:
   to use "<", ">", "<=" or ">=".
 
 * All the examples in this help file are surrounded with double quotes - the
-  actual condition should not be surrounded with them.
+  actual conditions should not be surrounded with them.
 
 
 If you're still feeling stumped, I suggest you either use the "Log all games"
