@@ -73,14 +73,18 @@ public class CommandScript extends Script{
    * expression.
    */
 
-  public CommandScript(PluginContext context, String name, String eventType, String [] eventSubtypes,
-      String condition, String [] commands) throws EvalError{
+  public CommandScript(PluginContext context, String name, String eventType,
+      String [] eventSubtypes, String condition, String [] commands) throws EvalError{
     super(context, name, eventType, eventSubtypes);
 
     this.condition = condition;
     this.commands = (String [])commands.clone();
 
     bsh = new Interpreter();
+
+    bsh.set("context", getContext());
+    bsh.set("connection", getContext().getConnection());
+
     addImports(bsh);
   }
 
@@ -163,6 +167,7 @@ public class CommandScript extends Script{
     try{
       bsh.set("event", evt);
       bsh.set("eventSubtype", eventSubtype);
+
       for (int i = 0; i < vars.length; i++){
         Object [] var = vars[i];
         String varName = (String)(var[0]);
