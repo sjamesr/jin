@@ -128,7 +128,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting URLs.
    */
 
-  private static final Pattern urlRegex = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"!]");
+  private static final Pattern urlRegex = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"!?]");
 
 
 
@@ -136,7 +136,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting emails.
    */
 
-  private static final Pattern emailRegex = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"]+");
+  private static final Pattern emailRegex = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"?]+");
 
 
   
