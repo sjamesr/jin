@@ -150,7 +150,7 @@ public abstract class DialogPanel extends JPanel{
    
   public void resizeContainerToFit(){
     if (dialog != null)
-      dialog.setSize(dialog.getPreferredSize());
+      dialog.pack();
   }
 
 
