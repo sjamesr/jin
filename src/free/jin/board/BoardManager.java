@@ -88,38 +88,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Maps piece set identifiers to <code>PieceSet</code> objects.
-   */
-   
-  private final Hashtable pieceSets = new Hashtable();
-
-
-
-  /**
-   * The default piece set.
-   */
-   
-  private PieceSet defaultPieceSet;
-
-  
-
-  /**
-   * Maps board pattern identifiers to <code>BoardPattern</code> objects.
-   */
-
-  private final Hashtable boardPatterns = new Hashtable();
-
-
-
-  /**
-   * The default board pattern.
-   */
-   
-  private BoardPattern defaultBoardPattern;
-  
-  
-  
-  /**
    * A Hashtable mapping Game objects to BoardPanel objects which are currently
    * used.
    */
@@ -187,8 +155,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public void start() throws PluginStartException{
     obtainSoundManager();
-    loadPieceSets();
-    loadBoardPatterns();
     initPreferences();
     registerConnListeners();
     preload();
@@ -255,33 +221,20 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Loads the piece sets.
    */
    
-  protected void loadPieceSets() throws PluginStartException{
-    ClassLoader [] pieceSetLoaders = loadResources("pieces");
+  // protected void loadPieceSets() throws PluginStartException{
+  //   Resource [] pieceSetsArr = getResources("pieces");
 
-    try{
-      String resourceName = 
-        TextUtilities.translateResource(BoardManager.class, "defaultPieceSetDef"); 
-      defaultPieceSet = new PieceSet(BoardManager.class.getClassLoader(), resourceName);
-    } catch (IOException e){
-        throw new PluginStartException(e, "Unable to load default piece set");
-      }
+  //   if ((pieceSetsArr == null) || (pieceSetsArr.length == 0)){
+  //     pieceSets.put("default", PieceSet.DEFAULT_PIECE_SET);
+  //     return;
+  //   }
       
-    if ((pieceSetLoaders == null) || (pieceSetLoaders.length == 0)){
-      pieceSets.put("default", defaultPieceSet);
-      return;
-    }
-      
-    for (int i = 0; i < pieceSetLoaders.length; i++){
-      try{
-        PieceSet pieceSet = new PieceSet(pieceSetLoaders[i], "definition");
-        if (pieceSet.isCompatibleWith(getServer()))
-          pieceSets.put(pieceSet.getId(), pieceSet);
-      } catch (IOException e){
-          System.err.println("I/O error while loading piece set");
-          e.printStackTrace();
-        }
-    }
-  }
+  //   for (int i = 0; i < pieceSetsArr.length; i++){
+  //     PieceSet pieceSet = (PieceSet)pieceSetsArr[i];
+  //     if (pieceSet.isCompatibleWith(getServer()))
+  //       pieceSets.put(pieceSet.getId(), pieceSet);
+  //   }
+  // }
   
   
   
@@ -289,33 +242,20 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Loads the board patterns.
    */
    
-  protected void loadBoardPatterns() throws PluginStartException{
-    ClassLoader [] boardLoaders = loadResources("boards");
+  // protected void loadBoardPatterns() throws PluginStartException{
+  //   Resource [] boardPatternsArr = getResources("boards");
 
-    try{
-      String resourceName = 
-        TextUtilities.translateResource(BoardManager.class, "defaultBoardPatternDef"); 
-      defaultBoardPattern = new BoardPattern(BoardManager.class.getClassLoader(), resourceName);
-    } catch (IOException e){
-        throw new PluginStartException(e, "Unable to load default board pattern");
-      }
+  //   if ((boardPatternsArr == null) || (boardPatternsArr.length == 0)){
+  //     boardPatterns.put("default", BoardPattern.DEFAULT_BOARD_PATTERN);
+  //     return;
+  //   }
       
-    if ((boardLoaders == null) || (boardLoaders.length == 0)){
-      boardPatterns.put("default", defaultBoardPattern);
-      return;
-    }
-      
-    for (int i = 0; i < boardLoaders.length; i++){
-      try{
-        BoardPattern boardPattern = new BoardPattern(boardLoaders[i], "definition");
-        if (boardPattern.isCompatibleWith(getServer()))
-          boardPatterns.put(boardPattern.getId(), boardPattern);
-      } catch (IOException e){
-          System.err.println("I/O error while loading board pattern");
-          e.printStackTrace();
-        }
-    }
-  }
+  //   for (int i = 0; i < boardPatternsArr.length; i++){
+  //     BoardPattern boardPattern = (BoardPattern)boardPatternsArr[i];
+  //     if (boardPattern.isCompatibleWith(getServer()))
+  //       boardPatterns.put(boardPattern.getId(), boardPattern);
+  //   }
+  // }
 
 
 
@@ -371,8 +311,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     setCoordsDisplayColor(prefs.getColor("coords-display.color", Color.blue.darker()));
 
-    setPieceSet(prefs.getString("piece-set-id", null));
-    setBoardPattern(prefs.getString("board-pattern-id", null));
+    String pieceSetId = prefs.getString("piece-set-id", null);
+    if (pieceSetId != null)
+      setPieceSet((PieceSet)getResource("pieces", pieceSetId));
+    
+    String boardPatternId = prefs.getString("board-pattern-id", null);
+    if (boardPatternId != null)
+      setBoardPattern((BoardPattern)getResource("boards", boardPatternId));
     
     setWhitePieceColor(prefs.getColor("white-piece-color", Color.white));
     setBlackPieceColor(prefs.getColor("black-piece-color", Color.black));
@@ -922,8 +867,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
    
   public void setPieceSet(PieceSet set){
-    PieceSet pieceSet = set == null ? defaultPieceSet : set;
-    piecePainter = pieceSet.createPiecePainter();
+    PieceSet pieceSet = set == null ? PieceSet.DEFAULT_PIECE_SET : set;
+    piecePainter = pieceSet.getPiecePainter();
     configurePiecePainter();
     
     props.setProperty("pieceSet", pieceSet);    
@@ -937,40 +882,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public void setBoardPattern(BoardPattern pattern){
-    BoardPattern boardPattern = pattern == null ? defaultBoardPattern : pattern;
-    boardPainter = boardPattern.createBoardPainter();
+    BoardPattern boardPattern = pattern == null ? BoardPattern.DEFAULT_BOARD_PATTERN : pattern;
+    boardPainter = boardPattern.getBoardPainter();
     configureBoardPainter();
     
     props.setProperty("boardPattern", boardPattern);
   }
   
   
-  
-  /**
-   * Sets the current piece set to be of the specified type.
-   *
-   * @param id The identifier of the piece set.
-   */
-
-  public void setPieceSet(String id){
-    PieceSet pieceSet = (id == null ? null : (PieceSet)pieceSets.get(id));
-    setPieceSet(pieceSet);
-  }
-  
-  
-  
-  /**
-   * Sets the current board pattern to be of the specified type.
-   *
-   * @param id The identifier of the board pattern.   
-   */
-
-  public void setBoardPattern(String id){
-    BoardPattern boardPattern = (id == null ? null : (BoardPattern)boardPatterns.get(id));
-    setBoardPattern(boardPattern);
-  }
-  
-
 
   /**
    * Registers all the necessary listeners with the Connection.
@@ -992,65 +911,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     createBoardPanel(new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
         5*60*1000, 2000, 1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER));
   }
-
-
-
-  /**
-   * Returns a list of available piece sets.
-   */
-   
-  public PieceSet [] getAvailablePieceSets(){
-    // Put the piece sets in a vector ordered alphabetically by name
-    Enumeration pieceSetIds = pieceSets.keys();
-    Vector pieceSetsVec = new Vector(pieceSets.size());
-    while (pieceSetIds.hasMoreElements()){
-      Object id = pieceSetIds.nextElement();
-      PieceSet pieceSet = (PieceSet)pieceSets.get(id);
-      int i = 0;
-      while (i < pieceSetsVec.size()){
-        PieceSet cur = (PieceSet)pieceSetsVec.elementAt(i);
-        if (pieceSet.getName().compareTo(cur.getName()) < 0)
-          break;
-        i++;
-      }
-      pieceSetsVec.insertElementAt(pieceSet, i);
-    }
-    
-    PieceSet [] pieceSets = new PieceSet[pieceSetsVec.size()];
-    pieceSetsVec.copyInto(pieceSets);
-    
-    return pieceSets;
-  }
-  
-  
-  
-  /**
-   * Returns a list of available board patterns.
-   */
-   
-  public BoardPattern [] getAvailableBoardPatterns(){
-    // Put the board patterns in a vector ordered alphabetically by name
-    Enumeration boardPatternIds = boardPatterns.keys();
-    Vector boardPatternsVec = new Vector(boardPatterns.size());
-    while (boardPatternIds.hasMoreElements()){
-      Object id = boardPatternIds.nextElement();
-      BoardPattern boardPattern = (BoardPattern)boardPatterns.get(id);
-      int i = 0;
-      while (i < boardPatternsVec.size()){
-        BoardPattern cur = (BoardPattern)boardPatternsVec.elementAt(i);
-        if (boardPattern.getName().compareTo(cur.getName()) < 0)
-          break;
-        i++;
-      }
-      boardPatternsVec.insertElementAt(boardPattern, i);
-    }
-    
-    BoardPattern [] boardPatterns = new BoardPattern[boardPatternsVec.size()];
-    boardPatternsVec.copyInto(boardPatterns);
-    
-    return boardPatterns;
-  }
-  
 
 
 
@@ -1437,257 +1297,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public String getName(){
     return "Chess Board";
-  }
-  
-  
-  
-  /**
-   * Encapsulates a piece set.
-   */
-   
-  public static class PieceSet{
-    
-
-    
-    /**
-     * The definition properties of this piece set.
-     */
-     
-    private final Properties definition;
-    
-    
-    
-    /**
-     * The class loader of this piece set.
-     */
-     
-    private final ClassLoader loader;
-    
-    
-    
-    /**
-     * Loads a new <code>PieceSet</code> with the specified
-     * <code>ClassLoader</code>. The definition resource name is also specified. 
-     */
-     
-    public PieceSet(ClassLoader loader, String defResourceName) throws IOException{
-      this.loader = loader;
-      this.definition = IOUtilities.loadProperties(loader.getResourceAsStream(defResourceName));
-      
-      if (definition == null)
-        throw new IOException("Unable to load piece set definition from: " + defResourceName);
-    }
-    
-    
-    
-    /**
-     * Returns the identifier of this piece set.
-     */
-     
-    public String getId(){
-      return definition.getProperty("id");
-    }
-    
-    
-    
-    /**
-     * Returns the name of this piece set.
-     */
-     
-    public String getName(){
-      return definition.getProperty("name");
-    }
-    
-    
-    
-    /**
-     * Returns whether this piece set can be used on the specified server.
-     */
-     
-    public boolean isCompatibleWith(Server server){
-      String allowedServers = definition.getProperty("servers");
-      if (allowedServers == null)
-        return true;
-      
-      String [] servers = TextUtilities.getTokens(allowedServers, " ");
-      for (int i = 0; i < servers.length; i++){
-        if (servers[i].equals(server.getId()))
-          return true;
-      }
-      
-      return false;
-    }
-    
-    
-    
-    /**
-     * Creates a PiecePainter for this piece set or null if unable to load it.
-     */
-     
-    public PiecePainter createPiecePainter(){
-      String className = definition.getProperty("classname");
-      if (className == null){
-        System.err.println("Unable to find classname property in definition of piece set: "
-          + getId());
-        return null;
-      }
-
-      try{
-        return (PiecePainter)loader.loadClass(className).newInstance();
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to find class " + className);
-        }
-        catch (InstantiationException e){
-          System.err.println("Unable to instantiate class " + className); 
-        }
-        catch (IllegalAccessException e){
-          System.err.println("Unable to instantiate class " + className + " due to access restrictions."); 
-        }
-        catch (ClassCastException e){
-          System.err.println("Unable to cast " + className + " into PiecePainter"); 
-        }
-        
-      return null;
-    }
-    
-
-    
-    /**
-     * Returns the name of the piece set.
-     */
-     
-    public String toString(){
-      return getName();
-    }
-    
-    
-    
-  }
-  
-  
-  
-  /**
-   * Encapsulates a board pattern.
-   */
-   
-  public static class BoardPattern{
-
-    
-
-    /**
-     * The definition properties of this board pattern.
-     */
-     
-    private final Properties definition;
-    
-    
-    
-    /**
-     * The class loader of this board pattern.
-     */
-     
-    private final ClassLoader loader;
-    
-    
-    
-    
-    /**
-     * Loads a new <code>BoardPattern</code> with the specified
-     * <code>ClassLoader</code>. The definition resource name is also specified. 
-     */
-     
-    public BoardPattern(ClassLoader loader, String defResourceName) throws IOException{
-      this.loader = loader;
-      this.definition = IOUtilities.loadProperties(loader.getResourceAsStream(defResourceName));
-      
-      if (definition == null)
-        throw new IOException("Unable to load board pattern definition from: " + defResourceName);
-    }
-    
-    
-    
-    /**
-     * Returns the identifier of this board pattern.
-     */
-     
-    public String getId(){
-      return definition.getProperty("id");
-    }
-    
-    
-    
-    /**
-     * Returns the name of this board pattern.
-     */
-     
-    public String getName(){
-      return definition.getProperty("name");
-    }
-    
-    
-    
-    /**
-     * Returns whether this piece set can be used on the specified server.
-     */
-     
-    public boolean isCompatibleWith(Server server){
-      String allowedServers = definition.getProperty("servers");
-      if (allowedServers == null)
-        return true;
-      
-      String [] servers = TextUtilities.getTokens(allowedServers, " ");
-      for (int i = 0; i < servers.length; i++){
-        if (servers[i].equals(server.getId()))
-          return true;
-      }
-      
-      return false;
-    }
-
-
-
-    /**
-     * Creates a new BoardPainter for this piece set or null if unable to load it.
-     */
-     
-    public BoardPainter createBoardPainter(){
-      String className = definition.getProperty("classname");
-      if (className == null){
-        System.err.println("Unable to find classname property in definition of piece set: "
-          + getId());
-        return null;
-      }
-
-      try{
-        return (BoardPainter)loader.loadClass(className).newInstance();
-      } catch (ClassNotFoundException e){
-          System.err.println("Unable to find class " + className);
-        }
-        catch (InstantiationException e){
-          System.err.println("Unable to instantiate class " + className); 
-        }
-        catch (IllegalAccessException e){
-          System.err.println("Unable to instantiate class " + className + " due to access restrictions."); 
-        }
-        catch (ClassCastException e){
-          System.err.println("Unable to cast " + className + " into BoardPainter"); 
-        }
-        
-      return null;
-    }
-    
-    
-    
-    /**
-     * Returns the name of the board pattern.
-     */
-     
-    public String toString(){
-      return getName();
-    }
-
-
-    
   }
   
 
