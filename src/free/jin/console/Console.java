@@ -572,13 +572,19 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       }
 
       public void run(){
-        if (numAddToOutputCalls==curNumCalls){
-          BoundedRangeModel verticalScrollModel = outputScrollPane.getVerticalScrollBar().getModel();
-          verticalScrollModel.setValue(verticalScrollModel.getMaximum());
+        if (numAddToOutputCalls == curNumCalls){
+          try{
+            int lastOffset = outputComponent.getDocument().getEndPosition().getOffset();
+            Rectangle lastCharRect = outputComponent.modelToView(lastOffset - 1);
+            outputComponent.scrollRectToVisible(lastCharRect);
+          } catch (BadLocationException e){e.printStackTrace();}
+
           didScrollToBottom = true;
-          outputScrollPane.getViewport().putClientProperty("EnableWindowBlit", Boolean.TRUE); 
+
           // Enable blitting again
-//          outputComponent.repaint(); Not sure why this is needed
+          outputScrollPane.getViewport().putClientProperty("EnableWindowBlit", Boolean.TRUE); 
+
+          outputComponent.repaint();
         }
         else{
           curNumCalls = numAddToOutputCalls;
@@ -686,10 +692,10 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       outputComponent.addLink(link);
     }
 
-    for (int i=0;i<linkREs.length;i++){
+    for (int i = 0; i < linkREs.length; i++){
       Pattern linkRE = linkREs[i];
 
-      if (linkRE==null) // Bad pattern was given in properties.
+      if (linkRE == null) // Bad pattern was given in properties.
         continue;
 
       MatchIterator matches = linkRE.matcher(text).findAll();      
