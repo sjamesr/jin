@@ -27,8 +27,8 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import free.jin.DialogPanel;
 import free.jin.action.JinAction;
+import free.jin.ui.DialogPanel;
 import free.workarounds.FixedJTextField;
 
 
