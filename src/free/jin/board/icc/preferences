@@ -1,0 +1,32 @@
+
+piece-painter-class-name = string;free.jin.board.icc.ChessclubVectorPiecePainter
+
+piece-set-count = integer;7
+piece-set-0=string;Blitzin Vector,free.jin.board.icc.ChessclubVectorPiecePainter
+piece-set-1=string;Eboard Vector,free.chess.art.EboardVectorPiecePainter
+piece-set-2=string;XBoard,free.chess.art.XBoardPiecePainter
+piece-set-3=string;Bookup,free.jin.board.icc.BookupPiecePainter
+piece-set-4=string;Dyche Standard,free.jin.board.icc.Dyche3PiecePainter
+piece-set-5=string;Dyche Gray,free.jin.board.icc.Dyche1PiecePainter
+piece-set-6=string;Dyche Color,free.jin.board.icc.Dyche2PiecePainter
+
+
+board-painter-class-name = string;free.jin.board.icc.WoodenBoardPainter
+
+board-count = integer;5
+board-0=string;Solid Color,free.chess.DefaultBoardPainter
+board-1=string;Wooden Light,free.jin.board.icc.WoodenBoardPainter
+board-2=string;Wooden Dark,free.chess.art.WoodenBoardPainter
+board-3=string;Marble,free.chess.art.MarbleBoardPainter
+board-4=string;Slate,free.chess.art.SlateBoardPainter
+
+white-piece-color=color;ffffff
+black-piece-color=color;000000
+white-outline-color=color;000000
+black-outline-color=color;ffffff
+
+light-square-color=color;ffcf90
+dark-square-color=color;8f604f
+
+move-highlighting.color=color;00b2b2
+drag-square-highlighting.color=color;0000ff
