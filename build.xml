@@ -28,7 +28,11 @@
 		<property name="plugins.dir" value="${build.dir}/plugins" />
 		<property name="actions.dir" value="${build.dir}/actions" />
 		<property name="resources.dir" value="${build.dir}/resources" />	
-		<property name="lnfs.dir" value="${build.dir}/lnfs" />	
+		<property name="lnfs.dir" value="${build.dir}/lnfs" />
+		
+		<property file="${source.dir}/free/jin/resources/app.props" prefix="jin" />
+		<property name="release.name" value="${jin.app.name}" />
+		<property name="release.version" value="${jin.app.version}" />
 	</target>
 
 
@@ -85,6 +89,7 @@
 		<mkdir dir="${actions.dir}/fics" />
 		<mkdir dir="${actions.dir}/icc" />
 		<mkdir dir="${lnfs.dir}" />
+		
 		
 		<!-- Copy libs -->
 		<copy todir="${libs.dir}">
@@ -175,18 +180,26 @@
 			</or>
 		</condition>
 		
-		<!-- Call the tasks that do platform specific stuff -->
-		<antcall target="doUnixStuff" />
-		<antcall target="doWindowsStuff" />
-		<antcall target="doMacOSXStuff" />
-		<antcall target="doAppletStuff" />
-		
 
 		<!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
 			<fileset dir="${source.dir}" excludes="**/*.java **/*.html" />
 		</copy>
+		
+		
+		<!-- Call the tasks that do platform specific stuff -->
+		<antcall target="doUnixStuff" />
+		<antcall target="doWindowsStuff" />
+		<antcall target="doMacOSXStuff" />
+		<antcall target="doAppletStuff" />
 
+		
+		<!-- Set application name and version -->
+		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
+			<entry key="app.name" value="${release.name}" />
+			<entry key="app.version" value="${release.version}" />
+		</propertyfile>
+		
 		
 		<!-- Utility library: free.util.* and free.workarounds.* -->
 
@@ -632,6 +645,10 @@
 		<copy todir="${build.dir}">
 			<fileset file="resources/os-specific/applet/**" excludes="**.java"/>
 		</copy>
+		
+ 		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
+			<entry key="lf.extra.count" value="0" />
+		</propertyfile>
 	</target>
 	
 	
