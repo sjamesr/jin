@@ -154,7 +154,7 @@ public class BackgroundChooser extends JDialog{
 
     tileButton.setMnemonic('T');
     stretchButton.setMnemonic('S');
-    centerButton.setMnemonic('e');
+    centerButton.setMnemonic('C');
 
     ButtonGroup group = new ButtonGroup();
     group.add(tileButton);
