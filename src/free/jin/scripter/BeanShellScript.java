@@ -120,7 +120,7 @@ public class BeanShellScript extends Script{
              "}");
 
     bsh.eval("void appendLine(String line){\n"+
-             "  free.jin.console.ConsoleManager plugin = getPlugin(\"console\");\n"+
+             "  free.jin.console.ConsoleManager plugin = scripter.getPlugin(\"console\");\n"+
              "  plugin.addSpecialLine(line);\n"+
              "}");
   }
