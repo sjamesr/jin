@@ -32,6 +32,10 @@ import java.util.Vector;
 import javax.swing.SwingUtilities;
 import free.jin.event.JinListenerManager;
 import free.util.EventListenerList;
+import free.chess.variants.BothSidesCastlingVariant;
+import free.chess.variants.NoCastlingVariant;
+import free.chess.variants.fischerrandom.FischerRandom;
+import free.chess.variants.suicide.Suicide;
 
 
 /**
@@ -332,8 +336,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
-   * Returns the wild variant corresponding to the given game category name,
-   * or <code>null</code> if that category is not supported. 
+   * Returns the wild variant corresponding to the given server wild variant 
+   * name/category name, or <code>null</code> if that category is not supported. 
    */
 
   private static WildVariant getVariant(String categoryName){
@@ -342,8 +346,25 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         categoryName.equalsIgnoreCase("standard"))
       return Chess.getInstance();
 
+    
+    if (categoryName.startsWith("wild/")){
+      String wildId = categoryName.substring("wild/.".length());
+      if (wildId.equals("0") || wildId.equals("1"))
+        return new BothSidesCastlingVariant(Chess.INITIAL_POSITION_FEN, categoryName);
+      else if (wildId.equals("2") || wildId.equals("3"))
+        return new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, categoryName);
+      else if (wildId.equals("5") || wildId.equals("8") || wildId.equals("8a"))
+        return new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, categoryName);
+      else if (wildId.equals("fr"))
+        return FischerRandom.getInstance();
+    }
+    else if (categoryName.equals("suicide"))
+      return Suicide.getInstance();
+    else if (categoryName.equals("losers"))
+      return new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, categoryName);
+
     // This means it's a fake variant we're using because the server hasn't told us the real one.
-    if (categoryName.equals("fake-variant"))
+    else if (categoryName.equals("fake-variant"))
       return Chess.getInstance();
 
     return null;
@@ -620,23 +641,71 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     Square fromSquare, toSquare;
     Piece promotionPiece = null;
     if (moveVerbose.equals("o-o")){
-      if (currentPlayer.isWhite()){
-        fromSquare = Square.parseSquare("e1");
-        toSquare = Square.parseSquare("g1");
+      if (variant instanceof BothSidesCastlingVariant){
+        if (currentPlayer.isWhite()){
+          if (position.getPieceAt("e1") == ChessPiece.WHITE_KING){
+            fromSquare = Square.parseSquare("e1");
+            toSquare = Square.parseSquare("g1");
+          }
+          else{
+            fromSquare = Square.parseSquare("d1");
+            toSquare = Square.parseSquare("b1");
+          }
+        }
+        else{
+          if (position.getPieceAt("e8") == ChessPiece.BLACK_KING){
+            fromSquare = Square.parseSquare("e8");
+            toSquare = Square.parseSquare("g8");
+          }
+          else{
+            fromSquare = Square.parseSquare("d8");
+            toSquare = Square.parseSquare("b8");
+          }
+        }
       }
-      else{
-        fromSquare = Square.parseSquare("e8");
-        toSquare = Square.parseSquare("g8");
+      else{      
+        if (currentPlayer.isWhite()){
+          fromSquare = Square.parseSquare("e1");
+          toSquare = Square.parseSquare("g1");
+        }
+        else{
+          fromSquare = Square.parseSquare("e8");
+          toSquare = Square.parseSquare("g8");
+        }
       }
     }
     else if (moveVerbose.equals("o-o-o")){
-      if (currentPlayer.isWhite()){
-        fromSquare = Square.parseSquare("e1");
-        toSquare = Square.parseSquare("c1");
+      if (variant instanceof BothSidesCastlingVariant){
+        if (currentPlayer.isWhite()){
+          if (position.getPieceAt("e1") == ChessPiece.WHITE_KING){
+            fromSquare = Square.parseSquare("e1");
+            toSquare = Square.parseSquare("c1");
+          }
+          else{
+            fromSquare = Square.parseSquare("d1");
+            toSquare = Square.parseSquare("f1");
+          }
+        }
+        else{
+          if (position.getPieceAt("e8") == ChessPiece.BLACK_KING){
+            fromSquare = Square.parseSquare("e8");
+            toSquare = Square.parseSquare("c8");
+          }
+          else{
+            fromSquare = Square.parseSquare("d8");
+            toSquare = Square.parseSquare("f8");
+          }
+        }
       }
       else{
-        fromSquare = Square.parseSquare("e8");
-        toSquare = Square.parseSquare("c8");
+        if (currentPlayer.isWhite()){
+          fromSquare = Square.parseSquare("e1");
+          toSquare = Square.parseSquare("c1");
+        }
+        else{
+          fromSquare = Square.parseSquare("e8");
+          toSquare = Square.parseSquare("c8");
+        }
       }
     }
     else{
