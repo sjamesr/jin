@@ -724,9 +724,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   protected void executeSpecialCommand(String command){
     command = command.trim();
     if (command.equalsIgnoreCase("cls")){
-      outputComponent.setText("");
-      outputComponent.removeAll();
-      outputComponent.removeLinks();
+      clear();
     }
     else if (command.startsWith("url ")){
       String urlString = command.substring("url ".length());
@@ -773,6 +771,19 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       else
         addToOutput("Unable to issue command, not connected yet", "info");
     }
+  }
+
+
+
+
+  /**
+   * Removes all text from the console.
+   */
+
+  public void clear(){
+    outputComponent.setText("");
+    outputComponent.removeAll();
+    outputComponent.removeLinks();
   }
 
 
