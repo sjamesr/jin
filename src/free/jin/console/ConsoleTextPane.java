@@ -179,7 +179,7 @@ public class ConsoleTextPane extends JTextPane{
   protected void paintComponent(Graphics g){
     if (renderingHints == null){
       renderingHints = new Hashtable(10, 0.1f);
-      boolean antialias = new Boolean(console.getProperty("output-text.antialias")).booleanValue();
+      boolean antialias = console.getPrefs().getBool("output-text.antialias", false);
 //      String fractionalMetrics = console.getProperty("output-text.fractionalMetrics");
 
       String textAntialiasValue = "VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
@@ -366,21 +366,21 @@ public class ConsoleTextPane extends JTextPane{
       return null;
 
     if (defaultPopupMenu == null){
-      int numCommands = Integer.parseInt(console.getProperty("output-popup.num-commands", "0"));
+      int numCommands = console.getPrefs().getInt("output-popup.num-commands", 0);
       if (numCommands == 0)
         return null;
 
       defaultPopupMenu = new JPopupMenu();
 
       for (int i=0;i<numCommands;i++){
-        String command = console.getProperty("output-popup.command-"+i);
+        String command = console.getPrefs().getString("output-popup.command-" + i);
 
         if (command.equalsIgnoreCase("separator")){
           defaultPopupMenu.addSeparator();
           continue;
         }
 
-        String commandName = console.getProperty("output-popup.command-"+i+"-name");
+        String commandName = console.getPrefs().getString("output-popup.command-" + i + "-name");
 
         JMenuItem menuItem = new JMenuItem(commandName);
         menuItem.setActionCommand(command);

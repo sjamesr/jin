@@ -159,19 +159,19 @@ public class GameListTableModel implements TableModel{
 
   protected String getHistoryResultCodeString(int resultCode, Player player){
     switch (resultCode){
-      case JinConnection.WHITE_WON:
+      case Connection.WHITE_WON:
         if (player.isWhite())
           return "+";
         else
           return "-";
-      case JinConnection.WHITE_LOST:
+      case Connection.WHITE_LOST:
         if (player.isBlack())
           return "+";
         else
           return "-";
-      case JinConnection.DRAWN:
+      case Connection.DRAWN:
         return "=";
-      case JinConnection.ABORTED:
+      case Connection.ABORTED:
         return "a";
       default:
         throw new IllegalArgumentException("Illegal result code encountered");

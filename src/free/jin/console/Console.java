@@ -30,9 +30,9 @@ import javax.swing.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.io.IOException;
-import free.jin.JinConnection;
+import free.jin.Connection;
+import free.jin.Preferences;
 import free.jin.plugin.Plugin;
-import free.util.StringParser;
 import free.util.BrowserControl;
 import free.workarounds.FixUtils;
 
@@ -80,12 +80,18 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * The Plugin which uses us, we use its properties to determine all kinds of
-   * our properties (text colors etc.).
+   * The connection to the server.
    */
 
-  protected final Plugin userPlugin;
+  private final Connection conn;
 
+
+
+  /**
+   * The preferences of this console.
+   */
+
+  private final Preferences prefs;
 
 
 
@@ -120,7 +126,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting URLs.
    */
 
-  private static final Pattern urlRegex = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"]");
+  private static final Pattern urlRegex = new Pattern("(((ftp|http(s)?)://)|(www\\.))([^\\s()<>\"])*[^\\s.,()<>\"!]");
 
 
 
@@ -174,12 +180,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Creates a new Console which is used by the given Plugin. The Console uses
-   * various properties of the plugin to determine how do display text etc.
+   * Creates a new Console with the specified preferences and connection to the
+   * server.
    */
 
-  public Console(Plugin userPlugin){
-    this.userPlugin = userPlugin;
+  public Console(Connection conn, Preferences prefs){
+    this.conn = conn;
+    this.prefs = prefs;
 
     this.outputComponent = createOutputComponent();
     configureOutputComponent(outputComponent);
@@ -195,6 +202,16 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     outputComponent.addContainerListener(this);
 
     init();
+  }
+
+
+
+  /**
+   * Returns the preferences.
+   */
+
+  public Preferences getPrefs(){
+    return prefs;
   }
 
 
@@ -432,63 +449,58 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   private void init(){
     attributesCache.clear(); // Clear the cache
 
-
     /********************* OUTPUT COMPONENT ***********************/
 
     // We set it here because of a Swing bug which causes the background to be 
     // drawn with the foreground color if you set the background as an attribute.
-    String outputBg = getProperty("background");
-    if (outputBg!=null)
-      outputComponent.setBackground(StringParser.parseColor(outputBg));
+    Color outputBg = prefs.getColor("background", null);
+    if (outputBg != null)
+      outputComponent.setBackground(outputBg);
 
-    String outputSelection = getProperty("output-selection");
-    if (outputSelection!=null)
-      outputComponent.setSelectionColor(StringParser.parseColor(outputSelection));
+    Color outputSelection = prefs.getColor("output-selection", null);
+    if (outputSelection != null)
+      outputComponent.setSelectionColor(outputSelection);
 
-    String outputSelected = getProperty("output-selected");
-    if (outputSelected!=null)
-      outputComponent.setSelectedTextColor(StringParser.parseColor(outputSelected));      
+    Color outputSelected = prefs.getColor("output-selected", null);
+    if (outputSelected != null)
+      outputComponent.setSelectedTextColor(outputSelected);
 
 
 
     /********************* INPUT COMPONENT *************************/
 
-    String inputBg = getProperty("input-background");
-    if (inputBg!=null)
-      inputComponent.setBackground(StringParser.parseColor(inputBg));
+    Color inputBg = prefs.getColor("input-background", null);
+    if (inputBg != null)
+      inputComponent.setBackground(inputBg);
 
-    String inputFg = getProperty("input-foreground");
-    if (inputFg!=null)
-      inputComponent.setForeground(StringParser.parseColor(inputFg));
+    Color inputFg = prefs.getColor("input-foreground", null);
+    if (inputFg != null)
+      inputComponent.setForeground(inputFg);
 
-    String inputSelection = getProperty("input-selection");
-    if (inputSelection!=null)
-      inputComponent.setSelectionColor(StringParser.parseColor(inputSelection));
+    Color inputSelection = prefs.getColor("input-selection", null);
+    if (inputSelection != null)
+      inputComponent.setSelectionColor(inputSelection);
 
-    String inputSelected = getProperty("input-selected");
-    if (inputSelected!=null)
-      inputComponent.setSelectedTextColor(StringParser.parseColor(inputSelected));      
+    Color inputSelected = prefs.getColor("input-selected", null);
+    if (inputSelected != null)
+      inputComponent.setSelectedTextColor(inputSelected);
 
 
-    int numLinkPatterns = Integer.parseInt(getProperty("output-link.num-patterns","0"));
+    int numLinkPatterns = prefs.getInt("output-link.num-patterns", 0);
     linkREs = new Pattern[numLinkPatterns];
     linkCommands = new String[numLinkPatterns];
     linkSubexpressionIndices = new int[numLinkPatterns];
-    for (int i=0;i<numLinkPatterns;i++){
+    for (int i = 0; i < numLinkPatterns; i++){
       try{
-        String linkPattern = getProperty("output-link.pattern-"+i);
-        String linkCommand = getProperty("output-link.command-"+i);
-        String subexpressionIndexString = getProperty("output-link.index-"+i);
-        if ((linkPattern!=null)&&(linkCommand!=null)&&(subexpressionIndexString!=null)){
-          linkSubexpressionIndices[i] = Integer.parseInt(subexpressionIndexString);
-          Pattern regex = new Pattern(linkPattern);
-          linkREs[i] = regex;
-          linkCommands[i] = linkCommand;
-        }
+        String linkPattern = prefs.getString("output-link.pattern-" + i);
+        String linkCommand = prefs.getString("output-link.command-" + i);
+        int subexpressionIndex = prefs.getInt("output-link.index-"+i);
+
+        linkSubexpressionIndices[i] = subexpressionIndex;
+        Pattern regex = new Pattern(linkPattern);
+        linkREs[i] = regex;
+        linkCommands[i] = linkCommand;
       } catch (PatternSyntaxException e){
-          e.printStackTrace();
-        }
-        catch (NumberFormatException e){
           e.printStackTrace();
         }
     }
@@ -520,8 +532,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   protected boolean isCopyOnSelect(){
-    String val = userPlugin.getProperty("copyOnSelect", "true");
-    return new Boolean(val).booleanValue();
+    return prefs.getBool("copyOnSelect", true);
   }
 
 
@@ -772,19 +783,14 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     }
     else if (command.startsWith("url ")){
       String urlString = command.substring("url ".length());
-      try{
-        BrowserControl.displayURL(urlString);
-      } catch (IOException e){
-          e.printStackTrace();
-        }
+      if (!BrowserControl.displayURL(urlString))
+        BrowserControl.showDisplayBrowserFailedDialog(urlString, this, true);
+
     }
     else if (command.startsWith("email ")){
       String emailString = command.substring("email ".length());
-      try{
-        BrowserControl.displayMailer(emailString);
-      } catch (IOException e){
-          e.printStackTrace();
-        }
+      if (!BrowserControl.displayMailer(emailString))
+        BrowserControl.showDisplayMailerFailedDialog(emailString, this, true);
     }
     else{
       addToOutput("Unknown special command: \""+command+"\"","system");
@@ -809,7 +815,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     if (command.isSpecial())
       executeSpecialCommand(commandString);
     else{
-      JinConnection conn = userPlugin.getConnection();
       if (conn.isConnected())
         conn.sendCommand(commandString);
       else
@@ -854,7 +859,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   public int getTellerRingSize(){
-    return Integer.parseInt(getProperty("teller-ring-size", "5"));
+    return prefs.getInt("teller-ring-size", 5);
   }
 
 
@@ -886,113 +891,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
 
-
-  /**
-   * Returns the value of the userPlugin property with the given name. Returns
-   * null if no property with the given name exists. This method simply delegates
-   * to Plugin.getProperty(String)
-   */
-
-  public String getProperty(String propertyName){
-    return userPlugin.getProperty(propertyName);
-  }
-
-
-
-
-  /**
-   * Returns the value of the property with the given name. Returns the given 
-   * default value if no property with the given name exists. This method simply
-   * delegates to Plugin.getProperty(String, String)
-   */
-
-  public String getProperty(String propertyName, String defaultValue){
-    return userPlugin.getProperty(propertyName, defaultValue);
-  }
-
-
-  
-
-
-  /**
-   * Looks up and returns a value for the property with the given name. Simply
-   * delegates to Plugin.lookupProperty(String).
-   */
-
-  protected String lookupStringProperty(String propertyName){
-    return userPlugin.lookupProperty(propertyName);
-  }
-
-
-
-
-  /**
-   * Looks up an integer property with the given name. Follows the same procedure
-   * as lookupStringProperty(String) and then parses the string as an integer.
-   */
-
-  protected Integer lookupIntegerProperty(String propertyName){
-    String propertyValue = lookupStringProperty(propertyName);
-    if (propertyValue == null)
-      return null;
-
-    return new Integer(propertyValue);
-  }
-
-
-
-
-  /**
-   * Looks up a float property with the given name. Follows the same procedure
-   * as lookupStringProperty(String) and then parses the string as a float.
-   */
-
-  protected Float lookupFloatProperty(String propertyName){
-    String propertyValue = lookupStringProperty(propertyName);
-    if (propertyValue == null)
-      return null;
-
-    return new Float(propertyValue);
-  }
-
-
-
-
-
-  /**
-   * Looks up a boolean property with the given name. Follows the same procedure
-   * as lookupStringProperty(String) and then parses the string as a boolean.
-   */
-
-  protected Boolean lookupBooleanProperty(String propertyName){
-    String propertyValue = lookupStringProperty(propertyName);
-    if (propertyValue == null)
-      return null;
-
-    return new Boolean(propertyValue);
-  }
-
-
-
-
-
-  /**
-   * Looks up a color property with the given name. Follows the same procedure
-   * as lookupStringProperty(String) and then parses the string as a color.
-   */
-
-  protected Color lookupColorProperty(String propertyName){
-    String propertyValue = lookupStringProperty(propertyName);
-    if (propertyValue == null)
-      return null;
-
-    return StringParser.parseColor(propertyValue);
-  }
-
-
-
-
-
   /**
    * Returns the AttributeSet for the given type of output text. Due to a bug
    * in Swing, this method does not address the background color.
@@ -1000,31 +898,30 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   protected AttributeSet attributesForTextType(String textType){
     AttributeSet attributes = (AttributeSet)attributesCache.get(textType);
-    if (attributes!=null)
+    if (attributes != null)
       return attributes;
 
+    String fontFamily = (String)prefs.lookup("font-family." + textType, "Monospaced");
+    Integer fontSize = (Integer)prefs.lookup("font-size." + textType, new Integer(14));
+    Boolean bold = (Boolean)prefs.lookup("font-bold." + textType, Boolean.FALSE);
+    Boolean italic = (Boolean)prefs.lookup("font-italic." + textType, Boolean.FALSE);
+    Boolean underline = (Boolean)prefs.lookup("font-underlined." + textType, Boolean.FALSE);
+    Color foreground = (Color)prefs.lookup("foreground." + textType, Color.white);
+
     SimpleAttributeSet mAttributes = new SimpleAttributeSet();
-
-    String fontFamily = lookupStringProperty("font-family."+textType);
-    Integer fontSize = lookupIntegerProperty("font-size."+textType);
-    Boolean bold = lookupBooleanProperty("font-bold."+textType);
-    Boolean italic = lookupBooleanProperty("font-italic."+textType);
-    Boolean underlined = lookupBooleanProperty("font-underlined."+textType);
-    Color foreground = lookupColorProperty("foreground."+textType);
-
-    if (fontFamily!=null)
-      StyleConstants.setFontFamily(mAttributes,fontFamily);
-    if (fontSize!=null)
-      StyleConstants.setFontSize(mAttributes,fontSize.intValue());
-    if (bold!=null)
-      StyleConstants.setBold(mAttributes,bold.booleanValue());
-    if (italic!=null)
-      StyleConstants.setItalic(mAttributes,italic.booleanValue());
-    if (underlined!=null)
-      StyleConstants.setUnderline(mAttributes,underlined.booleanValue());
-    if (foreground!=null)
-      StyleConstants.setForeground(mAttributes,foreground);
-    attributesCache.put(textType,mAttributes);
+    mAttributes.addAttribute(StyleConstants.FontFamily, fontFamily);
+    mAttributes.addAttribute(StyleConstants.FontSize, fontSize);
+    mAttributes.addAttribute(StyleConstants.Bold, bold);
+    mAttributes.addAttribute(StyleConstants.Italic, italic);
+    mAttributes.addAttribute(StyleConstants.Underline, underline);
+    mAttributes.addAttribute(StyleConstants.Foreground, foreground);
+//    StyleConstants.setFontFamily(mAttributes, fontFamily);
+//    StyleConstants.setFontSize(mAttributes, fontSize);
+//    StyleConstants.setBold(mAttributes, bold);
+//    StyleConstants.setItalic(mAttributes, italic);
+//    StyleConstants.setUnderline(mAttributes, underlined);
+//    StyleConstants.setForeground(mAttributes, foreground);
+    attributesCache.put(textType, mAttributes);
 
     return mAttributes;
   }

@@ -27,14 +27,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.util.Properties;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
-import free.util.StringParser;
-import free.util.StringEncoder;
 import free.util.swing.ColorChooserButton;
 import free.jin.plugin.PreferencesPanel;
+import free.jin.Preferences;
 
 
 /**
@@ -53,12 +51,11 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
 
-
   /**
-   * The properties we've modified as a result of user actions.
+   * The preferences we've modified as a result of user actions.
    */
 
-  private final Properties modifiedProps;
+  protected final Preferences prefs;
 
 
 
@@ -126,7 +123,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
   public ConsolePreferencesPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
 
-    modifiedProps = new Properties();
+    prefs = Preferences.createBackedUp(Preferences.createNew(), consoleManager.getPrefs());
 
     createSettingsPanels();
 
@@ -147,57 +144,6 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     if (textStyleChooser != null)
       textStyleChooser.addChangeListener(settingsChangeListener);
   }
-
-
-
-
-
-  /**
-   * Returns the value of the specified property. It first looks for such a
-   * property in our local properties, which we may possibly have modified. If
-   * there's no such property there, the plugin is asked for such a property.
-   */
-
-  protected String getProperty(String propertyName){
-    String value = modifiedProps.getProperty(propertyName);
-    return value == null ? consoleManager.getProperty(propertyName) : value; 
-  }
-
-
-
-
-  /**
-   * Returns the value of the specified property in the same manner
-   * <code>getProperty(String)</code> does, only if the returned value would be
-   * <code>null</code>, returns the 2nd specified string instead.
-   */
-
-  protected String getProperty(String propertyName, String defaultValue){
-    String propertyValue = getProperty(propertyName);
-    return propertyValue == null ? defaultValue : propertyValue;
-  }
-
-
-
-
-  /**
-   * Looks up the value of the specified property. The search is done
-   * recursively, each time removing the prefix of the property name, delimited
-   * by a '.' character.
-   */
-
-  protected String lookupProperty(String propertyName){
-    String propertyValue = getProperty(propertyName);
-    if (propertyValue == null){
-      int dotIndex = propertyName.lastIndexOf(".");
-      if (dotIndex == -1)
-        return null;
-      return lookupProperty(propertyName.substring(0,dotIndex));
-    }
-    else
-      return propertyValue;
-  }
-
 
 
 
@@ -248,19 +194,13 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     TextStyleChooserPanel textStyleChooser = categoryPanel.getTextStyleChooser();
 
     if (categoryPanel == defaultSettingsPanel){
-      String newSelectionColor = StringEncoder.encodeColor(selectionColorButton.getColor());
-      modifiedProps.put("output-selection", newSelectionColor);
+      prefs.setColor("output-selection", selectionColorButton.getColor());
+      prefs.setColor("output-selected", selectedColorButton.getColor());
+      prefs.setColor("background", textStyleChooser.getSelectedBackground());
 
-      String newSelectedColor = StringEncoder.encodeColor(selectedColorButton.getColor());
-      modifiedProps.put("output-selected", newSelectedColor);
-
-      Color background = textStyleChooser.getSelectedBackground();
-      modifiedProps.put("background", StringEncoder.encodeColor(background));
-
-      if (textStyleChooser.isAntialiasingSelectionEnabled()){
-        boolean antialias = defaultSettingsPanel.getTextStyleChooser().isAntialias();
-        modifiedProps.put("output-text.antialias", String.valueOf(antialias));
-      }
+      if (textStyleChooser.isAntialiasingSelectionEnabled())
+        prefs.setBool("output-text.antialias",
+          defaultSettingsPanel.getTextStyleChooser().isAntialias());
     }
 
     Font font = textStyleChooser.getSelectedFont();
@@ -271,10 +211,10 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       String category = categoriesToUpdate[i];
 
       setProperty(category, "font-family", font.getFamily());
-      setProperty(category, "font-size", String.valueOf(font.getSize()));
-      setProperty(category, "font-bold", String.valueOf(font.isBold()));
-      setProperty(category, "font-italic", String.valueOf(font.isItalic()));
-      setProperty(category, "foreground", StringEncoder.encodeColor(foreground));
+      setProperty(category, "font-size", new Integer(font.getSize()));
+      setProperty(category, "font-bold", new Boolean(font.isBold()));
+      setProperty(category, "font-italic", new Boolean(font.isItalic()));
+      setProperty(category, "foreground", foreground);
     }
   }
 
@@ -288,11 +228,11 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected void updatePanels(){
-    selectionColorButton.setColor(StringParser.parseColor(getProperty("output-selection")));
-    selectedColorButton.setColor(StringParser.parseColor(getProperty("output-selected")));
+    selectionColorButton.setColor(prefs.getColor("output-selection"));
+    selectedColorButton.setColor(prefs.getColor("output-selected"));
 
-    Color background = StringParser.parseColor(getProperty("background"));
-    boolean antialias = new Boolean(getProperty("output-text.antialias")).booleanValue();
+    Color background = prefs.getColor("background");
+    boolean antialias = prefs.getBool("output-text.antialias", false);
 
     for (int i = 0; i < categoryPanels.size(); i++){
       CategoryPanel panel = (CategoryPanel)categoryPanels.elementAt(i);
@@ -300,7 +240,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       String mainCategory = panel.getMainCategory();
 
       Font font = getCategoryFont(mainCategory);
-      Color foreground = StringParser.parseColor(lookupProperty("foreground."+mainCategory));
+      Color foreground = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
 
       textStyleChooser.setSelectedFont(font);
       textStyleChooser.setSelectedForeground(foreground);
@@ -333,8 +273,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   private void createDefaultSettingsPanel(){
     Font font = getCategoryFont("");
-    Color foreground = StringParser.parseColor(getProperty("foreground"));
-    Color background = StringParser.parseColor(getProperty("background"));
+    Color foreground = prefs.getColor("foreground");
+    Color background = prefs.getColor("background");
 
     boolean antialiasingSupported;
     try{
@@ -342,7 +282,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
     } catch (ClassNotFoundException e){
         antialiasingSupported = false;
       }
-    boolean antialiasingValue = new Boolean(getProperty("output-text.antialias")).booleanValue();
+    boolean antialiasingValue = prefs.getBool("output-text.antialias", false);
 
     TextStyleChooserPanel defaultSettingsChooserPanel = 
       new TextStyleChooserPanel(font, foreground, background, antialiasingValue, true, antialiasingSupported);
@@ -372,24 +312,25 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   private void createSettingsPanelsFromProperties(){
-    Color background = StringParser.parseColor(getProperty("background"));
-    boolean antialiasingValue = new Boolean(getProperty("output-text.antialias")).booleanValue();
+    Color background = prefs.getColor("background");
+    boolean antialiasingValue = prefs.getBool("output-text.antialias", false);
 
-    int categoriesCount = Integer.parseInt(getProperty("preferences.categories.count", "0"));
+    int categoriesCount = prefs.getInt("preferences.categories.count", 0);
 
     for (int i = 0; i < categoriesCount; i++){
       CategoryPanel categoryPanel;
 
-      boolean isCustomPanel = new Boolean(getProperty("preferences.categories."+i+".custom")).booleanValue();
+      boolean isCustomPanel = prefs.getBool("preferences.categories." + i + ".custom", false);
 
       if (isCustomPanel){
-        String id = getProperty("preferences.categories."+i+".id");
+        String id = prefs.getString("preferences.categories." + i + ".id");
         categoryPanel = createCustomCategoryPanel(id);
       }
       else{
-        String categoryName = getProperty("preferences.categories."+i+".name");
+        String categoryName = prefs.getString("preferences.categories." + i + ".name");
+        String categoriesString = prefs.getString("preferences.categories."+i+".ids");
+        StringTokenizer categoriesTokenizer = new StringTokenizer(categoriesString, ";");
 
-        StringTokenizer categoriesTokenizer = new StringTokenizer(getProperty("preferences.categories."+i+".ids"), ";");
         String [] categories = new String[categoriesTokenizer.countTokens()];
         for (int categoryIndex = 0; categoryIndex < categories.length; categoryIndex++)
           categories[categoryIndex] = categoriesTokenizer.nextToken();
@@ -397,7 +338,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
         String mainCategory = categories[0];
 
         Font font = getCategoryFont(mainCategory);
-        Color foreground = StringParser.parseColor(lookupProperty("foreground."+mainCategory));
+        Color foreground = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
           
         TextStyleChooserPanel textStyleChooserPanel = new TextStyleChooserPanel(font, foreground, background, antialiasingValue, false, false);
         categoryPanel = new CategoryPanel(categoryName, textStyleChooserPanel, categories);
@@ -439,7 +380,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooserButton createSelectionColorButton(){
-    Color selectionColor = StringParser.parseColor(getProperty("output-selection"));
+    Color selectionColor = prefs.getColor("output-selection");
     ColorChooserButton button = new ColorChooserButton("Selection", selectionColor);
     button.setMnemonic('l');
 
@@ -455,7 +396,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooserButton createSelectedColorButton(){
-    Color selectedColor = StringParser.parseColor(getProperty("output-selected"));
+    Color selectedColor = prefs.getColor("output-selected");
     ColorChooserButton button = new ColorChooserButton("Selected Text", selectedColor);
     button.setMnemonic('e');
 
@@ -526,16 +467,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   private void updatePanel(TextStyleChooserPanel chooserPanel, String categoryName, Color background){
-    String fontFamily = lookupProperty("font-family."+categoryName);
-    int fontSize = Integer.parseInt(lookupProperty("font-size."+categoryName));
-    int fontStyle = 0;
-    if (new Boolean(lookupProperty("font-bold."+categoryName)).booleanValue())
-      fontStyle |= Font.BOLD;
-    if (new Boolean(lookupProperty("font-italic."+categoryName)).booleanValue())
-      fontStyle |= Font.ITALIC;
-    Color foreground = StringParser.parseColor(lookupProperty("foreground."+categoryName));
-
-    Font font = new Font(fontFamily, fontStyle, fontSize);
+    Color foreground = (Color)prefs.lookup("foreground." + categoryName, Color.white);
+    Font font = getCategoryFont(categoryName);
 
     chooserPanel.setSelectedFont(font);
     chooserPanel.setSelectedBackground(background);
@@ -550,21 +483,18 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges(){
-    Enumeration modifiedPropsEnum = modifiedProps.keys();
-    while (modifiedPropsEnum.hasMoreElements()){
-      String propertyName = (String)modifiedPropsEnum.nextElement();
-      String propertyValue = (String)modifiedProps.get(propertyName);
-      if (!consoleManager.lookupProperty(propertyName).equals(propertyValue))
-        consoleManager.setProperty(propertyName, propertyValue);
+    Preferences consolePrefs = consoleManager.getPrefs();
+
+    Enumeration prefNames = prefs.getPreferenceNames();
+    while (prefNames.hasMoreElements()){
+      String propertyName = (String)prefNames.nextElement();
+      Object propertyValue = prefs.get(propertyName);
+
+      consolePrefs.set(propertyName, propertyValue);
     }
 
-    String newSelectionColor = StringEncoder.encodeColor(selectionColorButton.getColor());
-    if (!newSelectionColor.equals(consoleManager.lookupProperty("output-selection")))
-      consoleManager.setProperty("output-selection", newSelectionColor);
-
-    String newSelectedColor = StringEncoder.encodeColor(selectedColorButton.getColor());
-    if (!newSelectedColor.equals(consoleManager.lookupProperty("output-selected")))
-      consoleManager.setProperty("output-selected", newSelectedColor);
+    consolePrefs.setColor("output-selection", selectionColorButton.getColor());
+    consolePrefs.setColor("output-selected", selectedColorButton.getColor());
 
     consoleManager.refreshFromProperties();
   }
@@ -578,12 +508,12 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected Font getCategoryFont(String categoryName){
-    String fontFamily = lookupProperty("font-family."+categoryName);
-    int fontSize = Integer.parseInt(lookupProperty("font-size."+categoryName));
+    String fontFamily = (String)prefs.lookup("font-family." + categoryName, "Monospaced");
+    int fontSize = ((Integer)prefs.lookup("font-size." + categoryName, new Integer(14))).intValue();
     int fontStyle = 0;
-    if (new Boolean(lookupProperty("font-bold."+categoryName)).booleanValue())
+    if (((Boolean)prefs.lookup("font-bold." + categoryName, Boolean.FALSE)).booleanValue())
       fontStyle |= Font.BOLD;
-    if (new Boolean(lookupProperty("font-italic."+categoryName)).booleanValue())
+    if (((Boolean)prefs.lookup("font-italic." + categoryName, Boolean.FALSE)).booleanValue())
       fontStyle |= Font.ITALIC;
 
     return new Font(fontFamily, fontStyle, fontSize);
@@ -598,12 +528,12 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    * silently ignored.
    */
 
-  protected void setProperty(String categoryName, String propertyType, String propertyValue){
-    String propertyName = (categoryName.equals("") ? propertyType : propertyType+"."+categoryName);
-    if (new Boolean(getProperty(propertyName+".unmodifiable", "false")).booleanValue())
+  protected void setProperty(String categoryName, String propertyType, Object propertyValue){
+    String propertyName = (categoryName.equals("") ? propertyType : propertyType + "." + categoryName);
+    if (prefs.getBool(propertyName + ".unmodifiable", false))
       return;
 
-    modifiedProps.put(propertyName, propertyValue);
+    prefs.set(propertyName, propertyValue);
   }
 
 

@@ -26,16 +26,13 @@ import free.jin.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import java.beans.*;
 import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
-import free.util.StringParser;
-import free.util.StringEncoder;
-import free.workarounds.FixedJInternalFrame;
+import free.jin.plugin.PluginUIContainer;
 import java.net.URL;
 
 
@@ -45,6 +42,7 @@ import java.net.URL;
  */
 
 public class ConsoleManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListListener{
+
 
   
   /**
@@ -56,11 +54,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * The JInternalFrame in which the console sits.
+   * The container in which the console sits.
    */
 
-  protected JInternalFrame consoleFrame;
-
+  protected PluginUIContainer consoleContainer;
 
 
 
@@ -72,7 +69,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
-
   /**
    * Starts this plugin.
    */
@@ -81,10 +77,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     initState();
     openConsole();
     registerConnListeners();
-    JinConnection conn = getConnection();
-    console.addToOutput("Trying to connect to "+conn.getHostname()+" on port "+conn.getPort()+"...", "info");
   }
-
 
 
 
@@ -94,10 +87,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   public void stop(){
     unregisterConnListeners();
-    closeConsole();
   }
-
-
 
 
 
@@ -106,10 +96,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected void initState(){
-    gameListDisplayStyle = getProperty("game-list-display-style", "embedded");
+    gameListDisplayStyle = getPrefs().getString("game-list-display-style", "embedded");
   }
-
-
 
 
 
@@ -120,109 +108,21 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   private void openConsole(){
     console = createConsole();
 
-    consoleFrame = new FixedJInternalFrame("Main Console", true, true, true, true);
+    consoleContainer = createContainer("");
+    consoleContainer.setTitle("Main Console");
 
-    String iconImageName = getProperty("icon-image");
-    if (iconImageName != null){
-      URL iconImageURL = ConsoleManager.class.getResource(iconImageName);
-      if (iconImageURL!= null)
-        consoleFrame.setFrameIcon(new ImageIcon(iconImageURL));
-    } 
+    URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
+    if (iconImageURL != null)
+      consoleContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
 
-    /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html on
-       why I do this instead of adding an InternalFrameListener like a sane person. */
-    consoleFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-    consoleFrame.addVetoableChangeListener(new VetoableChangeListener(){
+    consoleContainer.setCloseOperation(PluginUIContainer.CLOSE_SESSION_ON_CLOSE);
 
-      public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
-        if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
-              pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
-
-          int result = JOptionPane.YES_OPTION; 
-
-          if (getConnection().isConnected())
-            result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), "Really close this window and log out?", "Select an option", JOptionPane.YES_NO_OPTION);
-
-          if (result==JOptionPane.YES_OPTION)
-            getPluginContext().getMainFrame().closeConnection();
-          else
-            throw new PropertyVetoException("Canceled closing", pce);
-        }
-      }
-
-    });
-
-    Container content = consoleFrame.getContentPane();
+    Container content = consoleContainer.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(console, BorderLayout.CENTER);
 
-    JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-    desktop.add(consoleFrame);
-
-    Rectangle desktopBounds = new Rectangle(desktop.getSize());
-    String boundsString = getProperty("frame-bounds");
-    Rectangle bounds = null;
-    if (boundsString!=null)
-      bounds = StringParser.parseRectangle(boundsString);
-
-    if (bounds == null)
-      consoleFrame.setBounds(0, 0, desktopBounds.width*3/4, desktopBounds.height*3/4);
-    else
-      consoleFrame.setBounds(bounds);
-
-
-    boolean isMaximized = Boolean.valueOf(getProperty("maximized", "false")).booleanValue();
-    if (isMaximized){
-      try{
-        consoleFrame.setMaximum(true);
-      } catch (java.beans.PropertyVetoException e){}
-    }
-
-
-    boolean isIconified = Boolean.valueOf(getProperty("iconified", "false")).booleanValue();
-    if (isIconified){
-      try{
-        consoleFrame.setIcon(true);
-      } catch (java.beans.PropertyVetoException e){}
-    }
-
-
-    boolean isSelected = Boolean.valueOf(getProperty("selected", "false")).booleanValue();
-    if (isSelected){
-      // We can't do this immediately because if some other plugin adds another frame
-      // afterwards, our frame will lose selection.
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run(){
-          try{
-            consoleFrame.toFront();
-            consoleFrame.setSelected(true);
-          } catch (PropertyVetoException e){}
-        }
-      });
-    }
-
-
-    JComponent icon = consoleFrame.getDesktopIcon();
-    String iconBoundsString = getProperty("frame-icon-bounds");
-    if (iconBoundsString!=null){
-      Rectangle iconBounds = StringParser.parseRectangle(iconBoundsString);
-      icon.setBounds(iconBounds);
-    }
-
-    // We shouldn't bring the console to front and make it selected if isSelected==false
-    // but we do it anyway because otherwise it causes the console to think it's in front
-    // and selected when it's really not under MS VM (at least)
-    // This works either way as someone will have to claim selectedness later
-    // if they really want it.
-    consoleFrame.setVisible(true);
-    try{
-      consoleFrame.toFront();
-      consoleFrame.setSelected(true);
-    } catch (java.beans.PropertyVetoException e){} // Ignore.
-
-    console.requestDefaultFocus();
+    consoleContainer.setVisible(true);
   }
-
 
 
 
@@ -231,8 +131,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected Console createConsole(){
-    Console console = new Console(this);
-    return console;
+    return new Console(getConn(), getPrefs());
   }
 
 
@@ -242,9 +141,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public JMenu createPluginMenu(){
-    JMenu myMenu = new JMenu(getName());
+    JMenu myMenu = new JMenu("Console");
 
-    if (getConnection() instanceof GameListJinConnection){
+    if (getConn() instanceof GameListConnection){
       JMenu gameListDisplayStyleMenu = new JMenu("Game lists display style");
       gameListDisplayStyleMenu.setMnemonic('g');
 
@@ -271,7 +170,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
           String oldStyle = gameListDisplayStyle;
           gameListDisplayStyle = actionCommand;
 
-          GameListJinListenerManager listenerManager = ((GameListJinConnection)getConnection()).getGameListJinListenerManager();
+          GameListListenerManager listenerManager = ((GameListConnection)getConn()).getGameListListenerManager();
 
           if (gameListDisplayStyle.equals("none"))
             listenerManager.removeGameListListener(ConsoleManager.this);
@@ -304,13 +203,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     myMenu.add(clearMenuItem);
 
 
-    final JCheckBoxMenuItem copyOnSelectCB = new JCheckBoxMenuItem("Copy on Select",
-      new Boolean(getProperty("copyOnSelect", "true")).booleanValue());
+    JCheckBoxMenuItem copyOnSelectCB 
+      = new JCheckBoxMenuItem("Copy on Select", getPrefs().getBool("copyOnSelect", true));
     copyOnSelectCB.setMnemonic('S');
     copyOnSelectCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
-        getUser().setProperty(getID()+".copyOnSelect",copyOnSelectCB.isSelected() ? "true" : "false");
+        JCheckBoxMenuItem source = (JCheckBoxMenuItem)evt.getSource();
+        getPrefs().setBool("copyOnSelect", source.isSelected());
       }
   
     });
@@ -333,34 +233,20 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
-
-
-  /**
-   * Closes the console.
-   */
-
-  private void closeConsole(){
-    consoleFrame.removeAll();
-    consoleFrame.dispose();
-  }
-
-
-
-
   /**
    * Registers all the necessary listeners to JinConnection events.
    */
 
   protected void registerConnListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.addPlainTextListener(this);
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
 
-    if ((conn instanceof GameListJinConnection)&&(!gameListDisplayStyle.equalsIgnoreCase("none")))
-      ((GameListJinConnection)conn).getGameListJinListenerManager().addGameListListener(this);
+    if ((conn instanceof GameListConnection) && !gameListDisplayStyle.equalsIgnoreCase("none"))
+      ((GameListConnection)conn).getGameListListenerManager().addGameListListener(this);
   }
 
 
@@ -371,15 +257,15 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected void unregisterConnListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.removePlainTextListener(this);
     listenerManager.removeChatListener(this);
     listenerManager.removeConnectionListener(this);
 
-    if ((conn instanceof GameListJinConnection)&&(!gameListDisplayStyle.equalsIgnoreCase("none")))
-      ((GameListJinConnection)conn).getGameListJinListenerManager().removeGameListListener(this);
+    if ((conn instanceof GameListConnection) && !gameListDisplayStyle.equalsIgnoreCase("none"))
+      ((GameListConnection)conn).getGameListListenerManager().removeGameListListener(this);
   } 
 
 
@@ -431,15 +317,24 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
+  /**
+   * Gets called when a connection is attempted.
+   */
+
+  public void connectionAttempted(ConnectionEvent evt){
+    console.addToOutput("Trying to connect to " + evt.getHost() + 
+                        " on port " + evt.getPort() + "...", "info");
+  }
+
+
 
   /**
    * Gets called when the connection to the server is established.
    */
 
   public void connectionEstablished(ConnectionEvent evt){
-    console.addToOutput("Connected","info");  
+    console.addToOutput("Connected", "info");  
   }
-
 
 
 
@@ -448,10 +343,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionLoggedIn(ConnectionEvent evt){
-    consoleFrame.setTitle("Main Console - "+getConnection().getUsername()+" on "+getUser().getServer().getLongName());    
-    consoleFrame.repaint(); // The title doesn't repaint itself.
+    consoleContainer.setTitle("Main Console - " + getConn().getUsername() +
+      " on " + getServer().getLongName());
   }
-
 
 
 
@@ -497,7 +391,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     // preferred width of the cells in that column.
     TableColumnModel columnModel = table.getColumnModel();
     TableModel model = table.getModel();
-    for (int columnIndex=0;columnIndex<columnModel.getColumnCount();columnIndex++){
+    for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++){
       TableColumn column = columnModel.getColumn(columnIndex);
       Component headerRendererComponent = column.getHeaderRenderer().getTableCellRendererComponent(table, column.getHeaderValue(), false, false, 0, columnIndex);
       int maxWidth = headerRendererComponent.getPreferredSize().width;
@@ -524,8 +418,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     if (gameListDisplayStyle.equals("embedded")){
       scrollPane.setBorder(new TitledBorder(title));
-      int maxHeight = (console.getOutputArea().height-40)*2/3;
-      if (scrollPane.getPreferredSize().height>maxHeight)
+      int maxHeight = (console.getOutputArea().height - 40) * 2/3;
+      if (scrollPane.getPreferredSize().height > maxHeight)
         scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width, maxHeight));
 
       // This is stupid, but fixes the bug in the embedded case case described at
@@ -535,24 +429,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       console.addToOutput(scrollPane);
     }
     else{
-      JInternalFrame frame = new FixedJInternalFrame(title, true, true, true, true);
-      frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-      frame.getContentPane().add(scrollPane);
+      PluginUIContainer container = createContainer(null);
+      container.setTitle(title);
 
-      JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-      Dimension desktopSize = desktop.getSize();
-      Dimension prefSize = frame.getPreferredSize();
-      int width = Math.min(prefSize.width, desktopSize.width);
-      int height = Math.min(prefSize.height, desktopSize.height);
-      int x = (desktopSize.width-width)/2;
-      int y = (desktopSize.height-height)/2;
-      frame.setBounds(x, y, width, height);
+      Container content = container.getContentPane();
+      content.setLayout(new BorderLayout());
+      content.add(scrollPane, BorderLayout.CENTER);
 
-      desktop.add(frame);
-      frame.setVisible(true);
-      try{
-        frame.setSelected(true);
-      } catch (java.beans.PropertyVetoException e){} // Ignore.
+      container.setVisible(true);
     }
   }
 
@@ -563,31 +447,30 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void saveState(){
-    boolean isMaximized = consoleFrame.isMaximum();
-    setProperty("maximized", String.valueOf(isMaximized));
-
-    boolean isIconified = consoleFrame.isIcon();
-    setProperty("iconified", String.valueOf(isIconified));
-
-    boolean isSelected = consoleFrame.isSelected();
-    setProperty("selected", String.valueOf(isSelected));
-
-    // This is the only way to retrieve the "normal" bounds of the frame under
-    // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
-    if (isMaximized){
-      try{
-        consoleFrame.setMaximum(false);
-      } catch (java.beans.PropertyVetoException ex){}
-    }
-
-    Rectangle consoleFrameBounds = consoleFrame.getBounds();
-    // If something bad happened, let's not save that state.
-    if ((consoleFrameBounds.width > 10) && (consoleFrameBounds.height > 10))
-      setProperty("frame-bounds",StringEncoder.encodeRectangle(consoleFrameBounds));
-
-    setProperty("game-list-display-style", gameListDisplayStyle);
+    if (getConn() instanceof GameListConnection)
+      getPrefs().setString("game-list-display-style", gameListDisplayStyle);
   }
 
+
+
+  /**
+   * Returns the string <code>"console"</code>. The scripter plugin has this
+   * hardcoded.
+   */
+
+  public String getId(){
+    return "console";
+  }
+
+
+
+  /**
+   * Returns the string "Main Console".
+   */
+
+  public String getName(){
+    return "Main Console";
+  }
 
 
 
@@ -598,7 +481,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public boolean hasPreferencesUI(){
-    return new Boolean(getProperty("preferences.show", "true")).booleanValue();
+    return getPrefs().getBool("preferences.show", true);
   }
 
 

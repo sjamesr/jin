@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import free.workarounds.FixedJTable;
 import free.jin.event.GameListEvent;
 import free.jin.GameListItem;
+import free.jin.Preferences;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -130,24 +131,26 @@ public class GameListTable extends FixedJTable{
     if (issuedCommandName==null)
       return null;
 
-    String prefix = issuedCommandName+"-popup.";
-    int numCommands = Integer.parseInt(console.getProperty(prefix+"num-commands", "0"));
-    if (numCommands==0)
+    Preferences prefs = console.getPrefs();
+    String prefix = issuedCommandName + "-popup.";
+    int numCommands = prefs.getInt(prefix + "num-commands", 0);
+    if (numCommands == 0)
       return null;
 
     JPopupMenu popup = new JPopupMenu();
     int actualNumCommands = 0;
     for (int i=0;i<numCommands;i++){
-      String command = console.getProperty(prefix+"command-"+i);
+      String command = prefs.getString(prefix + "command-" + i);
 
       if (command.equalsIgnoreCase("separator")){
         popup.addSeparator();
         continue;
       }
 
-      String commandName = console.getProperty(prefix+"command-"+i+"-name");
-      boolean isMultiSupported = new Boolean(console.getProperty(prefix+"command-"+i+"-multi-select-supported", "true")).booleanValue();
-      if ((numSelectedRows>1)&&!isMultiSupported)
+      String commandName = prefs.getString(prefix + "command-" + i + "-name");
+      boolean isMultiSupported =
+        prefs.getBool(prefix + "command-" + i + "-multi-select-supported", true);
+      if ((numSelectedRows > 1) && !isMultiSupported)
         continue;
 
       JMenuItem menuItem = new JMenuItem(commandName);
@@ -243,7 +246,7 @@ public class GameListTable extends FixedJTable{
       Point point = evt.getPoint();
       int rowIndex = rowAtPoint(point);
       GameListItem item = gameListEvent.getItem(rowIndex);
-      String command = console.getProperty(commandNameForID(gameListEvent.getID())+"-game-list-action");
+      String command = console.getPrefs().getString(commandNameForID(gameListEvent.getID()) + "-game-list-action");
       command = insertItemProperties(command, item, '$');
       console.issueCommand(new Command(command, 0));
     }

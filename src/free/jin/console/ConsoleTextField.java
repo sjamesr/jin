@@ -23,6 +23,7 @@ package free.jin.console;
 
 import free.workarounds.FixedJTextField;
 import free.workarounds.FixUtils;
+import free.jin.Preferences;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.Vector;
@@ -133,8 +134,10 @@ public class ConsoleTextField extends FixedJTextField{
     if (tellNextTellerKeyStroke != null)
       unregisterKeyboardAction(tellNextTellerKeyStroke);
 
-    String tellLastTellerKeyStrokeString = console.getProperty("tell-last-teller-keystroke");
-    String tellNextTellerKeyStrokeString = console.getProperty("tell-next-teller-keystroke");
+    Preferences prefs = console.getPrefs();
+
+    String tellLastTellerKeyStrokeString = prefs.getString("tell-last-teller-keystroke", null);
+    String tellNextTellerKeyStrokeString = prefs.getString("tell-next-teller-keystroke", null);
 
     if (tellLastTellerKeyStrokeString != null){
       tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);

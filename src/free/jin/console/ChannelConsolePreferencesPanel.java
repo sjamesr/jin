@@ -31,7 +31,7 @@ import java.util.StringTokenizer;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import free.util.swing.IntegerStrictPlainDocument;
-import free.util.StringParser;
+import free.util.TextUtilities;
 
 
 /**
@@ -93,12 +93,11 @@ public class ChannelConsolePreferencesPanel extends ConsolePreferencesPanel{
 
   protected CategoryPanel createCustomCategoryPanel(String id){
     if (id.endsWith("channels-panel")){
-      String categoryName = consoleManager.getProperty("preferences.categories."+id+".name");
-      StringTokenizer idsTokenizer = new StringTokenizer(consoleManager.getProperty("preferences.categories."+id+".ids"), ";");
-      String [] categoryIDs = new String[idsTokenizer.countTokens()];
-      for (int i = 0; i < categoryIDs.length; i++)
-        categoryIDs[i] = idsTokenizer.nextToken();
-      int channelsCount = Integer.parseInt(consoleManager.getProperty("preferences.categories."+id+".channels-count"));
+      String categoryName = prefs.getString("preferences.categories." + id + ".name");
+      String [] categoryIDs = 
+        TextUtilities.getTokens(prefs.getString("preferences.categories." + id + ".ids"), ";");
+
+      int channelsCount = prefs.getInt("preferences.categories." + id + ".channels-count");
 
       ChannelsCategoryPanel channelCategoryPanel = createChannelsCategoryPanel(categoryName, categoryIDs, channelsCount);
       if (channelPanels == null)        // Can't initialize in the constructor because this 
@@ -121,9 +120,9 @@ public class ChannelConsolePreferencesPanel extends ConsolePreferencesPanel{
   private ChannelsCategoryPanel createChannelsCategoryPanel(String categoryName, String [] categoryIDs, int channelsCount){
     String mainCategory = categoryIDs[0];
     Font font = getCategoryFont(mainCategory);
-    Color foreground = StringParser.parseColor(lookupProperty("foreground."+mainCategory));
-    Color background = StringParser.parseColor(lookupProperty("background"));
-    boolean antialias = new Boolean(getProperty("output-text.antialias")).booleanValue();
+    Color foreground = (Color)prefs.lookup("foreground." + mainCategory, Color.white);
+    Color background = prefs.getColor("background");
+    boolean antialias = prefs.getBool("output-text.antialias", false);
 
     TextStyleChooserPanel textStyleChooser = new TextStyleChooserPanel(font, foreground, background, antialias, false, false);
 
@@ -205,7 +204,7 @@ public class ChannelConsolePreferencesPanel extends ConsolePreferencesPanel{
 
       String category = super.getMainCategory() + ("".equals(channel) ? "" : "." + channel);
       Font font = getCategoryFont(category);
-      Color foreground = StringParser.parseColor(lookupProperty("foreground."+category));
+      Color foreground = (Color)prefs.lookup("foreground." + category, Color.white);
 
       textStyleChooser.setSelectedFont(font);
       textStyleChooser.setSelectedForeground(foreground);
