@@ -529,25 +529,35 @@ public abstract class StandardLoginDialog implements LoginDialog{
   public Component createMembersPanel(final JDialog parentDialog){
     Box usernamePanel = new Box(BoxLayout.X_AXIS);
 
-    usernameField = new FixedJTextField(user.getProperty("login.username"),15);
-    usernameField.setMaximumSize(usernameField.getPreferredSize());
+    usernameField = new FixedJTextField(15);
+    usernameField.setText(user.getProperty("login.username"));
 
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
     usernamePanel.add(new JLabel("Handle (your login name)"));
     usernamePanel.add(Box.createHorizontalGlue());
+    usernamePanel.add(Box.createHorizontalStrut(10));
 
     
     Box passwordInputPanel = new Box(BoxLayout.X_AXIS);
 
-    passwordField = new FixedJPasswordField(user.getProperty("login.password"),15);
-    passwordField.setMaximumSize(passwordField.getPreferredSize());
+    passwordField = new FixedJPasswordField(15);
+    passwordField.setText(user.getProperty("login.password"));
 
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
     passwordInputPanel.add(new JLabel("Password"));
     passwordInputPanel.add(Box.createHorizontalGlue());
+    passwordInputPanel.add(Box.createHorizontalStrut(10));
 
+    int fieldsWidth = Math.max(usernameField.getPreferredSize().width, passwordField.getPreferredSize().width);
+    usernameField.setMaximumSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
+    passwordField.setMaximumSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
+    usernameField.setPreferredSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
+    passwordField.setPreferredSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
+
+    usernameField.setColumns(0); // Otherwise setPreferredSize is ignored and it will still
+    passwordField.setColumns(0); // use the amount of columns to calculate preferred size.
 
     Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
 
