@@ -928,6 +928,8 @@ public class JinMain implements JinContext{
 
       files.put(filename, new MemoryFile(data));
     }
+    
+    in.close();
 
     return files;
   }
