@@ -860,9 +860,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       whiteClock.setMaximumSize(whiteClock.getPreferredSize());
       blackClock.setMaximumSize(blackClock.getPreferredSize());
 
-      positionScrollBar.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-      if (buttonPanel != null)
-        buttonPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+      int labelWidth = Math.max(whiteLabel.getPreferredSize().width,
+                                  blackLabel.getPreferredSize().width);
+      int labelHeight = Math.max(whiteLabel.getPreferredSize().height,
+                                  blackLabel.getPreferredSize().height);
+      whiteLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+      blackLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+      whiteLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+      blackLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+
 
       if (flipped){
         whiteLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
@@ -873,20 +879,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
         topInfoBox.add(whiteLabel);
         topInfoBox.add(Box.createHorizontalGlue());
-        topInfoBox.add(Box.createHorizontalStrut(10));
-        topInfoBox.add(positionScrollBar);
-        topInfoBox.add(Box.createHorizontalStrut(10));
-        topInfoBox.add(Box.createHorizontalGlue());
         topInfoBox.add(whiteClock);
 
         bottomInfoBox.add(blackLabel);
-        bottomInfoBox.add(Box.createHorizontalStrut(10));
         bottomInfoBox.add(Box.createHorizontalGlue());
-        if (buttonPanel != null){
-          bottomInfoBox.add(buttonPanel);
-          bottomInfoBox.add(Box.createHorizontalGlue());
-          bottomInfoBox.add(Box.createHorizontalStrut(10));
-        }
         bottomInfoBox.add(blackClock);
       }
       else{
@@ -898,20 +894,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
         topInfoBox.add(blackLabel);
         topInfoBox.add(Box.createHorizontalGlue());
-        topInfoBox.add(Box.createHorizontalStrut(10));
-        topInfoBox.add(positionScrollBar);
-        topInfoBox.add(Box.createHorizontalStrut(10));
-        topInfoBox.add(Box.createHorizontalGlue());
         topInfoBox.add(blackClock);
 
         bottomInfoBox.add(whiteLabel);
-        bottomInfoBox.add(Box.createHorizontalStrut(10));
         bottomInfoBox.add(Box.createHorizontalGlue());
-        if (buttonPanel != null){
-          bottomInfoBox.add(buttonPanel);
-          bottomInfoBox.add(Box.createHorizontalGlue());
-          bottomInfoBox.add(Box.createHorizontalStrut(10));
-        }
         bottomInfoBox.add(whiteClock);
       }
 
