@@ -1,6 +1,0 @@
-classname = free.jin.board.BoardPattern
-
-id = winter
-name = Winter
-boardPainter.classname = free.chess.ImageBoardPainter
-scaleSquares = true

@@ -1,5 +1,0 @@
-classname = free.jin.board.BoardPattern
-
-id = plain
-name = Plain Color
-boardPainter.classname = free.chess.PlainBoardPainter

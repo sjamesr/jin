@@ -1,6 +1,0 @@
-classname = free.jin.board.BoardPattern
-
-id = gray-tiles
-name = Gray Tiles
-boardPainter.classname = free.chess.ImageBoardPainter
-scaleSquares = true

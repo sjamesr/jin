@@ -1,6 +1,0 @@
-classname = free.jin.board.BoardPattern
-
-id = green-marble
-name = Green Marble
-boardPainter.classname = free.chess.ImageBoardPainter
-scaleSquares = true

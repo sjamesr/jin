@@ -1,5 +1,0 @@
-classname = free.jin.board.BoardPattern
-
-id = red-marble
-name = Red Marble
-boardPainter.classname = free.chess.ImageBoardPainter
