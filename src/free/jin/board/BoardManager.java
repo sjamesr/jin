@@ -268,8 +268,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setMoveInputStyle("click'n'click".equals(prefs.getString("move-input-style", null)) ? 
       JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP);
 
-    setDraggedPieceStyle("target-cursor".equals(prefs.getString("dragged-piece-style", null)) ?
-      JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE : JBoard.NORMAL_DRAGGED_PIECE);
+    setPieceFollowsCursor(prefs.getBool("piece-follows-cursor", false));
+    
+    setHighlightMadeMoveSquares(prefs.getBool("highlight-made-move-squares", true));
+    setMadeMoveSquaresHighlightColor(
+      prefs.getColor("highlight-made-move-squares.color", new Color(0x0000ff)));
 
     String moveHighlightingStyleString = prefs.getString("move-highlight.style", "square");
     if ("target-square".equals(moveHighlightingStyleString))
@@ -284,9 +287,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setHighlightingOwnMoves(prefs.getBool("move-highlight.highlight-own", false));
 
     setMoveHighlightingColor(prefs.getColor("move-highlight.color", Color.red));
-
-    setDragSquareHighlightingColor(
-      prefs.getColor("drag-square-highlighting.color", new Color(0x0000ff)));
 
     String moveSendingModeString = prefs.getString("move-sending-mode", "predrag");
     if ("legal-chess".equals(moveSendingModeString))
@@ -553,40 +553,73 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-
   /**
-   * Returns the current dragged piece style. Possible values defined in
-   * <code>free.chess.JBoard</code>.
+   * Returns whether the moved piece follows the mouse cursor.
    */
-
-  public int getDraggedPieceStyle(){
-    return props.getIntegerProperty("draggedPieceStyle");
+   
+  public boolean isPieceFollowsCursor(){
+    return props.getBooleanProperty("pieceFollowsCursor");
+  }
+  
+  
+  
+  /**
+   * Sets whether the moved piece follows the mouse cursor.
+   */
+   
+  public void setPieceFollowsCursor(boolean pieceFollowsCursor){
+    props.setBooleanProperty("pieceFollowsCursor", pieceFollowsCursor);
   }
 
 
 
+  /**
+   * Returns whether the currently made move is highlighted by highlighting the
+   * origin and target squares. This refers to the move that is currently being
+   * made by the user (that is, in the middle of the move-making process), as
+   * opposed to the last move highlighting, which is specified by the
+   * <code>setMoveHighlightingStyle</code> method.
+   */
+   
+  public boolean isHighlightMadeMoveSquares(){
+    return props.getBooleanProperty("highlightMadeMoveSquares");
+  }
+  
+  
+  
+  /**
+   * Sets whether the currently made move is highlighted.
+   */
+   
+  public void setHighlightMadeMoveSquares(boolean highlight){
+    props.setBooleanProperty("highlightMadeMoveSquares", highlight);
+  }
+
+
+  
 
   /**
-   * Sets the dragged piece style to the specified value.
-   *
-   * @param draggedPieceStyle The new dragged piece style. Possible values are
-   * defined in <code>free.chess.JBoard</code>.
+   * Returns the color used for highlighting in
+   * <code>highlightMadeMoveSquares</code> mode.
    */
 
-  public void setDraggedPieceStyle(int draggedPieceStyle){
-    switch (draggedPieceStyle){
-      case JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE:
-      case JBoard.NORMAL_DRAGGED_PIECE:
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown dragged piece style: "+draggedPieceStyle);
-    }
-
-    props.setIntegerProperty("draggedPieceStyle", draggedPieceStyle);
+  public Color getMadeMoveSquaresHighlightColor(){
+    return (Color)props.getProperty("madeMoveSquaresHighlightColor");
   }
 
 
 
+  /**
+   * Sets the color used for highlighting in
+   * <code>highlightMadeMoveSquares</code> mode.
+   */
+
+  public void setMadeMoveSquaresHighlightColor(Color color){
+    props.setProperty("madeMoveSquaresHighlightColor", color);
+  }
+
+
+  
 
   /**
    * Returns <code>true</code> if promotable pieces are automatically promoted
@@ -702,31 +735,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-
-  /**
-   * Returns the current drag square highlighting color.
-   */
-
-  public Color getDragSquareHighlightingColor(){
-    return (Color)props.getProperty("dragSquareHighlightingColor");
-  }
-
-
-
-
-  /**
-   * Sets the drag square highlighting color to the specified value.
-   *
-   * @param dragSquareHighlightingColor The new drag square highlighting color.
-   */
-
-  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
-    props.setProperty("dragSquareHighlightingColor", dragSquareHighlightingColor);
-  }
-
-
-
-
+  
   /**
    * Returns the current move sending mode.
    */
@@ -1225,8 +1234,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setString("move-input-style", getMoveInputStyle() == JBoard.CLICK_N_CLICK ?
       "click'n'click" : "drag'n'drop");
 
-    prefs.setString("dragged-piece-style",
-      getDraggedPieceStyle() == JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE ? "target-cursor" : "normal");
+    prefs.setBool("piece-follows-cursor", isPieceFollowsCursor());
+    
+    prefs.setBool("highlight-made-move-squares", isHighlightMadeMoveSquares());
+    prefs.setColor("highlight-made-move-squares.color",getMadeMoveSquaresHighlightColor());
 
     String moveHighlightingString;
     switch (getMoveHighlightingStyle()){
@@ -1254,8 +1265,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setBool("move-highlight.highlight-own", isHighlightingOwnMoves());
 
     prefs.setColor("move-highlight.color", getMoveHighlightingColor());
-
-    prefs.setColor("drag-square-highlighting.color",getDragSquareHighlightingColor());
 
     int moveSendingMode = getMoveSendingMode();
     String moveSendingModeString;

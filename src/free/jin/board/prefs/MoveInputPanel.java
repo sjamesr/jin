@@ -68,27 +68,26 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   
   
   /**
-   * The "piece follows cursor" move visualization style selecting radio button.
+   * The "piece follows cursor" checkbox.
    */
    
-  protected final JRadioButton pieceFollowsCursor;
+  protected final JCheckBox pieceFollowsCursor;
   
   
   
   /**
-   * The "highlight target square" move visualization style selecting radio
-   * button.
+   * The "highlight move squares" checkbox.
    */
    
-  protected final JRadioButton highlightTargetSquare;
+  protected final JCheckBox highlightMadeMoveSquares;
   
   
   
   /**
-   * The color chooser for the highlight target square color.
+   * The color chooser for the made move squares highlight color.
    */
    
-  protected final ColorChooser highlightColor;
+  protected final ColorChooser madeMoveSquaresHighlightColor;
   
   
   
@@ -164,36 +163,41 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
     
-    pieceFollowsCursor = new JRadioButton("Piece follows cursor",
-      boardManager.getDraggedPieceStyle() == JBoard.NORMAL_DRAGGED_PIECE);
-    highlightTargetSquare = new JRadioButton("Highlight target square",
-      boardManager.getDraggedPieceStyle() == JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE);
-    
-    pieceFollowsCursor.setToolTipText("When in the process of moving a piece, the piece will follow the cursor");
-    highlightTargetSquare.setToolTipText("When in the process of moving a piece, the square under the cursor is highlighted");
-    
-    ButtonGroup moveVisualizationGroup = new ButtonGroup();
-    moveVisualizationGroup.add(pieceFollowsCursor);
-    moveVisualizationGroup.add(highlightTargetSquare);
+    pieceFollowsCursor = new JCheckBox("Piece follows cursor", 
+      boardManager.isPieceFollowsCursor());
+    pieceFollowsCursor.setToolTipText("When in the process of moving a piece, the piece will follow the mouse cursor");
     pieceFollowsCursor.setMnemonic('P');
-    highlightTargetSquare.setMnemonic('H');
-    ActionListener moveVisualizationListener = new ActionListener(){
+    pieceFollowsCursor.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        MoveInputPanel.this.previewBoard.setDraggedPieceStyle(getDraggedPieceStyle());
+        MoveInputPanel.this.previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
         
         fireStateChanged();
       }
-    };
-    pieceFollowsCursor.addActionListener(moveVisualizationListener);
-    highlightTargetSquare.addActionListener(moveVisualizationListener);
+    });
+      
+    highlightMadeMoveSquares = new JCheckBox("Highlight move squares",
+      boardManager.isHighlightMadeMoveSquares());
+    highlightMadeMoveSquares.setToolTipText("When in the process of moving a piece, the origin square and the square under the cursor are highlighted");
+    highlightMadeMoveSquares.setMnemonic('H');
+    highlightMadeMoveSquares.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        boolean selected = highlightMadeMoveSquares.isSelected();
+        MoveInputPanel.this.previewBoard.setHighlightMadeMoveSquares(selected);
+        madeMoveSquaresHighlightColor.setEnabled(selected);
+       
+        fireStateChanged();
+      }
+    });
     
-    highlightColor = new ColorChooser("Highlight color:", boardManager.getDragSquareHighlightingColor());
-    highlightColor.setToolTipText("The color of the highlighting element in \"Highlight target square\" mode");
-    highlightColor.setMnemonic('t');
-    highlightColor.addChangeListener(new ChangeListener(){
+    
+    madeMoveSquaresHighlightColor = 
+      new ColorChooser("Highlight color:", boardManager.getMadeMoveSquaresHighlightColor());
+    madeMoveSquaresHighlightColor.setToolTipText("The color of the highlight \"Highlight move squares\" mode");
+    madeMoveSquaresHighlightColor.setMnemonic('t');
+    madeMoveSquaresHighlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        MoveInputPanel.this.previewBoard.setDragSquareHighlightingColor(
-          highlightColor.getColor());
+        MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(
+          madeMoveSquaresHighlightColor.getColor());
           
         fireStateChanged();
       }
@@ -248,12 +252,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JComponent moveVisualizationPanel = createMoveVisualizationUI();
     JComponent movingInAdvancePanel = createMovingInAdvanceUI();
     
-    highlightTargetSquare.addChangeListener(new ChangeListener(){
-      public void stateChanged(ChangeEvent evt){
-        highlightColor.setEnabled(highlightTargetSquare.isSelected());
-      }
-    });
-    highlightColor.setEnabled(highlightTargetSquare.isSelected());
+    madeMoveSquaresHighlightColor.setEnabled(highlightMadeMoveSquares.isSelected());
     
     
     JPanel topPanel = new PreferredSizedPanel();
@@ -305,21 +304,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   
   
   /**
-   * Returns the currently selected dragged piece style.
-   */
-   
-  private int getDraggedPieceStyle(){
-    if (pieceFollowsCursor.isSelected())
-      return JBoard.NORMAL_DRAGGED_PIECE;
-    else if (highlightTargetSquare.isSelected())
-      return JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE;
-    else
-      throw new IllegalStateException("None of the radio buttons are selected");
-  }
-  
-  
-
-  /**
    * Returns the currently selected move sending mode.
    */
    
@@ -343,7 +327,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    
   public void initPreviewBoard(){
     previewBoard.setMoveInputStyle(getMoveInputStyle());
-    previewBoard.setDraggedPieceStyle(getDraggedPieceStyle());
+    previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
+    previewBoard.setHighlightMadeMoveSquares(highlightMadeMoveSquares.isSelected());
     previewBoard.setManualPromote(!autoPromote.isSelected());
   }
   
@@ -405,12 +390,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
     pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);    
-    highlightTargetSquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    highlightMadeMoveSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    madeMoveSquaresHighlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     panel.add(pieceFollowsCursor);
-    panel.add(highlightTargetSquare);
-    panel.add(highlightColor);
+    panel.add(highlightMadeMoveSquares);
+    panel.add(madeMoveSquaresHighlightColor);
     panel.add(Box.createVerticalGlue());
     
     return panel;
@@ -455,10 +440,11 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     boardManager.setMoveInputStyle(getMoveInputStyle());
     boardManager.setAutoPromote(autoPromote.isSelected());
     
-    boardManager.setDraggedPieceStyle(getDraggedPieceStyle());
-    boardManager.setDragSquareHighlightingColor(highlightColor.getColor());
+    boardManager.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
+    boardManager.setHighlightMadeMoveSquares(highlightMadeMoveSquares.isSelected());
+    boardManager.setMadeMoveSquaresHighlightColor(madeMoveSquaresHighlightColor.getColor());
     
-   boardManager.setMoveSendingMode(getMoveSendingMode());   
+    boardManager.setMoveSendingMode(getMoveSendingMode());   
   }
   
   

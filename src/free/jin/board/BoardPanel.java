@@ -593,13 +593,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setPiecePainter(boardManager.getPiecePainter());
     board.setBoardPainter(boardManager.getBoardPainter());
     board.setMoveInputStyle(boardManager.getMoveInputStyle());
-    board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
+    board.setPieceFollowsCursor(boardManager.isPieceFollowsCursor());
+    board.setHighlightMadeMoveSquares(boardManager.isHighlightMadeMoveSquares());
+    board.setMadeMoveSquaresHighlightColor(boardManager.getMadeMoveSquaresHighlightColor());
     board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
     board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
     board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
-    board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
 
     ActionListener escapeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -1969,16 +1970,18 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (src == boardManager){
       if ("moveInputStyle".equals(propertyName))
         board.setMoveInputStyle(boardManager.getMoveInputStyle());
-      else if ("draggedPieceStyle".equals(propertyName))
-        board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
+      else if ("pieceFollowsCursor".equals(propertyName))
+        board.setPieceFollowsCursor(boardManager.isPieceFollowsCursor());
+      else if ("highlightMadeMoveSquares".equals(propertyName))
+        board.setHighlightMadeMoveSquares(boardManager.isHighlightMadeMoveSquares());
+      else if ("madeMoveSquaresHighlightColor".equals(propertyName))
+        board.setMadeMoveSquaresHighlightColor(boardManager.getMadeMoveSquaresHighlightColor());
       else if ("moveHighlightingStyle".equals(propertyName))
         board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
       else if ("autoPromote".equals(propertyName))
         board.setManualPromote(!boardManager.isAutoPromote());
       else if ("moveHighlightingColor".equals(propertyName))
         board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
-      else if ("dragSquareHighlightingColor".equals(propertyName))
-        board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
       else if ("highlightingOwnMoves".equals(propertyName))
         highlightOwnMoves = boardManager.isHighlightingOwnMoves();
       else if ("moveSendingMode".equals(propertyName)){

@@ -49,7 +49,7 @@ public class JBoard extends JComponent{
    * The default move highlighting color.
    */
    
-  private static final Color DEFAULT_MOVE_HIGHLIGHTING_COLOR = Color.cyan.darker();
+  private static final Color DEFAULT_MOVE_HIGHLIGHT_COLOR = Color.cyan.darker();
   
 
 
@@ -62,10 +62,11 @@ public class JBoard extends JComponent{
   
   
   /**
-   * The default drag-square highlighting color.
+   * The default highlighting color for the squares of the move currently being
+   * made.
    */
    
-  private static final Color DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR = Color.blue;
+  private static final Color DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR = Color.blue;
    
   
    
@@ -125,23 +126,6 @@ public class JBoard extends JComponent{
    */
 
   public static final int CURRENT_PLAYER_MOVES = 4;
-
-
-
-  /**
-   * The constant for regular dragged piece style (the piece is being dragged).
-   */
-
-  public static final int NORMAL_DRAGGED_PIECE = 0;
-
-
-
-  /**
-   * The constant for dragged piece style where the square under the cursor is
-   * highlighted to indicate the target square.
-   */
-
-  public static final int HIGHLIGHT_TARGET_DRAGGED_PIECE = 1;
 
 
 
@@ -247,7 +231,7 @@ public class JBoard extends JComponent{
 
       // Repaint the dragged piece position.
       if (checkMovingPieceSquare)
-        repaint(tmpRect = getMovedPieceRect(tmpRect));
+        repaint(tmpRect = getMoveAreaRect(tmpRect));
 
       for (int file = 0; file < 8; file++){
         for (int rank = 0; rank < 8; rank++){
@@ -265,8 +249,7 @@ public class JBoard extends JComponent{
         }
       }
 
-      if ((getDraggedPieceStyle() == HIGHLIGHT_TARGET_DRAGGED_PIECE) && 
-          (movedPieceSquare != null))
+      if (isHighlightMadeMoveSquares() && (movedPieceSquare != null))
         repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
 
       if (movedPieceSquare != null){                        // We were dragging a piece
@@ -323,11 +306,19 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The current dragged piece style.
+   * Whether the piece follows the cursor as a move is being made.
    */
 
-  private int draggedPieceStyle = NORMAL_DRAGGED_PIECE;
-
+  private boolean isPieceFollowsCursor = true;
+  
+  
+  
+  /**
+   * Whether the squares of the made move are highlighted.
+   */
+   
+  private boolean isHighlightMadeMoveSquares = false;
+  
 
 
   /**
@@ -374,7 +365,7 @@ public class JBoard extends JComponent{
    * The color used for move highlighting.
    */
 
-  private Color moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHTING_COLOR;
+  private Color moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHT_COLOR;
   
   
   
@@ -388,10 +379,10 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The color used for highlighting the square when dragging a piece.
+   * The color used for highlighting the squares of a move as it's being made.
    */
 
-  private Color dragSquareHighlightingColor = DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR;
+  private Color madeMoveSquaresHighlightColor = DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR;
 
 
 
@@ -570,7 +561,7 @@ public class JBoard extends JComponent{
    */
 
   public void setPosition(Position newPosition){
-    if (newPosition==null)
+    if (newPosition == null)
       throw new IllegalArgumentException("Null position");
 
     Position oldPosition = position;
@@ -679,35 +670,50 @@ public class JBoard extends JComponent{
 
 
   /**
-   * Sets the dragged piece style to the given style. Possible values are
-   * {@link #NORMAL_DRAGGED_PIECE} and {@link #HIGHLIGHT_TARGET_DRAGGED_PIECE}.
+   * Sets whether the moved piece follows the mouse cursor while a move is being
+   * made.
    */
 
-  public void setDraggedPieceStyle(int newStyle){
-    switch(newStyle){
-      case NORMAL_DRAGGED_PIECE:
-      case HIGHLIGHT_TARGET_DRAGGED_PIECE:
-        break;
-      default:
-        throw new IllegalArgumentException("Illegal dragged piece style value: "+newStyle);
-    }
-    
-    int oldStyle = draggedPieceStyle;
-    this.draggedPieceStyle = newStyle;
-    firePropertyChange("draggedPieceStyle", oldStyle, newStyle);
+  public void setPieceFollowsCursor(boolean isPieceFollowsCursor){
+    boolean oldVal = this.isPieceFollowsCursor; 
+    this.isPieceFollowsCursor = isPieceFollowsCursor;
+    firePropertyChange("pieceFollowsCursor", oldVal, isPieceFollowsCursor);
   }
 
 
 
   /**
-   * Returns the current dragged piece style.
+   * Returns whether the moved piece follows the mouse cursor while a move is
+   * being made.
    */
 
-  public int getDraggedPieceStyle(){
-    return draggedPieceStyle;
+  public boolean isPieceFollowsCursor(){
+    return isPieceFollowsCursor;
   }
 
 
+  
+  /**
+   * Sets whether the squares of a move being made are highlighted. 
+   */
+
+  public void setHighlightMadeMoveSquares(boolean highlight){
+    boolean oldVal = this.isHighlightMadeMoveSquares; 
+    this.isHighlightMadeMoveSquares = highlight;
+    firePropertyChange("highlightMadeMoveSquares", oldVal, highlight);
+  }
+
+
+
+  /**
+   * Returns whether the move being made is highlighted.
+   */
+
+  public boolean isHighlightMadeMoveSquares(){
+    return isHighlightMadeMoveSquares;
+  }
+
+  
 
   /**
    * Sets the move highlighting style.
@@ -929,11 +935,13 @@ public class JBoard extends JComponent{
   /**
    * Sets the color used for move highlighting to the specified color. Passing
    * <code>null</code> is equivalent to setting the color to the default one.
+   * Note: this refers to highlighting the move specified by setHighlightedMove,
+   * not the move being made by the user.
    */
 
   public void setMoveHighlightingColor(Color moveHighlightingColor){
     if (moveHighlightingColor == null)
-      moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHTING_COLOR;
+      moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHT_COLOR;
     
     Object oldColor = this.moveHighlightingColor;
     this.moveHighlightingColor = moveHighlightingColor;
@@ -981,31 +989,30 @@ public class JBoard extends JComponent{
 
 
   /**
-   * Sets the color used for square highlighting when dragging a piece (such as
-   * what occurs when in HIGHLIGHT_TARGET_DRAGGED_PIECE mode) to the specified
-   * color. Passing <code>null</code> is equivalent to setting it to the default
-   * color.
+   * Sets the color used for highlighting the squares of the move being made.
+   * This refers to the highlighting specified by the
+   * <code>highlightMadeMoveSquares</code> property. Passing <code>null</code>
+   * is equivalent to setting it to the default color.
    */
 
-  public void setDragSquareHighlightingColor(Color dragSquareHighlightingColor){
-    if (dragSquareHighlightingColor == null)
-      dragSquareHighlightingColor = DEFAULT_DRAG_SQUARE_HIGHLIGHTING_COLOR;
+  public void setMadeMoveSquaresHighlightColor(Color newColor){
+    if (newColor == null)
+      newColor = DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR;
     
-    Object oldColor = this.dragSquareHighlightingColor;
-    this.dragSquareHighlightingColor = dragSquareHighlightingColor;
+    Object oldColor = this.madeMoveSquaresHighlightColor;
+    this.madeMoveSquaresHighlightColor = newColor;
     repaint();
-    firePropertyChange("dragSquareHighlightingColor", oldColor, dragSquareHighlightingColor);
+    firePropertyChange("madeMoveSquaresHighlightColor", oldColor, newColor);
   }
 
 
   
   /**
-   * Returns the color used for square highlighting when dragging a piece (such
-   * as what occurs when in HIGHLIGHT_TARGET_DRAGGED_PIECE mode).
+   * Returns the color used for highlighting the squares of the move being made.
    */
 
-  public Color getDragSquareHighlightingColor(){
-    return dragSquareHighlightingColor;
+  public Color getMadeMoveSquaresHighlightColor(){
+    return madeMoveSquaresHighlightColor;
   }
 
 
@@ -1071,12 +1078,10 @@ public class JBoard extends JComponent{
     if (!isMovingPiece())
       throw new IllegalStateException();
 
-    repaint(getMovedPieceRect(null));
+    repaint(getMoveAreaRect(null));
     repaint(squareToRect(movedPieceSquare, null));
     movedPieceSquare = null;
     movedPieceLoc = null;
-    if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
-      setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     
     fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
   }
@@ -1108,7 +1113,8 @@ public class JBoard extends JComponent{
     BoardPainter boardPainter = getBoardPainter();
     PiecePainter piecePainter = getPiecePainter();
 
-    int draggedPieceStyle = getDraggedPieceStyle();
+    boolean isPieceFollowsCursor = isPieceFollowsCursor();
+    boolean isHighlightMadeMoveSquares = isHighlightMadeMoveSquares(); 
     int moveHighlightingStyle = getMoveHighlightingStyle();
 
     // Paint the board
@@ -1119,7 +1125,7 @@ public class JBoard extends JComponent{
       for (int rank = 0; rank < 8; rank++){
         Square curSquare = Square.getInstance(file, rank);
 
-        if ((draggedPieceStyle == NORMAL_DRAGGED_PIECE) && curSquare.equals(movedPieceSquare))
+        if (isPieceFollowsCursor && curSquare.equals(movedPieceSquare))
           continue;
 
         Piece piece = position.getPieceAt(curSquare);
@@ -1167,20 +1173,21 @@ public class JBoard extends JComponent{
 
     // Paint the currently moved piece, or highlighted square
     if (movedPieceSquare != null){
-      getMovedPieceRect(rect);
-      if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
-        Piece piece = position.getPieceAt(movedPieceSquare);
-        piecePainter.paintPiece(piece, g, this, rect, false);
-      }
-      else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE){
+      if (isHighlightMadeMoveSquares){
+        getTargetSquareRect(rect);
         int targetHighlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
         int originHighlightSize = Math.min(2*targetHighlightSize/3, targetHighlightSize - 1);
         
         Square square = locationToSquare(rect.x, rect.y);
         if (square != null) // May be null if mouse is dragged out of the board
-          drawSquare(g, square, targetHighlightSize, getDragSquareHighlightingColor());
+          drawSquare(g, square, targetHighlightSize, getMadeMoveSquaresHighlightColor());
         
-        drawSquare(g, movedPieceSquare, originHighlightSize, getDragSquareHighlightingColor());
+        drawSquare(g, movedPieceSquare, originHighlightSize, getMadeMoveSquaresHighlightColor());
+      }
+      if (isPieceFollowsCursor){
+        getMovedPieceGraphicRect(rect);
+        Piece piece = position.getPieceAt(movedPieceSquare);
+        piecePainter.paintPiece(piece, g, this, rect, false);
       }
     }
   }
@@ -1500,45 +1507,113 @@ public class JBoard extends JComponent{
 
     return squareRect;
   }
-
-
-
+  
+  
+  
   /**
-   * Returns a rectangle (in pixels) which completely contains the piece
-   * currently being moved. Returns <code>null</code> if no piece is currently
-   * being dragged.
+   * Calculates a rectangle (in pixels) which completely contains the graphic of
+   * the piece currently being moved, if we are in
+   * <code>pieceFollowsCursor</code> mode.
+   * Throws an <code>IllegalStateException</code> if we are not in in
+   * <code>pieceFollowsCursor</code> mode or if a piece is not currently being
+   * moved.
    */
-
-  public Rectangle getMovedPieceRect(Rectangle rect){
+   
+  private Rectangle getMovedPieceGraphicRect(Rectangle rect){
+    if (!isPieceFollowsCursor())
+      throw new IllegalStateException("Not in pieceFollowsCursor mode");
+    
     if (movedPieceLoc == null)
-      return null;
-
+      throw new IllegalStateException("No piece is being moved");
+    
     rect = getBoardRect(rect);
     int squareWidth = rect.width/8;
     int squareHeight = rect.height/8;
-
-    if (getDraggedPieceStyle() == NORMAL_DRAGGED_PIECE){
-      rect.x = movedPieceLoc.x - squareWidth/2;
-      rect.y = movedPieceLoc.y - squareHeight/2;
-    }
-    else if (getDraggedPieceStyle() == HIGHLIGHT_TARGET_DRAGGED_PIECE){
-      rect.x = movedPieceLoc.x - (movedPieceLoc.x - rect.x)%squareWidth;
-      rect.y = movedPieceLoc.y - (movedPieceLoc.y - rect.y)%squareHeight;
-      
-      // This is needed because the way we do rounding, it gets rounded towards
-      // zero, which is not what we want for negative values.
-      if (movedPieceLoc.x < 0)
-        rect.x -= squareWidth;
-      if (movedPieceLoc.y < 0)
-        rect.y -= squareHeight;
-    }
-    else
-      throw new IllegalStateException("Unknown dragged piece style value: " + getDraggedPieceStyle());
+    rect.x = movedPieceLoc.x - squareWidth/2;
+    rect.y = movedPieceLoc.y - squareHeight/2;
+    rect.width = squareWidth;
+    rect.height = squareHeight;
+    
+    return rect;
+  }
+  
+  
+  
+  /**
+   * Calculates a rectangle (in pixels) of the square under the mouse, which
+   * needs to be highlighted when in <code>highlightMadeMoveSquares</code> mode.
+   * Throws an <code>IllegalStateException</code> if we are not in
+   * <code>highlightMadeMove</code> or if a piece is not currently being
+   * moved.
+   */
+   
+  private Rectangle getTargetSquareRect(Rectangle rect){
+    if (!isHighlightMadeMoveSquares())
+      throw new IllegalStateException("Not in highlightMadeMoveSquares mode");
+    
+    if (movedPieceLoc == null)
+      throw new IllegalStateException("No piece is being moved");
+    
+    rect = getBoardRect(rect);
+    int squareWidth = rect.width/8;
+    int squareHeight = rect.height/8;
+    
+    rect.x = movedPieceLoc.x - (movedPieceLoc.x - rect.x)%squareWidth;
+    rect.y = movedPieceLoc.y - (movedPieceLoc.y - rect.y)%squareHeight;
+    
+    // This is needed because the way we do rounding, it gets rounded towards
+    // zero, which is not what we want for negative values.
+    if (movedPieceLoc.x < 0)
+      rect.x -= squareWidth;
+    if (movedPieceLoc.y < 0)
+      rect.y -= squareHeight;
     
     rect.width = squareWidth;
     rect.height = squareHeight;
-
+    
     return rect;
+  }
+   
+  
+
+
+  /**
+   * Returns a rectangle (in pixels) which completely covers the area that needs
+   * to be redrawn when a piece is being moved.
+   * Throws an <code>IllegalStateException</code> if a piece is not currently
+   * being moved.
+   */
+
+  private Rectangle getMoveAreaRect(Rectangle rect){
+    if (movedPieceLoc == null)
+      throw new IllegalStateException("No piece is being moved");
+
+    if (isPieceFollowsCursor()){
+      if (isHighlightMadeMoveSquares()){
+        if (rect == null)
+          rect = new Rectangle();
+        
+        Rectangle pieceGraphic = getMovedPieceGraphicRect(null);
+        Rectangle targetSquare = getTargetSquareRect(null);
+        
+        rect.setBounds(pieceGraphic.union(targetSquare));
+        
+        return rect;
+      }
+      else
+        return getMovedPieceGraphicRect(rect);
+    }
+    else{
+      if (isHighlightMadeMoveSquares())
+        return getTargetSquareRect(rect);
+      else{
+        if (rect == null)
+          return new Rectangle(0,0,0,0);
+        
+        rect.setBounds(0,0,0,0);
+        return rect;
+      }
+    }
   }
 
 
@@ -1635,17 +1710,16 @@ public class JBoard extends JComponent{
 
     int x = evt.getX();
     int y = evt.getY();
-    int draggedPieceStyle = getDraggedPieceStyle();
     
     Rectangle helpRect = null;
 
     if ((evtID == MouseEvent.MOUSE_EXITED) && (inputStyle == CLICK_N_CLICK)){
       if (movedPieceSquare != null){ // Fake the piece being at its original location
-        repaint(helpRect = getMovedPieceRect(helpRect));
+        repaint(helpRect = getMoveAreaRect(helpRect));
         squareToRect(movedPieceSquare, helpRect);
         movedPieceLoc.x = helpRect.x + helpRect.width/2;
         movedPieceLoc.y = helpRect.y + helpRect.height/2;
-        repaint(getMovedPieceRect(helpRect));
+        repaint(getMoveAreaRect(helpRect));
       }
     }
 
@@ -1675,10 +1749,8 @@ public class JBoard extends JComponent{
         movedPieceLoc = new Point(x, y);
 
         repaint(helpRect = squareToRect(square, helpRect));
-        if (draggedPieceStyle == NORMAL_DRAGGED_PIECE)
-          repaint(helpRect = getMovedPieceRect(helpRect));
-        else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
-          setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        if (isPieceFollowsCursor())
+          repaint(helpRect = getMovedPieceGraphicRect(helpRect));
         
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_STARTED));
       }
@@ -1705,15 +1777,12 @@ public class JBoard extends JComponent{
           position.makeMove(madeMove);
         }
         else{ // Picked up the piece and dropped it immediately.
-          repaint(helpRect = getMovedPieceRect(helpRect));
+          repaint(helpRect = getMoveAreaRect(helpRect));
           repaint(helpRect = squareToRect(movedPieceSquare, helpRect));
         }
 
         movedPieceSquare = null;
         movedPieceLoc = null;
-        
-        if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
-          setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
       }
@@ -1748,7 +1817,7 @@ public class JBoard extends JComponent{
 
     if ((evtID == MouseEvent.MOUSE_DRAGGED) ||
        ((evtID == MouseEvent.MOUSE_MOVED) && (inputStyle == CLICK_N_CLICK))){
-      repaint(helpRect = getMovedPieceRect(helpRect));
+      repaint(helpRect = getMoveAreaRect(helpRect));
       
       if ((locationToSquare(x, y) == null) && (inputStyle == CLICK_N_CLICK)){
         // Fake the piece being at its original location
@@ -1760,7 +1829,7 @@ public class JBoard extends JComponent{
         movedPieceLoc.x = x;
         movedPieceLoc.y = y;
       }
-      repaint(helpRect = getMovedPieceRect(helpRect));
+      repaint(helpRect = getMoveAreaRect(helpRect));
     }
   }
 
