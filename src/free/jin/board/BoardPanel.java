@@ -1014,12 +1014,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         isBoardPositionUpdating = true;
         board.getPosition().copyFrom(realPosition);
         isBoardPositionUpdating = false;
-        displayedMoveNumber = madeMoves.size();
       }
     }
     else
       isMoveEnRoute = false;
 
+    if (shouldUpdateBoard)
+      displayedMoveNumber = madeMoves.size();
 
     if (queuedMove != null){
       UserMoveEvent evt2 = new UserMoveEvent(this, queuedMove);
