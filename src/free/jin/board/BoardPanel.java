@@ -765,7 +765,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void updatePositionScrollBar(){
     isPositionScrollBarUpdating = true;
-    positionScrollBar.setValues(displayedMoveNumber, 1, 0, madeMoves.size());
+
+    // +1 because we also need to be able to display the initial position
+    positionScrollBar.setValues(displayedMoveNumber, 1, 0, madeMoves.size() + 1); 
+
     isPositionScrollBarUpdating = false;
   }
 
@@ -993,14 +996,26 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     Move move = evt.getMove();
 
+    // If for example, the user is observing a game, and is looking at a
+    // position other than the last one, we don't want to update the board when
+    // a new move arrives.
+    boolean shouldUpdateBoard = true; 
+
+    if (displayedMoveNumber != madeMoves.size())
+      shouldUpdateBoard = false;
+
     madeMoves.addElement(move);
     realPosition.makeMove(move);
 
     if (!isMoveEnRoute){ // This is not the server echoeing our own move, so play sound.
       playAudioClipForMove(move);
-      isBoardPositionUpdating = true;
-      board.getPosition().copyFrom(realPosition);
-      isBoardPositionUpdating = false;
+
+      if (shouldUpdateBoard){
+        isBoardPositionUpdating = true;
+        board.getPosition().copyFrom(realPosition);
+        isBoardPositionUpdating = false;
+        displayedMoveNumber = madeMoves.size();
+      }
     }
     else
       isMoveEnRoute = false;
@@ -1021,7 +1036,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.setEnabled(true);
     timer.stop();
     updateClockActiveness();
-    displayedMoveNumber = madeMoves.size();
     addMoveToListTable(move);
     updatePositionScrollBar();
   }
@@ -1074,14 +1088,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     isMoveEnRoute = false;
     queuedMove = null;
-    isBoardPositionUpdating = true;
-    board.getPosition().copyFrom(realPosition);
-    isBoardPositionUpdating = false;
+
+    // Try not to change the board if possible. If, however we were displaying the position
+    // after a move that was taken back, we have to update the board.
+    if (displayedMoveNumber >= madeMoves.size()){
+      isBoardPositionUpdating = true;
+      board.getPosition().copyFrom(realPosition);
+      isBoardPositionUpdating = false;
+      displayedMoveNumber = madeMoves.size();
+    }
+
     if (!board.isEnabled())
       board.setEnabled(true);
 
     updateClockActiveness();
-    displayedMoveNumber = madeMoves.size();
     updateMoveListTable();
     updatePositionScrollBar();
   }
