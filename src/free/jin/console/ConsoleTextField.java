@@ -193,7 +193,7 @@ public class ConsoleTextField extends FixedJTextField{
                                          // event before we clear the text.
 
 
-    boolean isControlDown = evt.isShiftDown();
+    boolean isControlDown = evt.isControlDown();
     boolean isShiftDown = evt.isShiftDown();
 
     if (evt.getID() == KeyEvent.KEY_PRESSED){
