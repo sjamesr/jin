@@ -26,7 +26,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.Document;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.swing.SwingUtils;
 import free.util.TextUtilities;
