@@ -47,10 +47,10 @@ public class AppletJinContext implements JinContext{
   
   
   /**
-   * The applet we're using.
+   * The applet we're running as.
    */
    
-  private final JApplet applet;
+  private final JinApplet applet;
   
 
   
@@ -120,10 +120,10 @@ public class AppletJinContext implements JinContext{
   
   /**
    * Creates a new instance of <code>AppletJinContext</code> with the specified
-   * <code>JApplet</code>.
+   * <code>JinApplet</code>.
    */
   
-  public AppletJinContext(JApplet applet) throws IOException,
+  public AppletJinContext(JinApplet applet) throws IOException,
       ClassNotFoundException, InstantiationException, IllegalAccessException{
     
     if (applet == null)
@@ -151,7 +151,7 @@ public class AppletJinContext implements JinContext{
     
     // Apply Swing fixes
     fixSwing();
-
+    
     // Create the main frame
     mainFrame = createMainFrame();
     
@@ -425,13 +425,25 @@ public class AppletJinContext implements JinContext{
   
   
   /**
+   * This method is called by the <code>JinApplet</code> to tell us when the
+   * applet's start method was called. We don't do anything because
+   * <code>JinApplet</code> has a button which starts/stops us.
+   */
+   
+  void applet_start(){
+    
+  }
+  
+  
+  
+  /**
    * This is called by the <code>JinApplet</code> to tell us when the applet's
    * stop method was called. We don't try to save preferences here because this
    * method is usually given very little time to finish by most applet
    * containers, after which the applet and all its windows are killed.
    */
    
-  void stop(){
+  void applet_stop(){
     if (mainFrame.isVisible())
       mainFrame.dispose();
   }
@@ -463,6 +475,8 @@ public class AppletJinContext implements JinContext{
     storeUserPrefs();
 
     mainFrame.dispose();
+    
+    applet.closed();
   }
 
 
