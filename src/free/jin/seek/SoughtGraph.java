@@ -580,6 +580,7 @@ public class SoughtGraph extends JComponent{
     String name = seek.getSeekerName();
     String title = seek.getSeekerTitle();
     int rating = seek.getSeekerRating();
+    String ratingString = seek.isSeekerRated() ? (" "+rating) : "";
     boolean isProvisional = seek.isSeekerProvisional()&&seek.isSeekerRegistered();
     int time = seek.getTime()/(60*1000);
     int inc = seek.getInc()/1000;
@@ -590,7 +591,7 @@ public class SoughtGraph extends JComponent{
     boolean isManualAccept = seek.isManualAccept();
     boolean isFormula = seek.isFormula();
 
-    String seekString = name+title+" "+rating+(isProvisional ? " (provisional) " : " ")+time+" "+inc+" "+(isRated ? "rated" : "unrated")+" ";
+    String seekString = name+title+ratingString+(isProvisional ? " (provisional) " : " ")+time+" "+inc+" "+(isRated ? "rated" : "unrated")+" ";
 
     if (!(variant instanceof Chess))
       seekString = seekString+variant.getName()+" ";
