@@ -181,7 +181,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     }
 
     if (Boolean.valueOf(getProperty("visible", "true")).booleanValue())
-      showSoughtGraphFrame();
+      showSoughtGraphFrame(Boolean.valueOf(getProperty("selected", "true")).booleanValue());
 
 
     /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
@@ -259,21 +259,25 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * register the listener because it seems to be broken in JDK 1.1
    */
 
-  protected void showSoughtGraphFrame(){
+  protected void showSoughtGraphFrame(boolean bringToFront){
     if (soughtGraphFrame.getParent() != null)
       return;
 
     getPluginContext().getMainFrame().getDesktop().add(soughtGraphFrame);
-    soughtGraphFrame.setVisible(true);
-    soughtGraphFrame.toFront();
 
     try{ 
+      soughtGraphFrame.setVisible(true);
+
+      if (bringToFront)
+        soughtGraphFrame.toFront();
+
       // The documentation of JInternalFrame recommends not to do this,
       // but this seems to be the only way to get the isClosed flag of a JInternalFrame
       // set to false.
       soughtGraphFrame.setClosed(false);
 
-      soughtGraphFrame.setSelected(true);
+      if (bringToFront)
+        soughtGraphFrame.setSelected(true);
     } catch (PropertyVetoException e){}
 
     // It may be null if the graph is shown before it's created.
@@ -332,22 +336,22 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void saveState(){
-    User user = getUser();
-    String prefix = getID()+".";
-
     Rectangle soughtGraphFrameBounds = soughtGraphFrame.getBounds();
     // If something bad happened, let's not save that state.
     if ((soughtGraphFrameBounds.width > 10) && (soughtGraphFrameBounds.height > 10))
-      user.setProperty(prefix+"frame-bounds",StringEncoder.encodeRectangle(soughtGraphFrameBounds));
+      setProperty("frame-bounds",StringEncoder.encodeRectangle(soughtGraphFrameBounds));
 
     boolean isMaximized = soughtGraphFrame.isMaximum();
-    user.setProperty(prefix+"maximized", String.valueOf(isMaximized));
+    setProperty("maximized", String.valueOf(isMaximized));
 
     boolean isIconified = soughtGraphFrame.isIcon();
-    user.setProperty(prefix+"iconified", String.valueOf(isIconified));
+    setProperty("iconified", String.valueOf(isIconified));
 
     boolean isVisible = (soughtGraphFrame.getParent() != null);
-    user.setProperty(prefix+"visible", String.valueOf(isVisible));
+    setProperty("visible", String.valueOf(isVisible));
+
+    boolean isSelected = soughtGraphFrame.isSelected();
+    setProperty("selected", String.valueOf(isSelected));
   }
 
 
@@ -403,7 +407,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
         String actionCommand = evt.getActionCommand();
 
         if ("visible".equals(actionCommand))
-          showSoughtGraphFrame();
+          showSoughtGraphFrame(true);
         else if ("hidden".equals(actionCommand))
           hideSoughtGraphFrame();
         else
