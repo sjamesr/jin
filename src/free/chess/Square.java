@@ -38,7 +38,7 @@ public class Square{
    * The pool of unique immutable instances of Square.
    */
 
-  private final static Square [][] pool = new Square[8][8];
+  private static final Square [][] pool = new Square[8][8];
 
 
 

@@ -72,7 +72,7 @@ public class Player implements Cloneable{
    * The id of the timestamp client of the user.
    */
 
-  private transient final int timestampClientNumber;
+  private final /*transient*/ int timestampClientNumber;
 
 
 

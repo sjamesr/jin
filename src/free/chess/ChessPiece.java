@@ -38,7 +38,7 @@ public class ChessPiece extends Piece{
    * A constant representing a pawn.
    */
 
-  protected final static int PAWN = 1;
+  protected static final int PAWN = 1;
 
 
 
@@ -46,7 +46,7 @@ public class ChessPiece extends Piece{
    * A constant representing a knight.
    */
 
-  protected final static int KNIGHT = 2;
+  protected static final int KNIGHT = 2;
 
 
 
@@ -55,7 +55,7 @@ public class ChessPiece extends Piece{
    * A constant representing a bishop.
    */
                                         
-  protected final static int BISHOP = 3;
+  protected static final int BISHOP = 3;
 
 
 
@@ -63,7 +63,7 @@ public class ChessPiece extends Piece{
    * A constant representing a rook.
    */
 
-  protected final static int ROOK = 4;
+  protected static final int ROOK = 4;
 
 
 
@@ -71,7 +71,7 @@ public class ChessPiece extends Piece{
    * A constant representing a queen.
    */
 
-  protected final static int QUEEN = 5;
+  protected static final int QUEEN = 5;
 
 
 
@@ -79,26 +79,26 @@ public class ChessPiece extends Piece{
    * A constant representing a king.
    */
 
-  protected final static int KING = 6;
+  protected static final int KING = 6;
 
 
 
 
   // Final objects representing each piece.
 
-  public final static ChessPiece WHITE_PAWN   = new ChessPiece(WHITE,PAWN);
-  public final static ChessPiece WHITE_KNIGHT = new ChessPiece(WHITE,KNIGHT);
-  public final static ChessPiece WHITE_BISHOP = new ChessPiece(WHITE,BISHOP);
-  public final static ChessPiece WHITE_ROOK   = new ChessPiece(WHITE,ROOK);
-  public final static ChessPiece WHITE_QUEEN  = new ChessPiece(WHITE,QUEEN);
-  public final static ChessPiece WHITE_KING   = new ChessPiece(WHITE,KING);
+  public static final ChessPiece WHITE_PAWN   = new ChessPiece(WHITE,PAWN);
+  public static final ChessPiece WHITE_KNIGHT = new ChessPiece(WHITE,KNIGHT);
+  public static final ChessPiece WHITE_BISHOP = new ChessPiece(WHITE,BISHOP);
+  public static final ChessPiece WHITE_ROOK   = new ChessPiece(WHITE,ROOK);
+  public static final ChessPiece WHITE_QUEEN  = new ChessPiece(WHITE,QUEEN);
+  public static final ChessPiece WHITE_KING   = new ChessPiece(WHITE,KING);
   
-  public final static ChessPiece BLACK_PAWN   = new ChessPiece(BLACK,PAWN);
-  public final static ChessPiece BLACK_KNIGHT = new ChessPiece(BLACK,KNIGHT);
-  public final static ChessPiece BLACK_BISHOP = new ChessPiece(BLACK,BISHOP);
-  public final static ChessPiece BLACK_ROOK   = new ChessPiece(BLACK,ROOK);
-  public final static ChessPiece BLACK_QUEEN  = new ChessPiece(BLACK,QUEEN);
-  public final static ChessPiece BLACK_KING   = new ChessPiece(BLACK,KING);
+  public static final ChessPiece BLACK_PAWN   = new ChessPiece(BLACK,PAWN);
+  public static final ChessPiece BLACK_KNIGHT = new ChessPiece(BLACK,KNIGHT);
+  public static final ChessPiece BLACK_BISHOP = new ChessPiece(BLACK,BISHOP);
+  public static final ChessPiece BLACK_ROOK   = new ChessPiece(BLACK,ROOK);
+  public static final ChessPiece BLACK_QUEEN  = new ChessPiece(BLACK,QUEEN);
+  public static final ChessPiece BLACK_KING   = new ChessPiece(BLACK,KING);
 
 
 
