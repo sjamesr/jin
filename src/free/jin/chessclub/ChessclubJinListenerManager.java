@@ -300,43 +300,43 @@ public class ChessclubJinListenerManager extends BasicJinListenerManager{
 
 
 
-  /**
-   * Adds the given FriendsListener to the list of listeners receiving
-   * notifications about friends.
-   */
-
-  public void addFriendsListener(FriendsListener listener){
-    super.addFriendsListener(listener);
-
-    if (listenerList.getListenerCount(FriendsListener.class)==1){
+//  /**
+//   * Adds the given FriendsListener to the list of listeners receiving
+//   * notifications about friends.
+//   */
+//
+//  public void addFriendsListener(FriendsListener listener){
+//    super.addFriendsListener(listener);
+//
+//    if (listenerList.getListenerCount(FriendsListener.class)==1){
+////      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
+////      setDGState(Datagram.DG_NOTIFY_LEFT, true);
+////      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
+//
+//      source.firstFriendsListenerAdded();
+//    }
+//  }
+//
+//
+//
+//
+//
+//  /**
+//   * Removes the given FriendsListener from the list of listeners receiving
+//   * notifications about friends.
+//   */
+//
+//  public void removeFriendsListener(FriendsListener listener){
+//    super.removeFriendsListener(listener);
+//
+//    if (listenerList.getListenerCount(FriendsListener.class)==0){
 //      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
 //      setDGState(Datagram.DG_NOTIFY_LEFT, true);
 //      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-
-      source.firstFriendsListenerAdded();
-    }
-  }
-
-
-
-
-
-  /**
-   * Removes the given FriendsListener from the list of listeners receiving
-   * notifications about friends.
-   */
-
-  public void removeFriendsListener(FriendsListener listener){
-    super.removeFriendsListener(listener);
-
-    if (listenerList.getListenerCount(FriendsListener.class)==0){
-//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
-//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
-//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-
-      source.lastFriendsListenerRemoved();
-    }
-  }
+//
+//      source.lastFriendsListenerRemoved();
+//    }
+//  }
 
  
 
