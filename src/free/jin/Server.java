@@ -120,6 +120,7 @@ public abstract class Server{
   }
 
 
+
   /**
    * Creates and returns a <code>User</code> for this <code>Server</code> with
    * the specified <code>Properties</code> and Hashtable containing the User
@@ -137,9 +138,15 @@ public abstract class Server{
    * Creates a guest <code>User</code>.
    */
 
-  public User createGuest(){
-    return new User(this, new Properties(), new Hashtable());
-  }
+  public abstract User createGuest();
+
+
+
+  /**
+   * Returns true if the specified <code>User</code> is a guest.
+   */
+
+  public abstract boolean isGuest(User user);
 
 
 
