@@ -29,6 +29,7 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;
 import free.util.ArrayEnumeration;
+import free.util.AWTUtilities;
 import java.io.*;
 import java.util.*;
 
@@ -179,13 +180,12 @@ public class JinFrame extends JFrame{
 
     Server [] servers = Jin.getServers();
     if (servers.length > 1){
-      Object result = JOptionPane.showInputDialog(this,"Choose a server to connect to",
-        "Choose server", JOptionPane.QUESTION_MESSAGE, null, servers, null);
+      ServerChoiceDialog dialog = new ServerChoiceDialog(this, servers);
+      AWTUtilities.centerWindow(dialog, this);
+      chosenServer = dialog.getChoice();
 
-      if (result == null)
+      if (chosenServer == null)
         return;
-
-      chosenServer = (Server)result;
     }
     else if (servers.length == 0){
       JOptionPane.showMessageDialog(this, "No defined servers, will exit.");
