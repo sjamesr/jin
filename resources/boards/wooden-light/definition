@@ -1,4 +1,4 @@
 id = wooden-light
-name = Wooden Light
+name = Light Wood
 classname = ImageBoardLoader
 servers = icc
