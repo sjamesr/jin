@@ -130,6 +130,17 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     consoleFrame = new JInternalFrame("Main Console",true,true,true,true);
 
+    try{
+      String iconImage = getProperty("icon-image");
+      if (iconImage != null){
+        InputStream imageStream = ConsoleManager.class.getResourceAsStream(iconImage);
+        if (imageStream != null){
+          byte [] imageData = IOUtilities.readToEnd(imageStream);
+          consoleFrame.setFrameIcon(new ImageIcon(imageData));
+        }
+      }
+    } catch (IOException e){}
+
     /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html on
        why I do this instead of adding an InternalFrameListener like a sane person. */
     consoleFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -142,7 +153,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
           int result = JOptionPane.YES_OPTION; 
 
           if (getConnection().isConnected())
-            result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(),"Really close this window and log out?","Select an option",JOptionPane.YES_NO_OPTION);
+            result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), "Really close this window and log out?", "Select an option", JOptionPane.YES_NO_OPTION);
           if (result==JOptionPane.YES_OPTION)
             getPluginContext().getMainFrame().closeConnection(getConnection());
           else
