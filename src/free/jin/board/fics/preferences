@@ -11,4 +11,15 @@ light-square-color=color;ffcf90
 dark-square-color=color;8f604f
 
 move-highlight.color=color;00b2b2
+move-highlight.highlight-own=boolean;false
 drag-square-highlighting.color=color;0000ff
+
+coords-display.color=color;b2
+coords-display.style=string;none
+
+auto-promote=boolean;false
+move-highlight.style=string;square
+dragged-piece-style=string;normal
+move-sending-mode=string;predrag
+
+move-input-style=string;drag'n'drop
