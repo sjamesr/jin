@@ -30,9 +30,10 @@ import free.util.IOUtilities;
 
 /**
  * This class allows you to play sounds in an application in JDK 1.1 - it uses
- * sun.audio classes and is thus not platform independent, but it simply won't
- * do anything if it fails. The "au" format is most likely to be supported, but
- * others may work too.
+ * a variety of hacks (implementations of AudioPlayer) to try and play the sound
+ * and is thus not platform independent, but it simply won't do anything if it
+ * fails. The "au" format is most likely to be supported, but others may work
+ * too.
  */
 
 public class AudioClip{
@@ -53,6 +54,7 @@ public class AudioClip{
    */
 
   private static final String [] playerClassnames;
+
 
 
 
@@ -88,39 +90,21 @@ public class AudioClip{
 
 
   /**
-   * The byte array containing the sound in some format.
+   * The URL of the audio clip.
    */
 
-  private final byte [] sound;
+  private final URL url;
 
+
+
+
+  /**
+   * The audio clip data.
+   */
+
+  private final byte [] data;
 
   
-  /**
-   * Creates a new AudioClip from the given byte array. This constructor does
-   * not block.
-   */
-  /*
-  public AudioClip(byte [] sound){
-    this.sound = sound;
-  }
-  */
-
-
-
-  /**
-   * Creates a new AudioClip from the given InputStream. This constructor blocks
-   * until all the sound data is read from the InputStream.
-   */
-
-  public AudioClip(InputStream in) throws IOException{
-    ByteArrayOutputStream buf = new ByteArrayOutputStream();
-    IOUtilities.pump(in, buf);
-    in.close();
-
-    this.sound = buf.toByteArray();
-  }
-
-
 
 
   /**
@@ -129,19 +113,11 @@ public class AudioClip{
    */
 
   public AudioClip(URL url) throws IOException{
-    this(url.openStream());
+    this.url = url;
+    InputStream in = url.openStream();
+    this.data = IOUtilities.readToEnd(in);
+    in.close();
   } 
-
-
-
-  /**
-   * Creates a new AudioClip from the given file. This constructor blocks until
-   * all the sound data is read from the file.
-   */
-
-  public AudioClip(File file) throws IOException{
-    this(new FileInputStream(file));
-  }
 
 
 
@@ -165,8 +141,11 @@ public class AudioClip{
           Class playerClass = Class.forName(classname);
           AudioPlayer player = (AudioPlayer)playerClass.newInstance();
           player.play(this);
+          System.err.println("Will now use "+classname+" to play audio clips.");
           successfulPlayer = player;
-        } catch (Exception e){
+        } catch (Throwable e){
+            if (e instanceof ThreadDeath)
+              throw (ThreadDeath)e;
             continue;
           }
         break;
@@ -178,11 +157,22 @@ public class AudioClip{
 
 
   /**
-   * Returns the audio data.
+   * Returns the URL of the audio clip.
+   */
+
+  public URL getURL(){
+    return url;
+  }
+
+
+
+
+  /**
+   * Returns the data of the audio clip.
    */
 
   public byte [] getData(){
-    return sound;
+    return (byte [])data.clone();
   }
 
   
