@@ -91,14 +91,14 @@ public class LookAndFeelMenu extends JMenu{
     lnfButtonGroup = new ButtonGroup();
     for (int i=0;i<lnfs.length;i++){
       UIManager.LookAndFeelInfo lnf = lnfs[i];
-      JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(lnf.getName());
+      JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(lnf.getName());
       menuItem.addActionListener(lnfActionListener);
 
       lookAndFeelClassNamesToButtons.put(lnf.getClassName(), menuItem);
       buttonsToLookAndFeelClassNames.put(menuItem, lnf.getClassName());
 
       if (lnf.getClassName().equals(currentLookAndFeelClassName))
-        menuItem.setState(true);
+        menuItem.setSelected(true);
 
       menuItem.setMnemonic(lnf.getName().charAt(0));
 
