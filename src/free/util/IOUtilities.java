@@ -224,7 +224,8 @@ public class IOUtilities{
 
   /**
    * Reads from the given InputStream until its end and returns a byte array
-   * of the contents.
+   * of the contents. Note that this method doesn't close the given InputStream,
+   * that is left to the user.
    */
 
   public static byte [] readToEnd(InputStream in) throws IOException{
@@ -252,7 +253,8 @@ public class IOUtilities{
 
   /**
    * Reads all the information from the given InputStream and returns it as
-   * plain text by using the default system encoding.
+   * plain text by using the default system encoding. Note that this method
+   * doesn't close the given InputStream, that is left to the user.
    */
 
   public static String loadText(InputStream in) throws IOException{
@@ -270,7 +272,10 @@ public class IOUtilities{
    */
 
   public static String loadText(URL url) throws IOException{
-    return loadText(url.openStream());
+    InputStream in = url.openStream();
+    String text = loadText(in);
+    in.close();
+    return text;
   }
 
 
@@ -287,7 +292,10 @@ public class IOUtilities{
     if (!file.exists())
       throw new IOException("File does not exist");
 
-    return loadText(new FileInputStream(file));
+    InputStream in = new FileInputStream(file);
+    String text = loadText(in);
+    in.close();
+    return text;
   }
 
 
