@@ -55,10 +55,10 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
   /**
-   * Our own copy of the user properties merged with plugin properties.
+   * The properties we've modified as a result of user actions.
    */
 
-  private final Properties props;
+  private final Properties modifiedProps;
 
 
 
@@ -126,7 +126,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
   public ConsolePreferencesPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
 
-    props = mergePluginAndUserProps();
+    modifiedProps = new Properties();
 
     createSettingsPanels();
 
@@ -153,27 +153,49 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
 
   /**
-   * Merges the plugin properties with the user properties for the plugin that
-   * uses this preferences panel. The user properties override the plugin
-   * properties. Returns the resulting Properties object.
+   * Returns the value of the specified property. It first looks for such a
+   * property in our local properties, which we may possibly have modified. If
+   * there's no such property there, the plugin is asked for such a property.
    */
 
-  private Properties mergePluginAndUserProps(){
-    Properties props = new Properties(consoleManager.getPluginContext().getProperties());
+  private String getProperty(String propertyName){
+    String value = modifiedProps.getProperty(propertyName);
+    return value == null ? consoleManager.getProperty(propertyName) : value; 
+  }
 
-    Properties userProps = consoleManager.getUser().getProperties();
-    Enumeration userPropsEnum = userProps.keys();
-    String pluginID = consoleManager.getID();
-    while (userPropsEnum.hasMoreElements()){
-      String key = (String)userPropsEnum.nextElement();
-      if (key.startsWith(pluginID)){
-        Object value = userProps.get(key);
-        key = key.substring(key.indexOf(".")+1);
-        props.put(key, value);
-      }
+
+
+
+  /**
+   * Returns the value of the specified property in the same manner
+   * <code>getProperty(String)</code> does, only if the returned value would be
+   * <code>null</code>, returns the 2nd specified string instead.
+   */
+
+  public String getProperty(String propertyName, String defaultValue){
+    String propertyValue = getProperty(propertyName);
+    return propertyValue == null ? defaultValue : propertyValue;
+  }
+
+
+
+
+  /**
+   * Looks up the value of the specified property. The search is done
+   * recursively, each time removing the prefix of the property name, delimited
+   * by a '.' character.
+   */
+
+  protected String lookupProperty(String propertyName){
+    String propertyValue = getProperty(propertyName);
+    if (propertyValue == null){
+      int dotIndex = propertyName.lastIndexOf(".");
+      if (dotIndex == -1)
+        return null;
+      return lookupProperty(propertyName.substring(0,dotIndex));
     }
-
-    return props;
+    else
+      return propertyValue;
   }
 
 
@@ -225,13 +247,13 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
   protected void updatePropertiesFrom(CategoryPanel categoryPanel){
     if (categoryPanel == defaultSettingsPanel){
       String newSelectionColor = StringEncoder.encodeColor(selectionColorButton.getColor());
-      props.put("output-selection", newSelectionColor);
+      modifiedProps.put("output-selection", newSelectionColor);
 
       String newSelectedColor = StringEncoder.encodeColor(selectedColorButton.getColor());
-      props.put("output-selected", newSelectedColor);
+      modifiedProps.put("output-selected", newSelectedColor);
 
       Color background = defaultSettingsPanel.getTextStyleChooser().getSelectedBackground();
-      props.put("background", StringEncoder.encodeColor(background));
+      modifiedProps.put("background", StringEncoder.encodeColor(background));
     }
 
     TextStyleChooserPanel textStyleChooser = categoryPanel.getTextStyleChooser();
@@ -260,10 +282,10 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected void updatePanels(){
-    selectionColorButton.setColor(StringParser.parseColor(props.getProperty("output-selection")));
-    selectedColorButton.setColor(StringParser.parseColor(props.getProperty("output-selected")));
+    selectionColorButton.setColor(StringParser.parseColor(getProperty("output-selection")));
+    selectedColorButton.setColor(StringParser.parseColor(getProperty("output-selected")));
 
-    Color background = StringParser.parseColor(props.getProperty("background"));
+    Color background = StringParser.parseColor(getProperty("background"));
 
     for (int i = 0; i < categoryPanels.size(); i++){
       CategoryPanel panel = (CategoryPanel)categoryPanels.elementAt(i);
@@ -303,8 +325,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   private void createDefaultSettingsPanel(){
     Font font = getCategoryFont("");
-    Color foreground = StringParser.parseColor(props.getProperty("foreground"));
-    Color background = StringParser.parseColor(props.getProperty("background"));
+    Color foreground = StringParser.parseColor(getProperty("foreground"));
+    Color background = StringParser.parseColor(getProperty("background"));
 
     TextStyleChooserPanel defaultSettingsChooserPanel = 
       new TextStyleChooserPanel(font, foreground, background, true);
@@ -334,23 +356,23 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   private void createSettingsPanelsFromProperties(){
-    Color background = StringParser.parseColor(props.getProperty("background"));
+    Color background = StringParser.parseColor(getProperty("background"));
 
-    int categoriesCount = Integer.parseInt(props.getProperty("preferences.categories.count", "0"));
+    int categoriesCount = Integer.parseInt(getProperty("preferences.categories.count", "0"));
 
     for (int i = 0; i < categoriesCount; i++){
       CategoryPanel categoryPanel;
 
-      boolean isCustomPanel = new Boolean(props.getProperty("preferences.categories."+i+".custom")).booleanValue();
+      boolean isCustomPanel = new Boolean(getProperty("preferences.categories."+i+".custom")).booleanValue();
 
       if (isCustomPanel){
-        String id = props.getProperty("preferences.categories."+i+".id");
+        String id = getProperty("preferences.categories."+i+".id");
         categoryPanel = createCustomCategoryPanel(id);
       }
       else{
-        String categoryName = props.getProperty("preferences.categories."+i+".name");
+        String categoryName = getProperty("preferences.categories."+i+".name");
 
-        StringTokenizer categoriesTokenizer = new StringTokenizer(props.getProperty("preferences.categories."+i+".ids"), ";");
+        StringTokenizer categoriesTokenizer = new StringTokenizer(getProperty("preferences.categories."+i+".ids"), ";");
         String [] categories = new String[categoriesTokenizer.countTokens()];
         for (int categoryIndex = 0; categoryIndex < categories.length; categoryIndex++)
           categories[categoryIndex] = categoriesTokenizer.nextToken();
@@ -400,7 +422,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooserButton createSelectionColorButton(){
-    Color selectionColor = StringParser.parseColor(props.getProperty("output-selection"));
+    Color selectionColor = StringParser.parseColor(getProperty("output-selection"));
     ColorChooserButton button = new ColorChooserButton("Selection", selectionColor);
     button.setMnemonic('l');
 
@@ -416,7 +438,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooserButton createSelectedColorButton(){
-    Color selectedColor = StringParser.parseColor(props.getProperty("output-selected"));
+    Color selectedColor = StringParser.parseColor(getProperty("output-selected"));
     ColorChooserButton button = new ColorChooserButton("Selected text", selectedColor);
     button.setMnemonic('e');
 
@@ -480,27 +502,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
   
 
 
-
   
-  /**
-   * Looks up the value of the property with the name in the props Properties.
-   */
-
-  protected String lookupProperty(String propertyName){
-    String propertyValue = props.getProperty(propertyName);
-    if (propertyValue == null){
-      int dotIndex = propertyName.lastIndexOf(".");
-      if (dotIndex == -1)
-        return null;
-      return lookupProperty(propertyName.substring(0,dotIndex));
-    }
-    else
-      return propertyValue;
-  }
-
-
-
-
   /**
    * Refreshes the given TextStyleChooserPanel's settings from the properties of
    * the given category.
@@ -531,10 +533,10 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges(){
-    Enumeration changedProps = props.keys();
-    while (changedProps.hasMoreElements()){
-      String propertyName = (String)changedProps.nextElement();
-      String propertyValue = (String)props.get(propertyName);
+    Enumeration modifiedPropsEnum = modifiedProps.keys();
+    while (modifiedPropsEnum.hasMoreElements()){
+      String propertyName = (String)modifiedPropsEnum.nextElement();
+      String propertyValue = (String)modifiedProps.get(propertyName);
       if (!consoleManager.lookupProperty(propertyName).equals(propertyValue))
         consoleManager.setProperty(propertyName, propertyValue, true);
     }
@@ -581,10 +583,10 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   protected void setProperty(String categoryName, String propertyType, String propertyValue){
     String propertyName = (categoryName.equals("") ? propertyType : propertyType+"."+categoryName);
-    if (new Boolean(props.getProperty(propertyName+".unmodifiable", "false")).booleanValue())
+    if (new Boolean(getProperty(propertyName+".unmodifiable", "false")).booleanValue())
       return;
 
-    props.put(propertyName, propertyValue);
+    modifiedProps.put(propertyName, propertyValue);
   }
 
 
