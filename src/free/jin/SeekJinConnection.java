@@ -34,8 +34,10 @@ public interface SeekJinConnection extends JinConnection{
 
 
   /**
-   * Adds the given SeekListener to the list of listeners receiving notifications
-   * when seeks are added and removed.
+   * Adds the given SeekListener to the list of listeners receiving 
+   * notifications when seeks are added and removed. Note that the
+   * implementation must deliver not only new Seeks to the newly registered 
+   * listener but also all of the current seeks as well.
    */
 
   void addSeekListener(SeekListener listener);
