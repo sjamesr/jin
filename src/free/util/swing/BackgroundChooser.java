@@ -211,11 +211,13 @@ public class BackgroundChooser extends JDialog{
     pickImage.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
-        fileChooser.showOpenDialog(BackgroundChooser.this);
-        File pic = fileChooser.getSelectedFile();
-        if (pic != null){
-          chosenImageFile = pic;
-          desktop.setWallpaper(Toolkit.getDefaultToolkit().getImage(pic.getAbsolutePath()));
+        int val = fileChooser.showOpenDialog(BackgroundChooser.this);
+        if (val == JFileChooser.APPROVE_OPTION){
+          File pic = fileChooser.getSelectedFile();
+          if ((pic != null) && pic.exists()){
+            chosenImageFile = pic;
+            desktop.setWallpaper(Toolkit.getDefaultToolkit().getImage(pic.getAbsolutePath()));
+          }
         }
       }
 
