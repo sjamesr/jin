@@ -1034,66 +1034,70 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processSeekAdded(SeekInfoStruct seekInfo){
-    WildVariant variant = getVariant(seekInfo.getMatchType());
-    if (variant != null){
-      String seekID = String.valueOf(seekInfo.getSeekIndex());
-      StringBuffer titlesBuf = new StringBuffer();
-      int titles = seekInfo.getSeekerTitles();
+    // We may get seeks after setting seekInfo to false because the server
+    // already sent them when we sent it the request to set seekInfo to false.
+    if (getSeekInfo()){
+      WildVariant variant = getVariant(seekInfo.getMatchType());
+      if (variant != null){
+        String seekID = String.valueOf(seekInfo.getSeekIndex());
+        StringBuffer titlesBuf = new StringBuffer();
+        int titles = seekInfo.getSeekerTitles();
 
-      if ((titles & SeekInfoStruct.COMPUTER) != 0)
-        titlesBuf.append("(C)");
-      if ((titles & SeekInfoStruct.GM) != 0)
-        titlesBuf.append("(GM)");
-      if ((titles & SeekInfoStruct.IM) != 0)
-        titlesBuf.append("(IM)");
-      if ((titles & SeekInfoStruct.FM) != 0)
-        titlesBuf.append("(FM)");
-      if ((titles & SeekInfoStruct.WGM) != 0)
-        titlesBuf.append("(WGM)");
-      if ((titles & SeekInfoStruct.WIM) != 0)
-        titlesBuf.append("(WIM)");
-      if ((titles & SeekInfoStruct.WFM) != 0)
-        titlesBuf.append("(WFM)");
+        if ((titles & SeekInfoStruct.COMPUTER) != 0)
+          titlesBuf.append("(C)");
+        if ((titles & SeekInfoStruct.GM) != 0)
+          titlesBuf.append("(GM)");
+        if ((titles & SeekInfoStruct.IM) != 0)
+          titlesBuf.append("(IM)");
+        if ((titles & SeekInfoStruct.FM) != 0)
+          titlesBuf.append("(FM)");
+        if ((titles & SeekInfoStruct.WGM) != 0)
+          titlesBuf.append("(WGM)");
+        if ((titles & SeekInfoStruct.WIM) != 0)
+          titlesBuf.append("(WIM)");
+        if ((titles & SeekInfoStruct.WFM) != 0)
+          titlesBuf.append("(WFM)");
 
-      boolean isProvisional = (seekInfo.getSeekerProvShow() == 'P');
+        boolean isProvisional = (seekInfo.getSeekerProvShow() == 'P');
 
-      boolean isSeekerRated = (seekInfo.getSeekerRating() != 0);
+        boolean isSeekerRated = (seekInfo.getSeekerRating() != 0);
 
-      boolean isRegistered = ((seekInfo.getSeekerTitles() & SeekInfoStruct.UNREGISTERED) == 0);
+        boolean isRegistered = ((seekInfo.getSeekerTitles() & SeekInfoStruct.UNREGISTERED) == 0);
 
-      boolean isComputer = ((seekInfo.getSeekerTitles() & SeekInfoStruct.COMPUTER) != 0);
+        boolean isComputer = ((seekInfo.getSeekerTitles() & SeekInfoStruct.COMPUTER) != 0);
 
-      Player color;
-      switch (seekInfo.getSeekerColor()){
-        case 'W':
-          color = Player.WHITE_PLAYER;
-          break;
-        case 'B':
-          color = Player.BLACK_PLAYER;
-          break;
-        case '?':
-          color = null;
-          break;
-        default:
-          throw new IllegalStateException("Bad desired color char: "+seekInfo.getSeekerColor());
+        Player color;
+        switch (seekInfo.getSeekerColor()){
+          case 'W':
+            color = Player.WHITE_PLAYER;
+            break;
+          case 'B':
+            color = Player.BLACK_PLAYER;
+            break;
+          case '?':
+            color = null;
+            break;
+          default:
+            throw new IllegalStateException("Bad desired color char: "+seekInfo.getSeekerColor());
+        }
+
+        boolean isRatingLimited = ((seekInfo.getOpponentMinRating() > 0) || (seekInfo.getOpponentMaxRating() < 9999));
+
+        Seek seek = new Seek(seekID, seekInfo.getSeekerHandle(), titlesBuf.toString(), seekInfo.getSeekerRating(),
+          isProvisional, isRegistered, isSeekerRated, isComputer, variant, seekInfo.getMatchType(),
+          seekInfo.getMatchTime()*60*1000, seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
+          isRatingLimited, seekInfo.getOpponentMinRating(), seekInfo.getOpponentMaxRating(),
+          !seekInfo.isAutomaticAccept(), seekInfo.isFormulaUsed());
+
+        Integer seekIndex = new Integer(seekInfo.getSeekIndex());
+
+        Seek oldSeek = (Seek)seeks.get(seekIndex);
+        if (oldSeek != null)
+          listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, oldSeek));
+
+        seeks.put(seekIndex, seek);
+        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
       }
-
-      boolean isRatingLimited = ((seekInfo.getOpponentMinRating() > 0) || (seekInfo.getOpponentMaxRating() < 9999));
-
-      Seek seek = new Seek(seekID, seekInfo.getSeekerHandle(), titlesBuf.toString(), seekInfo.getSeekerRating(),
-        isProvisional, isRegistered, isSeekerRated, isComputer, variant, seekInfo.getMatchType(),
-        seekInfo.getMatchTime()*60*1000, seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
-        isRatingLimited, seekInfo.getOpponentMinRating(), seekInfo.getOpponentMaxRating(),
-        !seekInfo.isAutomaticAccept(), seekInfo.isFormulaUsed());
-
-      Integer seekIndex = new Integer(seekInfo.getSeekIndex());
-
-      Seek oldSeek = (Seek)seeks.get(seekIndex);
-      if (oldSeek != null)
-        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, oldSeek));
-
-      seeks.put(seekIndex, seek);
-      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
     }
     
     return true;
@@ -1110,8 +1114,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     for (int i = 0; i < removedSeeks.length; i++){
       Integer seekIndex = new Integer(removedSeeks[i]);
       Seek seek = (Seek)seeks.get(seekIndex);
-      if (seek == null) // Shouldn't happen
-        continue;
+      if (seek == null) // Happens if the seek is one we didn't fire an event for,
+        continue;       // for example if we don't support the variant.
 
       listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
 
