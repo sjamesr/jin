@@ -30,8 +30,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import free.jin.plugin.PreferencesPanel;
-import free.jin.plugin.BadChangesException;
+import free.jin.PreferencesPanel;
+import free.jin.BadChangesException;
 import free.util.SquareLayout;
 import free.chess.Position;
 

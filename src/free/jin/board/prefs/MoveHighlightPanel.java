@@ -29,7 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.jin.plugin.BadChangesException;
+import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.chess.event.MoveListener;
@@ -148,7 +148,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     JPanel contentPanel = new PreferredSizedPanel();
     contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
     contentPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Move Highlighting"),
+      BorderFactory.createTitledBorder("Last Move Highlighting"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     none.setAlignmentX(JComponent.LEFT_ALIGNMENT);

@@ -27,7 +27,7 @@ import java.awt.*;
 import free.jin.board.*;
 import free.jin.Jin;
 import free.jin.Resource;
-import free.jin.plugin.BadChangesException;
+import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.swing.UrlDisplayingAction;

@@ -24,7 +24,7 @@ package free.jin.console.fics;
 import free.jin.console.*;
 import free.jin.event.ChatEvent;
 import free.jin.console.ChannelConsolePreferencesPanel;
-import free.jin.plugin.PreferencesPanel;
+import free.jin.PreferencesPanel;
 
 
 /**

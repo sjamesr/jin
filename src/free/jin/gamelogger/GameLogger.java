@@ -33,7 +33,6 @@ import java.text.SimpleDateFormat;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.PluginStartException;
-import free.jin.plugin.PreferencesPanel;
 import bsh.Interpreter;
 import bsh.EvalError;
 

@@ -31,7 +31,7 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import free.util.swing.ColorChooser;
-import free.jin.plugin.PreferencesPanel;
+import free.jin.PreferencesPanel;
 import free.jin.Preferences;
 
 

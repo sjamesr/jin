@@ -32,7 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import free.jin.plugin.Plugin;
-import free.jin.plugin.PreferencesPanel;
+import free.jin.PreferencesPanel;
 import free.jin.plugin.PluginUIContainer;
 import java.net.URL;
 import java.util.Vector;

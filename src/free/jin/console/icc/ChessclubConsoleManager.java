@@ -23,7 +23,7 @@ package free.jin.console.icc;
 
 import free.jin.console.*;
 import free.jin.event.ChatEvent;
-import free.jin.plugin.PreferencesPanel;
+import free.jin.PreferencesPanel;
 
 
 /**

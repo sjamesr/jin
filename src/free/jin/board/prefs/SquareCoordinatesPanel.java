@@ -29,7 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.jin.plugin.BadChangesException;
+import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 
