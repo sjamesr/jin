@@ -938,8 +938,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveInputMenu.setMnemonic('M');
 
     int moveInputStyle = getMoveInputStyle();
-    JRadioButtonMenuItem dragndropMenuItem = new JRadioButtonMenuItem("Drag'n'Drop", moveInputStyle == JBoard.DRAG_N_DROP);
-    JRadioButtonMenuItem clicknclickMenuItem = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle == JBoard.CLICK_N_CLICK);
+    final JRadioButtonMenuItem dragndropMenuItem = new JRadioButtonMenuItem("Drag'n'Drop", moveInputStyle == JBoard.DRAG_N_DROP);
+    final JRadioButtonMenuItem clicknclickMenuItem = new JRadioButtonMenuItem("Click'n'Click", moveInputStyle == JBoard.CLICK_N_CLICK);
 
     dragndropMenuItem.setMnemonic('D');
     clicknclickMenuItem.setMnemonic('C');
@@ -947,7 +947,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     ButtonGroup inputModeGroup = new ButtonGroup();
     inputModeGroup.add(dragndropMenuItem);
     inputModeGroup.add(clicknclickMenuItem);
-
+    
     dragndropMenuItem.setActionCommand("dragndrop");
     clicknclickMenuItem.setActionCommand("clicknclick");
 
@@ -967,9 +967,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     clicknclickMenuItem.addActionListener(inputModeListener);
 
     int draggedPieceStyle = getDraggedPieceStyle();
-    JRadioButtonMenuItem normalDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Follow Cursor",
+    final JRadioButtonMenuItem normalDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Follow Cursor",
       draggedPieceStyle == JBoard.NORMAL_DRAGGED_PIECE);
-    JRadioButtonMenuItem targetDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Square Outline",
+    final JRadioButtonMenuItem targetDraggedPieceStyleMenuItem = new JRadioButtonMenuItem("Square Outline",
       draggedPieceStyle == JBoard.CROSSHAIR_DRAGGED_PIECE);
 
     normalDraggedPieceStyleMenuItem.setMnemonic('F');
@@ -998,8 +998,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     normalDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
     targetDraggedPieceStyleMenuItem.addActionListener(draggedPieceStyleListener);
 
-    JRadioButtonMenuItem legalChess = new JRadioButtonMenuItem("Legal Chess");
-    JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Predrag");
+    final JRadioButtonMenuItem legalChess = new JRadioButtonMenuItem("Legal Chess");
+    final JRadioButtonMenuItem predrag = new JRadioButtonMenuItem("Predrag");
     premoveRadioButton = new JRadioButtonMenuItem("Premove");
 
     switch (getMoveSendingMode()){
@@ -1051,7 +1051,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         setAutoPromote(autoQueenMenuItem.isSelected());
       }
     });
-
+    
     moveInputMenu.add(dragndropMenuItem);
     moveInputMenu.add(clicknclickMenuItem);
     moveInputMenu.addSeparator();
@@ -1063,6 +1063,45 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveInputMenu.add(premoveRadioButton);
     moveInputMenu.addSeparator();
     moveInputMenu.add(autoQueenMenuItem);
+    
+    PropertyChangeListener propertyChangeListener = new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        Object src = evt.getSource();
+        String propertyName = evt.getPropertyName();
+        
+        if ("moveInputStyle".equals(propertyName)){
+          switch (getMoveInputStyle()){
+            case JBoard.DRAG_N_DROP: dragndropMenuItem.setSelected(true); break;
+            case JBoard.CLICK_N_CLICK: clicknclickMenuItem.setSelected(true); break;
+            default:
+              throw new IllegalStateException("Unrecognized move input style: "+getMoveInputStyle());
+            
+          }
+        }
+        else if ("draggedPieceStyle".equals(propertyName)){
+          switch (getDraggedPieceStyle()){
+            case JBoard.NORMAL_DRAGGED_PIECE: normalDraggedPieceStyleMenuItem.setSelected(true); break;
+            case JBoard.CROSSHAIR_DRAGGED_PIECE: targetDraggedPieceStyleMenuItem.setSelected(true); break;
+            default:
+              throw new IllegalStateException("Unrecognized dragged piece style: "+getDraggedPieceStyle());
+          }
+        }
+        else if ("moveSendingMode".equals(propertyName)){
+          switch (getMoveSendingMode()){
+            case LEGAL_CHESS_MOVE_SENDING_MODE: legalChess.setSelected(true); break;
+            case PREDRAG_MOVE_SENDING_MODE: predrag.setSelected(true); break;
+            case PREMOVE_MOVE_SENDING_MODE: premoveRadioButton.setSelected(true); break;
+            default:
+              throw new IllegalStateException("Unrecognized move sending mode: "+getMoveSendingMode());
+          }
+        }
+        else if ("autoPromote".equals(propertyName)){
+          autoQueenMenuItem.setSelected(isAutoPromote());
+        }
+      }
+    };
+    
+    addPropertyChangeListener(propertyChangeListener);
 
     return moveInputMenu;
   }
@@ -1079,11 +1118,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     JMenu moveHighlightingMenu =  new JMenu("Move Highlighting");
     moveHighlightingMenu.setMnemonic('H');
     
-    JRadioButtonMenuItem noMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("None",
+    final JRadioButtonMenuItem noMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("None",
       moveHighlightingStyle == JBoard.NO_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem squareMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Square",
+    final JRadioButtonMenuItem squareMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Square",
       moveHighlightingStyle == JBoard.SQUARE_MOVE_HIGHLIGHTING);
-    JRadioButtonMenuItem arrowMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Arrow",
+    final JRadioButtonMenuItem arrowMoveHighlightingStyleMenuItem = new JRadioButtonMenuItem("Arrow",
       moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
 
     noMoveHighlightingStyleMenuItem.setMnemonic('N');
@@ -1133,6 +1172,28 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     moveHighlightingMenu.add(arrowMoveHighlightingStyleMenuItem);
     moveHighlightingMenu.addSeparator();
     moveHighlightingMenu.add(highlightOwnMovesCheckBox);
+    
+    PropertyChangeListener propertyChangeListener = new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        Object src = evt.getSource();
+        String propertyName = evt.getPropertyName();
+        
+        if ("moveHighlightingStyle".equals(propertyName)){
+          switch (getMoveHighlightingStyle()){
+            case JBoard.NO_MOVE_HIGHLIGHTING: noMoveHighlightingStyleMenuItem.setSelected(true); break;
+            case JBoard.SQUARE_MOVE_HIGHLIGHTING: squareMoveHighlightingStyleMenuItem.setSelected(true); break;
+            case JBoard.ARROW_MOVE_HIGHLIGHTING: arrowMoveHighlightingStyleMenuItem.setSelected(true); break;
+            default:
+              throw new IllegalStateException("Unrecognized move highlighting style: "+getMoveHighlightingStyle());
+          }
+        }
+        else if ("highlightingOwnMoves".equals(propertyName)){
+          highlightOwnMovesCheckBox.setSelected(isHighlightingOwnMoves());
+        }
+      }
+    };
+    
+    addPropertyChangeListener(propertyChangeListener);
 
     return moveHighlightingMenu;
   }
@@ -1148,10 +1209,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     coordsMenu.setMnemonic('C');
 
     int style = getCoordsDisplayStyle();
-    JRadioButtonMenuItem none = new JRadioButtonMenuItem("None", style == JBoard.NO_COORDS);
-    JRadioButtonMenuItem rim = new JRadioButtonMenuItem("On the Rim", style == JBoard.RIM_COORDS);
-    JRadioButtonMenuItem outside = new JRadioButtonMenuItem("Outside the Board", style == JBoard.OUTSIDE_COORDS);
-    JRadioButtonMenuItem every = new JRadioButtonMenuItem("In Every Square", style == JBoard.EVERY_SQUARE_COORDS);
+    final JRadioButtonMenuItem none = new JRadioButtonMenuItem("None", style == JBoard.NO_COORDS);
+    final JRadioButtonMenuItem rim = new JRadioButtonMenuItem("On the Rim", style == JBoard.RIM_COORDS);
+    final JRadioButtonMenuItem outside = new JRadioButtonMenuItem("Outside the Board", style == JBoard.OUTSIDE_COORDS);
+    final JRadioButtonMenuItem every = new JRadioButtonMenuItem("In Every Square", style == JBoard.EVERY_SQUARE_COORDS);
     
     none.setMnemonic('N');
     rim.setMnemonic('R');
@@ -1193,6 +1254,25 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     coordsMenu.add(rim);
     coordsMenu.add(outside);
     coordsMenu.add(every);
+    
+    PropertyChangeListener propertyChangeListener = new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        Object src = evt.getSource();
+        String propertyName = evt.getPropertyName();
+        
+        switch (getCoordsDisplayStyle()){
+          case JBoard.NO_COORDS: none.setSelected(true); break;
+          case JBoard.RIM_COORDS: rim.setSelected(true); break;
+          case JBoard.OUTSIDE_COORDS: outside.setSelected(true); break;
+          case JBoard.EVERY_SQUARE_COORDS: every.setSelected(true); break;
+          default:
+            throw new IllegalStateException("Unrecognized coords display style: " + getCoordsDisplayStyle());
+        }
+      }
+    };
+    
+    addPropertyChangeListener(propertyChangeListener);
+    
     
     return coordsMenu;
   }
