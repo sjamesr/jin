@@ -27,6 +27,7 @@ import javax.swing.text.*;
 import java.awt.event.*;
 import javax.swing.event.*;
 import java.util.Hashtable;
+import java.util.Vector;
 import java.io.IOException;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
@@ -36,6 +37,7 @@ import free.jin.JinConnection;
 import free.jin.plugin.Plugin;
 import free.util.StringParser;
 import free.util.BrowserControl;
+import free.workarounds.FixUtils;
 import jregex.*;
 
 
@@ -155,6 +157,15 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
+   * A history of people who have told us anything.
+   */
+
+  private final Vector tellers = new Vector();
+
+
+
+
+  /**
    * The amount of times addToOutput was called. See {@see #addToOutput(String, String)}
    * for the hack involved.
    */
@@ -183,6 +194,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   public Console(Plugin userPlugin){
+    this.userPlugin = userPlugin;
+
     this.outputComponent = createOutputComponent();
     this.outputScrollPane = createOutputScrollPane(outputComponent);
     this.inputComponent = createInputComponent();
@@ -195,7 +208,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
 
-    this.userPlugin = userPlugin;
     init();
   }
 
@@ -513,7 +525,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   protected boolean isCopyOnSelect(){
-    String val = userPlugin.getProperty("copyOnSelect","true");
+    String val = userPlugin.getProperty("copyOnSelect", "true");
     return new Boolean(val).booleanValue();
   }
 
@@ -806,6 +818,57 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
+   * Gets called when a tell by the given player is received. This method saves
+   * the name of the teller so it can be later retrieved when F9 is hit.
+   */
+
+  public void tellReceived(String teller){
+    tellers.removeElement(teller);
+    tellers.insertElementAt(teller, 0);
+    if (tellers.size() > getTellerRingSize())
+      tellers.removeElementAt(tellers.size());
+  }
+
+
+
+
+  /**
+   * Returns the size of the teller ring, the amount of last players who told us
+   * something we traverse.
+   */
+
+  public int getTellerRingSize(){
+    return Integer.parseInt(getProperty("teller-ring-size", "5"));
+  }
+
+
+
+  /**
+   * Returns the nth (from the end) person who told us something via "tell",
+   * "say" or "atell"  which went into this console. The index is 0 based. 
+   * Sorry about the name of the method but I didn't think getColocutor()
+   * was much better :-)
+   */
+
+  public String getTeller(int n){
+    return (String)tellers.elementAt(n);
+  }
+
+
+
+
+  /**
+   * Returns the amount of people who have told us anything so far.
+   */
+
+  public int getTellerCount(){
+    return tellers.size();
+  }
+
+
+
+
+  /**
    * Returns the value of the userPlugin property with the given name. Returns
    * null if no property with the given name exists. This method simply delegates
    * to Plugin.getProperty(String)
@@ -1011,34 +1074,26 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   public void keyTyped(KeyEvent evt){
     if (SwingUtilities.isDescendingFrom(evt.getComponent(), outputComponent)){
-      // We do the weird KeyEvent.class.getField("CHAR_UNDEFINED").getChar() call
-      // because Sun changed the value of CHAR_UNDEFINED somewhere between
-      // JDK 1.1 and JDK 1.3
-      try{
+      if (evt.getKeyChar() != FixUtils.CHAR_UNDEFINED){
 
-        if (evt.getKeyChar() != KeyEvent.class.getField("CHAR_UNDEFINED").getChar(null)){
-
-          // We request the focus in invokeLater because we want the key event
-          // processing to finish while the correct component still has focus.
-          SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-              requestDefaultFocus();
-            }
-          });
+        // We request the focus in invokeLater because we want the key event
+        // processing to finish while the correct component still has focus.
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run(){
+            requestDefaultFocus();
+          }
+        });
 
 
-          KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
+        KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
 
-          KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
+        KeyEvent fakeKeyReleasedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_RELEASED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
+        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyReleasedEvent);
 
-          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
-          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
-        }
-
-      } catch (IllegalAccessException e){e.printStackTrace();}
-        catch (NoSuchFieldException e){e.printStackTrace();}
+        KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
+        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
+      }
     }
   }
 
