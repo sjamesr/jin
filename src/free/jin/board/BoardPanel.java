@@ -538,8 +538,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       board.setFlipped(true);
 
     board.setMoveInputMode(calcMoveInputMode(game));
-    board.setPiecePainter(boardManager.getPieceSet().getPiecePainter());
-    board.setBoardPainter(boardManager.getBoardPattern().getBoardPainter());
+    board.setPiecePainter(boardManager.getPiecePainter());
+    board.setBoardPainter(boardManager.getBoardPainter());
     board.setMoveInputStyle(boardManager.getMoveInputStyle());
     board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
     board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
@@ -1858,11 +1858,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Object src = evt.getSource();
     String propertyName = evt.getPropertyName();
     if (src == boardManager){
-      if ("pieceSet".equals(propertyName))
-        board.setPiecePainter(boardManager.getPieceSet().getPiecePainter());
-      else if ("boardPattern".equals(propertyName))
-        board.setBoardPainter(boardManager.getBoardPattern().getBoardPainter());
-      else if ("moveInputStyle".equals(propertyName))
+      if ("moveInputStyle".equals(propertyName))
         board.setMoveInputStyle(boardManager.getMoveInputStyle());
       else if ("draggedPieceStyle".equals(propertyName))
         board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
@@ -1893,14 +1889,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
       else if ("coordsDisplayColor".equals(propertyName))
         board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
-      else if ("whitePieceColor".equals(propertyName) ||
+      else if ("pieceSet".equals(propertyName) ||
+               "whitePieceColor".equals(propertyName) ||
                "blackPieceColor".equals(propertyName) ||
                "whiteOutlineColor".equals(propertyName) ||
-               "blackOutlineColor".equals(propertyName) ||
+               "blackOutlineColor".equals(propertyName)){
+        board.setPiecePainter(boardManager.getPiecePainter());
+      }
+      else if ("boardPattern".equals(propertyName) ||
                "lightSquareColor".equals(propertyName) ||
                "darkSquareColor".equals(propertyName)){
-        board.repaint();
+        board.setBoardPainter(boardManager.getBoardPainter());
       }
+
     }
     else if (src == game){
       if ("whiteName".equals(propertyName)){
