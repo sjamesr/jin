@@ -22,6 +22,7 @@
 package free.jin.board;
 
 import javax.swing.*;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -219,15 +220,15 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
 
   protected void addComponents(Plugin plugin, Game game){
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
+    
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 5, 5));
+    buttonPanel.add(startButton);
+    buttonPanel.add(backwardButton);
+    buttonPanel.add(forwardButton);
+    buttonPanel.add(endButton);
+    
     add(Box.createHorizontalGlue());
-    add(startButton);
-    add(Box.createHorizontalStrut(5));
-    add(backwardButton);
-    add(Box.createHorizontalStrut(5));
-    add(forwardButton);
-    add(Box.createHorizontalStrut(5));
-    add(endButton);
+    add(buttonPanel);
     add(Box.createHorizontalGlue());
   }
 
