@@ -226,6 +226,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     if (getConnection() instanceof GameListJinConnection){
       JMenu gameListDisplayStyleMenu = new JMenu("Game lists display style");
+      gameListDisplayStyleMenu.setMnemonic('g');
 
       JCheckBoxMenuItem embeddedCB = new JCheckBoxMenuItem("Embedded", gameListDisplayStyle.equalsIgnoreCase("embedded"));
       JCheckBoxMenuItem framedCB = new JCheckBoxMenuItem("Framed", gameListDisplayStyle.equalsIgnoreCase("framed"));
@@ -233,6 +234,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       embeddedCB.setActionCommand("embedded");
       framedCB.setActionCommand("framed");
       noneCB.setActionCommand("none");
+      embeddedCB.setMnemonic('E');
+      framedCB.setMnemonic('F');
+      noneCB.setMnemonic('N');
       ButtonGroup gameListDisplayStyleCBGroup = new ButtonGroup();
       gameListDisplayStyleCBGroup.add(embeddedCB);
       gameListDisplayStyleCBGroup.add(framedCB);
@@ -268,6 +272,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     }
 
     JMenuItem clearMenuItem = new JMenuItem("Clear Console");
+    clearMenuItem.setMnemonic('C');
+    clearMenuItem.setAccelerator(KeyStroke.getKeyStroke("control E"));
     clearMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -278,7 +284,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     myMenu.add(clearMenuItem);
 
 
-    final JCheckBoxMenuItem copyOnSelectCB = new JCheckBoxMenuItem("Copy on Select",new Boolean(getProperty("copyOnSelect","true")).booleanValue());
+    final JCheckBoxMenuItem copyOnSelectCB = new JCheckBoxMenuItem("Copy on Select",
+      new Boolean(getProperty("copyOnSelect", "true")).booleanValue());
+    copyOnSelectCB.setMnemonic('S');
     copyOnSelectCB.addChangeListener(new ChangeListener(){
       
       public void stateChanged(ChangeEvent evt){
