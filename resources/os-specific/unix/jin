@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Follow links
+filename=`readlink -f $0`
+if [ -z "$filename" ]
+then
+  filename = $0
+fi
+
+# Change to Jin's directory - Jin needs to be run from its directory
+cd `dirname $filename`
+
+# Run Jin
+java -Xmx128M -Xms16M -jar jin.jar
