@@ -91,8 +91,35 @@ public class TextUtilities{
 
     return buf.toString();
   }
+  
+  
+  
+  /**
+   * Trims the specified string on the right only.
+   */
+   
+   public static String trimRight(String s){
+     StringBuffer buf = new StringBuffer(s);
+     int length = buf.length();
+     while (Character.isWhitespace(buf.charAt(length - 1)))
+       buf.setLength(--length);
+     
+     return buf.toString();
+   }
 
 
+
+  /**
+   * Trims the specified string on the left only.
+   */
+   
+   public static String trimLeft(String s){
+     int i = 0;
+     while (Character.isWhitespace(s.charAt(i)))
+       i++;
+     
+     return s.substring(i);
+   }
 
 
 
