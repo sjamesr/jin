@@ -377,28 +377,6 @@ public class JBoard extends JComponent{
 
 
 
-  /**
-   * We use this image to cache whatever we draw.
-   */
-
-  private Image cacheImage;
-
-
-
-
-  /**
-   * <code>null</code> when we can use the cache image when painting, the
-   * rectangle that needs to be repainted otherwise. We would use
-   * RepaintManager.currentManager(this).getDirtyRegion(this), but at the time
-   * the paintComponent method is called, the RepaintManager already considers
-   * it completely clean.
-   */
-
-  private Rectangle dirtyRect = null;
-
-
-
-
 
   /**
    * A boolean telling us whether we're currently showing the promotion target
@@ -431,7 +409,6 @@ public class JBoard extends JComponent{
     this.piecePainter = piecePainter;
 
     setOpaque(true);
-    setDoubleBuffered(false); // We're double buffering ourselves.
     enableEvents(MouseEvent.MOUSE_EVENT_MASK |
                  MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
@@ -969,51 +946,20 @@ public class JBoard extends JComponent{
    * Paints this JBoard on the given Graphics object.
    */
 
-  public void paintComponent(Graphics componentGraphics){
-    Rectangle clipRect = componentGraphics.getClipBounds();
+  public void paintComponent(Graphics g){
+    super.paintComponent(g);
 
-    if (cacheImage != null){
-      if ((dirtyRect == null) || !GraphicsUtilities.intersect(clipRect, dirtyRect)){
-        componentGraphics.drawImage(cacheImage, 0, 0, null);
-        return;
-      }
-    }
-
+    Rectangle clipRect = g.getClipBounds();
     Dimension size = getSize();
 
-    boolean newImage = false;
-    if ((cacheImage == null) || (cacheImage.getWidth(null) != size.width) || (cacheImage.getHeight(null) != size.height)){
-      if (cacheImage != null)
-        cacheImage.flush();
-      cacheImage = createImage(size.width, size.height);
-      newImage = true;
-    }
-
-    Graphics cacheGraphics = cacheImage.getGraphics();
-    if (!newImage) // A new image needs to be drawn completely.
-      cacheGraphics.clipRect(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
-
-    if (java2D){ // Try copying the RenderingHints.
-      try{
-        tryCopyingRenderingHints(componentGraphics, cacheGraphics);
-      } catch (Throwable t){
-          if (t instanceof RuntimeException)
-            throw (RuntimeException)t;
-          t.printStackTrace();
-          java2D = false;
-        }
-    }
-
-    super.paintComponent(cacheGraphics);
-
     // Fill the borders outside the actual board.
-    cacheGraphics.setColor(getBackground());
-    cacheGraphics.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
-    cacheGraphics.fillRect(0, size.height - size.height%8, size.width, size.height%8);
+    g.setColor(getBackground());
+    g.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
+    g.fillRect(0, size.height - size.height%8, size.width, size.height%8);
 
     Rectangle squareRect = new Rectangle(0, 0, size.width/8, size.height/8);
-    cacheGraphics.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
-    clipRect = cacheGraphics.getClipBounds();
+    g.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
+    clipRect = g.getClipBounds();
 
     Position position = getPosition();
     BoardPainter boardPainter = getBoardPainter();
@@ -1023,7 +969,7 @@ public class JBoard extends JComponent{
     int moveHighlightingStyle = getMoveHighlightingStyle();
 
     // Paint the board
-    boardPainter.paintBoard(cacheGraphics, this, 0, 0, size.width, size.height);
+    boardPainter.paintBoard(g, this, 0, 0, size.width, size.height);
 
     // Paint the stationary pieces
     for (int file = 0; file < 8; file++)
@@ -1041,7 +987,7 @@ public class JBoard extends JComponent{
         if (!squareRect.intersects(clipRect))
           continue;
 
-        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect, isShaded(curSquare));
+        piecePainter.paintPiece(piece, g, this, squareRect, isShaded(curSquare));
       }
 
     // Paint move highlighting
@@ -1050,57 +996,31 @@ public class JBoard extends JComponent{
       Square to = highlightedMove.getEndingSquare();
       if ((from != null) && (to != null)){
         if (moveHighlightingStyle == SQUARE_MOVE_HIGHLIGHTING){
-          drawSquare(cacheGraphics, from, 2, getMoveHighlightingColor());
-          drawSquare(cacheGraphics, to, 2, getMoveHighlightingColor());
+          drawSquare(g, from, 2, getMoveHighlightingColor());
+          drawSquare(g, to, 2, getMoveHighlightingColor());
         }
         else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
-          drawArrow(cacheGraphics, from, to, 5, getMoveHighlightingColor());
+          drawArrow(g, from, to, 5, getMoveHighlightingColor());
       }
     }
 
     
     // Allow PaintHooks to paint
-    callPaintHooks(cacheGraphics);
+    callPaintHooks(g);
 
     // Paint the currently moved piece, or highlighted square
     if (movedPieceSquare != null){
       getMovedPieceRect(squareRect);
       if (draggedPieceStyle == NORMAL_DRAGGED_PIECE){
         Piece piece = position.getPieceAt(movedPieceSquare);
-        piecePainter.paintPiece(piece, cacheGraphics, this, squareRect, false);
+        piecePainter.paintPiece(piece, g, this, squareRect, false);
       }
-      else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
-        drawSquare(cacheGraphics, locationToSquare(squareRect.x, squareRect.y), 2, getDragSquareHighlightingColor());
-    }
-
-    componentGraphics.drawImage(cacheImage, 0, 0, null);
-    dirtyRect = null;
-  }
-
-
-
-
-  /**
-   * Attempts to copy the RenderingHints from the specified source Graphics
-   * to the specified target Graphics.
-   */
-
-  private static void tryCopyingRenderingHints(Graphics source, Graphics target) throws Throwable{
-                                                                            // Yes, yes, I know :-)
-    Class Graphics2DClass = Class.forName("java.awt.Graphics2D");
-    if (Graphics2DClass.isInstance(source) && Graphics2DClass.isInstance(target)){
-       // Should be true (I think)
-
-      Class MapClass = Class.forName("java.util.Map");
-      java.lang.reflect.Method getRenderingHints = 
-        Graphics2DClass.getMethod("getRenderingHints", new Class[0]);
-      java.lang.reflect.Method setRenderingHints = 
-        Graphics2DClass.getMethod("setRenderingHints", new Class[]{MapClass});
-      Object renderingHints = getRenderingHints.invoke(source, new Object[0]);
-      setRenderingHints.invoke(target, new Object[]{renderingHints});
+      else if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE){
+        drawSquare(g, locationToSquare(squareRect.x, squareRect.y), 2,
+          getDragSquareHighlightingColor());
+      }
     }
   }
-
 
 
 
@@ -1198,32 +1118,6 @@ public class JBoard extends JComponent{
       hook.paint(this, g);
     }
   }
-
-
-
-
-  /**
-   * Overrides Component.repaint(long, int, int, int, int) to invalidate the
-   * cache image.
-   */
-
-  public void repaint(long time, int x, int y, int width, int height){
-    super.repaint(time, x, y, width, height);
-
-//    dirtyRect = RepaintManager.currentManager(this).getDirtyRegion(this);
-// This is commented out because if a component is obscured, and never painted
-// because of repaint() calls, RepaintManager will say that it's clean (except
-// for the last repaint call). I'm not sure why we need to ask the RepaintManager
-// for the dirty rect anyway... don't we know it ourselves?
-
-    if (dirtyRect == null)
-      dirtyRect = new Rectangle(x, y, width, height);
-    else
-      dirtyRect = dirtyRect.union(new Rectangle(x, y, width, height));
-
-    dirtyRect = dirtyRect.intersection(new Rectangle(getSize()));
-  }
-
 
 
 
@@ -1473,10 +1367,6 @@ public class JBoard extends JComponent{
         movedPieceLoc = null;
       }
     }
-
-    RepaintManager repaintManager = RepaintManager.currentManager(this);
-    paintImmediately(repaintManager.getDirtyRegion(this));
-    repaintManager.markCompletelyClean(this);
   }
 
 
@@ -1517,10 +1407,6 @@ public class JBoard extends JComponent{
       movedPieceLoc.y = y;
       repaint(helpRect = getMovedPieceRect(helpRect));
     }
-
-    RepaintManager repaintManager = RepaintManager.currentManager(this);
-    paintImmediately(repaintManager.getDirtyRegion(this));
-    repaintManager.markCompletelyClean(this);
   }
 
 
