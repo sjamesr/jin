@@ -21,16 +21,8 @@
 
 package free.jin.chessclub.board;
 
-import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
-import free.chess.ImagePiecePainter;
-import free.chess.PiecePainter;
-import free.chess.ChessPiece;
 import free.chess.art.ResourceImagePiecePainter;
-import free.util.IOUtilities;
 
 /**
  * An implementation of <code>PiecePainter</code> which draws the bookup piece
@@ -40,7 +32,7 @@ import free.util.IOUtilities;
  * commercial or otherwise.
  */
 
-public class BookupBoardPiecePainter extends ResourceImagePiecePainter{
+public class BookupPiecePainter extends ResourceImagePiecePainter{
 
 
 
@@ -53,7 +45,7 @@ public class BookupBoardPiecePainter extends ResourceImagePiecePainter{
 
   static{
     try{
-      new ResourceImagePiecePainter(BookupBoardPiecePainter.class, "bookup", "gif");
+      new ResourceImagePiecePainter(BookupPiecePainter.class, "bookup", "gif");
     } catch (IOException e){
         throw new RuntimeException("Unable to load the bookup piece set: "+e.getMessage());
       }
@@ -66,8 +58,8 @@ public class BookupBoardPiecePainter extends ResourceImagePiecePainter{
    * Creates a new BookupBoardPiecePainter.
    */
 
-  public BookupBoardPiecePainter() throws IOException{
-    super(BookupBoardPiecePainter.class, "bookup", "gif");
+  public BookupPiecePainter() throws IOException{
+    super(BookupPiecePainter.class, "bookup", "gif");
   }
 
 }

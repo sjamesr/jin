@@ -32,7 +32,7 @@ import free.chess.art.ResourceImagePiecePainter;
  * commercial or otherwise.
  */
 
-public class Dyche3BoardPiecePainter extends ResourceImagePiecePainter{
+public class Dyche3PiecePainter extends ResourceImagePiecePainter{
 
 
 
@@ -45,7 +45,7 @@ public class Dyche3BoardPiecePainter extends ResourceImagePiecePainter{
 
   static{
     try{
-      new ResourceImagePiecePainter(Dyche3BoardPiecePainter.class, "dyche3", "gif");
+      new ResourceImagePiecePainter(Dyche3PiecePainter.class, "dyche3", "gif");
     } catch (IOException e){
         throw new RuntimeException("Unable to load the dyche3 piece set: "+e.getMessage());
       }
@@ -58,8 +58,8 @@ public class Dyche3BoardPiecePainter extends ResourceImagePiecePainter{
    * Creates a new Dyche3BoardPiecePainter.
    */
 
-  public Dyche3BoardPiecePainter() throws IOException{
-    super(Dyche3BoardPiecePainter.class, "dyche3", "gif");
+  public Dyche3PiecePainter() throws IOException{
+    super(Dyche3PiecePainter.class, "dyche3", "gif");
   }
 
 }
