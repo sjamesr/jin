@@ -1,15 +1,5 @@
 <project name="Jin" default="build">
 
-	<property name="source.dir" value="src" />
-	<property name="classes.dir" value="classes" />	
-	<property name="build.dir" value="build" />
-	<property name="res.dir" value="resources" />	
-	<property name="libs.dir" value="${build.dir}/libs" />	
-	<property name="servers.dir" value="${build.dir}/servers" />	
-	<property name="plugins.dir" value="${build.dir}/plugins" />
-	<property name="resources.dir" value="${build.dir}/resources" />	
-	<property name="debug" value="yes" />
-	
 	<path id="compile.class.path">
 		<fileset dir="resources/libs">
 			<include name="*.jar"/>
@@ -17,39 +7,60 @@
 	</path>
 
 
+	<!-- Initializes stuff -->
+	<target name="init">
+		<property name="build.dir" value="build" />
+    
+		<property name="source.dir" value="src" />
+		<property name="classes.dir" value="classes" />	
+		<property name="res.dir" value="resources" />	
+		<property name="libs.dir" value="${build.dir}/libs" />	
+		<property name="servers.dir" value="${build.dir}/servers" />	
+		<property name="plugins.dir" value="${build.dir}/plugins" />
+		<property name="resources.dir" value="${build.dir}/resources" />	
+		<property name="lnfs.dir" value="${build.dir}/lnfs" />	
+		<property name="debug" value="yes" />
+	</target>
+
+
+
   <!-- Removes things done by build -->
-	<target name="clean">
+
+	<target name="clean" depends="init">
 		<delete dir="${classes.dir}" />
 		<delete dir="${build.dir}" />
 	</target>
 
 
+
 	<!-- This is just to compile everything, without jarring
 	     or placing things at appropriate locations -->
-	<target name="compile">
+	<target name="compile" depends="init">
 		<mkdir dir="${classes.dir}" />
+    <echo message="COMPILER: ${build.compiler}" />
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
 		       classpathref="compile.class.path"
 		       debug="${debug}">
-         
+
       <!-- <compilerarg compiler="jikes" value="+Pnaming-convention" /> -->
       <compilerarg compiler="jikes" value="+Punused-type-imports" />
       <compilerarg compiler="jikes" value="+Punused-package-imports" />
       <compilerarg compiler="jikes" value="+Pno-shadow" />
 		</javac>
 
+
 		<!-- Piece sets -->		
 		<mkdir dir="${classes.dir}/pieces" />
-		
+    
 		<javac srcdir="${res.dir}/pieces"
 		       destdir="${classes.dir}/pieces"
 		       includes="*.java"
 		       classpath="${classes.dir}"
 		       debug="${debug}"
 		/>
-		
+
 		<antcall target="compilePieceSet">
 			<param name="piece-set-id" value="blitzin"/>
 		</antcall>
@@ -83,19 +94,24 @@
 
 	<!-- After compiling, this jars everything properly
 	     and puts it where it belongs. -->
-	<target name="build" depends="compile">
+	<target name="build" depends="init, compile">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${libs.dir}" />
 		<mkdir dir="${servers.dir}" />
 		<mkdir dir="${plugins.dir}" />
 		<mkdir dir="${plugins.dir}/fics" />
 		<mkdir dir="${plugins.dir}/icc" />
+		<mkdir dir="${lnfs.dir}" />
 		
 		<!-- Copy libs -->
 		<copy todir="${libs.dir}">
 			<fileset dir="resources/libs" />
 		</copy>
     
+    <!-- Copy Look and Feels -->
+    <copy todir="${lnfs.dir}">
+      <fileset dir="resources/lnfs" />
+    </copy>
 
     <!-- Check whether Unix -->    
     <condition property="unix">
@@ -112,57 +128,50 @@
 			<os family="windows" />
 		</condition>
     
-    <!-- Check whether x86 -->
-    <condition property="x86">
-      <or>
-        <equals arg1="x86" arg2="${os.arch}" />
-        <equals arg1="i386" arg2="${os.arch}" />
-        <equals arg1="i486" arg2="${os.arch}" />
-        <equals arg1="i586" arg2="${os.arch}" />
-        <equals arg1="i686" arg2="${os.arch}" />
-      </or>
-    </condition>
     
-    <!-- Check whether unix on x86 -->
-    <condition property="unixOnx86">
-      <and>
-        <isset property="unix" />
-        <isset property="x86" />
-      </and>
-    </condition>
-
-		<condition property="runDoUnixOnx86Stuff">
+		<condition property="runDoUnixStuff">
 			<or>
-				<isset property="unixOnx86" />
 				<and>
-					<isset property="release.target" />
-					<equals arg1="unix" arg2="${release.target}" />
+					<not>
+						<isset property="release.platform" />
+					</not>
+					<isset property="unix" />
+				</and>
+				<and>
+					<isset property="release.platform" />
+					<equals arg1="unix" arg2="${release.platform}" />
 				</and>
 			</or>
 		</condition>
 
 		<condition property="runDoWindowsStuff">
 			<or>
-				<isset property="windows" />
 				<and>
-					<isset property="release.target" />
-					<equals arg1="windows" arg2="${release.target}" />
+					<not>
+						<isset property="release.platform" />
+					</not>
+					<isset property="windows" />
+				</and>
+				<and>
+					<isset property="release.platform" />
+					<equals arg1="windows" arg2="${release.platform}" />
 				</and>
 			</or>
 		</condition>
     
     <!-- Call the tasks that do platform specific stuff -->
-		<antcall target="doUnixOnx86Stuff" />
+		<antcall target="doUnixStuff" />
 		<antcall target="doWindowsStuff" />
     
-    
+
     <!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
 			<fileset dir="${source.dir}" excludes="**/*.java **/*.html" />
 		</copy>
 
-
+    
 		<!-- Utility library: free.util.* and free.workarounds.* -->
+
 		<jar jarfile="${libs.dir}/util.jar"
 		     basedir="${classes.dir}"
 		     includes="free/util/** free/workarounds/**"
@@ -217,6 +226,7 @@
 			         excludes="free/jin/console/icc/** free/jin/console/fics/**" />
 		</jar>
 
+
 		<!-- Console plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/console.jar" compress="false">
 			<fileset dir="${classes.dir}"
@@ -225,6 +235,7 @@
 			<fileset dir="${classes.dir}/free/jin/console/icc"
 			         includes="definition preferences" />
 		</jar>
+
 
 		<!-- Console plugin for FICS -->
 		<jar jarfile="${plugins.dir}/fics/console.jar" compress="false">
@@ -243,6 +254,7 @@
 			         excludes="free/jin/sound/icc/** free/jin/sound/fics/**" />
 		</jar>
 
+    
 		<!-- Sound plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/sound.jar" compress="false">
 			<fileset dir="${classes.dir}"
@@ -251,6 +263,7 @@
 			<fileset dir="${classes.dir}/free/jin/sound/icc"
 			         includes="definition preferences" />
 		</jar>
+
 
 		<!-- Sound plugin for FICS -->
 		<jar jarfile="${plugins.dir}/fics/sound.jar" compress="false">
@@ -269,6 +282,7 @@
 			         excludes="free/jin/seek/icc/** free/jin/seek/fics/**" />
 		</jar>
 
+
 		<!-- Seek Graph plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/seek.jar" compress="false">
 			<fileset dir="${classes.dir}"
@@ -277,6 +291,7 @@
 			<fileset dir="${classes.dir}/free/jin/seek/icc"
 			         includes="definition preferences" />
 		</jar>
+
 
 		<!-- Seek Graph plugin for FICS -->
 		<jar jarfile="${plugins.dir}/fics/seek.jar" compress="false">
@@ -295,6 +310,7 @@
 			         excludes="free/jin/board/icc/** free/jin/board/fics/**" />
 		</jar>
 
+
 		<!-- Board plugin for ICC -->
 		<jar jarfile="${plugins.dir}/icc/board.jar" compress="false">
 			<fileset dir="${classes.dir}"
@@ -303,6 +319,7 @@
 			<fileset dir="${classes.dir}/free/jin/board/icc"
 			         includes="definition preferences" />
 		</jar>
+
 
 		<!-- Board plugin for FICS -->
 		<jar jarfile="${plugins.dir}/fics/board.jar" compress="false">
@@ -368,7 +385,8 @@
 		<jar jarfile="${resources.dir}/pieces/eboard.jar" compress="false">
 			<fileset dir="${res.dir}/pieces/eboard"
 			         excludes="**.java" />
-		</jar>
+    </jar>
+
 		
 		<!-- Xboard -->
 		<antcall target="buildImagePieceSet">
@@ -467,9 +485,31 @@
 			<fileset dir="${res.dir}/boards/${board-pattern-id}" />
 		</jar>
 	</target>
+  
+  
+  <!-- If the property unix is set, does things required for this platform -->
+  <target name="doUnixStuff" if="runDoUnixStuff">
+    <copy todir="${build.dir}">
+      <fileset dir="resources/os-specific/unix" includes="jin" />
+    </copy>
+    <chmod file="${build.dir}/jin" perm="a+x" />
+  
+    <!-- Check whether x86 -->
+    <condition property="x86">
+      <or>
+        <equals arg1="x86" arg2="${os.arch}" />
+        <equals arg1="i386" arg2="${os.arch}" />
+        <equals arg1="i486" arg2="${os.arch}" />
+        <equals arg1="i586" arg2="${os.arch}" />
+        <equals arg1="i686" arg2="${os.arch}" />
+      </or>
+    </condition>
+    <antcall target="doUnixOnx86Stuff" /> 
+    
+  </target>
 
-  <!-- If the property unixOnx86 is set, does things required for this platform -->
-  <target name="doUnixOnx86Stuff" if="runDoUnixOnx86Stuff">   
+  <!-- If the property x86 is set, does things required for unix on x86 -->
+  <target name="doUnixOnx86Stuff" if="x86">   
     <copy todir="${build.dir}">
       <fileset dir="resources/os-specific/unix/x86" />
     </copy>
