@@ -173,6 +173,8 @@ public class InternalFramesUIProvider implements UIProvider{
     desktop.setWallpaperLayoutStyle(layoutStyle);
     if (wallpaper != null)
       desktop.setWallpaper(desktop.getToolkit().getImage(wallpaper));
+
+    desktop.putClientProperty("JDesktopPane.dragMode", "outline");
   }
 
 
@@ -350,6 +352,12 @@ public class InternalFramesUIProvider implements UIProvider{
     else if ("seek".equals(pluginId)){
       if ("".equals(id))
         return new RectDouble(0.5, 0.5, 0.5, 0.5);
+    }
+    else if ("board".equals(pluginId)){
+      try{
+        int boardIndex = Integer.parseInt(id);
+        return new RectDouble(0.25, 0.05*(boardIndex%6), 0.75, 0.75);
+      } catch (NumberFormatException e){}
     }
 
     return new RectDouble(0.2, 0.2, 0.6, 0.6);
