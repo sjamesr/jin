@@ -419,6 +419,10 @@ public class JinFrameMenuBar extends JMenuBar{
       JButton cancelButton = new JButton("Cancel");
       final JButton applyButton = new JButton("Apply");
       applyButton.setEnabled(false);
+
+      okButton.setMnemonic('O');
+      cancelButton.setMnemonic('C');
+      applyButton.setMnemonic('A');
       prefPanel.addChangeListener(new ChangeListener(){
         public void stateChanged(ChangeEvent evt){
           applyButton.setEnabled(true);
