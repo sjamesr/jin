@@ -828,7 +828,7 @@ public class JBoard extends JComponent{
     int squareHeight = getHeight()/8;
     int file = x/squareWidth;
     int rank = 7-(y/squareHeight);
-    if ((file > 7) || (rank > 7))
+    if ((file > 7) || (rank < 0))
       return null;
 
     if (isFlipped())
