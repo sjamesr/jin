@@ -62,7 +62,15 @@ public class JinApplet extends JApplet implements ActionListener{
    * A label that informs the user that the applet is starting.
    */
    
-  private JLabel startingLabel;
+  private JLabel startingLabel1;
+  
+  
+  
+  /**
+   * Another label, telling the user that starting Jin may take a while :-)
+   */
+   
+  private JLabel startingLabel2;
   
   
   
@@ -94,7 +102,8 @@ public class JinApplet extends JApplet implements ActionListener{
     AppletContextAudioPlayer.setAppletContext(getAppletContext());
     
     startStopButton = new JButton(START_JIN_TEXT);
-    startingLabel = new JLabel("");
+    startingLabel1 = new JLabel("");
+    startingLabel2 = new JLabel("");
     createUI();
     
     startStopButton.addActionListener(this);
@@ -109,7 +118,8 @@ public class JinApplet extends JApplet implements ActionListener{
   public void actionPerformed(ActionEvent evt){
     if (startStopButton.getText().equals(START_JIN_TEXT)){
       startStopButton.setText(STOP_JIN_TEXT);
-      startingLabel.setText("Starting Jin, please wait...");
+      startingLabel1.setText("Starting Jin, please wait...");
+      startingLabel2.setText("(this may take a few minutes)");
         
       SwingUtilities.invokeLater(new Runnable(){
         public void run(){
@@ -134,7 +144,8 @@ public class JinApplet extends JApplet implements ActionListener{
     try{
       context = new AppletJinContext(this);
       context.start();
-      startingLabel.setText("");
+      startingLabel1.setText("");
+      startingLabel2.setText("");
     } catch (Throwable t){
         t.printStackTrace();
         createErrorUI(t);
@@ -151,6 +162,8 @@ public class JinApplet extends JApplet implements ActionListener{
     context = null;
     
     startStopButton.setEnabled(false);
+    
+    getAppletContext().showDocument(getDocumentBase(), "_self"); // Reload webpage
     
     // We can't properly restart Jin because we're not using/loading the new
     // preferences.
@@ -187,7 +200,8 @@ public class JinApplet extends JApplet implements ActionListener{
     
     contentPane.add(buttonPanel);
     contentPane.add(Box.createVerticalStrut(30));
-    contentPane.add(startingLabel);
+    contentPane.add(startingLabel1);
+    contentPane.add(startingLabel2);
     contentPane.add(Box.createVerticalGlue());
     
     setContentPane(contentPane);
