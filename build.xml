@@ -8,7 +8,7 @@
 	<property name="servers.dir" value="${build.dir}/servers" />	
 	<property name="plugins.dir" value="${build.dir}/plugins" />
 	<property name="resources.dir" value="${build.dir}/resources" />	
-	<property name="debug" value="no" />
+	<property name="debug" value="yes" />
 	
 	<path id="compile.class.path">
 		<fileset dir="resources/libs">
@@ -370,25 +370,46 @@
 			<fileset dir="${res.dir}/boards/plain" />
 		</jar>
 		
-		<!-- Wooden Dark -->
+		<!-- Dark Wood -->
 		<antcall target="buildBoardPattern">
 			<param name="board-pattern-id" value="wooden-dark" />
 		</antcall>
 		
-		<!-- Wooden Light -->
+		<!-- Light Wood -->
 		<antcall target="buildBoardPattern">
 			<param name="board-pattern-id" value="wooden-light" />
 		</antcall>
 		
-		<!-- Marble -->
-		<antcall target="buildBoardPattern">
-			<param name="board-pattern-id" value="marble" />
-		</antcall>
-
 		<!-- Slate -->
 		<antcall target="buildBoardPattern">
 			<param name="board-pattern-id" value="slate" />
 		</antcall>
+    
+		<!-- Cold Marble -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="cold-marble" />
+		</antcall>
+    
+		<!-- Gray Tiles -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="gray-tiles" />
+		</antcall>
+
+		<!-- Green Marble -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="green-marble" />
+		</antcall>
+
+		<!-- Pale Wood -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="pale-wood" />
+		</antcall>
+    
+		<!-- Winter -->
+		<antcall target="buildBoardPattern">
+			<param name="board-pattern-id" value="winter" />
+		</antcall>
+    
 		
 	</target>
 	
