@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
+import free.jin.action.ActionInfo;
 import free.util.PlatformUtils;
 import free.util.IOUtilities;
 import free.util.BrowserControl;
@@ -75,6 +76,14 @@ public class AppletJinContext implements JinContext{
    */
    
   private final Server server;
+  
+  
+  
+  /**
+   * The actions we'll be using.
+   */
+   
+  private final ActionInfo [] actions;
   
   
   
@@ -140,6 +149,9 @@ public class AppletJinContext implements JinContext{
     // Load the server we'll be connecting to.
     server = loadServer();
     
+    // Load the actions we'll be using.
+    actions = loadActions();
+    
     // Load the plugins we'll be running.
     plugins = loadPlugins();
     
@@ -190,6 +202,40 @@ public class AppletJinContext implements JinContext{
       server.setPort(Integer.parseInt(portString));
     
     return server;
+  }
+  
+  
+  
+  /**
+   * Loads the actions we'll be using.
+   */
+   
+  private ActionInfo [] loadActions() throws IOException, ClassNotFoundException{
+    String actionsCount = applet.getParameter("actions.count");
+    if (actionsCount == null)
+      throw new IllegalStateException("No actions.count parameter specified");
+    
+    ActionInfo [] actions = new ActionInfo[Integer.parseInt(actionsCount)];
+    
+    for (int i = 0; i < actions.length; i++){
+      String className = applet.getParameter("actions." + i + ".classname");
+      if (className == null)
+        throw new IllegalStateException("Missing classname for action No. " + i);
+
+      // See the long comment about the definition file in loadPlugins
+      
+      Class actionClass = Class.forName(className);
+
+      InputStream actionPrefsIn = actionClass.getResourceAsStream("preferences");
+      Preferences actionPrefs = (actionPrefsIn == null ? Preferences.createNew() : Preferences.load(actionPrefsIn));
+  
+      if (actionPrefsIn != null)
+        actionPrefsIn.close();
+  
+      actions[i] = new ActionInfo(actionClass, actionPrefs);
+    }
+    
+    return actions;
   }
   
   
@@ -531,6 +577,20 @@ public class AppletJinContext implements JinContext{
       throw new IllegalArgumentException("Unknown server: " + server);
     
     return (PluginInfo [])plugins.clone();
+  }
+  
+  
+  
+  /**
+   * Returns the actions for the specified server (which must be the server
+   * we're connecting to).
+   */
+   
+  public ActionInfo [] getActions(Server server){
+    if (server != this.server)
+      throw new IllegalArgumentException("Unknown server: " + server);
+    
+    return (ActionInfo [])actions.clone();
   }
 
 

@@ -37,6 +37,8 @@ import free.util.zip.ZipClassLoader;
 import free.util.zip.ZipURLStreamHandler;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
+import free.jin.action.JinAction;
+import free.jin.action.ActionInfo;
 
 
 /**
@@ -102,7 +104,7 @@ public class JinMain implements JinContext{
    * <pre>
    *  _______________ _______________ _______________
    *  |             | |             | |             |
-   *  | plugin1.jar | | plugin2.jar | | plugin3.jar |   
+   *  | plugin1.jar | | plugin2.jar | | action1.jar |   
    *  |_____________| |_____________| |_____________|   
    *         |               |               |          
    *         |               V               |          
@@ -161,6 +163,15 @@ public class JinMain implements JinContext{
    */
 
   private final Server [] servers;
+  
+  
+  
+  /**
+   * Maps <code>Server</code> objects to arrays of <code>ActionInfo</code>
+   * instances describing standalone actions for that server.
+   */
+   
+  private final Hashtable serversToActions;
 
 
   
@@ -228,7 +239,10 @@ public class JinMain implements JinContext{
 
     // Load server(s) support
     servers = loadServers();
-
+    
+    // Load actions
+    serversToActions = loadActions();
+    
     // Load plugins
     serversToPlugins = loadPlugins();
 
@@ -369,7 +383,7 @@ public class JinMain implements JinContext{
    
     for (int i = 0; i < files.length; i++){
       try{
-        File file = files[0];
+        File file = files[i];
         if (file.exists())
           return loadResource(file, plugin);
       } catch (IOException e){e.printStackTrace();}
@@ -481,6 +495,17 @@ public class JinMain implements JinContext{
   public PluginInfo [] getPlugins(Server server){
     PluginInfo [] plugins = (PluginInfo [])serversToPlugins.get(server);
     return (PluginInfo [])plugins.clone();
+  }
+  
+  
+  
+  /**
+   * Returns the list of actions for the specified server.
+   */
+   
+  public ActionInfo [] getActions(Server server){
+    ActionInfo [] actions = (ActionInfo [])serversToActions.get(server);
+    return (ActionInfo [])actions.clone();
   }
 
 
@@ -802,13 +827,129 @@ public class JinMain implements JinContext{
     server.setGuestUser(loadUser(guestDir, server));
     return server;
   }
+  
+  
+  
+  /**
+   * Loads the actions for all servers. Returns a hashtable mapping
+   * <code>Server</code> objects to arrays of <code>ActionInfo</code> objects
+   * describing the standalone actions for that server.
+   */
+   
+  private Hashtable loadActions() throws IOException, ClassNotFoundException{
+    Hashtable actions = new Hashtable();
+    for (int i = 0; i < servers.length; i++)
+      actions.put(servers[i], new Vector());
+
+    // actions that are shared between all users - usually the ones that come with Jin
+    loadActions(actions, new File(JIN_DIR, "actions")); 
+
+    // user specific actions, from his own preferences directory
+    loadActions(actions, new File(prefsDir, "actions"));
+
+
+    // Convert the Server->Vector map to Server->ActionInfo[] map
+    Hashtable result = new Hashtable();
+    for (int i = 0; i < servers.length; i++){
+      Server server = servers[i];
+      Vector actionsVector = (Vector)actions.get(server);
+      ActionInfo [] actionsArray = new ActionInfo[actionsVector.size()];
+      actionsVector.copyInto(actionsArray);
+
+      result.put(server, actionsArray);
+    }
+
+    return result;
+  }
+  
+  
+  
+  /**
+   * Loads actions from the specified directory into the specified hashtable.
+   */
+   
+  private void loadActions(Hashtable actions, File dir) throws IOException, ClassNotFoundException{
+    if (!dir.isDirectory())
+      return;
+
+    String [] jars;
+    FilenameFilter jarsFilter = new ExtensionFilenameFilter(".jar");
+
+    // Load actions that are for all servers
+    jars = dir.list(jarsFilter);
+    for (int i = 0; i < jars.length; i++){
+      ActionInfo actionInfo = loadActionInfo(new File(dir, jars[i]));
+      if (actionInfo == null)
+        continue;
+
+      for (int j = 0; j < servers.length; j++)
+        ((Vector)actions.get(servers[j])).addElement(actionInfo);
+    }
+
+
+    // Load server specific actions
+    for (int i = 0; i < servers.length; i++){
+      Server server = servers[i];
+
+      File serverSpecificDir = new File(dir, server.getId());
+      if (!serverSpecificDir.isDirectory())
+        continue;
+
+      jars = serverSpecificDir.list(jarsFilter);
+      for (int j = 0; j < jars.length; j++){
+        ActionInfo actionInfo = loadActionInfo(new File(serverSpecificDir, jars[j]));
+        if (actionInfo == null)
+          continue;
+
+        ((Vector)actions.get(server)).addElement(actionInfo);
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Loads a single action description from the specified jar. Returns 
+   * <code>null</code> if unable to load the action.
+   */
+
+  private ActionInfo loadActionInfo(File jar) throws IOException, ClassNotFoundException{
+    if (!jar.isFile())
+      return null;
+    
+    ChildClassLoader loader = new ZipClassLoader(jar, mainLoader);
+
+    InputStream actionDefIn = loader.getResourceAsStream("definition");
+    if (actionDefIn == null){
+      System.err.println(jar + " does not contain an action definition file");
+      return null;
+    }
+    Properties actionDef = IOUtilities.loadProperties(actionDefIn);
+
+    String classname = actionDef.getProperty("classname");
+    if (classname == null){
+      System.out.println("The action definition file in " + jar + " does not contain a classname property");
+      return null;
+    }
+    
+    Class actionClass = loader.loadClass(classname);
+
+    InputStream actionPrefsIn = actionClass.getResourceAsStream("preferences");
+    Preferences actionPrefs = (actionPrefsIn == null ? Preferences.createNew() : Preferences.load(actionPrefsIn));
+
+    if (actionPrefsIn != null)
+      actionPrefsIn.close();
+
+    return new ActionInfo(actionClass, actionPrefs);
+  }
+  
 
 
 
   /**
    * Loads the plugin classes for all servers. Returns a hashtable that maps
-   * <code>Server</code> objects to arrays of Class objects representing the
-   * plugin classes for that server.
+   * <code>Server</code> objects to arrays of PluginInfo objects describing
+   * the plugins for that server.
    */
 
   private Hashtable loadPlugins() throws IOException, ClassNotFoundException{
@@ -843,8 +984,7 @@ public class JinMain implements JinContext{
    * Loads plugins from the specified directory into the specified hashtable.
    */
 
-  private void loadPlugins(Hashtable plugins, File dir) throws IOException,
-      ClassNotFoundException{
+  private void loadPlugins(Hashtable plugins, File dir) throws IOException, ClassNotFoundException{
     if (!dir.isDirectory())
       return;
 
