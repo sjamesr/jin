@@ -139,6 +139,7 @@ public class ChessclubJinListenerManager extends BasicJinListenerManager{
       setDGState(Datagram.DG_TAKEBACK, true);
       setDGState(Datagram.DG_ILLEGAL_MOVE, true);
       setDGState(Datagram.DG_MSEC, true);
+      setDGState(Datagram.DG_OFFERS_IN_MY_GAME, true);
       setDGState(Datagram.DG_MORETIME, true);
       setDGState(Datagram.DG_FLIP, true);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, true);
@@ -175,6 +176,7 @@ public class ChessclubJinListenerManager extends BasicJinListenerManager{
       setDGState(Datagram.DG_TAKEBACK, false);
       setDGState(Datagram.DG_ILLEGAL_MOVE, false);
       setDGState(Datagram.DG_MSEC, false);
+      setDGState(Datagram.DG_OFFERS_IN_MY_GAME, false);
       setDGState(Datagram.DG_MORETIME, false);
       setDGState(Datagram.DG_FLIP, false);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, false);
