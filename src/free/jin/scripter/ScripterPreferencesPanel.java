@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.StringTokenizer;
 import javax.swing.border.EmptyBorder;
 import free.workarounds.FixedJTextArea;
 import free.jin.plugin.PreferencesPanel;
@@ -354,7 +355,16 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       "scripts are therefore simply small pieces of Java code that\n"+
       "can be run without compiling. For more information about\n"+
       "BeanShell see http://www.beanshell.org/. Use this script\n"+
-      "type if you have at least basic knowledge of Java.";
+      "type if you have at least basic knowledge of Java.\n";
+      
+      
+      
+    /**
+     * An array containing all the possible text for the type explanation text
+     * area.
+     */
+     
+    private final String [] expTexts = new String[]{commandsText, beanshellText};
 
 
 
@@ -425,9 +435,31 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
 
       final JTextArea typeExplanationTextArea = new FixedJTextArea(){
         public boolean isFocusTraversable(){return false;}
+        
+        private Dimension prefSize = null;
+        public Dimension getPreferredSize(){
+          if (prefSize == null){
+            FontMetrics metrics = getFontMetrics(getFont());
+            int width = 0;
+            int height = 0;
+            for (int i = 0; i < expTexts.length; i++){
+              StringTokenizer tokenizer = new StringTokenizer(expTexts[i], "\n");
+              if (tokenizer.countTokens()*metrics.getHeight() > height)
+                height = tokenizer.countTokens()*metrics.getHeight();
+              while (tokenizer.hasMoreTokens()){
+                String line = tokenizer.nextToken();
+                int lineWidth = metrics.stringWidth(line);
+                if (lineWidth > width)
+                  width = lineWidth;
+              }
+            }
+            
+            prefSize = new Dimension(width, height);
+          }
+          
+          return prefSize;
+        }
       };
-      typeExplanationTextArea.setPreferredSize(new Dimension(370, 150));
-      typeExplanationTextArea.setFont(new Font("Serif", Font.PLAIN, 16));
       typeExplanationTextArea.setEditable(false);
       typeExplanationTextArea.setOpaque(false);
 
