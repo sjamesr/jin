@@ -9,7 +9,7 @@
 	// Prerequisites: connectToDatabase has been called.
 	function initDatabase(){
 		// Connect to MySQL and select the database
-		if (!(mysql_connect("localhost", "jin", "@db_pass@") && mysql_select_db("@db_name@")))
+		if (!connectToMySQL())
 			return "Couldn't connect to MySQL or select database - " . mysql_error();	
 		
 		// Create the Preferences table if it doesn't exist yet
