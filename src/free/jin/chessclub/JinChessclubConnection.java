@@ -629,12 +629,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     gameProps.put("BlackName", blackName);
     gameProps.put("Variant", variant);
     gameProps.put("RatingCategoryString", ratingCategoryString);
-    gameProps.put("IsRated", new Boolean(isRated));
+    gameProps.put("IsRated", isRated ? Boolean.TRUE : Boolean.FALSE);
     gameProps.put("WhiteInitial", new Integer(whiteInitial));
     gameProps.put("WhiteIncrement", new Integer(whiteIncrement));
     gameProps.put("BlackInitial", new Integer(blackInitial));
     gameProps.put("BlackIncrement", new Integer(blackIncrement));
-    gameProps.put("IsPlayedGame", new Boolean(isPlayedGame));
+    gameProps.put("IsPlayedGame", isPlayedGame ? Boolean.TRUE : Boolean.FALSE);
     gameProps.put("WhiteRating", new Integer(whiteRating));
     gameProps.put("BlackRating", new Integer(blackRating));
     gameProps.put("WhiteTitles", displayableTitle(whiteTitles));
@@ -1361,7 +1361,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
   protected void processFlip(int gameNumber, boolean isFlipped){
     if (existsNonStarted(gameNumber)){
-      putPropertyForNonStarted(gameNumber, "InitiallyFlipped", new Boolean(isFlipped));
+      putPropertyForNonStarted(gameNumber, "InitiallyFlipped", isFlipped ? Boolean.TRUE : Boolean.FALSE);
     }
     else{
       try{

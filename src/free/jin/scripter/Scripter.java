@@ -826,10 +826,10 @@ public class Scripter extends Plugin{
         vars.addElement(new Object[]{"userPlayer", game.getUserPlayer().toString().toLowerCase()});
       }
 
-      vars.addElement(new Object[]{"isGameRated", new Boolean(game.isRated())});
+      vars.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
-      vars.addElement(new Object[]{"isPlayed", new Boolean(game.isPlayed())});
-      vars.addElement(new Object[]{"isTimeOdds", new Boolean(game.isTimeOdds())});
+      vars.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
 
       return vars;
     }
@@ -845,7 +845,7 @@ public class Scripter extends Plugin{
     public void moveMade(MoveMadeEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"move", evt.getMove()});
-//      varsVector.addElement(new Object[]{"isNewMove", new Boolean(evt.isNew())});
+//      varsVector.addElement(new Object[]{"isNewMove", evt.isNew() ? Boolean.TRUE : Boolean.FALSE});
       // Since I'm not sure myself whether isNewMove does what it was intended to,
       // let's not confuse the user...
 
@@ -889,7 +889,7 @@ public class Scripter extends Plugin{
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"player", evt.getPlayer().toString().toLowerCase()});
       varsVector.addElement(new Object[]{"time", new Integer(evt.getTime())});
-      varsVector.addElement(new Object[]{"isClockRunning", new Boolean(evt.isClockRunning())});
+      varsVector.addElement(new Object[]{"isClockRunning", evt.isClockRunning() ? Boolean.TRUE : Boolean.FALSE});
 
       Object [][] vars = new Object[varsVector.size()][];
       varsVector.copyInto(vars);
@@ -899,7 +899,7 @@ public class Scripter extends Plugin{
 
     public void boardFlipped(BoardFlipEvent evt){
       Vector varsVector = createVarsVector(evt);
-      varsVector.addElement(new Object[]{"isFlipped", new Boolean(evt.isFlipped())});
+      varsVector.addElement(new Object[]{"isFlipped", evt.isFlipped() ? Boolean.TRUE : Boolean.FALSE});
 
 
       Object [][] vars = new Object[varsVector.size()][];
@@ -921,7 +921,7 @@ public class Scripter extends Plugin{
 
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"offerType", offerType});
-      varsVector.addElement(new Object[]{"isOffered", new Boolean(evt.isOffered())});
+      varsVector.addElement(new Object[]{"isOffered", evt.isOffered() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"player", evt.getPlayer().toString().toLowerCase()});
       if (evt.getOfferId() == OfferEvent.TAKEBACK_OFFER)
         varsVector.addElement(new Object[]{"takebackCount", new Integer(evt.getTakebackCount())});
@@ -1017,7 +1017,7 @@ public class Scripter extends Plugin{
 
       if (Utilities.contains(eventSubtypes, subtypes[1])){
         varsVector.addElement(new Object[]{"move", move});
-        varsVector.addElement(new Object[]{"isNewMove", new Boolean(true)});
+        varsVector.addElement(new Object[]{"isNewMove", Boolean.TRUE});
       }
 
       if (Utilities.contains(eventSubtypes, subtypes[6]))
@@ -1032,15 +1032,15 @@ public class Scripter extends Plugin{
       if (Utilities.contains(eventSubtypes, subtypes[5])){
         varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
         varsVector.addElement(new Object[]{"time", new Integer(4*60*1000)});
-        varsVector.addElement(new Object[]{"isClockRunning", new Boolean(true)});
+        varsVector.addElement(new Object[]{"isClockRunning", Boolean.TRUE});
       }
 
       if (Utilities.contains(eventSubtypes, subtypes[3]))
-        varsVector.addElement(new Object[]{"isFlipped", new Boolean(true)});
+        varsVector.addElement(new Object[]{"isFlipped", Boolean.TRUE});
 
       if (Utilities.contains(eventSubtypes, subtypes[7])){
         varsVector.addElement(new Object[]{"offerType", "draw"});
-        varsVector.addElement(new Object[]{"isMade", new Boolean(true)});
+        varsVector.addElement(new Object[]{"isMade", Boolean.TRUE});
         varsVector.addElement(new Object[]{"player", Player.WHITE_PLAYER.toString().toLowerCase()});
       }
 
@@ -1090,21 +1090,21 @@ public class Scripter extends Plugin{
       vars.addElement(new Object[]{"name", seek.getSeekerName()});
       vars.addElement(new Object[]{"title", seek.getSeekerTitle()});
       vars.addElement(new Object[]{"rating", new Integer(seek.getSeekerRating())});
-      vars.addElement(new Object[]{"isProvisional", new Boolean(seek.isSeekerProvisional())});
-      vars.addElement(new Object[]{"isRegistered", new Boolean(seek.isSeekerRegistered())});
-      vars.addElement(new Object[]{"isComputer", new Boolean(seek.isSeekerComputer())});
+      vars.addElement(new Object[]{"isProvisional", seek.isSeekerProvisional() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isRegistered", seek.isSeekerRegistered() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isComputer", seek.isSeekerComputer() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"ratingCategory", seek.getRatingCategoryString()});
       vars.addElement(new Object[]{"time", new Integer(seek.getTime()/(1000*60))});
       vars.addElement(new Object[]{"inc", new Integer(seek.getInc()/1000)});
-      vars.addElement(new Object[]{"isRated", new Boolean(seek.isRated())});
+      vars.addElement(new Object[]{"isRated", seek.isRated() ? Boolean.TRUE : Boolean.FALSE});
       String colorString = seek.getSoughtColor() == null ? null :
                           (seek.getSoughtColor().isWhite() ? "white" : "black");
       vars.addElement(new Object[]{"color", colorString});
-      vars.addElement(new Object[]{"ratingLimited", new Boolean(seek.isRatingLimited())});
+      vars.addElement(new Object[]{"ratingLimited", seek.isRatingLimited() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"minRating", new Integer(seek.getMinRating())});
       vars.addElement(new Object[]{"maxRating", new Integer(seek.getMaxRating())});
-      vars.addElement(new Object[]{"isManualAccept", new Boolean(seek.isManualAccept())});
-      vars.addElement(new Object[]{"isFormula", new Boolean(seek.isFormula())});
+      vars.addElement(new Object[]{"isManualAccept", seek.isManualAccept() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isFormula", seek.isFormula() ? Boolean.TRUE : Boolean.FALSE});
 
       return vars;
     }
@@ -1137,21 +1137,21 @@ public class Scripter extends Plugin{
       varsVector.addElement(new Object[]{"name", seek.getSeekerName()});
       varsVector.addElement(new Object[]{"title", seek.getSeekerTitle()});
       varsVector.addElement(new Object[]{"rating", new Integer(seek.getSeekerRating())});
-      varsVector.addElement(new Object[]{"isProvisional", new Boolean(seek.isSeekerProvisional())});
-      varsVector.addElement(new Object[]{"isRegistered", new Boolean(seek.isSeekerRegistered())});
-      varsVector.addElement(new Object[]{"isComputer", new Boolean(seek.isSeekerComputer())});
+      varsVector.addElement(new Object[]{"isProvisional", seek.isSeekerProvisional() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"isRegistered", seek.isSeekerRegistered() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"isComputer", seek.isSeekerComputer() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"ratingCategory", seek.getRatingCategoryString()});
       varsVector.addElement(new Object[]{"time", new Integer(seek.getTime()/(1000*60))});
       varsVector.addElement(new Object[]{"inc", new Integer(seek.getInc()/1000)});
-      varsVector.addElement(new Object[]{"isRated", new Boolean(seek.isRated())});
+      varsVector.addElement(new Object[]{"isRated", seek.isRated() ? Boolean.TRUE : Boolean.FALSE});
       String colorString = seek.getSoughtColor() == null ? null :
                           (seek.getSoughtColor().isWhite() ? "white" : "black");
       varsVector.addElement(new Object[]{"color", colorString});
-      varsVector.addElement(new Object[]{"ratingLimited", new Boolean(seek.isRatingLimited())});
+      varsVector.addElement(new Object[]{"ratingLimited", seek.isRatingLimited() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"minRating", new Integer(seek.getMinRating())});
       varsVector.addElement(new Object[]{"maxRating", new Integer(seek.getMaxRating())});
-      varsVector.addElement(new Object[]{"isManualAccept", new Boolean(seek.isManualAccept())});
-      varsVector.addElement(new Object[]{"isFormula", new Boolean(seek.isFormula())});
+      varsVector.addElement(new Object[]{"isManualAccept", seek.isManualAccept() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"isFormula", seek.isFormula() ? Boolean.TRUE : Boolean.FALSE});
 
       Object [][] vars = new Object[varsVector.size()][];
       varsVector.copyInto(vars);

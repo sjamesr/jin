@@ -363,7 +363,7 @@ public abstract class Preferences{
    */
 
   public void setBool(String prefName, boolean prefValue){
-    set(prefName, new Boolean(prefValue));
+    set(prefName, prefValue ? Boolean.TRUE : Boolean.FALSE);
   }
 
 
@@ -588,7 +588,7 @@ public abstract class Preferences{
     String prefValue = propValue.substring(indexOfSeparator + 1);
 
     if ("boolean".equals(prefType))
-      return new Boolean(prefValue);
+      return Boolean.valueOf(prefValue);
     else if ("integer".equals(prefType))
       return new Integer(prefValue);
     else if ("double".equals(prefType))

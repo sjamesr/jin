@@ -215,8 +215,8 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
       setProperty(category, "font-family", font.getFamily());
       setProperty(category, "font-size", new Integer(font.getSize()));
-      setProperty(category, "font-bold", new Boolean(font.isBold()));
-      setProperty(category, "font-italic", new Boolean(font.isItalic()));
+      setProperty(category, "font-bold", font.isBold() ? Boolean.TRUE : Boolean.FALSE);
+      setProperty(category, "font-italic", font.isItalic() ? Boolean.TRUE : Boolean.FALSE);
       setProperty(category, "foreground", foreground);
     }
   }

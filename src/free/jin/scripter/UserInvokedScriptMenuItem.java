@@ -295,7 +295,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
               else if ("String".equals(type))
                 value = valueString;
               else if ("Boolean".equals(type))
-                value = new Boolean(valueString);
+                value = Boolean.valueOf(valueString);
               else if ("Real".equals(type))
                 value = new Double(valueString);
               else throw new IllegalStateException("Unknown variable type: "+type);

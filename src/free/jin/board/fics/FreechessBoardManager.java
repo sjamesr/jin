@@ -60,14 +60,6 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
   private Object primaryPlayedGameID = null;
 
 
-
-  /**
-   * The amount of games played by the user.
-   */
-
-  private int userPlayedGamesCount = 0;
-  
-  
   
   /**
    * Creates a new <code>FreechessBoardManager</code>. Registers a listener for

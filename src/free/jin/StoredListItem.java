@@ -47,7 +47,7 @@ public class StoredListItem extends GameListItem{
       whiteInc, blackTime, blackInc, whiteRating, blackRating, isRated,
       variantName, ratingCategoryName, eco);
 
-    setProperty("IsOpponentPresent", new Boolean(isOpponentPresent));
+    setProperty("IsOpponentPresent", isOpponentPresent ? Boolean.TRUE : Boolean.FALSE);
     setProperty("AdjournmentReason", adjournmentReason);
     setProperty("Player", player);
   }

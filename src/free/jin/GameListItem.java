@@ -89,7 +89,7 @@ public abstract class GameListItem{
     setProperty("BlackInc", new Integer(blackInc));
     setProperty("WhiteRating", new Integer(whiteRating));
     setProperty("BlackRating", new Integer(blackRating));
-    setProperty("IsRated", new Boolean(isRated));
+    setProperty("IsRated", isRated ? Boolean.TRUE : Boolean.FALSE);
     setProperty("VariantName", variantName);
     setProperty("RatingCategoryName", ratingCategoryName);
     setProperty("ECO", eco);

@@ -572,11 +572,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     class BottomScroller implements Runnable{
       
       private int curNumCalls;
-      private int initNumCalls;
       
       BottomScroller(int curNumCalls){
         this.curNumCalls = curNumCalls;
-        initNumCalls = curNumCalls;
       }
 
       public void run(){
