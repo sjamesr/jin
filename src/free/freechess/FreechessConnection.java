@@ -45,6 +45,14 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
+   * A regular expression string for matching FICS titles.
+   */
+
+  private static final String titlesRegex = "\\([A-Z\\*\\(\\)]*\\)";
+
+
+
+  /**
    * The lock we wait on when logging.
    */
 
@@ -167,6 +175,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
     sendCommand("set style "+style);
     sendCommand("set interface "+interfaceVar);
+    sendCommand("set bell 0");
     sendCommand("iset nowrap 1");
     sendCommand("iset lock 1");
   }
@@ -184,7 +193,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (!isConnected())
       throw new IllegalStateException("Not connected");
 
-    System.out.print(command+": ");
+    System.out.println("SENDING COMMAND: "+command);
 
     try{
       out.write(command.getBytes());
@@ -249,9 +258,27 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private void handleLine(String line){
+    if (handleChannelTell(line))
+      return;
     if (handleLogin(line))
       return;
     if (handlePersonalTell(line))
+      return;
+    if (handleSayTell(line))
+      return;
+    if (handlePTell(line))
+      return;
+    if (handleShout(line))
+      return;
+    if (handleIShout(line))
+      return;
+    if (handleTShout(line))
+      return;
+    if (handleCShout(line))
+      return;
+    if (handleKibitz(line))
+      return;
+    if (handleWhisper(line))
       return;
 
     processLine(line);
@@ -266,7 +293,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern loginPattern =
-    new Pattern("^\\*\\*\\*\\* Starting FICS session as ("+usernameRegex+")\\(?.*\\)? \\*\\*\\*\\*");
+    new Pattern("^\\*\\*\\*\\* Starting FICS session as ("+usernameRegex+")("+titlesRegex+")? \\*\\*\\*\\*");
 
 
 
@@ -298,8 +325,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * The regular expression matching personal tells.
    */
 
-  private static final Pattern ptellPattern = 
-    new Pattern("("+usernameRegex+")(\\(.*\\))? tells you: (.*)");
+  private static final Pattern personalTellPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")? tells you: (.*)");
 
 
 
@@ -310,7 +337,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePersonalTell(String line){
-    Matcher matcher = ptellPattern.matcher(line);
+    Matcher matcher = personalTellPattern.matcher(line);
     if (!matcher.find())
       return false;
 
@@ -327,13 +354,402 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a personal tell arrives. The <code>titles</code>
-   * variable contains the titles of the player who send the personal tell in
-   * the "(T1)(T2)" format, or <code>null</code> if that player has no titles.
+   * This method is called when a personal tell arrives. 
    */
 
   protected void processPersonalTell(String username, String titles, String message){}
 
+
+
+
+  /**
+   * The regular expression matching "say" tells.
+   */
+
+  private static final Pattern sayPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?(\\[(\\d*)\\])? says: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a "say" tell and
+   * to further process it if it is.
+   */
+
+  private boolean handleSayTell(String line){
+    Matcher matcher = sayPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String gameNumberString = matcher.group(4);
+    String message = matcher.group(5);
+
+    int gameNumber = gameNumberString == null ? -1 : Integer.parseInt(gameNumberString);
+
+    processSayTell(username, titles, gameNumber, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a "say" tell arrives. The
+   * <code>gameNumber</code> argument will contain -1 if the game number was not
+   * specified.
+   */
+
+  protected void processSayTell(String username, String titles, int gameNumber, String message){}
+
+
+
+
+  /**
+   * The regular expression matching "ptell" tells.
+   */
+
+  private static final Pattern ptellPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")? \\(your partner\\) tells you: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a "ptell" tell and
+   * to further process it if it is.
+   */
+
+  private boolean handlePTell(String line){
+    Matcher matcher = ptellPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String message = matcher.group(3);
+
+    processPTell(username, titles, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a "ptell" tell arrives. 
+   */
+
+  protected void processPTell(String username, String titles, String message){}
+
+
+
+
+  /**
+   * The regular expression matching channel tells.
+   */
+
+  private static final Pattern channelTellPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\((\\d*)\\): (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a channel tell and
+   * to further process it if it is.
+   */
+
+  private boolean handleChannelTell(String line){
+    Matcher matcher = channelTellPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String channelNumberString = matcher.group(3);
+    String message = matcher.group(4);
+
+    int channelNumber = Integer.parseInt(channelNumberString);
+
+    processChannelTell(username, titles, channelNumber, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a channel tell arrives. 
+   */
+
+  protected void processChannelTell(String username, String titles, int channelNumber, String message){}
+
+
+
+
+  /**
+   * The regular expression matching kibitzes.
+   */
+
+  private static final Pattern kibitzPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]*)\\)\\[(\\d*)\\] kibitzes: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a kibitz and
+   * to further process it if it is.
+   */
+
+  private boolean handleKibitz(String line){
+    Matcher matcher = kibitzPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String ratingString = matcher.group(3);
+    String gameNumberString = matcher.group(4);
+    String message = matcher.group(5);
+
+    int rating = (ratingString != null) && !ratingString.equals("----") ? Integer.parseInt(ratingString) : -1;
+    int gameNumber = Integer.parseInt(gameNumberString);
+
+    processKibitz(username, titles, rating, gameNumber, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a kibitz arrives. The rating argument contains
+   * -1 if the player is unrated or otherwise doesn't have a rating.
+   */
+
+  protected void processKibitz(String username, String titles, int rating, int gameNumber, String message){}
+
+
+
+
+
+  /**
+   * The regular expression matching whispers.
+   */
+
+  private static final Pattern whisperPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\(([-0-9]*)\\)\\[(\\d*)\\] whispers: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a whisper and
+   * to further process it if it is.
+   */
+
+  private boolean handleWhisper(String line){
+    Matcher matcher = whisperPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String ratingString = matcher.group(3);
+    String gameNumberString = matcher.group(4);
+    String message = matcher.group(5);
+
+    int rating = (ratingString != null) && !ratingString.equals("----") ? Integer.parseInt(ratingString) : -1;
+    int gameNumber = Integer.parseInt(gameNumberString);
+
+    processWhisper(username, titles, rating, gameNumber, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a whisper arrives. The rating argument contains
+   * -1 if the player is unrated or otherwise doesn't have a rating.
+   */
+
+  protected void processWhisper(String username, String titles, int rating, int gameNumber, String message){}
+
+
+
+  
+  /**
+   * The regular expression matching shouts.
+   */
+
+  private static final Pattern shoutPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")? shouts: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a shout and
+   * to further process it if it is.
+   */
+
+  private boolean handleShout(String line){
+    Matcher matcher = shoutPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String message = matcher.group(3);
+
+    processShout(username, titles, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a shout arrives. 
+   */
+
+  protected void processShout(String username, String titles, String message){}
+
+
+
+
+  /**
+   * The regular expression matching "ishouts".
+   */
+
+  private static final Pattern ishoutPattern = 
+    new Pattern("^--> ("+usernameRegex+")("+titlesRegex+")? ?(.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is an "ishout" and
+   * to further process it if it is.
+   */
+
+  private boolean handleIShout(String line){
+    Matcher matcher = ishoutPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String message = matcher.group(3);
+
+    processIShout(username, titles, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when an "ishout" arrives. 
+   */
+
+  protected void processIShout(String username, String titles, String message){}
+
+
+
+
+
+  /**
+   * The regular expression matching "tshouts".
+   */
+
+  private static final Pattern tshoutPattern = 
+    new Pattern("^:("+usernameRegex+")("+titlesRegex+")? t-shouts: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a "tshout" and
+   * to further process it if it is.
+   */
+
+  private boolean handleTShout(String line){
+    Matcher matcher = tshoutPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String message = matcher.group(3);
+
+    processTShout(username, titles, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a "tshout" arrives. 
+   */
+
+  protected void processTShout(String username, String titles, String message){}
+
+
+
+
+
+  /**
+   * The regular expression matching "cshouts".
+   */
+
+  private static final Pattern cshoutPattern = 
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")? c-shouts: (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a "cshout" and
+   * to further process it if it is.
+   */
+
+  private boolean handleCShout(String line){
+    Matcher matcher = cshoutPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String username = matcher.group(1);
+    String titles = matcher.group(2);
+    String message = matcher.group(3);
+
+    processCShout(username, titles, message);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a "cshout" arrives. 
+   */
+
+  protected void processCShout(String username, String titles, String message){}
 
 
 
