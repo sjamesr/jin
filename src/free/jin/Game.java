@@ -129,6 +129,8 @@ public class Game extends Struct{
    * @param gameType The type of the game - possible values are {@link #MY_GAME},
    * {@link #OBSERVED_GAME} and {@link #ISOLATED_BOARD}.
    * @param initialPosition The initial position in the game.
+   * @param pliesSinceStart The amount of from the actual beginning of the game
+   * to the inital position.
    * @param whiteName The name of the player with the white pieces.
    * @param blackName The name of the player with the black pieces.
    * @param whiteTime The initial amount of time on the white player's clock,
@@ -208,6 +210,8 @@ public class Game extends Struct{
    * increment for white and black.
    *
    * @param initialPosition The initial position in the game.
+   * @param pliesSinceStart The amount of from the actual beginning of the game
+   * to the inital position.
    * @param whiteName The name of the player with the white pieces.
    * @param blackName The name of the player with the black pieces.
    * @param time The initial amount of time on the players' clock, in milliseconds.
@@ -293,9 +297,6 @@ public class Game extends Struct{
    */
 
   public void setInitialPosition(Position initialPosition, int pliesSinceStart){
-    if (isPlayed() && (getGameType() == MY_GAME) && (pliesSinceStart != 0))
-      throw new IllegalArgumentException("pliesSinceStart may not be nonzero for games played by the user");
-
     this.initialPosition.copyFrom(initialPosition);
     this.pliesSinceStart = pliesSinceStart;
   }
