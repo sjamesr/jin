@@ -130,6 +130,26 @@
         <isset property="x86" />
       </and>
     </condition>
+
+		<condition property="runDoUnixOnx86Stuff">
+			<or>
+				<isset property="unixOnx86" />
+				<and>
+					<isset property="release.target">
+					<equals arg1="unix" arg2="${release.target}" />
+				</and>
+			</or>
+		</condition>
+
+		<condition property="runDoWindowsStuff">
+			<or>
+				<isset property="windows" />
+				<and>
+					<isset property="release.target">
+					<equals arg1="windows" arg2="${release.target}" />
+				</and>
+			</or>
+		</condition>
     
     <!-- Call the tasks that do platform specific stuff -->
 		<antcall target="doUnixOnx86Stuff" />
@@ -449,7 +469,7 @@
 	</target>
 
   <!-- If the property unixOnx86 is set, does things required for this platform -->
-  <target name="doUnixOnx86Stuff" if="unixOnx86">   
+  <target name="doUnixOnx86Stuff" if="runDoUnixOnx86Stuff">   
     <copy todir="${build.dir}">
       <fileset dir="resources/os-specific/unix/x86" />
     </copy>
@@ -459,7 +479,7 @@
 
 
   <!-- If the property windows is set, does things required for this platform -->
-  <target name="doWindowsStuff" if="windows">   
+  <target name="doWindowsStuff" if="runDoWindowsStuff">   
     <copy todir="${build.dir}">
       <fileset dir="resources/os-specific/windows" />
     </copy>
