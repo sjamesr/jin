@@ -486,6 +486,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     try{
       boardFrame.setSelected(true);
     } catch (java.beans.PropertyVetoException e){} // Ignore.
+
+    // Artificially invoke this, since it would not get called otherwise
+    // (we're already in the middle of the dispatching of that event).
+    boardPanel.gameStarted(evt);
   }
 
 
