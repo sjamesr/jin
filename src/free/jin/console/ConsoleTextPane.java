@@ -24,10 +24,7 @@ package free.jin.console;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Keymap;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 import free.util.GraphicsUtilities;
 import java.util.Vector;
 import java.util.Hashtable;
@@ -256,8 +253,9 @@ public class ConsoleTextPane extends JTextPane{
         return null;
 
       try{
-        int wordStart = Utilities.getWordStart(this, pressedLocation);
-        int wordEnd = Utilities.getWordEnd(this, pressedLocation);
+        int wordStart = getWordStart(pressedLocation);
+        int wordEnd = getWordEnd(pressedLocation);
+        String text = getText();
         if (isAboveText(evt.getX(), evt.getY(), wordStart, wordEnd)){
           selection = getDocument().getText(wordStart, wordEnd - wordStart);
           if (selection.trim().length() != 0) // Don't override current selection with whitespace selection
@@ -318,6 +316,112 @@ public class ConsoleTextPane extends JTextPane{
     }
     
     return defaultPopupMenu;
+  }
+
+
+
+
+  /**
+   * Returns the start of the word at the specified location.
+   */
+
+  private int getWordStart(int location) throws BadLocationException{
+    Document document = getDocument();
+    Element lineElement = Utilities.getParagraphElement(this, location);
+    int lineStart = lineElement.getStartOffset();
+    int lineEnd = Math.min(lineElement.getEndOffset(), document.getLength());
+    
+    String text = document.getText(lineStart, lineEnd - lineStart);
+    if ((text == null) || (text.length() == 0))
+      return location;
+
+    location -= lineStart;
+
+    int textLength = text.length();
+
+    char locationChar = text.charAt(location);
+    boolean isWhitespaceWord;
+    if (isWhitespaceChar(locationChar))
+      isWhitespaceWord = true;
+    else if (isWordChar(locationChar))
+      isWhitespaceWord = false;
+    else 
+      return location + lineStart;
+
+    for (int i = location; i >= 0; i--){
+      char c = text.charAt(i);
+      if ((isWhitespaceWord && !isWhitespaceChar(c)) || 
+           !isWhitespaceWord && !isWordChar(c))
+        return lineStart + i + 1;
+    }
+
+    return lineStart;
+  }
+
+
+
+
+  /**
+   * Returns the end of the word at the specified location.
+   */
+
+  private int getWordEnd(int location) throws BadLocationException{
+    Document document = getDocument();
+    Element lineElement = Utilities.getParagraphElement(this, location);
+    int lineStart = lineElement.getStartOffset();
+    int lineEnd = Math.min(lineElement.getEndOffset(), document.getLength());
+    
+    String text = document.getText(lineStart, lineEnd - lineStart);
+    if ((text == null) || (text.length() == 0))
+      return location;
+
+    location -= lineStart;
+
+    int textLength = text.length();
+
+    char locationChar = text.charAt(location);
+    boolean isWhitespaceWord;
+    if (isWhitespaceChar(locationChar))
+      isWhitespaceWord = true;
+    else if (isWordChar(locationChar))
+      isWhitespaceWord = false;
+    else 
+      return location + lineStart + 1;
+
+    for (int i = location; i < textLength; i++){
+      char c = text.charAt(i);
+      if ((isWhitespaceWord && !isWhitespaceChar(c)) || 
+           !isWhitespaceWord && !isWordChar(c))
+        return lineStart + i;
+    }
+
+    return lineEnd;
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the specified character should be considered
+   * a word character by the text selection mechanism, <code>false</code>
+   * otherwise.
+   */
+
+  protected boolean isWordChar(char c){
+    return Character.isLetter(c) || Character.isDigit(c);
+  }
+
+
+
+
+  /**
+   * Returns <code>true</code> if the specified character should be considered
+   * a whitespace character by the text selection mechanism, <code>false</code>
+   * otherwise.
+   */
+
+  protected boolean isWhitespaceChar(char c){
+    return Character.isWhitespace(c);
   }
 
 
@@ -403,12 +507,104 @@ public class ConsoleTextPane extends JTextPane{
 
 
 
+
+  /**
+   * True if we're running under 1.1 MS VM.
+   */
+
+  private static final boolean MS_VM = (System.getProperty("java.version").compareTo("1.2") < 0) &&
+                                        System.getProperty("java.vendor").startsWith("Microsoft");
+
+
+
+
+  /**
+   * Due to a bug in MS VM, which never sends mouse events with clickCount more
+   * than 2, we're forced to count clicks ourselves. 
+   */
+
+  private int clickCount = 0;
+  private long lastPressTime, lastReleaseTime;
+
+
+
+  /**
+   * Updates the click count, if necessary.
+   */
+
+  private void updateClickCount(MouseEvent evt){
+    if (MS_VM){
+      switch (evt.getID()){
+        case MouseEvent.MOUSE_MOVED:
+        case MouseEvent.MOUSE_DRAGGED:
+        case MouseEvent.MOUSE_EXITED:
+        case MouseEvent.MOUSE_ENTERED:
+          clickCount = 0;
+          break;
+        case MouseEvent.MOUSE_PRESSED:
+          if (evt.getWhen() - lastReleaseTime < 500)
+            clickCount++;
+          else
+            clickCount = 1;
+          break;
+        case MouseEvent.MOUSE_RELEASED:
+          lastReleaseTime = evt.getWhen();
+          break;
+      }
+    }
+  }
+
+
+
+  /**
+   * Returns the click count for the specified mouse event.
+   */
+
+  private int getClickCount(MouseEvent evt){
+    if (MS_VM)
+      return clickCount;
+    else
+      return evt.getClickCount();
+  }
+
+
+
   /**
    * Processes the given MouseEvent.
    */
 
   protected void processMouseEvent(MouseEvent evt){
-    super.processMouseEvent(evt);
+    updateClickCount(evt);
+
+    // We want to handle events where clickCount >= 2 ourselves
+    if (evt.getClickCount() < 2)
+      super.processMouseEvent(evt);
+
+    int pressedLoc = viewToModel(evt.getPoint());
+    int selectionStart = getSelectionStart();
+    int selectionEnd = getSelectionEnd();
+
+    if (pressedLoc != -1){
+      try{
+        if ((getClickCount(evt) >= 2) && (evt.getID() == MouseEvent.MOUSE_PRESSED)
+            && SwingUtilities.isLeftMouseButton(evt)){
+          if ((getClickCount(evt) % 2) == 0){
+            int start = getWordStart(pressedLoc);
+            int end = getWordEnd(pressedLoc);
+
+            select(start, end);
+          }
+          else{
+            Document document = getDocument();
+            Element paragraphElement = Utilities.getParagraphElement(this, pressedLoc);
+            int start = paragraphElement.getStartOffset();
+            int end = Math.min(paragraphElement.getEndOffset(), document.getLength());
+
+            select(start, end);
+          }
+        }
+      } catch (BadLocationException e){}
+    }
 
     if (evt.isPopupTrigger()){
       JPopupMenu popup = getPopupMenu(evt);
@@ -439,11 +635,9 @@ public class ConsoleTextPane extends JTextPane{
       processPossibleLinkUpdate(evt);
     } 
 
-    if (evt.getID()==MouseEvent.MOUSE_CLICKED){
-      if (curLink!=null){
+    if ((evt.getID() == MouseEvent.MOUSE_CLICKED) && SwingUtilities.isLeftMouseButton(evt)){
+      if (curLink != null)
         console.issueCommand(curLink.getCommand());
-//        evt.consume(); Not sure what's it for, so commenting out until I find out.
-      }
     } 
 
   }
@@ -456,9 +650,11 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   protected void processMouseMotionEvent(MouseEvent evt){
+    updateClickCount(evt);
+
     super.processMouseMotionEvent(evt);
 
-    if (evt.getID()==MouseEvent.MOUSE_MOVED){
+    if (evt.getID() == MouseEvent.MOUSE_MOVED){
       processPossibleLinkUpdate(evt);
     }
   }
