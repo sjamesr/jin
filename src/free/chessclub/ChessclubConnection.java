@@ -3113,6 +3113,7 @@ public class ChessclubConnection extends free.util.Connection{
       case Datagram.DG_REMOVE_TOURNEY:{
         int id = datagram.getInteger(0);
         processRemoveTourney(id);
+        break;
       }
       case Datagram.DG_DIALOG_START:{
         processDialogStart(datagram.getInteger(0));
