@@ -41,6 +41,7 @@ import free.chess.variants.suicide.Suicide;
 import free.chess.variants.atomic.Atomic;
 import free.util.Pair;
 import free.util.TextUtilities;
+import free.util.Utilities;
 
 
 
@@ -464,9 +465,73 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     return null;
   }
+  
+  
+ 
+  
+  /**
+   * Returns the wild variant name corresponding to the specified wild variant,
+   * that can be used for issuing a seek, e.g. "w1" or "fr".
+   * Returns null if the specified wild variant is not supported by FICS.
+   */
+   
+  private String getWildName(WildVariant variant){
+    if (variant == null)
+      throw new IllegalArgumentException("Null variant");
+
+    String variantName = variant.getName();
+    if (variantName.startsWith("wild/"))
+      return "w" + variantName.substring("wild/".length());
+    else if (variant.equals(Chess.getInstance()))
+      return "";
+    else if (variant.equals(FischerRandom.getInstance()))
+      return "fr";
+    else if (variant.equals(Suicide.getInstance()))
+      return "suicide";
+    else if (variant.equals(Atomic.getInstance()))
+      return "atomic";
+    else if ("losers".equals(variantName))
+      return "losers";
+    
+    return null;
+  }
+  
 
 
+  /**
+   * A list of supported wild variants, initialized lazily.
+   */
+   
+  private static WildVariant [] wildVariants;
+  
+  
+  
+  /**
+   * Returns a list of support wild variants.
+   */
+   
+  public WildVariant [] getSupportedVariants(){
+    if (wildVariants == null){
+      wildVariants = new WildVariant[]{
+        Chess.getInstance(),
+        FischerRandom.getInstance(),
+        Suicide.getInstance(),
+        Atomic.getInstance(),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "losers"),
+        new BothSidesCastlingVariant(Chess.INITIAL_POSITION_FEN, "wild/0"),
+        new BothSidesCastlingVariant(Chess.INITIAL_POSITION_FEN, "wild/1"),
+        new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, "wild/2"),
+        new NoCastlingVariant(Chess.INITIAL_POSITION_FEN, "wild/3"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "wild/5"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "wild/8"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "wild/8a"),
+      };
+    }
+    
+    return (WildVariant [])wildVariants.clone();
+  }
 
+  
 
   /**
    * A hashtable where we keep game numbers mapped to GameInfoStruct objects
@@ -2003,6 +2068,32 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
     sendCommand("$play "+seek.getID());
+  }
+  
+  
+  
+  /**
+   * Issues the specified seek.
+   */
+   
+  public void issueSeek(UserSeek seek){
+    WildVariant variant = seek.getVariant();
+    String wildName = getWildName(variant);
+    if (wildName == null)
+      throw new IllegalArgumentException("Unsupported variant: " + variant);
+    
+    Player color = seek.getColor();
+    
+    String seekCommand = "seek " + seek.getTime() + " " + seek.getInc() + " " +
+      (seek.isRated() ? "rated" : "unrated") + " " +
+      (color == null ? "" : color.isWhite() ? "white " : "black ") +
+      wildName + " " +
+      (seek.isManualAccept() ? "manual " : "") +
+      (seek.isFormula() ? "formula " : "") +
+      (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
+      (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " ";
+      
+    sendCommand(seekCommand);
   }
 
 
