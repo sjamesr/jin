@@ -1,3 +1,5 @@
+classname = free.jin.board.BoardPattern
+
 id = wooden-dark
 name = Dark Wood
-classname = ImageBoardLoader
+boardPainter.classname = free.chess.ImageBoardPainter

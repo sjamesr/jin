@@ -1,4 +1,6 @@
+classname = free.jin.board.BoardPattern
+
 id = wooden-light
 name = Light Wood
-classname = ImageBoardLoader
+boardPainter.classname = free.chess.ImageBoardPainter
 servers = icc

@@ -1,3 +1,5 @@
+classname = free.jin.board.BoardPattern
+
 id = slate
 name = Slate
-classname = ImageBoardLoader
+boardPainter.classname = free.chess.ImageBoardPainter
