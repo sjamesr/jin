@@ -438,18 +438,15 @@ public class AppletJinContext implements JinContext{
   
   /**
    * This is called by the <code>JinApplet</code> to tell us when the applet's
-   * stop method was called. We don't try to save preferences here because this
-   * method is usually given very little time to finish by most applet
-   * containers, after which the applet and all its windows are killed.
+   * stop method was called. 
    */
    
   void applet_stop(){
-    if (mainFrame.isVisible())
-      mainFrame.dispose();
+    
   }
-
-
-
+  
+  
+  
   /**
    * Quits the application, possibly asking the user to confirm quitting first.
    */
@@ -554,12 +551,11 @@ public class AppletJinContext implements JinContext{
 
 
   /**
-   * TODO: Implement this. 
+   * Returns <code>true</code> immediately, since we're uploading all the
+   * preferences to the server when the applet is closed. 
    */
   
   public boolean storeUser(User user){
-    if (!JinUtilities.isKnownUser(this, user))
-      throw new IllegalArgumentException("Unknown user: " + user);
     
     // All the preferences are uploaded when the application is closed.
     return true;
@@ -731,6 +727,11 @@ public class AppletJinContext implements JinContext{
             out.writeBytes("users." + user.getUsername() + "\n");
             user.getPrefs().save(out);
           }
+          
+          User guest = server.getGuest();
+          out.writeByte('\n');
+          out.writeBytes("users.guest\n");
+          guest.getPrefs().save(out);
           
           out.writeBytes("Done");
     
