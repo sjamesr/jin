@@ -323,7 +323,8 @@ public class Style12Struct extends Struct{
 
   
   /**
-   * Returns a string representing the player whose turn it currently is.
+   * Returns a string representing the player whose turn it currently is, either
+   * "W" or "B".
    */
 
   public String getCurrentPlayer(){
@@ -557,6 +558,18 @@ public class Style12Struct extends Struct{
 
   public int getNextMoveNumber(){
     return getIntegerProperty("NextMoveNumber");
+  }
+
+
+
+
+  /**
+   * Returns the amount of plies since the beginning of the game. The method
+   * assumes that the first player to move was white.
+   */
+
+  public int getPlayedPlyCount(){
+    return (getNextMoveNumber()-1)*2 + (getCurrentPlayer().equals("B") ? 1 : 0);
   }
 
 
