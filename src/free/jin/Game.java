@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import free.chess.Position;
 import free.chess.WildVariant;
 import free.chess.Player;
+import free.util.Struct;
 
 
 /**
@@ -39,7 +40,7 @@ import free.chess.Player;
  * the <code>setInitialPosition</code> method).
  */
 
-public class Game{
+public class Game extends Struct{
 
 
   /**
@@ -63,15 +64,6 @@ public class Game{
    */
 
   public static final int ISOLATED_BOARD = 3;
-
-
-
-  /**
-   * All of the game properties are kept in this Hashtable. There are just too
-   * many of them to be confortably kept in instance variables :-)
-   */
-
-  private final Hashtable gameProperties = new Hashtable(100, 0.25f);
 
 
 
@@ -122,6 +114,8 @@ public class Game{
           String ratingCategoryString, boolean isRated, boolean isPlayed, String whiteTitles, 
           String blackTitles, boolean initiallyFlipped, Player userPlayer){
 
+    super(20);
+
     switch(gameType){
       case MY_GAME:
       case OBSERVED_GAME:
@@ -131,26 +125,25 @@ public class Game{
         throw new IllegalArgumentException("Unknown game type: "+gameType);
     }
 
-    setProperty("GameType", new Integer(gameType));
-    setProperty("WhiteName", whiteName);
+    setIntegerProperty("GameType", gameType);
+    setStringProperty("WhiteName", whiteName);
     setProperty("BlackName", blackName);
-    setProperty("WhiteTime", new Integer(whiteTime));
-    setProperty("WhiteInc", new Integer(whiteInc));
-    setProperty("BlackTime", new Integer(blackTime));
-    setProperty("BlackInc", new Integer(blackInc));
-    setProperty("WhiteRating", new Integer(whiteRating));
-    setProperty("BlackRating", new Integer(blackRating));
-    setProperty("IsRated", new Boolean(isRated));
-    setProperty("GameID", gameID);
-    setProperty("RatingCategoryString", ratingCategoryString);
-    setProperty("IsPlayed", new Boolean(isPlayed));
-    setProperty("WhiteTitles", whiteTitles);
-    setProperty("BlackTitles", blackTitles);
-    setProperty("InitiallyFlipped", new Boolean(initiallyFlipped));
-    if (userPlayer!=null)
-      setProperty("UserPlayer", userPlayer);
+    setIntegerProperty("WhiteTime", whiteTime);
+    setIntegerProperty("WhiteInc", whiteInc);
+    setIntegerProperty("BlackTime", blackTime);
+    setIntegerProperty("BlackInc", blackInc);
+    setIntegerProperty("WhiteRating", whiteRating);
+    setIntegerProperty("BlackRating", blackRating);
+    setBooleanProperty("IsRated", isRated);
+    setStringProperty("GameID", gameID);
+    setStringProperty("RatingCategoryString", ratingCategoryString);
+    setBooleanProperty("IsPlayed", isPlayed);
+    setStringProperty("WhiteTitles", whiteTitles);
+    setStringProperty("BlackTitles", blackTitles);
+    setBooleanProperty("InitiallyFlipped", initiallyFlipped);
+    setProperty("UserPlayer", userPlayer);
 
-    setProperty("IsTimeOdds", new Boolean((whiteTime!=blackTime)||(whiteInc!=blackInc)));
+    setBooleanProperty("IsTimeOdds", (whiteTime!=blackTime) || (whiteInc!=blackInc));
 
     this.initialPosition = initialPosition;
   }
@@ -244,66 +237,6 @@ public class Game{
 
   public WildVariant getVariant(){
     return initialPosition.getVariant();
-  }
-
-
-
-
-
-  /**
-   * Sets the value of the given property. A property may not have its value reset.
-   */
-
-  protected final void setProperty(Object property, Object propertyValue){
-    Object oldValue = gameProperties.put(property, propertyValue);
-    if (oldValue!=null){
-      gameProperties.put(property, oldValue);
-      throw new IllegalArgumentException("A property's value may not be reset - attempted to reset the value of "+property);
-    }
-  }
-
-
-
-
-  /**
-   * Returns the value of the given property.
-   */
-
-  protected final Object getProperty(Object property){
-    return gameProperties.get(property);
-  }
-
-
-
-
-  /**
-   * Returns the value of the given integer property.
-   */
-
-  protected final int getIntegerProperty(Object property){
-    return ((Integer)getProperty(property)).intValue();
-  }
-
-
-
-
-  /**
-   * Returns the value of the given string property.
-   */
-
-  protected final String getStringProperty(Object property){
-    return (String)getProperty(property);
-  }
-
-
-
-
-  /**
-   * Returns the value of the given boolean property.
-   */
-
-  protected final boolean getBooleanProperty(Object property){
-    return ((Boolean)getProperty(property)).booleanValue();
   }
 
 
