@@ -483,7 +483,28 @@ public class Jin{
    */
 
   public static String getInterfaceName(){
-    return getProperty("name")+" "+getProperty("version")+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")";
+    return getAppName()+" "+getAppVersion()+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")";
+  }
+
+
+
+
+  /**
+   * Returns the official name of the application.
+   */
+
+  public static String getAppName(){
+    return getProperty("name", "Jin");
+  }
+
+
+
+  /**
+   * Returns the version of the application.
+   */
+
+  public static String getAppVersion(){
+    return getProperty("version");
   }
 
 
