@@ -65,8 +65,8 @@ public class Bot extends ChessclubConnection{
     String password = args[3];
 
     try{
-      Bot bot = new Bot(hostname, port, username, password);
-      bot.connectAndLogin();
+      Bot bot = new Bot(username, password);
+      bot.connectAndLogin(hostname, port);
     } catch (IOException e){
         e.printStackTrace();
         System.exit(0);
@@ -77,12 +77,12 @@ public class Bot extends ChessclubConnection{
 
 
   /**
-   * Creates a new ServerBot which will connect to the given hostname on the
-   * given port and will use the given account and password.
+   * Creates a new Bot which will connect with the specified username and
+   * password.
    */
 
-  public Bot(String hostname, int port, String username, String password){
-    super(hostname, port, username, password, System.out);
+  public Bot(String username, String password){
+    super(username, password, System.out);
 
     setDGState(Datagram.DG_PERSONAL_TELL, true); // This lets people talk to us.
   }
@@ -96,7 +96,7 @@ public class Bot extends ChessclubConnection{
 
   private static void showUsage(){
     System.out.println("Usage: ");
-    System.out.println("  java "+Bot.class.getName()+" hostname port username password");
+    System.out.println("  java " + Bot.class.getName() + " hostname port username password");
   }
 
 

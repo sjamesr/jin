@@ -86,8 +86,8 @@ public class PlayerManagingConnection extends ChessclubConnection{
    * rating of all the players online will be available.
    */
 
-  public PlayerManagingConnection(String hostname, int port, String username, String password, PrintStream echoStream, int [] trackedDGs){
-    super(hostname,port,username,password,echoStream);
+  public PlayerManagingConnection(String username, String password, PrintStream echoStream, int [] trackedDGs){
+    super(username,password,echoStream);
 
     for (int i=0;i<trackedDGs.length;i++){
       switch (trackedDGs[i]){
