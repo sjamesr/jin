@@ -303,7 +303,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
       sendCommand(getRequestedUsername());
       if (getPassword() != null)
-        sendCommand(getPassword());
+        sendCommand(getPassword(), false);
     }
 
 
@@ -383,18 +383,26 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  
+  /**
+   * Sends the specified command to the server.
+   */
+   
+  public void sendCommand(String command){
+    sendCommand(command, true);
+  }
 
 
   /**
-   * Sends the given command to the server. You should not include the end of
-   * line symbol in the command.
+   * Sends the given command to the server, optionally echoing it to System.out.
    */
 
-  public synchronized void sendCommand(String command){
+  public synchronized void sendCommand(String command, boolean echo){
     if (!isConnected())
       throw new IllegalStateException("Not connected");
 
-    System.out.println("SENDING COMMAND: "+command);
+    if (echo)
+      System.out.println("SENDING COMMAND: " + command);
 
     try{
       out.write(command.getBytes());

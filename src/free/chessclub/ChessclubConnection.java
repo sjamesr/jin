@@ -732,7 +732,7 @@ public class ChessclubConnection extends free.util.Connection{
       if ((password == null) || (password.length() == 0))
         sendCommand(requestedUsername);
       else
-        sendCommand(requestedUsername+" "+password);
+        sendCommand(requestedUsername + " " + password, false);
     }
 
     synchronized(loginLock){
@@ -800,16 +800,24 @@ public class ChessclubConnection extends free.util.Connection{
 
 
 
+  
+  /**
+   * Sends the specified command to the server.
+   */
+   
+  public void sendCommand(String command){
+    sendCommand(command, true);
+  }
+  
 
 
   /**
-   * Sends the given command to the server.
+   * Sends the given command to the server, optionally echoing it to System.out.
    */
 
-  public synchronized void sendCommand(String command){
-    if (echoStream != null){
-      echoStream.println("SENDING COMMAND: "+command);
-    }
+  public synchronized void sendCommand(String command, boolean echo){
+    if (echo && (echoStream != null))
+      echoStream.println("SENDING COMMAND: " + command);
 
     if (!isConnected())
       throw new IllegalStateException("Not connected");
