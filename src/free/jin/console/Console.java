@@ -432,7 +432,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
     // We set it here because of a Swing bug which causes the background to be 
     // drawn with the foreground color if you set the background as an attribute.
-    String outputBg = getProperty("output-background");
+    String outputBg = getProperty("background");
     if (outputBg!=null)
       outputComponent.setBackground(StringParser.parseColor(outputBg));
 
