@@ -234,6 +234,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     clearButton.addActionListener(clearingActionListener);
     clearButton.setRequestFocusEnabled(false);
     
+    // We always want input component to have focus
+    inputComponent.setNextFocusableComponent(inputComponent);
+    
     JPanel bottomPanel = new JPanel(new BorderLayout());
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
     bottomPanel.add(clearButton, BorderLayout.EAST);
