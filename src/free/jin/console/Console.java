@@ -675,9 +675,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       int matchStart = result.start();
       int matchEnd = result.end();
 
-      Command command = new Command("url "+text.substring(matchStart,matchEnd), Command.SPECIAL_MASK|Command.BLANKED_MASK);
-      Link link = new Link(matchStart+oldTextLength, matchEnd+oldTextLength, command);
-      document.setCharacterAttributes(matchStart+oldTextLength, matchEnd-matchStart, urlAttributes, false);
+      Command command = new Command("url "+text.substring(matchStart,matchEnd),
+        Command.SPECIAL_MASK | Command.BLANKED_MASK);
+      Position linkStart = document.createPosition(matchStart + oldTextLength);
+      Position linkEnd = document.createPosition(matchEnd + oldTextLength);
+      Link link = new Link(linkStart, linkEnd, command);
+      document.setCharacterAttributes(matchStart + oldTextLength, matchEnd - matchStart, 
+        urlAttributes, false);
       outputComponent.addLink(link);
     }
 
@@ -687,9 +691,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       int matchStart = result.start();
       int matchEnd = result.end();
 
-      Command command = new Command("email "+text.substring(matchStart,matchEnd), Command.SPECIAL_MASK|Command.BLANKED_MASK);
-      Link link = new Link(matchStart+oldTextLength, matchEnd+oldTextLength, command);
-      document.setCharacterAttributes(matchStart+oldTextLength, matchEnd-matchStart, emailAttributes, false);
+      Command command = new Command("email "+text.substring(matchStart,matchEnd),
+        Command.SPECIAL_MASK | Command.BLANKED_MASK);
+      Position linkStart = document.createPosition(matchStart + oldTextLength);
+      Position linkEnd = document.createPosition(matchEnd + oldTextLength);
+      Link link = new Link(linkStart, linkEnd, command);
+      document.setCharacterAttributes(matchStart + oldTextLength, matchEnd - matchStart,
+        emailAttributes, false);
       outputComponent.addLink(link);
     }
 
@@ -717,9 +725,12 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         int matchStart = result.start(linkSubexpressionIndex);
         int matchEnd = result.end(linkSubexpressionIndex);
 
-        document.setCharacterAttributes(matchStart+oldTextLength, matchEnd-matchStart, commandAttributes, false);
+        document.setCharacterAttributes(matchStart + oldTextLength, matchEnd - matchStart,
+          commandAttributes, false);
 
-        Link link = new Link(matchStart+oldTextLength, matchEnd+oldTextLength, new Command(linkCommand,0));
+        Position linkStart = document.createPosition(matchStart + oldTextLength);
+        Position linkEnd = document.createPosition(matchEnd + oldTextLength);
+        Link link = new Link(linkStart, linkEnd, new Command(linkCommand,0));
         outputComponent.addLink(link);
       }
     }

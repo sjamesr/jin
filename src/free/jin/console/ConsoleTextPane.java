@@ -30,7 +30,6 @@ import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.lang.reflect.*;
-import free.workarounds.TranslatingGraphics;
 
 
 /**
@@ -255,7 +254,7 @@ public class ConsoleTextPane extends JTextPane{
     int selectionEnd = getSelectionEnd();
 
     if ((selection == null) || (selection.length() == 0) ||
-        !isAboveText(evt.getX(), evt.getY(), selectionStart, selectionEnd)){
+        !isOverText(evt.getX(), evt.getY(), selectionStart, selectionEnd)){
       int pressedLocation = viewToModel(evt.getPoint());
       if (pressedLocation == -1)
         return null;
@@ -264,7 +263,7 @@ public class ConsoleTextPane extends JTextPane{
         int wordStart = getWordStart(pressedLocation);
         int wordEnd = getWordEnd(pressedLocation);
         String text = getText();
-        if (isAboveText(evt.getX(), evt.getY(), wordStart, wordEnd)){
+        if (isOverText(evt.getX(), evt.getY(), wordStart, wordEnd)){
           selection = getDocument().getText(wordStart, wordEnd - wordStart);
           if (selection.trim().length() != 0) // Don't override current selection with whitespace selection
             select(wordStart, wordEnd);
@@ -702,10 +701,10 @@ public class ConsoleTextPane extends JTextPane{
     int numLinks = links.size();
     for (int i = 0; i < numLinks; i++){
       Link link = (Link)links.elementAt(i);
-      int linkStart = link.getStartIndex();
-      int linkEnd = link.getEndIndex();
+      int linkStart = link.getStartPosition().getOffset();
+      int linkEnd = link.getEndPosition().getOffset();
 
-      if (isAboveText(x, y, linkStart, linkEnd))
+      if (isOverText(x, y, linkStart, linkEnd))
         return link;
     }
 
@@ -720,7 +719,7 @@ public class ConsoleTextPane extends JTextPane{
    * character between the two specified positions in the text.
    */
 
-  protected boolean isAboveText(int x, int y, int startPos, int endPos){
+  protected boolean isOverText(int x, int y, int startPos, int endPos){
     Rectangle startCharRect, endCharRect;
     try{
       startCharRect = modelToView(startPos);
@@ -783,8 +782,8 @@ public class ConsoleTextPane extends JTextPane{
         String commandString = command.getCommandString();
 
         try{
-          int startIndex = link.getStartIndex();
-          int length = link.getEndIndex()-startIndex;
+          int startIndex = link.getStartPosition().getOffset();
+          int length = link.getEndPosition().getOffset() - startIndex;
           String linkText = getText(startIndex, length);
 
           if (linkText.equals(commandString))
