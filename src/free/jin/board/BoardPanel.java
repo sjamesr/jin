@@ -37,6 +37,7 @@ import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
 import free.util.swing.FullscreenPanel;
 import free.util.SquareLayout;
+import free.util.PlatformUtils;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.border.EmptyBorder;
@@ -371,14 +372,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     setLayout(new BorderLayout());
     add(fullscreenPanel, BorderLayout.CENTER);
 
-    KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
-    contentPanel.registerKeyboardAction(fullscreenAction, fullscreenKeyStroke, WHEN_FOCUSED);
+    // Fullscreen mode locks up the application under OS X.
+    if (PlatformUtils.isMacOSX()){
+      fullscreenButton.setEnabled(false);  
+    }
+    else{
+      KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
+      contentPanel.registerKeyboardAction(fullscreenAction, fullscreenKeyStroke, WHEN_FOCUSED);
+    }
   }
+  
 
 
-
-
-
+  
   /**
    * Adds the given UserMoveListener to the list of listeners receiving events about
    * moves made on the board by the user. 
@@ -1812,54 +1818,56 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (isMoveListTableSelectionUpdating)
       return;
 
-    isMoveListTableSelectionUpdating = true;
-
     int row = moveListTable.getSelectedRow();
     int column = moveListTable.getSelectedColumn();
 
     if ((row == -1) || (column == -1))
       return;
-
-    boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
-
-    int moveNum = column + row*2;
-    if (isFirstMoveBlack && (moveNum > 0))
-      moveNum--;
-
-    if (moveNum == madeMoves.size() + 1) // The user pressed the last empty cell
-      moveNum--;
-
-    if (moveNum > madeMoves.size()) // Shouldn't happen
-      throw new IllegalStateException();
-
-    Position pos = game.getInitialPosition();
-    for (int i = 0; i < moveNum; i++){
-      Move move = (Move)madeMoves.elementAt(i);
-      pos.makeMove(move);
-    }
-
-    board.clearShaded();
     
-    if ((moveNum == madeMoves.size()) && (queuedMove != null)){
-      pos.makeMove(queuedMove);
-      board.setShaded(queuedMove.getEndingSquare(), true);
-    }
+    isMoveListTableSelectionUpdating = true;
 
-    isBoardPositionUpdating = true;
-    board.getPosition().copyFrom(pos);
-    isBoardPositionUpdating = false;
-    setDisplayedMove(moveNum);
-
-    if (!isPositionScrollBarUpdating)
-      positionScrollBar.setValues(displayedMoveNumber, 1, 0, madeMoves.size() + 1); 
-
-    board.setEditable(displayedMoveNumber == madeMoves.size());
-
-    updateMoveHighlighting(false);
-
-    SwingUtilities.invokeLater(new MoveListScrollBarUpdater());
-
-    isMoveListTableSelectionUpdating = false;
+    try{
+      boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
+  
+      int moveNum = column + row*2;
+      if (isFirstMoveBlack && (moveNum > 0))
+        moveNum--;
+  
+      if (moveNum == madeMoves.size() + 1) // The user pressed the last empty cell
+        moveNum--;
+  
+      if (moveNum > madeMoves.size()) // Shouldn't happen
+        throw new IllegalStateException();
+  
+      Position pos = game.getInitialPosition();
+      for (int i = 0; i < moveNum; i++){
+        Move move = (Move)madeMoves.elementAt(i);
+        pos.makeMove(move);
+      }
+  
+      board.clearShaded();
+      
+      if ((moveNum == madeMoves.size()) && (queuedMove != null)){
+        pos.makeMove(queuedMove);
+        board.setShaded(queuedMove.getEndingSquare(), true);
+      }
+  
+      isBoardPositionUpdating = true;
+      board.getPosition().copyFrom(pos);
+      isBoardPositionUpdating = false;
+      setDisplayedMove(moveNum);
+  
+      if (!isPositionScrollBarUpdating)
+        positionScrollBar.setValues(displayedMoveNumber, 1, 0, madeMoves.size() + 1); 
+  
+      board.setEditable(displayedMoveNumber == madeMoves.size());
+  
+      updateMoveHighlighting(false);
+  
+      SwingUtilities.invokeLater(new MoveListScrollBarUpdater());
+    } finally{
+        isMoveListTableSelectionUpdating = false;
+      }
   }
 
 
@@ -1874,11 +1882,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (source == positionScrollBar){
       if (isPositionScrollBarUpdating)
         return;
+      
+      System.out.println("1");
 
       isPositionScrollBarUpdating = true;
 
       if (madeMoves.size() > 0){
         int moveNum = positionScrollBar.getValue();
+        System.out.println("moveNum: "+moveNum);
 
         boolean isFirstMoveBlack = ((Move)madeMoves.elementAt(0)).getPlayer().isBlack();
         int visualMoveNumber = isFirstMoveBlack ? moveNum + 1 : moveNum;
@@ -1886,6 +1897,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         int column = (visualMoveNumber == 0) ? 0 : 2 - (visualMoveNumber%2);
 
         if (!isMoveListTableSelectionUpdating){
+          System.out.println("row="+row+" column="+column);
           setMoveListTableSelection(row, column);
         }
       }
