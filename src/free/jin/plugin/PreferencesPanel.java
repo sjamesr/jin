@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.hightemplar.com/jin/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2002, 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -44,9 +44,11 @@ public abstract class PreferencesPanel extends JPanel{
 
   /**
    * Applies the changes done by the user.
+   *
+   * @throws BadChangesException if the changes done by the user are invalid.
    */
 
-  public abstract void applyChanges();
+  public abstract void applyChanges() throws BadChangesException;
 
 
 
