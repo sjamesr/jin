@@ -39,9 +39,10 @@ import free.util.PlatformUtils;
 
 
 /**
- * An implementation of the <code>UIProvider</code> interface via a single
- * main container, a <code>JDesktopPane</code> and <code>JInternalFrames</code>
- * for ui containers.
+ * An MDI implementation of <code>UIProvider</code> - each
+ * <code>PluginUIContainer</code> is implemented via a
+ * <code>JInternalFrame</code>, all of which sit inside a main
+ * <code>JFrame</code>.
  */
 
 public class MdiUiProvider implements UIProvider{
@@ -49,18 +50,10 @@ public class MdiUiProvider implements UIProvider{
 
 
   /**
-   * Jin's instance.
-   */
-   
-  private final Jin jin;
-  
-  
-  
-  /**
-   * The main container.
+   * The main frame.
    */
 
-  private final TopLevelContainer mainContainer;
+  private JFrame mainFrame;
 
 
 
@@ -68,7 +61,7 @@ public class MdiUiProvider implements UIProvider{
    * The desktop pane.
    */
 
-  private final AdvancedJDesktopPane desktop;
+  private AdvancedJDesktopPane desktop;
 
 
 
@@ -76,7 +69,7 @@ public class MdiUiProvider implements UIProvider{
    * The menubar.
    */
 
-  private final JMenuBar menubar;
+  private JMenuBar menubar;
 
 
 
@@ -93,7 +86,7 @@ public class MdiUiProvider implements UIProvider{
    * The connection menu.
    */
 
-  private final ConnectionMenu connMenu;
+  private ConnectionMenu connMenu;
   
   
   
@@ -101,7 +94,7 @@ public class MdiUiProvider implements UIProvider{
    * The preferences menu.
    */
 
-  private final PreferencesMenu prefsMenu;
+  private PreferencesMenu prefsMenu;
 
 
 
@@ -109,7 +102,7 @@ public class MdiUiProvider implements UIProvider{
    * The help menu.
    */
 
-  private final JMenu helpMenu;
+  private JMenu helpMenu;
 
 
 
@@ -117,26 +110,34 @@ public class MdiUiProvider implements UIProvider{
    * The internal frame switcher that tracks the order of internal frames.
    */
 
-  private final InternalFrameSwitcher frameSwitcher;
+  private InternalFrameSwitcher frameSwitcher;
 
 
   
   /**
-   * Creates a new <code>MdiUiProvider</code> with the specified
-   * main container. The Jin instance must be passed here because this
-   * constructor is invoked from Jin's constructor, at which point Jin's
-   * instance is not yet available via <code>Jin.getInstance()</code>. 
+   * Creates a new <code>MdiUiProvider</code>.
    */
 
-  public MdiUiProvider(Jin jin, TopLevelContainer mainContainer){
-    this.jin = jin;
-    this.mainContainer = mainContainer;
+  public MdiUiProvider(){
+    
+  }
+  
 
+
+  /**
+   * Creates all the UI, makes the main frame visible and then invokes the
+   * <code>start</code> method of the connection manager.
+   */
+   
+  public void start(){
+    mainFrame = createMainFrame();
+    Jin.getInstance().restoreFrameGeometry(mainFrame, "frame");
+    
     configureDesktop(desktop = new AdvancedJDesktopPane());
     configureMenubar(menubar = new JMenuBar());
 
-    mainContainer.setContentPane(desktop);
-    mainContainer.setMenuBar(menubar);
+    mainFrame.setContentPane(desktop);
+    mainFrame.setJMenuBar(menubar);
 
     menubar.add(connMenu = new ConnectionMenu());
     menubar.add(prefsMenu = new PreferencesMenu());
@@ -149,7 +150,48 @@ public class MdiUiProvider implements UIProvider{
     try{
       FocusManager.setCurrentManager(new FocusManager());
     } catch (SecurityException e){}
+    
+    
+    mainFrame.addWindowListener(new WindowAdapter(){
+      public void windowOpened(WindowEvent evt){
+        mainFrame.removeWindowListener(this);
+        
+        // Workaround - otherwise menu activation shortcuts don't work
+        // immediately. Under OS X, in native menubar mode, this actually breaks things.
+        if ((mainFrame.getJMenuBar() != null) &&
+            (mainFrame.getFocusOwner() != null) &&
+            !PlatformUtils.isMacOSX()){
+          mainFrame.getJMenuBar().requestFocus();
+        }
+
+        Jin.getInstance().getConnManager().start();
+      }
+    });
+    
+    mainFrame.setVisible(true);
   }
+
+  
+  
+  /**
+   * Creates and configures the main frame.
+   */
+
+  private JFrame createMainFrame(){
+    JFrame frame = new JFrame();
+    
+    frame.setTitle(Jin.getInstance().getAppName());
+    frame.setIconImage(frame.getToolkit().getImage(getClass().getResource("resources/icon.gif")));
+    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    frame.addWindowListener(new WindowAdapter(){
+      public void windowClosing(WindowEvent evt){
+        Jin.getInstance().quit(true);
+      }
+    });
+
+    return frame;
+  }
+  
 
 
 
@@ -158,7 +200,7 @@ public class MdiUiProvider implements UIProvider{
    */
 
   private void configureDesktop(AdvancedJDesktopPane desktop){
-    Preferences prefs = jin.getPrefs();
+    Preferences prefs = Jin.getInstance().getPrefs();
 
     Color bgColor = prefs.getColor("desktop.bgcolor", null);
     String wallpaper = prefs.getString("desktop.wallpaper.filename", null);
@@ -190,7 +232,7 @@ public class MdiUiProvider implements UIProvider{
   private void configureMenubar(JMenuBar menubar){
     
   }
-
+  
 
 
   /**
@@ -199,7 +241,7 @@ public class MdiUiProvider implements UIProvider{
    */
 
   public void showDialog(DialogPanel dialog, Component parent){
-    Frame parentFrame = mainContainer.getTopMostFrame();
+    Frame parentFrame = mainFrame;
     if (parent != null)
       parentFrame = AWTUtilities.frameForComponent(parent);
 
@@ -244,20 +286,34 @@ public class MdiUiProvider implements UIProvider{
       addPluginMenus(session.getPlugins());
       loadSelectedFrame(session);
       
-      mainContainer.setTitle(session.getUser().getUsername() + " at " + session.getServer().getShortName());
+      mainFrame.setTitle(session.getUser().getUsername() + " at " 
+                          + session.getServer().getShortName() + 
+                          " - " + Jin.getInstance().getAppName());
     }
     else{
       removePluginMenus();
       saveSelectedFrame(session);
       removePluginContainers();
       
-      mainContainer.setTitle("");
+      mainFrame.setTitle(Jin.getInstance().getAppName());
     }
 
     // Bugfix - otherwise activating the menu via keyboard stops working.
     // On OS X, with native menubar, this actually breaks things.
     if (!isConnected && !PlatformUtils.isMacOSX())
       menubar.requestFocus();
+  }
+  
+  
+  
+  /**
+   * Stores our state (such as main window bounds) to preferences and disposes
+   * of the main window.
+   */
+   
+  public void stop(){
+    Jin.getInstance().saveFrameGeometry(mainFrame, "frame");
+    mainFrame.dispose();    
   }
 
 
@@ -461,7 +517,7 @@ public class MdiUiProvider implements UIProvider{
 
       if (!connected && (session != null)){
         User user = session.getUser();
-        if (jin.isKnownUser(user) && !user.isGuest()){
+        if (Jin.getInstance().isKnownUser(user) && !user.isGuest()){
           recentAccounts.removeElement(user);
           recentAccounts.insertElementAt(user, 0);
           updateRecentAccountsMenuItems();
@@ -480,14 +536,14 @@ public class MdiUiProvider implements UIProvider{
      */
 
     public void actionPerformed(ActionEvent evt){
-      ConnectionManager connManager = jin.getConnManager();
+      ConnectionManager connManager = Jin.getInstance().getConnManager();
       Object source = evt.getSource();
       if (source == newConnection){
         connManager.displayNewConnUI();
       }
       else if (source == closeConnection){
         Object result = OptionPanel.OK;
-        Session session = jin.getConnManager().getSession();
+        Session session = Jin.getInstance().getConnManager().getSession();
         if ((session != null) && session.isConnected()){
           result = OptionPanel.confirm("Close Session?",
             "Disconnect from the server and close the session?", OptionPanel.OK);
@@ -497,12 +553,12 @@ public class MdiUiProvider implements UIProvider{
           connManager.closeSession();
       }
       else if (source == exit){
-        jin.quit(true);
+        Jin.getInstance().quit(true);
       }
       else{ // One of the recent account menu items
         int index = Utilities.indexOf(getMenuComponents(), source);
         User user = (User)recentAccounts.elementAt(index - separatorIndex - 1);
-        connManager.displayNewConnUI(user.getServer(), user.getPreferredConnDetails());
+        connManager.displayNewConnUI(user);
       }
     }
 
@@ -552,18 +608,18 @@ public class MdiUiProvider implements UIProvider{
 
     private Vector loadRecentAccounts(){
       Vector accounts = new Vector(MAX_RECENT_LIST);
-      Preferences prefs = jin.getPrefs();
+      Preferences prefs = Jin.getInstance().getPrefs();
 
       int count = prefs.getInt("accounts.recent.count", 0);
       for (int i = 0; i < count; i++){
         String username = prefs.getString("accounts.recent." + i + ".username");
         String serverId = prefs.getString("accounts.recent." + i + ".serverId");
 
-        Server server = jin.getServerById(serverId);
+        Server server = Jin.getInstance().getServerById(serverId);
         if (server == null)
           continue;
 
-        User user = jin.getUser(server, username);
+        User user = Jin.getInstance().getUser(server, username);
         if (user == null)
           continue;
 
@@ -582,7 +638,7 @@ public class MdiUiProvider implements UIProvider{
      */
 
     private void saveRecentAccounts(Vector accounts){
-      Preferences prefs = jin.getPrefs();
+      Preferences prefs = Jin.getInstance().getPrefs();
 
       int count = accounts.size();
       prefs.setInt("accounts.recent.count", count);
@@ -738,18 +794,17 @@ public class MdiUiProvider implements UIProvider{
       if (source == bgMenu)
         showBGDialog();
       else if (source == lnfMenu){
-        Frame topMostFrame = mainContainer.getTopMostFrame();
-        JDialog dialog = new PrefsDialog(topMostFrame, "Look and Feel Selection", 
-          new LookAndFeelPrefPanel(new Component[]{topMostFrame}));
-        AWTUtilities.centerWindow(dialog, topMostFrame);
+        JDialog dialog = new PrefsDialog(mainFrame, "Look and Feel Selection", 
+          new LookAndFeelPrefPanel(new Component[]{mainFrame}));
+        AWTUtilities.centerWindow(dialog, mainFrame);
         dialog.setVisible(true);
       }
       else{
         int pluginIndex = Integer.parseInt(actionCommand);
         Plugin plugin = plugins[pluginIndex];
-        JDialog dialog = new PrefsDialog(mainContainer.getTopMostFrame(), 
+        JDialog dialog = new PrefsDialog(mainFrame, 
           plugin.getName() + " Preferences", plugin.getPreferencesUI());
-        AWTUtilities.centerWindow(dialog, mainContainer.getTopMostFrame());
+        AWTUtilities.centerWindow(dialog, mainFrame);
         dialog.setVisible(true);
       }
     }
@@ -761,11 +816,11 @@ public class MdiUiProvider implements UIProvider{
      */
 
     private void showBGDialog(){
-      Preferences prefs = jin.getPrefs();
+      Preferences prefs = Jin.getInstance().getPrefs();
       String wallpaperFilename = prefs.getString("desktop.wallpaper.filename", null);
       File currentImageFile = wallpaperFilename == null ? null : new File(wallpaperFilename);
       
-      BackgroundChooser bChooser = new BackgroundChooser(mainContainer.getTopMostFrame(), desktop,
+      BackgroundChooser bChooser = new BackgroundChooser(mainFrame, desktop,
         null, null, AdvancedJDesktopPane.CENTER, desktop.getBackground(), currentImageFile, 
         desktop.getWallpaperLayoutStyle());
       bChooser.setVisible(true);
@@ -1026,7 +1081,7 @@ public class MdiUiProvider implements UIProvider{
   
       int margin = 50;
       Dimension prefSize = frame.getPreferredSize();
-      Dimension contentPaneSize = mainContainer.getContentPane().getSize();
+      Dimension contentPaneSize = mainFrame.getContentPane().getSize();
       double w = Math.min(prefSize.width, contentPaneSize.width - margin);
       double h = Math.min(prefSize.height, contentPaneSize.height - margin);
       double x = (contentPaneSize.width - margin - w)/2;
@@ -1316,14 +1371,14 @@ public class MdiUiProvider implements UIProvider{
             break;
           case CLOSE_SESSION_ON_CLOSE:
             Object result = OptionPanel.OK;
-            Session session = jin.getConnManager().getSession();
+            Session session = Jin.getInstance().getConnManager().getSession();
             if ((session != null) && session.isConnected()){
               result = OptionPanel.confirm("Close Session?",
                 "Close this window and disconnect?", OptionPanel.OK);
             }
 
             if (result == OptionPanel.OK)
-              jin.getConnManager().closeSession();
+              Jin.getInstance().getConnManager().closeSession();
             break;
           case DO_NOTHING_ON_CLOSE:
             firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_CLOSING));
@@ -1374,7 +1429,7 @@ public class MdiUiProvider implements UIProvider{
      */
 
     public void processKeyEvent(Component focusedComponent, KeyEvent evt){
-      if (!SwingUtilities.isDescendingFrom(evt.getComponent(), mainContainer.getContentPane())){
+      if (!SwingUtilities.isDescendingFrom(evt.getComponent(), mainFrame.getContentPane())){
         super.processKeyEvent(focusedComponent, evt);
         return;
       }

@@ -80,14 +80,6 @@ public class Jin{
   
   
   /**
-   * The main Jin frame.
-   */
-   
-  private final JFrame mainFrame;
-  
-  
-  
-  /**
    * The ui provider.
    */
    
@@ -133,14 +125,8 @@ public class Jin{
     // Apply Swing fixes
     fixSwing();
 
-    // Create the main frame
-    mainFrame = createMainFrame();
-    
-    // Restore the main frame geometry
-    restoreFrameGeometry(mainFrame, "frame");
-
     // Create the UI manager
-    uiProvider = new MdiUiProvider(this, TopLevelContainer.getFor(mainFrame, mainFrame.getTitle()));
+    uiProvider = new MdiUiProvider();
 
     // Create the connection manager
     connManager = new ConnectionManager();
@@ -179,22 +165,7 @@ public class Jin{
    */
 
   public void start(){
-    mainFrame.addWindowListener(new WindowAdapter(){
-      public void windowOpened(WindowEvent evt){
-        mainFrame.removeWindowListener(this);
-        
-        // Workaround - otherwise menu activation shortcuts don't work
-        // immediately. Under OS X, in native menubar mode, this actually breaks things.
-        if ((mainFrame.getJMenuBar() != null) &&
-            (mainFrame.getFocusOwner() != null) &&
-            !PlatformUtils.isMacOSX()){
-          mainFrame.getJMenuBar().requestFocus();
-        }
-
-        connManager.start();
-      }
-    });
-    mainFrame.setVisible(true);
+    uiProvider.start();
   }
   
   
@@ -260,33 +231,13 @@ public class Jin{
   
   
   
-  /**
-   * Creates and configures the main Jin frame.
-   */
-
-  private JFrame createMainFrame(){
-    JFrame frame = new JFrame();
-    
-    frame.setTitle(appProps.getProperty("frame.title", "Jin"));
-    frame.setIconImage(frame.getToolkit().getImage(getClass().getResource("resources/icon.gif")));
-    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    frame.addWindowListener(new WindowAdapter(){
-      public void windowClosing(WindowEvent evt){
-        quit(true);
-      }
-    });
-
-    return frame;
-  }
-
-  
-  
   
   /**
    * Restores the geometry of the specified frame from the preferences.
+   * This is a helper method for the various UIProviders. 
    */
    
-  private void restoreFrameGeometry(JFrame frame, String prefNamePrefix){
+  void restoreFrameGeometry(JFrame frame, String prefNamePrefix){
     Preferences prefs = context.getPrefs();
     
     Dimension screenSize = frame.getToolkit().getScreenSize();
@@ -318,10 +269,11 @@ public class Jin{
   
   /**
    * Saves the geometry of the specified frame into the preferences
-   * with preference names prefixed with the specified string.
+   * with preference names prefixed with the specified string. This is a helper
+   * method for the various UIProviders.
    */
 
-  private void saveFrameGeometry(JFrame frame, String prefNamePrefix){
+  void saveFrameGeometry(JFrame frame, String prefNamePrefix){
     Preferences prefs = context.getPrefs();
     
     // Save bounds on screen
@@ -623,15 +575,13 @@ public class Jin{
     
     if (result == OptionPanel.OK){
       connManager.closeSession();
-      saveFrameGeometry(mainFrame, "frame");
       saveLookAndFeel();
+      uiProvider.stop();
       
       User [] usersArr = new User[users.size()];
       users.copyInto(usersArr);
       context.setUsers(usersArr);
   
-      mainFrame.dispose();
-
       instance = null;      
       
       context.shutdown();
