@@ -6,9 +6,3 @@ login.hostname = chessclub.com
 login.port = 5000
 
 plugins=ChessclubConsoleManager;SoundManager;ChessclubBoardManager;SoughtGraphPlugin
-
-chessclub-board-manager.piece-set-class-name = free.jin.chessclub.board.ChessclubVectorPiecePainter
-
-chessclub-board-manager.piece-set-count = 2
-chessclub-board-manager.piece-set-0=Blitzin Vector Pieces;free.jin.chessclub.board.ChessclubVectorPiecePainter
-chessclub-board-manager.piece-set-1=Eboard Vector Pieces;free.chess.art.EboardVectorPiecePainter
