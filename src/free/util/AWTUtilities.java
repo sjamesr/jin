@@ -46,7 +46,7 @@ public class AWTUtilities{
 
     Dimension size = target.getSize();
     Rectangle parentBounds = parent == null || !parent.isShowing() ? 
-      new Rectangle(target.getToolkit().getScreenSize()) :
+      getUsableScreenBounds() :
       new Rectangle(parent.getLocationOnScreen(), parent.getSize());
 
     target.setLocation(parentBounds.x + (parentBounds.width - size.width)/2, parentBounds.y + (parentBounds.height - size.height)/2);
@@ -166,6 +166,60 @@ public class AWTUtilities{
         catch (InvocationTargetException e){e.printStackTrace();}
     }
   }
+  
+  
+  
+  /**
+   * Attempts to determine the usable screen bounds of the default screen
+   * device. If the require java.awt API is not available under the JVM we're
+   * running in, this will simply return the screen bounds obtained via
+   * <code>Toolkit.getScreenSize()</code>.
+   */
+  
+  public static Rectangle getUsableScreenBounds(){
+    if (PlatformUtils.isJavaBetterThan("1.4")){
+      try{
+        Class graphicsEnvironmentClass = Class.forName("java.awt.GraphicsEnvironment");
+        Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
+        Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
+        
+        Class [] emptyClassArr = new Class[0];
+        Method getLocalGraphicsEnvironmentMethod = 
+          graphicsEnvironmentClass.getMethod("getLocalGraphicsEnvironment", emptyClassArr);
+        Method getDefaultScreenDeviceMethod = 
+          graphicsEnvironmentClass.getMethod("getDefaultScreenDevice", emptyClassArr);
+        Method getDefaultConfigurationMethod =
+          graphicsDeviceClass.getMethod("getDefaultConfiguration", emptyClassArr);
+        Method getBoundsMethod = 
+          graphicsConfigurationClass.getMethod("getBounds", emptyClassArr);
+        Method getScreenInsetsMethod = 
+          Toolkit.class.getMethod("getScreenInsets", new Class[]{graphicsConfigurationClass});
+        
+        Object [] emptyObjArr = new Object[0];
+        Object graphicsEnvironment = getLocalGraphicsEnvironmentMethod.invoke(null, emptyObjArr);
+        Object defaultScreenDevice = getDefaultScreenDeviceMethod.invoke(graphicsEnvironment, emptyObjArr);
+        Object defaultConfiguration = getDefaultConfigurationMethod.invoke(defaultScreenDevice, emptyObjArr);
+        Rectangle bounds = (Rectangle)getBoundsMethod.invoke(defaultConfiguration, emptyObjArr);
+        Insets insets = 
+          (Insets)getScreenInsetsMethod.invoke(Toolkit.getDefaultToolkit(), new Object[]{defaultConfiguration});
+        
+        bounds.x += insets.left;
+        bounds.y += insets.top;
+        bounds.width -= insets.left + insets.right;
+        bounds.height -= insets.top + insets.bottom;
+        
+        return bounds;
+      } catch (ClassNotFoundException e){e.printStackTrace();}
+        catch (SecurityException e){e.printStackTrace();}
+        catch (NoSuchMethodException e){e.printStackTrace();}
+        catch (IllegalArgumentException e){e.printStackTrace();}
+        catch (IllegalAccessException e){e.printStackTrace();}
+        catch (InvocationTargetException e){e.printStackTrace();}
+    }
+
+    return new Rectangle(new Point(0, 0), Toolkit.getDefaultToolkit().getScreenSize());
+  }
+  
   
   
   
