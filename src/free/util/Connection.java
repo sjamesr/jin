@@ -363,7 +363,7 @@ public abstract class Connection{
   
   public synchronized void disconnect() throws IOException{
     if (!isConnected())
-      throw new IllegalArgumentException();
+      throw new IllegalStateException("Not connected already");
 
     isConnected = false;
     isLoggedIn = false;
