@@ -207,11 +207,13 @@ class CommandsScriptDialog extends ScriptDialog{
     try{
       Object [][] vars = scripter.getAvailableVariables(eventType, selectedSubtypes);
       Interpreter bsh = new Interpreter();
-      for (int i = 0; i < vars.length; i++){
-        Object [] var = vars[i];
-        String name = (String)var[0];
-        Object value = var[1];
-        bsh.set(name, value);
+      if (vars != null){
+        for (int i = 0; i < vars.length; i++){
+          Object [] var = vars[i];
+          String name = (String)var[0];
+          Object value = var[1];
+          bsh.set(name, value);
+        }
       }
       Object val = bsh.eval(condition);
       if (!(val instanceof Boolean))
