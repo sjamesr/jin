@@ -27,11 +27,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Enumeration;
 import free.util.swing.IntegerStrictPlainDocument;
-import free.util.Utilities;
+import free.util.swing.SwingUtils;
+import free.util.TextUtilities;
+import free.util.AWTUtilities;
+import free.util.WindowDisposingActionListener;
 
 
 
@@ -40,6 +40,14 @@ import free.util.Utilities;
  */
 
 public abstract class StandardLoginDialog implements LoginDialog{
+
+
+  /**
+   * The <code>Server</code> we're trying to login to.
+   */
+
+  protected final Server server;
+
 
 
 
@@ -51,106 +59,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
 
-
-  /**
-   * The <code>Properties</code> we use as default values for the various fields
-   * in this dialog.
-   */
-
-  protected final Properties props;
-
-
-
-  /**
-   * The <code>Server</code> we're trying to login to.
-   */
-
-  protected final Server server;
-
-
-
-  /**
-   * The JTextField containing the user's username.
-   */
-
-  protected JTextField usernameField;
-
-
-
-
-  /**
-   * The JPasswordField containing the user's password.
-   */
-
-  protected JPasswordField passwordField;
-
-
-
-  /**
-   * The JComboBox containing the hostname of the server to connect to.
-   */
-
-  protected JComboBox hostnameBox;
-
-
-
-  /**
-   * The JTextField containing the port to connect on.
-   */
-
-  protected JTextField portField;
-
-
-
-  /**
-   * The JCheckBox saying whether to save the user's password.
-   */
-
-  protected JCheckBox savePasswordCheckBox;
-
-
-
-  /**
-   * The default button.
-   */
-
-  protected JButton defaultButton = null;
-
-
-
-  /**
-   * True if the user canceled the connection, false otherwise.
-   */
-
-  private boolean isCanceled = true;
-
-
-
-  /**
-   * The dialog we open.
-   */
-
-  protected JDialog dialog;
-
-
-
-
-  /**
-   * An action listener which cancels the dialog. It is attached to a "Cancel"
-   * button and registered as the ActionListener for an ESCAPE keystroke.
-   */
-
-  private final ActionListener closeActionListener = new ActionListener(){
-
-    public void actionPerformed(ActionEvent evt){
-      cancel();
-    }
-    
-  };
-
-
-
-  /**
+ /**
    * The "hint" user that was given to us.
    */
 
@@ -159,11 +68,91 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
 
   /**
-   * The <code>User</code> we're going to return.
+   * The <code>User</code> we're going to return. Also used as a flag to
+   * indicate whether the user cancelled the dialog.
    */
 
-  protected User resultUser = null;
+  private User resultUser = null;
 
+
+
+
+  /**
+   * The JTextField containing the user's username.
+   */
+
+  private final JTextField usernameField;
+
+
+
+
+  /**
+   * The JPasswordField containing the user's password.
+   */
+
+  private final JPasswordField passwordField;
+
+
+
+  /**
+   * The JComboBox containing the hostname of the server to connect to.
+   */
+
+  private final JComboBox hostnameBox;
+
+
+
+  /**
+   * The JTextField containing the port to connect on.
+   */
+
+  private final JTextField portField;
+
+
+
+  /**
+   * The JCheckBox saying whether to save the user's password.
+   */
+
+  private final JCheckBox savePWCheckBox;
+
+
+
+  /**
+   * The JDialog we show the user.
+   */
+
+  protected JDialog dialog = null;
+
+
+
+
+  /**
+   * The real constructor.
+   */
+
+  private StandardLoginDialog(String title, Server server, User hintUser){
+    if (server == null)
+      throw new IllegalArgumentException("Server may not be null");
+
+    this.title = title;
+    this.hintUser = hintUser;
+    this.server = server;
+
+    String username = getProperty("login.username", "");
+    String password = getProperty("login.password", "");
+    String [] hostnames = TextUtilities.getTokens(getProperty("login.hosts", null), ";");
+    String hostname = getProperty("login.hostname", hostnames[0]);
+    String port = getProperty("login.port", "");
+    boolean savePassword = "true".equalsIgnoreCase(getProperty("login.savepassword", "false"));
+
+    usernameField = new FixedJTextField(username);
+    passwordField = new FixedJPasswordField(password);
+    hostnameBox = new FixedJComboBox(hostnames);
+    hostnameBox.setSelectedItem(hostname);
+    portField = new FixedJTextField(new IntegerStrictPlainDocument(0, 65535, 10), port, 5);
+    savePWCheckBox = new JCheckBox("Save password", savePassword);
+  }
 
 
 
@@ -174,10 +163,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   public StandardLoginDialog(String title, User hintUser){
-    this.title = title;
-    this.props = getUserProperties(hintUser);
-    this.hintUser = hintUser;
-    this.server = hintUser.getServer();
+    this(title, hintUser.getServer(), hintUser);
   }
 
 
@@ -190,128 +176,77 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   public StandardLoginDialog(String title, Server server){
-    this.title = title;
-    this.props = getServerProperties(server);
-    this.hintUser = null;
-    this.server = server;
+    this(title, server, null);
   }
 
 
 
 
   /**
-   * Grabs the properties needed to be used as default values for this login
-   * dialog from the specified <code>User</code>, puts them into a
-   * <code>Properties</code> object and returns it.
+   * Returns the property with the specified name. If the hint user is not
+   * <code>null</code>, its property with the specified name is returned,
+   * otherwise, if not null, the server's property, otherwise, the specified
+   * default value.
    */
 
-  protected Properties getUserProperties(User user){
-    Properties props = new Properties();
-    Utilities.put(props, "login.hostname", user.getProperty("login.hostname"));
-    Utilities.put(props, "login.port", user.getProperty("login.port"));
-    Utilities.put(props, "login.username", user.getProperty("login.username"));
-    Utilities.put(props, "login.password", user.getProperty("login.password"));
-    Utilities.put(props, "login.hosts", user.getProperty("login.hosts"));
-    Utilities.put(props, "login.savepassword", user.getProperty("login.savepassword"));
-
-    return props;
+  protected String getProperty(String propertyName, String defaultValue){
+    String val = hintUser == null ? 
+      server.getProperty(propertyName) : hintUser.getProperty(propertyName);
+    return val == null ? defaultValue : val;
   }
 
 
 
-
-  /**
-   * Grabs the properties needed to be used as default values for this login
-   * dialog from the specified <code>Server</code>, puts them into a
-   * <code>Properties</code> object and returns it.
-   */
-
-  protected Properties getServerProperties(Server server){
-    Properties props = new Properties();
-    Utilities.put(props, "login.hostname", server.getProperty("login.hostname"));
-    Utilities.put(props, "login.port", server.getProperty("login.port"));
-    Utilities.put(props, "login.username", server.getProperty("login.username"));
-    Utilities.put(props, "login.password", server.getProperty("login.password"));
-    Utilities.put(props, "login.hosts", server.getProperty("login.hosts"));
-    Utilities.put(props, "login.savepassword", server.getProperty("login.savepassword"));
-
-    return props;
-  }
-
-
-
-
-  /**
-   * Cancels the dialog, disposing of it with the <code>isCanceled</code> method
-   * returning <code>true</code>.
-   */
-
-  protected void cancel(){
-    isCanceled = true;
-    dialog.dispose();
-  }
-
-
-
-
-  /**
-   * Proceeds with the login process. Disposes of the dialog with the
-   * <code>isCanceled</code> method returning <code>false</code>.
-   */
-  
-  protected void proceed(){
-    isCanceled = false;
-
-    dialog.dispose();
-  }
-
-
-
-
-  /**
-   * This method determines whether the currently specified user details are
-   * sufficiently different from the details of the hint user so as to warrant
-   * the creation of a new User object. The default implementation checks
-   * whether the usernames are different (case insensitively).
-   */
-
-  protected boolean shouldCreateNewUser(){
-    return (hintUser == null) || !usernameField.getText().equalsIgnoreCase(hintUser.getUsername()); 
-  }
-
-
-
- 
 
   /**
    * Shows the user the login dialog and waits for the user to either ok or
    * cancel.
    */
 
-  public void show(Component parentComponent){
-    Frame parentFrame = parentComponent instanceof Frame ?
-      (Frame)parentComponent :
-      (Frame)SwingUtilities.getAncestorOfClass(Frame.class, parentComponent);
+  public void show(Component parent){
+    if (dialog != null)
+      throw new IllegalStateException("Dialog already shown");
 
-    dialog = new JDialog(parentFrame, title ,true){
+    dialog = new JDialog(AWTUtilities.frameForComponent(parent), title ,true){
 
       private boolean painted = false;
     
-      public void paint(Graphics g){ // Hack to set the focus and the default button to be where we want them,
-                                     // because nothing else seems to work.
+      // Hack to set the focus where we want it.
+      public void paint(Graphics g){ 
+                                     
         if (!painted){
           painted = true;
           if (usernameField.getText().length() == 0)
             usernameField.requestFocus();
           else if (passwordField.getPassword().length == 0)
             passwordField.requestFocus();
-          else
-            defaultButton.requestFocus();
+          else{
+            JButton defaultButton = getRootPane().getDefaultButton();
+            if (defaultButton != null)
+              defaultButton.requestFocus();
+          }
         }
         super.paint(g);
       }
     
     };
+
+    addComponents(dialog, usernameField, passwordField, hostnameBox, portField, savePWCheckBox);
+
+    AWTUtilities.centerWindow(dialog, parent);
+    dialog.setVisible(true);
+  }
+
+
+
+
+  /**
+   * Adds all the components to the dialog, in the appropriate layout.
+   */
+                             
+  protected void addComponents(JDialog dialog, JTextField usernameField,
+    JPasswordField passwordField, JComboBox hostnameBox, JTextField portField,
+    JCheckBox savePWCheckBox){
 
     dialog.setResizable(true); // Setting it to false causes problems on KDE.
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -319,12 +254,12 @@ public abstract class StandardLoginDialog implements LoginDialog{
     JComponent content = new JPanel(new BorderLayout());
     dialog.setContentPane(content);
 
-    KeyStroke closeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    content.registerKeyboardAction(closeActionListener, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    SwingUtils.registerEscapeCloser(dialog);
 
     Component guestPanel = createGuestsPanel(dialog);
-    Component advancedOptionsPanel = createAdvancedOptionsPanel(dialog);
-    Component membersPanel = createMembersPanel(dialog);
+    Component advancedOptionsPanel = createAdvancedOptionsPanel(dialog, hostnameBox, portField);
+    Component membersPanel = 
+      createMembersPanel(dialog, usernameField, passwordField, savePWCheckBox);
     Component cancelButtonPanel = createCancelButtonPanel(dialog);
 
     Box upperPanel = new Box(BoxLayout.X_AXIS);
@@ -350,13 +285,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     hpanel.add(vpanel);
     hpanel.add(Box.createHorizontalStrut(10));
 
-    content.add(hpanel,BorderLayout.CENTER);
-
-    dialog.getRootPane().setDefaultButton(defaultButton);
-
-    dialog.pack();
-    dialog.setLocationRelativeTo(parentComponent);
-    dialog.setVisible(true);
+    content.add(hpanel, BorderLayout.CENTER);
   }
 
 
@@ -369,7 +298,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createConnectAsGuestButton(){
-    JButton button = new JButton("Connect as Guest");
+    JButton button = new JButton("Login as Guest");
     button.setMnemonic('G');
     return button;
   }
@@ -385,28 +314,21 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected void connectAsGuestActionPerformed(){
-    String inputIllegalityReason = findInputIllegalityReason(false);
+    String hostname = (String)hostnameBox.getSelectedItem();
+    String port = portField.getText();
+
+    String inputIllegalityReason = findInputIllegalityReason("", "", hostname, port, false);
     if (inputIllegalityReason != null){
       JOptionPane.showMessageDialog(dialog, inputIllegalityReason, "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
       return;
     }
 
-    if ((hintUser == null) || !server.isGuest(hintUser)){
-      System.out.println("Creating guest");
-      resultUser = server.createGuest();
-    }
-    else{
-      System.out.println("Reusing guest");
-      resultUser = hintUser;
-    }
+    resultUser = server.getGuest();
 
-    resultUser.setProperty("login.hostname", (String)hostnameBox.getSelectedItem());
-    resultUser.setProperty("login.port", portField.getText());
+    resultUser.setProperty("login.hostname", hostname);
+    resultUser.setProperty("login.port", port);
 
-    usernameField.setText(resultUser.getUsername());
-    passwordField.setText(resultUser.getProperty("login.password"));
-
-    proceed();
+    dialog.dispose();
   }
 
 
@@ -443,7 +365,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * @param parentDialog The dialog to which the panel will be added.
    */
 
-  public Component createGuestsPanel(final JDialog parentDialog){
+  public Component createGuestsPanel(JDialog parentDialog){
     Box vpanel = new Box(BoxLayout.Y_AXIS);
 
     vpanel.add(Box.createVerticalStrut(10));
@@ -498,7 +420,9 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * @param parentDialog The dialog to which the panel will be added.
    */
 
-  public Component createAdvancedOptionsPanel(final JDialog parentDialog){
+  public Component createAdvancedOptionsPanel(JDialog parentDialog, JComboBox hostnameBox,
+    JTextField passwordField){
+
     JPanel hostnameLabelPanel = new JPanel(new GridLayout(3,1));
     hostnameLabelPanel.add(new JLabel("Server"));
     hostnameLabelPanel.add(new JLabel("Hostname or"));
@@ -508,16 +432,8 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
-    StringTokenizer hosts = new StringTokenizer(props.getProperty("login.hosts", ""), ";");
-    Object [] items = new String[hosts.countTokens()];
-    int i = 0;
-    while (hosts.hasMoreTokens())
-      items[i++] = hosts.nextToken();
-
-    hostnameBox = new FixedJComboBox(items);
     hostnameBox.setFont(UIManager.getFont("TextField.font"));
     hostnameBox.setEditable(true);
-    hostnameBox.setSelectedItem(props.getProperty("login.hostname"));
     hostnameLabel.setLabelFor(hostnameBox);
 
     hostnamePanel.add(hostnameBox);
@@ -527,8 +443,6 @@ public abstract class StandardLoginDialog implements LoginDialog{
     
     Box portPanel = new Box(BoxLayout.X_AXIS);
 
-    Document portDocument = new IntegerStrictPlainDocument(0,65535,10);
-    portField = new FixedJTextField(portDocument,String.valueOf(props.getProperty("login.port")),5);
     portField.setMaximumSize(portField.getPreferredSize());
 
     portPanel.add(portField);
@@ -570,7 +484,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
   protected JButton createForgotPasswordButton(){
     JButton button = new JButton("Retrieve Password");
-    button.setMnemonic('F');
+    button.setMnemonic('t');
     return button;
   }
 
@@ -607,37 +521,33 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected void connectActionPerformed(){
-    String inputIllegalityReason = findInputIllegalityReason(true);
+    String username = usernameField.getText();
+    String password = new String(passwordField.getPassword());
+    String hostname = (String)hostnameBox.getSelectedItem();
+    String port = portField.getText();
+    boolean savePassword = savePWCheckBox.isSelected();
+
+    String inputIllegalityReason = 
+      findInputIllegalityReason(username, password, hostname, port, true);
     if (inputIllegalityReason != null){
       JOptionPane.showMessageDialog(dialog, inputIllegalityReason,
         "Wrong Connection Settings", JOptionPane.ERROR_MESSAGE);
       return;
     }
 
-    props.put("login.username", usernameField.getText());
-    boolean savePassword = savePasswordCheckBox.isSelected();
-    if (savePassword)
-      props.put("login.password", new String(passwordField.getPassword()));
-    else
-      props.put("login.password", "");
-    props.put("login.hostname", (String)hostnameBox.getSelectedItem());
-    props.put("login.port", portField.getText());
-    props.put("login.savepassword", String.valueOf(savePassword));
-
-    if (shouldCreateNewUser())
-      resultUser = server.createUser(props);
-    else{
+    if (username.equalsIgnoreCase(getProperty("login.username", null))) // Reuse the hint user
       resultUser = hintUser;
+    else
+      resultUser = server.createUser(username);
 
-      Enumeration propsEnum = props.keys();
-      while (propsEnum.hasMoreElements()){
-        String key = (String)propsEnum.nextElement();
-        String value = props.getProperty(key);
-        resultUser.setProperty(key, value);
-      }
-    }
+    resultUser.setProperty("login.username", username);
+    resultUser.setProperty("login.hostname", hostname);
+    resultUser.setProperty("login.port", port);
+    resultUser.setProperty("login.savepassword", String.valueOf(savePassword));
+    if (savePassword)
+      resultUser.setProperty("login.password", password);
 
-    proceed();
+    dialog.dispose();
   }
 
 
@@ -650,12 +560,12 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * @param parentDialog The dialog to which the panel will be added.
    */
 
-  public Component createMembersPanel(final JDialog parentDialog){
+  public Component createMembersPanel(JDialog parentDialog, JTextField usernameField,
+    JPasswordField passwordField, JCheckBox savePWCheckBox){
+
     Box usernamePanel = new Box(BoxLayout.X_AXIS);
 
-    usernameField = new FixedJTextField(15);
-    usernameField.setText(props.getProperty("login.username"));
-
+    usernameField.setPreferredSize(new Dimension(130, 20));
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
     JLabel handleLabel = new JLabel("Handle (your login name)");
@@ -668,9 +578,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     
     Box passwordInputPanel = new Box(BoxLayout.X_AXIS);
 
-    passwordField = new FixedJPasswordField(15);
-    passwordField.setText(props.getProperty("login.password"));
-
+    passwordField.setPreferredSize(new Dimension(130, 20));
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
     JLabel passwordLabel = new JLabel("Password");
@@ -691,9 +599,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
 
-    boolean savePassword = Boolean.valueOf(props.getProperty("login.savepassword", "false")).booleanValue();
-    savePasswordCheckBox = new JCheckBox("Save password", savePassword);
-    savePasswordCheckBox.setMnemonic('S');
+    savePWCheckBox.setMnemonic('S');
 
     JButton forgotPasswordButton = createForgotPasswordButton();
     if (forgotPasswordButton != null){
@@ -707,7 +613,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
       });
     }
 
-    passwordOptionsPanel.add(savePasswordCheckBox);
+    passwordOptionsPanel.add(savePWCheckBox);
     if (forgotPasswordButton != null){
       passwordOptionsPanel.add(Box.createHorizontalStrut(10));
       passwordOptionsPanel.add(forgotPasswordButton);
@@ -727,11 +633,10 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     });
 
-    defaultButton = connectButton;
+    dialog.getRootPane().setDefaultButton(connectButton);
 
     decisionPanel.add(connectButton);
     decisionPanel.add(Box.createHorizontalGlue());
-
 
     Box vpanel = new Box(BoxLayout.Y_AXIS);
     vpanel.add(Box.createVerticalStrut(10));
@@ -767,14 +672,14 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * @param parentDialog The dialog to which the panel will be added.
    */
 
-  public Component createCancelButtonPanel(final JDialog parentDialog){
+  public Component createCancelButtonPanel(JDialog parentDialog){
     Box panel = new Box(BoxLayout.Y_AXIS);
 
     panel.add(Box.createVerticalGlue());
 
     JButton button = new JButton("Cancel");
     button.setDefaultCapable(false);
-    button.addActionListener(closeActionListener);
+    button.addActionListener(new WindowDisposingActionListener(dialog));
 
     panel.add(button);
 
@@ -791,16 +696,27 @@ public abstract class StandardLoginDialog implements LoginDialog{
    * The default implementation checks that the port value is a valid port.
    */
 
-  public String findInputIllegalityReason(boolean checkUsernameAndPassword){
-    String portString = portField.getText();
+  public String findInputIllegalityReason(String username, String password, String hostname,
+      String port, boolean checkUsernameAndPassword){
+
     try{
-      Integer.parseInt(portString);
+      Integer.parseInt(port);
     } catch (NumberFormatException e){
-        return "Bad port value: "+portString;
+        return "Bad port value: "+port;
       }
 
     return null;
   }
+
+
+
+  /**
+   * This method is meant to be overriden by subclasses to actually create the
+   * connection based on the specified values.
+   */
+
+  protected abstract JinConnection createConnectionImpl(String hostname, int port,
+    String username, String password);
 
 
 
@@ -811,7 +727,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   public boolean isCanceled(){
-    return isCanceled;
+    return resultUser == null;
   }
 
 
@@ -824,6 +740,23 @@ public abstract class StandardLoginDialog implements LoginDialog{
   public User getUser(){
     return resultUser;
   }
+
+
+
+  /**
+   * Returns a JinConnection based on the user's choices.
+   */
+
+  public JinConnection createConnection(){
+    String hostname = resultUser.getProperty("login.hostname");
+    int port = Integer.parseInt(resultUser.getProperty("login.port"));
+    String username = resultUser.getProperty("login.username");
+    String password = resultUser.isGuest() ? "" : new String(passwordField.getPassword());
+
+    return createConnectionImpl(hostname, port, username, password);
+  }
+
+
 
 
 }
