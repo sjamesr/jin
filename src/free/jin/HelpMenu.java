@@ -36,14 +36,6 @@ public class HelpMenu extends JMenu{
 
 
   /**
-   * The context.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * The action listener that forwards all event handling to the private
    * <code>menuActivated</code> method.
    */
@@ -60,11 +52,9 @@ public class HelpMenu extends JMenu{
    * Creates a new <code>HelpMenu</code>.
    */
 
-  public HelpMenu(JinContext context){
+  public HelpMenu(){
     super("Help");
     setMnemonic('H');
-
-    this.context = context;
 
     add(createWebsiteMenuItem());
     add(createCreditsMenuItem());
@@ -81,9 +71,9 @@ public class HelpMenu extends JMenu{
 
   private void menuActivated(String actionCommand){
     if ("credits".equals(actionCommand))
-      new LicensePanel().display(context.getUIProvider());
+      new LicensePanel().display();
     else if ("about".equals(actionCommand))
-      new AboutPanel(context).display(context.getUIProvider());
+      new AboutPanel().display();
     else
       throw new IllegalArgumentException("Unknown action command: " + actionCommand);
   }
