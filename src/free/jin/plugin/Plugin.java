@@ -24,6 +24,7 @@ package free.jin.plugin;
 import free.jin.*;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import free.util.Utilities;
 
 
 /**
@@ -163,6 +164,9 @@ public abstract class Plugin{
    */
 
   public void setProperty(String propertyName, String propertyValue, boolean userTriggered){
+    if (Utilities.areEqual(propertyValue, getProperty(propertyName)))
+      return;
+
     getUser().setProperty(getID()+"."+propertyName, propertyValue, userTriggered);
   }
 
