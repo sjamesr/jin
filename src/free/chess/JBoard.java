@@ -569,6 +569,12 @@ public class JBoard extends JComponent{
     super.paintComponent(g);
 
     Dimension size = getSize();
+
+    // Fill the borders outside the actual board.
+    g.setColor(getBackground());
+    g.fillRect(size.width-size.width%8, 0, size.width%8, size.height);
+    g.fillRect(0, size.height-size.height%8, size.width, size.height%8);
+
     Rectangle squareRect = new Rectangle(0, 0, size.width/8, size.height/8);
     g.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
     Rectangle clipRect = g.getClipBounds();
