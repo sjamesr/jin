@@ -1182,11 +1182,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * The regular expression matching lines specifying that an illegal move has
-   * been attempted.
+   * been attempted. There are two types I know currently, but there may be
+   * more, so I'm allowing anything that starts with the expected pattern. The
+   * two I know are:
+   * 1. Illegal move (e2e4).
+   * 2. Illegal move (e2e4). You must capture.
    */
 
   private static final Pattern illegalMovePattern = 
-    new Pattern("^Illegal move \\((.*)\\)\\.$");
+    new Pattern("^Illegal move \\((.*)\\)\\..*");
 
 
 
