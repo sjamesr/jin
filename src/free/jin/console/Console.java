@@ -1024,10 +1024,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   public void keyPressed(KeyEvent evt){
-    if ((evt.getSource()==inputComponent)){
+    if ((evt.getSource() == inputComponent)){
       if (evt.getID() == KeyEvent.KEY_PRESSED){
         long modifiers = evt.getModifiers();
         boolean isCtrlDown = (modifiers & KeyEvent.CTRL_MASK) != 0;
+        boolean isShiftDown = (modifiers & KeyEvent.SHIFT_MASK) != 0;
         JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
         Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
         int value = vscrollbar.getValue();
@@ -1057,6 +1058,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
             if (isCtrlDown)
               vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
             break;
+          case KeyEvent.VK_INSERT:
+            if (isShiftDown){
+              inputComponent.paste();
+              evt.consume(); // We don't want to paste twice.
+            }
         }
       }
     }
