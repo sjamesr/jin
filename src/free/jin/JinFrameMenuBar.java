@@ -211,9 +211,11 @@ public class JinFrameMenuBar extends JMenuBar{
     closeConnMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
-        int result = JOptionPane.showConfirmDialog(jinFrame, "Are you sure you want to log out and close the connection?", "Select an option", JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.YES_OPTION;
+        if (jinFrame.getConnection().isConnected())
+          result = JOptionPane.showConfirmDialog(jinFrame, "Are you sure you want to log out and close the connection?", "Select an option", JOptionPane.YES_NO_OPTION);
 
-        if (result==JOptionPane.YES_OPTION)
+        if (result == JOptionPane.YES_OPTION)
           jinFrame.closeConnection();
       }
 
