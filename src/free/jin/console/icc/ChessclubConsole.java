@@ -21,11 +21,13 @@
 
 package free.jin.console.icc;
 
+import javax.swing.text.BadLocationException;
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
 import free.jin.Connection;
 import free.jin.Preferences;
+import free.util.TextUtilities;
 
 
 /**
@@ -69,6 +71,28 @@ public class ChessclubConsole extends Console{
   protected ConsoleTextPane createOutputComponent(){
     return new ChessclubConsoleTextPane(this);
   }
+  
+  
+  
+  /**
+   * Works around the issue with specially layed out finger noted, such as
+   * "finger Live" by splitting lines with lots of spaces followed by a ':'.
+   * See http://sourceforge.net/tracker/index.php?func=detail&aid=675197&group_id=50386&atid=459537
+   * for more information.
+   */
+   
+  protected void addToOutputImpl(String text, String textType) throws BadLocationException{
+    String delim = "        :";
+    int index;
+    while ((index = text.indexOf(delim)) != -1){
+      String line = TextUtilities.trimRight(text.substring(0, index));
+      super.addToOutputImpl(line, textType);
+      text = text.substring(index + delim.length() - 3);
+    }
+    
+    super.addToOutputImpl(text, textType);
+  }
 
+  
 
 }
