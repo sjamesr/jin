@@ -588,9 +588,10 @@ public class GameLogger extends Plugin implements GameListener{
     Game game = evt.getGame();
     GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
     Vector movelist = gameInfo.movelist;
-    int takebackCount = evt.getTakebackCount();
-    for (int i = 0; i < takebackCount; i++)
-      movelist.removeElementAt(movelist.size() - 1);
+    int start = movelist.size() - 1;
+    int stop = Math.max(0, movelist.size() - evt.getTakebackCount());
+    for (int i = start; i >= stop; i--)
+      movelist.removeElementAt(i);
   }
 
 
