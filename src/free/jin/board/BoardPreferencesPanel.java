@@ -109,10 +109,10 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     initPreviewBoard();
     
     JTabbedPane tabs = new JTabbedPane();
-    tabs.addTab("Board Looks", boardLooksPanel);
-    tabs.addTab("Move Input", moveInputPanel);
-    tabs.addTab("Move Highlighting", moveHighlightingPanel);
-    tabs.addTab("Coordinates", squareCoordsPanel);
+    tabs.addTab("Board Looks", null, boardLooksPanel, "Specify preferred piece set and board pattern");
+    tabs.addTab("Move Input", null, moveInputPanel, "Specify how moves are made by the user");
+    tabs.addTab("Move Highlighting", null, moveHighlightingPanel, "Specify how the last move is highlighted");
+    tabs.addTab("Coordinates", null, squareCoordsPanel, "Specify how square coordinates are displayed");
     
     ChangeListener changeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
