@@ -21,7 +21,6 @@
 
 package free.freechess;
 
-import free.chess.*;
 import free.util.Struct;
 import java.util.StringTokenizer;
 
