@@ -1379,8 +1379,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
 
   /**
-   * Gets called when a DG_CIRCLE datagram arrives. Fires a CircleEvent to all
-   * registered ChessclubGameListeners.
+   * Gets called when a DG_CIRCLE datagram arrives.
    */
 
   protected void processCircle(int gameNumber, String examiner, String coordinate){
@@ -1390,10 +1389,26 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
       Square circleSquare = Square.parseSquare(coordinate);
 
-      fireGameEvent(new CircleEvent(this, game, circleSquare));
+      fireGameEvent(new CircleEvent(this, game, CircleEvent.CIRCLE_ADDED, circleSquare));
     } catch (NoSuchGameException e){}
   }
+  
+  
+  
+  /**
+   * Gets called when a DG_UNCIRCLE datagram arrives.
+   */
+   
+  protected void processUncircle(int gameNumber, String examiner, String coordinate){
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
 
+      Square circleSquare = Square.parseSquare(coordinate);
+
+      fireGameEvent(new CircleEvent(this, game, CircleEvent.CIRCLE_REMOVED, circleSquare));
+    } catch (NoSuchGameException e){}
+  } 
 
 
 
@@ -1409,11 +1424,28 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       Square fromSquare = Square.parseSquare(origin);
       Square toSquare = Square.parseSquare(destination);
 
-      fireGameEvent(new ArrowEvent(this, game, fromSquare, toSquare));
+      fireGameEvent(new ArrowEvent(this, game, ArrowEvent.ARROW_ADDED, fromSquare, toSquare));
     } catch (NoSuchGameException e){}
   }
 
 
+  
+  /**
+   * Gets called when a DG_UNARROW datagram arrives.
+   */
+
+  protected void processUnarrow(int gameNumber, String examiner, String origin, String destination){
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
+
+      Square fromSquare = Square.parseSquare(origin);
+      Square toSquare = Square.parseSquare(destination);
+
+      fireGameEvent(new ArrowEvent(this, game, ArrowEvent.ARROW_REMOVED, fromSquare, toSquare));
+    } catch (NoSuchGameException e){}
+  }
+  
 
 
   /**
