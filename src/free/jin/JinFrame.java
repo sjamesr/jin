@@ -21,21 +21,13 @@
 
 package free.jin;
 
-import free.jin.plugin.PluginContext;
-import free.jin.plugin.Plugin;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
+import free.jin.plugin.*;
+import java.io.*;
+import java.util.*;
 
 
 /**

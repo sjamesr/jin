@@ -26,7 +26,7 @@ import javax.swing.*;
 import free.jin.User;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
-import free.jin.UnsupportedContextException;
+import free.jin.plugin.UnsupportedContextException;
 import free.jin.SeekJinConnection;
 import free.jin.event.SeekListener;
 import free.jin.event.SeekEvent;
