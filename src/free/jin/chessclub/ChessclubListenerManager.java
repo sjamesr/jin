@@ -143,7 +143,9 @@ public class ChessclubListenerManager extends BasicListenerManager{
       setDGState(Datagram.DG_FLIP, true);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, true);
       setDGState(Datagram.DG_ARROW, true);
+      setDGState(Datagram.DG_UNARROW, true);
       setDGState(Datagram.DG_CIRCLE, true);
+      setDGState(Datagram.DG_UNCIRCLE, true);
       source.setStyle(13);
     }
   }
@@ -180,7 +182,9 @@ public class ChessclubListenerManager extends BasicListenerManager{
       setDGState(Datagram.DG_FLIP, false);
       setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, false);
       setDGState(Datagram.DG_ARROW, false);
+      setDGState(Datagram.DG_UNARROW, false);
       setDGState(Datagram.DG_CIRCLE, false);
+      setDGState(Datagram.DG_UNCIRCLE, false);
       source.setStyle(1);
       source.lastGameListenerRemoved();
     }
@@ -203,16 +207,28 @@ public class ChessclubListenerManager extends BasicListenerManager{
         if (listeners[i] == GameListener.class){
           GameListener listener = (GameListener)listeners[i+1];
           try{
-            if (evt instanceof CircleEvent){ 
-              if (listener instanceof ChessclubGameListener) 
-                ((ChessclubGameListener)listener).circleAdded((CircleEvent)evt);
+            if (listener instanceof ChessclubGameListener){
+              ChessclubGameListener chessclubListener = (ChessclubGameListener)listener;
+            
+              if (evt instanceof CircleEvent){
+                CircleEvent cevt = (CircleEvent)evt;
+                
+                if (cevt.getId() == CircleEvent.CIRCLE_ADDED)
+                  chessclubListener.circleAdded(cevt);
+                else if (cevt.getId() == CircleEvent.CIRCLE_REMOVED)
+                  chessclubListener.circleRemoved(cevt);
+              }
+              else if (evt instanceof ArrowEvent){
+                ArrowEvent aevt = (ArrowEvent)evt;
+                
+                if (aevt.getId() == ArrowEvent.ARROW_ADDED)
+                  chessclubListener.arrowAdded(aevt);
+                else if (aevt.getId() == ArrowEvent.ARROW_REMOVED)
+                  chessclubListener.arrowRemoved(aevt);
+              }
+              else
+                throw new IllegalArgumentException("Unknown GameEvent type: " + evt.getClass());
             }
-            else if (evt instanceof ArrowEvent){
-              if (listener instanceof ChessclubGameListener)
-                ((ChessclubGameListener)listener).arrowAdded((ArrowEvent)evt);
-            }
-            else
-              throw new IllegalArgumentException("Unknown GameEvent type: "+evt.getClass());
           } catch (RuntimeException e){
               e.printStackTrace();
             }
