@@ -25,6 +25,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
+import java.util.Hashtable;
 import free.util.AWTUtilities;
 
 
@@ -74,19 +75,21 @@ public class FontSelectorPanel extends JPanel{
 
 
   /**
-   * The checkbox for choosing whether the font is bold or not.
+   * A Hashtable mapping <code>BooleanFontOption</code> names to
+   * <code>BooleanFontOptions</code>.
    */
 
-  private final JCheckBox boldCheckBox;
+  private Hashtable fontOptions = new Hashtable();
 
 
 
 
   /**
-   * The checkbox for choosing whether the font is italic or not.
+   * A Hashtable mapping <code>BooleanFontOptions</code> to JCheckBoxes
+   * representing them.
    */
 
-  private final JCheckBox italicCheckBox;
+  private Hashtable fontOptionCheckBoxes = new Hashtable();
 
 
 
@@ -124,12 +127,43 @@ public class FontSelectorPanel extends JPanel{
 
 
   /**
-   * Creates a new FontSelectorPanel which will allow choosing from the list
-   * of fonts available to the default Toolkit.
+   * Creates a new <code>FontSelectorPanel</code> which will allow choosing from
+   * the list of fonts available to the default Toolkit.
    */
 
   public FontSelectorPanel(){
-    this(AWTUtilities.getAvailableFontNames());
+    this(AWTUtilities.getAvailableFontNames(), new BooleanFontOption[]{
+      createBoldFontOption(),
+      createItalicFontOption()
+    });
+  }
+
+
+
+
+  /**
+   * Creates a new </code>FontSelectorPanel</code> which will allow choosing
+   * from the list of fonts available to the default Toolkit and will allow the
+   * user to select from the specified BooleanFontOptions.
+   */
+
+  public FontSelectorPanel(BooleanFontOption [] fontOptions){
+    this(AWTUtilities.getAvailableFontNames(), fontOptions);
+  }
+
+
+
+
+  /**
+   * Creates a new </code>FontSelectorPanel</code> which will allow choosing
+   * from the list of specified fonts.
+   */
+
+  public FontSelectorPanel(String [] fontNames){
+    this(fontNames, new BooleanFontOption[]{
+      createBoldFontOption(),
+      createItalicFontOption()
+    });
   }
 
 
@@ -140,16 +174,16 @@ public class FontSelectorPanel extends JPanel{
    * specified list of fonts.
    */
 
-  public FontSelectorPanel(String [] fontNames){
+  public FontSelectorPanel(String [] fontNames, BooleanFontOption [] fontOptions){
     fontNamesList = new JList(fontNames);
     fontNamesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     fontSizesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    boldCheckBox = new JCheckBox("Bold");
-    italicCheckBox = new JCheckBox("Italic");
-
-    boldCheckBox.setMnemonic('B');
-    italicCheckBox.setMnemonic('I');
+    for (int i = 0; i < fontOptions.length; i++){
+      BooleanFontOption fontOption = fontOptions[i];
+      this.fontOptions.put(fontOption.getOptionName(), fontOption);
+      fontOption.setFontSelectorPanel(this);
+    }
 
     previewPanelHolder = new JPanel(new BorderLayout());
     Border outsideBorder = new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED);
@@ -158,7 +192,7 @@ public class FontSelectorPanel extends JPanel{
 
     setPreviewPanel(new DefaultPreviewPanel(this));
 
-    createUI();
+    createUI(fontOptions);
 
     fontNamesList.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
@@ -178,16 +212,61 @@ public class FontSelectorPanel extends JPanel{
       }
     });
 
-    ChangeListener checkBoxChangeListener = new ChangeListener(){
-      public void stateChanged(ChangeEvent evt){
-        fireStateChanged();
-      }
-    };
-
-    boldCheckBox.addChangeListener(checkBoxChangeListener);
-    italicCheckBox.addChangeListener(checkBoxChangeListener);
   }
 
+
+
+
+  /**
+   * Returns the <code>BooleanFontOption</code> with the specified name, or
+   * <code>null</code> if no such <code>BooleanFontOption</code> exists.
+   */
+
+  public BooleanFontOption getFontOption(String optionName){
+    return (BooleanFontOption)fontOptions.get(optionName);
+  }
+
+
+
+
+  /**
+   * Returns the value of the <code>BooleanFontOption</code> with the specified
+   * name.
+   *
+   * @throws IllegalArgumentException if no <code>BooleanFontOption</code> with
+   * the specified name exists.
+   */
+
+  public boolean getFontOptionValue(String optionName){
+    BooleanFontOption fontOption = getFontOption(optionName);
+    if (fontOption == null)
+      throw new IllegalArgumentException();
+    return fontOption.getValue();
+  }
+
+
+
+
+  /**
+   * Creates a <code>BooleanFontOption</code> for specifying the whether the
+   * font is bold or not.
+   */
+
+  public static BooleanFontOption createBoldFontOption(){
+    return new BooleanFontOption("Bold", 'B', false);
+  }
+
+
+
+
+  /**
+   * Creates a <code>BooleanFontOption</code> for specifying the whether the
+   * font is italic or not.
+   */
+
+  public static BooleanFontOption createItalicFontOption(){
+    return new BooleanFontOption("Italic", 'I', false);
+  }
 
 
 
@@ -196,7 +275,7 @@ public class FontSelectorPanel extends JPanel{
    * Creates the UI.
    */
 
-  private void createUI(){
+  private void createUI(BooleanFontOption [] fontOptions){
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     JPanel topPanel = new JPanel(new BorderLayout(5, 5));
@@ -226,11 +305,27 @@ public class FontSelectorPanel extends JPanel{
     topPanel.add(fontNamePanel, BorderLayout.CENTER);
     topPanel.add(fontSizePanel, BorderLayout.EAST);
 
+    ChangeListener checkBoxChangeListener = new ChangeListener(){
+      public void stateChanged(ChangeEvent evt){
+        AbstractButton checkbox = (AbstractButton)evt.getSource();
+        String name = checkbox.getActionCommand();
+        BooleanFontOption fontOption = (BooleanFontOption)FontSelectorPanel.this.fontOptions.get(name);
+        fontOption.setValue(checkbox.isSelected());
+      }
+    };
+
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
 
     Box checkBoxesPanel = Box.createVerticalBox();
-    checkBoxesPanel.add(boldCheckBox);
-    checkBoxesPanel.add(italicCheckBox);
+
+    for (int i = 0; i < fontOptions.length; i++){
+      BooleanFontOption fontOption = fontOptions[i];
+      JCheckBox checkbox = new JCheckBox(fontOption.getOptionName(), fontOption.getValue());
+      checkbox.setMnemonic(fontOption.getMnemonic());
+      checkbox.addChangeListener(checkBoxChangeListener);
+      checkBoxesPanel.add(checkbox);
+      fontOptionCheckBoxes.put(fontOption, checkbox);
+    }
 
     bottomPanel.add(checkBoxesPanel, BorderLayout.WEST);
     bottomPanel.add(previewPanelHolder, BorderLayout.CENTER);
@@ -258,9 +353,11 @@ public class FontSelectorPanel extends JPanel{
       return null;
 
     int style = 0;
-    if (boldCheckBox.isSelected())
+    BooleanFontOption boldOption = getFontOption("Bold");
+    BooleanFontOption italicOption = getFontOption("Italic");
+    if ((boldOption != null) && boldOption.getValue())
       style |= Font.BOLD;
-    if (italicCheckBox.isSelected())
+    if ((italicOption != null) && italicOption.getValue())
       style |= Font.ITALIC;
 
     return new Font(fontName, style, Integer.parseInt(fontSizeString));
@@ -276,12 +373,32 @@ public class FontSelectorPanel extends JPanel{
   public void setSelectedFont(Font font){
     fontNameField.setText(font.getFamily());
     fontSizeField.setText(String.valueOf(font.getSize()));
-    boldCheckBox.setSelected(font.isBold());
-    italicCheckBox.setSelected(font.isItalic());
+
+    BooleanFontOption boldOption = getFontOption("Bold");
+    BooleanFontOption italicOption = getFontOption("Italic");
+
+    if (boldOption != null)
+      boldOption.setValue(font.isBold());
+    if (italicOption != null)
+      italicOption.setValue(font.isItalic());
 
     fontNamesList.setSelectedValue(font.getFamily(), true);
     fontSizesList.setSelectedValue(String.valueOf(font.getSize()), true);
 
+    fireStateChanged();
+  }
+
+
+
+
+  /**
+   * This method is called by <code>BooleanFontOptions</code> when their value
+   * changes.
+   */
+
+  protected void booleanOptionChanged(BooleanFontOption option){
+    AbstractButton checkbox = (AbstractButton)fontOptionCheckBoxes.get(option);
+    checkbox.setSelected(option.getValue());
     fireStateChanged();
   }
 
@@ -369,22 +486,22 @@ public class FontSelectorPanel extends JPanel{
      * The FontSelectorPanel we're a part of.
      */
 
-    private FontSelectorPanel parent;
+    protected final FontSelectorPanel fontSelectorPanel;
 
 
 
 
     /**
      * Creates a new DefaultPreviewPanel with the specified FontSelectorPanel
-     * as the parent. 
+     * as the user. 
      */
 
-    public DefaultPreviewPanel(FontSelectorPanel parent){
+    public DefaultPreviewPanel(FontSelectorPanel fontSelectorPanel){
       super("AaBbYyZz123", JLabel.CENTER);
 
-      this.parent = parent;
+      this.fontSelectorPanel = fontSelectorPanel;
 
-      parent.addChangeListener(this);
+      fontSelectorPanel.addChangeListener(this);
 
       setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
@@ -397,8 +514,128 @@ public class FontSelectorPanel extends JPanel{
      */
 
     public void stateChanged(ChangeEvent evt){
-      setFont(parent.getSelectedFont());
+      setFont(fontSelectorPanel.getSelectedFont());
       repaint();
+    }
+
+  }
+
+
+
+
+  /**
+   * A class allowing to specify a boolean option for the font, such as "Bold"
+   * or "Italic".
+   */
+
+  public static class BooleanFontOption{
+
+
+
+    /**
+     * The name of the option, something like "Bold", or "Italic".
+     */
+
+    private final String name;
+
+
+
+    /**
+     * The character that should be used for the mnemonic of the checkbox
+     * displaying the choice for this option.
+     */
+
+    private final char mnemonic;
+
+
+
+    /**
+     * The current boolean value.
+     */
+
+    private boolean value;
+
+
+
+
+    /**
+     * The FontSelectorPanel using us.
+     */
+
+    private FontSelectorPanel fontSelectorPanel;
+
+
+
+
+    /**
+     * Creates a new BooleanFontOption with the specified name, mnemonic and
+     * initial value.
+     */
+
+    public BooleanFontOption(String name, char mnemonic, boolean initValue){
+      this.name = name;
+      this.mnemonic = mnemonic;
+      this.value = initValue;
+    }
+
+
+
+
+    /**
+     * Sets the <code>FontSelectorPanel</code> using this
+     * <code>BooleanFontOption</code>.
+     */
+
+    private void setFontSelectorPanel(FontSelectorPanel fontSelectorPanel){
+      this.fontSelectorPanel = fontSelectorPanel;
+    }
+
+
+
+
+    /**
+     * Returns the name of the <code>BooleanFontOption</code>.
+     */
+
+    public String getOptionName(){
+      return name;
+    }
+
+
+
+
+    /**
+     * Returns the mnemonic used for the checkbox of this option.
+     */
+
+    public char getMnemonic(){
+      return mnemonic;
+    }
+
+
+
+
+    /**
+     * Returns the current value of the option.
+     */
+
+    public boolean getValue(){
+      return value;
+    }
+
+
+
+
+    /**
+     * Sets the current value of the option and notifies the user
+     * <code>FontSelectorPanel</code>.
+     */
+
+    public void setValue(boolean value){
+      if (this.value != value){
+        this.value = value;
+        fontSelectorPanel.booleanOptionChanged(this);
+      }
     }
 
   }
