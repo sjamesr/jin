@@ -25,6 +25,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import free.util.PlatformUtils;
 
 
 
@@ -63,8 +64,31 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     
     UIManager.LookAndFeelInfo [] installedLnfs = UIManager.getInstalledLookAndFeels(); 
     LnF [] lnfs = new LnF[installedLnfs.length];
-    for (int i = 0; i < lnfs.length; i++)
+    for (int i = 0; i < lnfs.length; i++){
       lnfs[i] = new LnF(installedLnfs[i]);
+    }
+    
+    
+    // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
+    // Remove this when Sun fixes it.
+    if (Boolean.getBoolean("java.version.applet") && PlatformUtils.isJavaBetterThan("1.5")){
+      int gtkIndex = -1;
+      for (int i = 0; i < lnfs.length; i++){
+        if (lnfs[i].classname.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")){
+          gtkIndex = i;
+          break;
+        }
+      }
+      if (gtkIndex != -1){
+        LnF [] lnfs2 = new LnF[lnfs.length - 1];
+        for (int i = 0; i < gtkIndex; i++)
+          lnfs2[i] = lnfs[i];
+        for (int i = gtkIndex; i < lnfs2.length; i++)
+          lnfs2[i] = lnfs[i + 1];
+        lnfs = lnfs2;
+      }
+    }
+    
     
     this.lookAndFeels = new JList(lnfs);
     
