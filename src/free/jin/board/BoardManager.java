@@ -1222,7 +1222,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     Object source = pce.getSource();
 
     if (source instanceof JInternalFrame){
-      if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
+      if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY) &&
           pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
         JInternalFrame boardFrame =  (JInternalFrame)source;
         BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(boardFrame);
@@ -1230,8 +1230,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         if (boardPanel.isActive()){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
           Game game = ((BoardPanel)internalFramesToBoardPanels.get(boardFrame)).getGame();
 
-          int result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(),"Are you sure you want to quit this game?","Select an option",JOptionPane.YES_NO_OPTION);
-          if (result==JOptionPane.YES_OPTION)
+          boolean shouldAsk = false;
+          String question = null;
+
+          if (game.getGameType() == Game.MY_GAME){
+            shouldAsk = true;
+            if (game.isPlayed())
+              question = "Are you sure you want to RESIGN this game?";
+            else
+              question = "Are you sure you want to stop examining this game?";
+          }
+
+          int result;
+          if (shouldAsk)
+            result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), question, "Select an option", JOptionPane.YES_NO_OPTION);
+          else
+            result = JOptionPane.YES_OPTION;
+          if (result == JOptionPane.YES_OPTION)
             getConnection().quitGame(game);
           else
             throw new PropertyVetoException("Canceled closing", pce);
