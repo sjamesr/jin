@@ -1,7 +1,7 @@
 /**
  * The chess framework library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2004 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The chess framework library is free software; you can redistribute
@@ -22,12 +22,12 @@
 package free.chess;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Hashtable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.Component;
-import java.awt.BorderLayout;
+import free.util.AWTUtilities;
 
 
 /**
@@ -42,6 +42,14 @@ public class PieceChooser extends JComponent implements ActionListener{
    */
 
   private final Hashtable buttonsToPieces = new Hashtable();
+  
+  
+  
+  /**
+   * Maps pieces to buttons.
+   */
+   
+  private final Hashtable piecesToButtons = new Hashtable();
 
 
 
@@ -60,14 +68,17 @@ public class PieceChooser extends JComponent implements ActionListener{
    */
 
   public PieceChooser(Piece [] pieces, PiecePainter piecePainter){
-    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    int gridSize = (int)Math.round(Math.ceil(Math.sqrt(pieces.length)));
+    setLayout(new GridLayout(gridSize, gridSize, 10, 10));
     for (int i=0;i<pieces.length;i++){
       Piece piece = pieces[i];
-      add(Box.createHorizontalStrut(10));
       JButton button = new JButton(piece.getTypeName(), new PieceIcon(piece, piecePainter, 32, 32));
+      button.setVerticalTextPosition(SwingConstants.BOTTOM);
+      button.setHorizontalTextPosition(SwingConstants.CENTER);
       button.setRolloverEnabled(true);
       add(button);
       buttonsToPieces.put(button, piece);
+      piecesToButtons.put(piece, button);
       button.addActionListener(this);
     }
   }
@@ -81,19 +92,31 @@ public class PieceChooser extends JComponent implements ActionListener{
 
   public Piece getSelectedPiece(){
     return chosenPiece;
-  } 
+  }
+  
+  
+  
+  /**
+   * Returns the button corresponding to the specified piece.
+   */
+   
+  public JButton buttonForPiece(Piece piece){
+    return (JButton)piecesToButtons.get(piece);
+  }
 
 
 
   /**
-   * Displays a modal dialog over the given Component which lets the user choose
-   * from the given set of Pieces which are painted using the given PiecePainter.
-   * Returns the piece chosen by the user.
+   * Displays a modal dialog over the given Component at the specified
+   * coordinates, which lets the user choose from the given set of Pieces which
+   * are painted using the given PiecePainter. Returns the piece chosen by the
+   * user.
    */
 
-  public static Piece showPieceChooser(Component parentComponent, Piece [] pieces, PiecePainter painter, Piece defaultPiece){
+  public static Piece showPieceChooser(Component parentComponent, int x, int y, 
+      Piece [] pieces, PiecePainter painter, Piece defaultPiece){
     final JDialog dialog = new JDialog(JOptionPane.getFrameForComponent(parentComponent), "Choose a piece", true);
-
+    
     JComponent content = new JPanel(new BorderLayout());
     dialog.setContentPane(content);
     PieceChooser chooser = new PieceChooser(pieces, painter);
@@ -111,9 +134,19 @@ public class PieceChooser extends JComponent implements ActionListener{
       }
     });
 
+    JButton defaultButton = chooser.buttonForPiece(defaultPiece);
+    dialog.getRootPane().setDefaultButton(defaultButton);
     dialog.pack();
-    dialog.setLocationRelativeTo(parentComponent);
+    Dimension size = dialog.getSize();
+    Point parentLoc = parentComponent.getLocationOnScreen();
+    // Try to position the default button under the mouse
+    int locX = parentLoc.x + x - defaultButton.getX() - defaultButton.getWidth()/2;
+    int locY = parentLoc.y + y - defaultButton.getY() - defaultButton.getHeight()/2 - 20; // 20 is what we think is a typical size for the window title.
+    
+    dialog.setLocation(locX, locY);
+    AWTUtilities.forceToScreen(dialog);
     dialog.setVisible(true);
+    
     Piece selectedPiece = chooser.getSelectedPiece();
     if (selectedPiece == null) // User closed the dialog...
       selectedPiece = defaultPiece;
