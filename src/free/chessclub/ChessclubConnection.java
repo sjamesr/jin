@@ -3182,12 +3182,21 @@ public class ChessclubConnection extends free.util.Connection{
     int commandCount = 0;
 
     while (tokenizer.hasMoreTokens()){
-      StringBuffer command = new StringBuffer(tokenizer.nextToken());
-      for (int i = 0; i < command.length(); i++){
-        if (command.charAt(i) == '\\')
-          command.deleteCharAt(i);
+      String escaped = tokenizer.nextToken();
+      StringBuffer unescaped = new StringBuffer(escaped.length());
+      int length = escaped.length();
+      int i = 0;
+      while (i < length){
+        if (escaped.charAt(i) == '\\'){
+          unescaped.append(escaped.charAt(i+1));
+          i += 2;
+        }
+        else{
+          unescaped.append(escaped.charAt(i));
+          i++;
+        }
       }
-      commandList[commandCount++] = command.toString();
+      commandList[commandCount++] = unescaped.toString();
     }
 
     return commandList;
