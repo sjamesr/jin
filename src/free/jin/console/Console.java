@@ -843,7 +843,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     tellers.removeElement(teller);
     tellers.insertElementAt(teller, 0);
     if (tellers.size() > getTellerRingSize())
-      tellers.removeElementAt(tellers.size());
+      tellers.removeElementAt(tellers.size() - 1);
   }
 
 
