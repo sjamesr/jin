@@ -544,8 +544,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
     resultUser.setProperty("login.hostname", hostname);
     resultUser.setProperty("login.port", port);
     resultUser.setProperty("login.savepassword", String.valueOf(savePassword));
-    if (savePassword)
-      resultUser.setProperty("login.password", password);
+    resultUser.setProperty("login.password", savePassword ? password : "");
 
     dialog.dispose();
   }
