@@ -24,6 +24,8 @@ package free.jin.freechess;
 import free.freechess.Ivar;
 import free.jin.event.BasicListenerManager;
 import free.jin.event.SeekListener;
+import free.jin.freechess.event.IvarStateChangeListener;
+import free.jin.freechess.event.IvarStateChangeEvent;
 
 
 /**
@@ -89,6 +91,46 @@ public class FreechessListenerManager extends BasicListenerManager{
       source.lastSeekListenerRemoved();
     }
   }
+  
+  
+  
+  /**
+   * Adds the specified IvarStateChangeListener to the list of listeners
+   * receiving notification of changes in states of ivars.
+   */
+   
+  public void addIvarStateChangeListener(IvarStateChangeListener listener){
+    listenerList.add(IvarStateChangeListener.class, listener);
+  }
+  
 
+  
+  /**
+   * Removes the specified IvarStateChangeListener from the list of listeners
+   * receiving notification of changes in states of ivars.
+   */
+   
+  public void removeIvarStateChangeListener(IvarStateChangeListener listener){
+    listenerList.remove(IvarStateChangeListener.class, listener);
+  }
+  
+  
+  
+  /**
+   * Notifies all registered IvarStateChangeListeners of the specified
+   * IvarStateChangeEvent.
+   */
+   
+  public void fireIvarStateChangeEvent(IvarStateChangeEvent evt){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == IvarStateChangeListener.class){
+        IvarStateChangeListener listener = (IvarStateChangeListener)listeners[i+1];
+        listener.ivarStateChanged(evt);
+      }
+    }
+  }
+  
+  
 
 }
