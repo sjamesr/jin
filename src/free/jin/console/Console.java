@@ -269,8 +269,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       public void mouseReleased(MouseEvent e){
         dragging = false;
         super.mouseReleased(e);
-        if (isCopyOnSelect())
-          requestDefaultFocus();
+        if (isCopyOnSelect()){
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              requestDefaultFocus();
+            }
+          });
+        }
       }
 
 
