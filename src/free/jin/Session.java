@@ -269,12 +269,14 @@ public class Session{
   /**
    * Creates and starts the plugins, then connects and logs on to the server.
    * Note that this method blocks until the connection is established (or until
-   * it fails to connect) and the account is logged in.
+   * it fails to connect) and the account is logged in. Returns whether actually
+   * logged in (it is possible to fail without an error, if, for example we were
+   * closed while logging in).
    *
-   * @throws LoginException if login fails for some reason.
+   * @throws LoginException if login fails with an error.
    */
 
-  public void login() throws LoginException{
+  public boolean login() throws LoginException{
     synchronized(this){
       if (conn.isConnected())
         throw new IllegalArgumentException("Session already logged in");
@@ -300,8 +302,8 @@ public class Session{
         }
       } catch (IOException e){
           synchronized(this){
-            if (isClosed)
-              throw new LoginException("Session closed while connecting");
+            if (isClosed) // We got closed while logging in
+              return false;
             errorMessages[portIndex] = e.getMessage();
           }
         }
@@ -324,6 +326,8 @@ public class Session{
         buf.setLength(buf.length() - 1);
         throw new LoginException(buf.toString());
       }
+      else
+        return true;
     }
   }
 
