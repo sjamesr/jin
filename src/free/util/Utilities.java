@@ -69,7 +69,7 @@ public class Utilities{
    * (contains <code>null</code>).
    */
 
-  public static boolean isElementOf(Object [] array, Object item){
+  public static boolean contains(Object [] array, Object item){
     return (indexOf(array, item) != -1);
   }
 
@@ -97,6 +97,25 @@ public class Utilities{
 
 
 
+  /**
+   * Returns the index of the first occurrance of specified integer in the
+   * specified array, or -1 if the specified integer is not an element of the
+   * specified array.
+   */
+
+  public static int indexOf(int [] arr, int val){
+    if (arr == null)
+      throw new IllegalArgumentException("The specified array may not be null");
+
+    for (int i = 0; i < arr.length; i++)
+      if (arr[i] == val)
+        return i;
+
+    return -1;
+  }
+
+  
+  
   /**
    * Converts the specified array into a string by appending all its elements
    * separated by a semicolon.
@@ -157,6 +176,26 @@ public class Utilities{
         n = arr[i];
 
     return n;
+  }
+
+
+
+  /**
+   * Returns a hash code for the specified double value.
+   */
+
+  public static int hashCode(double val){
+    return hashCode(Double.doubleToLongBits(val));
+  }
+
+
+
+  /**
+   * Returns a hash code for the specified long value.
+   */
+
+  public static int hashCode(long val){
+    return (int)(val ^ (val >>> 32));
   }
 
 
