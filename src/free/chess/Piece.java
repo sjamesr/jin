@@ -232,7 +232,10 @@ public abstract class Piece{
    */
 
   public boolean equals(Object o){
-    if (o.getClass()!=this.getClass())
+    if (o == null)
+      return false;
+
+    if (o.getClass() != this.getClass())
       return false;
 
     return val==((Piece)o).val;
