@@ -71,7 +71,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
-      ", " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
+      ", " + System.getProperty("os.name") + " " + getSafeOSVersion() + ")");
 
     setStyle(12);
 
@@ -81,6 +81,22 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     setIvarState(Ivar.MOVECASE, true);
     // setIvarState(Ivar.COMPRESSMOVE, true); Pending DAV's bugfixing spree
     setIvarState(Ivar.LOCK, true);
+  }
+  
+  
+  
+  /**
+   * Returns the OS version after stripping out the patch level from it.
+   * We do this to avoid revealing that information to everyone on the server.
+   */
+  
+  private static String getSafeOSVersion(){
+    String osVersion = System.getProperty("os.version");
+    int i  = osVersion.indexOf(".", osVersion.indexOf(".") + 1);
+    if (i != -1)
+      osVersion = osVersion.substring(0, i) + ".x";
+    
+    return osVersion;
   }
 
 
