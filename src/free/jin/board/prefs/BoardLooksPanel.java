@@ -24,9 +24,9 @@ package free.jin.board.prefs;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
+import free.jin.board.*;
+import free.jin.Resource;
 import free.jin.plugin.BadChangesException;
-import free.jin.board.BoardManager;
-import free.jin.board.JinBoard;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.swing.UrlDisplayingAction;
@@ -139,8 +139,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
   public BoardLooksPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    pieceSets = new JList(boardManager.getAvailablePieceSets());
-    boardPatterns = new JList(boardManager.getAvailableBoardPatterns());
+    pieceSets = new JList(getPieceSets());
+    boardPatterns = new JList(getBoardPatterns());
     whiteColor = new ColorChooser("White color:", boardManager.getWhitePieceColor());
     blackColor = new ColorChooser("Black color:", boardManager.getBlackPieceColor());
     whiteOutline = new ColorChooser("White outline:", boardManager.getWhiteOutlineColor());
@@ -171,9 +171,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     pieceSets.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
-        BoardManager.PieceSet set =
-          (BoardManager.PieceSet)pieceSets.getSelectedValue();
-        PiecePainter painter = set.createPiecePainter();
+        PieceSet set = (PieceSet)pieceSets.getSelectedValue();
+        PiecePainter painter = set.getPiecePainter();
         
         if (painter instanceof ColoredPiecePainter){
           ColoredPiecePainter cPainter = (ColoredPiecePainter)painter; 
@@ -191,9 +190,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
 
     boardPatterns.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
-        BoardManager.BoardPattern pattern =
-          (BoardManager.BoardPattern)boardPatterns.getSelectedValue();
-        BoardPainter painter = pattern.createBoardPainter();
+        BoardPattern pattern = (BoardPattern)boardPatterns.getSelectedValue();
+        BoardPainter painter = pattern.getBoardPainter();
         
         if (painter instanceof ColoredBoardPainter){
           ColoredBoardPainter cPainter = (ColoredBoardPainter)painter;
@@ -278,13 +276,73 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
   
   
   /**
+   * Gets the list of piece sets from the board manager.
+   */
+   
+  private PieceSet [] getPieceSets(){
+    Resource [] resources = boardManager.getResources("pieces");
+    PieceSet [] pieceSets = new PieceSet[resources.length];
+    
+    for (int i = 0; i < resources.length; i++)
+      pieceSets[i] = (PieceSet)resources[i];
+    
+    // Bubble sort by name
+    for (int i = 0; i < resources.length; i++){
+      for (int j = i; j < resources.length - 1; j++){
+        String name1 = pieceSets[j].getName();
+        String name2 = pieceSets[j+1].getName();
+        
+        if (name1.compareTo(name2) > 0){
+          PieceSet tmp = pieceSets[j];
+          pieceSets[j] = pieceSets[j+1];
+          pieceSets[j+1] = tmp;
+        }
+      }
+    }
+    
+    return pieceSets;
+  }
+  
+  
+  
+  /**
+   * Gets the list of board patterns from the board manager.
+   */
+   
+  private BoardPattern [] getBoardPatterns(){
+    Resource [] resources = boardManager.getResources("boards");
+    BoardPattern [] boardPatterns = new BoardPattern[resources.length];
+    
+    for (int i = 0; i < resources.length; i++)
+      boardPatterns[i] = (BoardPattern)resources[i];
+    
+    // Bubble sort by name
+    for (int i = 0; i < resources.length; i++){
+      for (int j = i; j < resources.length - 1; j++){
+        String name1 = boardPatterns[j].getName();
+        String name2 = boardPatterns[j+1].getName();
+        
+        if (name1.compareTo(name2) > 0){
+          BoardPattern tmp = boardPatterns[j];
+          boardPatterns[j] = boardPatterns[j+1];
+          boardPatterns[j+1] = tmp;
+        }
+      }
+    }
+    
+    return boardPatterns;
+  }
+  
+  
+  
+  /**
    * Sets the initial properties of the preview board.
    */
    
   public void initPreviewBoard(){
-    BoardManager.PieceSet pieceSet = (BoardManager.PieceSet)pieceSets.getSelectedValue();
+    PieceSet pieceSet = (PieceSet)pieceSets.getSelectedValue();
     if (pieceSet != null){
-      PiecePainter piecePainter = pieceSet.createPiecePainter();
+      PiecePainter piecePainter = pieceSet.getPiecePainter();
       if (piecePainter instanceof ColoredPiecePainter){
         ColoredPiecePainter cPainter = (ColoredPiecePainter)piecePainter; 
         cPainter.setWhiteColor(whiteColor.getColor()); 
@@ -295,9 +353,9 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
       previewBoard.setPiecePainter(piecePainter);
     }
 
-    BoardManager.BoardPattern boardPattern = (BoardManager.BoardPattern)boardPatterns.getSelectedValue();
+    BoardPattern boardPattern = (BoardPattern)boardPatterns.getSelectedValue();
     if (boardPattern != null){
-      BoardPainter boardPainter = boardPattern.createBoardPainter();
+      BoardPainter boardPainter = boardPattern.getBoardPainter();
       if (boardPainter instanceof ColoredBoardPainter){
         ColoredBoardPainter cPainter = (ColoredBoardPainter)boardPainter;
         cPainter.setDarkColor(darkSquares.getColor()); 
@@ -398,8 +456,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   public void applyChanges() throws BadChangesException{
-    boardManager.setPieceSet((BoardManager.PieceSet)pieceSets.getSelectedValue());
-    boardManager.setBoardPattern((BoardManager.BoardPattern)boardPatterns.getSelectedValue());
+    boardManager.setPieceSet((PieceSet)pieceSets.getSelectedValue());
+    boardManager.setBoardPattern((BoardPattern)boardPatterns.getSelectedValue());
     boardManager.setWhitePieceColor(whiteColor.getColor());
     boardManager.setBlackPieceColor(blackColor.getColor());
     boardManager.setWhiteOutlineColor(whiteOutline.getColor());
