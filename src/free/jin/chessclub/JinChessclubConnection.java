@@ -911,7 +911,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     return new Game(gameType, initialPosition, 0, whiteName, blackName, whiteInitial,
       whiteIncrement, blackInitial, blackIncrement, whiteRating, blackRating,
-      String.valueOf(gameNumber), ratingCategoryString, isRated, isPlayedGame, whiteTitles,
+      new Integer(gameNumber), ratingCategoryString, isRated, isPlayedGame, whiteTitles,
       blackTitles, isInitiallyFlipped, userPlayer);
   }
 
@@ -1227,9 +1227,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   /**
    * This method changes the settings of the given game to the given settings.
-   * Since Game objects are immutable, it does this by stopping the current game
-   * and then creating a new one and bringing it to the state of the old one.
-   * This method only works for started games.
    */
   
   protected void updateGame(int gameType, int gameNumber, String whiteName, String blackName,
@@ -1237,55 +1234,26 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       int blackInitial, int blackIncrement, boolean isPlayedGame, int whiteRating, 
       int blackRating, Object gameID, String whiteTitles, String blackTitles){
         
-    GameInfo gameInfo = removeGameInfo(gameNumber);
-    Game game = gameInfo.game;
-
-    int result = 
-      (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
-    if (game.getResult() == Game.GAME_IN_PROGRESS) // Make sure the game doesn't remain in progress
-      game.setResult(result);
-
-    fireGameEvent(new GameEndEvent(this, game, result));
-
-    Game newGame = new Game(gameType, game.getInitialPosition(), game.getPliesSinceStart(),
-      whiteName, blackName, whiteInitial, whiteIncrement, blackInitial, blackIncrement,
-      whiteRating, blackRating, String.valueOf(gameNumber), ratingCategoryString, isRated,
-      isPlayedGame, whiteTitles, blackTitles, game.isBoardInitiallyFlipped(),
-      game.getUserPlayer());
-      
-    GameInfo newGameInfo = new GameInfo(newGame, new Position(newGame.getInitialPosition()),
-      gameInfo.numMovesToFollow);
-    addGameInfo(gameNumber, newGameInfo);
-
-    fireGameEvent(new GameStartEvent(this, newGame));
-
-    Position position = newGameInfo.position;
-    int numMoves = gameInfo.moves.size();
-    for (int i = 0; i < numMoves; i++){
-      Move move = (Move)gameInfo.moves.elementAt(i);
-
-      position.makeMove(move);
-      newGameInfo.moves.addElement(move);
-
-      fireGameEvent(new MoveMadeEvent(this, newGame, move, false));
-    }
-
-    newGameInfo.isFlipped = gameInfo.isFlipped;
-    fireGameEvent(new BoardFlipEvent(this, newGame, newGameInfo.isFlipped));    
-
-    int whiteTime = gameInfo.getWhiteTime();
-    if (gameInfo.isWhiteClockRunning())
-      whiteTime -= (System.currentTimeMillis()-gameInfo.getWhiteTimestamp());
-    newGameInfo.setWhiteClock(whiteTime, gameInfo.isWhiteClockRunning());
-    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.WHITE_PLAYER, whiteTime,
-      newGameInfo.isWhiteClockRunning()));
-
-    int blackTime = gameInfo.getBlackTime();
-    if (gameInfo.isBlackClockRunning())
-      blackTime -= (System.currentTimeMillis()-gameInfo.getBlackTimestamp());
-    newGameInfo.setBlackClock(blackTime, gameInfo.isBlackClockRunning());
-    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.BLACK_PLAYER, blackTime,
-      newGameInfo.isBlackClockRunning()));
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+      Game game = gameInfo.game;
+  
+      game.setGameType(gameType);
+      game.setId(new Integer(gameNumber));
+      game.setWhiteName(whiteName);
+      game.setBlackName(blackName);
+      game.setRatingCategoryString(ratingCategoryString);
+      game.setRated(isRated);
+      game.setWhiteTime(whiteInitial);
+      game.setWhiteInc(whiteIncrement);
+      game.setBlackTime(blackInitial);
+      game.setBlackInc(blackIncrement);
+      game.setPlayed(isPlayedGame);
+      game.setWhiteRating(whiteRating);
+      game.setBlackRating(blackRating);
+      game.setWhiteTitles(whiteTitles);
+      game.setBlackTitles(blackTitles);
+    } catch (NoSuchGameException e){}
   }
   
   
