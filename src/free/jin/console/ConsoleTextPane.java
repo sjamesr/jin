@@ -178,15 +178,23 @@ public class ConsoleTextPane extends JTextPane{
       try{
         int wordStart = Utilities.getWordStart(this, pressedLocation);
         int wordEnd = Utilities.getWordEnd(this, pressedLocation);
-        select(wordStart, wordEnd);
+        if (isAboveText(evt.getX(), evt.getY(), wordStart, wordEnd)){
+          selection = getDocument().getText(wordStart, wordEnd - wordStart);
+          if (selection.trim().length() != 0) // Don't override current selection with whitespace selection
+            select(wordStart, wordEnd);
+
+          selection = getSelectedText();
+        }
       } catch (BadLocationException e){
+          e.printStackTrace();
           return null;
         }
-
-      selection = getSelectedText();
     }
 
-    if (defaultPopupMenu==null){
+    if ((selection == null) || (selection.length() == 0))
+      return null;
+
+    if (defaultPopupMenu == null){
       int numCommands = Integer.parseInt(console.getProperty("output-popup.num-commands", "0"));
       if (numCommands == 0)
         return null;
@@ -445,8 +453,20 @@ public class ConsoleTextPane extends JTextPane{
     if (startCharRect.y + startCharRect.height <= endCharRect.y){ // Separate lines.
       if (y > startCharRect.y){
         if (y <= startCharRect.y + startCharRect.height){
-          if (x > startCharRect.x)
-            return true;
+          if (x > startCharRect.x){
+            try{
+              int lineEnd = Utilities.getRowEnd(this, startPos);
+              if (lineEnd == -1)
+                return false;
+
+              Rectangle lineEndCharRect = modelToView(lineEnd);
+              if (x <= lineEndCharRect.x + lineEndCharRect.width)
+                return true;
+            } catch (BadLocationException e){ // Shouldn't happen
+                e.printStackTrace();
+                return false;
+              }
+          }
         }
         else if (y < endCharRect.y)
           return true;
