@@ -125,12 +125,23 @@ public class Server{
 
 
 
+
+  /**
+   * Returns a long server name.
+   */
+
+  public String getLongName(){
+    return getProperty("name.long");
+  }
+
+
+
   /**
    * Returns a textual representation of this Server.
    */
 
   public String toString(){
-    return getProperty("name.long");
+    return getLongName();
   }
 
 }
