@@ -24,6 +24,7 @@ package free.util.audio;
 import sun.audio.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import free.util.BlockingQueue;
 
 
 /**
@@ -39,10 +40,10 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
 
 
   /**
-   * The time when the last sound finished playing.
+   * The maximum amount of AudioClips we're allowed to queue.
    */
 
-  private static long lastFinishedSoundTime = 0;
+  public static final int MAX_QUEUE_SIZE = 2;
 
 
 
@@ -54,57 +55,38 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
 
 
 
-
   /**
-   * True when the thread is ready to play the clip, false if it's currently
-   * playing one.
+   * The queue holding AudioClips for the player thread to play.
    */
 
-  private static volatile boolean ready = false;
-
-
-
-
-  /**
-   * The audio clip to play next;
-   */
-
-  private static AudioClip clipToPlay = null;
+  private static final BlockingQueue clipQueue = new BlockingQueue();
 
 
 
 
   /**
    * Plays the given AudioClip, throws an IOException if unsuccessful. Due to
-   * bugs in mixing sound in sun.audio.AudioPlayer, this method tries to estimate
-   * the amount of time the clip will take to play (which it can do pretty accurately
-   * knowing that the sample rate must be 8000hz) and ignores subsequent
-   * calls if they occur within the interval needed for the sound to finish playing.
+   * bugs in mixing sound in sun.audio.AudioPlayer, calling this method while
+   * an AudioClip is already playing will cause the new clip to be queued for
+   * playing instead of mixed with the currently playing one as may happen with
+   * other AudioPlayer implementations. The queue has an upper bound for its
+   * size. Once that many AudioClips are queued, further requests will be
+   * silently dropped.
    */
 
-  public void play(AudioClip clip){
-    synchronized(SunAudioPlayer.class){ // It doesn't mix well several sounds playing simultaneously.
-      if (lastFinishedSoundTime+200>=System.currentTimeMillis()){ // Give a some time on top.
-        System.err.println("Sound already playing, ignoring play request.");
-        return; // Ignore.
-      }
-
-      if ((playerThread!=null)&&!ready){ // It should be null, time+200ms is up.
-        playerThread.stop();
-        playerThread = null;
-      }
-
-      this.clipToPlay = clip;
-
-      if (playerThread==null){
-        playerThread = new Thread(this);
-        playerThread.setDaemon(true);
-        playerThread.start();
-      }
-      else{
-        SunAudioPlayer.class.notify();
-      }
+  public synchronized void play(AudioClip clip){
+    if (clipQueue.size() == MAX_QUEUE_SIZE){
+      System.err.println("Queue full, ignoring play request.");
+      return; // Ignore.
     }
+
+    if (playerThread==null){ // Lazily start the thread.
+      playerThread = new Thread(this, "SunAudioPlayer");
+      playerThread.setDaemon(true);
+      playerThread.start();
+    }
+
+    clipQueue.push(clip);
   }
 
 
@@ -115,32 +97,24 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    */
 
   public void run(){
-    while (true){
-      synchronized(SunAudioPlayer.class){
-        if (clipToPlay==null)
-          try{
-            SunAudioPlayer.class.wait();
-          } catch (InterruptedException e){
-              e.printStackTrace();
-            }
+    try{
+      int timeToWait = 0;
+      while (true){
+        if (timeToWait!=0)
+          Thread.sleep(timeToWait);
+        AudioClip clip = (AudioClip)clipQueue.pop();
+        byte [] data = clip.getData();
+        timeToWait = data.length/8;
+        try{
+          NativeAudioStream audioStream = new NativeAudioStream(new ByteArrayInputStream(data));
+          sun.audio.AudioPlayer.player.start(audioStream);
+        } catch (IOException e){
+            return;
+          }
       }
-      AudioClip clip = clipToPlay;
-      clipToPlay = null;
-      ready = false;
-
-      byte [] data = clip.getData();
-      int timeToPlay = data.length/8;
-      lastFinishedSoundTime = System.currentTimeMillis()+timeToPlay;
-      try{
-        NativeAudioStream audioStream = new NativeAudioStream(new ByteArrayInputStream(data));
-        sun.audio.AudioPlayer.player.start(audioStream);
-      } catch (IOException e){
-          return;
-        }
-
-      ready = true;
-    }
+    } catch (InterruptedException e){}
   }
 
 
 }
+ 
