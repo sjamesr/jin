@@ -202,7 +202,8 @@ public class ColorChooserButton extends JComponent implements ActionListener{
    */
 
   public void actionPerformed(ActionEvent evt){
-    Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(this), "Chooser a color", color);
+    Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(this),
+      "Choose a color", color);
     if (newColor != null)
       setColor(newColor);
   }
