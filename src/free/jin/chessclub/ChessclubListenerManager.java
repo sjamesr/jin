@@ -30,7 +30,7 @@ import free.jin.event.BasicListenerManager;
 
 /**
  * A chessclub.com specific extension of BasicListenerManager. Used by
- * <code>ChessclubConnection</code>
+ * <code>JinChessclubConnection</code>.
  */
 
 public class ChessclubListenerManager extends BasicListenerManager{
@@ -60,17 +60,6 @@ public class ChessclubListenerManager extends BasicListenerManager{
 
 
   /**
-   * Sets the state of the datagram with the given code.
-   */
-
-  private void setDGState(int dgCode, boolean state){
-    source.setDGState(dgCode, state);
-  }
-
-
-
-
-  /**
    * Adds the given ChatListener to receive notification when chat related
    * messages arrive from the server.
    */
@@ -79,12 +68,12 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.addChatListener(listener);
 
     if (listenerList.getListenerCount(ChatListener.class) == 1){
-      setDGState(Datagram.DG_PERSONAL_TELL, true);
-      setDGState(Datagram.DG_PERSONAL_QTELL, true);
-      setDGState(Datagram.DG_SHOUT, true);
-      setDGState(Datagram.DG_CHANNEL_TELL, true);
-      setDGState(Datagram.DG_CHANNEL_QTELL, true);
-      setDGState(Datagram.DG_KIBITZ, true);
+      source.addDatagramListener(source, Datagram.DG_PERSONAL_TELL);
+      source.addDatagramListener(source, Datagram.DG_PERSONAL_QTELL);
+      source.addDatagramListener(source, Datagram.DG_SHOUT);
+      source.addDatagramListener(source, Datagram.DG_CHANNEL_TELL);
+      source.addDatagramListener(source, Datagram.DG_CHANNEL_QTELL);
+      source.addDatagramListener(source, Datagram.DG_KIBITZ);
     }
   }
 
@@ -100,12 +89,12 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.removeChatListener(listener);
 
     if (listenerList.getListenerCount(ChatListener.class) == 0){
-      setDGState(Datagram.DG_PERSONAL_TELL, false);
-      setDGState(Datagram.DG_PERSONAL_QTELL, false);
-      setDGState(Datagram.DG_SHOUT, false);
-      setDGState(Datagram.DG_CHANNEL_TELL, false);
-      setDGState(Datagram.DG_CHANNEL_QTELL, true);
-      setDGState(Datagram.DG_KIBITZ, false);
+      source.removeDatagramListener(source, Datagram.DG_PERSONAL_TELL);
+      source.removeDatagramListener(source, Datagram.DG_PERSONAL_QTELL);
+      source.removeDatagramListener(source, Datagram.DG_SHOUT);
+      source.removeDatagramListener(source, Datagram.DG_CHANNEL_TELL);
+      source.removeDatagramListener(source, Datagram.DG_CHANNEL_QTELL);
+      source.removeDatagramListener(source, Datagram.DG_KIBITZ);
     }
   }
 
@@ -123,29 +112,29 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.addGameListener(listener);
 
     if (listenerList.getListenerCount(GameListener.class) == 1){
-      setDGState(Datagram.DG_MY_GAME_STARTED, true);
-      setDGState(Datagram.DG_STARTED_OBSERVING, true);
-      setDGState(Datagram.DG_ISOLATED_BOARD, true);
-      setDGState(Datagram.DG_MY_GAME_CHANGE, true);
-      setDGState(Datagram.DG_MY_GAME_RESULT, true);
-      setDGState(Datagram.DG_POSITION_BEGIN, true);
-      setDGState(Datagram.DG_MY_RELATION_TO_GAME, true);
-      setDGState(Datagram.DG_SEND_MOVES, true);
-      setDGState(Datagram.DG_MOVE_SMITH, true);
-      setDGState(Datagram.DG_MOVE_ALGEBRAIC, true);
-      setDGState(Datagram.DG_IS_VARIATION, true);
-      setDGState(Datagram.DG_BACKWARD, true);
-      setDGState(Datagram.DG_TAKEBACK, true);
-      setDGState(Datagram.DG_ILLEGAL_MOVE, true);
-      setDGState(Datagram.DG_MSEC, true);
-      setDGState(Datagram.DG_OFFERS_IN_MY_GAME, true);
-      setDGState(Datagram.DG_MORETIME, true);
-      setDGState(Datagram.DG_FLIP, true);
-      setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, true);
-      setDGState(Datagram.DG_ARROW, true);
-      setDGState(Datagram.DG_UNARROW, true);
-      setDGState(Datagram.DG_CIRCLE, true);
-      setDGState(Datagram.DG_UNCIRCLE, true);
+      source.addDatagramListener(source, Datagram.DG_MY_GAME_STARTED);
+      source.addDatagramListener(source, Datagram.DG_STARTED_OBSERVING);
+      source.addDatagramListener(source, Datagram.DG_ISOLATED_BOARD);
+      source.addDatagramListener(source, Datagram.DG_MY_GAME_CHANGE);
+      source.addDatagramListener(source, Datagram.DG_MY_GAME_RESULT);
+      source.addDatagramListener(source, Datagram.DG_POSITION_BEGIN);
+      source.addDatagramListener(source, Datagram.DG_MY_RELATION_TO_GAME);
+      source.addDatagramListener(source, Datagram.DG_SEND_MOVES);
+      source.addDatagramListener(source, Datagram.DG_MOVE_SMITH);
+      source.addDatagramListener(source, Datagram.DG_MOVE_ALGEBRAIC);
+      source.addDatagramListener(source, Datagram.DG_IS_VARIATION);
+      source.addDatagramListener(source, Datagram.DG_BACKWARD);
+      source.addDatagramListener(source, Datagram.DG_TAKEBACK);
+      source.addDatagramListener(source, Datagram.DG_ILLEGAL_MOVE);
+      source.addDatagramListener(source, Datagram.DG_MSEC);
+      source.addDatagramListener(source, Datagram.DG_OFFERS_IN_MY_GAME);
+      source.addDatagramListener(source, Datagram.DG_MORETIME);
+      source.addDatagramListener(source, Datagram.DG_FLIP);
+      source.addDatagramListener(source, Datagram.DG_KNOWS_FISCHER_RANDOM);
+      source.addDatagramListener(source, Datagram.DG_ARROW);
+      source.addDatagramListener(source, Datagram.DG_UNARROW);
+      source.addDatagramListener(source, Datagram.DG_CIRCLE);
+      source.addDatagramListener(source, Datagram.DG_UNCIRCLE);
       source.setStyle(13);
     }
   }
@@ -162,29 +151,29 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.removeGameListener(listener);
 
     if (listenerList.getListenerCount(GameListener.class) == 0){
-      setDGState(Datagram.DG_MY_GAME_STARTED, false);
-      setDGState(Datagram.DG_STARTED_OBSERVING, false);
-      setDGState(Datagram.DG_ISOLATED_BOARD, false);
-      setDGState(Datagram.DG_MY_GAME_CHANGE, false);
-      setDGState(Datagram.DG_MY_GAME_RESULT, false);
-      setDGState(Datagram.DG_POSITION_BEGIN, false);
-      setDGState(Datagram.DG_MY_RELATION_TO_GAME, false);
-      setDGState(Datagram.DG_SEND_MOVES, false);
-      setDGState(Datagram.DG_MOVE_SMITH, false);
-      setDGState(Datagram.DG_MOVE_ALGEBRAIC, false);
-      setDGState(Datagram.DG_IS_VARIATION, false);
-      setDGState(Datagram.DG_BACKWARD, false);
-      setDGState(Datagram.DG_TAKEBACK, false);
-      setDGState(Datagram.DG_ILLEGAL_MOVE, false);
-      setDGState(Datagram.DG_MSEC, false);
-      setDGState(Datagram.DG_OFFERS_IN_MY_GAME, false);
-      setDGState(Datagram.DG_MORETIME, false);
-      setDGState(Datagram.DG_FLIP, false);
-      setDGState(Datagram.DG_KNOWS_FISCHER_RANDOM, false);
-      setDGState(Datagram.DG_ARROW, false);
-      setDGState(Datagram.DG_UNARROW, false);
-      setDGState(Datagram.DG_CIRCLE, false);
-      setDGState(Datagram.DG_UNCIRCLE, false);
+      source.removeDatagramListener(source, Datagram.DG_MY_GAME_STARTED);
+      source.removeDatagramListener(source, Datagram.DG_STARTED_OBSERVING);
+      source.removeDatagramListener(source, Datagram.DG_ISOLATED_BOARD);
+      source.removeDatagramListener(source, Datagram.DG_MY_GAME_CHANGE);
+      source.removeDatagramListener(source, Datagram.DG_MY_GAME_RESULT);
+      source.removeDatagramListener(source, Datagram.DG_POSITION_BEGIN);
+      source.removeDatagramListener(source, Datagram.DG_MY_RELATION_TO_GAME);
+      source.removeDatagramListener(source, Datagram.DG_SEND_MOVES);
+      source.removeDatagramListener(source, Datagram.DG_MOVE_SMITH);
+      source.removeDatagramListener(source, Datagram.DG_MOVE_ALGEBRAIC);
+      source.removeDatagramListener(source, Datagram.DG_IS_VARIATION);
+      source.removeDatagramListener(source, Datagram.DG_BACKWARD);
+      source.removeDatagramListener(source, Datagram.DG_TAKEBACK);
+      source.removeDatagramListener(source, Datagram.DG_ILLEGAL_MOVE);
+      source.removeDatagramListener(source, Datagram.DG_MSEC);
+      source.removeDatagramListener(source, Datagram.DG_OFFERS_IN_MY_GAME);
+      source.removeDatagramListener(source, Datagram.DG_MORETIME);
+      source.removeDatagramListener(source, Datagram.DG_FLIP);
+      source.removeDatagramListener(source, Datagram.DG_KNOWS_FISCHER_RANDOM);
+      source.removeDatagramListener(source, Datagram.DG_ARROW);
+      source.removeDatagramListener(source, Datagram.DG_UNARROW);
+      source.removeDatagramListener(source, Datagram.DG_CIRCLE);
+      source.removeDatagramListener(source, Datagram.DG_UNCIRCLE);
       source.setStyle(1);
       source.lastGameListenerRemoved();
     }
@@ -261,8 +250,8 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.addSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 1){
-      setDGState(Datagram.DG_SEEK, true);
-      setDGState(Datagram.DG_SEEK_REMOVED, true);
+      source.addDatagramListener(source, Datagram.DG_SEEK);
+      source.addDatagramListener(source, Datagram.DG_SEEK_REMOVED);
     }
     else
       source.notFirstListenerAdded(listener);
@@ -280,8 +269,8 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.removeSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 0){
-      setDGState(Datagram.DG_SEEK, false);
-      setDGState(Datagram.DG_SEEK_REMOVED, false);
+      source.removeDatagramListener(source, Datagram.DG_SEEK);
+      source.removeDatagramListener(source, Datagram.DG_SEEK_REMOVED);
 
       source.lastSeekListenerRemoved();
     }
@@ -298,8 +287,8 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.addGameListListener(listener);
 
     if (listenerList.getListenerCount(GameListListener.class)==1){
-      setDGState(Datagram.DG_GAMELIST_BEGIN, true);
-      setDGState(Datagram.DG_GAMELIST_ITEM, true);
+      source.addDatagramListener(source, Datagram.DG_GAMELIST_BEGIN);
+      source.addDatagramListener(source, Datagram.DG_GAMELIST_ITEM);
     }
   }
 
@@ -315,55 +304,13 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.removeGameListListener(listener);
 
     if (listenerList.getListenerCount(GameListListener.class)==0){
-      setDGState(Datagram.DG_GAMELIST_BEGIN, false);
-      setDGState(Datagram.DG_GAMELIST_ITEM, false);
+      source.removeDatagramListener(source, Datagram.DG_GAMELIST_BEGIN);
+      source.removeDatagramListener(source, Datagram.DG_GAMELIST_ITEM);
     }
   }
 
 
 
-
-//  /**
-//   * Adds the given FriendsListener to the list of listeners receiving
-//   * notifications about friends.
-//   */
-//
-//  public void addFriendsListener(FriendsListener listener){
-//    super.addFriendsListener(listener);
-//
-//    if (listenerList.getListenerCount(FriendsListener.class)==1){
-////      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
-////      setDGState(Datagram.DG_NOTIFY_LEFT, true);
-////      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-//
-//      source.firstFriendsListenerAdded();
-//    }
-//  }
-//
-//
-//
-//
-//
-//  /**
-//   * Removes the given FriendsListener from the list of listeners receiving
-//   * notifications about friends.
-//   */
-//
-//  public void removeFriendsListener(FriendsListener listener){
-//    super.removeFriendsListener(listener);
-//
-//    if (listenerList.getListenerCount(FriendsListener.class)==0){
-//      setDGState(Datagram.DG_NOTIFY_ARRIVED, true);
-//      setDGState(Datagram.DG_NOTIFY_LEFT, true);
-//      setDGState(Datagram.DG_MY_NOTIFY_LIST, true);
-//
-//      source.lastFriendsListenerRemoved();
-//    }
-//  }
-
- 
-
- 
 
   /**
    * Adds the given ChessEventListener to the list of listeners receiving
@@ -374,8 +321,8 @@ public class ChessclubListenerManager extends BasicListenerManager{
     listenerList.add(ChessEventListener.class, listener);
 
     if (listenerList.getListenerCount(ChessEventListener.class)==1){
-      setDGState(Datagram.DG_TOURNEY, true);
-      setDGState(Datagram.DG_REMOVE_TOURNEY, true);
+      source.addDatagramListener(source, Datagram.DG_TOURNEY);
+      source.addDatagramListener(source, Datagram.DG_REMOVE_TOURNEY);
     }
   }
 
@@ -390,8 +337,8 @@ public class ChessclubListenerManager extends BasicListenerManager{
     listenerList.remove(ChessEventListener.class, listener);
 
     if (listenerList.getListenerCount(ChessEventListener.class)==0){
-      setDGState(Datagram.DG_TOURNEY, false);
-      setDGState(Datagram.DG_REMOVE_TOURNEY, false);
+      source.removeDatagramListener(source, Datagram.DG_TOURNEY);
+      source.removeDatagramListener(source, Datagram.DG_REMOVE_TOURNEY);
     }
   }
 
