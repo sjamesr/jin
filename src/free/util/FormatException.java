@@ -26,64 +26,69 @@ package free.util;
  * Thrown when the format of something is wrong.
  */
 
-public class FormatException extends IllegalArgumentException{
+public class FormatException extends Exception{
 
 
 
   /**
-   * The "real" exception that was thrown.
+   * The "reason" exception that caused this exception to be thrown.
    */
 
   private final Throwable realException;
 
   
 
-
   /**
-   * Creates a new FormatException for the given real Throwable and the given
-   * message.
+   * Creates a new <code>FormatException</code> with the specified "reason"
+   * <code>Throwable</code> and message.
    */
 
   public FormatException(Throwable realException, String message){
     super(message);
+    
     this.realException = realException;
   }
 
 
+  
   /**
-   * Creates a new FormatException for the given real Throwable.
+   * Creates a new <code>FormatException</code> with the specified "reason"
+   * <code>Throwable</code>.
    */
 
   public FormatException(Throwable realException){
-    this(realException,null);
+    this(realException, null);
   }
 
+  
 
   /**
-   * Creates a new FormatException with the given message.
+   * Creates a new <code>FormatException</code> with the specified message.
    */
 
   public FormatException(String message){
-    this(null,message);
+    this(null, message);
   }
 
 
-
+  
   /**
-   * Creates a new FormatException.
+   * Creates a new <code>FormatException</code>.
    */
 
   public FormatException(){
-    this(null,null);
+    this(null, null);
   }
 
 
 
   /**
-   * Returns the actual throwable that was thrown.
+   * Returns the actual throwable that resulted in this exception. For example,
+   * if an attempt to parse a string as an integer occurred, this should be
+   * the NumberFormatException that was thrown by <code>Integer.parseInt</code>.
    */
 
-  public Throwable getThrowable(){
+  public Throwable getReason(){
     return realException;
   }
 
@@ -107,7 +112,7 @@ public class FormatException extends IllegalArgumentException{
 
   public void printStackTrace(java.io.PrintStream s) { 
     synchronized(s){
-      if (realException!=null){
+      if (realException != null){
         s.println("++++");
         super.printStackTrace(s);
         realException.printStackTrace(s);
@@ -128,7 +133,7 @@ public class FormatException extends IllegalArgumentException{
 
   public void printStackTrace(java.io.PrintWriter s) { 
     synchronized(s){
-      if (realException!=null){
+      if (realException != null){
         s.println("++++");
         super.printStackTrace(s);
         realException.printStackTrace(s);
@@ -139,4 +144,6 @@ public class FormatException extends IllegalArgumentException{
     }
   }
 
+  
+  
 }
