@@ -350,6 +350,8 @@ public class SoughtGraph extends JComponent{
     for (int i = 0; i < seekMatrix.length; i++)
       for (int j = 0; j < seekMatrix[i].length; j++)
         seekMatrix[i][j] = null;
+    
+    repaint();
   }
 
 
