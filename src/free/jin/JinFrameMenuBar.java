@@ -405,7 +405,7 @@ public class JinFrameMenuBar extends JMenuBar{
       JDialog dialog = new JDialog(jinFrame, targetPlugin.getName()+" preferences", true);
       dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
       dialog.getContentPane().setLayout(new BorderLayout());
-      dialog.getContentPane().add(targetPlugin.createPreferencesUI());
+      dialog.getContentPane().add(targetPlugin.getPreferencesUI());
 
       AWTUtilities.centerWindow(dialog, jinFrame);
 
