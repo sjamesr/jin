@@ -165,20 +165,20 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       bounds = StringParser.parseRectangle(boundsString);
 
     if (bounds==null){
-//      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
-      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
+      soughtGraphFrame.setBounds(desktopBounds.width/4, desktopBounds.height/4, desktopBounds.width*3/4, desktopBounds.height*3/4);
+//      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
     }
     else
       soughtGraphFrame.setBounds(bounds);
 
-    boolean isMaximized = Boolean.valueOf(getProperty("maximized","false")).booleanValue();
+    boolean isMaximized = Boolean.valueOf(getProperty("maximized", "false")).booleanValue();
     if (isMaximized){
       try{
         soughtGraphFrame.setMaximum(true);
       } catch (java.beans.PropertyVetoException e){}
     }
 
-    boolean isIconified = Boolean.valueOf(getProperty("iconified","false")).booleanValue();
+    boolean isIconified = Boolean.valueOf(getProperty("iconified", "false")).booleanValue();
     if (isIconified){
       try{
         soughtGraphFrame.setIcon(true);
@@ -187,12 +187,12 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     JComponent icon = soughtGraphFrame.getDesktopIcon();
     String iconBoundsString = getProperty("frame-icon-bounds");
-    if (iconBoundsString!=null){
+    if (iconBoundsString != null){
       Rectangle iconBounds = StringParser.parseRectangle(iconBoundsString);
       icon.setBounds(iconBounds);
     }
 
-    if (Boolean.valueOf(getProperty("visible","true")).booleanValue())
+    if (Boolean.valueOf(getProperty("visible", "true")).booleanValue())
       showSoughtGraphFrame();
 
 
@@ -246,7 +246,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected JInternalFrame createSoughtGraphFrame(){
-    JInternalFrame frame = new JInternalFrame("Seek graph", false, true, false, true);
+    JInternalFrame frame = new JInternalFrame("Seek graph", true, true, true, true);
 
     String iconImageName = getProperty("icon-image");
     if (iconImageName != null){
