@@ -90,7 +90,7 @@ public class MoveMadeEvent extends GameEvent{
 
   /**
    * Returns <code>true</code> if the move was sent as a direct response to
-   * a move by a player. Returns false<code></code> if, for example, this is a
+   * a move by a player. Returns <code>false</code> if, for example, this is a
    * move that was actually done a while ago but we're only getting it now
    * because we've just started observing the game, making the move "old".
    */
