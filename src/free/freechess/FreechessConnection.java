@@ -230,7 +230,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     out = sock.getOutputStream();
 
     sendCommand(getRequestedUsername());
-    if ((getPassword() != null) && (getPassword().length() != 0))
+    if (getPassword() != null)
       sendCommand(getPassword());
 
     synchronized(loginLock){
