@@ -36,7 +36,7 @@
 
 	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark">
 	
-	<PARAM NAME="resources.pieces" VALUE="eboard xboard">
+	<PARAM NAME="resources.pieces" VALUE="fics/eboard xboard">
 			   
 <!--
 

@@ -34,9 +34,9 @@
 
 			   
 			   
-	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark wooden-light">
+	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light">
 	
-	<PARAM NAME="resources.pieces" VALUE="blitzin bookup dyche1 dyche2 dyche3 eboard xboard">
+	<PARAM NAME="resources.pieces" VALUE="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard">
 			   
 <!--
 
