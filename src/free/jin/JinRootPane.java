@@ -84,16 +84,7 @@ public class JinRootPane extends JRootPane{
 
     String wallpaperFilename = Jin.getProperty("desktop.wallpaper");
     Image wallpaper = wallpaperFilename==null ? null : Toolkit.getDefaultToolkit().getImage(wallpaperFilename);
-    if (wallpaper!=null){
-      MediaTracker tracker = new MediaTracker(this);
-      tracker.addImage(wallpaper,0);
-      try{
-        tracker.waitForAll();
-      } catch (InterruptedException e){
-          e.printStackTrace();
-        }
-    }
-    String wallpaperLayoutString = Jin.getProperty("desktop.wallpaper.layout","center");
+    String wallpaperLayoutString = Jin.getProperty("desktop.wallpaper.layout", "center");
     int wallpaperLayout = AdvancedJDesktopPane.CENTER;
     if (wallpaperLayoutString.equalsIgnoreCase("stretch"))
       wallpaperLayout = AdvancedJDesktopPane.STRETCH;
