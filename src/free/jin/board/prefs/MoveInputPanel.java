@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import free.jin.Game;
+import free.jin.OptionPanel;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.plugin.BadChangesException;
@@ -122,14 +123,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   protected final JRadioButton premove;
   
   
-  
-  /**
-   * The container holding all of the moving in advance mode selection UI. This
-   * is needed so that it can be disabled during games.
-   */
-   
-  private Container movingInAdvancePanel;
-   
   
   
   /**
@@ -233,6 +226,21 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     premove.setMnemonic('W');
     ActionListener movingInAdvanceListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        BoardManager boardManager = MoveInputPanel.this.boardManager;
+        if (boardManager.isUserPlaying()){
+          OptionPanel.error(boardManager.getUIProvider(), "Unable to change setting",
+            "Moving in advance settings may not be modified while playing a game");
+            
+          disallowMoveInAdvance.setSelected(
+            boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);
+          immediateSendMove.setSelected(
+            boardManager.getMoveSendingMode() == BoardManager.PREDRAG_MOVE_SENDING_MODE);
+          premove.setSelected(
+            boardManager.getMoveSendingMode() == BoardManager.PREMOVE_MOVE_SENDING_MODE);
+            
+          return;
+        }
+        
         fireStateChanged();
       }
     };
@@ -246,8 +254,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JComponent moveVisualizationPanel = createMoveVisualizationUI();
     JComponent movingInAdvancePanel = createMovingInAdvanceUI();
     
-    this.movingInAdvancePanel = movingInAdvancePanel;
-
     highlightTargetSquare.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         highlightColor.setEnabled(highlightTargetSquare.isSelected());
@@ -437,94 +443,13 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(immediateSendMove);
     panel.add(premove);
     panel.add(Box.createVerticalStrut(5));
-    panel.add(new JLabel("Some of the options may not")); 
+    panel.add(new JLabel("These settings may not")); 
     panel.add(new JLabel("be modified during a game")); 
     panel.add(Box.createVerticalGlue());
 
     return panel;    
   }
   
-  
-  
-  /**
-   * A game listener which allows us to disable the "moving in advance" panel
-   * during a game.
-   */
-   
-  private final GameListener gameListener = new GameAdapter(){
-    
-    public void gameStarted(GameStartEvent evt){
-      Game game = evt.getGame();
-      int gameType = game.getGameType();
-      
-      if ((gameType == Game.MY_GAME) && game.isPlayed())
-        userStartedPlaying();
-  
-      game.addPropertyChangeListener(new PropertyChangeListener(){
-        public void propertyChange(PropertyChangeEvent evt){
-          if ("played".equals(evt.getPropertyName())){
-            Game game = (Game)evt.getSource();
-            if (game.isPlayed())
-              userStartedPlaying();
-            else
-              userStoppedPlaying();
-          }
-        }
-      });
-    
-    }
-    
-    public void gameEnded(GameEndEvent evt){
-      Game game = evt.getGame();
-      int gameType = game.getGameType();
-  
-      if ((gameType == Game.MY_GAME) && game.isPlayed())
-        userStoppedPlaying();
-    }
-    
-    
-    private int playedGamesCount = 0;
-    
-    private void userStartedPlaying(){
-      playedGamesCount++;
-      
-      if (playedGamesCount == 1)
-        AWTUtilities.setContainerEnabled(movingInAdvancePanel, false);
-    }
-    
-    private void userStoppedPlaying(){
-      playedGamesCount--;
-      
-      if (playedGamesCount == 0)
-        AWTUtilities.setContainerEnabled(movingInAdvancePanel, true);
-    }
-     
-  };
-  
-  
-  
-  /**
-   * Registers a game listener so that we can disable the moving in advance
-   * panel during a game.
-   */
-   
-  public void addNotify(){
-    super.addNotify();
-    
-    boardManager.getConn().getListenerManager().addGameListener(gameListener);
-  }
-  
-  
-  
-  /**
-   * Unregisters the game listener registered by <code>addNotify</code>.
-   */
-   
-  public void removeNotify(){
-    super.removeNotify();
-    
-    boardManager.getConn().getListenerManager().removeGameListener(gameListener); 
-  }
   
 
   
