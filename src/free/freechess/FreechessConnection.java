@@ -305,7 +305,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * line symbol in the command.
    */
 
-  public void sendCommand(String command){
+  public synchronized void sendCommand(String command){
     if (!isConnected())
       throw new IllegalStateException("Not connected");
 
