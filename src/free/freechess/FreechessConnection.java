@@ -1269,7 +1269,18 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern illegalMovePattern = 
-    new Pattern("^Illegal move \\((.*)\\)\\..*");
+    new Pattern("^Illegal move \\((.*)\\)\\.(.*)");
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the user attempted to
+   * make a move when it is not his turn.
+   */
+
+  private static final Pattern notYourTurnPattern =
+    new Pattern("^(It is not your move.)$");
 
 
 
@@ -1280,16 +1291,29 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleIllegalMove(String line){
-    Matcher matcher = illegalMovePattern.matcher(line);
-    if (!matcher.find())
-      return false;
+    Matcher illegalMoveMatcher = illegalMovePattern.matcher(line);
+    Matcher notYourTurnMatcher = notYourTurnPattern.matcher(line);
 
-    String moveString = matcher.group(1);
+    if (illegalMoveMatcher.find()){
+      String moveString = illegalMoveMatcher.group(1);
+      String reason = illegalMoveMatcher.group(2);
 
-    if (!processIllegalMove(moveString))
-      processLine(line);
+      if (!processIllegalMove(moveString, reason))
+        processLine(line);
 
-    return true;
+      return true;
+    }
+    else if (notYourTurnMatcher.find()){
+      String moveString = null; // sigh
+      String reason = notYourTurnMatcher.group(1);
+
+      if (!processIllegalMove(moveString, reason))
+        processLine(line);
+
+      return true;
+    }
+
+    return false;
   }
 
 
@@ -1297,11 +1321,13 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * This method is called when a line specifying that an illegal move has been
-   * attempted is received. The specified string is the move string that was
-   * sent to the server.
+   * attempted is received. <code>moveString</code> is the move string that was
+   * sent to the server, if the server bothers to tells us what it was
+   * (otherwise, it is null). <code>reason</code> specifies the reason the move
+   * is illegal. This, too, may be null.
    */
 
-  protected boolean processIllegalMove(String moveString){return false;}
+  protected boolean processIllegalMove(String moveString, String reason){return false;}
 
 
 
