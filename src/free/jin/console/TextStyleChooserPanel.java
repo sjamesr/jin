@@ -366,7 +366,6 @@ public class TextStyleChooserPanel extends JPanel{
           String textAntialiasValue = "RenderingHints.VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
           bsh.eval("g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, "+textAntialiasValue+")");
         } catch (EvalError e){
-            e.printStackTrace();
             antialiasingSupported = false;
           }
       }
