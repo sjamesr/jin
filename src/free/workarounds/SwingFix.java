@@ -86,4 +86,23 @@ public class SwingFix{
     }
   }
 
+
+
+
+  /**
+   * Disables swing double buffering under Mac OS X since OS X does double
+   * buffering all by itself.
+   */
+
+  static{
+    String osName = System.getProperty("os.name");
+    if (osName.indexOf("Mac OS X") != -1){
+      // I know passing null may not be such a good idea, but the component
+      // argument is unused anyway, and the static method can't be "overriden"
+      // even though the documentation says it can :-).
+      RepaintManager.currentManager(null).setDoubleBufferingEnabled(false);
+    }
+  }
+
+
 }
