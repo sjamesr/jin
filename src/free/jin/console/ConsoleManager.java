@@ -30,6 +30,7 @@ import java.awt.*;
 import javax.swing.border.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.jin.plugin.PluginUIContainer;
@@ -209,7 +210,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     JMenuItem clearMenuItem = new JMenuItem("Clear Console");
     clearMenuItem.setMnemonic('C');
-    clearMenuItem.setAccelerator(KeyStroke.getKeyStroke("control E"));
+    clearMenuItem.setAccelerator(
+      KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     clearMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -467,6 +469,8 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       else
         column.setPreferredWidth(maxWidth);
     }
+    
+    
 
     String title = "  "+evt.getListTitle()+".  Displaying items "+evt.getFirstIndex()+"-"+evt.getLastIndex()+" out of "+evt.getItemCount()+"  ";
 
