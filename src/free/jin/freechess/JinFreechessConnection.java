@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
 import free.jin.event.ListenerManager;
+import free.jin.freechess.event.IvarStateChangeEvent;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.fischerrandom.FischerRandom;
@@ -218,7 +219,22 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   protected void processLine(String line){
     listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
   }
-
+  
+  
+  
+  /**
+   * Gets called when the server notifies us of a change in the state of some
+   * ivar.
+   */
+   
+  protected boolean processIvarStateChanged(Ivar ivar, boolean state){
+    IvarStateChangeEvent evt = new IvarStateChangeEvent(this, ivar, state);
+    
+    listenerManager.fireIvarStateChangeEvent(evt);
+    
+    return false;
+  }
+  
 
 
 
