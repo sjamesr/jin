@@ -37,38 +37,6 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
 
 
   /**
-   * The color of the white pieces.
-   */
-
-  private Color whiteColor;
-
-
-
-  /**
-   * The color of the black pieces.
-   */
-
-  private Color blackColor;
-
-
-
-  /**
-   * The color of the outline of the white pieces.
-   */
-
-  private Color whiteOutline;
-
-
-
-  /**
-   * The color of the outline of the black pieces.
-   */
-
-  private Color blackOutline;
-
-
-
-  /**
    * The size of the cached pieces.
    */
 
@@ -201,9 +169,6 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
     knightPolygon = null;
     pawnPolygon = null;
   }
-
-
-
 
 
 
@@ -409,8 +374,6 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
     g.setColor(outlineColor);
     g.drawPolygon(pawnPolygon);
   }    
-
-
 
 
 
