@@ -1092,18 +1092,14 @@ public class JinMain implements JinContext{
     File userPrefsFile = new File(prefsDir, "user.prefs");
     
     try{
-      if (userPrefsFile.canWrite())
-        userPrefs.save(userPrefsFile);
-      else
-        OptionPanel.error(uiProvider, "Saving Preferences Error",
-          "You don't have permissions to write:\n" + userPrefsFile);
+      userPrefs.save(userPrefsFile);
     } catch (SecurityException e){
         OptionPanel.error(uiProvider, "Saving Preferences Error",
           "The security manager doesn't allow writing:\n" + userPrefsFile);
       }
       catch (IOException e){
         OptionPanel.error(uiProvider, "Saving Preferences Error",
-          "Unable to save preferences into:\n" + userPrefsFile);
+          "Unable to save preferences into:\n" + userPrefsFile + "\nPerhaps you don't have permissions to write it?");
       }
   }
   
