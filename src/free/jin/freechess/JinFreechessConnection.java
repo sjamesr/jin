@@ -447,6 +447,23 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+  /**
+   * The user's primary played (by the user) game, -1 if unknown. This is only
+   * set when the user is playing more than one game.
+   */
+
+  private int primaryPlayedGame = -1;
+
+
+
+  /**
+   * The user's primary observed game, -1 if unknown. This is only set when
+   * the user is observing more than one game.
+   */
+
+  private int primaryObservedGame = -1;
+  
+
 
   /**
    * Returns the game with the specified number.
@@ -481,6 +498,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   private InternalGameData findMyGame() throws NoSuchGameException{
+    if (primaryPlayedGame != -1)
+      return getGameData(primaryPlayedGame);
+
     Enumeration gameNumbers = ongoingGamesData.keys();
     while (gameNumbers.hasMoreElements()){
       Integer gameNumber = (Integer)gameNumbers.nextElement();
@@ -799,6 +819,30 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+  /**
+   * Changes the primary played game.
+   */
+
+  protected boolean processSimulCurrentBoardChanged(int gameNumber, String oppName){
+    primaryPlayedGame = gameNumber;
+
+    return true;
+  }
+
+
+
+  /**
+   * Changes the primary observed game.
+   */
+
+  protected boolean processPrimaryGameChanged(int gameNumber){
+    primaryObservedGame = gameNumber;
+
+    return true;
+  }
+
+
+
 
 
   /**
@@ -1027,6 +1071,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void closeGame(int gameNumber, int result){
     Integer gameID = new Integer(gameNumber);
+
+    if (gameID.intValue() == primaryPlayedGame)
+      primaryPlayedGame = -1;
+    else if (gameID.intValue() == primaryObservedGame)
+      primaryObservedGame = -1;
+
     InternalGameData gameData = (InternalGameData)ongoingGamesData.remove(gameID);
     if (gameData != null){
       Game game = gameData.game;

@@ -506,6 +506,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handlePlayerCounteredTakebackOffer(line))
       return;
+    if (handleSimulCurrentBoardChanged(line))
+      return;
+    if (handlePrimaryGameChanged(line))
+      return;
 
     if (linesToFilter.remove(line) == null)
       processLine(line);
@@ -2219,6 +2223,90 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   protected boolean processPlayerCounteredTakebackOffer(int gameNum, String playerName,
       int takebackCount){
     return false;
+  }
+
+
+
+  /**
+   * The regular expression matching lines notifying the user which board he's
+   * at, in a simul.
+   */
+
+  private static final Pattern atBoardPattern = 
+    new Pattern("^You are now at ("+usernameRegex+")'s board \\(game (\\d+)\\)\\.$");
+
+
+
+  /**
+   * Handles lines notifying us that the board we're at (in a simul) has
+   * changed.
+   */
+
+  private boolean handleSimulCurrentBoardChanged(String line){
+    Matcher matcher = atBoardPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    String oppName = matcher.group(1);
+    int gameNumber = Integer.parseInt(matcher.group(2));
+
+    if (!processSimulCurrentBoardChanged(gameNumber, oppName))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * Gets called when a line notifying us that the current board in a simul
+   * we're giving has changed.
+   */
+
+  protected boolean processSimulCurrentBoardChanged(int gameNumber, String oppName){
+    return false;
+  }
+
+
+
+  /**
+   * The regular expression matching lines notifying us that the primary
+   * observed game has changed.
+   */
+
+  private static final Pattern primaryGameChangedPattern =
+    new Pattern("^Your primary game is now game (\\d+)\\.$");
+
+
+
+
+  /**
+   * Handles lines notifying us that the primary observed game has changed.
+   */
+
+  private boolean handlePrimaryGameChanged(String line){
+    Matcher matcher = primaryGameChangedPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    int gameNumber = Integer.parseInt(matcher.group(1));
+
+    if (!processPrimaryGameChanged(gameNumber))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when a line notifying us that the primary observes game has
+   * changed arrives.
+   */
+
+  protected boolean processPrimaryGameChanged(int gameNumber){
+    return true;
   }
 
 
