@@ -381,9 +381,28 @@ public class SoughtGraph extends JComponent{
 
     return rect;
   }
-
-
-
+  
+  
+  
+  /**
+   * Cached fonts.
+   */
+   
+  private Font timeStringFont = null;
+  private FontMetrics timeStringFontMetrics = null;
+  private Font ratingStringFont = null;
+  private Font seekFont = null;
+  private FontMetrics seekFontMetrics = null;
+  
+  
+  
+  /**
+   * The size at which the above sizes were cached, null if none.
+   */
+   
+  private Dimension fontsCachedAtSize = null;
+  
+  
 
   /**
    * Paints this SoughtGraph on the given Graphics.
@@ -394,6 +413,17 @@ public class SoughtGraph extends JComponent{
 
     int width = getWidth();
     int height = getHeight();
+    
+    if ((fontsCachedAtSize == null) || (width != fontsCachedAtSize.width) ||
+        (height != fontsCachedAtSize.height)){
+      timeStringFont = null;
+      timeStringFontMetrics = null;
+      ratingStringFont = null;
+      seekFont = null;
+      seekFontMetrics = null;
+      fontsCachedAtSize = new Dimension(width, height);
+    }
+    
 
     Color bg = getBackground();
     Color fg = getForeground();
@@ -457,12 +487,16 @@ public class SoughtGraph extends JComponent{
     String blitzString = prefs.getString("medium-category.name");
     String standardString = prefs.getString("slow-category.name");
     int timeStringHeight = (height-(graphY+graphHeight))/2;
-    int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, bulletString, bulletWidth, timeStringHeight);
-    int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, blitzString, blitzWidth, timeStringHeight);
-    int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, standardString, standardWidth, timeStringHeight);
-    int timeStringFontSize = Math.min(Math.min(bulletFontSize, blitzFontSize), standardFontSize);
-    Font timeStringFont = new Font(originalFont.getName(), originalFont.getStyle(), timeStringFontSize);
-    FontMetrics timeStringFontMetrics = g.getFontMetrics(timeStringFont);
+    
+    if (timeStringFont == null){
+      int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, bulletString, bulletWidth, timeStringHeight);
+      int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, blitzString, blitzWidth, timeStringHeight);
+      int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, standardString, standardWidth, timeStringHeight);
+      int fontSize = Math.min(Math.min(bulletFontSize, blitzFontSize), standardFontSize);
+      timeStringFont = new Font(originalFont.getName(), originalFont.getStyle(), fontSize);
+      timeStringFontMetrics = g.getFontMetrics(timeStringFont);
+    }
+    
     int bulletStringWidth = timeStringFontMetrics.stringWidth(bulletString);
     int blitzStringWidth = timeStringFontMetrics.stringWidth(blitzString);
     int standardStringWidth = timeStringFontMetrics.stringWidth(standardString);
@@ -477,11 +511,13 @@ public class SoughtGraph extends JComponent{
     String fifteenString = "1500";
     String twentyString = "2000";
     int ratingStringHeight = graphHeight/3; // This is obviously wrong, but we know for sure the height isn't going to limit us.
-    int tenFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, tenString, graphX-4, ratingStringHeight);
-    int fifteenFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, fifteenString, graphX-4, ratingStringHeight);
-    int twentyFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, twentyString, graphX-4, ratingStringHeight);
-    int ratingStringFontSize = Math.min(Math.min(tenFontSize, fifteenFontSize), twentyFontSize);
-    Font ratingStringFont = new Font(originalFont.getName(), originalFont.getStyle(), ratingStringFontSize);
+    if (ratingStringFont == null){
+      int tenFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, tenString, graphX-4, ratingStringHeight);
+      int fifteenFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, fifteenString, graphX-4, ratingStringHeight);
+      int twentyFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, twentyString, graphX-4, ratingStringHeight);
+      int ratingStringFontSize = Math.min(Math.min(tenFontSize, fifteenFontSize), twentyFontSize);
+      ratingStringFont = new Font(originalFont.getName(), originalFont.getStyle(), ratingStringFontSize);
+    }
     g.setFont(ratingStringFont);
     int ratingStringX = 1;
     g.drawString(tenString, ratingStringX, (int)(graphY+graphHeight-6*slotHeight));
@@ -489,12 +525,20 @@ public class SoughtGraph extends JComponent{
     g.drawString(twentyString, ratingStringX, (int)(graphY+graphHeight-26*slotHeight));
 
     // The current seek description string.
-    if (curSeek!=null){
+    if (curSeek != null){
       String seekString = getSeekString(curSeek);
       int seekStringHeight = (height-(graphY+graphHeight))/2;
-      int seekFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, seekString, width, seekStringHeight);
-      Font seekFont = new Font(originalFont.getName(), originalFont.getStyle(), seekFontSize);
-      FontMetrics seekFontMetrics = g.getFontMetrics(seekFont);
+      
+      // Ideally, when caching the font size here, we should also take into account
+      // the string for which we're caching the size, but the limiting factor for
+      // the font size is practically always the height, so the string doesn't really
+      // matter.
+      if (seekFont == null){
+        int seekFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, seekString, width, seekStringHeight);
+        seekFont = new Font(originalFont.getName(), originalFont.getStyle(), seekFontSize);
+        seekFontMetrics = g.getFontMetrics(seekFont);
+      }
+      
       g.setFont(seekFont);
       g.drawString(seekString, 1, height-seekStringHeight+seekFontMetrics.getMaxAscent());
     }
