@@ -94,7 +94,7 @@ public class JinApplet extends JApplet{
    
   public void stop(){
     if (context != null)
-      context.quit(false);
+      context.stop();
   }
   
   
