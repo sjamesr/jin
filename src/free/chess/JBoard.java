@@ -1074,7 +1074,17 @@ public class JBoard extends JComponent{
   public void repaint(long time, int x, int y, int width, int height){
     super.repaint(time, x, y, width, height);
 
-    dirtyRect = RepaintManager.currentManager(this).getDirtyRegion(this);
+//    dirtyRect = RepaintManager.currentManager(this).getDirtyRegion(this);
+// This is commented out because if a component is obscured, and never painted
+// because of repaint() calls, RepaintManager will say that it's clean (except
+// for the last repaint call). I'm not sure why we need to ask the RepaintManager
+// for the dirty rect anyway... don't we know it ourselves?
+
+    if (dirtyRect == null)
+      dirtyRect = new Rectangle(x, y, width, height);
+    else
+      dirtyRect = dirtyRect.union(new Rectangle(x, y, width, height));
+
     dirtyRect = dirtyRect.intersection(new Rectangle(getSize()));
   }
 
