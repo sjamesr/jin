@@ -755,13 +755,15 @@ public class InternalFramesUIProvider implements UIProvider{
       Preferences prefs = context.getPrefs();
       String wallpaperFilename = prefs.getString("desktop.wallpaper.filename", null);
       File currentImageFile = wallpaperFilename == null ? null : new File(wallpaperFilename);
+      
       BackgroundChooser bChooser = new BackgroundChooser(mainContainer.getTopMostFrame(), desktop,
-        null, AdvancedJDesktopPane.CENTER, currentImageFile);
+        null, null, AdvancedJDesktopPane.CENTER, desktop.getBackground(), currentImageFile, 
+        desktop.getWallpaperLayoutStyle());
       bChooser.setVisible(true);
 
-      Color chosenColor = bChooser.getChosenColor();
-      File chosenImageFile = bChooser.getChosenImageFile();
-      int chosenLayoutStyle = bChooser.getChosenImageLayoutStyle();
+      Color chosenColor = bChooser.getColor();
+      File chosenImageFile = bChooser.getImageFile();
+      int chosenLayoutStyle = bChooser.getImageLayoutStyle();
 
       prefs.setColor("desktop.bgcolor", chosenColor);
       prefs.setString("desktop.wallpaper.filename", chosenImageFile == null ? null : chosenImageFile.getAbsolutePath());
@@ -775,9 +777,6 @@ public class InternalFramesUIProvider implements UIProvider{
       }
       prefs.setString("desktop.wallpaper.layout", layoutStyle);
     }
-
-
-
   }
 
 
