@@ -38,6 +38,7 @@ import free.chessclub.level2.Datagram;
 import free.jin.chessclub.event.CircleEvent;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
+import free.util.Pair;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.Array;
@@ -1012,6 +1013,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       if (game.getResult() == Game.GAME_IN_PROGRESS) 
         game.setResult(result);
 
+      clearOffers(gameInfo, Player.WHITE_PLAYER);
+      clearOffers(gameInfo, Player.BLACK_PLAYER);
       fireGameEvent(new GameEndEvent(this, game, result));
     }
     else{
@@ -1071,6 +1074,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       boolean isNewMove = (moveInfo.variationCode != MoveStruct.MOVE_INITIAL) &&
                           (moveInfo.variationCode != MoveStruct.MOVE_FORWARD);
 
+      clearOffers(gameInfo, move.getPlayer().getOpponent());
       fireGameEvent(new MoveMadeEvent(this, game, move, isNewMove));
 
       if (gameInfo.numMovesToFollow > 0){
@@ -1143,8 +1147,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       Position pos = gameInfo.position;
       Vector moves = gameInfo.moves;
 
-      int numMadeMoves = moves.size()-backwardCount;
-      for (int i=moves.size() - 1; i >= numMadeMoves; i--)
+      int numMadeMoves = moves.size() - backwardCount;
+      for (int i = moves.size() - 1; i >= numMadeMoves; i--)
         moves.removeElementAt(i);
 
       pos.copyFrom(game.getInitialPosition());
@@ -1179,10 +1183,83 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         pos.makeMove((Move)moves.elementAt(i));
 
       fireGameEvent(new TakebackEvent(this, game, takebackCount));
+      updateTakebackOffer(gameInfo, Player.WHITE_PLAYER, 0); // The server seems to only clear
+      updateTakebackOffer(gameInfo, Player.BLACK_PLAYER, 0); // takeback offers on a takeback
     } catch (NoSuchGameException e){}
   }
 
 
+
+  /**
+   * Fires the appropriate OfferEvent.
+   */
+
+  protected void processOffersInMyGame(int gameNumber, boolean whiteDraw, boolean blackDraw,
+      boolean whiteAdjourn, boolean blackAdjourn, boolean whiteAbort, boolean blackAbort,
+      int whiteTakeback, int blackTakeback){
+
+    try{
+      GameInfo gameInfo = getGameInfo(gameNumber);
+
+      updateOffer(gameInfo, OfferEvent.DRAW_OFFER, Player.WHITE_PLAYER, whiteDraw);
+      updateOffer(gameInfo, OfferEvent.DRAW_OFFER, Player.BLACK_PLAYER, blackDraw);
+      updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, Player.WHITE_PLAYER, whiteAdjourn);
+      updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, Player.BLACK_PLAYER, blackAdjourn);
+      updateOffer(gameInfo, OfferEvent.ABORT_OFFER, Player.WHITE_PLAYER, whiteAbort);
+      updateOffer(gameInfo, OfferEvent.ABORT_OFFER, Player.BLACK_PLAYER, blackAbort);
+
+      updateTakebackOffer(gameInfo, Player.WHITE_PLAYER, whiteTakeback);
+      updateTakebackOffer(gameInfo, Player.BLACK_PLAYER, blackTakeback);
+    } catch (NoSuchGameException e){}
+
+  }
+
+
+
+  /**
+   * Updates the specified offer if necessary.
+   */
+
+  private void updateOffer(GameInfo gameInfo, int offerId, Player player, boolean newState){
+    if (newState ^ gameInfo.isOfferred(offerId, player)){
+      gameInfo.setOffer(offerId, player, newState);
+      fireGameEvent(new OfferEvent(this, gameInfo.game, offerId, newState, player));
+    }
+  }
+
+
+
+  /**
+   * Updates a takeback offer, if necessary.
+   */
+
+  private void updateTakebackOffer(GameInfo gameInfo, Player player, int takebackCount){
+    int oldTakeback;
+    if ((oldTakeback = gameInfo.getTakebackOffer(player)) != takebackCount){
+      if (oldTakeback != 0)
+        fireGameEvent(new OfferEvent(this, gameInfo.game, false, player, oldTakeback));
+
+      gameInfo.setTakebackOffer(player, takebackCount);
+
+      if (takebackCount != 0)
+        fireGameEvent(new OfferEvent(this, gameInfo.game, true, player, takebackCount));
+    }
+  }
+
+
+
+  /**
+   * Clears all existing offers for the specified player in the specified game
+   * and fires the appropriate events.
+   */
+
+  private void clearOffers(GameInfo gameInfo, Player player){
+    updateOffer(gameInfo, OfferEvent.DRAW_OFFER, player, false);
+    updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, player, false);
+    updateOffer(gameInfo, OfferEvent.ABORT_OFFER, player, false);
+
+    updateTakebackOffer(gameInfo, player, 0);
+  }
 
 
 
@@ -1683,11 +1760,37 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
     /**
-     * The value of System.currentTimeMillis() when whiteTime and isBlackRunning were
-     * last updated.
+     * The value of System.currentTimeMillis() when whiteTime and isBlackRunning
+     * were last updated.
      */
 
     private long blackTimestamp;
+
+
+
+    /**
+     * Works as a set of the offers currently in this game. The elements are
+     * Pairs in which the first item is the player who made the offer and the
+     * second one is the offer id. Takeback offers are kept separately.
+     */
+
+    private final Hashtable offers = new Hashtable();
+
+
+
+    /**
+     * The number of plies the white player offerred to takeback.
+     */
+
+    private int whiteTakeback;
+
+
+
+    /**
+     * The number of plies the black player offerred to takeback.
+     */
+
+    private int blackTakeback;
 
 
 
@@ -1788,17 +1891,70 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
     /**
-     * Returns the value of System.currentTimeMillis() the last time white's clock
-     * was updated.
+     * Returns the value of System.currentTimeMillis() the last time white's
+     * clock was updated.
      */
 
     public long getBlackTimestamp(){
       return blackTimestamp;
     }
 
+
+
+    /**
+     * Sets the state of the specified offer in the game. Takeback offers are
+     * handled by the setTakebackCount method.
+     */
+
+    public void setOffer(int offerId, Player player, boolean isMade){
+      Pair offer = new Pair(player, new Integer(offerId));
+      if (isMade) 
+        offers.put(offer, offer);
+      else
+        offers.remove(offer);
+    }
+
+
+
+    /**
+     * Adds the specified takeback offer to the offers in the game.
+     */
+
+    public void setTakebackOffer(Player player, int plies){
+      if (player.isWhite())
+        whiteTakeback = plies;
+      else
+        blackTakeback = plies;
+    }
+
+
+
+    /**
+     * Returns true if the specified offer has been made (and hasn't been
+     * withdrawn) in the game. Takeback offers are handled by the
+     * getTakebackCount method.
+     */
+
+    public boolean isOfferred(int offerId, Player player){
+      return offers.containsKey(new Pair(player, new Integer(offerId)));
+    }
+
+
+
+    /**
+     * Returns the amount of plies offered to take back by the specified player.
+     */
+
+    public int getTakebackOffer(Player player){
+      if (player.isWhite())
+        return whiteTakeback;
+      else
+        return blackTakeback;
+    }
+
+    
+
   }
-
-
 
 
 

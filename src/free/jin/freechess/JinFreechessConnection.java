@@ -36,6 +36,7 @@ import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
 import free.chess.variants.atomic.Atomic;
+import free.util.Pair;
 
 
 /**
@@ -448,36 +449,73 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
-   * Returns the Game object currently assosiated with the specified game
-   * number. Returns <code>null</code> if there is no such game.
+   * Returns the game with the specified number.
+   * This method (currently) exists solely for the benefit of the arrow/circle
+   * script.
    */
 
-  public Game getGame(int gameNumber){
-    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(new Integer(gameNumber));
-    if (gameData == null)
-      return null;
-
-    return gameData.game;
+  public Game getGame(int gameNumber) throws NoSuchGameException{
+    return getGameData(gameNumber).game;
   }
 
 
 
   /**
-   * Finds the game played by the user. Returns the game number, or null if the
-   * user currently doesn't play a game.
+   * Returns the InternalGameData for the ongoing game with the specified
+   * number. Throws a <code>NoSuchGameException</code> if there's no such game.
    */
 
-  private Integer findMyGame(){
+  private InternalGameData getGameData(int gameNumber) throws NoSuchGameException{
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(new Integer(gameNumber));
+    if (gameData == null)
+      throw new NoSuchGameException();
+
+    return gameData;
+  }
+
+
+
+  /**
+   * Finds the (primary) game played by the user. Throws a
+   * <code>NoSuchGameException</code> if there's no such game.
+   */
+
+  private InternalGameData findMyGame() throws NoSuchGameException{
     Enumeration gameNumbers = ongoingGamesData.keys();
     while (gameNumbers.hasMoreElements()){
       Integer gameNumber = (Integer)gameNumbers.nextElement();
-      InternalGameData nextGameData = (InternalGameData)ongoingGamesData.get(gameNumber);
-      Game nextGame = nextGameData.game;
-      if (nextGame.getGameType() == Game.MY_GAME)
-        return gameNumber;
+      InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+      Game game = gameData.game;
+      if (game.getGameType() == Game.MY_GAME)
+        return gameData;
     }
 
-    return null;
+    throw new NoSuchGameException();
+  }
+
+
+
+  /**
+   * Finds the played user's game against the specified opponent.
+   * Returns the game number of null if no such game exists.
+   */
+
+  private InternalGameData findMyGameAgainst(String playerName) throws NoSuchGameException{
+    Enumeration gameNumbers = ongoingGamesData.keys();
+    while (gameNumbers.hasMoreElements()){
+      Integer gameNumber = (Integer)gameNumbers.nextElement();
+      InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
+      Game game = gameData.game;
+      Player userPlayer = game.getUserPlayer();
+      if (userPlayer == null) // Not our game or not played
+        continue;
+      Player oppPlayer = userPlayer.getOpponent();
+      if ((oppPlayer.isWhite() && game.getWhiteName().equals(playerName)) ||
+          (oppPlayer.isBlack() && game.getBlackName().equals(playerName)))
+        return gameData;
+    }
+
+    throw new NoSuchGameException();
   }
 
 
@@ -574,14 +612,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processBSetupMode(boolean entered){
-    Integer gameNumber = findMyGame();
-    if (gameNumber == null) // We're not playing a game. Weird, but what can we do?
-      return false;
+    try{
+      findMyGame().isBSetup = entered;
+    } catch (NoSuchGameException e){}
 
-    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
-    gameData.isBSetup = entered;
-
-    return false;
+    return super.processBSetupMode(entered);
   }
 
 
@@ -627,6 +662,32 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
     /**
+     * Works as a set of the offers currently in this game. The elements are
+     * Pairs in which the first item is the player who made the offer and the
+     * second one is the offer id. Takeback offers are kept separately.
+     */
+
+    private final Hashtable offers = new Hashtable();
+
+
+
+    /**
+     * The number of plies the white player offerred to takeback.
+     */
+
+    private int whiteTakeback;
+
+
+
+    /**
+     * The number of plies the black player offerred to takeback.
+     */
+
+    private int blackTakeback;
+
+
+
+    /**
      * Creates a new InternalGameData.
      */
 
@@ -645,8 +706,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     }
 
 
-
-
+ 
     /**
      * Adds the specified move to the moves list.
      */
@@ -680,6 +740,58 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     public void clearMoves(){
       moveList.removeAllElements();
+    }
+
+
+
+    /**
+     * Returns true if the specified offer is currently made by the specified
+     * player in this game.
+     */
+
+    public boolean isOffered(int offerId, Player player){
+      return offers.containsKey(new Pair(player, new Integer(offerId)));
+    }
+
+
+
+    /**
+     * Sets the state of the specified offer in the game. Takeback offers are
+     * handled by the setTakebackCount method.
+     */
+
+    public void setOffer(int offerId, Player player, boolean isMade){
+      Pair offer = new Pair(player, new Integer(offerId));
+      if (isMade) 
+        offers.put(offer, offer);
+      else
+        offers.remove(offer);
+    }
+
+
+
+    /**
+     * Sets the takeback offer in the game to the specified amount of plies.
+     */
+
+    public void setTakebackOffer(Player player, int plies){
+      if (player.isWhite())
+        whiteTakeback = plies;
+      else
+        blackTakeback = plies;
+    }
+
+
+
+    /**
+     * Returns the amount of plies offered to take back by the specified player.
+     */
+
+    public int getTakebackOffer(Player player){
+      if (player.isWhite())
+        return whiteTakeback;
+      else
+        return blackTakeback;
     }
 
 
@@ -947,31 +1059,28 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   private void illegalMoveAttempted(String moveString){
-    Integer gameNumber = findMyGame(); 
-      // We must find the played game, since the server doesn't provide its game number.
+    try{
+      InternalGameData gameData = findMyGame(); 
+      Game game = gameData.game;
 
-    if (gameNumber == null) // We're not playing a game. Weird, but what can we do?
-      return;
+      Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
 
-    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
-
-    Game game = gameData.game;
-
-    Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
-
-    // Not a move we made (probably the user typed it in)
-    if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) 
-      return;
+      // Not a move we made (probably the user typed it in)
+      if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) 
+        return;
 
 
-    Move move = (Move)unechoedGameMoves.elementAt(0);
+      Move move = (Move)unechoedGameMoves.elementAt(0);
 
-    // We have no choice but to allow (moveString == null) because the server
-    // doesn't always send us the move string (for example if it's not our turn).
-    if ((moveString == null) || moveToString(game, move).equals(moveString)){ // Our move, probably
-      unechoedGameMoves.removeAllElements();
-      listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
-    }
+      // We have no choice but to allow (moveString == null) because the server
+      // doesn't always send us the move string (for example if it's not our turn).
+      if ((moveString == null) || moveToString(game, move).equals(moveString)){
+        // Our move, probably
+
+        unechoedGameMoves.removeAllElements();
+        listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
+      }
+    } catch (NoSuchGameException e){}
   }
 
 
@@ -1210,6 +1319,327 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
 
+  /**
+   * Fires the appropriate OfferEvent.
+   */
+
+  protected boolean processOppOffered(String oppName, String offerName){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer().getOpponent(), true);
+    } catch (NoSuchGameException e){}
+
+    return super.processOppOffered(offerName, oppName);
+  }
+
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processOppOfferedTakeback(String oppName, int takebackCount){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+
+      Player oppPlayer = gameData.game.getUserPlayer().getOpponent();
+      // getUserPlayer shouldn't return null here because we've obtained the game
+      // via findMyGameAgainst which should only return user played games.
+
+      updateTakebackOffer(gameData, oppPlayer, takebackCount);
+    } catch (NoSuchGameException e){}
+    
+    return super.processOppOfferedTakeback(oppName, takebackCount);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processTakebackOfferUpdated(int gameNum, int takebackCount){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player;
+      if (gameData.getTakebackOffer(Player.WHITE_PLAYER) != 0)
+        player = Player.WHITE_PLAYER;
+      else
+        player = Player.BLACK_PLAYER;
+
+      updateTakebackOffer(gameData, player, takebackCount);
+    } catch (NoSuchGameException e){}
+
+    return super.processTakebackOfferUpdated(gameNum, takebackCount);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processOppCounteredTakebackOffer(String oppName, int takebackCount){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+
+      Player userPlayer = gameData.game.getUserPlayer(); 
+      // getUserPlayer shouldn't return null here because we've obtained the game
+      // via findMyGameAgainst which should only return user played games.
+
+      updateTakebackOffer(gameData, userPlayer, 0);
+      updateTakebackOffer(gameData, userPlayer.getOpponent(), takebackCount);
+    } catch (NoSuchGameException e){}
+
+    return super.processOppCounteredTakebackOffer(oppName, takebackCount);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processPlayerCounteredTakebackOffer(int gameNum, String playerName,
+      int takebackCount){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player = gameData.game.getPlayerNamed(playerName);
+
+      updateTakebackOffer(gameData, player.getOpponent(), 0);
+      updateTakebackOffer(gameData, player, takebackCount);
+    } catch (NoSuchGameException e){}
+
+    return super.processPlayerCounteredTakebackOffer(gameNum, playerName, takebackCount);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processUserOffered(String offerName){
+    try{
+      InternalGameData gameData = findMyGame();
+
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer(), true);
+    } catch (NoSuchGameException e){}
+
+    return super.processUserOffered(offerName);
+  }
+
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processOppDeclined(String oppName, String offerName){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+      
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer(), false);
+    } catch (NoSuchGameException e){}
+
+    return super.processOppDeclined(offerName, oppName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processUserDeclined(String oppName, String offerName){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+      
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer().getOpponent(), false);
+    } catch (NoSuchGameException e){}
+
+    return super.processUserDeclined(oppName, offerName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processOppWithdrew(String oppName, String offerName){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer().getOpponent(), false);
+    } catch (NoSuchGameException e){}
+
+    return super.processOppWithdrew(oppName, offerName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processUserWithdrew(String oppName, String offerName){
+    try{
+      InternalGameData gameData = findMyGameAgainst(oppName);
+
+      updateOffers(gameData, offerName, gameData.game.getUserPlayer(), false);
+    } catch (NoSuchGameException e){}
+    
+    return super.processUserWithdrew(oppName, offerName);
+  }
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processPlayerOffered(int gameNum, String playerName, String offerName){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player = gameData.game.getPlayerNamed(playerName);
+
+      updateOffers(gameData, offerName, player, true);
+    } catch (NoSuchGameException e){}
+
+    return super.processPlayerOffered(gameNum, playerName, offerName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processPlayerDeclined(int gameNum, String playerName, String offerName){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player = gameData.game.getPlayerNamed(playerName);
+
+      updateOffers(gameData, offerName, player.getOpponent(), false);
+    } catch (NoSuchGameException e){}
+
+    return super.processPlayerDeclined(gameNum, playerName, offerName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processPlayerWithdrew(int gameNum, String playerName, String offerName){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player = gameData.game.getPlayerNamed(playerName);
+
+      updateOffers(gameData, offerName, player, false);
+    } catch (NoSuchGameException e){}
+
+    return super.processPlayerWithdrew(gameNum, playerName, offerName);
+  }
+
+
+
+  /**
+   * Fires the appropriate OfferEvent(s).
+   */
+
+  protected boolean processPlayerOfferedTakeback(int gameNum, String playerName, int takebackCount){
+    try{
+      InternalGameData gameData = getGameData(gameNum);
+      Player player = gameData.game.getPlayerNamed(playerName);
+
+      updateTakebackOffer(gameData, player, takebackCount);
+    } catch (NoSuchGameException e){}
+
+    return super.processPlayerOfferedTakeback(gameNum, playerName, takebackCount);
+  }
+
+
+
+  /**
+   * Updates the specified offer, firing any necessary events.
+   */
+
+  private void updateOffers(InternalGameData gameData, String offerName, Player player, boolean on){
+    int offerId;
+    try{
+      offerId = offerIdForOfferName(offerName);
+    } catch (IllegalArgumentException e){return;}
+
+    Game game = gameData.game;
+
+    if (offerId == OfferEvent.TAKEBACK_OFFER){
+      // We're forced to fake this so that an event is fired even if we start observing a game
+      // with an existing takeback offer (of which we're not aware).
+      if ((!on) && (gameData.getTakebackOffer(player) == 0))
+        gameData.setTakebackOffer(player, 1);
+
+      updateTakebackOffer(gameData, player.getOpponent(), 0); // Remove any existing offers
+      updateTakebackOffer(gameData, player, on ? 1 : 0);
+      // 1 as the server doesn't tell us how many
+    }
+    else{// if (gameData.isOffered(offerId, player) != on){ this
+         // We check this because we might get such an event if we start observing a game with
+         // an existing offer.
+
+      gameData.setOffer(offerId, player, on);
+      listenerManager.fireGameEvent(new OfferEvent(this, game, offerId, on, player));
+    }
+  }
+
+
+
+  /**
+   * Returns the offerId (as defined by OfferEvent) corresponding to the
+   * specified offer name. Throws an IllegalArgumentException if the offer name
+   * is not recognizes.
+   */
+
+  private static int offerIdForOfferName(String offerName) throws IllegalArgumentException{
+    if ("draw".equals(offerName))
+      return OfferEvent.DRAW_OFFER;
+    else if ("abort".equals(offerName))
+      return OfferEvent.ABORT_OFFER;
+    else if ("adjourn".equals(offerName))
+      return OfferEvent.ADJOURN_OFFER;
+    else if ("takeback".equals(offerName))
+      return OfferEvent.TAKEBACK_OFFER;
+    else
+      throw new IllegalArgumentException("Unknown offer name: "+offerName);
+  }
+
+
+
+
+  /**
+   * Updates the takeback offer in the specified game to the specified amount of
+   * plies.
+   */
+
+  private void updateTakebackOffer(InternalGameData gameData, Player player, int takebackCount){
+    Game game = gameData.game;
+
+    int oldTakeback = gameData.getTakebackOffer(player);
+    if (oldTakeback != 0)
+      listenerManager.fireGameEvent(new OfferEvent(this, game, false, player, oldTakeback));
+
+    gameData.setTakebackOffer(player, takebackCount);
+
+    if (takebackCount != 0)
+      listenerManager.fireGameEvent(new OfferEvent(this, game, true, player, takebackCount));
+  }
+
+
+
 
   /**
    * Accepts the given seek. Note that the given seek must be an instance generated
@@ -1222,7 +1652,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     sendCommand("$play "+seek.getID());
   }
-
 
 
 

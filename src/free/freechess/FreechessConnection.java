@@ -482,6 +482,30 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       return;
     if (handleQTell(line))
       return;
+    if (handleOppOffered(line))
+      return;
+    if (handleUserOffered(line))
+      return;
+    if (handleOppDeclined(line))
+      return;
+    if (handleUserDeclined(line))
+      return;
+    if (handleOppWithdrew(line))
+      return;
+    if (handleUserWithdrew(line))
+      return;
+    if (handlePlayerOffered(line))
+      return;
+    if (handlePlayerDeclined(line))
+      return;
+    if (handlePlayerWithdrew(line))
+      return;
+    if (handleTakebackOfferUpdated(line))
+      return;
+    if (handleOppCounteredTakebackOffer(line))
+      return;
+    if (handlePlayerCounteredTakebackOffer(line))
+      return;
 
     if (linesToFilter.remove(line) == null)
       processLine(line);
@@ -559,7 +583,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handlePersonalTell(String line){
     Matcher matcher = personalTellPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -601,7 +625,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleSayTell(String line){
     Matcher matcher = sayPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -648,7 +672,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handlePTell(String line){
     Matcher matcher = ptellPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -690,7 +714,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleChannelTell(String line){
     Matcher matcher = channelTellPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -723,7 +747,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern kibitzPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([\\-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
 
 
 
@@ -735,7 +759,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleKibitz(String line){
     Matcher matcher = kibitzPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -744,7 +768,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String gameNumberString = matcher.group(4);
     String message = matcher.group(5);
 
-    int rating = (ratingString != null) && !ratingString.equals("----") ? Integer.parseInt(ratingString) : -1;
+    int rating = (ratingString != null) && !ratingString.equals("----") ?
+      Integer.parseInt(ratingString) : -1;
     int gameNumber = Integer.parseInt(gameNumberString);
 
     if (!processKibitz(username, titles, rating, gameNumber, message))
@@ -772,7 +797,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private static final Pattern whisperPattern = 
-    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
+    new Pattern("^("+usernameRegex+")("+titlesRegex+")?\\( {,3}([\\-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
 
 
 
@@ -784,7 +809,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleWhisper(String line){
     Matcher matcher = whisperPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -832,7 +857,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleQTell(String line){
     Matcher matcher = qtellPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String message = matcher.group(1);
@@ -873,7 +898,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleShout(String line){
     Matcher matcher = shoutPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -915,7 +940,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleIShout(String line){
     Matcher matcher = ishoutPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -958,7 +983,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleTShout(String line){
     Matcher matcher = tshoutPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -1001,7 +1026,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleCShout(String line){
     Matcher matcher = cshoutPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -1043,7 +1068,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleAnnouncement(String line){
     Matcher matcher = announcementPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     String username = matcher.group(1);
@@ -1083,7 +1108,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleGameInfo(String line){
     Matcher matcher = gameinfoPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     GameInfoStruct data = GameInfoStruct.parseGameInfoLine(line);
@@ -1124,7 +1149,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleStyle12(String line){
     Matcher matcher = style12Pattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     Style12Struct data = Style12Struct.parseStyle12Line(line);
@@ -1164,7 +1189,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleDeltaBoard(String line){
     Matcher matcher = deltaBoardPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     DeltaBoardStruct data = DeltaBoardStruct.parseDeltaBoardLine(line);
@@ -1208,7 +1233,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleGameEnd(String line){
     Matcher matcher = gameEndPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     int gameNumber = Integer.parseInt(matcher.group(1));
@@ -1254,7 +1279,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleStoppedObserving(String line){
     Matcher matcher = stoppedObservingPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     int gameNumber = Integer.parseInt(matcher.group(1));
@@ -1297,7 +1322,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleStoppedExamining(String line){
     Matcher matcher = stoppedExaminingPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     int gameNumber = Integer.parseInt(matcher.group(1));
@@ -1400,7 +1425,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     Matcher illegalMoveMatcher = illegalMovePattern.matcher(line);
     Matcher notYourTurnMatcher = notYourTurnPattern.matcher(line);
 
-    if (illegalMoveMatcher.find()){
+    if (illegalMoveMatcher.matches()){
       String moveString = illegalMoveMatcher.group(1);
       String reason = illegalMoveMatcher.group(2);
 
@@ -1409,7 +1434,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
       return true;
     }
-    else if (notYourTurnMatcher.find()){
+    else if (notYourTurnMatcher.matches()){
       String moveString = null; // sigh
       String reason = notYourTurnMatcher.group(1);
 
@@ -1456,7 +1481,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleSeeksCleared(String line){
     Matcher matcher = seeksClearedPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     if (!processSeeksCleared())
@@ -1496,7 +1521,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleSeekAdded(String line){
     Matcher matcher = seekAddedPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     SeekInfoStruct seekInfo = SeekInfoStruct.parseSeekInfoLine(line);
@@ -1538,7 +1563,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleSeeksRemoved(String line){
     Matcher matcher = seeksRemovedPattern.matcher(line);
-    if (!matcher.find())
+    if (!matcher.matches())
       return false;
 
     StringTokenizer tokenizer = new StringTokenizer(line, " ");
@@ -1563,6 +1588,638 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   protected boolean processSeeksRemoved(int [] removedSeeks){return false;}
+
+
+
+  /**
+   * The regular expression matching lines specifying that a draw has been
+   * offerred to the user by one of his opponents.
+   */
+
+  private static final Pattern oppDrawOfferPattern =
+    new Pattern("^("+usernameRegex+") offers you a draw\\.$");
+
+
+
+  /**
+   * The regular expression matching lines specifying that an adjournment has
+   * been offerred to the user by one of his opponents.
+   */
+
+  private static final Pattern oppAdjournOfferPattern =
+    new Pattern("^("+usernameRegex+") would like to adjourn the game; type \"adjourn\" to accept\\.$");
+
+
+
+  /**
+   * The regular expression matching lines specifying that aborting the game has
+   * been offerred to the user by one of his opponents.
+   */
+
+  private static final Pattern oppAbortOfferPattern =
+    new Pattern("^("+usernameRegex+") would like to abort the game; type \"abort\" to accept\\.$");
+
+
+
+  /**
+   * The regular expression matching lines specifying that a takeback has been
+   * offerred to the user by one of his opponents.
+   */
+
+  private static final Pattern oppTakebackOfferPattern =
+    new Pattern("^("+usernameRegex+") would like to take back (\\d+) half move\\(s\\)\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that an offer (draw, abort, adjourn or takeback) has been offered to the 
+   * user by one of his opponents.
+   */
+
+  private boolean handleOppOffered(String line){
+    String offer;
+
+    Matcher matcher;
+    if ((matcher = oppDrawOfferPattern.matcher(line)).matches())
+      offer = "draw";
+    else if ((matcher = oppAdjournOfferPattern.matcher(line)).matches())
+      offer = "adjourn";
+    else if ((matcher = oppAbortOfferPattern.matcher(line)).matches())
+      offer = "abort";
+    else if ((matcher = oppTakebackOfferPattern.matcher(line)).matches())
+      offer = "takeback";
+    else
+      return false;
+
+    String oppName = matcher.group(1);
+
+    if ("takeback".equals(offer)){
+      int takebackCount = Integer.parseInt(matcher.group(2));
+      if (!processOppOfferedTakeback(oppName, takebackCount))
+        processLine(line);
+    }
+    else if (!processOppOffered(oppName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * This method is called when a line specifying that an offer has been made to
+   * the user by one of his opponents. Possible values for offer are "draw",
+   * "abort" and "adjourn", but clients should not break if a different value is
+   * received.
+   */
+
+  protected boolean processOppOffered(String oppName, String offer){return false;}
+
+
+
+  /**
+   * This method is called when a line specifying that a takeback has been
+   * offered to the user by one of his opponents.
+   */
+
+  protected boolean processOppOfferedTakeback(String oppName, int takebackCount){return false;}
+
+
+
+  /**
+   * The regular expression matching lines specifying that the user made a draw,
+   * abort, adjourn or takeback offer.
+   */
+
+  private static final Pattern userOfferPattern = new Pattern("^(\\w+) request sent\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a takeback has been offered to the user by one of his opponents.
+   */
+
+  private boolean handleUserOffered(String line){
+    Matcher matcher = userOfferPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    String offer = matcher.group(1).toLowerCase();
+
+    if (!processUserOffered(offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when the user makes an offer to his opponent. Possible values
+   * for offer are "draw", "abort", "adjourn" and "takeback" but clients should
+   * not break if a different value is received.
+   */
+
+  protected boolean processUserOffered(String offer){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the opponent declined
+   * an (abort, adjourn, draw or takeback) offer.
+   */
+
+  private static final Pattern oppDeclinedOfferPattern = 
+    new Pattern("^("+usernameRegex+") declines the (\\w+) request\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that the opponent declined the user's offer.
+   */
+
+  private boolean handleOppDeclined(String line){
+    Matcher matcher = oppDeclinedOfferPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    String oppName = matcher.group(1);
+    String offer = matcher.group(2);
+
+    if (!processOppDeclined(oppName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when the user's opponent declines an offer. Possible values
+   * for offer are "draw", "abort", "adjourn" and "takeback" but clients should
+   * not break if a different value is received.
+   */
+
+  protected boolean processOppDeclined(String oppName, String offer){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the user made a draw,
+   * abort, adjourn or takeback offer.
+   */
+
+  private static final Pattern userDeclinedPattern = 
+    new Pattern("^You decline the (\\w+) request from ("+usernameRegex+")\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that the user declined the opponent's offer.
+   */
+
+  private boolean handleUserDeclined(String line){
+    Matcher matcher = userDeclinedPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    String offer = matcher.group(1);
+    String oppName = matcher.group(2);
+
+    if (!processUserDeclined(oppName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when the user declines an offer. Possible values for offer are
+   * "draw", "abort", "adjourn" and "takeback" but clients should not break if
+   * a different value is received.
+   */
+
+  protected boolean processUserDeclined(String oppName, String offer){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the opponent withdrew
+   * his offer.
+   */
+
+  private static final Pattern oppWithdrewPattern = 
+    new Pattern("^("+usernameRegex+") withdraws the (\\w+) request\\.$");
+  
+
+
+  /**
+   * Handles lines specifying that the opponent withdrew his offer.
+   */
+
+  private boolean handleOppWithdrew(String line){
+    Matcher matcher = oppWithdrewPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    String oppName = matcher.group(1);
+    String offer = matcher.group(2);
+
+    if (!processOppWithdrew(oppName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * Gets called when the opponent withdraws an offer. Possible offer values are
+   * "draw", "abort", "adjourn" and "takeback" but clients should not break if
+   * a different value is received.
+   */
+
+  protected boolean processOppWithdrew(String oppName, String offer){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the user withdrew
+   * his offer.
+   */
+
+  private static final Pattern userWithdrewPattern = 
+    new Pattern("^You withdraw the (\\w+) request to ("+usernameRegex+")\\.$");
+  
+
+
+  /**
+   * Handles lines specifying that the user withdrew his offer.
+   */
+
+  private boolean handleUserWithdrew(String line){
+    Matcher matcher = userWithdrewPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    String offer = matcher.group(1);
+    String oppName = matcher.group(2);
+
+    if (!processUserWithdrew(oppName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * Gets called when the user withdraws an offer. Possible offer values are
+   * "draw", "abort", "adjourn" and "takeback" but clients should not break if
+   * a different value is received.
+   */
+
+  protected boolean processUserWithdrew(String oppName, String offer){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player made a draw
+   * offer.
+   */
+
+  private static final Pattern playerOfferedDrawPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") offers a draw\\.$");
+  
+
+
+  /**
+   * The regular expression matching lines specifying that a player offered to
+   * abort the game.
+   */
+
+  private static final Pattern playerOfferedAbortPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") requests to abort the game\\.$");
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player offered to
+   * adjourn the game.
+   */
+
+  private static final Pattern playerOfferedAdjournPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") requests to adjourn the game\\.$");
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player offered to
+   * takeback.
+   */
+
+  private static final Pattern playerOfferedTakebackPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") requests to take back (\\d+) half move\\(s\\)\\.$");
+
+
+
+  /**
+   * Handles lines specifying that a player (in a game we're observing) made an
+   * offer.
+   */
+
+  private boolean handlePlayerOffered(String line){
+    String offer;
+
+    Matcher matcher;
+    if ((matcher = playerOfferedDrawPattern.matcher(line)).matches())
+      offer = "draw";
+    else if ((matcher = playerOfferedAdjournPattern.matcher(line)).matches())
+      offer = "adjourn";
+    else if ((matcher = playerOfferedAbortPattern.matcher(line)).matches())
+      offer = "abort";
+    else if ((matcher = playerOfferedTakebackPattern.matcher(line)).matches())
+      offer = "takeback";
+    else
+      return false;
+
+    int gameNum = Integer.parseInt(matcher.group(1));
+    String playerName = matcher.group(2);
+
+    if ("takeback".equals(offer)){
+      int takebackCount = Integer.parseInt(matcher.group(3));
+      if (!processPlayerOfferedTakeback(gameNum, playerName, takebackCount))
+        processLine(line);
+    }
+    else if (!processPlayerOffered(gameNum, playerName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that an offer has been made by
+   * one of the players in the specified game. Possible values for offer are
+   * "draw", "abort" and "adjourn", but clients should not break if a different
+   * value is received.
+   */
+
+  protected boolean processPlayerOffered(int gameNum, String playerName, String offer){
+    return false;
+  }
+
+
+
+  /**
+   * This method is called when a line specifying that a takeback has been
+   * offered by one of the players in the specified game.
+   */
+
+  protected boolean processPlayerOfferedTakeback(int gameNum, String playerName, int takebackCount){
+    return false;
+  }
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player declined an
+   * offer.
+   */
+
+  private static final Pattern playerDeclinedPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") declines the (\\w+) request\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a player declined his opponent's offer.
+   */
+
+  private boolean handlePlayerDeclined(String line){
+    Matcher matcher = playerDeclinedPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    int gameNum = Integer.parseInt(matcher.group(1));
+    String playerName = matcher.group(2);
+    String offer = matcher.group(3);
+
+    if (!processPlayerDeclined(gameNum, playerName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when a player (in an observed game) declines an offer. Possible
+   * values for offer are "draw", "abort", "adjourn" and "takeback" but clients
+   * should not break if a different value is received.
+   */
+
+  protected boolean processPlayerDeclined(int gameNum, String playerName, String offer){
+    return false;
+  }
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player withdrew his
+   * offer.
+   */
+
+  private static final Pattern playerWithdrewPattern = 
+    new Pattern("^Game (\\d+): ("+usernameRegex+") withdraws the (\\w+) request\\.$");
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a player declined his opponent's offer.
+   */
+
+  private boolean handlePlayerWithdrew(String line){
+    Matcher matcher = playerWithdrewPattern.matcher(line);
+    if (!matcher.matches(line))
+      return false;
+
+    int gameNum = Integer.parseInt(matcher.group(1));
+    String playerName = matcher.group(2);
+    String offer = matcher.group(3);
+
+    if (!processPlayerWithdrew(gameNum, playerName, offer))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * Gets called when a player (in an observed game) withdraws an offer.
+   * Possible values for offer are "draw", "abort", "adjourn" and "takeback" but
+   * clients should not break if a different value is received.
+   */
+
+  protected boolean processPlayerWithdrew(int gameNum, String playerName, String offer){
+    return false;
+  }
+
+
+
+  /**
+   * The regular expression matching lines specifying that a takeback offer has
+   * been updated. This occurs if you offer a takeback and then make a move
+   * (the ply count is increased by 1).
+   */
+
+  private static final Pattern takebackOfferUpdatePattern =
+    new Pattern("^Game (\\d+): Updating the takeback offer to (\\d+) half-moves\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a takeback has been offered to the user by one of his opponents.
+   */
+
+  private boolean handleTakebackOfferUpdated(String line){
+    Matcher matcher = takebackOfferUpdatePattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    int gameNumber = Integer.parseInt(matcher.group(1));
+    int takebackCount = Integer.parseInt(matcher.group(2));
+
+    if (!processTakebackOfferUpdated(gameNumber, takebackCount))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a takeback offer has been updated (the number
+   * of plies to takeback has changed).
+   */
+
+  protected boolean processTakebackOfferUpdated(int gameNumber, int takebackCount){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that the opponent
+   * counter-offered a takeback offer with a different amount of plies to take
+   * back.
+   */
+
+  private static final Pattern oppCounterTakebackOfferPattern = new Pattern(
+    "^("+usernameRegex+") proposes a different number \\((\\d+)\\) of half-move\\(s\\)\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that the opponent counter-offered a takeback with a different amount of
+   * plies to take back.
+   */
+
+  private boolean handleOppCounteredTakebackOffer(String line){
+    Matcher matcher = oppCounterTakebackOfferPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    String oppName = matcher.group(1);
+    int takebackCount = Integer.parseInt(matcher.group(2));
+
+    if (!processOppCounteredTakebackOffer(oppName, takebackCount))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * This method is called when the opponent counter-offers a takeback with a
+   * different amount of plies to take back.
+   */
+
+  protected boolean processOppCounteredTakebackOffer(String oppName, int takebackCount){
+    return false;
+  }
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that a player
+   * counter-offered a takeback offer by his opponent with a different amount of
+   * plies to take back.
+   */
+
+  private static final Pattern playerCounterTakebackOfferPattern =
+    new Pattern("^Game (\\d+): ("+usernameRegex+") proposes a different number \\((\\d+)\\) of half-move\\(s\\) to take back\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that a player counter-offered a takeback offer by his opponent with a
+   * different amount of plies to take back.
+   */
+
+  private boolean handlePlayerCounteredTakebackOffer(String line){
+    Matcher matcher = playerCounterTakebackOfferPattern.matcher(line);
+    if (!matcher.matches())
+      return false;
+
+    int gameNum = Integer.parseInt(matcher.group(1));
+    String playerName = matcher.group(2);
+    int takebackCount = Integer.parseInt(matcher.group(3));
+
+    if (!processPlayerCounteredTakebackOffer(gameNum, playerName, takebackCount))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+  /**
+   * This method is called when a player counter-offers a takeback offer by his
+   * opponent with a different amount of plies to take back.
+   */
+
+  protected boolean processPlayerCounteredTakebackOffer(int gameNum, String playerName,
+      int takebackCount){
+    return false;
+  }
 
 
 
