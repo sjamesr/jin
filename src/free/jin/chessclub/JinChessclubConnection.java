@@ -1302,14 +1302,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
-
+      
       if (color==WHITE)
         gameInfo.setWhiteClock(msec, isRunning);
       else
         gameInfo.setBlackClock(msec, isRunning);
 
       Player player = (color==WHITE ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
-      fireGameEvent(new ClockAdjustmentEvent(this, game, player, msec, isRunning));
+      fireGameEvent(new ClockAdjustmentEvent(this, game, player, msec, isRunning && game.isPlayed()));
+      // The server always sends isRunning==true, even for examined games where
+      // it doesn't make sense.
+      
     } catch (NoSuchGameException e){}
   }
 
