@@ -34,6 +34,21 @@ import java.net.URL;
 
 public class ChessclubConsoleManager extends ConsoleManager{
 
+
+
+  /**
+   * Overrides <code>chatMessageArrived(ChatEvent)</code> to notify the
+   * <code>ChessclubConsole</code> when tells are received.
+   */
+
+  public void chatMessageArrived(ChatEvent evt){
+    super.chatMessageArrived(evt);
+
+    String type = evt.getType();
+    if (type.equals("tell") || type.equals("say") || type.equals("atell"))
+      ((ChessclubConsole)console).tellReceived(evt.getSender());
+  }
+
   
   /**
    * Returns the string that should be displayed according to the given
@@ -47,61 +62,43 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String message = evt.getMessage();
     Object forum = evt.getForum();
 
-    if (type.equals("tell")||type.equals("say")||type.equals("atell"))
-      ((ChessclubConsole)console).tellReceived(evt.getSender());
-
-
     String translation;
 
     // Tells
-    if (type.equals("tell")){
+    if (type.equals("tell"))
       translation = sender+title+" tells you: "+message;
-    }
-    else if (type.equals("say")){
+    else if (type.equals("say"))
       translation = sender+title+" says: "+message;
-    }
-    else if (type.equals("ptell")){
+    else if (type.equals("ptell"))
       translation = "Your partner tells you: "+message;
-    }
-    else if (type.equals("qtell")){
+    else if (type.equals("qtell"))
       translation = parseQTell(evt);
-    }
-    else if (type.equals("atell")){
+    else if (type.equals("atell"))
       translation = sender+title+" tells you: "+message;
-    }
 
     // Shouts
-    else if (type.equals("shout")){
+    else if (type.equals("shout"))
       translation = sender+title+" shouts: "+message;
-    }
-    else if (type.equals("ishout")){
+    else if (type.equals("ishout"))
       translation = "--> "+sender+" "+message;
-    }
-    else if (type.equals("sshout")){
+    else if (type.equals("sshout"))
       translation = sender+title+" sshouts: "+message;
-    }
-    else if (type.equals("announcement")){
+    else if (type.equals("announcement"))
       translation = "*** ANNOUNCEMENT from "+sender+": "+message+" ***";
-    }
     
     // Channel tells
-    else if (type.equals("channel-tell")){
+    else if (type.equals("channel-tell"))
       translation = sender+title+"("+forum+"): "+message;
-    }
-    else if (type.equals("channel-atell")){
+    else if (type.equals("channel-atell"))
       translation = sender+title+"("+forum+"): "+message;
-    }
-    else if (type.equals("channel-qtell")){
+    else if (type.equals("channel-qtell"))
       translation = parseChannelQTell(evt);
-    }
 
     // Kibitzes
-    else if (type.equals("kibitz")){
+    else if (type.equals("kibitz"))
       translation = "["+forum+"] "+sender+title+" kibitzes: "+message;
-    }
-    else if (type.equals("whisper")){
+    else if (type.equals("whisper"))
       translation = "["+forum+"] "+sender+title+" whispers: "+message;
-    }
     else
       return "Unknown chat type: \""+type+"\"";
     return translation;
