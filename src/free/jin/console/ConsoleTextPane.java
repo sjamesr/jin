@@ -109,7 +109,7 @@ public class ConsoleTextPane extends JTextPane{
    * under a Java2D capable JVM.
    */
 
-  private boolean renderingHintsSupported = true;
+  private static boolean renderingHintsSupported = true;
 
 
 
