@@ -251,7 +251,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setDragSquareHighlightingColor(
       StringParser.parseColor(getProperty("drag-square-highlighting.color", "0000ff")));
 
-    String moveSendingModeString = getProperty("move-sending-mode", "legal-chess");
+    String moveSendingModeString = getProperty("move-sending-mode", "predrag");
     if ("legal-chess".equals(moveSendingModeString))
       setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
     else if ("premove".equals(moveSendingModeString))
