@@ -1380,10 +1380,6 @@ public class JBoard extends JComponent{
 
     int x = evt.getX();
     int y = evt.getY();
-    Square square = locationToSquare(x,y);
-
-    if (square == null)
-      return;
 
     Rectangle helpRect = null;
 
