@@ -941,7 +941,7 @@ public class Scripter extends Plugin{
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       Vector varsVector = new Vector(25);
-      Game game = new Game(Game.MY_GAME, new Position(), "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
+      Game game = new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
         5*60*1000, 2000, 1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER);
 
       varsVector.addElement(new Object[]{"game", game});

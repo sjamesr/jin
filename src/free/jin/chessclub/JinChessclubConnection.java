@@ -621,10 +621,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
   /**
-   * Creates an AdvancedGame object from the properties saved by the addNonStartedGame method
-   * and the given initial position. The Hashtable with game information saved by
-   * the addNonStartedGame method is removed from the list of games for whom a
-   * game started event hasn't been fired yet.
+   * Creates a <code>Game</code> object from the properties saved by the
+   * addNonStartedGame method and the given initial position. The Hashtable with
+   * game information saved by the addNonStartedGame method is removed from the
+   * list of games for whom a game started event hasn't been fired yet.
    */
 
   private Game createGameFromNonStarted(int gameNumber, Position initialPosition){
@@ -648,9 +648,9 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     boolean isInitiallyFlipped = ((Boolean)gameProps.get("InitiallyFlipped")).booleanValue();
 
     Player userPlayer;
-    if (gameType==Game.ISOLATED_BOARD)
+    if (gameType == Game.ISOLATED_BOARD)
       userPlayer = null;
-    else if (gameType==Game.OBSERVED_GAME)
+    else if (gameType == Game.OBSERVED_GAME)
       userPlayer = null;
     else{ // MY_GAME
       String username = getUsername();
@@ -664,9 +664,10 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         userPlayer = null;
     }
 
-    return new Game(gameType, initialPosition, whiteName, blackName, whiteInitial, whiteIncrement,
-      blackInitial, blackIncrement, whiteRating, blackRating, String.valueOf(gameNumber), ratingCategoryString,
-      isRated, isPlayedGame, whiteTitles, blackTitles, isInitiallyFlipped, userPlayer);
+    return new Game(gameType, initialPosition, 0, whiteName, blackName, whiteInitial,
+      whiteIncrement, blackInitial, blackIncrement, whiteRating, blackRating,
+      String.valueOf(gameNumber), ratingCategoryString, isRated, isPlayedGame, whiteTitles,
+      blackTitles, isInitiallyFlipped, userPlayer);
   }
 
 
@@ -808,10 +809,11 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         game.setResult(result);
 
         if (becomesExamined){
-          updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(), game.getRatingCategoryString(),
-            game.isRated(), game.getWhiteTime(), game.getWhiteInc(), game.getBlackTime(),
-            game.getBlackInc(), false, game.getWhiteRating(), game.getBlackRating(), game.getID(),
-            game.getWhiteTitles(), game.getBlackTitles());
+          updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(),
+            game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
+            game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), false,
+            game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
+            game.getBlackTitles());
         }
         else if (game.getGameType() == Game.ISOLATED_BOARD){
           fireGameEvent(new GameEndEvent(this, game, result));
@@ -845,18 +847,21 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     GameInfo gameInfo = (GameInfo)gameNumbersToGameInfo.remove(new Integer(gameNumber));
     Game game = gameInfo.game;
 
-    int result = (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
+    int result = 
+      (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
     if (game.getResult() == Game.GAME_IN_PROGRESS) // Make sure the game doesn't remain in progress
       game.setResult(result);
 
     fireGameEvent(new GameEndEvent(this, game, result));
 
-    Game newGame = new Game(gameType, game.getInitialPosition(), whiteName, blackName,
-      whiteInitial, whiteIncrement, blackInitial, blackIncrement, whiteRating, blackRating,
-      String.valueOf(gameNumber), ratingCategoryString, isRated, isPlayedGame, whiteTitles,
-      blackTitles, game.isBoardInitiallyFlipped(), game.getUserPlayer());
+    Game newGame = new Game(gameType, game.getInitialPosition(), game.getPliesSinceStart(),
+      whiteName, blackName, whiteInitial, whiteIncrement, blackInitial, blackIncrement,
+      whiteRating, blackRating, String.valueOf(gameNumber), ratingCategoryString, isRated,
+      isPlayedGame, whiteTitles, blackTitles, game.isBoardInitiallyFlipped(),
+      game.getUserPlayer());
 
-    GameInfo newGameInfo = new GameInfo(newGame, new Position(newGame.getInitialPosition()), gameInfo.numMovesToFollow);
+    GameInfo newGameInfo = new GameInfo(newGame, new Position(newGame.getInitialPosition()),
+      gameInfo.numMovesToFollow);
     gameNumbersToGameInfo.put(new Integer(gameNumber), newGameInfo);
 
     fireGameEvent(new GameStartEvent(this, newGame));
@@ -879,13 +884,15 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (gameInfo.isWhiteClockRunning())
       whiteTime -= (System.currentTimeMillis()-gameInfo.getWhiteTimestamp());
     newGameInfo.setWhiteClock(whiteTime, gameInfo.isWhiteClockRunning());
-    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.WHITE_PLAYER, whiteTime, newGameInfo.isWhiteClockRunning()));
+    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.WHITE_PLAYER, whiteTime,
+      newGameInfo.isWhiteClockRunning()));
 
     int blackTime = gameInfo.getBlackTime();
     if (gameInfo.isBlackClockRunning())
       blackTime -= (System.currentTimeMillis()-gameInfo.getBlackTimestamp());
     newGameInfo.setBlackClock(blackTime, gameInfo.isBlackClockRunning());
-    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.BLACK_PLAYER, blackTime, newGameInfo.isBlackClockRunning()));
+    fireGameEvent(new ClockAdjustmentEvent(this, newGame, Player.BLACK_PLAYER, blackTime,
+      newGameInfo.isBlackClockRunning()));
   }
 
 
@@ -917,7 +924,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
         Position newInitPos = new Position(game.getVariant());
         newInitPos.setFEN(initFEN);
 
-        game.setInitialPosition(newInitPos);
+        game.setInitialPosition(newInitPos, 0);
         gameInfo.moves.removeAllElements();
         gameInfo.position.copyFrom(game.getInitialPosition());
         gameInfo.numMovesToFollow = numMovesToFollow;

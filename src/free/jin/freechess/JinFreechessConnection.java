@@ -732,9 +732,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if ((gameType == Game.MY_GAME) && isPlayed)
       userPlayer = boardData.isMyTurn() ? currentPlayer : currentPlayer.getOpponent();
 
-    Game game = new Game(gameType, initPos, whiteName, blackName, whiteTime, whiteInc,
-      blackTime, blackInc, whiteRating, blackRating, gameID, categoryName, isRated, isPlayed,
-      whiteTitles, blackTitles, initiallyFlipped, userPlayer);
+    Game game = new Game(gameType, initPos, boardData.getPlayedPlyCount(), whiteName, blackName,
+      whiteTime, whiteInc, blackTime, blackInc, whiteRating, blackRating, gameID, categoryName,
+      isRated, isPlayed, whiteTitles, blackTitles, initiallyFlipped, userPlayer);
 
     InternalGameData gameData = new InternalGameData(game);
 
@@ -997,7 +997,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     Player currentPlayer = playerForString(newBoardData.getCurrentPlayer());
     newPos.setCurrentPlayer(currentPlayer);
 
-    game.setInitialPosition(newPos);
+    game.setInitialPosition(newPos, newBoardData.getPlayedPlyCount());
 
     listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
 
