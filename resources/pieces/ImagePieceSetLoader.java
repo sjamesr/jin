@@ -29,7 +29,7 @@ import free.chess.ResourceImagePiecePainter;
  * This class allows one to package an image based piece set in a jar (or any
  * other structure which can be accessed via the getResource methods). The
  * format of the jar is described in the
- * <code>free.chess.art.ResourceImagePiecePainter</code> class with the root
+ * <code>free.chess.ResourceImagePiecePainter</code> class with the root
  * directory being the root of the jar. You then place the class file of this
  * class in the root.
  */
