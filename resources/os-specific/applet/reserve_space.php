@@ -1,19 +1,26 @@
 <?php
 	$submit = $_POST['submit'];
-	if ($submit && mysql_connect("localhost", "root") && mysql_select_db("jin")){
+	if ($submit){
+		if (!(mysql_connect("localhost", "root") && mysql_select_db("@database_name@"))){
+			echo "Couldn't connect to MySQL or select database<br>";
+			echo mysql_error();
+			return;	
+		}
 		
 		// Create the Preferences table if it doesn't exist yet
 		if (!mysql_query("SELECT * FROM Preferences")){
-			if (!mysql_query("CREATE TABLE Preferences ( CookieKey varchar(20), PrefsBlob blob, PRIMARY KEY (CookieKey), UNIQUE CookieKey (CookieKey) )")){
-				echo "Couldn't create Preferences table";
+			if (!mysql_query("CREATE TABLE Preferences ( CookieKey varchar(20) NOT NULL, PrefsBlob blob, PRIMARY KEY (CookieKey), UNIQUE CookieKey (CookieKey) )")){
+				echo "Couldn't create Preferences table<br>";
+				echo mysql_error();
 				return;
 			}
 		}
 		
 		// Create the KnownUsers table if it doesn't exist yet
 		if (!mysql_query("SELECT * FROM KnownUsers")){
-			if (!mysql_query("CREATE TABLE KnownUsers ( ICSUsername varchar(30), CookieKey varchar(20), PRIMARY KEY (ICSUsername), UNIQUE ICSUsername (ICSUsername) )")){
-				echo "Couldn't create KnownUsers table";
+			if (!mysql_query("CREATE TABLE KnownUsers ( ICSUsername varchar(30) NOT NULL, CookieKey varchar(20), PRIMARY KEY (ICSUsername), UNIQUE ICSUsername (ICSUsername) )")){
+				echo "Couldn't create KnownUsers table<br>";
+				echo mysql_error();
 				return;
 			}
 		}
@@ -49,7 +56,6 @@
 			
 			setcookie("prefs_key", $prefs_key, time() + 60*60*24*365); // Expires in a year
 		}
-		
 	}
 		
 ?>
