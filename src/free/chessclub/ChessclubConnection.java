@@ -164,7 +164,7 @@ public class ChessclubConnection extends free.util.Connection{
   public static final int KIBITZ = 300;
 
 
-
+  
 
   /**
    * The code for a whisper. A whisper is the same as a kibitz only
@@ -1959,6 +1959,32 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
+   * Gets called when a DG_TOURNEY datagram arrives.
+   */
+
+  protected void processTourney(int id, boolean canGuestsWatchJoin, boolean makeNewWindowOnJoin, boolean makeNewWindowOnWatch,
+    boolean makeNewWindowOnInfo, String description, String [] joinCommands, String [] watchCommands, String [] infoCommands,
+    String confirmText){
+
+  }
+
+
+
+
+
+  /**
+   * Gets called when a DG_REMOVE_TOURNEY datagram arrives.
+   */
+
+  protected void processRemoveTourney(int id){
+
+  }
+
+
+
+
+
+  /**
    * Gets called when a DG_DIALOG_START datagram arrives.
    */
 
@@ -2645,7 +2671,7 @@ public class ChessclubConnection extends free.util.Connection{
         break;
       }
       case Datagram.DG_IP:{
-        throw new IllegalStateException("Fishbait says this DG is undocumented intentionally");
+        throw new IllegalStateException("Bert Enderton says this DG is undocumented intentionally");
       }
       case Datagram.DG_CIRCLE:{
         processCircle(datagram.getInteger(0),datagram.getString(1),datagram.getString(2));
@@ -2878,6 +2904,26 @@ public class ChessclubConnection extends free.util.Connection{
       case Datagram.DG_POSITION_BEGIN:{
         processPositionBegin(datagram.getInteger(0),datagram.getString(1),datagram.getInteger(2));
         break;
+      }
+      case Datagram.DG_TOURNEY:{
+        int id = datagram.getInteger(0);
+        int bitfield = datagram.getInteger(1);
+        boolean canGuestsJoinWatch = (bitfield & 1) != 0;
+        boolean makeNewWindowOnJoin = (bitfield & 2) != 0;
+        boolean makeNewWindowOnWatch = (bitfield & 4) != 0;
+        boolean makeNewWindowOnInfo = (bitfield & 8) != 0;
+        String description = datagram.getString(2);
+        String [] joinCommands = parseDGTourneyCommandList(datagram.getString(3));
+        String [] watchCommands = parseDGTourneyCommandList(datagram.getString(4));
+        String [] infoCommands = parseDGTourneyCommandList(datagram.getString(5));
+        String confirmText = datagram.getString(6);
+        processTourney(id, canGuestsJoinWatch, makeNewWindowOnJoin, makeNewWindowOnWatch,
+          makeNewWindowOnInfo, description, joinCommands, watchCommands, infoCommands, confirmText);
+        break;
+      }
+      case Datagram.DG_REMOVE_TOURNEY:{
+        int id = datagram.getInteger(0);
+        processRemoveTourney(id);
       }
       case Datagram.DG_DIALOG_START:{
         processDialogStart(datagram.getInteger(0));
@@ -3122,6 +3168,30 @@ public class ChessclubConnection extends free.util.Connection{
 
 
 
+
+
+
+  /**
+   * Parses the given command list as is sent in the DG_TOURNEY datagram.
+   * Returns the list of commands.
+   */
+
+  private String [] parseDGTourneyCommandList(String commands){
+    StringTokenizer tokenizer = new StringTokenizer(commands, "&");
+    String [] commandList = new String[tokenizer.countTokens()];
+    int commandCount = 0;
+
+    while (tokenizer.hasMoreTokens()){
+      StringBuffer command = new StringBuffer(tokenizer.nextToken());
+      for (int i = 0; i < command.length(); i++){
+        if (command.charAt(i) == '\\')
+          command.deleteCharAt(i);
+      }
+      commandList[commandCount++] = command.toString();
+    }
+
+    return commandList;
+  }
 
 
   /**
