@@ -222,7 +222,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
   private void loadPatternSounds(String type, Hashtable map){
     Preferences prefs = getPrefs();
     int numPatterns = prefs.getInt("num-" + type + "-patterns", 0);
-
+    
     for (int i = 0; i < numPatterns; i++){
       try{
         String filename = prefs.getString(type + "-sound-" + i);
@@ -230,9 +230,14 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
         Pattern regex = new Pattern(pattern);
         
         if (!FILENAMES_TO_AUDIO_CLIPS.containsKey(filename)){
-          URL url = getClass().getResource(filename);
-          if (url == null)
+          // Currently all the sounds are located in the same directory as
+          // SoundManager, but it would probably be better to put them in the
+          // directory of the subclass and load with getClass().getResource()
+          // (and maybe with each super class of that too).
+          URL url = SoundManager.class.getResource(filename);
+          if (url == null){
             continue;
+          }
           FILENAMES_TO_AUDIO_CLIPS.put(filename, new AudioClip(url));
         }
 
@@ -331,7 +336,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     Object forum = evt.getForum();
     String sender = evt.getSender();
     String chatMessageType = type+"."+(forum == null ? "" : forum.toString())+"."+sender;
-
+    
     Enumeration patterns = chatPatternsToFilenames.keys();
     while (patterns.hasMoreElements()){
       Pattern regex = (Pattern)patterns.nextElement();
@@ -395,7 +400,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   public boolean playEventSound(String eventName){
     AudioClip clip = (AudioClip)eventsToAudioClips.get(eventName);
-    if (clip!=null){
+    if (clip != null){
       if (isOn())
         clip.play();
       return true;
