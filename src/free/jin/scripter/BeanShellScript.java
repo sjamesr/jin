@@ -96,6 +96,23 @@ public class BeanShellScript extends Script{
     bsh.set("prefs", scripter.getPrefs());
     bsh.set("connection", scripter.getConn());
   }
+  
+  
+  
+  /**
+   * This is a method which is never called whose purpose is to ensure that all
+   * the classes and methods used in this script via BeanShell actually exist.
+   * If they are removed by mistake, a compile-time error should occur.
+   */
+   
+  public static void ensureCorrectness(Scripter scripter) throws java.io.IOException{
+    if ("".length() == 0)
+      throw new Error("ensureCorrectness must never be invoked");
+    
+    scripter.getConn().sendCommand("Test");
+    new free.util.audio.AudioClip(free.util.IOUtilities.fileToURL(new java.io.File("Test"))).play();
+    ((free.jin.console.ConsoleManager)scripter.getPlugin("console")).addSpecialLine("Test");
+  }
 
 
 
@@ -123,6 +140,10 @@ public class BeanShellScript extends Script{
              "  free.jin.console.ConsoleManager plugin = scripter.getPlugin(\"console\");\n"+
              "  plugin.addSpecialLine(line);\n"+
              "}");
+             
+    // *************************************************************************
+    // IMPORTANT: Whenever modifying this method, modify ensureCorrectness too *
+    // *************************************************************************
   }
 
 
