@@ -324,42 +324,48 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     private int lastVisibleIndex = -1;
 
 
-    public void reshape(int x, int y, int width, int height){
-      JTextComponent view = (JTextComponent)getView();
-      Dimension curSize = this.getSize();
-      if ((view != null)&&(lastVisibleIndex==-1)&&((curSize.width!=width)||(curSize.height!=height))){
-        Dimension viewHoleSize = getExtentSize();
-        Point viewLocation = view.getLocation();
-        Point bottomRightPoint = new Point(viewHoleSize.width-viewLocation.x, viewHoleSize.height-viewLocation.y-1);
-        lastVisibleIndex = view.viewToModel(bottomRightPoint);
-      }
-
-      super.reshape(x, y, width, height);
-    }
+//    public void reshape(int x, int y, int width, int height){
+//      JTextComponent view = (JTextComponent)getView();
+//      Dimension curSize = this.getSize();
+//      if ((view != null)&&(lastVisibleIndex==-1)&&((curSize.width!=width)||(curSize.height!=height))){
+//        Dimension viewHoleSize = getExtentSize();
+//        Point viewLocation = view.getLocation();
+//        Point bottomRightPoint = new Point(viewHoleSize.width-viewLocation.x, viewHoleSize.height-viewLocation.y-1);
+//        lastVisibleIndex = view.viewToModel(bottomRightPoint);
+//      }
+//
+//      super.reshape(x, y, width, height);
+//    }
 
 
     public void setViewSize(Dimension newSize){
+      Dimension viewSize = getViewSize();
+      Dimension viewportSize = getExtentSize();
+
+      if ((viewSize.width == newSize.width) || (viewportSize.height > viewSize.height)){
+        super.setViewSize(newSize);
+        return;
+      }
+
+      JTextComponent view = (JTextComponent)getView();
+      Point viewPosition = getViewPosition();
+      Point viewCoords = 
+        new Point(viewportSize.width + viewPosition.x, viewportSize.height + viewPosition.y);
+      int lastVisibleIndex = view.viewToModel(viewCoords);
+
       super.setViewSize(newSize);
-
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run(){
-          if (lastVisibleIndex != -1){
-            try{
-              JTextComponent view = (JTextComponent)getView();              
-              Rectangle rect = view.modelToView(lastVisibleIndex);
-
-              if (rect!=null){
-//                OutputComponentViewport.this.setVisible(false);
-                view.scrollRectToVisible(new Rectangle(0,0,1,1));
-                view.scrollRectToVisible(rect);
-//                view.scrollRectToVisible(rect);
-//                OutputComponentViewport.this.setVisible(true);
-              }
-              lastVisibleIndex = -1;
-            } catch (BadLocationException e){}
-          }
+      this.doLayout();
+      // Otherwise the viewport doesn't update what it thinks about the size of
+      // the view and may thus scroll to the wrong location.
+      
+      try{
+        Dimension newViewportSize = getExtentSize();
+        Rectangle lastVisibleIndexPosition = view.modelToView(lastVisibleIndex);
+        if (lastVisibleIndexPosition != null){
+          setViewPosition(
+            new Point(0, lastVisibleIndexPosition.y + lastVisibleIndexPosition.height - 1 - newViewportSize.height));
         }
-      });
+      } catch (BadLocationException e){}
     }
 
   }
