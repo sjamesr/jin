@@ -1,3 +1,29 @@
+2.13
+
+* Again, fiddled with sound under Linux. There should now no longer be delay
+  between dropping a piece and the piece-move sound. On the other hand, you will
+  not get sound from Jin while audio device is taken. On the yet another hand
+  Jin will release the audio device when not using it.
+* The origin square is now highlighted too in "Highlight target square" move
+  visualization mode.
+* The format of piece sets and board patterns (the way they are packaged in the
+  zip/jar file) has changed. See http://www.jinchess.com/docs/customart/ and
+  the piece set/board pattern specific pages for more information.
+* Changed the Event field in logged PGN files to "(un)rated [category] game".
+* Changed the default color of links a bit brighter.
+* Added a new mechanism for extending Jin: Actions. An Action is smaller than
+  a plugin, and is easier to implement. It implements a single operation, which
+  is made available to plugins, and which they can use. Also, implemented an
+  Actions plugin, which lets the user run the available Actions from either a
+  menu or with buttons appearing in a window.
+* Implemented 3 Actions:
+  - Get Server Help: Shows server related help.
+  - Ask a Question: Lets the user type in a question, which is then sent to
+    the server help channel.
+  - Find an Opponent: Lets the user select seek options and issue a seek.
+
+
+
 2.12.1
 
 * Fixed a bug in the main console preferences dialog which prevented users from
