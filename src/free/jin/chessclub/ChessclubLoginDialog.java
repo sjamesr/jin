@@ -183,7 +183,6 @@ public class ChessclubLoginDialog implements LoginDialog{
                                      // because nothing else seems to work.
         if (!painted){
           painted = true;
-          getRootPane().setDefaultButton(defaultButton);
           if (usernameField.getText().length()==0)
             usernameField.requestFocus();
           else if (passwordField.getPassword().length==0)
@@ -235,6 +234,8 @@ public class ChessclubLoginDialog implements LoginDialog{
 
     content.add(hpanel,BorderLayout.CENTER);
 
+    dialog.getRootPane().setDefaultButton(defaultButton);
+
     dialog.pack();
     dialog.setLocationRelativeTo(parentComponent);
     dialog.setVisible(true);
@@ -255,6 +256,7 @@ public class ChessclubLoginDialog implements LoginDialog{
     vpanel.add(Box.createVerticalStrut(10));
 
     JButton connectAsGuestButton = new JButton("Connect as guest");
+    connectAsGuestButton.setDefaultCapable(false);
     connectAsGuestButton.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -279,6 +281,7 @@ public class ChessclubLoginDialog implements LoginDialog{
     vpanel.add(Box.createVerticalStrut(10));
 
     JButton joinICCButton = new JButton("Join ICC");
+    joinICCButton.setDefaultCapable(false);
     joinICCButton.addActionListener(new ActionListener(){
       
       public void actionPerformed(ActionEvent evt){
@@ -408,6 +411,7 @@ public class ChessclubLoginDialog implements LoginDialog{
     savePasswordCheckBox = new JCheckBox("Save password",savePassword);
 
     JButton forgotPasswordButton = new JButton("Forgot your password?");
+    forgotPasswordButton.setDefaultCapable(false);
     forgotPasswordButton.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -429,6 +433,7 @@ public class ChessclubLoginDialog implements LoginDialog{
     Box decisionPanel = new Box(BoxLayout.X_AXIS);
     
     final JButton connectButton = new JButton("Connect");
+    connectButton.setDefaultCapable(true);
     connectButton.addActionListener(new ActionListener(){
       
       public void actionPerformed(ActionEvent evt){
@@ -450,6 +455,7 @@ public class ChessclubLoginDialog implements LoginDialog{
 
 
     JButton saveButton = new JButton("Save settings");
+    saveButton.setDefaultCapable(false);
     saveButton.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
@@ -512,6 +518,7 @@ public class ChessclubLoginDialog implements LoginDialog{
     panel.add(Box.createVerticalGlue());
 
     JButton button = new JButton("Cancel");
+    button.setDefaultCapable(false);
     button.addActionListener(closeActionListener);
 
     panel.add(button);
