@@ -27,7 +27,8 @@ import java.lang.reflect.Array;
 
 /**
  * A convenient storage place for Listeners. The listeners are stored in the
- * same manner as in javax.swing.event.EventListenerList
+ * same manner as in javax.swing.event.EventListenerList.
+ * <STRONG>Note:</STRONG> This class is not thread safe.
  */
 
 public class EventListenerList{
