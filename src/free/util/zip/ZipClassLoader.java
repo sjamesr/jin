@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import java.net.URL;
-import free.util.IOUtilities;
 import free.util.ChildClassLoader;
 
 
@@ -77,46 +76,6 @@ public class ZipClassLoader extends ChildClassLoader{
     this(file, null);
   }
 
-
-
-  /**
-   * Loads the class data for the specified class name.
-   */
-
-  private byte [] loadClassData(String name) throws IOException{
-    String resourceName = name.replace('.', '/') + ".class";
-    InputStream in = getResourceAsStreamImpl(resourceName);
-    if (in == null)
-      throw new IOException(name + " not found");
-    return IOUtilities.readToEnd(in);
-  }
-
-
-
-  /**
-   * Loads the class with the specified name and optionally resolves it.
-   */
-
-  protected Class loadClassImpl(String name, boolean resolve){
-    try{
-      Class c = null;
-      try{
-        c = findSystemClass(name);
-      } catch (ClassNotFoundException e){}
-
-      if (c == null){
-        byte [] classData = loadClassData(name);
-        c = defineClass(name, classData, 0, classData.length);
-      }
-
-      if (resolve)
-        resolveClass(c);
-
-      return c;
-    } catch (IOException e){
-        return null;
-      }
-  }
 
 
 
