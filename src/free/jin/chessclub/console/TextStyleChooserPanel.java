@@ -129,12 +129,9 @@ public class TextStyleChooserPanel extends JPanel{
 
     JPanel colorChooserPanel = new JPanel(new GridLayout(1, (foregroundChooser == null) ? 1 : 2, 5, 5));
     colorChooserPanel.add(foregroundChooser);
-    foregroundChooser.setDefaultCapable(false);
-
-    if (backgroundChooser != null){
+    
+    if (backgroundChooser != null)
       colorChooserPanel.add(backgroundChooser);
-      backgroundChooser.setDefaultCapable(false);
-    }
 
     add(BorderLayout.CENTER, fontSelector);
     add(BorderLayout.SOUTH, colorChooserPanel);

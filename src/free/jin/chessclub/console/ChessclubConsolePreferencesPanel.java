@@ -283,8 +283,6 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     selectionColorPanel.add(selectedChooserButton);
     defaultPanel.add(BorderLayout.SOUTH, selectionColorPanel);
     addPanel("Default settings", categoriesModel, defaultPanel);
-    selectionChooserButton.setDefaultCapable(false);
-    selectedChooserButton.setDefaultCapable(false);
 
     JPanel defaultChannelPanel = (JPanel)categoriesToTextStyleChoosers.get("channel-tell");
     addPanel("Default channel settings", categoriesModel, defaultChannelPanel);
