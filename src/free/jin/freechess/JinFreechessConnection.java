@@ -39,7 +39,8 @@ import free.util.EventListenerList;
  * server.
  */
 
-public class JinFreechessConnection extends FreechessConnection implements JinConnection, SeekJinConnection{
+public class JinFreechessConnection extends FreechessConnection implements JinConnection,
+    SeekJinConnection, PGNJinConnection{
 
 
 
@@ -467,8 +468,20 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Invokes <code>closeGame(int)</code>.
    */
 
-  protected boolean processGameEnd(int gameNumber, String whiteName, String blackName, String reason, String result){
-    closeGame(gameNumber);
+  protected boolean processGameEnd(int gameNumber, String whiteName, String blackName,
+      String reason, String result){
+
+    int resultCode;
+    if ("1-0".equals(result))
+      resultCode = Game.WHITE_WINS;
+    else if ("0-1".equals(result))
+      resultCode = Game.BLACK_WINS;
+    else if ("1/2-1/2".equals(result))
+      resultCode = Game.DRAW;
+    else
+      resultCode = Game.UNKNOWN_RESULT;
+
+    closeGame(gameNumber, resultCode);
 
     return false;
   }
@@ -481,7 +494,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processStoppedObserving(int gameNumber){
-    closeGame(gameNumber);
+    closeGame(gameNumber, Game.UNKNOWN_RESULT);
 
     return false;
   }
@@ -494,7 +507,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected boolean processStoppedExamining(int gameNumber){
-    closeGame(gameNumber);
+    closeGame(gameNumber, Game.UNKNOWN_RESULT);
 
     return false;
   }
@@ -542,7 +555,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     }
 
     Position initPos = new Position(variant);
-    initPos.setLexigraphic(boardData.getBoardLexigraphic());
+    initPos.setFEN(boardData.getBoardFEN());
     Player currentPlayer = playerForString(boardData.getCurrentPlayer());
     initPos.setCurrentPlayer(currentPlayer);
 
@@ -592,7 +605,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void makeMove(Game game, Style12Struct oldBoardData, Style12Struct boardData){
     String moveVerbose = boardData.getMoveVerbose();
-    String movePretty = boardData.getMovePretty();
+    String moveSAN = boardData.getMoveSAN();
 
     WildVariant variant = game.getVariant();
     Position position = new Position(variant);
@@ -634,7 +647,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       }
     }
 
-    Move move = variant.createMove(position, fromSquare, toSquare, promotionPiece, movePretty);
+    Move move = variant.createMove(position, fromSquare, toSquare, promotionPiece, moveSAN);
 
     listenerManager.fireGameEvent(new MoveMadeEvent(this, game, move));
 
@@ -673,12 +686,13 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Fires an appropriate GameEndEvent.
    */
 
-  private void closeGame(int gameNumber){                                                                                                
+  private void closeGame(int gameNumber, int result){
     Integer gameID = new Integer(gameNumber);
     Game game = (Game)ongoingGames.remove(gameID);
+    game.setResult(result);
     if (game != null){
       lastStyle12Structs.remove(gameID);
-      listenerManager.fireGameEvent(new GameEndEvent(this, game));
+      listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
     }
   }
 
@@ -750,7 +764,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void changePosition(Game game, Style12Struct oldBoardData, Style12Struct newBoardData){
     Position newPos = game.getInitialPosition();
-    newPos.setLexigraphic(newBoardData.getBoardLexigraphic());
+    newPos.setFEN(newBoardData.getBoardFEN());
     Player currentPlayer = playerForString(newBoardData.getCurrentPlayer());
     newPos.setCurrentPlayer(currentPlayer);
 
