@@ -108,8 +108,9 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
           dataLine = (SourceDataLine)AudioSystem.getLine(info);
         }
         
-        if (!dataLine.isOpen())
+        if (!dataLine.isOpen()){
           dataLine.open(format);
+        }
         
         if (!format.matches(dataLine.getFormat())){
           dataLine.close();
@@ -121,16 +122,42 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
           dataLine.start();
         
         dataLine.write(data, 0, data.length);
-        dataLine.drain();
         
-        // Bugfix - drain() seems to return before the clip actually finished playing 
         try{
-          double playTimeSec = (data.length/format.getFrameSize())/format.getFrameRate();
-          long timeToSleep = (long)(playTimeSec*1000 - (System.currentTimeMillis() - startTime));
+          int framesTotal = data.length/format.getFrameSize();
+          int idleSleepTime = 0;
+
+          // Sleep until the dataLine says it's done          
+          while (dataLine.getFramePosition() < framesTotal){
+            int framesRemaining = framesTotal - dataLine.getFramePosition();
+            long timeToSleep = 1 + (long)(1000*framesRemaining/format.getFrameRate());
+            if (timeToSleep > 0){
+              Thread.sleep(timeToSleep);
+            
+              // Bugfix, the line sometimes gets stuck without finishing playing
+              if (framesRemaining == framesTotal - dataLine.getFramePosition()){
+                idleSleepTime += timeToSleep;
+                if (idleSleepTime > 100){ // Waited for longer than 100ms without any progress
+                  dataLine.close(); // Close and
+                  dataLine = null;  // discard the defective line
+                  break;
+                }
+              }
+              else
+                idleSleepTime = 0;
+            }
+          }
           
+          // Bugfix - sleep until the earliest moment the sound can finish
+          // playing because the dataLine sometimes reports it's done before
+          // it's really done.
+          long timeToSleep = (long)(1000*framesTotal/format.getFrameRate() -
+            (System.currentTimeMillis() - startTime));
           if (timeToSleep > 0)
             Thread.sleep(timeToSleep);
-          dataLine.close();
+          
+          if (dataLine != null)  
+            dataLine.close();
         } catch (InterruptedException e){e.printStackTrace();}
       } catch (IOException e){
         e.printStackTrace();
@@ -140,6 +167,8 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
         e.printStackTrace();
       } catch (IllegalArgumentException e){
         e.printStackTrace();
+      } catch (Throwable t){
+        t.printStackTrace();
       }
     }
   }
