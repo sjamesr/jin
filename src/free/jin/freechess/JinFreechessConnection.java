@@ -2029,6 +2029,53 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     sendCommand("$adjourn");
   }
 
+  
+
+  /**
+   * Returns <code>true</code>.
+   */
+   
+  public boolean isTakebackSupported(){
+    return true;
+  }
+  
+  
+  
+  /**
+   * Sends "takeback 1" to the server.
+   */
+   
+  public void requestTakeback(Game game){
+    checkGameMineAndPlayed(game);
+    
+    sendCommand("$takeback 1");
+  }
+  
+  
+  
+  /**
+   * Returns <code>true</code>.
+   */
+   
+  public boolean isMultipleTakebackSupported(){
+    return true;
+  }
+  
+  
+  
+  /**
+   * Sends "takeback plyCount" to the server.
+   */
+   
+  public void requestTakeback(Game game, int plyCount){
+    checkGameMineAndPlayed(game);
+    
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
+    sendCommand("$takeback " + plyCount);
+  }
+  
 
 
   /**
@@ -2040,7 +2087,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void goBackward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
-    sendCommand("$backward "+plyCount);
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
+    sendCommand("$backward " + plyCount);
   }
 
 
@@ -2055,7 +2105,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void goForward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
-    sendCommand("$forward "+plyCount);
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
+    sendCommand("$forward " + plyCount);
   }
 
 

@@ -1612,6 +1612,53 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
     else
       sendCommand("adjourn");
   }
+  
+  
+  
+  /**
+   * Returns <code>true</code>.
+   */
+   
+  public boolean isTakebackSupported(){
+    return true;
+  }
+  
+  
+  
+  /**
+   * Sends "takeback 1" to the server.
+   */
+   
+  public void requestTakeback(Game game){
+    checkGameMineAndPlayed(game);
+    
+    sendCommand("takeback 1");
+  }
+  
+  
+  
+  /**
+   * Returns <code>true</code>.
+   */
+   
+  public boolean isMultipleTakebackSupported(){
+    return true;
+  }
+  
+  
+  
+  /**
+   * Sends "takeback plyCount" to the server.
+   */
+   
+  public void requestTakeback(Game game, int plyCount){
+    checkGameMineAndPlayed(game);
+    
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
+    sendCommand("takeback " + plyCount);
+  }
 
 
 
@@ -1625,6 +1672,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   public void goBackward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
     sendCommand("backward "+plyCount);
   }
 
@@ -1640,6 +1690,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
   public void goForward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
+    if (plyCount < 1)
+      throw new IllegalArgumentException("Illegal ply count: " + plyCount);
+    
     sendCommand("forward "+plyCount);
   }
 
