@@ -30,6 +30,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.Vector;
 import free.util.PaintHook;
+import free.util.Utilities;
 
 
 /**
@@ -135,12 +136,51 @@ public class JBoard extends JComponent{
 
 
   /**
+   * A copy of the current position on the board. We keep this so that when the
+   * real position changes, we know which squares need repainting.
+   */
+
+  private Position positionCopy;
+
+
+
+
+  /**
    * The ChangeListener to the Position.
    */
 
   private ChangeListener positionChangeListener = new ChangeListener(){
     
     public void stateChanged(ChangeEvent evt){
+      // Repaint only the parts that really need to be repainted by checking
+      // which squares changed.
+      Dimension size = getSize();
+      boolean checkMovingPieceSquare = (movedPieceSquare != null);
+      Rectangle tmpRect = new Rectangle();
+
+
+      // Repaint the dragged piece position.
+      if (checkMovingPieceSquare)
+        repaint(tmpRect = getMovedPieceRect(tmpRect));
+
+      for (int file = 0; file < 8; file++){
+        for (int rank = 0; rank < 8; rank++){
+          Piece oldPiece = positionCopy.getPieceAt(file, rank);
+          Piece newPiece = position.getPieceAt(file, rank);
+
+          // We don't need to repaint the origin square of the moving piece.
+          if (checkMovingPieceSquare && (file == movedPieceSquare.getFile()) && (rank == movedPieceSquare.getRank())){
+            checkMovingPieceSquare = false;
+            continue;
+          }
+
+          if (!Utilities.areEqual(oldPiece, newPiece)){
+            tmpRect = squareToRect(file, rank, tmpRect);
+            repaint(tmpRect);
+          }
+        }
+      }
+
       if (movedPieceSquare != null){                        // We were dragging a piece
         if (position.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging is no longer there
           movedPieceSquare = null;
@@ -148,7 +188,7 @@ public class JBoard extends JComponent{
         }
       }
 
-      repaint();
+      positionCopy.copyFrom(position);
     }
 
   };
@@ -246,14 +286,6 @@ public class JBoard extends JComponent{
 
 
 
-  /**
-   * The Image we use for double buffering.
-   */
-
-  private Image dbImage = null;
-
-
-
 
   /**
    * A boolean telling us whether we're currently showing the promotion target
@@ -272,16 +304,14 @@ public class JBoard extends JComponent{
    */
 
   public JBoard(Position position){
-    if (position==null)
-      throw new IllegalArgumentException("Null position");
+    if (position == null)
+      throw new IllegalArgumentException("The Position may not be null");
 
     setOpaque(true);
 
-    this.position = position;
+    setPosition(position);
     this.boardPainter = position.getVariant().createDefaultBoardPainter();
     this.piecePainter = position.getVariant().createDefaultPiecePainter();
-
-    position.addChangeListener(positionChangeListener);
 
     enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
@@ -350,9 +380,15 @@ public class JBoard extends JComponent{
       throw new IllegalArgumentException("Null position");
 
     Position oldPosition = position;
-    position.removeChangeListener(positionChangeListener);
+    if (position != null)
+      position.removeChangeListener(positionChangeListener);
     position = newPosition;
     position.addChangeListener(positionChangeListener);
+
+    if (positionCopy == null)
+      positionCopy = new Position(position);
+    else
+      positionCopy.copyFrom(position);
 
     repaint();
 
@@ -572,12 +608,15 @@ public class JBoard extends JComponent{
 
     // Fill the borders outside the actual board.
     g.setColor(getBackground());
-    g.fillRect(size.width-size.width%8, 0, size.width%8, size.height);
-    g.fillRect(0, size.height-size.height%8, size.width, size.height%8);
+    g.fillRect(size.width - size.width%8, 0, size.width%8, size.height);
+    g.fillRect(0, size.height - size.height%8, size.width, size.height%8);
 
     Rectangle squareRect = new Rectangle(0, 0, size.width/8, size.height/8);
     g.clipRect(0, 0, squareRect.width*8, squareRect.height*8);
     Rectangle clipRect = g.getClipBounds();
+
+    System.out.println("Painting: "+clipRect);
+//    Thread.dumpStack();
 
     Position position = getPosition();
     BoardPainter boardPainter = getBoardPainter();
@@ -585,17 +624,17 @@ public class JBoard extends JComponent{
 
     int draggedPieceStyle = getDraggedPieceStyle();
 
-    boardPainter.paintBoard(g,this,0,0,size.width,size.height);
+    boardPainter.paintBoard(g, this, 0, 0, size.width, size.height);
 
-    for (int i=0;i<8;i++)
-      for (int j=0;j<8;j++){
-        Square curSquare = Square.getInstance(i,j);
+    for (int file = 0; file < 8; file++)
+      for (int rank = 0; rank < 8; rank++){
+        Square curSquare = Square.getInstance(file, rank);
 
-        if ((draggedPieceStyle==NORMAL_DRAGGED_PIECE)&&curSquare.equals(movedPieceSquare))
+        if ((draggedPieceStyle == NORMAL_DRAGGED_PIECE) && curSquare.equals(movedPieceSquare))
           continue;
 
         Piece piece = position.getPieceAt(curSquare);
-        if (piece==null)
+        if (piece == null)
           continue;
 
         squareRect = squareToRect(curSquare, squareRect);
@@ -608,26 +647,23 @@ public class JBoard extends JComponent{
     callPaintHooks(g);
 
     if (movedPieceSquare!=null){
+      getMovedPieceRect(squareRect);
       if (draggedPieceStyle==NORMAL_DRAGGED_PIECE){
         Piece piece = position.getPieceAt(movedPieceSquare);
-        int x = movedPieceLoc.x-squareRect.width/2;
-        int y = movedPieceLoc.y-squareRect.height/2;
-        piecePainter.paintPiece(piece, g, this, x, y, squareRect.width, squareRect.height);
+        piecePainter.paintPiece(piece, g, this, squareRect.x, squareRect.y, squareRect.width, squareRect.height);
       }
       else if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE){
         g.setColor(Color.blue);
-        squareRect.x = movedPieceLoc.x-movedPieceLoc.x%squareRect.width;
-        squareRect.y = movedPieceLoc.y-movedPieceLoc.y%squareRect.height;
         squareRect.width--;
         squareRect.height--;
-        for (int i=0;i<2;i++){
+        for (int i = 0; i < 2; i++){
           g.drawRect(squareRect.x, squareRect.y, squareRect.width, squareRect.height);
           squareRect.x++;
           squareRect.y++;
           squareRect.width-=2;
           squareRect.height-=2;
 
-          if ((squareRect.width<=0)||(squareRect.height<=0))
+          if ((squareRect.width <= 0) || (squareRect.height <= 0))
             break;
         }
       }
@@ -657,21 +693,66 @@ public class JBoard extends JComponent{
    */
 
   public Rectangle squareToRect(Square square, Rectangle squareRect){
-    if (squareRect==null)
+    return squareToRect(square.getFile(), square.getRank(), squareRect);
+  }
+
+
+
+
+  /**
+   * Returns the rectangle (in pixels) of the given square.
+   */
+
+  public Rectangle squareToRect(int file, int rank, Rectangle squareRect){
+    if (squareRect == null)
       squareRect = new Rectangle();
 
     squareRect.width = getWidth()/8;
     squareRect.height = getHeight()/8;
     if (isFlipped()){
-      squareRect.x = (7-square.getFile())*squareRect.width;
-      squareRect.y = square.getRank()*squareRect.height;
+      squareRect.x = (7-file)*squareRect.width;
+      squareRect.y = rank*squareRect.height;
     }
     else{
-      squareRect.x = square.getFile()*squareRect.width;
-      squareRect.y = (7-square.getRank())*squareRect.height;
+      squareRect.x = file*squareRect.width;
+      squareRect.y = (7-rank)*squareRect.height;
     }
 
     return squareRect;
+  }
+
+
+
+
+  /**
+   * Returns a Rectangle (in pixels) of the piece currently being dragged, or
+   * <code>null</code> if no piece is currently being dragged. The resulting
+   * value is put in the specified Rectangle (unless the resulting value is
+   * <code>null</code>, or the specified Rectangle is).
+   */
+
+  public Rectangle getMovedPieceRect(Rectangle rect){
+    if (movedPieceLoc == null)
+      return null;
+
+    if (rect == null)
+      rect = new Rectangle();
+
+    int squareWidth = getWidth()/8;
+    int squareHeight = getHeight()/8;
+
+    if (getDraggedPieceStyle() == NORMAL_DRAGGED_PIECE){
+      rect.x = movedPieceLoc.x - squareWidth/2;
+      rect.y = movedPieceLoc.y - squareHeight/2;
+    }
+    else{
+      rect.x = movedPieceLoc.x - movedPieceLoc.x%squareWidth;
+      rect.y = movedPieceLoc.y - movedPieceLoc.y%squareHeight;
+    }
+    rect.width = squareWidth;
+    rect.height = squareHeight;
+
+    return rect;
   }
 
 
@@ -777,8 +858,8 @@ public class JBoard extends JComponent{
 
     Square square = locationToSquare(x,y);
 
-    if (square==null){
-      if (evtID==MouseEvent.MOUSE_RELEASED){
+    if (square == null){
+      if (evtID == MouseEvent.MOUSE_RELEASED){
         movedPieceSquare = null;
         movedPieceLoc = null;
         repaint();
@@ -786,24 +867,26 @@ public class JBoard extends JComponent{
       return;
     }
 
+    Rectangle helpRect = null;
+
     if ((evtID==MouseEvent.MOUSE_PRESSED)||((evtID==MouseEvent.MOUSE_RELEASED)&&(inputStyle==DRAG_N_DROP))){
       if (movedPieceSquare==null){
         if (evtID==MouseEvent.MOUSE_RELEASED) // This happens if the user tries to drag an empty square into a piece.
           return;
         movedPieceSquare = square;
         Piece piece = position.getPieceAt(movedPieceSquare);
-        if ((piece==null)||(!canBeMoved(piece))){
+        if ((piece == null) || (!canBeMoved(piece))){
           movedPieceSquare = null;
           return;
         }
         movedPieceLoc = new Point(x, y);
 
-        if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE)
+        if (draggedPieceStyle == CROSSHAIR_DRAGGED_PIECE)
           setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
-        repaint(squareToRect(square, null));
-        if (draggedPieceStyle==NORMAL_DRAGGED_PIECE)
-          repaint(movedPieceLoc.x-squareWidth/2, movedPieceLoc.y-squareHeight/2, squareWidth, squareHeight);
+        repaint(helpRect = squareToRect(square, helpRect));
+        if (draggedPieceStyle == NORMAL_DRAGGED_PIECE)
+          repaint(helpRect = getMovedPieceRect(helpRect));
 
         // 17/02/2002 I can't see why this is needed, as "repaint(squareToRect(square, null))" already repaints the exact same area
         //            this call does.
@@ -812,6 +895,9 @@ public class JBoard extends JComponent{
 
       }
       else{
+        movedPieceLoc.x = x;
+        movedPieceLoc.y = y;
+
         if (!square.equals(movedPieceSquare)){
           WildVariant variant = position.getVariant();
           Piece [] promotionTargets = variant.getPromotionTargets(position, movedPieceSquare, square);
@@ -833,17 +919,21 @@ public class JBoard extends JComponent{
 
           position.makeMove(madeMove);
         }
+        else{ // Picked up the piece and left it immediately.
+          repaint(helpRect = getMovedPieceRect(helpRect));
+          repaint(helpRect = squareToRect(movedPieceSquare, helpRect));
+        }
 
         movedPieceSquare = null;
         movedPieceLoc = null;
         if (draggedPieceStyle==CROSSHAIR_DRAGGED_PIECE)
           setCursor(Cursor.getDefaultCursor());
-
-        repaint();
       }
     }
 
-    paintImmediately(RepaintManager.currentManager(this).getDirtyRegion(this));
+    RepaintManager repaintManager = RepaintManager.currentManager(this);
+    paintImmediately(repaintManager.getDirtyRegion(this));
+    repaintManager.markCompletelyClean(this);
   }
 
 
@@ -884,24 +974,18 @@ public class JBoard extends JComponent{
     if (square==null)
       return;
 
+    Rectangle helpRect = null;
 
     if ((evtID==MouseEvent.MOUSE_DRAGGED)||((evtID==MouseEvent.MOUSE_MOVED)&&(inputStyle==CLICK_N_CLICK))){
-      int draggedPieceStyle = getDraggedPieceStyle();
-      if (draggedPieceStyle==NORMAL_DRAGGED_PIECE){
-        repaint(movedPieceLoc.x-squareWidth/2, movedPieceLoc.y-squareHeight/2, squareWidth, squareHeight);
-        movedPieceLoc.x = x;
-        movedPieceLoc.y = y;
-        repaint(movedPieceLoc.x-squareWidth/2, movedPieceLoc.y-squareHeight/2, squareWidth, squareHeight);
-      }
-      else{
-        repaint(movedPieceLoc.x-movedPieceLoc.x%squareWidth, movedPieceLoc.y-movedPieceLoc.y%squareHeight, squareWidth, squareHeight);
-        movedPieceLoc.x = x;
-        movedPieceLoc.y = y;
-        repaint(movedPieceLoc.x-movedPieceLoc.x%squareWidth, movedPieceLoc.y-movedPieceLoc.y%squareHeight, squareWidth, squareHeight);
-      }
+      repaint(helpRect = getMovedPieceRect(helpRect));
+      movedPieceLoc.x = x;
+      movedPieceLoc.y = y;
+      repaint(helpRect = getMovedPieceRect(helpRect));
     }
 
-    paintImmediately(RepaintManager.currentManager(this).getDirtyRegion(this));
+    RepaintManager repaintManager = RepaintManager.currentManager(this);
+    paintImmediately(repaintManager.getDirtyRegion(this));
+    repaintManager.markCompletelyClean(this);
   }
 
 
@@ -937,5 +1021,6 @@ public class JBoard extends JComponent{
   public Dimension getMinimumSize(){
     return new Dimension(80,80);
   }
+
 
 }
