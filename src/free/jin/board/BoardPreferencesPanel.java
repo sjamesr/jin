@@ -104,6 +104,22 @@ public class BoardPreferencesPanel extends PreferencesPanel{
 
 
 
+  /**
+   * The ColorChooserButton for selecting the move highlighting color.
+   */
+
+  private final ColorChooserButton moveHighlightingColorChooser;
+
+
+
+  /**
+   * The ColorChooserButton for selecting the drag square highlighting color.
+   */
+
+  private final ColorChooserButton dragSquareHighlightingColorChooser;
+
+
+
 
   /**
    * Creates a new BoardPreferencesPanel with the given BoardManager.
@@ -122,11 +138,19 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     whiteOutlineChooser.setMnemonic('p');
     blackOutlineChooser.setMnemonic('k');
 
+
     lightColorChooser = new ColorChooserButton("Light squares", getColorProperty("light-square-color", new Color(255,207,144)));
     darkColorChooser = new ColorChooserButton("Dark squares", getColorProperty("dark-square-color", new Color(143,96,79)));
 
     lightColorChooser.setMnemonic('L');
     darkColorChooser.setMnemonic('D');
+
+
+    moveHighlightingColorChooser = new ColorChooserButton("Move highlighting", getColorProperty("move-highlighting-color", boardManager.getMoveHighlightingColor()));
+    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag square highlighting", getColorProperty("drag-square-highlighting-color", boardManager.getDragSquareHighlightingColor()));
+
+    moveHighlightingColorChooser.setMnemonic('M');
+    dragSquareHighlightingColorChooser.setMnemonic('s');
 
 
     ChangeListener changeNotifyListener = new ChangeListener(){
@@ -141,6 +165,8 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     blackOutlineChooser.addChangeListener(changeNotifyListener);
     lightColorChooser.addChangeListener(changeNotifyListener);
     darkColorChooser.addChangeListener(changeNotifyListener);
+    moveHighlightingColorChooser.addChangeListener(changeNotifyListener);
+    dragSquareHighlightingColorChooser.addChangeListener(changeNotifyListener);
 
     createUI();
   }
@@ -177,22 +203,31 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     piecesPanel.add(whiteOutlineChooser);
     piecesPanel.add(blackOutlineChooser);
     Border innerBorder = new EmptyBorder(5, 5, 5, 5);
-    Border outerBorder = new TitledBorder("Piece preferences");
+    Border outerBorder = new TitledBorder(" Piece preferences (*) ");
     piecesPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
     JPanel boardPanel = new JPanel(new GridLayout(1, 2, 5, 5));
     boardPanel.add(lightColorChooser);
     boardPanel.add(darkColorChooser);
     innerBorder = new EmptyBorder(5, 5, 5, 5);
-    outerBorder = new TitledBorder("Board preferences");
+    outerBorder = new TitledBorder(" Board preferences (*) ");
     boardPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
 
+    JPanel highlightPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+    highlightPanel.add(moveHighlightingColorChooser);
+    highlightPanel.add(dragSquareHighlightingColorChooser);
+    innerBorder = new EmptyBorder(5, 5, 5, 5);
+    outerBorder = new TitledBorder(" Highlighting preferences ");
+    highlightPanel.setBorder(new CompoundBorder(outerBorder, innerBorder));
+
     JPanel notePanel = new JPanel(new BorderLayout());
-    notePanel.add(BorderLayout.CENTER, new JLabel("Note that the color preferences only affect vector pieces and the solid color board"));
+    notePanel.add(BorderLayout.CENTER, new JLabel("* - Note that the color preferences only affect vector pieces and the solid color board"));
 
     add(piecesPanel);
     add(Box.createVerticalStrut(10));
     add(boardPanel);
+    add(Box.createVerticalStrut(10));
+    add(highlightPanel);
     add(Box.createVerticalStrut(10));
     add(notePanel);
   }
@@ -213,7 +248,10 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     maybeSetColorProperty("light-square-color", lightColorChooser.getColor());
     maybeSetColorProperty("dark-square-color", darkColorChooser.getColor());
 
-    boardManager.refreshFromProperties();
+    maybeSetColorProperty("move-highlighting-color", moveHighlightingColorChooser.getColor());
+    maybeSetColorProperty("drag-square-highlighting-color", dragSquareHighlightingColorChooser.getColor());
+
+    boardManager.refreshFromProperties(true);
   }
 
 
