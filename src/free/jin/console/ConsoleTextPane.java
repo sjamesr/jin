@@ -31,8 +31,7 @@ import javax.swing.text.Utilities;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import bsh.Interpreter;
-import bsh.EvalError;
+import java.lang.reflect.*;
 
 
 /**
@@ -156,7 +155,6 @@ public class ConsoleTextPane extends JTextPane{
 
 
 
-
   /**
    * Overrides <code>paintComponent</code> to enable/disable antialiasing and
    * perhaps other expensive rendering hints.
@@ -168,24 +166,31 @@ public class ConsoleTextPane extends JTextPane{
       boolean antialias = new Boolean(console.getProperty("output-text.antialias")).booleanValue();
 //      String fractionalMetrics = console.getProperty("output-text.fractionalMetrics");
 
-      String textAntialiasValue = "RenderingHints.VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
-      renderingHints.put("RenderingHints.KEY_TEXT_ANTIALIASING", textAntialiasValue);
+      String textAntialiasValue = "VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
+      renderingHints.put("KEY_TEXT_ANTIALIASING", textAntialiasValue);
 //      if (fractionalMetrics != null)
-//        renderingHints.put("RenderingHints.KEY_FRACTIONALMETRICS", fractionalMetrics);
+//        renderingHints.put("KEY_FRACTIONALMETRICS", fractionalMetrics);
     }
 
     if (renderingHintsSupported && !renderingHints.isEmpty()){
       try{
-        Interpreter bsh = new Interpreter();
-        bsh.set("g", g);
-        bsh.eval("g2 = (Graphics2D)g");
+        Class g2Class = Class.forName("java.awt.Graphics2D");
+        Class rhClass = Class.forName("java.awt.RenderingHints");
+        Class rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
+        Class [] argumentTypes = new Class[]{rhKeyClass, Object.class};
+        Method setRenderingHint = g2Class.getDeclaredMethod("setRenderingHint", argumentTypes);
+
         Enumeration renderingHintsEnum = renderingHints.keys();
         while (renderingHintsEnum.hasMoreElements()){
-          String key = (String)renderingHintsEnum.nextElement();
-          String value = (String)renderingHints.get(key);
-          bsh.eval("g2.setRenderingHint(" + key + ", " + value + ")");
+          String keyName = (String)renderingHintsEnum.nextElement();
+          String valueName = (String)renderingHints.get(keyName);
+          Object key = rhClass.getField(keyName).get(null);
+          Object value = rhClass.getField(valueName).get(null);
+          Object [] args = new Object[]{key, value};
+          setRenderingHint.invoke(g, args);
         }
-      } catch (EvalError e){
+      } catch (Exception e){
+          e.printStackTrace();
           System.err.println("Failed to set rendering hints. Probably not running under a Java2D capable JVM.");
           renderingHintsSupported = false;
         }
