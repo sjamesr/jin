@@ -381,7 +381,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectionColorButton(){
-    Color selectionColor = prefs.getColor("output-selection");
+    Color selectionColor = prefs.getColor("output-selection", UIManager.getColor("textHighlight"));
     ColorChooser button = new ColorChooser("Selection:", selectionColor);
     button.setMnemonic('l');
 
@@ -397,7 +397,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectedColorButton(){
-    Color selectedColor = prefs.getColor("output-selected");
+    Color selectedColor = prefs.getColor("output-selected", UIManager.getColor("textHighlightText"));
     ColorChooser button = new ColorChooser("Selected Text:", selectedColor);
     button.setMnemonic('e');
 
@@ -499,8 +499,11 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
       consolePrefs.set(propertyName, propertyValue);
     }
 
-    consolePrefs.setColor("output-selection", selectionColorButton.getColor());
-    consolePrefs.setColor("output-selected", selectedColorButton.getColor());
+    if (!selectionColorButton.getColor().equals(UIManager.getColor("textHighlight")))
+      consolePrefs.setColor("output-selection", selectionColorButton.getColor());
+    
+    if (!selectedColorButton.getColor().equals(UIManager.getColor("textHighlightText")))
+      consolePrefs.setColor("output-selected", selectedColorButton.getColor());
 
     consoleManager.refreshFromProperties();
   }
