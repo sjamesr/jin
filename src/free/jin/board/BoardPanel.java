@@ -504,9 +504,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           board.cancelMovingPiece();
         else if (queuedMove != null){
           setQueuedMove(null);
+          isBoardPositionUpdating = true;
           board.getPosition().copyFrom(realPosition);
           if (isMoveEnRoute())
             board.getPosition().makeMove(moveEnRoute);
+          isBoardPositionUpdating = false;
         }
       }
     };
