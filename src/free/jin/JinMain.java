@@ -1027,7 +1027,8 @@ public class JinMain implements JinContext{
 
     // Bugfix for Java bug 4464714 - setExtendedState only works once the
     // the window is realized.
-    mainFrame.addNotify();
+    if (mainFrame.getPeer() == null)
+      mainFrame.addNotify();
    
     int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
     AWTUtilities.setExtendedFrameState(mainFrame, state);
