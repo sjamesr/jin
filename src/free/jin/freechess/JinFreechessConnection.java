@@ -1491,8 +1491,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
   private void processOffered(boolean toUser, int offerIndex, String oppName, int offerId){
     try{
-      System.out.println("toUser="+toUser);
-      System.out.println("oppName="+oppName);
       InternalGameData gameData = findMyGameAgainst(oppName);
       Player userPlayer = gameData.game.getUserPlayer();
       Player player = toUser ? userPlayer.getOpponent() : userPlayer;
