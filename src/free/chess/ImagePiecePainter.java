@@ -111,21 +111,16 @@ public class ImagePiecePainter implements PiecePainter{
     if (pieceImages[size] != null)
       return (Image)(pieceImages[size].get(piece));
 
-    int distance = 1;
-    while (true){
-      int smaller = size - distance;
-      int bigger = size + distance;
+    for (int i = size; i > 0; i--)
+      if (pieceImages[i] != null)
+        return (Image)(pieceImages[i].get(piece));
 
-      if ((smaller > 0) && (pieceImages[smaller] != null))
-        return (Image)(pieceImages[smaller].get(piece));
+    for (int i = size+1; i < pieceImages.length; i++)
+      if (pieceImages[i] != null)
+        return (Image)(pieceImages[i].get(piece));
 
-      if ((bigger < pieceImages.length) && (pieceImages[bigger] != null))
-        return (Image)(pieceImages[bigger].get(piece));
-
-      distance++;
-    }
+    throw new Error("This can't happen");
   }
-
 
 
 
