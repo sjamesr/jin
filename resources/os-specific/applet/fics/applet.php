@@ -1,13 +1,10 @@
-<?php
-	header("CacheControl: no-cache");
-?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
 <TITLE> Jin Applet </TITLE>
 </HEAD>
 
-<BODY>
+<BODY<?php if ($_REQUEST['oldjava']) echo " onLoad='javascript:clearWaitMessage()'" ?>>
 
 <CENTER>
 
@@ -18,8 +15,10 @@
 		
 	<PARAM NAME="loadPrefsURL" VALUE="prefs.php?loadPrefs">
 	<PARAM NAME="savePrefsURL" VALUE="prefs.php?savePrefs">
+	
+	<PARAM NAME="bgcolor" VALUE="ffffff">
 		
-	<PARAM NAME="port" VALUE="5000">
+	<PARAM NAME="login.ports" VALUE="5000">
 		
 	<PARAM NAME="server.classname" VALUE="free.jin.freechess.FreechessServer">
 			   
@@ -41,6 +40,23 @@
 	<PARAM NAME="resources.pieces" VALUE="fics/eboard xboard">
 	
 </APPLET>
+
+<?php
+	// This only works in IE, which waits for applets to load before firing
+	// an onLoad event. This is ok, though, because the applet only takes
+	// a long time to load under MS VM.
+
+	if ($_REQUEST['oldjava']){
+?>
+	<H2 id="waitMessage">Jin is loading - this may take a few minutes</H2>
+	<SCRIPT type="text/javascript">
+		function clearWaitMessage(){
+			document.getElementById('waitMessage').innerHTML = "";
+		}
+	</SCRIPT>
+<?php
+	}
+?>
 </CENTER>
 
 </BODY>
