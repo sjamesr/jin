@@ -82,7 +82,7 @@ public class LookAndFeelMenu extends JMenu{
    */
 
   public LookAndFeelMenu(Component componentTreeToUpdate){
-    super("Look & Feel");
+    super("Look&Feel");
 
     ActionListener lnfActionListener = new LookAndFeelChoiceListener();
 
