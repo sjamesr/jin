@@ -1321,11 +1321,11 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       StringBuffer buf = new StringBuffer();
       int b;
       mainLoop: while ((b = in.read()) != -1){
-        if (b == '\r')
-          System.out.print("\\r");
-        else if (b == '\n')
-          System.out.print("\\n");
-        System.out.print((char)b);
+//        if (b == '\r')
+//          System.out.print("\\r");
+//        else if (b == '\n')
+//          System.out.print("\\n");
+//        System.out.print((char)b);
         if (b == '\r')
           continue;
         else if (b == '\n'){
@@ -1337,7 +1337,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
               continue mainLoop;
             }
           }
-          System.out.print("Sending line: \""+s+"\"");
+          System.out.println(s);
           execRunnable(new HandleLineRunnable(s));
           buf.setLength(0);
         }
