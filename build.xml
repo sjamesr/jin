@@ -11,8 +11,8 @@
 	<target name="init">
 		<property name="build.dir" value="build" />
 		<property name="build.debug" value="yes" />
-    <property name="build.compress" value="no" />
-    <property name="build.manifest" value="manifest.txt" />
+		<property name="build.compress" value="no" />
+		<property name="build.manifest" value="manifest.txt" />
 		
 		<property name="source.dir" value="src" />
 		<property name="classes.dir" value="classes" /> 
@@ -20,6 +20,7 @@
 		<property name="libs.dir" value="${build.dir}/libs" />	
 		<property name="servers.dir" value="${build.dir}/servers" />	
 		<property name="plugins.dir" value="${build.dir}/plugins" />
+		<property name="actions.dir" value="${build.dir}/actions" />
 		<property name="resources.dir" value="${build.dir}/resources" />	
 		<property name="lnfs.dir" value="${build.dir}/lnfs" />	
 	</target>
@@ -74,6 +75,9 @@
 		<mkdir dir="${plugins.dir}" />
 		<mkdir dir="${plugins.dir}/fics" />
 		<mkdir dir="${plugins.dir}/icc" />
+		<mkdir dir="${actions.dir}" />
+		<mkdir dir="${actions.dir}/fics" />
+		<mkdir dir="${actions.dir}/icc" />
 		<mkdir dir="${lnfs.dir}" />
 		
 		<!-- Copy libs -->
@@ -196,18 +200,19 @@
 
 
 		<!-- Fix CRLF in manifest.txt (for windows) -->
-    <fixcrlf srcdir="${user.dir}" includes="${manifest}" />
+		<fixcrlf srcdir="${user.dir}" includes="${manifest}" />
     
 
 		<!-- Jin classes -->
 		<jar jarfile="${build.dir}/jin.jar"
 		     basedir="${classes.dir}"
-		     includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/resources/**"
+		     includes="free/jin/* free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/action/* free/jin/resources/**"
 		     compress="${build.compress}"
 		     manifest="${build.manifest}"
 		/>
 
 
+		
 		<!-- Free Internet Chess Server support -->
 		<jar jarfile="${servers.dir}/freechess.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
@@ -216,7 +221,6 @@
 			<fileset dir="${classes.dir}/free/jin/freechess"
 			         includes="definition" />
 		</jar>
-
 
 		<!-- Internet Chess Club support -->
 		<jar jarfile="${servers.dir}/chessclub.jar" compress="${build.compress}">
@@ -227,6 +231,7 @@
 			         includes="definition" />
 		</jar>
 
+		
 
 		<!-- Console plugin library -->
 		<jar jarfile="${libs.dir}/console.jar" compress="${build.compress}">
@@ -235,27 +240,20 @@
 			         excludes="free/jin/console/icc/** free/jin/console/fics/**" />
 		</jar>
 
-
 		<!-- Console plugin for ICC -->
-		<jar jarfile="${plugins.dir}/icc/console.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/console/icc/**"
-			         excludes="free/jin/console/icc/definition" />
-			<fileset dir="${classes.dir}/free/jin/console/icc"
-			         includes="definition" />
-		</jar>
-
+		<antcall target="buildPlugin">
+			<param name="server.id" value="icc" />
+			<param name="plugin.id" value="console" />
+		</antcall>
 
 		<!-- Console plugin for FICS -->
-		<jar jarfile="${plugins.dir}/fics/console.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/console/fics/**"
-			         excludes="free/jin/console/fics/definition" />
-			<fileset dir="${classes.dir}/free/jin/console/fics"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="fics" />
+			<param name="plugin.id" value="console" />
+		</antcall>
 
 
+		
 		<!-- Sound plugin library -->
 		<jar jarfile="${libs.dir}/sound.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
@@ -263,26 +261,19 @@
 			         excludes="free/jin/sound/icc/** free/jin/sound/fics/**" />
 		</jar>
 
-		
 		<!-- Sound plugin for ICC -->
-		<jar jarfile="${plugins.dir}/icc/sound.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/sound/icc/**"
-			         excludes="free/jin/sound/icc/definition" />
-			<fileset dir="${classes.dir}/free/jin/sound/icc"
-			         includes="definition" />
-		</jar>
-
+		<antcall target="buildPlugin">
+			<param name="server.id" value="icc" />
+			<param name="plugin.id" value="sound" />
+		</antcall>
 
 		<!-- Sound plugin for FICS -->
-		<jar jarfile="${plugins.dir}/fics/sound.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/sound/fics/**"
-			         excludes="free/jin/sound/fics/definition" />
-			<fileset dir="${classes.dir}/free/jin/sound/fics"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="fics" />
+			<param name="plugin.id" value="sound" />
+		</antcall>
 
+		
 
 		<!-- Seek Graph plugin library -->
 		<jar jarfile="${libs.dir}/seek.jar" compress="${build.compress}">
@@ -291,26 +282,19 @@
 			         excludes="free/jin/seek/icc/** free/jin/seek/fics/**" />
 		</jar>
 
-
 		<!-- Seek Graph plugin for ICC -->
-		<jar jarfile="${plugins.dir}/icc/seek.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/seek/icc/**"
-			         excludes="free/jin/seek/icc/definition" />
-			<fileset dir="${classes.dir}/free/jin/seek/icc"
-			         includes="definition" />
-		</jar>
-
+		<antcall target="buildPlugin">
+			<param name="server.id" value="icc" />
+			<param name="plugin.id" value="seek" />
+		</antcall>
 
 		<!-- Seek Graph plugin for FICS -->
-		<jar jarfile="${plugins.dir}/fics/seek.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/seek/fics/**"
-			         excludes="free/jin/seek/fics/definition" />
-			<fileset dir="${classes.dir}/free/jin/seek/fics"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="fics" />
+			<param name="plugin.id" value="seek" />
+		</antcall>
 
+		
 
 		<!-- Board plugin library -->
 		<jar jarfile="${libs.dir}/board.jar" compress="${build.compress}">
@@ -319,37 +303,27 @@
 			         excludes="free/jin/board/icc/** free/jin/board/fics/**" />
 		</jar>
 
-
 		<!-- Board plugin for ICC -->
-		<jar jarfile="${plugins.dir}/icc/board.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/board/icc/**"
-			         excludes="free/jin/board/icc/definition" />
-			<fileset dir="${classes.dir}/free/jin/board/icc"
-			         includes="definition" />
-		</jar>
-
+		<antcall target="buildPlugin">
+			<param name="server.id" value="icc" />
+			<param name="plugin.id" value="board" />
+		</antcall>
 
 		<!-- Board plugin for FICS -->
-		<jar jarfile="${plugins.dir}/fics/board.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/board/fics/**"
-			         excludes="free/jin/board/fics/definition" />
-			<fileset dir="${classes.dir}/free/jin/board/fics"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="fics" />
+			<param name="plugin.id" value="board" />
+		</antcall>
 
 
+		
 		<!-- Game Logger plugin -->
-		<jar jarfile="${plugins.dir}/gamelogger.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/gamelogger/**"
-			         excludes="free/jin/gamelogger/definition" />
-			<fileset dir="${classes.dir}/free/jin/gamelogger"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="plugin.id" value="gamelogger" />
+		</antcall>
 
 
+		
 		<!-- Scripter plugin library -->
 		<jar jarfile="${libs.dir}/scripter.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
@@ -358,46 +332,60 @@
 		</jar>
 
 		<!-- Scripter plugin for ICC -->
-		<jar jarfile="${plugins.dir}/icc/scripter.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/scripter/icc/**"
-			         excludes="free/jin/scripter/icc/definition" />
-			<fileset dir="${classes.dir}/free/jin/scripter/icc"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="icc" />
+			<param name="plugin.id" value="scripter" />
+		</antcall>
 
 		<!-- Scripter plugin for FICS -->
-		<jar jarfile="${plugins.dir}/fics/scripter.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/scripter/fics/**"
-			         excludes="free/jin/scripter/fics/definition" />
-			<fileset dir="${classes.dir}/free/jin/scripter/fics"
-			         includes="definition" />
-		</jar>
+		<antcall target="buildPlugin">
+			<param name="server.id" value="fics" />
+			<param name="plugin.id" value="scripter" />
+		</antcall>
+		
+		
+		
+		<!-- Actions plugin -->
+		<antcall target="buildPlugin">
+			<param name="plugin.id" value="actions" />
+		</antcall>
+		
+		
 		
 
+		<!-- Get Server Help action -->
+		<antcall target="buildAction">
+			<param name="action.id" value="getserverhelp" />
+		</antcall>
+ 		
+		<!-- Ask a Question action -->
+		<antcall target="buildAction">
+			<param name="action.id" value="askquestion" />
+		</antcall>
+    
+    
 		<!-- Resources -->
 		<mkdir dir="${resources.dir}" />
 
 		
 		<!-- Piece sets -->
 		<mkdir dir="${resources.dir}/pieces" />
-    <mkdir dir="${resources.dir}/pieces/icc" />
-    <mkdir dir="${resources.dir}/pieces/fics" />
+		<mkdir dir="${resources.dir}/pieces/icc" />
+		<mkdir dir="${resources.dir}/pieces/fics" />
 		
 		
 		<!-- Eboard Vector - this one is special because it's the default set --> 
 		<jar jarfile="${resources.dir}/pieces/fics/eboard.jar" compress="false">
 			<fileset dir="${res.dir}/pieces/fics/eboard" />
 		</jar>
-    <antcall target="extractResource">
-      <param name="resource.file" value="${resources.dir}/pieces/fics/eboard.jar" />
-      <param name="resource.name" value="eboard" />
-    </antcall>
+		<antcall target="extractResource">
+			<param name="resource.file" value="${resources.dir}/pieces/fics/eboard.jar" />
+			<param name="resource.name" value="eboard" />
+		</antcall>
     
 		<!-- Blitzin Vector -->
 		<antcall target="buildImagePieceSet">
-      <param name="piece-set.dir" value="icc" />
+			<param name="piece-set.dir" value="icc" />
 			<param name="piece-set.id" value="blitzin" />
 		</antcall>
 
@@ -408,42 +396,42 @@
 
 		<!-- Bookup -->
 		<antcall target="buildImagePieceSet">
-      <param name="piece-set.dir" value="icc" />
+			<param name="piece-set.dir" value="icc" />
 			<param name="piece-set.id" value="bookup" />
 		</antcall>
 
 		<!-- Dyche Gray -->
 		<antcall target="buildImagePieceSet">
-      <param name="piece-set.dir" value="icc" />
+			<param name="piece-set.dir" value="icc" />
 			<param name="piece-set.id" value="dyche1" />
 		</antcall>
 
 		<!-- Dyche Color -->
 		<antcall target="buildImagePieceSet">
-      <param name="piece-set.dir" value="icc" />
+			<param name="piece-set.dir" value="icc" />
 			<param name="piece-set.id" value="dyche2" />
 		</antcall>
 		
 		<!-- Dyche Standard -->
 		<antcall target="buildImagePieceSet">
-      <param name="piece-set.dir" value="icc" />
+			<param name="piece-set.dir" value="icc" />
 			<param name="piece-set.id" value="dyche3" />
 		</antcall>
 		
 		
 		<!-- Board patterns -->
 		<mkdir dir="${resources.dir}/boards" />
-    <mkdir dir="${resources.dir}/boards/icc" />
-    <mkdir dir="${resources.dir}/boards/fics" />
+		<mkdir dir="${resources.dir}/boards/icc" />
+		<mkdir dir="${resources.dir}/boards/fics" />
 
 		<!-- Plain Color -->		
 		<zip destfile="${resources.dir}/boards/plain.zip" compress="false">
 			<fileset dir="${res.dir}/boards/plain" />
 		</zip>
-    <antcall target="extractResource">
-      <param name="resource.file" value="${resources.dir}/boards/plain.zip" />
-      <param name="resource.name" value="plain" />
-    </antcall>
+		<antcall target="extractResource">
+			<param name="resource.file" value="${resources.dir}/boards/plain.zip" />
+			<param name="resource.name" value="plain" />
+		</antcall>
     
 		
 		<!-- Dark Wood -->
@@ -453,7 +441,7 @@
 		
 		<!-- Light Wood -->
 		<antcall target="buildBoardPattern">
-      <param name="board-pattern.dir" value="icc" />
+			<param name="board-pattern.dir" value="icc" />
 			<param name="board-pattern.id" value="wooden-light" />
 		</antcall>
 		
@@ -493,43 +481,79 @@
 		</antcall>
 		
 	</target>
+  
+  
+	<!-- Creates a single plugin
+	     Parameters: server.id (optional, for server specific plugins}, plugin.id
+	-->
+	<target name="buildPlugin">
+		<property name="server.id" value="" />
+		<jar jarfile="${plugins.dir}/${server.id}/${plugin.id}.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/${plugin.id}/${server.id}/**"
+			         excludes="free/jin/${plugin.id}/${server.id}/definition" />
+			<fileset dir="${classes.dir}/free/jin/${plugin.id}/${server.id}"
+			         includes="definition" />
+		</jar>
+	</target>
+  
+
+	<!-- Creates a single action.
+	     Parameters: server.id (optional, for server specific actions), action.id
+	-->
+	<target name="buildAction">
+		<property name="server.id" value="" />
+		<jar jarfile="${actions.dir}/${server.id}/${action.id}.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/action/${action.id}/* free/jin/action/${action.id}/${server.id}/**"
+			         excludes="free/jin/action/${action.id}/${server.id}/definition" />
+			<fileset dir="${classes.dir}/free/jin/action/${action.id}/${server.id}"
+			         includes="definition" />
+		</jar>
+	</target>
+  
 	
-	<!-- Builds a single piece set -->
+	<!-- Builds a single piece set
+	     Parameters: piece-set.dir (optional, for server specific piece sets), piece-set.id
+	-->
 	<target name="buildImagePieceSet">
-    <property name="piece-set.dir" value="" />
-    <property name="resource.file" value="${resources.dir}/pieces/${piece-set.dir}/${piece-set.id}.zip" />
+		<property name="piece-set.dir" value="" />
+		<property name="resource.file" value="${resources.dir}/pieces/${piece-set.dir}/${piece-set.id}.zip" />
 		<zip destfile="${resource.file}" compress="false">
 			<fileset dir="${res.dir}/pieces/${piece-set.dir}/${piece-set.id}" />
 		</zip>
-    <antcall target="extractResource">
-      <param name="resource.file" value="${resource.file}" />
-      <param name="resource.name" value="${piece-set.id}" />
-    </antcall>
+		<antcall target="extractResource">
+			<param name="resource.file" value="${resource.file}" />
+			<param name="resource.name" value="${piece-set.id}" />
+		</antcall>
 	</target>
 	
 	
-	<!-- Builds a single board pattern -->
+	<!-- Builds a single board pattern
+	     Parameters: board-pattern.dir (optional, for server specific boards), board-pattern.dir
+	-->
 	<target name="buildBoardPattern">
-    <property name="board-pattern.dir" value="" />
-    <property name="resource.file" value="${resources.dir}/boards/${board-pattern.dir}/${board-pattern.id}.zip" />
+		<property name="board-pattern.dir" value="" />
+		<property name="resource.file" value="${resources.dir}/boards/${board-pattern.dir}/${board-pattern.id}.zip" />
 		<zip destfile="${resource.file}" compress="false">
 			<fileset dir="${res.dir}/boards/${board-pattern.dir}/${board-pattern.id}" />
 		</zip>
-    <antcall target="extractResource">
-      <param name="resource.file" value="${resource.file}" />
-      <param name="resource.name" value="${board-pattern.id}" />
-    </antcall>
+		<antcall target="extractResource">
+			<param name="resource.file" value="${resource.file}" />
+			<param name="resource.name" value="${board-pattern.id}" />
+		</antcall>
 	</target>
   
   
-  <!-- If the buildingApplet property is set, extracts the file specified by
-       the resource.file property into a directory specified by the resource.name
-       property and then deletes the file -->
-  <target name="extractResource" if="buildingApplet">
-    <dirname file="${resource.file}" property="base-dir" />
-    <unzip src="${resource.file}" dest="${base-dir}/${resource.name}" />
-    <delete file="${resource.file}" />
-  </target>
+	<!-- If the buildingApplet property is set, extracts the file specified by
+	     the resource.file property into a directory specified by the resource.name
+	     property and then deletes the file
+	-->
+	<target name="extractResource" if="buildingApplet">
+		<dirname file="${resource.file}" property="base-dir" />
+		<unzip src="${resource.file}" dest="${base-dir}/${resource.name}" />
+		<delete file="${resource.file}" />
+	</target>
   
 	
 	<!-- If the property buildingForUnix is set, does things required for Unix -->
