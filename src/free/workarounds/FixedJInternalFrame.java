@@ -34,7 +34,12 @@ import java.beans.PropertyVetoException;
  * A fix of JInternalFrame. Fixes the following bugs:
  * <UL>
  *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4109910.html">
- *        When a JInternalFrame is activated, focus is not transferred to its children.</A>.
+ *        When a JInternalFrame is activated, focus is not transferred to its children</A>.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4230389.html">
+ *        Adding a desktop icon to JDesktopPane causes null pointer exception</A>.
+ *        Note that the workaround for this bug is not completely transparent -
+ *        it changes the time when PropertyChangeListeners are invoked for the
+ *        iconified property to when the frame is added to another component.
  * </UL>
  */
 
@@ -109,6 +114,9 @@ public class FixedJInternalFrame extends JInternalFrame{
 
 
 
+  // <4109910>
+
+
   /**
    * The component that had the focus when this internal frame became
    * deselected.
@@ -121,8 +129,6 @@ public class FixedJInternalFrame extends JInternalFrame{
   public void setSelected(boolean selected) throws PropertyVetoException{
     super.setSelected(selected);
 
-    // http://developer.java.sun.com/developer/bugParade/bugs/4109910.html
-
     if (selected){
       if (findFocusOwner() == null){
         if (previousFocusedComponent != null)
@@ -133,8 +139,6 @@ public class FixedJInternalFrame extends JInternalFrame{
     }
     else
       previousFocusedComponent = findFocusOwner();
-
-    // http://developer.java.sun.com/developer/bugParade/bugs/4109910.html
   }
 
 
@@ -157,5 +161,74 @@ public class FixedJInternalFrame extends JInternalFrame{
     else
       return null;
   }
+
+
+
+  // </4109910>
+
+
+
+  // <4230389>
+
+
+  /**
+   * This variable is set to true if this JInternalFrame has been iconified
+   * (via setIcon(true)) before being added to a component.
+   */
+
+  private boolean speciallyIconified = false;
+
+
+
+  /**
+   * Overrides setIcon to work around bug 4230389 by not calling the superclass'
+   * method if we don't have a parent yet.
+   */
+
+  public void setIcon(boolean iconified) throws PropertyVetoException{
+    if ((getParent() == null) && (desktopIcon.getParent() == null)){
+      if (speciallyIconified == iconified)
+        return;
+
+      Boolean oldValue = speciallyIconified ? Boolean.TRUE : Boolean.FALSE; 
+      Boolean newValue = iconified ? Boolean.TRUE : Boolean.FALSE;
+      fireVetoableChange(IS_ICON_PROPERTY, oldValue, newValue);
+
+      speciallyIconified = iconified;
+    }
+    else
+      super.setIcon(iconified);
+  }
+
+
+
+
+  /**
+   * Overrides isIcon to remain consistent with setIcon.
+   */
+
+  public boolean isIcon(){
+    return super.isIcon() || speciallyIconified;
+  }
+
+
+
+
+  /**
+   * Make ourselves really iconified when added to something.
+   */
+
+  public void addNotify(){
+    super.addNotify();
+
+    if (speciallyIconified){
+      try{
+        setIcon(speciallyIconified);
+        speciallyIconified = false;
+      } catch (PropertyVetoException e){}
+    }
+  }
+
+  // </4230389>
 
 }
