@@ -31,6 +31,7 @@ import free.chess.PiecePainter;
 import free.chess.ResourcePiecePainter;
 import free.chess.DefaultPiecePainter;
 import free.util.IOUtilities;
+import free.util.PlatformUtils;
 import free.util.TextUtilities;
 import free.util.URLClassLoader;
 
@@ -99,11 +100,16 @@ public class PieceSet implements Resource{
   
   /**
    * Loads this <code>PieceSet</code> from the specified URL and for the
-   * specified plugin.
+   * specified plugin. Returns whether loading finished successfully and this
+   * <code>PieceSet</code> can be used for drawing piece sets.
    */
    
-  public void load(URL url, Plugin plugin) throws IOException{
+  public boolean load(URL url, Plugin plugin) throws IOException{
     Properties definition = IOUtilities.loadProperties(new URL(url, "definition"));
+    
+    String minJavaVer = definition.getProperty("minJavaVersion");
+    if ((minJavaVer != null) && !PlatformUtils.isJavaBetterThan(minJavaVer))
+      return false;
     
     this.name = definition.getProperty("name");
     this.id = definition.getProperty("id");
@@ -149,6 +155,8 @@ public class PieceSet implements Resource{
       
     if (piecePainter instanceof ResourcePiecePainter)
       ((ResourcePiecePainter)piecePainter).load(url);
+    
+    return true;
   }
   
   

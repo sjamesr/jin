@@ -21,18 +21,20 @@
 
 package free.jin.board;
 
-import java.net.URL;
-import java.io.IOException;
-import java.util.Properties;
+import free.chess.BoardPainter;
+import free.chess.DefaultBoardPainter;
+import free.chess.ResourceBoardPainter;
 import free.jin.Resource;
 import free.jin.Server;
 import free.jin.plugin.Plugin;
-import free.chess.BoardPainter;
-import free.chess.ResourceBoardPainter;
-import free.chess.DefaultBoardPainter;
 import free.util.IOUtilities;
+import free.util.PlatformUtils;
 import free.util.TextUtilities;
 import free.util.URLClassLoader;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
 
 
 /**
@@ -99,11 +101,16 @@ public class BoardPattern implements Resource{
   
   /**
    * Loads this <code>BoardPattern</code> from the specified URL and for the
-   * specified plugin.
+   * specified plugin. Returns <code>false</code> if the Java version required
+   * by the board pattern is higher than the one we're running in.
    */
    
-  public void load(URL url, Plugin plugin) throws IOException{
+  public boolean load(URL url, Plugin plugin) throws IOException{
     Properties definition = IOUtilities.loadProperties(new URL(url, "definition"));
+    
+    String minJavaVer = definition.getProperty("minJavaVersion");
+    if ((minJavaVer != null) && !PlatformUtils.isJavaBetterThan(minJavaVer))
+      return false;
     
     this.name = definition.getProperty("name");
     this.id = definition.getProperty("id");
@@ -149,6 +156,8 @@ public class BoardPattern implements Resource{
       
     if (boardPainter instanceof ResourceBoardPainter)
       ((ResourceBoardPainter)boardPainter).load(url);
+    
+    return true;
   }
   
   
