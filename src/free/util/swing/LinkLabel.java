@@ -94,7 +94,7 @@ public class LinkLabel extends JLabel{
 
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
-    if (evt.getID() == MouseEvent.MOUSE_RELEASED)
+    if (evt.getID() == MouseEvent.MOUSE_CLICKED)
       fireActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, getNormalText()));
   }
 
