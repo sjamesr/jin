@@ -438,6 +438,16 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
+   * A list of game numbers of ongoing games which we can't support for some
+   * reason (not a supported variant for example).
+   */
+
+  private final Vector unsupportedGames = new Vector();
+
+
+
+
+  /**
    * Returns the Game object currently assosiated with the specified game
    * number. Returns <code>null</code> if there is no such game.
    */
@@ -505,8 +515,9 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         // 1. Issue "forward" with an argument of 2 or bigger.
       }
     }
-    else{ // Grr, the server started a game without sending us a GameInfo line.
-          // Currently happens if you start examining a game (26.08.2002)
+    else if (!unsupportedGames.contains(gameNumber)){ 
+      // Grr, the server started a game without sending us a GameInfo line.
+      // Currently happens if you start examining a game (26.08.2002)
 
       // We have no choice but to fake the data, since the server simply doesn't
       // send us this information.
@@ -706,6 +717,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if (variant == null){
       processLine("This version of Jin does not support the wild variant ("+categoryName+") and is thus unable to display the game.");
       processLine("Please activate the appropriate command to abort this game");
+      unsupportedGames.addElement(new Integer(gameInfo.getGameNumber()));
       return null;
     }
 
@@ -926,6 +938,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       if (game.getGameType() == Game.MY_GAME)
         askSeeksRefresh();
     }
+    else
+      unsupportedGames.removeElement(gameID);
   }
 
 
