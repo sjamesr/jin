@@ -193,7 +193,7 @@ public class ConsoleTextPane extends JTextPane{
           rhClass = Class.forName("java.awt.RenderingHints");
           rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
           argumentTypes = new Class[]{rhKeyClass, Object.class};
-          setRenderingHint = g2Class.getDeclaredMethod("setRenderingHint", argumentTypes);
+          setRenderingHint = g2Class.getMethod("setRenderingHint", argumentTypes);
         }
 
         Enumeration renderingHintsEnum = renderingHints.keys();
