@@ -2,7 +2,7 @@ tell-last-teller-keystroke = string;F9
 tell-next-teller-keystroke = string;shift F9
 
 # Output properties
-output-selection = color;000080
+#output-selection = color;000080
 output-selected = color;ffffff
 
 output-popup.num-commands = integer;16
