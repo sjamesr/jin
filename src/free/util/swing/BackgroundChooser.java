@@ -80,7 +80,7 @@ public class BackgroundChooser extends JDialog{
    * The file chosen for the wallpaper, or null if it's the default.
    */
 
-  private File chosenImageFile = null;
+  private File chosenImageFile;
 
 
 
@@ -89,7 +89,7 @@ public class BackgroundChooser extends JDialog{
    * The chosen background image layout style, or -1 if it's the default.
    */
 
-  private int chosenImageLayoutStyle = -1;
+  private int chosenImageLayoutStyle;
 
 
 
@@ -98,7 +98,7 @@ public class BackgroundChooser extends JDialog{
    * The chosen background color, or null if it's the default.
    */
 
-  private Color chosenColor = null;
+  private Color chosenColor;
 
 
 
@@ -109,13 +109,17 @@ public class BackgroundChooser extends JDialog{
    */
 
   public BackgroundChooser(Frame parent, AdvancedJDesktopPane desktop, Image defaultImage,
-      int defaultImageLayoutStyle, Color defaultColor){
+      int defaultImageLayoutStyle, Color defaultColor, File currentImageFile){
     super(parent, "Pick background", true);
 
     this.desktop = desktop;
     this.defaultImage = defaultImage;
     this.defaultImageLayoutStyle = defaultImageLayoutStyle;
     this.defaultColor = defaultColor;
+
+    this.chosenImageFile = currentImageFile;
+    this.chosenImageLayoutStyle = desktop.getWallpaperLayoutStyle();
+    this.chosenColor = desktop.getBackground();
 
     createUI();
 

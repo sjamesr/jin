@@ -226,7 +226,9 @@ public class JinFrameMenuBar extends JMenuBar{
       public void actionPerformed(ActionEvent evt){
         AdvancedJDesktopPane desktop = (AdvancedJDesktopPane)jinFrame.getDesktop();
         Color defaultColor = UIManager.getColor("desktop");
-        BackgroundChooser bChooser = new BackgroundChooser(jinFrame, desktop, null, AdvancedJDesktopPane.CENTER, defaultColor);
+        String wallpaperFilename = Jin.getProperty("desktop.wallpaper");
+        File currentImageFile = wallpaperFilename == null ? null : new File(wallpaperFilename);
+        BackgroundChooser bChooser = new BackgroundChooser(jinFrame, desktop, null, AdvancedJDesktopPane.TILE, defaultColor, currentImageFile);
         bChooser.setVisible(true);
 
         Color chosenColor = bChooser.getChosenColor();
