@@ -99,6 +99,14 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     
     coordsColor = new ColorChooser("Coordinates' text color:", boardManager.getCoordsDisplayColor());
     
+    none.setToolTipText("No square coordinates are displayed on the board");
+    rim.setToolTipText("Row and column coordinates are displayed on the "+
+                       "border of the leftmost and bottommost squares");
+    outside.setToolTipText("Row and column coordinates are displayed outside "+
+                           "the board, along its left and bottom borders");
+    everySquare.setToolTipText("Square coordinates are displayed in each square");
+    coordsColor.setToolTipText("The color of the coordinates' text");
+    
     ButtonGroup group = new ButtonGroup();
     group.add(none);
     group.add(rim);

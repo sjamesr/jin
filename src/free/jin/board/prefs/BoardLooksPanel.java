@@ -154,6 +154,13 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     darkSquares.setMnemonic('D');
     lightSquares.setMnemonic('L');
     
+    whiteColor.setToolTipText("The color of white's pieces");
+    blackColor.setToolTipText("The color of black's pieces");
+    whiteOutline.setToolTipText("The color of the outline of white's pieces");
+    blackOutline.setToolTipText("The color of the outline of black's pieces");
+    darkSquares.setToolTipText("The color of the dark squares");
+    lightSquares.setToolTipText("The color of the light squares");
+    
     JComponent piecesPanel = createPiecesUI();
     JComponent boardPanel = createBoardUI();
     

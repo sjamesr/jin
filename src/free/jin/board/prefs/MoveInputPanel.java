@@ -144,6 +144,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
     clicknclick = new JRadioButton("Click and click",
       boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
+    
+    dragndrop.setToolTipText("Moves are entered by dragging pieces and "+
+                             "dropping them into their target squares");
+    clicknclick.setToolTipText("Moves are entered by clicking a piece, moving it "+
+                               "to its target square and then clicking again");
+    
     ButtonGroup moveInputGroup = new ButtonGroup();
     moveInputGroup.add(dragndrop);
     moveInputGroup.add(clicknclick);
@@ -160,6 +166,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     clicknclick.addActionListener(moveInputListener);
       
     autoPromote = new JCheckBox("Auto-Promote", boardManager.isAutoPromote());
+    autoPromote.setToolTipText("Automatically promotes to a queen instead of "+
+                               "asking the user which piece to promote to");
     autoPromote.setMnemonic('A');
     autoPromote.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -173,6 +181,10 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       boardManager.getDraggedPieceStyle() == JBoard.NORMAL_DRAGGED_PIECE);
     highlightTargetSquare = new JRadioButton("Highlight target square",
       boardManager.getDraggedPieceStyle() == JBoard.HIGHLIGHT_TARGET_DRAGGED_PIECE);
+    
+    pieceFollowsCursor.setToolTipText("When in the process of moving a piece, the piece will follow the cursor");
+    highlightTargetSquare.setToolTipText("When in the process of moving a piece, the square under the cursor is highlighted");
+    
     ButtonGroup moveVisualizationGroup = new ButtonGroup();
     moveVisualizationGroup.add(pieceFollowsCursor);
     moveVisualizationGroup.add(highlightTargetSquare);
@@ -189,6 +201,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightTargetSquare.addActionListener(moveVisualizationListener);
     
     highlightColor = new ColorChooser("Highlight color:", boardManager.getDragSquareHighlightingColor());
+    highlightColor.setToolTipText("The color of the highlighting element in \"Highlight target square\" mode");
     highlightColor.setMnemonic('t');
     highlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
@@ -206,6 +219,11 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       boardManager.getMoveSendingMode() == BoardManager.PREDRAG_MOVE_SENDING_MODE);
     premove = new JRadioButton("Wait for turn (premove)",
       boardManager.getMoveSendingMode() == BoardManager.PREMOVE_MOVE_SENDING_MODE);
+    
+    disallowMoveInAdvance.setToolTipText("Disallows entering a move when it isn't your turn");
+    immediateSendMove.setToolTipText("Moves entered when it isn't your turn are sent immediately to the server");
+    premove.setToolTipText("Moves entered when it isn't your turn are sent when it becomes your turn");
+    
     ButtonGroup movingInAdvanceButtonGroup = new ButtonGroup();
     movingInAdvanceButtonGroup.add(disallowMoveInAdvance);
     movingInAdvanceButtonGroup.add(immediateSendMove);
@@ -418,6 +436,9 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(disallowMoveInAdvance);
     panel.add(immediateSendMove);
     panel.add(premove);
+    panel.add(Box.createVerticalStrut(5));
+    panel.add(new JLabel("Some of the options may")); 
+    panel.add(new JLabel("not be modified during a game")); 
     panel.add(Box.createVerticalGlue());
 
     return panel;    

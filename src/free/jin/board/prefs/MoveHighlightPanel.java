@@ -119,6 +119,16 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     
     highlightColor = new ColorChooser("Highlight color:", boardManager.getMoveHighlightingColor());
     
+    none.setToolTipText("No move highlighting");
+    targetSquare.setToolTipText("Highlights the square into which the piece was moved");
+    bothSquares.setToolTipText("Highlights both the origin square of the piece that "+
+                               "was moved and the square it was moved into");
+    arrow.setToolTipText("Draws an arrow from the origin square of the piece that "+
+                         "was moved to the square it was moved into");
+    highlightOwnMoves.setToolTipText("Highlights your moves too, as opposed to "+
+                                     "highlighting only the opponent's moves");
+    highlightColor.setToolTipText("The color of the highlighting element");
+        
     ButtonGroup group = new ButtonGroup();
     group.add(none);
     group.add(targetSquare);
