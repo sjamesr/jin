@@ -35,11 +35,14 @@ public class UnixDevAudioPlayer implements AudioPlayer{
 
 
 
+
   /**
-   * Maps AudioClips to byte arrays containing the audio clip data.
+   * Returns true if the file "/dev/audio" exists.
    */
 
-  private static final Hashtable audioClipsToData = new Hashtable();
+  public boolean isSupported(){
+    return new File("/dev/audio").exists();
+  }
 
 
 

@@ -45,7 +45,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * The maximum amount of AudioClips we're allowed to queue.
    */
 
-  public static final int MAX_QUEUE_SIZE = 2;
+  private static final int MAX_QUEUE_SIZE = 2;
 
 
 
@@ -53,7 +53,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * The current thread playing the sound.
    */
 
-  private static volatile Thread playerThread = null;
+  private volatile Thread playerThread = null;
 
 
 
@@ -61,7 +61,22 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * The queue holding AudioClips for the player thread to play.
    */
 
-  private static final BlockingQueue clipQueue = new BlockingQueue();
+  private final BlockingQueue clipQueue = new BlockingQueue();
+
+
+
+
+  /**
+   * Returns true if the class "sun.audio.AudioPlayer" can be loaded.
+   */
+
+  public boolean isSupported(){
+    try{
+      return Class.forName("sun.audio.AudioPlayer") != null;
+    } catch (ClassNotFoundException e){
+        return false;
+      }
+  }
 
 
 

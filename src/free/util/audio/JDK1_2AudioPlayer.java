@@ -38,7 +38,18 @@ public class JDK1_2AudioPlayer implements AudioPlayer{
    * instances.
    */
 
-  private static final Hashtable audioClips = new Hashtable();
+  private final Hashtable audioClips = new Hashtable();
+
+
+
+
+  /**
+   * Returns true if the value of "java.version" is 1.2 or later.
+   */
+
+  public boolean isSupported(){
+    return System.getProperty("java.version").compareTo("1.2") >= 0;
+  }
 
 
 

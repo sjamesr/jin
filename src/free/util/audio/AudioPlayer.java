@@ -30,6 +30,14 @@ public interface AudioPlayer{
 
 
   /**
+   * Returns <code>true</code> if the AudioPlayer is supported on this system.
+   * Returns <code>false</code> otherwise.
+   */
+
+  boolean isSupported();
+
+
+  /**
    * Plays the given AudioClip. Throws an IOException if unsuccessful.
    */
 
