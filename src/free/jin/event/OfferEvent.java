@@ -191,5 +191,30 @@ public class OfferEvent extends GameEvent{
 
     return takebackCount;
   }
+  
+  
+  
+  /**
+   * Returns a textual representation of this <code>OfferEvent</code>.
+   */
+   
+  public String toString(){
+    StringBuffer buf = new StringBuffer("OfferEvent[");
+    switch (getOfferId()){
+      case DRAW_OFFER: buf.append("DRAW_OFFER,"); break;
+      case ABORT_OFFER: buf.append("ABORT_OFFER,"); break;
+      case ADJOURN_OFFER: buf.append("ADJOURN_OFFER,"); break;
+      case TAKEBACK_OFFER: buf.append("TAKEBACK_OFFER("+getTakebackCount()+"), "); break;
+    }
+    
+    buf.append(getPlayer() + ", ");
+    
+    if (isOffered())
+      buf.append("offered]");
+    else
+      buf.append("not offered]");
+
+    return buf.toString();    
+  }
 
 }
