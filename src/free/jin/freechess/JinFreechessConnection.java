@@ -225,18 +225,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
 
 
-
   /**
    * Fires an appropriate ChatEvent.
    */
 
   protected boolean processPersonalTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tell", username,
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "tell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
-
 
 
 
@@ -245,8 +243,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processSayTell(String username, String titles, int gameNumber, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "say", username,
-      (titles == null ? "" : titles), -1, message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(new ChatEvent(this, "say", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -259,8 +257,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processPTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", username,
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -275,8 +273,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   protected boolean processChannelTell(String username, String titles, int channelNumber, 
       String message){
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", username,
-      (titles == null ? "" : titles), -1, message, new Integer(channelNumber)));
+    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", ChatEvent.ROOM_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, new Integer(channelNumber)));
 
     return true;
   }
@@ -294,8 +292,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (titles == null)
       titles = "";
 
-    listenerManager.fireChatEvent(
-      new ChatEvent(this, "kibitz", username, titles, rating, message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(new ChatEvent(this, "kibitz", ChatEvent.GAME_CHAT_CATEGORY,
+      username, titles, rating, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -312,8 +310,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (titles == null)
       titles = "";
 
-    listenerManager.fireChatEvent(
-      new ChatEvent(this, "whisper", username, titles, rating, message, new Integer(gameNumber)));
+    listenerManager.fireChatEvent(new ChatEvent(this, "whisper", ChatEvent.GAME_CHAT_CATEGORY,
+      username, titles, rating, message, new Integer(gameNumber)));
 
     return true;
   }
@@ -343,10 +341,13 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
         title = "";
       Integer tourneyIndex = new Integer(matcher.group(3));
       message = matcher.group(4);
-      evt = new ChatEvent(this, "qtell.tourney", sender, title, -1, message, tourneyIndex);
+      evt = new ChatEvent(this, "qtell.tourney", ChatEvent.TOURNEY_CHAT_CATEGORY,
+        sender, title, -1, message, tourneyIndex);
     }
-    else
-      evt = new ChatEvent(this, "qtell", null, null, -1, message, null);
+    else{
+      evt = new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+        null, null, -1, message, null);
+    }
 
     listenerManager.fireChatEvent(evt);
 
@@ -361,8 +362,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "shout", username,
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "shout", ChatEvent.ROOM_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -375,8 +376,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processIShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", username,
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", ChatEvent.ROOM_CHAT_CATEGORY, 
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -389,8 +390,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processTShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", username, 
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", ChatEvent.TOURNEY_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -403,8 +404,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processCShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", username, 
-      (titles == null ? "" : titles), -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", ChatEvent.ROOM_CHAT_CATEGORY,
+      username, (titles == null ? "" : titles), -1, message, null));
 
     return true;
   }
@@ -417,8 +418,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processAnnouncement(String username, String message){
-    listenerManager.fireChatEvent(
-      new ChatEvent(this, "announcement", username, "", -1, message, null));
+    listenerManager.fireChatEvent(new ChatEvent(this, "announcement", ChatEvent.BROADCAST_CHAT_CATEGORY, 
+      username, "", -1, message, null));
 
     return true;
   }
