@@ -23,6 +23,8 @@ package free.jin.board.event;
 
 import java.util.EventListener;
 import free.jin.board.JinBoard;
+import free.jin.board.Arrow;
+import free.jin.board.Circle;
 import free.chess.Square;
 
 
@@ -33,12 +35,13 @@ import free.chess.Square;
 
 public interface ArrowCircleListener extends EventListener{
 
+  
 
   /**
    * Gets called when an arrow is added.
    */
 
-  void arrowAdded(JinBoard board, Square fromSquare, Square toSquare);
+  void arrowAdded(JinBoard board, Arrow arrow);
 
 
 
@@ -46,7 +49,7 @@ public interface ArrowCircleListener extends EventListener{
    * Gets called when an arrow is removed.
    */
 
-  void arrowRemoved(JinBoard board, Square fromSquare, Square toSquare);
+  void arrowRemoved(JinBoard board, Arrow arrow);
 
 
 
@@ -54,7 +57,7 @@ public interface ArrowCircleListener extends EventListener{
    * Gets called when a circle is added.
    */
 
-  void circleAdded(JinBoard board, Square circleSquare);
+  void circleAdded(JinBoard board, Circle circle);
 
 
 
@@ -62,6 +65,8 @@ public interface ArrowCircleListener extends EventListener{
    * Gets called when a circle is removed.
    */
 
-  void circleRemoved(JinBoard board, Square circleSquare);
+  void circleRemoved(JinBoard board, Circle circle);
+  
+ 
 
 }
