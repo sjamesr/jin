@@ -23,7 +23,9 @@ package free.jin.event;
 
 import free.jin.Game;
 import free.chess.Move;
+import free.chess.ChessMove;
 import free.jin.JinConnection;
+import free.jin.PGNJinConnection;
 
 
 /**
@@ -51,6 +53,9 @@ public class MoveMadeEvent extends GameEvent{
 
   public MoveMadeEvent(JinConnection conn, Game game, Move move){
     super(conn, game);
+
+    if ((conn instanceof PGNJinConnection) && (move instanceof ChessMove) && (((ChessMove)move).getSAN() == null))
+      throw new IllegalStateException("The source JinConnection implements PGNJinConnection, but did not provide a SAN representation of the move");
 
     this.move = move;
   } 
