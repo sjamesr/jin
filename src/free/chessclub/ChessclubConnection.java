@@ -481,6 +481,7 @@ public class ChessclubConnection extends free.util.Connection{
 
 
 
+
   /**
    * Creates a new ChessclubConnection with a chessclub.com server, the 
    * ChessclubConnection is initially unconnected. After creating the 
@@ -533,7 +534,7 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #isDGOn(int)
    */
 
-  public final boolean setDGState(int dgNumber, boolean state){
+  public synchronized final boolean setDGState(int dgNumber, boolean state){
     if ((state==false)&&isEssentialDG(dgNumber))
       return false;
 
@@ -552,6 +553,29 @@ public class ChessclubConnection extends free.util.Connection{
     }
 
     return true;
+  }
+
+
+
+
+
+  /**
+   * Sets the given datagram on again. This is needed because some datagrams
+   * won't correctly keep you up-to-date with the current state of events, and
+   * you need (sigh, this is definitely not safe) to set them again to get a
+   * refresh (DG_NOTIFY_ARRIVED for example). 
+   *
+   * @throws IllegalStateException if the datagram is not on already or if we're
+   * not logged in yet.
+   */
+
+  public synchronized void setDGOnAgain(int dgNumber){
+    if (!isDGOn(dgNumber))
+      throw new IllegalStateException("Cannot set on again a datagram which is not on");
+    if (!isLoggedIn())
+      throw new IllegalStateException("Cannot set on again a datagram when not yet logged in");
+
+    sendCommand("set-2 "+dgNumber+" 1");
   }
 
 
@@ -582,7 +606,7 @@ public class ChessclubConnection extends free.util.Connection{
    * this method will throw an IllegalAccessException.
    */
 
-  public final boolean setStyle(int style){
+  public synchronized final boolean setStyle(int style){
     int essentialStyle = getEssentialStyle();
     if ((essentialStyle!=-1)&&(essentialStyle!=style))
       return false;
@@ -648,7 +672,7 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #setDGState(int,boolean)
    */
 
-  public boolean isDGOn(int dg){
+  public synchronized boolean isDGOn(int dg){
     return level2Settings.get(dg);
   }
 
@@ -667,32 +691,43 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #disconnect()
    */
 
-  protected synchronized void login() throws IOException{
-    synchronized(loginLock){
-      out = sock.getOutputStream();
+  protected void login() throws IOException{
+    out = sock.getOutputStream();
 
-      int largestSetDGNumber = level2Settings.size();
-      while ((largestSetDGNumber>=0)&&(!level2Settings.get(largestSetDGNumber)))
-        largestSetDGNumber--;
-      if (largestSetDGNumber>=0){
-        StringBuffer buf = new StringBuffer("level2settings=");
-        for (int i=0;i<=largestSetDGNumber;i++){
-          buf.append(level2Settings.get(i) ? "1" : "0");
-        }
-        sendCommand(buf.toString());
+    int largestSetDGNumber = level2Settings.size();
+    while ((largestSetDGNumber>=0)&&(!level2Settings.get(largestSetDGNumber)))
+      largestSetDGNumber--;
+    if (largestSetDGNumber>=0){
+      StringBuffer buf = new StringBuffer("level2settings=");
+      for (int i=0;i<=largestSetDGNumber;i++){
+        buf.append(level2Settings.get(i) ? "1" : "0");
       }
+      sendCommand(buf.toString());
+    }
 
-      sendCommand(getRequestedUsername()+" "+getPassword());
+    sendCommand(getRequestedUsername()+" "+getPassword());
+    synchronized(loginLock){
       try{
         loginLock.wait(); // Wait until we receive DG_WHO_AM_I
       } catch (InterruptedException e){
           e.printStackTrace();
         } 
-
-      sendCommand("set-quietly prompt 0");
-      sendCommand("set-quietly style "+style);
-      sendCommand("set-quietly interface "+interfaceVar);
     }
+  }
+
+
+
+
+  /**
+   * Sets the various things we need to set on login.
+   */
+
+  protected void onLogin(){
+    super.onLogin();
+
+    sendCommand("set-quietly prompt 0");
+    sendCommand("set-quietly style "+style);
+    sendCommand("set-quietly interface "+interfaceVar);
   }
 
 
@@ -726,7 +761,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Sends the given command to the server.
    */
 
-  public void sendCommand(String command){
+  public synchronized void sendCommand(String command){
     if (echoStream!=null){
       echoStream.println("SENDING COMMAND: "+command);
     }
@@ -3000,7 +3035,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #ESTABLISHED_RATING}.
    */
 
-  private int convertRatingType(int iccCode){
+  private static int convertRatingType(int iccCode){
     switch (iccCode){
       case 0:
         return NO_RATING;
@@ -3021,7 +3056,7 @@ public class ChessclubConnection extends free.util.Connection{
    * player state codes.
    */
 
-  private int convertPlayerState(String iccCode){
+  private static int convertPlayerState(String iccCode){
     if ("P".equals(iccCode))
       return PLAYING;
     if ("E".equals(iccCode))
@@ -3052,7 +3087,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #BLACK} or {@link #COLORLESS}.
    */
 
-  private int convertColorPreference(int iccCode){
+  private static int convertColorPreference(int iccCode){
   
     switch (iccCode){
       case -1:
@@ -3074,7 +3109,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #CHANNEL_TELL} or {@link #CHANNEL_ATELL}.
    */
 
-  private int convertChannelTellType(int iccCode){
+  private static int convertChannelTellType(int iccCode){
     switch (iccCode){
       case 1:
         return CHANNEL_TELL;
@@ -3095,7 +3130,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #QTELL} or {@link #ATELL}.
    */
 
-  private int convertPersonalTellType(int iccCode){
+  private static int convertPersonalTellType(int iccCode){
     switch (iccCode){
       case 0:
         return SAY;
@@ -3120,7 +3155,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #ANNOUNCEMENT}.
    */
 
-  private int convertShoutType(int iccCode){
+  private static int convertShoutType(int iccCode){
     switch (iccCode){
       case 0:
         return SHOUT;
@@ -3143,7 +3178,7 @@ public class ChessclubConnection extends free.util.Connection{
    * {@link #EXAMINED_GAME} or {@link #PLAYED_GAME}.
    */
 
-  private int convertGameType(int iccCode){
+  private static int convertGameType(int iccCode){
     switch (iccCode){
       case -1:
         return STORED_GAME;
@@ -3165,7 +3200,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Returns the list of commands.
    */
 
-  private String [] parseDGTourneyCommandList(String commands){
+  private static String [] parseDGTourneyCommandList(String commands){
     StringTokenizer tokenizer = new StringTokenizer(commands, "&");
     String [] commandList = new String[tokenizer.countTokens()];
     int commandCount = 0;
@@ -3229,7 +3264,7 @@ public class ChessclubConnection extends free.util.Connection{
    * is terminated.
    */
 
-  public final void handleDisconnection(){
+  public synchronized final void handleDisconnection(){
     if (echoStream!=null)
       echoStream.println("DISCONNECTED");
 
