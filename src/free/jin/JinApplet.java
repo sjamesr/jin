@@ -136,8 +136,6 @@ public class JinApplet extends Applet implements JinContext{
       if (bgColorString != null)
         setBackground(new Color(0xff000000 | Integer.parseInt(bgColorString, 16)));
       
-      params.put("login.hostname", getDocumentBase().getHost());
-      
       setLayout(new FlowLayout());
       add(new UserAuthPanel());
     } catch (Throwable t){
