@@ -24,7 +24,9 @@ package free.util.audio;
 import sun.audio.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Hashtable;
 import free.util.BlockingQueue;
+import free.util.IOUtilities;
 
 
 /**
@@ -65,7 +67,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
 
 
   /**
-   * Plays the given AudioClip, throws an IOException if unsuccessful. Due to
+   * Plays the given AudioClip. Due to
    * bugs in mixing sound in sun.audio.AudioPlayer, calling this method while
    * an AudioClip is already playing will cause the new clip to be queued for
    * playing instead of mixed with the currently playing one as may happen with

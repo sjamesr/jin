@@ -22,6 +22,7 @@
 package free.util.audio;
 
 import java.io.*;
+import java.util.Hashtable;
 import free.util.IOUtilities;
 
 
@@ -33,6 +34,16 @@ import free.util.IOUtilities;
 public class UnixDevAudioPlayer implements AudioPlayer{
 
 
+
+  /**
+   * Maps AudioClips to byte arrays containing the audio clip data.
+   */
+
+  private static final Hashtable audioClipsToData = new Hashtable();
+
+
+
+
   /**
    * Writes the sound data of the given AudioClip into /dev/audio. Throws an 
    * IOException if unsuccessful.
@@ -41,8 +52,9 @@ public class UnixDevAudioPlayer implements AudioPlayer{
   public void play(AudioClip clip) throws IOException{
     OutputStream out = null;
     try{
+      byte [] data = clip.getData();
       out = new FileOutputStream("/dev/audio");
-      InputStream in = new ByteArrayInputStream(clip.getData());
+      InputStream in = new ByteArrayInputStream(data);
       IOUtilities.pump(in, out);
     }
     finally{

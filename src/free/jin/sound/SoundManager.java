@@ -30,8 +30,8 @@ import free.jin.FriendsJinConnection;
 import free.jin.Game;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.io.InputStream;
 import java.io.IOException;
+import java.net.URL;
 import javax.swing.JMenu;
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButtonMenuItem;
@@ -187,11 +187,10 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
         Pattern regex = new Pattern(pattern);
         
         if (!filenamesToAudioClips.containsKey(filename)){
-          InputStream in = getClass().getResourceAsStream(filename);
-          if (in==null)
+          URL url = getClass().getResource(filename);
+          if (url == null)
             continue;
-          filenamesToAudioClips.put(filename, new AudioClip(in));
-          in.close();
+          filenamesToAudioClips.put(filename, new AudioClip(url));
         }
 
         patToFilenames.put(regex, filename);
@@ -232,11 +231,10 @@ public class SoundManager extends Plugin implements ChatListener, ConnectionList
       String resourceName = getProperty(eventName);
       if (resourceName==null)
         return;
-      InputStream in = getClass().getResourceAsStream(resourceName);
-      if (in==null)
+      URL url = SoundManager.class.getResource(resourceName);
+      if (url == null)
         return;
-      eventsToAudioClips.put(eventName, new AudioClip(in));
-      in.close();
+      eventsToAudioClips.put(eventName, new AudioClip(url));
     } catch (IOException e){
         e.printStackTrace();
       }
