@@ -2790,26 +2790,15 @@ public class ChessclubConnection extends free.util.Connection{
         break;
       }
       case Datagram.DG_CHANNEL_QTELL:{
-        String message = datagram.getString(3);
-        int index;
-        while ((index = message.indexOf("\\n"))!=-1)
-          message = message.substring(0,index)+"\n"+message.substring(index+2);
-        
-        processChannelQTell(datagram.getInteger(0),datagram.getString(1),datagram.getString(2),
-          message);
+        processChannelQTell(datagram.getInteger(0), datagram.getString(1), datagram.getString(2), datagram.getString(3));
         break;
       }
       case Datagram.DG_PERSONAL_QTELL:{
-        String message = datagram.getString(2);
-        int index;
-        while ((index = message.indexOf("\\n"))!=-1)
-          message = message.substring(0,index)+"\n"+message.substring(index+2);
-        
-        processPersonalQTell(datagram.getString(0),datagram.getString(1),message);
+        processPersonalQTell(datagram.getString(0), datagram.getString(1), datagram.getString(2));
         break;
       }
       case Datagram.DG_SET_BOARD:{
-        processSetBoard(datagram.getInteger(0),datagram.getString(1),datagram.getString(2).equals("W") ? WHITE : BLACK);
+        processSetBoard(datagram.getInteger(0), datagram.getString(1), datagram.getString(2).equals("W") ? WHITE : BLACK);
         break;
       }
       case Datagram.DG_MATCH_ASSESSMENT:{
