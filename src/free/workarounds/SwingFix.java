@@ -82,7 +82,7 @@ public class SwingFix{
   static{
     String osName = System.getProperty("os.name");
     if (osName.indexOf("Windows") != -1){
-      UIManager.put("ScrollBar.track", new Color(230,230,230));
+      UIManager.put("ScrollBar.track", new Color(230, 230, 230));
     }
   }
 
@@ -95,13 +95,17 @@ public class SwingFix{
    */
 
   static{
-    String osName = System.getProperty("os.name");
-    if (osName.indexOf("Mac OS X") != -1){
-      // I know passing null may not be such a good idea, but the component
-      // argument is unused anyway, and the static method can't be "overriden"
-      // even though the documentation says it can :-).
-      RepaintManager.currentManager(null).setDoubleBufferingEnabled(false);
-    }
+    try{
+      String osName = System.getProperty("os.name");
+      if (osName.indexOf("Mac OS X") != -1){
+        // I know passing null may not be such a good idea, but the component
+        // argument is unused anyway, and the static method can't be "overriden"
+        // even though the documentation says it can :-).
+        RepaintManager.currentManager(null).setDoubleBufferingEnabled(false);
+      }
+    } catch (RuntimeException e){
+        e.printStackTrace();
+      }
   }
 
 
