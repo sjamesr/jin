@@ -67,8 +67,18 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private RootPaneContainer fullscreenWindow = null;
-
-
+  
+  
+  
+  /**
+   * The extended state of the original parent frame. This is needed as a
+   * workaround for the maximized state sometimes being reset when coming back
+   * from fullscreen mode.
+   */
+   
+  private Object originalFrameState;
+  
+  
   
   /**
    * Creates a new <code>FullscreenPanel</code> with the specified target
@@ -190,8 +200,12 @@ public class FullscreenPanel extends FixedJPanel{
       Object graphicsConfiguration = 
         getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), null);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, null);
+      
+      Frame originalFrame = SwingUtils.frameForComponent(this);
+      Method getExtState = Frame.class.getDeclaredMethod("getExtendedState", new Class[0]);
+      originalFrameState = getExtState.invoke(originalFrame, new Object[0]);
 
-      SwingUtils.frameForComponent(this).setVisible(false);
+      originalFrame.setVisible(false);
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{frame});
 
       return frame;
@@ -264,7 +278,14 @@ public class FullscreenPanel extends FixedJPanel{
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{null});
 
       frame.dispose();
-      SwingUtils.frameForComponent(this).setVisible(true);
+
+      
+      Frame originalFrame = SwingUtils.frameForComponent(this);
+      
+      Method setExtState =
+        Frame.class.getDeclaredMethod("setExtendedState", new Class[]{int.class});
+      setExtState.invoke(originalFrame, new Object[]{originalFrameState});
+      originalFrame.setVisible(true);
     } catch (Exception e){e.printStackTrace();}
   }
 
