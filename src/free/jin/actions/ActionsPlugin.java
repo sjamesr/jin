@@ -22,7 +22,12 @@
 package free.jin.actions;
 
 import javax.swing.*;
-import free.jin.plugin.Plugin;
+import free.jin.plugin.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import free.jin.action.JinAction;
 
 
@@ -40,8 +45,67 @@ public class ActionsPlugin extends Plugin{
    */
    
   private final JMenu menu = new JMenu("Actions");
-
   
+  
+  
+  /**
+   * The ui container for the action buttons.
+   */
+   
+  private PluginUIContainer buttonContainer;
+  
+  
+  
+  /**
+   * The radio button indicating the actions ui container is visible. 
+   */
+   
+  private final JRadioButtonMenuItem shownButton; 
+    
+  
+
+  /**
+   * The radio button indicating the actions ui container is invisible. 
+   */
+   
+  private final JRadioButtonMenuItem hiddenButton;
+  
+  
+  
+  /**
+   * Creates a new <code>ActionsPlugin</code>.
+   */
+   
+  public ActionsPlugin(){
+    shownButton = new JRadioButtonMenuItem("Action Buttons Shown"); 
+    hiddenButton = new JRadioButtonMenuItem("Action Buttons Hidden");
+    
+    shownButton.setMnemonic('S');
+    hiddenButton.setMnemonic('H');
+    
+    ButtonGroup bGroup = new ButtonGroup();
+    bGroup.add(shownButton);
+    bGroup.add(hiddenButton);
+    
+    shownButton.setActionCommand("show");
+    hiddenButton.setActionCommand("hide");
+
+    ActionListener visibilityListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        String actionCommand = evt.getActionCommand();
+        boolean isVisible = "show".equals(actionCommand);
+        buttonContainer.setVisible(isVisible);
+      }
+    };
+
+    shownButton.addActionListener(visibilityListener);
+    hiddenButton.addActionListener(visibilityListener);
+    
+    menu.add(shownButton);
+    menu.add(hiddenButton);
+  }
+   
+
   
   /**
    * Returns the name of this plugin - "Actions".
@@ -68,25 +132,78 @@ public class ActionsPlugin extends Plugin{
    */
    
   public void start(){
-    ListModel actions = getActions();
-    for (int i = 0; i < actions.getSize(); i++){
-      JinAction action = (JinAction)actions.getElementAt(i);
-      menu.add(createMenuItemFor(action));
-    }
+    buttonContainer = createButtonContainer();
+    
+    addActionButtons();
+    addActionMenuItems();
+    
+    if (getPrefs().getBool("visible", true))
+      buttonContainer.setVisible(true);
   }
   
   
   
   /**
-   * Creates and returns a <code>JMenuItem</code> for the specified
-   * <code>JinAction</code>.
+   * Creates the ui container for the action buttons.
    */
    
-  private JMenuItem createMenuItemFor(final JinAction action){
-    JMenuItem menuItem = new JMenuItem(action.getName());
-    menuItem.addActionListener(action);
+  private PluginUIContainer createButtonContainer(){
+    PluginUIContainer container = createContainer("");
+    container.setTitle("Actions");
+    container.setCloseOperation(PluginUIContainer.HIDE_ON_CLOSE);
     
-    return menuItem;
+    container.addPluginUIListener(new PluginUIAdapter(){
+      public void pluginUIShown(PluginUIEvent evt){
+        if (!shownButton.isSelected())
+          shownButton.setSelected(true);
+      }
+      public void pluginUIHidden(PluginUIEvent evt){
+        if (!hiddenButton.isSelected())
+          hiddenButton.setSelected(true);
+      }
+    });
+    
+    return container;
+  }
+  
+  
+  
+  /**
+   * Adds the action buttons into the button container. 
+   */
+   
+  private void addActionButtons(){
+    ListModel actions = getActions();
+    
+    JComponent content = new JPanel(new GridLayout(actions.getSize(), 1, 5, 5));
+    for (int i = 0; i < actions.getSize(); i++){
+      JinAction action = (JinAction)actions.getElementAt(i);
+      JButton button = new JButton(action.getName());
+      button.addActionListener(action);
+      content.add(button);
+    }
+    
+    content.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    buttonContainer.getContentPane().setLayout(new BorderLayout());
+    buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
+  }
+  
+  
+  
+  /**
+   * Adds all the actions to the plugin's menu.
+   */
+   
+  private void addActionMenuItems(){
+    menu.addSeparator();
+    ListModel actions = getActions();
+    for (int i = 0; i < actions.getSize(); i++){
+      JinAction action = (JinAction)actions.getElementAt(i);
+      JMenuItem menuItem = new JMenuItem(action.getName());
+      menuItem.addActionListener(action);
+      menu.add(menuItem);
+    }
   }
   
   
@@ -97,6 +214,16 @@ public class ActionsPlugin extends Plugin{
    
   public JMenu getPluginMenu(){
     return menu;
+  }
+  
+  
+  
+  /**
+   * Saves the plugin's state into preferences.
+   */
+   
+  public void saveState(){
+    getPrefs().setBool("visible", buttonContainer.isVisible());     
   }
   
   
