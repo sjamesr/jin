@@ -156,8 +156,11 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected java.net.Socket createSocket(final String hostname, final int port) throws IOException{
-    java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port); // Comment this to disable timesealing
-//    java.net.Socket sock = new java.net.Socket(hostname, port); // Comment this to enable timesealing
+    java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port);
+    // Comment this to disable timesealing
+    
+    //java.net.Socket sock = new java.net.Socket(hostname, port);
+    // Comment this to enable timesealing
 
     execRunnable(new Runnable(){
 

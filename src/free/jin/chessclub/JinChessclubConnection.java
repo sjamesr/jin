@@ -210,6 +210,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
 
   protected Socket createSocket(final String hostname, final int port) throws IOException{
     Socket sock = new free.chessclub.timestamp.TimestampingSocket(hostname, port);
+    // Comment this to disable timestamping
+    
+    //java.net.Socket sock = new java.net.Socket(hostname, port);
+    // Comment this to enable timestamping
 
     execRunnable(new Runnable(){
 
