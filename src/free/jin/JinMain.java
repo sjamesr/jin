@@ -945,7 +945,7 @@ public class JinMain implements JinContext{
     frame.addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent evt){
         Object result =
-          OptionPanel.confirm(uiProvider, "Really Close?", "Close Jin?", OptionPanel.OK);
+          OptionPanel.confirm(uiProvider, "Exit", "Exit Jin?", OptionPanel.OK);
 
         if (result == OptionPanel.OK)
           shutdown();
