@@ -48,8 +48,8 @@ public class SwingFix{
     String cutAction = DefaultEditorKit.cutAction;
     String copyAction = DefaultEditorKit.copyAction;
     String pasteAction = DefaultEditorKit.pasteAction;
-    int ctrlMask = InputEvent.CTRL_MASK;
-    int metaMask = InputEvent.META_MASK;
+    
+    int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     JTextComponent.KeyBinding cut =
       new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, 0), cutAction);
@@ -58,22 +58,14 @@ public class SwingFix{
     JTextComponent.KeyBinding paste =
       new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0), pasteAction);
     JTextComponent.KeyBinding ctrlX =
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, ctrlMask), cutAction);
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, mask), cutAction);
     JTextComponent.KeyBinding ctrlC =
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, ctrlMask), copyAction);
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, mask), copyAction);
     JTextComponent.KeyBinding ctrlV = 
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, ctrlMask), pasteAction);
-    JTextComponent.KeyBinding cmdX =
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_X, metaMask), cutAction);
-    JTextComponent.KeyBinding cmdC =
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, metaMask), copyAction);
-    JTextComponent.KeyBinding cmdV = 
-      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, metaMask), pasteAction);
+      new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, mask), pasteAction);
 
     JTextComponent.KeyBinding[] extraBindings =
-      new JTextComponent.KeyBinding[]{cut, copy, paste, 
-                                     ctrlX, ctrlC, ctrlV,
-                                     cmdX, cmdC, cmdV};
+      new JTextComponent.KeyBinding[]{cut, copy, paste, ctrlX, ctrlC, ctrlV};
 
     Keymap defaultKeyMap = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
 
