@@ -8,7 +8,7 @@
 
 <CENTER>
 <APPLET CODE="free.jin.JinApplet"
-        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar"
+        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar"
 		WIDTH="300" HEIGHT="300">
 		
 	<PARAM NAME="port" value="5000">
@@ -16,7 +16,7 @@
 	<PARAM NAME="server.classname"
 	           VALUE="free.jin.freechess.FreechessServer">
 			   
-	<PARAM NAME="plugins.count" VALUE="3">
+	<PARAM NAME="plugins.count" VALUE="4">
 			   
 	<PARAM NAME="plugins.0.classname"
 	           VALUE="free.jin.console.fics.FreechessConsoleManager">
@@ -27,6 +27,9 @@
 	<PARAM NAME="plugins.2.classname"
 	           VALUE="free.jin.seek.fics.FreechessSoughtGraphPlugin">
 
+	<PARAM NAME="plugins.3.classname"
+	           VALUE="free.jin.sound.fics.FreechessSoundManager">
+			   
 <!--
 
 	Uncomment this and rename the file to .php to allow saving preferences.
