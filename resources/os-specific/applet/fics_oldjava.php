@@ -8,7 +8,7 @@
 
 <CENTER>
 <APPLET CODE="free.jin.JinApplet"
-        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar, plugins/actions.jar, actions/getserverhelp.jar"
+        ARCHIVE="jin.jar, libs/swingall.jar, libs/chess.jar, libs/util.jar, libs/jregex.jar, libs/timesealing.jar, servers/freechess.jar, libs/console.jar, plugins/fics/console.jar, libs/board.jar, plugins/fics/board.jar, libs/seek.jar, plugins/fics/seek.jar, libs/sound.jar, plugins/fics/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
 		WIDTH="400" HEIGHT="300">
 		
 	<PARAM NAME="port" value="5000">
@@ -23,8 +23,10 @@
 	<PARAM NAME="plugins.3.classname" VALUE="free.jin.sound.fics.FreechessSoundManager">
 	<PARAM NAME="plugins.4.classname" VALUE="free.jin.actions.ActionsPlugin">
 
-	<PARAM NAME="actions.count" VALUE="1">
+	<PARAM NAME="actions.count" VALUE="3">
 	<PARAM NAME="actions.0.classname" VALUE="free.jin.action.getserverhelp.GetServerHelpAction">
+	<PARAM NAME="actions.1.classname" VALUE="free.jin.action.askquestion.AskQuestionAction">
+	<PARAM NAME="actions.2.classname" VALUE="free.jin.action.seek.SeekAction">
 
 	
 	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark">
