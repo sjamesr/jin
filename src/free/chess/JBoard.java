@@ -45,15 +45,6 @@ import free.util.GraphicsUtilities;
 public class JBoard extends JComponent{
 
 
-
-  /**
-   * Do we think we're running in a Java2D capable JVM?
-   */
-
-  private static boolean java2D = (System.getProperty("java.version").compareTo("1.2") >= 0);
-
-
-
   /**
    * The constant for drag'n'drop move input style.
    */
