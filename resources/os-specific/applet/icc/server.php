@@ -1,11 +1,26 @@
 <?php
 	// A bunch of ICC specific functions.
+	// This file defines functions which the people responsible for the
+	// webserver where the applet is running from should provide. The
+	// implementations in this file are simply for testing.
 	
 	
 	// Returns whether prefs.php should be accessed via https, false if via
 	// plain http
 	function isSSLPrefs(){
 		return false;
+	}
+	
+	
+	// Returns the port to which the applet should connect
+	function getPort(){
+		return 5001;
+	}
+	
+	
+	// Returns the background color of the applet, in hexadecimal RRGGBB format
+	function getBackgroundColor(){
+		return "ffffff";
 	}
 	
 	
