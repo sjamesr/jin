@@ -1957,6 +1957,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void done(){
     boardManager.removePropertyChangeListener(this); 
   }
+  
+  
+  
+  /**
+   * Before we are removed, if we are in fullscreen mode, we must restore normal
+   * mode.
+   */
+   
+  public void removeNotify(){
+    if (fullscreenPanel.isFullscreen())
+      fullscreenPanel.setFullscreen(false);
+    
+    super.removeNotify();
+  }
 
 
 
