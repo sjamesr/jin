@@ -135,10 +135,10 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   protected void processComponentKeyEvent(KeyEvent evt){
-    if (!isEditable())
+    if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null))
       return;
-    else
-      super.processComponentKeyEvent(evt);
+
+    super.processComponentKeyEvent(evt);
   }
 
 
