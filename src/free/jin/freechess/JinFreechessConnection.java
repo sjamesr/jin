@@ -146,9 +146,11 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   public void onLogin(){
     sendCommand("set bell 0");
     sendCommand("iset gameinfo 1");
+    sendCommand("iset showownseek 1");
 
     filterLine("Bell off.");
     filterLine("gameinfo set.");
+    filterLine("showownseek set.");
 
     super.onLogin();
 
