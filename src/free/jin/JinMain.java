@@ -1142,6 +1142,15 @@ public class JinMain implements JinContext{
       
       File prefsDir = new File(System.getProperty("user.home"), ".jin");
       createPreferencesDir(prefsDir);
+      
+      // Redirect output and error streams to a MultiOutputStream which
+      // writes both to the original location and a log
+      try{
+        FileOutputStream log = new FileOutputStream(new File(prefsDir, "log"));
+        PrintStream printLog = new PrintStream(new MultiOutputStream(System.out, log));
+        System.setOut(printLog);
+        System.setErr(printLog);
+      } catch (IOException e){e.printStackTrace();}
 
       app = new JinMain(prefsDir);
       
