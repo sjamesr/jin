@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import free.jin.board.*;
+import free.jin.Jin;
 import free.jin.Resource;
 import free.jin.plugin.BadChangesException;
 import free.util.swing.ColorChooser;
@@ -242,18 +243,24 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     lightSquares.addChangeListener(boardColorChangeListener);
     
     
-    JButton downloadExtras = new JButton("Download Extras");
-    downloadExtras.setMnemonic('E');
-    downloadExtras.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/extras/"));
+    JButton downloadExtras = null;
+    if (Jin.getInstance().isUserExtensible()){
+      downloadExtras = new JButton("Download Extras");
+      downloadExtras.setMnemonic('E');
+      downloadExtras.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/extras/"));
+    }
     
     JPanel boardAndExtraPanel = new JPanel();
     boardAndExtraPanel.setLayout(new BoxLayout(boardAndExtraPanel, BoxLayout.Y_AXIS));
     boardPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-    downloadExtras.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    if (downloadExtras != null)
+      downloadExtras.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     boardAndExtraPanel.add(boardPanel);
-    boardAndExtraPanel.add(Box.createVerticalStrut(15));
-    boardAndExtraPanel.add(downloadExtras);
-    boardAndExtraPanel.add(Box.createVerticalStrut(15));
+    if (downloadExtras != null){
+      boardAndExtraPanel.add(Box.createVerticalStrut(15));
+      boardAndExtraPanel.add(downloadExtras);
+      boardAndExtraPanel.add(Box.createVerticalStrut(15));
+    }
    
     
     JPanel contentPanel = new JPanel(new BorderLayout());
