@@ -94,9 +94,10 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
    * Checks that the username is valid.
    */
 
-  public String findInputIllegalityReason(boolean checkUsernameAndPassword){
+  public String findInputIllegalityReason(String username, String password, String hostname,
+      String port, boolean checkUsernameAndPassword){
+
     if (checkUsernameAndPassword){
-      String username = usernameField.getText();
       int usernameLength = username.length();
       if ((usernameLength < 2) || (usernameLength > 15))
         return "Usernames must be between 2 and 15 characters long";
@@ -112,9 +113,13 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
         if (!isValidUsernameCharacter(c))
           return "Your username contains at least one illegal character: " + c;
       }
+
+      if (username.equalsIgnoreCase("guest"))
+        return "You should login as guest by clicking the \"Login as Guest\" button";
     }
 
-    return super.findInputIllegalityReason(checkUsernameAndPassword);
+    return super.findInputIllegalityReason(username, password, hostname, port,
+      checkUsernameAndPassword);
   }
 
 
@@ -141,15 +146,12 @@ public class ChessclubLoginDialog extends StandardLoginDialog{
 
 
   /**
-   * Returns a <code>JinChessclubConnection</code> based on the hostname, port,
+   * Creates a <code>JinChessclubConnection</code> based on the hostname, port,
    * username and password chosen by the user.
    */
 
-  public JinConnection createConnection(){
-    String hostname = (String)hostnameBox.getSelectedItem();
-    int port = Integer.parseInt(portField.getText());
-    String username = usernameField.getText();
-    String password = new String(passwordField.getPassword());
+  protected JinConnection createConnectionImpl(String hostname, int port, 
+      String username, String password){
 
     return new JinChessclubConnection(hostname, port, username, password);
   }
