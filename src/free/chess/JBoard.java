@@ -27,10 +27,13 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 import java.util.Vector;
 import free.util.PaintHook;
 import free.util.Utilities;
 import free.util.GraphicsUtilities;
+import free.chess.event.MoveProgressListener;
+import free.chess.event.MoveProgressEvent;
 
 
 /**
@@ -226,6 +229,14 @@ public class JBoard extends JComponent{
    */
 
   private Position positionCopy;
+  
+  
+  
+  /**
+   * Our listener list.
+   */
+   
+  private final EventListenerList listenerList = new EventListenerList();
 
 
 
@@ -476,6 +487,50 @@ public class JBoard extends JComponent{
 
   public JBoard(){
     this(new Position());
+  }
+  
+  
+  
+  /**
+   * Adds a <code>MoveProgressListener</code>.
+   */
+   
+  public void addMoveProgressListener(MoveProgressListener listener){
+    listenerList.add(MoveProgressListener.class, listener);
+  }
+
+
+
+  /**
+   * Remove a <code>MoveProgressListener</code>.
+   */
+   
+  public void removeMoveProgressListener(MoveProgressListener listener){
+    listenerList.remove(MoveProgressListener.class, listener);
+  }
+  
+  
+  
+  /**
+   * Fires the specified <code>MoveProfressEvent</code> to interested listeners.
+   */
+   
+  protected void fireMoveProgressEvent(MoveProgressEvent evt){
+    int id = evt.getId();
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = listeners.length-2; i>=0; i-=2 ){
+      if (listeners[i] == MoveProgressListener.class){
+        MoveProgressListener listener = (MoveProgressListener)listeners[i+1]; 
+        switch (id){
+          case MoveProgressEvent.MOVE_MAKING_STARTED:
+            listener.moveMakingStarted(evt);
+            break;
+          case MoveProgressEvent.MOVE_MAKING_ENDED:
+            listener.moveMakingEnded(evt);
+            break;
+        }
+      }          
+    }
   }
 
 
@@ -1030,6 +1085,8 @@ public class JBoard extends JComponent{
     movedPieceLoc = null;
     if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    
+    fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
   }
 
 
@@ -1623,6 +1680,8 @@ public class JBoard extends JComponent{
           repaint(helpRect = getMovedPieceRect(helpRect));
         else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
           setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        
+        fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_STARTED));
       }
       else{
         if (!square.equals(movedPieceSquare)){
@@ -1657,6 +1716,7 @@ public class JBoard extends JComponent{
         if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
           setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         
+        fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
       }
     }
   }
