@@ -38,6 +38,11 @@ import java.beans.PropertyVetoException;
  *        Note that the workaround for this bug is not completely transparent -
  *        it changes the time when PropertyChangeListeners are invoked for the
  *        iconified property to when the frame is added to another component.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4769773.html">
+ *        JInternalFrame.setMaximum(true) before adding it to JDesktopPane causes NPE</A>.
+ *        Note that the workaround for this bug is not completely transparent -
+ *        it changes the time when PropertyChangeListeners are invoked for the
+ *        iconified property to when the frame is added to another component.
  * </UL>
  */
 
@@ -171,7 +176,7 @@ public class FixedJInternalFrame extends JInternalFrame{
 
   /**
    * This variable is set to true if this JInternalFrame has been iconified
-   * (via setIcon(true)) before being added to a component.
+   * (via setIcon(true)) before being added to a container.
    */
 
   private boolean speciallyIconified = false;
@@ -210,10 +215,61 @@ public class FixedJInternalFrame extends JInternalFrame{
   }
 
 
+  // </4230389>
+
+
+  // <4769773>
 
 
   /**
-   * Make ourselves really iconified when added to something.
+   * This variable is set to true if this JInternalFrame has been maximized
+   * (via setMaximum(true)) before being added to a container.
+   */
+
+  private boolean speciallyMaximized = false;
+
+
+
+  /**
+   * Overrides setMaximum to work around bug 4230389 by not calling the
+   * superclass' method if we don't have a parent yet.
+   */
+
+  public void setMaximum(boolean maximized) throws PropertyVetoException{
+    if (getParent() == null){
+      if (speciallyMaximized == maximized)
+        return;
+
+      Boolean oldValue = speciallyMaximized ? Boolean.TRUE : Boolean.FALSE; 
+      Boolean newValue = maximized ? Boolean.TRUE : Boolean.FALSE;
+      fireVetoableChange(IS_ICON_PROPERTY, oldValue, newValue);
+
+      speciallyMaximized = maximized;
+    }
+    else
+      super.setMaximum(maximized);
+  }
+
+
+
+
+  /**
+   * Overrides isMaximum to remain consistent with setMaximum.
+   */
+
+  public boolean isMaximum(){
+    return super.isMaximum() || speciallyMaximized;
+  }
+
+
+  // </4769773>
+
+  
+
+  // <4230389> and <4769773>
+  
+  /**
+   * Make ourselves really iconified/maximized when added to something.
    */
 
   public void addNotify(){
@@ -225,8 +281,15 @@ public class FixedJInternalFrame extends JInternalFrame{
         speciallyIconified = false;
       } catch (PropertyVetoException e){}
     }
+
+    if (speciallyMaximized){
+      try{
+        setMaximum(speciallyMaximized);
+        speciallyMaximized = false;
+      } catch (PropertyVetoException e){}
+    }
   }
 
-  // </4230389>
+  // </4230389> and </4769773>
 
 }
