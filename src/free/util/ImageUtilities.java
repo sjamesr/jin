@@ -54,37 +54,55 @@ public class ImageUtilities{
    * A constant indicating that the loading of the image was aborted.
    */
 
-  public static final int ABORTED = 4;
+  public static final int ABORTED = 3;
 
 
+  
+  /**
+   * A constant indicating that the loading of the image was interrupted.
+   */
+
+  public static final int INTERRUPTED = 4;
+
+  
 
   /**
    * Starts loading the given image, returns only when it's done loading.
    * Note that it's much more efficient to preload a lot of images at once using
    * the preload(Image []) method instead of this one.
    *
-   * @return The result of the image loading, either {@link #COMPLETE}, {@link #ERRORED}
-   * or {@link #ABORTED}.
+   * @return The result of the image loading, either {@link #COMPLETE},
+   * {@link #ERRORED}, {@link #ABORTED} or {@link #INTERRUPTED}.
    *
    * @see #preload(java.awt.Image [], int [])
    */
 
-  public static int preload(Image image) throws InterruptedException{
+  public static int preload(Image image){
     Toolkit toolkit = Toolkit.getDefaultToolkit();
+    
+    // Check if already loaded
+    if ((toolkit.checkImage(image, -1, -1, null) & ImageObserver.ALLBITS) != 0)
+      return COMPLETE;
+    
     Object lock = new Object();
     synchronized(lock){
       while (true){
         ImageLoadObserver observer = new ImageLoadObserver(lock);
         toolkit.prepareImage(image, -1, -1, observer);
         int result = toolkit.checkImage(image, -1, -1, null);
-        if ((result&ImageObserver.ALLBITS)!=0)
+        if ((result & ImageObserver.ALLBITS) != 0)
           return COMPLETE;
-        if ((result&ImageObserver.ERROR)!=0)
+        if ((result & ImageObserver.ERROR) != 0)
           return ERRORED;
-        if ((result&ImageObserver.ABORT)!=0)
+        if ((result & ImageObserver.ABORT) != 0)
           return ABORTED;
-        lock.wait();
-        return observer.getResult();
+        
+        try{
+          lock.wait();
+          return observer.getResult();
+        } catch (InterruptedException e){
+            return INTERRUPTED;
+          }
       }
     }
   }
@@ -102,39 +120,44 @@ public class ImageUtilities{
    * @see #preload(Image)
    */
 
-  public static int [] preload(Image [] images, int [] results) throws InterruptedException{
+  public static int [] preload(Image [] images, int [] results){
     Object [] locks = new Object[images.length];
     ImageLoadObserver [] loadObservers = new ImageLoadObserver[images.length];
-    if ((results==null)||(results.length<images.length))
+    if ((results == null) || (results.length < images.length))
       results = new int[images.length];
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    for (int i=0;i<images.length;i++){
+    for (int i = 0; i < images.length; i++){
       locks[i] = new Object();
       loadObservers[i] = new ImageLoadObserver(locks[i]);
       toolkit.prepareImage(images[i], -1, -1, loadObservers[i]);
     }
 
-    for (int i=0;i<images.length;i++){
+    for (int i = 0; i < images.length; i++){
       synchronized(locks[i]){
         int result = toolkit.checkImage(images[i], -1, -1, null);
 
-        if ((result&ImageObserver.ALLBITS)!=0){
+        if ((result & ImageObserver.ALLBITS) != 0){
           results[i] = COMPLETE;
           continue;
         }
-        if ((result&ImageObserver.ERROR)!=0){
+        if ((result & ImageObserver.ERROR) != 0){
           results[i] = ERRORED;
           continue;
         }
-        if ((result&ImageObserver.ABORT)!=0){
+        if ((result & ImageObserver.ABORT) != 0){
           results[i] = ABORTED;
           continue;
         }
-
-        locks[i].wait();
-        results[i] = loadObservers[i].getResult();
+        
+        try{
+          locks[i].wait();
+          results[i] = loadObservers[i].getResult();
+        } catch (InterruptedException e){
+            results[i] = INTERRUPTED;
+          }
       }
     }
+    
     return results;
   }
 
@@ -184,17 +207,17 @@ public class ImageUtilities{
 
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height){
       synchronized(lock){
-        if ((infoflags&ALLBITS)!=0){
+        if ((infoflags & ALLBITS)!=0){
           result = ImageUtilities.COMPLETE;
           lock.notify();
           return false;
         }
-        if ((infoflags&ERROR)!=0){
+        if ((infoflags & ERROR)!=0){
           result = ImageUtilities.ERRORED;
           lock.notify();
           return false;
         }
-        if ((infoflags&ABORT)!=0){
+        if ((infoflags & ABORT)!=0){
           result = ImageUtilities.ABORTED;
           lock.notify();
           return false;
