@@ -131,9 +131,6 @@ public class ImagePiecePainter implements PiecePainter{
   protected Image shadeImage(Image image){
     Image shadedImage = Toolkit.getDefaultToolkit().createImage(
       new FilteredImageSource(image.getSource(), shadingFilter));
-    try{
-      ImageUtilities.preload(shadedImage);
-    } catch (InterruptedException e){}
     return shadedImage;
   }
 
@@ -209,6 +206,10 @@ public class ImagePiecePainter implements PiecePainter{
 
     int size = width > height ? height : width;
     Image pieceImage = getPieceImage(size, piece, shaded);
+    if (shaded)
+      try{
+        ImageUtilities.preload(pieceImage);
+      } catch (InterruptedException e){}
     int pieceWidth = pieceImage.getWidth(null);
     int pieceHeight = pieceImage.getHeight(null);
     g.drawImage(pieceImage, x + (width - pieceWidth)/2, y + (height - pieceHeight)/2, observer);
