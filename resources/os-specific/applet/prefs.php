@@ -33,9 +33,9 @@
 	// Returns null on success; an error message on failure.
 	// Prerequisites: initDatabase has been called.
 	function initUser($userid){
-		$result = mysql_fetch_array(mysql_query("SELECT * FROM Preferences WHERE ICSUserId = '$userid'"));
+		$result = mysql_fetch_array(mysql_query("SELECT * FROM Preferences WHERE ICSUserId = '" . addslashes($userid)  . "'"));
 		if (!$result){ // A new user
-			$result = mysql_query("INSERT INTO Preferences VALUES ( '$userid' , NULL, NULL )");
+			$result = mysql_query("INSERT INTO Preferences VALUES ( '" . addslashes($userid) . "' , NULL, NULL )");
 			if (!$result)
 				return "Couldn't insert new user - " . mysql_error();
 		}
@@ -51,9 +51,9 @@
 	function genPrefsSaveKey($userid){
 		do{
 			$prefsSaveKey = sprintf("%s%s%s%s", mt_rand(0, 10000), mt_rand(0, 10000), mt_rand(0, 10000), mt_rand(0, 10000));
-		} while (mysql_fetch_array(mysql_query("SELECT * FROM Preferences WHERE PrefsSaveKey = '$prefsSaveKey'")));
+		} while (mysql_fetch_array(mysql_query("SELECT * FROM Preferences WHERE PrefsSaveKey = '" . addslashes($prefsSaveKey) . "'")));
 		
-		mysql_query("UPDATE Preferences SET PrefsSaveKey = '$prefsSaveKey' WHERE ICSUserId = '$userid'");
+		mysql_query("UPDATE Preferences SET PrefsSaveKey = '" . addslashes($prefsSaveKey) . "' WHERE ICSUserId = '" . addslashes($userid) . "'");
 		
 		return $prefsSaveKey;
 	}
@@ -73,12 +73,12 @@
 		if ($doneString != "Done")
 			return "Upload did not complete";
 		
-		$prefsBlob = addslashes(implode("\n", array_slice($lines, 1, count($lines) - 2)));
+		$prefsBlob = implode("\n", array_slice($lines, 1, count($lines) - 2));
 		
-		if (!mysql_query("UPDATE Preferences SET PrefsBlob = '$prefsBlob' WHERE PrefsSaveKey = '$prefsSaveKey'"))
+		if (!mysql_query("UPDATE Preferences SET PrefsBlob = '" . addslashes($prefsBlob) . "' WHERE PrefsSaveKey = '" . addslashes($prefsSaveKey) . "'"))
 			return "Unknown PrefsSaveKey: $prefsSaveKey";
 			
-		mysql_query("UPDATE Preferences SET PrefsSaveKey = NULL WHERE PrefsSaveKey = '$prefsSaveKey'");
+		mysql_query("UPDATE Preferences SET PrefsSaveKey = NULL WHERE PrefsSaveKey = '" . addslashes($prefsSaveKey) . "'");
 		
 		return "";
 	}
@@ -90,7 +90,7 @@
 	// into HTML between the applet tags.
 	// Prerequisites: initUser has been called for the specified user.
 	function loadPrefs($userid){
-		$sqlresult = mysql_query("SELECT PrefsBlob FROM Preferences WHERE ICSUserId = '$userid'");
+		$sqlresult = mysql_query("SELECT PrefsBlob FROM Preferences WHERE ICSUserId = '" . addslashes($userid) . "'");
 			
 		if ($sqlresult)
 			$sqlresult = mysql_result($sqlresult, 0);
