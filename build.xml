@@ -135,7 +135,7 @@
 			<or>
 				<isset property="unixOnx86" />
 				<and>
-					<isset property="release.target">
+					<isset property="release.target" />
 					<equals arg1="unix" arg2="${release.target}" />
 				</and>
 			</or>
@@ -145,7 +145,7 @@
 			<or>
 				<isset property="windows" />
 				<and>
-					<isset property="release.target">
+					<isset property="release.target" />
 					<equals arg1="windows" arg2="${release.target}" />
 				</and>
 			</or>
