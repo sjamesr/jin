@@ -88,7 +88,7 @@ public class ResourceImageBoardPainter extends ImageBoardPainter{
    * file altogether.
    */
    
-  public static ResourceImageBoardPainter getInstance(Class c, String relPath) throws IOException{
+  public static ImageBoardPainter getInstance(Class c, String relPath) throws IOException{
     return getInstance(c.getClassLoader(), TextUtilities.translateResource(c, relPath));
   }
   
@@ -101,7 +101,7 @@ public class ResourceImageBoardPainter extends ImageBoardPainter{
    * the files, see the <code>getInstance(Class, String)</code> method.
    */
    
-  public static ResourceImageBoardPainter getInstance(ClassLoader cl, String path) throws IOException{
+  public static ImageBoardPainter getInstance(ClassLoader cl, String path) throws IOException{
     if (!(path.endsWith("/") || "".equals(path)))
       path = path + "/";
     String defFile = path + "definition";
