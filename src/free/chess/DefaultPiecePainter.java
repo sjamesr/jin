@@ -21,11 +21,6 @@
 
 package free.chess;
 
-import java.awt.Graphics;
-import java.awt.Dimension;
-import java.awt.image.ImageObserver;
-import free.util.ImageUtilities;
-
 
 /**
  * The default PiecePainter implementation used in JBoard.
@@ -37,58 +32,6 @@ import free.util.ImageUtilities;
  * <A HREF="http://eboard.sourceforge.net/">the eboard website</A>
  */
 
-public class DefaultPiecePainter implements PiecePainter{
-
-
-  
-  /**
-   * The piece painter we're exploiting.
-   */
-
-  private final PiecePainter painter;
-
-
-
-  /**
-   * Creates a new DefaultPiecePainter.
-   */
-
-  public DefaultPiecePainter(){
-    painter = new free.chess.art.EboardVectorPiecePainter();
-  }
-
-
-
-
-  /**
-   * Simply delegates to the exploited piece painter.
-   */
-
-  public void scaleHint(int width, int height){
-    painter.scaleHint(width, height);
-  }
-
-
-
-
-  /**
-   * Returns the preferred piece size of the exploited piece painter.
-   */
-
-  public Dimension getPreferredPieceSize(){
-    return painter.getPreferredPieceSize();
-  }
-
-
-
-
-  /**
-   * Delegates painting to the exploited piece painter.
-   */
-
-  public void paintPiece(Piece piece, Graphics g, ImageObserver imageObserver, int x, int y, int width, int height){
-    painter.paintPiece(piece, g, imageObserver, x, y, width, height);
-  }
-  
+public class DefaultPiecePainter extends free.chess.art.EboardVectorPiecePainter{
 
 }
