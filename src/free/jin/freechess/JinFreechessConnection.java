@@ -345,7 +345,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
   private static WildVariant getVariant(String categoryName){
     if (categoryName.equalsIgnoreCase("lightning") ||
         categoryName.equalsIgnoreCase("blitz") ||
-        categoryName.equalsIgnoreCase("standard"))
+        categoryName.equalsIgnoreCase("standard") ||
+        categoryName.equalsIgnoreCase("untimed"))
       return Chess.getInstance();
 
     
@@ -851,8 +852,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     Player currentPlayer = playerForString(boardData.getCurrentPlayer());
 
-    boolean whiteRunning = game.isPlayed() && currentPlayer.isWhite();
-    boolean blackRunning = game.isPlayed() && currentPlayer.isBlack();
+    boolean whiteRunning = boardData.isClockRunning() && currentPlayer.isWhite();
+    boolean blackRunning = boardData.isClockRunning() && currentPlayer.isBlack();
 
     listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.WHITE_PLAYER, whiteTime, whiteRunning));
     listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.BLACK_PLAYER, blackTime, blackRunning));
