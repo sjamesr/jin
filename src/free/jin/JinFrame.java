@@ -273,22 +273,10 @@ public class JinFrame extends JFrame{
 
 
 
-    // Phase 4 - Create and add the plugins' menus.
+    // Phase 4 - Tell JinFrameMenuBar to add the required menus on-connect.
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    menubar.addPluginsMenu(conn);
-    menubar.makePluginsMenuVisible(conn);
-    JMenu pluginsMenu = menubar.getPluginsMenu(conn);
     pluginsEnum = plugins.elements();
-    while (pluginsEnum.hasMoreElements()){
-      Plugin plugin = (Plugin)pluginsEnum.nextElement();
-      JMenu pluginMenu = plugin.createPluginMenu();
-      if (pluginMenu != null)
-        pluginsMenu.add(pluginMenu);
-    }
-    // Bugfix
-    menubar.invalidate();
-    menubar.validate();
-
+    menubar.connecting(conn, pluginsEnum);
 
 
     // Phase 5 - connect.
@@ -394,9 +382,10 @@ public class JinFrame extends JFrame{
     connsToPlugins.remove(conn);
     connsToUsers.remove(conn);
 
-    System.out.println("Removing plugins menu");
+    System.out.println("Modifying menubar");
     JinFrameMenuBar menubar = getJinFrameMenuBar();
-    menubar.removePluginsMenu(conn);
+    menubar.disconnected(conn);
+
     // Bugfix
     menubar.repaint();
   }

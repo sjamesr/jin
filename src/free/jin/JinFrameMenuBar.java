@@ -25,6 +25,8 @@ import free.util.swing.LookAndFeelMenu;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.AdvancedJDesktopPane;
 import free.util.StringEncoder;
+import free.util.AWTUtilities;
+import free.jin.plugin.Plugin;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -32,10 +34,11 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 import java.awt.Component;
 import java.awt.Color;
+import java.awt.BorderLayout;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.util.Vector;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.io.File;
 
 
@@ -58,19 +61,57 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
   /**
-   * Maps JinConnection objects to JMenus for their plugins.
+   * The "Connection" menu.
    */
 
-  private final Hashtable pluginsMenus = new Hashtable();
+  private final JMenu connectionMenu;
+
+
+
+  /**
+   * The "Preferences" menu.
+   */
+
+  private final JMenu preferencesMenu;
 
 
 
 
   /**
-   * The currently visible PluginsMenu.
+   * The "Plugins" menu.
    */
 
-  private JMenu currentlyVisiblePluginsMenu = null;
+  private JMenu pluginsMenu = null;
+
+
+
+
+  /**
+   * Holds a list of all the plugin menus we've added.
+   */
+
+  private final Vector pluginMenus = new Vector(4);
+
+
+
+
+  /**
+   * Holds a list of all the plugin UI menu items we've added.
+   */
+
+  private final Vector pluginUIMenuItems = new Vector(4);
+
+
+
+
+
+  /**
+   * Holds a list of connection creating JMenuItems which need to be disabled
+   * when a connection is established.
+   */
+
+  private final Vector connectionMenuItems = new Vector();
+
 
 
 
@@ -119,9 +160,11 @@ public class JinFrameMenuBar extends JMenuBar{
   public JinFrameMenuBar(JinFrame jinFrame){
     this.jinFrame = jinFrame;
 
-    add(createConnectionMenu());
+    add(connectionMenu = createConnectionMenu());
     add(new LookAndFeelMenu(jinFrame.getRootPane()));
-    add(createPreferencesMenu());
+    add(preferencesMenu = createPreferencesMenu());
+
+    setBorderPainted(true);
   }
 
 
@@ -144,6 +187,7 @@ public class JinFrameMenuBar extends JMenuBar{
       }
 
     });
+    connectionMenuItems.addElement(newConn);
 
 
     JMenuItem openConn = new JMenuItem("Open Connection");
@@ -170,6 +214,7 @@ public class JinFrameMenuBar extends JMenuBar{
       }
 
     });
+    connectionMenuItems.addElement(openConn);
 
 
     JMenuItem exitMenuItem = new JMenuItem("Exit");
@@ -266,64 +311,171 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
   /**
-   * Adds a plugins JMenu for the given JinConnection.
+   * This method is called when a connection is about to be established. It
+   * performes whatever necessary modifications to the menubar, such as
+   * adding certain menus.
+   *
+   * @param conn The JinConnection about to be established.
+   * @param plugins An Enumeration of all the plugins for the connection.
    */
 
-  public void addPluginsMenu(JinConnection conn){
-    JMenu pluginsMenu = new JMenu("Plugins");
-    pluginsMenu.setMnemonic(KeyEvent.VK_P);
+  void connecting(JinConnection conn, Enumeration plugins){
+    while (plugins.hasMoreElements()){
+      Plugin plugin = (Plugin)plugins.nextElement();
 
-    pluginsMenus.put(conn, pluginsMenu);
-  }
+      JMenu pluginMenu = plugin.createPluginMenu();
+      if (pluginMenu != null)
+        addPluginMenu(pluginMenu);
 
-
-
-  /**
-   * Removes the plugins JMenu for the given JinConnection.
-   */
-
-  public void removePluginsMenu(JinConnection conn){
-    JMenu pluginsMenu = (JMenu)pluginsMenus.remove(conn);
-
-    if (currentlyVisiblePluginsMenu == pluginsMenu){
-      remove(currentlyVisiblePluginsMenu);
-      currentlyVisiblePluginsMenu = null;
+      if (plugin.hasPreferencesUI())
+        addPluginPreferenceUIMenuItem(plugin);
     }
-  }
 
-
-
-
-  /**
-   * Makes the plugins JMenu for the given JinConnection the currently visible
-   * plugins menu.
-   */
-
-  public void makePluginsMenuVisible(JinConnection conn){
-    JMenu menu = (JMenu)pluginsMenus.get(conn);
+    int size = connectionMenuItems.size();
+    for (int i = 0; i < size; i++){
+      JMenuItem menuItem = (JMenuItem)connectionMenuItems.elementAt(i);
+      menuItem.setEnabled(false);
+    }
     
-    if (currentlyVisiblePluginsMenu == menu)
-      return;
-    if (currentlyVisiblePluginsMenu!=null){
-      int index = getComponentIndex(currentlyVisiblePluginsMenu);
-      remove(currentlyVisiblePluginsMenu);
-      add(menu, index);
+    // Bugfix
+    invalidate();
+    validate();
+  }
+
+
+
+
+
+  /**
+   * This method is called when the connection has been broken. It should return
+   * the menubar to the state it was in before
+   * <code>connecting(JinConnection, Enumeration)</code> was called.
+   */
+
+  void disconnected(JinConnection conn){
+    removePluginMenus();
+    removePluginPreferenceUIMenuItems();
+
+    int size = connectionMenuItems.size();
+    for (int i = 0; i < size; i++){
+      JMenuItem menuItem = (JMenuItem)connectionMenuItems.elementAt(i);
+      menuItem.setEnabled(true);
     }
-    else
-      add(menu);
-    currentlyVisiblePluginsMenu = menu;
   }
 
 
 
 
   /**
-   * Returns the plugins JMenu for the given JinConnection.
+   * Adds a menu item which shows the given plugin's preferences UI to the
+   * "Preferences" menu.
    */
 
-  public JMenu getPluginsMenu(JinConnection conn){
-    return (JMenu)pluginsMenus.get(conn);
+  private void addPluginPreferenceUIMenuItem(Plugin plugin){
+    if (!plugin.hasPreferencesUI())
+      return;
+
+    if (pluginUIMenuItems.size() == 0)
+      preferencesMenu.addSeparator(); 
+
+    JMenuItem menuItem = new JMenuItem(plugin.getName());
+    menuItem.addActionListener(new ShowPreferencesUI(plugin));
+    preferencesMenu.add(menuItem);
+
+    pluginUIMenuItems.addElement(menuItem);
   }
+
+
+
+
+  /**
+   * An ActionListener implementation which opens a dialog with the given
+   * Plugin's preferences UI.
+   */
+
+  private class ShowPreferencesUI implements ActionListener{
+
+    private final Plugin targetPlugin;
+
+    public ShowPreferencesUI(Plugin plugin){
+      this.targetPlugin = plugin; 
+    }
+
+    public void actionPerformed(ActionEvent evt){
+      JDialog dialog = new JDialog(jinFrame, targetPlugin.getName()+" preferences", true);
+      dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      dialog.getContentPane().setLayout(new BorderLayout());
+      dialog.getContentPane().add(targetPlugin.createPreferencesUI());
+
+      AWTUtilities.centerWindow(dialog, jinFrame);
+
+      dialog.show();
+    }
+
+  }
+
+
+
+
+
+  /**
+   * Removes the menus added via the <code>addPluginPreferenceUIMenuItem(Plugin)</code>
+   * method.
+   */
+
+  private void removePluginPreferenceUIMenuItems(){
+    boolean hadPreferenceMenus = !pluginUIMenuItems.isEmpty();
+    int index = pluginUIMenuItems.size()-1;
+    while (index >= 0){
+      JMenuItem menuItem = (JMenuItem)pluginUIMenuItems.elementAt(index);
+      pluginUIMenuItems.removeElementAt(index);
+      preferencesMenu.remove(menuItem);
+      index--;
+    }
+
+    if (hadPreferenceMenus)
+      preferencesMenu.remove(preferencesMenu.getMenuComponentCount()-1); // Separator
+  }
+
+
+
+
+  /**
+   * Adds the give JMenu as the plugin's menu.
+   */
+
+  private void addPluginMenu(JMenu menu){
+    if (pluginsMenu == null){
+      pluginsMenu = new JMenu("Plugins");
+      pluginsMenu.setMnemonic(KeyEvent.VK_P);
+      add(pluginsMenu);
+    }
+
+    pluginsMenu.add(menu);
+    pluginMenus.addElement(menu);
+  }
+
+
+
+
+  /**
+   * Removes all the menus added via the <code>addPluginMenu</code> method.
+   */
+
+  private void removePluginMenus(){
+    int index = pluginMenus.size() - 1;
+    while (index >= 0){
+      JMenu menu = (JMenu)pluginMenus.elementAt(index);
+      pluginMenus.removeElementAt(index);
+      pluginsMenu.remove(menu);
+      index--;
+    }
+
+    remove(pluginsMenu);
+    pluginsMenu = null;
+  }
+
+  
 
 
 
@@ -347,8 +499,11 @@ public class JinFrameMenuBar extends JMenuBar{
       throw new IllegalStateException("JSeparator starting the user connections list not found.");
 
 
-    while (connMenu.getMenuComponent(startSeparatorIndex+1)!=endUserConnSep)
+    while (connMenu.getMenuComponent(startSeparatorIndex+1)!=endUserConnSep){
+      JMenuItem menuItem = connMenu.getItem(startSeparatorIndex+1);
       connMenu.remove(startSeparatorIndex+1);
+      connectionMenuItems.removeElement(menuItem);
+    }
 
 
     ListModel users = Jin.getUsers();
@@ -360,7 +515,8 @@ public class JinFrameMenuBar extends JMenuBar{
       menuItem.addActionListener(userConnectionListener);
       if (usersCount - i <= 9)
         menuItem.setMnemonic(Character.forDigit(usersCount - i,10));
-      connMenu.insert(menuItem,startSeparatorIndex+1);
+      connMenu.insert(menuItem, startSeparatorIndex+1);
+      connectionMenuItems.addElement(menuItem);
     }
   }
 
