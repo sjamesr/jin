@@ -744,7 +744,7 @@ public class JBoard extends JPanel{
     if (!isEnabled())
       return;
 
-    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) != MouseEvent.BUTTON1_MASK) 
+    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) == 0) 
       return;
 
     int inputStyle = getMoveInputStyle();
@@ -842,8 +842,13 @@ public class JBoard extends JPanel{
       return;
 
     // Only respond to the left mouse button.
-    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) != MouseEvent.BUTTON1_MASK) 
-      return;
+//    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) == 0) 
+//      return;
+    // This doesn't work under Sun's JDK1.1, because evt.getModifiers() always returns
+    // 0 for some reason. In any case, this check can be rather safely omitted
+    // because there already is a check for the mouse button in processMouseEvent
+    // which gives a (non null) value to movedPieceSquare which we check in this
+    // method.
 
     int inputStyle = getMoveInputStyle();
     if (movedPieceSquare==null)
