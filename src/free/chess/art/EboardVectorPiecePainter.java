@@ -33,6 +33,7 @@
 package free.chess.art;
 
 import java.awt.*;
+import free.chess.VectorPiecePainter;
 
 
 /**

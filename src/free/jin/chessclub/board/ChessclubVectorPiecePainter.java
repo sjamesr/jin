@@ -22,7 +22,7 @@
 package free.jin.chessclub.board;
 
 import java.awt.*;
-import free.chess.art.VectorPiecePainter;
+import free.chess.VectorPiecePainter;
 
 
 /**
