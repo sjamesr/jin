@@ -7,7 +7,7 @@
 	<property name="libs.dir" value="${build.dir}/libs" />	
 	<property name="servers.dir" value="${build.dir}/servers" />	
 	<property name="plugins.dir" value="${build.dir}/plugins" />
-	<property name="extensions.dir" value="${build.dir}/extensions" />	
+	<property name="resources.dir" value="${build.dir}/resources" />	
 	<property name="debug" value="no" />
 	
 	<path id="compile.class.path">
@@ -275,21 +275,21 @@
 		
 
 		<!-- Extensions -->
-		<mkdir dir="${extensions.dir}" />
+		<mkdir dir="${resources.dir}" />
 
 		
 		<!-- Piece sets -->
-		<mkdir dir="${extensions.dir}/pieces" />
+		<mkdir dir="${resources.dir}/pieces" />
 		
 		<!-- Blitzin Vector -->
-		<jar jarfile="${extensions.dir}/pieces/blitzin.jar" compress="false">
+		<jar jarfile="${resources.dir}/pieces/blitzin.jar" compress="false">
 			<fileset dir="${classes.dir}/pieces/blitzin" includes="**" />
 			<fileset dir="${res.dir}/pieces/blitzin"
 					 excludes="**.java" />
 		</jar>
 		
 		<!-- Eboard Vector - this one is special because it's the default set --> 
-		<jar jarfile="${extensions.dir}/pieces/eboard.jar" compress="false">
+		<jar jarfile="${resources.dir}/pieces/eboard.jar" compress="false">
 			<fileset dir="${res.dir}/pieces/eboard"
 					 excludes="**.java" />
 		</jar>
@@ -321,10 +321,10 @@
 		
 		
 		<!-- Board patterns -->
-		<mkdir dir="${extensions.dir}/boards" />
+		<mkdir dir="${resources.dir}/boards" />
 
 		<!-- Plain Color -->		
-		<jar jarfile="${extensions.dir}/boards/plain.jar" compress="false">
+		<jar jarfile="${resources.dir}/boards/plain.jar" compress="false">
 			<fileset dir="${res.dir}/boards/plain" />
 		</jar>
 		
@@ -352,7 +352,7 @@
 	
 	<!-- Builds a single piece set -->
 	<target name="buildImagePieceSet">
-		<jar jarfile="${extensions.dir}/pieces/${piece-set-id}.jar" compress="false">
+		<jar jarfile="${resources.dir}/pieces/${piece-set-id}.jar" compress="false">
 			<fileset dir="${classes.dir}/pieces" includes="ImagePieceSetLoader*.class" />
 			<fileset dir="${res.dir}/pieces/${piece-set-id}" />
 		</jar>
@@ -366,7 +366,7 @@
 	
 	<!-- Builds a single board pattern -->
 	<target name="buildBoardPattern">
-		<jar jarfile="${extensions.dir}/boards/${board-pattern-id}.jar" compress="false">
+		<jar jarfile="${resources.dir}/boards/${board-pattern-id}.jar" compress="false">
 			<fileset dir="${classes.dir}/boards" includes="ImageBoardLoader*.class" />
 			<fileset dir="${res.dir}/boards/${board-pattern-id}" />
 		</jar>
