@@ -235,9 +235,9 @@ public class BlockingQueue implements Cloneable{
 
   public synchronized Object clone(){
     BlockingQueue copy = new BlockingQueue();
-    Enumeration enum = getElements();
-    while (enum.hasMoreElements()){
-      Object item = enum.nextElement();
+    Enumeration elems = getElements();
+    while (elems.hasMoreElements()){
+      Object item = elems.nextElement();
       copy.push(item);
     }
     return copy;
