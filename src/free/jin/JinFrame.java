@@ -385,6 +385,21 @@ public class JinFrame extends JFrame{
     for (int i = 0; i < plugins.length; i++){
       try{
         Plugin plugin = plugins[i];
+        if (plugin != null){
+          System.out.println("Saving state for "+plugin.getName());
+          plugin.saveState();  
+        }
+      } catch (Throwable e){ // Make sure plugins don't bother other plugins.
+          synchronized(System.err){
+            System.err.println("An exception occurred while stopping a plugin:");
+            e.printStackTrace();
+          }
+        }
+    }
+
+    for (int i = 0; i < plugins.length; i++){
+      try{
+        Plugin plugin = plugins[i];
         if (plugin!=null){
           System.out.println("Stopping "+plugin.getName());
           plugin.stop();  
