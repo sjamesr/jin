@@ -195,9 +195,9 @@ public class User{
     int [] ports = prefs.getIntList("login.ports", server.getPorts());
 
     if (isGuest())
-      return ConnectionDetails.createGuest(username, hostname, ports);
+      return ConnectionDetails.createGuest(getServer(), username, hostname, ports);
     else
-      return ConnectionDetails.create(username, password, savePassword, hostname, ports);
+      return ConnectionDetails.create(getServer(), this, username, password, savePassword, hostname, ports);
   }
 
 
@@ -209,6 +209,10 @@ public class User{
   void setPreferredConnDetails(ConnectionDetails details){
     if (details.isGuest() != isGuest())
       throw new IllegalArgumentException("isGuest property mismatch");
+    if (details.getServer() != getServer())
+      throw new IllegalArgumentException("server property mismatch");
+    if (details.getUser() != this)
+      throw new IllegalArgumentException("user property mismatch");
 
     prefs.setString("login.hostname", details.getHost());
     prefs.setIntList("login.ports", details.getPorts());
@@ -239,6 +243,16 @@ public class User{
    
   public boolean isDirty(){
     return isDirty; 
+  }
+  
+  
+  
+  /**
+   * Returns a description of the user.
+   */
+   
+  public String toString(){
+    return getUsername() + "@" + getServer().getShortName();
   }
   
 
