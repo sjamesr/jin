@@ -24,7 +24,6 @@ package free.jin;
 import free.jin.plugin.PluginStartException;
 import free.util.Utilities;
 import free.util.TextUtilities;
-import free.util.PlatformUtils;
 
 
 /**

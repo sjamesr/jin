@@ -33,7 +33,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import free.jin.DialogPanel;
-import free.jin.UIProvider;
 import free.jin.OptionPanel;
 import free.util.PlatformUtils;
 import free.workarounds.FixedJComboBox;

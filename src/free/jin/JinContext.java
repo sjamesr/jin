@@ -21,7 +21,6 @@
 
 package free.jin;
 
-import javax.swing.ListModel;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
 import free.jin.action.ActionInfo;

@@ -30,7 +30,6 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.applet.Applet;
 
 
 /**

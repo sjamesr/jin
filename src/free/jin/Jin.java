@@ -22,8 +22,6 @@
 package free.jin;
 
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
 import java.io.IOException;
 import java.util.Properties;
 import javax.swing.JFrame;

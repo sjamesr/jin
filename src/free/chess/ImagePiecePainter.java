@@ -173,8 +173,6 @@ public class ImagePiecePainter implements ResourcePiecePainter{
       new String[]{"wk", "bk", "wq", "bq", "wr", "br", "wb", "bb", "wn", "bn", "wp", "bp"};
     
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Hashtable pieceImages = new Hashtable(sizes.length*5/4);
-    int imagesCount = 0;
     for (int i = 0; i < sizes.length; i++){
       int size = sizes[i];
       

@@ -22,7 +22,6 @@
 package free.jin.plugin;
 
 import free.jin.*;
-import java.util.Hashtable;
 import javax.swing.ListModel;
 import javax.swing.DefaultListModel;
 import free.util.Utilities;
@@ -78,16 +77,6 @@ public class PluginContext{
   private final DefaultListModel actions = new DefaultListModel();
 
 
-
-  /**
-   * A lazily filled hashtable of plugins mapped to the <code>Preferences</code>
-   * objects they should use. Note that these aren't the plugin preferences,
-   * but the user preferences backed up by the plugin preferences.
-   */
-
-  private final Hashtable pluginsToPreferences = new Hashtable();
-
-  
 
   /**
    * Creates a new <code>PluginContext</code> with the specified information.

@@ -538,9 +538,6 @@ public class JinApplet extends Applet implements JinContext{
     
     conn.connect();
     
-    InputStream in = new BufferedInputStream(conn.getInputStream());
-    DataInputStream dataIn = new DataInputStream(in);
-    
     buf.reset();
     IOUtilities.pump(conn.getInputStream(), buf);
     String result = new String(buf.toByteArray());
