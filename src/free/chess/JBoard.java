@@ -1028,6 +1028,8 @@ public class JBoard extends JComponent{
     repaint(squareToRect(movedPieceSquare, null));
     movedPieceSquare = null;
     movedPieceLoc = null;
+    if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
+      setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   }
 
 
@@ -1619,6 +1621,8 @@ public class JBoard extends JComponent{
         repaint(helpRect = squareToRect(square, helpRect));
         if (draggedPieceStyle == NORMAL_DRAGGED_PIECE)
           repaint(helpRect = getMovedPieceRect(helpRect));
+        else if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
+          setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
       }
       else{
         if (!square.equals(movedPieceSquare)){
@@ -1649,6 +1653,10 @@ public class JBoard extends JComponent{
 
         movedPieceSquare = null;
         movedPieceLoc = null;
+        
+        if (draggedPieceStyle == HIGHLIGHT_TARGET_DRAGGED_PIECE)
+          setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        
       }
     }
   }
