@@ -114,6 +114,14 @@ public class BoardPattern implements Resource{
     
     
     String classname = definition.getProperty("boardPainter.classname");
+    
+    // Hack to support the old board pack format 
+    if (classname == null){
+      String resClassname = definition.getProperty("classname");
+      if ("ImageBoardLoader".equals(resClassname))
+        classname = free.chess.ImageBoardPainter.class.getName();
+    }
+    
     Class boardPainterClass = null;
     
     try{

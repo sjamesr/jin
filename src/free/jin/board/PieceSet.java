@@ -114,6 +114,14 @@ public class PieceSet implements Resource{
     
     
     String classname = definition.getProperty("piecePainter.classname");
+    
+    // Hack to support the old piece pack format 
+    if (classname == null){
+      String resClassname = definition.getProperty("classname");
+      if ("ImagePieceSetLoader".equals(resClassname))
+        classname = free.chess.ImagePiecePainter.class.getName();
+    }
+    
     Class piecePainterClass = null;
     
     try{

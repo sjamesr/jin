@@ -390,6 +390,12 @@ public class JinMain implements JinContext{
     String classname = def.getProperty("classname");
     if (classname == null)
       return null;
+   
+    // Hack to support the old pieces/boards pack format.
+    if ("ImagePieceSetLoader".equals(classname))
+      classname = "free.jin.board.PieceSet";
+    else if ("ImageBoardLoader".equals(classname))
+      classname = "free.jin.board.BoardPattern";
     
     try{
       // We need to load it with the plugin's classloader because the
