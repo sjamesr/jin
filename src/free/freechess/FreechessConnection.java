@@ -203,7 +203,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * sent to the server on login.
    */
 
-  public synchronized final void setSeekInfoState(boolean state){
+  public synchronized final void setSeekInfo(boolean state){
     if (seekInfoOn == state)
       return;
 
@@ -214,9 +214,20 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 //      sendCommand("iset seekremove " + (seekInfoOn ? "1" : "0"));
       // Although "help iv_seekinfo" says we need to set it, DAV says we don't.
 
-      filterLine("seekinfo "+(seekInfoOn ? "" : "un")+"set.");
+      filterLine("seekinfo "+(seekInfoOn ? "" : "un") + "set.");
 //      filterLine("seekremove "+(seekInfoOn ? "" : "un")+"set.");
     }
+  }
+
+
+
+
+  /**
+   * Returns the current state of seek information sending.
+   */
+
+  public synchronized final boolean getSeekInfo(){
+    return seekInfoOn;
   }
 
 
