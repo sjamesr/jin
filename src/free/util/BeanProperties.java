@@ -516,8 +516,7 @@ public class BeanProperties{
    * Returns the value of the <code>String</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.String</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown (I kid you not).
+   * no property with the specified name, <code>null</code> is returned.
    */
 
   public String getStringProperty(String propertyName){
