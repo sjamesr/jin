@@ -407,10 +407,12 @@ public class ChesslikeGenericVariant implements WildVariant{
     if ((promotionTarget != null) && !(promotionTarget instanceof ChessPiece))
       throw new IllegalArgumentException("Wrong promotion target type: "+promotionTarget.getClass());
 
-    if (pos.getPieceAt(startingSquare)==null)
+    Piece movingPiece = pos.getPieceAt(startingSquare);
+
+    if (movingPiece == null)
       throw new IllegalArgumentException("The moving piece may not be null");
 
-    Player movingPlayer = pos.getCurrentPlayer();
+    Player movingPlayer = movingPiece.getPlayer();
     ChessPiece promotionChessTarget = (ChessPiece)promotionTarget;
 
     boolean isEnPassant = isEnPassant(pos, startingSquare, endingSquare, promotionChessTarget);
