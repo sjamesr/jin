@@ -41,10 +41,11 @@ public interface UIProvider{
   /**
    * Creates a new ui container for the specified plugin and id. The id is used
    * to identify the container between invocations of this method and to track
-   * its properties (such as geometry). You may pass <code>null</code> as the
-   * id, in which case the container's properties will not be tracked. It is
-   * recommended to use an empty string for the plugin's main container, if
-   * applicable.
+   * its properties (such as geometry). You may not request more than one
+   * container with a given id, but if you use <code>null</code> as the id, the
+   * container will not be tracked at all, and you can request as many as you
+   * wish. It is recommended to use an empty string for the plugin's main
+   * container, if applicable.
    */
 
   PluginUIContainer createPluginUIContainer(Plugin plugin, String id);
