@@ -551,6 +551,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleIvarStateChanged(String line){
+    if (line.indexOf("set") == -1)
+      return false;
+    
     Matcher matcher = IVAR_SET_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -647,6 +650,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePersonalTell(String line){
+    if (line.indexOf("tells you: ") == -1)
+      return false;
+    
     Matcher matcher = PERSONAL_TELL_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -689,6 +695,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleSayTell(String line){
+    if (line.indexOf("says: ") == -1)
+      return false;
+    
     Matcher matcher = SAY_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -736,6 +745,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePTell(String line){
+    if (line.indexOf("(your partner) tells you: ") == -1)
+      return false;
+    
     Matcher matcher = PTELL_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -778,6 +790,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleChannelTell(String line){
+    if (line.indexOf("): ") == -1)
+      return false;
+    
     Matcher matcher = CHANNEL_TELL_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -823,6 +838,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleKibitz(String line){
+    if (line.indexOf("kibitzes: ") == -1)
+      return false;
+    
     Matcher matcher = KIBITZ_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -873,6 +891,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleWhisper(String line){
+    if (line.indexOf("whispers: ") == -1)
+      return false;
+    
     Matcher matcher = WHISPER_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -920,6 +941,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleQTell(String line){
+    if (!line.startsWith(":"))
+      return false;
+    
     Matcher matcher = QTELL_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -961,6 +985,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleShout(String line){
+    if (line.indexOf("shouts: ") == -1)
+      return false;
+    
     Matcher matcher = SHOUT_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1003,6 +1030,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleIShout(String line){
+    if (!line.startsWith("--> "))
+      return false;
+    
     Matcher matcher = ISHOUT_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1046,6 +1076,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleTShout(String line){
+    if (line.indexOf("t-shouts: ") == -1)
+      return false;
+    
     Matcher matcher = TSHOUT_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1089,6 +1122,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleCShout(String line){
+    if (line.indexOf("c-shouts: ") == -1)
+      return false;
+    
     Matcher matcher = CSHOUT_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1131,6 +1167,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleAnnouncement(String line){
+    if (!line.startsWith("    **ANNOUNCEMENT** from "))
+      return false;
+    
     Matcher matcher = ANNOUNCEMENT_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1157,24 +1196,14 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * The regular expression matching gameinfo lines.
-   */
-
-  private static final Pattern GAME_INFO_REGEX = new Pattern("^<g1> .*");
-
-
-
-
-  /**
    * Called to determine whether the given line of text is a gameinfo line and
    * to further process it if it is.
    */
 
   private boolean handleGameInfo(String line){
-    Matcher matcher = GAME_INFO_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<g1> "))
       return false;
-
+    
     GameInfoStruct data = GameInfoStruct.parseGameInfoLine(line);
 
     if (!processGameInfo(data))
@@ -1198,22 +1227,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   
   /**
-   * The regular expression matching style12 lines.
-   */
-
-  private static final Pattern STYLE_12_REGEX = new Pattern("^<12> .*");
-
-
-
-
-  /**
    * Called to determine whether the given line of text is a style12 line and
    * to further process it if it is.
    */
 
   private boolean handleStyle12(String line){
-    Matcher matcher = STYLE_12_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<12> "))
       return false;
 
     Style12Struct data = Style12Struct.parseStyle12Line(line);
@@ -1238,22 +1257,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * The regular expression matching delta board lines.
-   */
-
-  private static final Pattern DELTA_BOARD_REGEX = new Pattern("^<d1> .*");
-
-
-
-
-  /**
    * Called to determine whether the given line of text is a delta board line
    * and to further process it if it is.
    */
 
   private boolean handleDeltaBoard(String line){
-    Matcher matcher = DELTA_BOARD_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<d1> "))
       return false;
 
     DeltaBoardStruct data = DeltaBoardStruct.parseDeltaBoardLine(line);
@@ -1278,26 +1287,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-  
-  /**
-   * The regular expression matching bughouse holdings lines.
-   */
-
-  private static final Pattern BUGHOUSE_HOLDINGS_REGEX = new Pattern("^<b1> .*");
-
-
-
-
   /**
    * Called to determine whether the given line of text is a bughouse holdings
    * line and to further process it if it is.
    */
 
   private boolean handleBughouseHoldings(String line){
-    Matcher matcher = BUGHOUSE_HOLDINGS_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<b1> "))
       return false;
-
+    
     // Implement real handling.
     
     return true;
@@ -1323,6 +1321,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleGameEnd(String line){
+    if (!line.startsWith("{Game "))
+      return false;
+      
     Matcher matcher = GAME_END_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1369,6 +1370,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleStoppedObserving(String line){
+    if (!line.startsWith("Removing game "))
+      return false;
+      
     Matcher matcher = STOPPED_OBSERVING_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1412,6 +1416,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleStoppedExamining(String line){
+    if (!line.startsWith("You are no longer examining game "))
+      return false;
+    
     Matcher matcher = STOPPED_EXAMINING_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1436,21 +1443,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-  /**
-   * The regular expression matching lines specifying that an illegal move has
-   * been attempted. There are two types I know currently, but there may be
-   * more, so I'm allowing anything that starts with the expected pattern. The
-   * two I know are:
-   * 1. Illegal move (e2e4).
-   * 2. Illegal move (e2e4). You must capture.
-   */
-
-  private static final Pattern ILLEGAL_MOVE_REGEX = 
-    new Pattern("^Illegal move \\((.*)\\)\\.(.*)");
-
-
-
+  
   /**
    * Called to determine whether the specified line of text specifies entering
    * bsetup mode.
@@ -1495,7 +1488,22 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  
+  /**
+   * The regular expression matching lines specifying that an illegal move has
+   * been attempted. There are two types I know currently, but there may be
+   * more, so I'm allowing anything that starts with the expected pattern. The
+   * two I know are:
+   * 1. Illegal move (e2e4).
+   * 2. Illegal move (e2e4). You must capture.
+   */
 
+  private static final Pattern ILLEGAL_MOVE_REGEX = 
+    new Pattern("^Illegal move \\((.*)\\)\\.(.*)");
+
+    
+    
+    
   /**
    * The regular expression matching lines specifying that the user attempted to
    * make a move when it is not his turn.
@@ -1513,6 +1521,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleIllegalMove(String line){
+    if (!(line.startsWith("Illegal move ") || line.equals("It is not your move.")))
+      return false;
+    
     Matcher illegalMoveMatcher = ILLEGAL_MOVE_REGEX.matcher(line);
     Matcher notYourTurnMatcher = NOT_YOUR_TURN_REGEX.matcher(line);
 
@@ -1554,25 +1565,13 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-  /**
-   * The regular expression matching lines specifying that all seeks have been
-   * cleared.
-   */
-
-  private static final Pattern SEEKS_CLEARED_REGEX = new Pattern("^<sc>$");
-
-
-
-
   /**
    * Called to determine whether the given line of text is a line specifying
    * that all seeks have been cleared.
    */
 
   private boolean handleSeeksCleared(String line){
-    Matcher matcher = SEEKS_CLEARED_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.equals("<sc>"))
       return false;
 
     if (!processSeeksCleared())
@@ -1594,27 +1593,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-  /**
-   * The regular expression matching lines specifying that a new seek has been
-   * added.
-   */
-
-  private static final Pattern SEEK_ADDED_REGEX = new Pattern("^<sn?> .*");
-
-
-
-
   /**
    * Called to determine whether the given line of text is a line specifying
    * that a new seek has been added.
    */
 
   private boolean handleSeekAdded(String line){
-    Matcher matcher = SEEK_ADDED_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!(line.startsWith("<s> ") || line.startsWith("<sn> ")))
       return false;
-
+    
     SeekInfoStruct seekInfo = SeekInfoStruct.parseSeekInfoLine(line);
 
     if (!processSeekAdded(seekInfo))
@@ -1636,27 +1623,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-
-  /**
-   * The regular expression matching lines specifying that seeks have been
-   * removed.
-   */
-
-  private static final Pattern SEEKS_REMOVED_REGEX = new Pattern("^<sr> .*");
-
-
-
-
   /**
    * Called to determine whether the given line of text is a line specifying
    * that seeks have been removed.
    */
 
   private boolean handleSeeksRemoved(String line){
-    Matcher matcher = SEEKS_REMOVED_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<sr> "))
       return false;
-
+    
     StringTokenizer tokenizer = new StringTokenizer(line, " ");
     tokenizer.nextToken(); // Skip the "<sr>"
 
@@ -1708,6 +1683,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleOffer(String line){
+    if (!(line.startsWith("<pt> ") || line.startsWith("<pf> ")))
+      return false;
+    
     Matcher matcher = OFFER_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -1831,15 +1809,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
-  /**
-   * The regular expression matching lines specifying that an offer has been
-   * removed.
-   */
-
-  private static final Pattern OFFER_REMOVED_REGEX = new Pattern("^<pr> (\\d+)$");
-
-
-
+  
   /**
    * Gets called to determine whether the specified line is a line informing us
    * that the specified offer has been removed (accepted, declined, withdrawn,
@@ -1847,11 +1817,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleOfferRemoved(String line){
-    Matcher matcher = OFFER_REMOVED_REGEX.matcher(line);
-    if (!matcher.matches())
+    if (!line.startsWith("<pr> "))
       return false;
-
-    int offerIndex = Integer.parseInt(matcher.group(1));
+      
+    int offerIndex = Integer.parseInt(line.substring("<pr> ".length()));
 
     if (!processOfferRemoved(offerIndex))
       processLine(line);
@@ -1919,6 +1888,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePlayerOffered(String line){
+    if (!line.startsWith("Game "))
+      return false;
+    
     String offer;
 
     Matcher matcher;
@@ -1991,6 +1963,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePlayerDeclined(String line){
+    if ((!line.startsWith("Game ")) || (line.indexOf("declines the ") == -1))
+      return false;
+      
     Matcher matcher = PLAYER_DECLINED_REGEX.matcher(line);
     if (!matcher.matches(line))
       return false;
@@ -2036,6 +2011,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePlayerWithdrew(String line){
+    if ((!line.startsWith("Game ")) || (line.indexOf("withdraws the ") == -1))
+      return false;
+    
     Matcher matcher = PLAYER_WITHDREW_REGEX.matcher(line);
     if (!matcher.matches(line))
       return false;
@@ -2084,6 +2062,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePlayerCounteredTakebackOffer(String line){
+    if ((!line.startsWith("Game ")) || (line.indexOf("proposes a different number ") == -1))
+      return false;
+    
     Matcher matcher = PLAYER_COUNTER_TAKEBACK_OFFER_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -2129,6 +2110,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handleSimulCurrentBoardChanged(String line){
+    if (!line.startsWith("You are now at "))
+      return false;
+      
     Matcher matcher = AT_BOARD_REGEX.matcher(line);
     if (!matcher.matches())
       return false;
@@ -2172,6 +2156,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   private boolean handlePrimaryGameChanged(String line){
+    if (!line.startsWith("Your primary game is now game "))
+      return false;
+    
     Matcher matcher = PRIMARY_GAME_CHANGED_REGEX.matcher(line);
     if (!matcher.matches(line))
       return false;
