@@ -223,6 +223,9 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="icc" />
 			<param name="server.file" value="chessclub.jar" />
+			<param name="libs" value="icc/timestamping.jar jregex.jar chess.jar seek.jar board.jar sound.jar util.jar swingall.jar console.jar" />
+			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
+			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
 			<param name="pieces" value="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard" />
 		</antcall>
@@ -230,6 +233,9 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="fics" />
 			<param name="server.file" value="freechess.jar" />
+			<param name="libs" value="fics/timesealing.jar jregex.jar chess.jar seek.jar board.jar sound.jar util.jar swingall.jar console.jar" />
+			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
+			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
 			<param name="pieces" value="fics/eboard xboard" />
 		</antcall>
@@ -244,17 +250,25 @@
 	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" 
-			         includes="jin.jar index.html prefs.php DetectJava.class libs/*.jar libs/${server.name}/* plugins/* plugins/${server.name}/* actions/* actions/${server.name}/* servers/${server.file}"
-					 excludes="${excluded_files}"
-			/>
-			<filterset>
-				<filter token="old_java_url" value="applet.php?oldjava=1" />
-				<filter token="new_java_url" value="applet.php?oldjava=0" />
-			</filterset>
+			<fileset dir="${build.dir}" includes="jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
 		</copy>
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}/${server.name}" />
+		</copy>
+		
+		<mkdir dir="${dir-to-tar}/libs" />
+		<copy todir="${dir-to-tar}/libs">
+			<fileset dir="${build.dir}/libs" includes="${libs}" />
+		</copy>
+		
+		<mkdir dir="${dir-to-tar}/plugins" />
+		<copy todir="${dir-to-tar}/plugins">
+			<fileset dir="${build.dir}/plugins" includes="${plugins}" />
+		</copy>
+		
+		<mkdir dir="${dir-to-tar}/actions" />
+		<copy todir="${dir-to-tar}/actions">
+			<fileset dir="${build.dir}/actions" includes="${actions}" />
 		</copy>
 		
 		
