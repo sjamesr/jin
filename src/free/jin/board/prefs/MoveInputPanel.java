@@ -437,8 +437,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(immediateSendMove);
     panel.add(premove);
     panel.add(Box.createVerticalStrut(5));
-    panel.add(new JLabel("Some of the options may")); 
-    panel.add(new JLabel("not be modified during a game")); 
+    panel.add(new JLabel("Some of the options may not")); 
+    panel.add(new JLabel("be modified during a game")); 
     panel.add(Box.createVerticalGlue());
 
     return panel;    
