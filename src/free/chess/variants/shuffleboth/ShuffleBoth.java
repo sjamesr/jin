@@ -65,7 +65,7 @@ public class ShuffleBoth extends BothSidesCastlingVariant{
    */
 
   private ShuffleBoth(){
-    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Shuffle Both");
+    super(Chess.INITIAL_POSITION_FEN /* Not used anyway */, "Shuffle both");
   }
 
 
