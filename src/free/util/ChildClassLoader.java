@@ -25,12 +25,14 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
+import free.util.IOUtilities;
 
 
 /**
  * A class loader with a parent, to which loading is delegated if the class or
  * resource can't be found. This class isn't needed with JDK1.2 which already
- * has this functionality. 
+ * has this functionality. As an additional feature, this class uses a Hashtable
+ * to look up already loaded classes, so any subclasses needn't do this.
  */
 
 public abstract class ChildClassLoader extends ClassLoader{
@@ -42,6 +44,14 @@ public abstract class ChildClassLoader extends ClassLoader{
    */
 
   private final ChildClassLoader parent;
+
+
+
+  /**
+   * Maps class names to already loaded classes.
+   */
+
+  private final Hashtable namesToClasses = new Hashtable();
 
 
 
@@ -82,39 +92,19 @@ public abstract class ChildClassLoader extends ClassLoader{
    */
 
   public final synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException{
-    
-    // Already loaded? 
-    Class c = findLoadedClass(name);
-
-    // System class?
-    if (c == null){    
-      try{
-        c = findSystemClass(name);
-      } catch (ClassNotFoundException e){}
-    }
-
-    // Our class?
-    if (c == null){
-      try{
-        byte [] classData = loadClassData(name);
-        if (classData != null)
-          c = defineClass(name, classData, 0, classData.length);
-      } catch (IOException e){}
-    }
-
-    // Our class indeed - resolve if necessary and return 
-    if (c != null){
-      if (resolve)
-        resolveClass(c);
+    Class c = (Class)namesToClasses.get(name);
+    if (c != null)
       return c;
+
+    c = loadClassImpl(name, resolve);
+    if (c == null){
+      if (parent == null)
+        throw new ClassNotFoundException(name);
+      else
+        c = parent.loadClass(name, resolve);
     }
 
-    // Delegate to parent, if there is one.
-    if (parent == null)
-      throw new ClassNotFoundException(name);
-    else
-      c = parent.loadClass(name, resolve);
-    
+    namesToClasses.put(name, c);
     return c;
   }
 
@@ -147,19 +137,52 @@ public abstract class ChildClassLoader extends ClassLoader{
 
 
   /**
-   * Returns (usually by loading from the appropriate location) the byte array
-   * defining the class with the specific name. The default implementation uses
-   * the getResourceAsStreamImpl method to load that data.
+   * Loads the class data for the specified class name. The default
+   * implementation loads the class data via
+   * <code>getResourceAsStreamImpl</code> 
    */
 
   protected byte [] loadClassData(String name) throws IOException{
     String resourceName = name.replace('.', '/') + ".class";
     InputStream in = getResourceAsStreamImpl(resourceName);
     if (in == null)
-      throw new IOException(name + " not found");
+      return null;
+    
     return IOUtilities.readToEnd(in);
   }
 
+
+
+  /**
+   * Loads the class with the specified name and optionally resolves it.
+   * The default implementation first tries to obtain the class via
+   * <code>findSystemClass</code> and if that fails, loads the class via
+   * <code>loadClassData</code>.
+   */
+
+  protected Class loadClassImpl(String name, boolean resolve){
+    try{
+      Class c = null;
+      try{
+        c = findSystemClass(name);
+      } catch (ClassNotFoundException e){}
+
+      if (c == null){
+        byte [] classData = loadClassData(name);
+        if (classData == null)
+          return null;
+        
+        c = defineClass(name, classData, 0, classData.length);
+      }
+
+      if (resolve)
+        resolveClass(c);
+
+      return c;
+    } catch (IOException e){
+        return null;
+      }
+  }
 
 
 
