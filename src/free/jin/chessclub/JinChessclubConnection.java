@@ -48,7 +48,7 @@ import java.lang.reflect.Array;
  * TODO: document the tell types.
  */
 
-public class JinChessclubConnection extends ChessclubConnection implements JinConnection, SeekJinConnection, GameListJinConnection{
+public class JinChessclubConnection extends ChessclubConnection implements JinConnection, SeekJinConnection, GameListJinConnection, ChessEventJinConnection{
 
 
 
@@ -76,8 +76,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     super(hostname, port, username, password, System.out);
 
     setInterface(Jin.getProperty("name")+" "+Jin.getProperty("version")+" ("+System.getProperty("java.vendor")+" "+System.getProperty("java.version")+", "+System.getProperty("os.name")+" "+System.getProperty("os.version")+")");
-    setDGState(Datagram.DG_GAMELIST_BEGIN, true);
-    setDGState(Datagram.DG_GAMELIST_ITEM, true);
   }
 
 
@@ -2440,7 +2438,109 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
+  /**
+   * Maps ChessEvent IDs (as Integer objects) to ChessEvent objects.
+   * Contains the currently existing events.
+   */
 
+  private final Hashtable chessEvents = new Hashtable();
+
+
+
+
+  /**
+   * Adds the given ChessEventListener to the list of listeners receiving
+   * notifications when an event is added.
+   */
+
+  public void addChessEventListener(ChessEventListener listener){
+    listenerList.add(ChessEventListener.class, listener);
+
+    if (listenerList.getListenerCount(ChessEventListener.class)==1){
+      setDGState(Datagram.DG_TOURNEY, true);
+      setDGState(Datagram.DG_REMOVE_TOURNEY, true);
+    }
+  }
+
+
+
+  /**
+   * Removes the given ChessEventListener from the list of listeners receiving
+   * notifications when an event is added.
+   */
+
+  public void removeChessEventListener(ChessEventListener listener){
+    listenerList.remove(ChessEventListener.class, listener);
+
+    if (listenerList.getListenerCount(ChessEventListener.class)==0){
+      setDGState(Datagram.DG_TOURNEY, false);
+      setDGState(Datagram.DG_REMOVE_TOURNEY, false);
+    }
+  }
+
+
+
+
+  /**
+   * Gets called when a DG_TOURNEY event arrives. Fires the appropriate
+   * ChessEvent to any registered listeners.
+   */
+
+  protected void processTourney(int id, boolean canGuestsWatchJoin, boolean makeNewWindowOnJoin, boolean makeNewWindowOnWatch,
+    boolean makeNewWindowOnInfo, String description, String [] joinCommands, String [] watchCommands, String [] infoCommands,
+    String confirmText){
+
+    ChessEvent newEvent = new ChessEvent(id, description, joinCommands, watchCommands, infoCommands, confirmText);
+    ChessEvent existingEvent = (ChessEvent)chessEvents.put(new Integer(id), newEvent);
+
+    if (existingEvent != null)
+      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_UPDATED, newEvent));
+    else
+      fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
+  }
+
+
+
+
+  /**
+   * Gets called when a DG_REMOVE_TOURNEY event arrives. Fires the appropriate
+   * ChessEvent to any registered listeners.
+   */
+
+  protected void processRemoveTourney(int id){
+    ChessEvent evt = (ChessEvent)chessEvents.get(new Integer(id));
+    if (evt == null) // Ignore DG_REMOVE_TOURNEY for events we didn't get a DG_TOURNEY for.
+      return;
+
+    fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, evt));
+  }
+
+
+
+
+  /**
+   * Dispatches the given ChessEventEvent to all interested listeners.
+   */
+
+  protected void fireChessEventEvent(ChessEventEvent evt){
+    Object [] listenerList = this.listenerList.getListenerList();
+    for (int i=0;i<listenerList.length;i+=2){
+      if (listenerList[i]==ChessEventListener.class){
+        ChessEventListener listener = (ChessEventListener)listenerList[i+1];
+        switch (evt.getID()){
+          case ChessEventEvent.EVENT_ADDED:
+            listener.chessEventAdded(evt);
+            break;
+          case ChessEventEvent.EVENT_UPDATED:
+            listener.chessEventUpdated(evt);
+            break;
+          case ChessEventEvent.EVENT_REMOVED:
+            listener.chessEventRemoved(evt);
+            break;
+        }
+      }
+    }
+  }
 
 
   /**
