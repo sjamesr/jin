@@ -147,7 +147,6 @@
 		<property name="app-dir.name" value="Jin-${release.version}.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
-		<mkdir dir="${app-dir}/Contents/MacOS" />
 		<copy todir="${release.osx.dir}">
 			<fileset dir="osx" includes="mkdmg" />
 			<filterset>
@@ -178,7 +177,7 @@
 		         username="${cf.username}"
 		         keyfile="${user.home}/.ssh/id_dsa"
 		         passphrase="${cf.passphrase}"
-		         command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; cp /System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub ${app-dir.name}/Contents/MacOS/ &amp;&amp;	/Developer/Tools/SetFile -a B ${app-dir.name} &amp;&amp; chmod u+x mkdmg &amp;&amp; ./mkdmg&quot;"
+		         command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; mkdir ${app-dir.name}/Contents/MacOS &amp;&amp; cp /System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub ${app-dir.name}/Contents/MacOS/ &amp;&amp;	/Developer/Tools/SetFile -a B ${app-dir.name} &amp;&amp; chmod u+x mkdmg &amp;&amp; ./mkdmg&quot;"
 		/>
 		<scp keyfile="${user.home}/.ssh/id_dsa"
 		     passphrase="${cf.passphrase}"
@@ -190,7 +189,7 @@
 		         keyfile="${user.home}/.ssh/id_dsa"
 		         passphrase="${cf.passphrase}"
 		         command="rm -rf bundle.zip ${app-dir.name} mkdmg jin-${release.version}-osx.dmg"
-		/>
+		/> 
 		<delete file="${release.osx.dir}/bundle.zip" />
 		<delete file="${release.osx.dir}/mkdmg" />
 		<delete dir="${app-dir}" />
