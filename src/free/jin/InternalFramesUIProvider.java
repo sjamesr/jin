@@ -209,14 +209,18 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   public PluginUIContainer createPluginUIContainer(Plugin plugin, String id){
-    Object key = new Pair(plugin, id);
-    PluginContainer container = (PluginContainer)pluginContainers.get(key);
-    if (container != null)
-      throw new IllegalArgumentException("Cannot allocate a container with the same id twice");
+    PluginContainer container = new PluginContainer(plugin, id);
     
-    container = new PluginContainer(plugin, id);
-    pluginContainers.put(key, container);
-
+    if (id != null){
+      Object key = new Pair(plugin, id);
+      Object oldContainer = pluginContainers.put(key, container);
+      
+      if (oldContainer != null){
+        pluginContainers.put(key, oldContainer);
+        throw new IllegalArgumentException("Cannot allocate a container with the same id twice");
+      }
+    }
+    
     return container;
   }
 
