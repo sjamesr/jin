@@ -374,13 +374,12 @@ public class JinFrame extends JFrame{
 
     if (!user.isGuest()){
       System.out.println("Saving user settings");
-      Jin.save(user);
+      String userPath = Jin.saveUser(user);
 
-      String userPath = Jin.getSettingsPath(user);
-      // The returned value can't be null because we've just saved the user
-
-      System.out.println("Saving last user information");
-      Jin.setProperty("last.user.path", userPath);
+      if (userPath != null){
+        System.out.println("Saving last user information");
+        Jin.setProperty("last.user.path", userPath);
+      }
     }
 
     System.out.println("Closing connection");
