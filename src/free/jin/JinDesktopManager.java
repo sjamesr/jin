@@ -22,6 +22,8 @@
 package free.jin;
 
 import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 
 
 /**
@@ -69,6 +71,62 @@ public class JinDesktopManager extends DefaultDesktopManager{
 
     if (!isSelected)
       jinFrame.getInternalFrameSwitcher().selectPrevious();
+  }
+
+
+
+
+  /**
+   * This method makes sure the user doesn't do stupid things like moving the
+   * internal frame out of reach.
+   */
+
+  public void resizeFrame(JComponent f, int newX, int newY, int newWidth, int newHeight){
+    JDesktopPane desktop = jinFrame.getDesktop();
+    Dimension desktopSize = desktop.getSize();
+    Rectangle jifBounds = f.getBounds();
+    final int MARGIN = 100;
+
+    // Determine which border is being dragged by checking which sides are
+    // not at their original locations.
+
+    boolean left = (jifBounds.x != newX);
+    boolean top = (jifBounds.y != newY);
+    boolean right = (newX + newWidth != jifBounds.x + jifBounds.width);
+    boolean bottom = (newY + newHeight != jifBounds.y + jifBounds.height);
+
+    int x1 = newX;
+    int y1 = newY;
+    int x2 = x1 + newWidth;
+    int y2 = y1 + newHeight;
+
+    // Adjust the appropriate sides
+    if (right)
+      x2 = Math.min(Math.max(x2, MARGIN), x1 + desktopSize.width);
+    if (bottom)
+      y2 = Math.min(y2, y1 + desktopSize.height);
+    if (left)
+      x1 = Math.min(Math.max(x1, x2 - desktopSize.width), desktopSize.width - MARGIN);
+    if (top)
+      y1 = Math.max(Math.min(Math.max(y1, 0), desktopSize.height - MARGIN), y2 - desktopSize.height);
+    
+    super.resizeFrame(f, x1, y1, x2 - x1, y2 - y1);
+  }
+
+
+  /**
+   * This method makes sure the user doesn't do stupid things like moving the
+   * internal frame out of reach.
+   */
+
+  public void dragFrame(JComponent f, int newX, int newY){
+    JDesktopPane desktop = jinFrame.getDesktop();
+    Dimension desktopSize = desktop.getSize();
+
+    newX = Math.max(Math.min(newX, desktopSize.width - 100), 100 - f.getWidth());
+    newY = Math.max(Math.min(newY, desktopSize.height - 100), 0);
+
+    super.dragFrame(f, newX, newY);
   }
       
 }
