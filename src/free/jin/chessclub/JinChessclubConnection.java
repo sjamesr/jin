@@ -1863,7 +1863,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
 
 
-
   /**
    * Adds the given SeekListener to the list of listeners receiving notification
    * of SeekEvents.
@@ -1875,6 +1874,14 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (listenerList.getListenerCount(SeekListener.class)==1){
       setDGState(Datagram.DG_SEEK, true);
       setDGState(Datagram.DG_SEEK_REMOVED, true);
+    }
+    else{
+      Enumeration seeksEnum = seeks.elements();
+      while (seeksEnum.hasMoreElements()){
+        Seek seek = (Seek)seeksEnum.nextElement();
+        SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
+        listener.seekAdded(evt);
+      }
     }
   }
 
@@ -1892,6 +1899,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
     if (listenerList.getListenerCount(SeekListener.class)==0){
       setDGState(Datagram.DG_SEEK, false);
       setDGState(Datagram.DG_SEEK_REMOVED, false);
+      seeks.clear();
     }
   }
 
