@@ -67,42 +67,41 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
     // Tells
     if (type.equals("tell"))
-      translation = sender+title+" tells you: "+message;
+      return sender+title+" tells you: "+message;
     else if (type.equals("say"))
-      translation = sender+title+" says: "+message;
+      return sender+title+" says: "+message;
     else if (type.equals("ptell"))
-      translation = "Your partner tells you: "+message;
+      return "Your partner tells you: "+message;
     else if (type.equals("qtell"))
-      translation = parseQTell(evt);
+      return parseQTell(evt);
     else if (type.equals("atell"))
-      translation = sender+title+" tells you: "+message;
+      return sender+title+" tells you: "+message;
 
     // Shouts
     else if (type.equals("shout"))
-      translation = sender+title+" shouts: "+message;
+      return sender+title+" shouts: "+message;
     else if (type.equals("ishout"))
-      translation = "--> "+sender+" "+message;
+      return "--> "+sender+" "+message;
     else if (type.equals("sshout"))
-      translation = sender+title+" sshouts: "+message;
+      return sender+title+" sshouts: "+message;
     else if (type.equals("announcement"))
-      translation = "*** ANNOUNCEMENT from "+sender+": "+message+" ***";
+      return "*** ANNOUNCEMENT from "+sender+": "+message+" ***";
     
     // Channel tells
     else if (type.equals("channel-tell"))
-      translation = sender+title+"("+forum+"): "+message;
+      return sender+title+"("+forum+"): "+message;
     else if (type.equals("channel-atell"))
-      translation = sender+title+"("+forum+"): "+message;
+      return sender+title+"("+forum+"): "+message;
     else if (type.equals("channel-qtell"))
-      translation = parseChannelQTell(evt);
+      return parseChannelQTell(evt);
 
     // Kibitzes
     else if (type.equals("kibitz"))
-      translation = "["+forum+"] "+sender+title+" kibitzes: "+message;
+      return "["+forum+"] "+sender+title+" kibitzes: "+message;
     else if (type.equals("whisper"))
-      translation = "["+forum+"] "+sender+title+" whispers: "+message;
-    else
-      return "Unknown chat type: \""+type+"\"";
-    return translation;
+      return "["+forum+"] "+sender+title+" whispers: "+message;
+
+    return evt.toString();
   }
 
 
