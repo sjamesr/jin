@@ -43,6 +43,15 @@ import free.util.GraphicsUtilities;
 public class JBoard extends JComponent{
 
 
+
+  /**
+   * Do we think we're running in a Java2D capable JVM?
+   */
+
+  private static boolean java2D = (System.getProperty("java.version").compareTo("1.2") >= 0);
+
+
+
   /**
    * The constant for drag'n'drop move input style.
    */
@@ -853,6 +862,17 @@ public class JBoard extends JComponent{
     if (!newImage) // A new image needs to be drawn completely.
       cacheGraphics.clipRect(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
 
+    if (java2D){ // Try copying the RenderingHints.
+      try{
+        tryCopyingRenderingHints(componentGraphics, cacheGraphics);
+      } catch (Throwable t){
+          if (t instanceof RuntimeException)
+            throw (RuntimeException)t;
+          t.printStackTrace();
+          java2D = false;
+        }
+    }
+
     super.paintComponent(cacheGraphics);
 
     // Fill the borders outside the actual board.
@@ -924,6 +944,25 @@ public class JBoard extends JComponent{
 
     componentGraphics.drawImage(cacheImage, 0, 0, null);
     dirtyRect = null;
+  }
+
+
+
+
+  /**
+   * Attempts to copy the RenderingHints from the specified source Graphics
+   * to the specified target Graphics.
+   */
+
+  private static void tryCopyingRenderingHints(Graphics source, Graphics target) throws Throwable{ // Yes, yes, I know :-)
+    Class Graphics2DClass = Class.forName("java.awt.Graphics2D");
+    if (Graphics2DClass.isInstance(source) && Graphics2DClass.isInstance(target)){ // Should be true (I think)
+      Class MapClass = Class.forName("java.util.Map");
+      java.lang.reflect.Method getRenderingHints = Graphics2DClass.getMethod("getRenderingHints", new Class[0]);
+      java.lang.reflect.Method setRenderingHints = Graphics2DClass.getMethod("setRenderingHints", new Class[]{MapClass});
+      Object renderingHints = getRenderingHints.invoke(source, new Object[0]);
+      setRenderingHints.invoke(target, new Object[]{renderingHints});
+    }
   }
 
 
