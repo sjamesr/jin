@@ -24,7 +24,6 @@ package free.jin.board;
 import free.chess.*;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.Vector;
 import free.chess.Position;
 import free.chess.Square;

@@ -23,7 +23,6 @@ package free.jin.seek;
 
 import java.awt.*;
 import javax.swing.*;
-import free.jin.User;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.UnsupportedContextException;

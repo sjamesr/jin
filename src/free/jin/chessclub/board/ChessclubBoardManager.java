@@ -22,8 +22,6 @@
 package free.jin.chessclub.board;
 
 
-import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;

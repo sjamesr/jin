@@ -24,11 +24,8 @@ package free.jin.chessclub.board;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.Vector;
 import free.chess.Position;
 import free.chess.Square;
-import free.util.PaintHook;
-import free.jin.board.event.ArrowCircleListener;
 import free.jin.board.JinBoard;
 
 

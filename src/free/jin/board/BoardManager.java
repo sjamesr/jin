@@ -36,7 +36,6 @@ import free.jin.board.event.UserMoveEvent;
 import free.jin.sound.SoundManager;
 import free.util.StringParser;
 import free.util.StringEncoder;
-import free.util.SingleItemEnumeration;
 import free.util.BeanProperties;
 import free.workarounds.FixedJInternalFrame;
 import java.awt.event.ActionListener;

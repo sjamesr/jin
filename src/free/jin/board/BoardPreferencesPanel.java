@@ -28,8 +28,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import free.jin.plugin.PreferencesPanel;
 import free.util.swing.ColorChooserButton;
-import free.util.StringEncoder;
-import free.util.StringParser;
 
 
 /**

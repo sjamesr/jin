@@ -24,16 +24,12 @@ package free.chess;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JComponent;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
-import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.util.Vector;
-import java.util.Hashtable;
 import free.util.PaintHook;
 import free.util.Utilities;
-import free.util.GraphicsUtilities;
 
 
 /**

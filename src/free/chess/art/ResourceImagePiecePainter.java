@@ -30,7 +30,6 @@ import free.chess.ImagePiecePainter;
 import free.chess.ChessPiece;
 import free.util.IOUtilities;
 import free.util.ImageUtilities;
-import free.util.Pair;
 
 
 /**

@@ -24,7 +24,6 @@ package free.workarounds;
 import javax.swing.JTextField;
 import javax.swing.text.Document;
 import javax.swing.UIManager;
-import javax.swing.BoundedRangeModel;
 import java.awt.Cursor;
 import java.awt.Color;
 import java.awt.Rectangle;

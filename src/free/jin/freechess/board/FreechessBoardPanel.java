@@ -24,7 +24,6 @@ package free.jin.freechess.board;
 import javax.swing.*;
 import free.jin.board.BoardPanel;
 import free.jin.board.BoardManager;
-import free.jin.plugin.Plugin;
 import free.jin.Game;
 
 

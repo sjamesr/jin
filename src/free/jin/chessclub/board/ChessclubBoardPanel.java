@@ -27,7 +27,6 @@ import free.jin.board.BoardPanel;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.Game;
-import free.chess.JBoard;
 import free.chess.Player;
 import free.chess.Square;
 import free.jin.chessclub.UserImageInternalFrame;

@@ -22,7 +22,6 @@
 package free.chess.art;
 
 import java.awt.*;
-import java.awt.image.ImageObserver;
 import free.chess.PiecePainter;
 import free.chess.Piece;
 

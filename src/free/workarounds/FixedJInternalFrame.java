@@ -24,8 +24,6 @@ package free.workarounds;
 import java.awt.Component;
 import java.awt.Window;
 import javax.swing.JInternalFrame;
-import javax.swing.JRootPane;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import java.beans.PropertyVetoException;
 
