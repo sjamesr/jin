@@ -52,14 +52,14 @@ public final class PairKey{
 
 
   /**
-   * Creates a new PairKey with the two given objects.
+   * Creates a new PairKey with the two given objects. Either of the keys may
+   * be <code>null</code>.
    */
 
   public PairKey(Object first, Object second){
     this.first = first;
     this.second = second;
   }
-
 
 
 
@@ -91,7 +91,9 @@ public final class PairKey{
    */
 
   public int hashCode(){
-    return (first.hashCode()+1)^second.hashCode();
+    int hash1 = (first == null ? 0 : first.hashCode());
+    int hash2 = (second == null ? 0 : second.hashCode());
+    return hash1^hash2;
   }
 
 
@@ -105,12 +107,15 @@ public final class PairKey{
    */
 
   public boolean equals(Object o){
+    if (o == this)
+      return true;
+
     if (!(o instanceof PairKey))
       return false;
 
-    PairKey pk = (PairKey)o;
+    PairKey pairKey = (PairKey)o;
 
-    return first.equals(pk.getFirst()) && second.equals(pk.getSecond());
+    return Utilities.areEqual(pairKey.first, first) && Utilities.areEqual(pairKey.second, second);
   }
 
 }
