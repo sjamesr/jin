@@ -87,8 +87,8 @@ public class ChessclubServer extends AbstractServer{
    * Creates and returns a new <code>JinChessclubConnection</code>.
    */
 
-  public Connection createConnection(JinContext context, String username, String password){
-    return new JinChessclubConnection(context, username, password);
+  public Connection createConnection(String username, String password){
+    return new JinChessclubConnection(username, password);
   }
 
 
