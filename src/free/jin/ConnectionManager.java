@@ -172,7 +172,12 @@ public class ConnectionManager{
       ConnectionDetails connDetails = session.getConnDetails().usePort(connPort);
       user.setPreferredConnDetails(connDetails);
 
-      if (user.isGuest()){
+      if (!context.isSavePrefsCapable()){
+        // The context can't save the user anyway, so why bother asking the user?
+        if (!JinUtilities.isKnownUser(context, user))
+          context.addUser(user);
+      }
+      else if (user.isGuest()){
         // Microsoft VM returns "C:\windows\java" as the user.home directory.
         // Since this is shared between all users of the computer, we warn the
         // user about it.
