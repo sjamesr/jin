@@ -76,7 +76,10 @@ public class SdiUiProvider extends AbstractUiProvider{
   
   public void sessionClosed(SessionEvent evt){
     super.sessionClosed(evt);
-    Jin.getInstance().quit(false);
+    
+    // Check that we've really connected
+    if (evt.getSession().getPort() != -1)
+      Jin.getInstance().quit(false);
   }
 
 
