@@ -105,6 +105,8 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
     });
 
+    sendCommand("set-quietly wrap 0");
+
     // Hack, currently, the server has a bug which causes it not to send us
     // the current event list even if we have turned DG_TOURNEY on at the login
     // line. Remove when Bert fixes it.
