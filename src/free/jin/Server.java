@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,221 +21,82 @@
 
 package free.jin;
 
-import java.util.Properties;
-import java.util.Hashtable;
-import java.io.InputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.net.MalformedURLException;
 
 
 /**
- * This class encapsulates the various properties of a chess server.
+ * Defines the interface that needs to be implemented in order to support a
+ * chess server.
  */
 
-public abstract class Server{
+public interface Server{
 
 
 
   /**
-   * The properties of this server.
+   * This method is called exactly once, immediately after the
+   * <code>Server</code> object is created to tell the Server of the guest 
+   * account preferences. The specified argument will be <code>null</code> if
+   * the guest account hasn't been used yet (and has no preferences to speak
+   * of).
    */
 
-  private Properties props;
+  void setGuestUser(User user);
 
 
 
   /**
-   * The <code>URL</code> of the server's website.
+   * Creates and returns an unconnected <code>Connection</code> object by using
+   * the specified connection details.
    */
 
-  private URL website;
+  Connection createConnection(JinContext context, String username, String password);
 
 
 
   /**
-   * The guest <code>User</code> of this server. Loaded/created lazily.
+   * Returns the <code>User</code> object representing the guest account on this
+   * server.
    */
 
-  private User guest = null;
+  User getGuest();
 
 
 
   /**
-   * Creates a new Server object.
+   * Returns the hostname of the default host for this server. May not be
+   * <code>null</code>.
    */
 
-  protected Server(){
-    
-  }
+  String getDefaultHost();
 
 
 
   /**
-   * Initializes whatever the server needs. This is called immediately after
-   * instantiation and may be used as a constructor.
+   * Returns the list of hostnames of all the hosts for this server. This may
+   * not be <code>null</code> or empty.
    */
 
-  protected void init(Properties props){
-    this.props = props;
-
-    String urlString = props.getProperty("website.url");
-    try{
-      website = new URL(urlString);
-    } catch (MalformedURLException e){
-        throw new IllegalArgumentException("Bad URL for server's website: "+urlString);
-      }
-  }
+  String [] getHosts();
 
 
 
   /**
-   * Loads a Server object from the given InputStream.
+   * Returns a list of the ports on which the server is listening, in the order
+   * they should be tried.
    */
 
-  public static Server load(InputStream serverIn) throws IOException{
-    Properties props = new Properties();
-    props.load(serverIn);
-
-    try{
-      String classname = props.getProperty("classname");
-      Server server = (Server)Class.forName(classname).newInstance();
-      server.init(props);
-      return server;
-    } catch (InstantiationException e){
-        e.printStackTrace();
-      }
-      catch (IllegalAccessException e){
-        e.printStackTrace();
-      }
-      catch (ClassNotFoundException e){
-        e.printStackTrace();
-      }
-
-    return null;
-  }
+  int [] getPorts();
 
 
 
   /**
-   * Creates a new <code>User</code> with only the specified username.
-   */
-
-  public User createUser(String username){
-    Properties props = new Properties();
-    props.put("login.username", username);
-
-    return createUser(props);
-  }
-
-
-
-  /**
-   * Creates and returns a <code>User</code> for this <code>Server</code> with
-   * the specified <code>Properties</code> and no User files.
-   */
-
-  protected User createUser(Properties props){
-    return createUser(props, new Hashtable());
-  }
-
-
-
-  /**
-   * Creates and returns a <code>User</code> for this <code>Server</code> with
-   * the specified <code>Properties</code> and Hashtable containing the User
-   * file names mapped to <code>MemoryFile</code> instances containing the
-   * file's data.
-   */
-
-  protected User createUser(Properties props, Hashtable userFiles){
-    return new User(this, props, userFiles);
-  }
-
-
-
-
-  /**
-   * Returns the "guest" user <code>User</code>. Note that unlike the name
-   * implies, guest preferences are actually kept between sessions
-   * automatically.
-   */
-
-  public User getGuest(){
-    if (guest == null){
-      guest = Jin.loadGuest(this);
-      if (guest == null)
-        guest = createGuest();
-    }
-
-    return guest;
-  }
-
-
-
-  /**
-   * Creates a new guest <code>User</code>.
-   */
-
-  protected abstract User createGuest();
-
-
-
-
-  /**
-   * Returns <code>true</code> if the specified <code>User</code> is the global
-   * guest account.
-   */
-
-  boolean isGuest(User user){
-    return user == guest;
-  }
-
-
-
-
-  /**
-   * Creates and returns a new <code>LoginDialog</code> for this
-   * <code>Server</code>.
-   */
-
-  public abstract LoginDialog createLoginDialog();
-
-
-
-
-  /**
-   * Creates and returns a new <code>LoginDialog</code> for this
-   * <code>Server</code> using the specified <code>User</code> for the dialog
-   * default.
-   */
-
-  public abstract LoginDialog createLoginDialog(User user);
-
-
-
-
-  /**
-   * Returns this server's property with the given name or <code>null</code> if
-   * no such property exists for this server.
-   */
-
-  public String getProperty(String propertyName){
-    return props.getProperty(propertyName);
-  }
-
-
-
-
-  /**
-   * Returns an ID of this server. This should be a short, lowecase only string
+   * Returns an ID of this server. This should be a short, lowercase only string
    * without any whitespace. It should also be unique between all servers. It is
    * not necessary (although preferable) for it to be descriptive.
    */
 
-  public String getID(){
-    return getProperty("id");
-  }
+  String getId();
 
 
 
@@ -246,20 +107,15 @@ public abstract class Server{
    * example.
    */
 
-  public String getName(){
-    return getProperty("name");
-  }
-
+  String getShortName();
 
 
 
   /**
-   * Returns a long server name. Example: "Internet Chess Club".
+   * Returns the server's full name. Example: "Internet Chess Club".
    */
 
-  public String getLongName(){
-    return getProperty("name.long");
-  }
+  String getLongName();
 
 
 
@@ -267,19 +123,34 @@ public abstract class Server{
    * Returns the URL of the server's website.
    */
 
-  public URL getWebsite(){
-    return website;
-  }
-
+  String getWebsite();
 
 
 
   /**
-   * Returns a textual representation of this Server.
+   * Returns the URL of the server's registration page, or <code>null</code>
+   * if none exists.
    */
 
-  public String toString(){
-    return getLongName()+" ("+getWebsite()+")";
-  }
+  String getRegistrationPage();
+
+
+
+  /**
+   * Returns the URL of server's password retrieval page, or <code>null</code>
+   * if none exists.
+   */
+
+  String getPasswordRetrievalPage();
+
+
+
+  /**
+   * Returns the username policy of this server.
+   */
+
+  UsernamePolicy getUsernamePolicy();
+
+
 
 }

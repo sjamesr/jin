@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,17 +21,12 @@
 
 package free.jin;
 
-import java.util.Properties;
 import java.util.Hashtable;
-import free.util.Utilities;
 import free.util.MemoryFile;
 
 
 /**
- * A holder for the user's settings and preferences. Throughout the
- * documentation (unless I forgot/mistyped), the actual user is referred to as
- * "user" (lowercase 'u') and a <code>User</code> object is referred to as
- * "User" (uppercase 'u'). 
+ * Contains the details of an account on a chess server.
  */
 
 public class User{
@@ -39,7 +34,7 @@ public class User{
 
 
   /**
-   * The server of this user.
+   * The server of this account.
    */
 
   private final Server server;
@@ -47,152 +42,63 @@ public class User{
 
 
   /**
-   * The properties of the User.
+   * The username of this account.
    */
 
-  private final Properties props;
-
+  private String username;
 
 
 
   /**
-   * Maps "file" names to instances of <code>MemoryFile</code> which contain the
-   * data of those files. This allows plugins to write data which cannot fit in
-   * the User's settings and then read it.
+   * The preferences of the user.
    */
 
-  private final Hashtable userFiles;
-
+  private final Preferences prefs;
 
 
 
   /**
-   * Creates a new <code>User</code> with the specified <code>Server</code>,
-   * properties and user files.
+   * Maps filenames to <code>MemoryFile</code> objects.
    */
 
-  User(Server server, Properties props, Hashtable userFiles){
-    if (server == null)
-      throw new IllegalArgumentException("The specified Server object may not be null");
-    if (props == null)
-      props = new Properties();
-    if (userFiles == null)
-      userFiles = new Hashtable();
+  private final Hashtable files;
 
+
+
+  /**
+   * Creates a new <code>User</code> object. Before creating a <code>User</code>
+   * object with a user supplied username, make sure that the username is not
+   * the guest username (via the username policy of the server).
+   *
+   * @param server The server of the account.
+   * @param username The username of the account.
+   * @param prefs The user's preferences.
+   * @param files The user's files. Maps filenames to <code>MemoryFile</code>
+   * objects.
+   */
+
+  public User(Server server, String username, Preferences prefs, Hashtable files){
     this.server = server;
-    this.props = props;
-    this.userFiles = userFiles;
+    this.username = username;
+    this.prefs = prefs;
+    this.files = files;
   }
 
 
 
-
   /**
-   * Returns the User's properties.
+   * Creates a new <code>User</code> object with the specified server and
+   * username. The user initially has no preferences or files.
    */
 
-  Properties getProperties(){
-    return props;
-  }
-
-
-
-
-  /**
-   * Returns the Hashtable mapping user "file" names to
-   * <code>MemoryFile</code> instances holding the data of those
-   * "files".
-   */
-
-  Hashtable getUserFiles(){
-    return userFiles;
-  }
-
-
-
-
-  /**
-   * Returns a <code>MemoryFile</code> with the specified name. Returns
-   * <code>null</code> if no <code>MemoryFile</code> with the specified name
-   * exists.
-   */
-
-  public MemoryFile getFile(String name){
-    return (MemoryFile)userFiles.get(name);
+  public User(Server server, String username){
+    this(server, username, Preferences.createNew(), new Hashtable());
   }
 
 
 
   /**
-   * Adds the specified <code>MemoryFile</code> to this User's files under the
-   * specified name. If a <code>MemoryFile</code> under the specified name
-   * already exists, it is removed and returned by this method.
-   */
-
-  public MemoryFile putFile(String name, MemoryFile file){
-    return (MemoryFile)Utilities.put(userFiles, name, file);
-  }
-
-
-
-  /**
-   * Returns the value of the property of the user with the given name or null
-   * if the user has no property with the given name.
-   */
-
-  public String getProperty(String propertyName){
-    String propertyValue = props.getProperty(propertyName);
-    return propertyValue == null ? getServer().getProperty(propertyName) : propertyValue;
-  }
-
-
-
-
-  /**
-   * Returns the value of the property of the user with the given name or the 
-   * given default value if the user has no property with the given name.
-   */
-
-  public String getProperty(String propertyName, String defaultValue){
-    String propertyValue = getProperty(propertyName);
-    return propertyValue == null ? defaultValue : propertyValue;
-  }
-
-
-
-
-
-  /**
-   * Returns the username of this user - the value of the "login.username"
-   * property.
-   */
-
-  public String getUsername(){
-    return getProperty("login.username");
-  }
-
-
-
-
-  /**
-   * Sets this user's property with the given name to the given value, or, if
-   * the specified property value is null, removes the property.
-   * 
-   * @param propertyName The name of the property.
-   * @param propertyValue The new value of the property.
-   */
-
-  public void setProperty(String propertyName, String propertyValue){
-    if (propertyValue == null)
-      props.remove(propertyName);
-    else
-      props.put(propertyName, propertyValue);
-  }
-
-
-
-  /**
-   * Returns the Server object represeting the serverthis user logs on to.
+   * Returns the server on which this account is registered.
    */
 
   public Server getServer(){
@@ -202,22 +108,109 @@ public class User{
 
 
   /**
-   * Returns <code>true</code> if this user is the global guest account.
+   * Returns the username of this account.
    */
 
-  public boolean isGuest(){
-    return getServer().isGuest(this);
+  public String getUsername(){
+    return username;
+  }
+
+
+
+  /**
+   * Returns the preferences of this account.
+   */
+
+  public Preferences getPrefs(){
+    return prefs;
+  }
+
+
+
+  /**
+   * Returns the files hashtable. This is used by code that stores the memory
+   * files.
+   */
+
+  Hashtable getFilesMap(){
+    return files;
+  }
+
+
+
+  /**
+   * Returns the file with the specified name, or <code>null</code> if no file
+   * with the specified name exists. Filenames are case sensitive.
+   */
+
+  public MemoryFile getFile(String filename){
+    return (MemoryFile)files.get(filename);
+  }
+
+
+
+  /**
+   * Sets the file with the specified name. If a file with the specified name
+   * already exists, it is deleted. The specified file may be <code>null</code>
+   * if you want to call this method just for the side effect of removing the
+   * existing file.
+   */
+
+  public void setFile(String filename, MemoryFile file){
+    if (file == null)
+      files.remove(filename);
+    else
+      files.put(filename, file);
   }
 
 
 
 
   /**
-   * Returns a textual representation of the user.
+   * Returns whether this <code>User</code> object represents the guest account.
    */
 
-  public String toString(){
-    return "User[server=\""+getServer().getLongName()+"\",login.username=\""+getUsername()+"\"]";
-  } 
+  public boolean isGuest(){
+    return this == server.getGuest();
+  }
+
+
+
+  /**
+   * Returns the preferred connection details of this user.
+   */
+
+  ConnectionDetails getPreferredConnDetails(){
+    String password = prefs.getString("login.password", "");
+    boolean savePassword = prefs.getBool("login.savePassword", false);
+    String hostname = prefs.getString("login.hostname", server.getDefaultHost());
+    int [] ports = prefs.getIntList("login.ports", server.getPorts());
+
+    if (isGuest())
+      return ConnectionDetails.createGuest(username, hostname, ports);
+    else
+      return ConnectionDetails.create(username, password, savePassword, hostname, ports);
+  }
+
+
+
+  /**
+   * Sets the specified user's connection details to the specified ones.
+   */
+
+  void setPreferredConnDetails(ConnectionDetails details){
+    if (details.isGuest() != isGuest())
+      throw new IllegalArgumentException("isGuest property mismatch");
+
+    prefs.setString("login.hostname", details.getHost());
+    prefs.setIntList("login.ports", details.getPorts());
+
+    if (!details.isGuest()){
+      boolean savePassword = details.isSavePassword();
+      prefs.setBool("login.savePassword", savePassword);
+      prefs.setString("login.password", savePassword ? details.getPassword() : "");
+    }
+  }
+
 
 }

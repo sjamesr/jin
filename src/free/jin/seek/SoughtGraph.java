@@ -28,10 +28,10 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import free.jin.plugin.Plugin;
 import free.jin.Seek;
+import free.jin.Preferences;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.util.GraphicsUtilities;
-import free.util.StringParser;
 import free.util.ImageUtilities;
 import free.chess.WildVariant;
 import free.chess.Player;
@@ -171,39 +171,29 @@ public class SoughtGraph extends JComponent{
   public SoughtGraph(Plugin plugin){
     this.plugin = plugin;
 
+    Preferences prefs = plugin.getPrefs();
+
     setOpaque(true);
-    setBackground(StringParser.parseColor(plugin.getProperty("background-color", "ffffff")));
+    setBackground(prefs.getColor("background-color", Color.white));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
 
-    String bgImageName = plugin.getProperty("background-image");
-    Image bgImage;
-    if (bgImageName == null)
-      bgImage = null;
-    else{
-      bgImage = getToolkit().getImage(SoughtGraph.class.getResource(bgImageName));
-      try{
-        if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
-          bgImage = null;
-      } catch (InterruptedException e){}
-    }
+    Image bgImage = getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
+    try{
+      if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
+        bgImage = null;
+    } catch (InterruptedException e){}
 
     this.bgImage = bgImage;
 
-    String seekImageSizes = plugin.getProperty("seek-image.sizes");
-    StringTokenizer tokenizer = new StringTokenizer(seekImageSizes, ",");
+    int [] seekImageSizes = prefs.getIntList("seek-image.sizes");
     int maxSize = 0;
-    while (tokenizer.hasMoreTokens()){
-      int size = Integer.parseInt(tokenizer.nextToken());
-      if (size > maxSize)
-        maxSize = size;
-    }
+    for (int i = 0; i < seekImageSizes.length; i++)
+      if (seekImageSizes[i] > maxSize)
+        maxSize = seekImageSizes[i];
 
     seekImageCache = new Hashtable[maxSize+1];
-    tokenizer = new StringTokenizer(seekImageSizes, ",");
-    while (tokenizer.hasMoreTokens()){
-      int size = Integer.parseInt(tokenizer.nextToken());
-      seekImageCache[size] = new Hashtable(10);
-    }
+    for (int i = 0; i < seekImageSizes.length; i++)
+      seekImageCache[seekImageSizes[i]] = new Hashtable(10);
 
     enableEvents(MouseEvent.MOUSE_MOTION_EVENT_MASK|MouseEvent.MOUSE_EVENT_MASK);
   }
@@ -460,10 +450,12 @@ public class SoughtGraph extends JComponent{
     g.setColor(fg);
     Font originalFont = g.getFont();
 
+    Preferences prefs = plugin.getPrefs();
+
     // The "Bullet", "Blitz" and "Standard" strings.    
-    String bulletString = plugin.getProperty("fast-category.name");
-    String blitzString = plugin.getProperty("medium-category.name");
-    String standardString = plugin.getProperty("slow-category.name");
+    String bulletString = prefs.getString("fast-category.name");
+    String blitzString = prefs.getString("medium-category.name");
+    String standardString = prefs.getString("slow-category.name");
     int timeStringHeight = (height-(graphY+graphHeight))/2;
     int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, bulletString, bulletWidth, timeStringHeight);
     int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, blitzString, blitzWidth, timeStringHeight);
@@ -573,12 +565,11 @@ public class SoughtGraph extends JComponent{
 
     Image image = (Image)sizeImages.get(imageKey);
     if (image == null){
-      String imagesDir = plugin.getProperty("seek-image.directory");
-      String imageName = plugin.lookupProperty(imageKey);
+      String imageName = (String)plugin.getPrefs().lookup(imageKey);
       if (imageName == null)
         return null;
 
-      String imageFile = imagesDir+"/"+index+"/"+imageName;
+      String imageFile = "images/"+index+"/"+imageName;
       image = getToolkit().getImage(SoughtGraph.class.getResource(imageFile));
       try{
         if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)

@@ -24,9 +24,8 @@ package free.jin.sound;
 import free.util.audio.*;
 import free.jin.event.*;
 import jregex.*;
+import free.jin.*;
 import free.jin.plugin.Plugin;
-import free.jin.JinConnection;
-import free.jin.Game;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.io.IOException;
@@ -120,7 +119,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void init(){
-    isOn = getProperty("on", "true").toLowerCase().equals("true");
+    isOn = getPrefs().getBool("on", true);
   }
 
 
@@ -133,7 +132,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public void saveState(){
-    setProperty("on", isOn ? "true" : "false");
+    getPrefs().setBool("on", isOn);
   }
 
 
@@ -220,12 +219,13 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   private void loadPatternSounds(String type, Hashtable map){
-    int numPatterns = Integer.parseInt(getProperty("num-"+type+"-patterns"));
+    Preferences prefs = getPrefs();
+    int numPatterns = prefs.getInt("num-" + type + "-patterns", 0);
 
     for (int i = 0; i < numPatterns; i++){
       try{
-        String filename = getProperty(type+"-sound-"+i);
-        String pattern = getProperty(type+"-pattern-"+i);
+        String filename = prefs.getString(type + "-sound-" + i);
+        String pattern = prefs.getString(type + "-pattern-" + i);
         Pattern regex = new Pattern(pattern);
         
         if (!filenamesToAudioClips.containsKey(filename)){
@@ -256,8 +256,8 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   protected final void loadEventAudioClip(String eventName){
     try{
-      String resourceName = getProperty(eventName);
-      if (resourceName==null)
+      String resourceName = getPrefs().getString(eventName, null);
+      if (resourceName == null)
         return;
       URL url = SoundManager.class.getResource(resourceName);
       if (url == null)
@@ -276,8 +276,8 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void registerListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.addPlainTextListener(this);
     listenerManager.addChatListener(this);
@@ -294,8 +294,8 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void unregisterListeners(){
-    JinConnection conn = getConnection();
-    JinListenerManager listenerManager = conn.getJinListenerManager();
+    Connection conn = getConn();
+    ListenerManager listenerManager = conn.getListenerManager();
 
     listenerManager.removePlainTextListener(this);
     listenerManager.removeChatListener(this);
@@ -437,6 +437,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
   }
 
 
+  
+  public void connectionAttempted(ConnectionEvent evt){}
+
 
   
   /**
@@ -507,6 +510,27 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
   public boolean isOn(){
     return isOn;
   }
+
+
+
+  /**
+   * Returns the name of this plugin.
+   */
+
+  public String getName(){
+    return "Sound";
+  }
+
+
+
+  /**
+   * Returns the string "sound".
+   */
+
+  public String getId(){
+    return "sound";
+  }
+
 
 
 }

@@ -23,16 +23,12 @@ package free.jin.seek;
 
 import java.awt.*;
 import javax.swing.*;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginContext;
-import free.jin.plugin.UnsupportedContextException;
-import free.jin.SeekJinConnection;
+import free.jin.plugin.*;
+import free.jin.SeekConnection;
 import free.jin.event.SeekListener;
 import free.jin.event.SeekEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.seek.event.SeekSelectionEvent;
-import free.util.StringParser;
-import free.util.StringEncoder;
 import free.workarounds.FixedJInternalFrame;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
@@ -48,7 +44,8 @@ import java.net.URL;
  * ICS derived servers (ICC, FICS, chess.net).
  */
 
-public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelectionListener{
+public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelectionListener,
+    PluginUIListener{
 
 
 
@@ -61,10 +58,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
-   * The JInternalFrame which contains the sought graph.
+   * The container of the sought graph.
    */
 
-  protected JInternalFrame soughtGraphFrame;
+  protected PluginUIContainer soughtGraphContainer;
 
 
 
@@ -86,21 +83,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
-
   /**
    * Sets the plugin context - if the connection is not an instance of
    * SeekJinConnection, this method throws an UnsupportedContextException.
    */
 
-  public void setContext(PluginContext context) throws UnsupportedContextException{
-    if (!(context.getConnection() instanceof SeekJinConnection))
-      throw new UnsupportedContextException("The connection does not implement seeking functionality");
+  public void setContext(PluginContext context) throws PluginStartException{
+    if (!(context.getConnection() instanceof SeekConnection))
+      throw new PluginStartException("The connection does not implement seeking functionality");
 
     super.setContext(context);
   }
-
-
 
 
  
@@ -123,7 +116,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public void stop(){
     unregisterListeners();
-    closeSoughtGraph();
   }
 
 
@@ -135,102 +127,26 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void initSoughtGraph(){
-    soughtGraph = createSoughtGraph();
-    soughtGraphFrame = createSoughtGraphFrame();
+    soughtGraphContainer = createContainer("");
+    soughtGraphContainer.setCloseOperation(PluginUIContainer.HIDE_ON_CLOSE);
+    soughtGraphContainer.setTitle("Seek Graph");
 
-    Container content = soughtGraphFrame.getContentPane();
+    URL iconImageURL = SoughtGraphPlugin.class.getResource("icon.gif");
+    if (iconImageURL!= null)
+      soughtGraphContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+
+    soughtGraphContainer.addPluginUIListener(this);
+
+
+    soughtGraph = createSoughtGraph();
+
+    Container content = soughtGraphContainer.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(soughtGraph, BorderLayout.CENTER);
 
-    JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-
-    Rectangle desktopBounds = new Rectangle(desktop.getSize());
-    String boundsString = getProperty("frame-bounds");
-    Rectangle bounds = null;
-    if (boundsString!=null)
-      bounds = StringParser.parseRectangle(boundsString);
-
-    if (bounds == null){
-      soughtGraphFrame.setBounds(desktopBounds.width/2, desktopBounds.height/2, desktopBounds.width/2, desktopBounds.height/2);
-//      soughtGraphFrame.setBounds(desktopBounds.width - 650, desktopBounds.height - 450, 650, 450);
-    }
-    else
-      soughtGraphFrame.setBounds(bounds);
-
-    boolean isMaximized = Boolean.valueOf(getProperty("maximized", "false")).booleanValue();
-    if (isMaximized){
-      try{
-        soughtGraphFrame.setMaximum(true);
-      } catch (PropertyVetoException e){}
-    }
-
-    boolean isIconified = Boolean.valueOf(getProperty("iconified", "false")).booleanValue();
-    if (isIconified){
-      try{
-        soughtGraphFrame.setIcon(true);
-      } catch (PropertyVetoException e){}
-    }
-
-    JComponent icon = soughtGraphFrame.getDesktopIcon();
-    String iconBoundsString = getProperty("frame-icon-bounds");
-    if (iconBoundsString != null){
-      Rectangle iconBounds = StringParser.parseRectangle(iconBoundsString);
-      icon.setBounds(iconBounds);
-    }
-
-    boolean isSelected = Boolean.valueOf(getProperty("selected", "true")).booleanValue();
-
-    if (Boolean.valueOf(getProperty("visible", "true")).booleanValue())
-      showSoughtGraphFrame(isSelected);
-
-    if (isSelected){
-      // We can't do this immediately because if some other plugin adds another frame
-      // afterwards, our frame will lose selection.
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run(){
-          try{
-            soughtGraphFrame.toFront();
-            soughtGraphFrame.setSelected(true);
-          } catch (PropertyVetoException e){}
-        }
-      });
-    }
-
-
-    /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
-       reason I do this instead of adding an InternalFrameListener like a sane person. */
-    soughtGraphFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-    soughtGraphFrame.addVetoableChangeListener(new VetoableChangeListener(){
-
-      public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
-        if (closingFrame) // Ignore our own close frame calls
-          return;
-
-        if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
-            pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
-
-          hideSoughtGraphFrame();
-          throw new PropertyVetoException("Canceled closing", pce);
-        }
-      }
-    });
+    if (getPrefs().getBool("isVisible", true))
+      soughtGraphContainer.setVisible(true);
   }
-
-
-
-
-  /**
-   * Closes the sought graph and undoes everything done by the initSoughtGraph
-   * method.
-   */
-
-  protected void closeSoughtGraph(){
-    hideSoughtGraphFrame();
-    soughtGraphFrame.dispose();
-    soughtGraphFrame = null;
-    soughtGraph = null;
-  }
-
 
 
 
@@ -244,103 +160,41 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
 
-
   /**
-   * Creates and returns the JInternalFrame which will contain the sought graph.
+   * Gets called when the seek graph container is made visible.
    */
 
-  protected JInternalFrame createSoughtGraphFrame(){
-    JInternalFrame frame = new FixedJInternalFrame("Seek graph", true, true, true, true);
-
-    String iconImageName = getProperty("icon-image");
-    if (iconImageName != null){
-      URL iconImageURL = SoughtGraphPlugin.class.getResource(iconImageName);
-      if (iconImageURL!= null)
-        frame.setFrameIcon(new ImageIcon(iconImageURL));
-    }
-
-    return frame;
-  }
-
-
-
-
-  /**
-   * Shows the sought graph frame. Showing the sought graph frame should only be
-   * done through this method, since it also registers this SoughtGraphPlugin as
-   * a SeekListener. I haven't used a ComponentListener to automatically 
-   * register the listener because it seems to be broken in JDK 1.1
-   */
-
-  protected void showSoughtGraphFrame(boolean bringToFront){
-    if (soughtGraphFrame.getParent() != null)
-      return;
-
-    try{ 
-      getPluginContext().getMainFrame().getDesktop().add(soughtGraphFrame);
-      soughtGraphFrame.setVisible(true);
-
-      if (bringToFront)
-        soughtGraphFrame.toFront();
-      else
-        soughtGraphFrame.toBack();
-
-      // The documentation of JInternalFrame says not to do this,
-      // but this seems to be the only way to get the isClosed flag of a JInternalFrame
-      // set to false.
-      soughtGraphFrame.setClosed(false);
-
-      soughtGraphFrame.setSelected(bringToFront);
-    } catch (PropertyVetoException e){}
-
+  public void pluginUIShown(PluginUIEvent evt){
     // It may be null if the graph is shown before it's created.
     if ((visibleRB != null) && (!visibleRB.isSelected())) 
       visibleRB.setSelected(true);
-    SeekJinConnection conn = (SeekJinConnection)getConnection();
-    conn.getSeekJinListenerManager().addSeekListener(SoughtGraphPlugin.this);
+
+    SeekConnection conn = (SeekConnection)getConn();
+    conn.getSeekListenerManager().addSeekListener(this);
   }
 
 
 
   /**
-   * This is used to avoid recursion when closing the frame.
-   * The recursion results from the VetoableChangeListener being invoked when
-   * the frame is being closed which in turn invokes hideSoughtGraphFrame.
+   * Gets called when the seek graph container is made invisible.
    */
 
-  private boolean closingFrame = false;
-
-
-
-
-  /**
-   * Hides the sought graph frame. Hiding the sought graph frame should only be
-   * done through this method, since it also unregisters this SoughtGraphPlugin
-   * as a SeekListener. I haven't used a ComponentListener to automatically 
-   * unregister the listener because it seems to be broken in JDK 1.1
-   */
-
-  protected void hideSoughtGraphFrame(){
-    if (soughtGraphFrame.getParent() == null)
-      return;
-
-    try{ 
-      closingFrame = true;
-      soughtGraphFrame.setClosed(true);
-    } catch (PropertyVetoException e){}
-      finally{
-        closingFrame = false;
-      }
-
+  public void pluginUIHidden(PluginUIEvent evt){
     soughtGraph.removeAllSeeks();
 
     // It may be null if the graph is shown before it's created.
     if ((visibleRB != null) && (visibleRB.isSelected())) 
       nonVisibleRB.setSelected(true);
-    SeekJinConnection conn = (SeekJinConnection)getConnection();
-    conn.getSeekJinListenerManager().removeSeekListener(SoughtGraphPlugin.this);
+
+    SeekConnection conn = (SeekConnection)getConn();
+    conn.getSeekListenerManager().removeSeekListener(this);
   }
 
+
+
+  public void pluginUIClosing(PluginUIEvent evt){}
+  public void pluginUIActivated(PluginUIEvent evt){}
+  public void pluginUIDeactivated(PluginUIEvent evt){}
 
 
 
@@ -349,23 +203,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void saveState(){
-    Rectangle soughtGraphFrameBounds = soughtGraphFrame.getBounds();
-    // If something bad happened, let's not save that state.
-    if ((soughtGraphFrameBounds.width > 10) && (soughtGraphFrameBounds.height > 10))
-      setProperty("frame-bounds",StringEncoder.encodeRectangle(soughtGraphFrameBounds));
-
-    boolean isMaximized = soughtGraphFrame.isMaximum();
-    setProperty("maximized", String.valueOf(isMaximized));
-
-    boolean isIconified = soughtGraphFrame.isIcon();
-    setProperty("iconified", String.valueOf(isIconified));
-
-    boolean isVisible = (soughtGraphFrame.getParent() != null) ||
-                        (soughtGraphFrame.getDesktopIcon().getParent() != null);
-    setProperty("visible", String.valueOf(isVisible));
-
-    boolean isSelected = soughtGraphFrame.isSelected();
-    setProperty("selected", String.valueOf(isSelected));
+    boolean isVisible = soughtGraphContainer.isVisible();
+    getPrefs().setBool("isVisible", isVisible);
   }
 
 
@@ -387,10 +226,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void unregisterListeners(){
-    SeekJinConnection conn = (SeekJinConnection)getConnection();
+    SeekConnection conn = (SeekConnection)getConn();
 
     soughtGraph.removeSeekSelectionListener(this);
-    conn.getSeekJinListenerManager().removeSeekListener(this); // Just in case.
+    conn.getSeekListenerManager().removeSeekListener(this); // Just in case.
   }
 
 
@@ -403,7 +242,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public JMenu createPluginMenu(){
     JMenu myMenu = new JMenu(getName());
 
-    visibleRB = new JRadioButtonMenuItem("Graph Shown", new Boolean(getProperty("visible", "true")).booleanValue());
+    visibleRB = new JRadioButtonMenuItem("Graph Shown", getPrefs().getBool("isVisible", true));
     nonVisibleRB = new JRadioButtonMenuItem("Graph Hidden", !visibleRB.isSelected());
 
     visibleRB.setMnemonic('s');
@@ -413,19 +252,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     visibilityGroup.add(visibleRB);
     visibilityGroup.add(nonVisibleRB);
 
-    visibleRB.setActionCommand("visible");
-    nonVisibleRB.setActionCommand("hidden");
+    visibleRB.setActionCommand("show");
+    nonVisibleRB.setActionCommand("hide");
 
     ActionListener visibilityListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String actionCommand = evt.getActionCommand();
-
-        if ("visible".equals(actionCommand))
-          showSoughtGraphFrame(true);
-        else if ("hidden".equals(actionCommand))
-          hideSoughtGraphFrame();
-        else
-          throw new IllegalStateException("Unknown action command: "+actionCommand);
+        boolean isVisible = "show".equals(actionCommand);
+        soughtGraphContainer.setVisible(isVisible);
+        getPrefs().setBool("isVisible", isVisible);
       }
     };
 
@@ -465,11 +300,33 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   /**
    * SeekSelectionListener implementation. Gets called when the user selects a
-   * Seek. This method asks the SeekJinConnection to accept the selected seek.
+   * Seek. This method asks the SeekConnection to accept the selected seek.
    */
 
   public void seekSelected(SeekSelectionEvent evt){
-    ((SeekJinConnection)getConnection()).acceptSeek(evt.getSeek());
+    ((SeekConnection)getConn()).acceptSeek(evt.getSeek());
   }
+
+
+
+  /**
+   * Returns the string <code>"seek"</code>.
+   */
+
+  public String getId(){
+    return "seek";
+  }
+
+
+
+  /**
+   * Returns the name of this plugin.
+   */
+
+  public String getName(){
+    return "Seek Graph";
+  }
+
+  
 
 }
