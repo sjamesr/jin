@@ -723,8 +723,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       }
     }
 
+    if (column == 2) // There's an extra, empty cell, which we need to clear.
+      model.setValueAt(null, row, column);
 
-    if (displayedMoveNumber==0)
+
+    if (displayedMoveNumber == 0)
       moveListTable.clearSelection();
     else{
       int visualMoveNumber = isFirstMoveBlack ? displayedMoveNumber + 1 : displayedMoveNumber;
