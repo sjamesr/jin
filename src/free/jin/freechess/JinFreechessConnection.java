@@ -39,7 +39,7 @@ import free.util.EventListenerList;
  * server.
  */
 
-public class JinFreechessConnection extends FreechessConnection implements JinConnection{
+public class JinFreechessConnection extends FreechessConnection implements JinConnection, SeekJinConnection{
 
 
 
@@ -427,7 +427,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       // We have no choice but to fake the data, since the server simply doesn't send us this information.
       GameInfoStruct fakeGameInfo = new GameInfoStruct(boardData.getGameNumber(), false, "fake-variant", false, false, false,
         boardData.getInitialTime(), boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement(), 0,
-        -1, -1, false, false);
+        -1, ' ', -1, ' ', false, false);
 
       game = startGame(fakeGameInfo, boardData);
     }
@@ -734,6 +734,201 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     game.setInitialPosition(newPos);
 
     listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
+  }
+
+
+
+
+
+  /**
+   * Maps seek IDs to Seek objects currently in the sought list.
+   */
+
+  private final Hashtable seeks = new Hashtable();
+
+
+
+
+  /**
+   * Returns the SeekJinListenerManager via which you can register and
+   * unregister SeekListeners.
+   */
+
+  public SeekJinListenerManager getSeekJinListenerManager(){
+    return getFreechessJinListenerManager();
+  }
+
+
+
+
+  /**
+   * Creates an appropriate Seek object and fires a SeekEvent.
+   */
+
+  protected boolean processSeekAdded(SeekInfoStruct seekInfo){
+    WildVariant variant = getVariant(seekInfo.getMatchType());
+    if (variant != null){
+      String seekID = String.valueOf(seekInfo.getSeekIndex());
+      StringBuffer titlesBuf = new StringBuffer();
+      int titles = seekInfo.getSeekerTitles();
+
+      if ((titles & SeekInfoStruct.COMPUTER) != 0)
+        titlesBuf.append("(C)");
+      if ((titles & SeekInfoStruct.GM) != 0)
+        titlesBuf.append("(GM)");
+      if ((titles & SeekInfoStruct.IM) != 0)
+        titlesBuf.append("(IM)");
+      if ((titles & SeekInfoStruct.FM) != 0)
+        titlesBuf.append("(FM)");
+      if ((titles & SeekInfoStruct.WGM) != 0)
+        titlesBuf.append("(WGM)");
+      if ((titles & SeekInfoStruct.WIM) != 0)
+        titlesBuf.append("(WIM)");
+      if ((titles & SeekInfoStruct.WFM) != 0)
+        titlesBuf.append("(WFM)");
+
+      boolean isProvisional = (seekInfo.getSeekerProvShow() == 'P');
+
+      boolean isSeekerRated = (seekInfo.getSeekerProvShow() != 'E');
+
+      boolean isRegistered = ((seekInfo.getSeekerTitles() & SeekInfoStruct.UNREGISTERED) == 0);
+
+      boolean isComputer = ((seekInfo.getSeekerTitles() & SeekInfoStruct.COMPUTER) != 0);
+
+      Player color;
+      switch (seekInfo.getSeekerColor()){
+        case 'W':
+          color = Player.WHITE_PLAYER;
+          break;
+        case 'B':
+          color = Player.BLACK_PLAYER;
+          break;
+        case '?':
+          color = null;
+          break;
+        default:
+          throw new IllegalStateException("Bad desired color char: "+seekInfo.getSeekerColor());
+      }
+
+      boolean isRatingLimited = ((seekInfo.getOpponentMinRating() > 0) || (seekInfo.getOpponentMaxRating() < 9999));
+
+      Seek seek = new Seek(seekID, seekInfo.getSeekerHandle(), titlesBuf.toString(), seekInfo.getSeekerRating(),
+        isProvisional, isRegistered, isSeekerRated, isComputer, variant, seekInfo.getMatchType(),
+        seekInfo.getMatchTime()*60*1000, seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
+        isRatingLimited, seekInfo.getOpponentMinRating(), seekInfo.getOpponentMaxRating(),
+        !seekInfo.isAutomaticAccept(), seekInfo.isFormulaUsed());
+
+      Integer seekIndex = new Integer(seekInfo.getSeekIndex());
+
+      Seek oldSeek = (Seek)seeks.get(seekIndex);
+      if (oldSeek != null)
+        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, oldSeek));
+
+      seeks.put(seekIndex, seek);
+      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
+    }
+    
+    return false;
+  }
+
+
+
+
+  /**
+   * Issues the appropriate SeekEvents and removes the seeks.
+   */
+
+  protected boolean processSeeksRemoved(int [] removedSeeks){
+    for (int i = 0; i < removedSeeks.length; i++){
+      Integer seekIndex = new Integer(removedSeeks[i]);
+      Seek seek = (Seek)seeks.get(seekIndex);
+      if (seek == null) // Shouldn't happen
+        continue;
+
+      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+
+      seeks.remove(seekIndex);
+    }
+    
+    return false;
+  }
+
+
+
+
+  /**
+   * Issues the appropriate SeeksEvents and removes the seeks.
+   */
+
+  protected boolean processSeeksCleared(){
+    int seeksCount = seeks.size();
+    if (seeksCount != 0){
+      Object [] seeksIndices = new Object[seeksCount];
+
+      // Copy all the keys into a temporary array
+      Enumeration seekIDsEnum = seeks.keys();
+      for (int i = 0; i < seeksCount; i++)
+        seeksIndices[i] = seekIDsEnum.nextElement();
+
+      // Remove all the seeks one by one, notifying any interested listeners.
+      for (int i = 0; i < seeksCount; i++){
+        Object seekIndex = seeksIndices[i];
+        Seek seek = (Seek)seeks.get(seekIndex);
+        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+        seeks.remove(seekIndex);
+      }
+    }
+    
+    return false;
+  }
+
+
+
+
+  /**
+   * This method is called by our FreechessJinListenerManager when a new
+   * SeekListener is added and we already had registered listeners (meaning that
+   * iv_seekinfo was already on, so we need to notify the new listeners of all
+   * existing seeks as well).
+   */
+
+  void notFirstListenerAdded(SeekListener listener){
+    Enumeration seeksEnum = seeks.elements();
+    while (seeksEnum.hasMoreElements()){
+      Seek seek = (Seek)seeksEnum.nextElement();
+      SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
+      listener.seekAdded(evt);
+    }
+  }
+
+
+
+
+  /**
+   * This method is called by our ChessclubJinListenerManager when the last
+   * SeekListener is removed.
+   */
+
+  void lastSeekListenerRemoved(){
+    seeks.clear();
+  }
+
+
+
+
+  /**
+   * Accepts the given seek. Note that the given seek must be an instance generated
+   * by this SeekJinConnection and it must be in the current sought list.
+   */
+
+  public void acceptSeek(Seek seek){
+    if (!seeks.containsKey(seek.getID()))
+      throw new IllegalArgumentException("The id of the specified seek is not on the seek list");
+
+    if (seeks.get(seek.getID()) != seek)
+      throw new IllegalArgumentException("The seek mapped to the id of the specified seek does not match the specified seek");
+
+    sendCommand("play "+seek.getID());
   }
 
 
