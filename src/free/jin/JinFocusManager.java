@@ -62,8 +62,10 @@ public class JinFocusManager extends DefaultFocusManager{
    */
 
   public void processKeyEvent(Component focusedComponent, KeyEvent evt){
-    if (SwingUtilities.windowForComponent(evt.getComponent()) != jinFrame)
+    if (SwingUtilities.windowForComponent(evt.getComponent()) != jinFrame){
+      super.processKeyEvent(focusedComponent, evt);
       return;
+    }
 
     int keyCode = evt.getKeyCode();
     if (((keyCode == KeyEvent.VK_TAB) && evt.isControlDown()) ||
