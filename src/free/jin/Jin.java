@@ -344,51 +344,52 @@ public class Jin{
    * Saves the given User. If this is yet an unknown User and the user doesn't
    * abort the save, it is added to the list of known users.
    *
-   * @returns True if everything went ok, false if the user canceled the save
-   * or some I/O error occurred while saving the user.
+   * @throws IOException if an I/O error occurs while saving the user's
+   * settings.
    */
 
   public static boolean save(User user){
+    File userFile;
+    String filename = user.getFilename();
+    if (filename==null){
+      String username = user.getProperty("login.username");
+      String serverShortName = user.getServer().getProperty("name.short");
+      userFile = new File(usersDir, username+"."+serverShortName);
+    }
+    else
+      userFile = new File(usersDir, filename);
+
+    /* I don't think you really need to ask the user where he wants his settings file. */
+//    if ((filename==null)||!userFile.exists()){
+//      JFileChooser chooser = new JFileChooser(usersDir);
+//      chooser.setSelectedFile(userFile);
+//      chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(user.getServer()));
+//      chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
+//
+//      int result = chooser.showSaveDialog(mainFrame);
+//      if (result==JFileChooser.CANCEL_OPTION)
+//        return false;
+//      userFile = chooser.getSelectedFile();
+//
+//      // TODO: Add checking whether the file already exists if JFileChooser doesn't
+//      // do it automatically.
+//      }
+
     try{
-      File userFile;
-      String filename = user.getFilename();
-      if (filename==null){
-        String username = user.getProperty("login.username");
-        String serverShortName = user.getServer().getProperty("name.short");
-        userFile = new File(usersDir, username+"."+serverShortName);
-      }
-      else
-        userFile = new File(usersDir, filename);
-      if ((filename==null)||!userFile.exists()){
-        JFileChooser chooser = new JFileChooser(usersDir);
-        chooser.setSelectedFile(userFile);
-        chooser.addChoosableFileFilter(new ServerSpecificUserFileFilter(user.getServer()));
-        chooser.removeChoosableFileFilter(chooser.getAcceptAllFileFilter());
-
-        int result = chooser.showSaveDialog(mainFrame);
-        if (result==JFileChooser.CANCEL_OPTION)
-          return false;
-        userFile = chooser.getSelectedFile();
-
-        // TODO: Add checking whether the file already exists if JFileChooser doesn't
-        // do it automatically.
-      }
-
       user.save(userFile);
-
-      if (!users.contains(user))
-        users.addElement(user);
-      else{                         
-        users.removeElement(user);  // Replace, this may look like stupid code, but remember Users 
-        users.addElement(user);     // can be equal but different (User overrides equals(Object)).
-      }
-
-      return true;
     } catch (IOException e){
-        System.err.println("Unable to save the user information due to:");
-        e.printStackTrace();
+        JOptionPane.showMessageDialog(mainFrame, "Unable to save your user file, your home directory or user file aren't writeable", "Error", JOptionPane.ERROR_MESSAGE);
         return false;
       }
+
+    if (!users.contains(user))
+      users.addElement(user);
+    else{                         
+      users.removeElement(user);  // Replace, this may look like stupid code, but remember Users 
+      users.addElement(user);     // can be equal but different (User overrides equals(Object)).
+    }
+
+    return true;
   }
 
 
