@@ -101,6 +101,8 @@ public class FreechessConsoleManager extends ConsoleManager{
       return ":"+sender+title+" t-shouts: "+message;
     else if (type.equals("cshout"))
       return sender+title+" c-shouts: "+message;
+    else if (type.equals("announcement"))
+      return "    **ANNOUNCEMENT** from "+sender+": "+message; 
 
     return evt.toString();
   }
