@@ -955,8 +955,12 @@ public class JBoard extends JComponent{
 
       }
       else{
-        movedPieceLoc.x = x;
-        movedPieceLoc.y = y;
+        // We don't need to modify the location of the piece on a non motion mouse event, do we?
+        // I commented it out because it causes a bug if you drop a piece while quickly moving the mouse.
+        // The location of the piece is updated without the old position being repainted, which creates
+        // garbage on the screen.
+//        movedPieceLoc.x = x; 
+//        movedPieceLoc.y = y;
 
         if (!square.equals(movedPieceSquare)){
           WildVariant variant = position.getVariant();
