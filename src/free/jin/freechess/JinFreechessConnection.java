@@ -724,7 +724,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
     Move move = variant.createMove(position, fromSquare, toSquare, promotionPiece, moveSAN);
 
-    listenerManager.fireGameEvent(new MoveMadeEvent(this, game, move));
+    listenerManager.fireGameEvent(new MoveMadeEvent(this, game, move, false)); 
+      // (isNew == false) because FICS never sends the entire move history
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if ((unechoedGameMoves != null) && (unechoedGameMoves.size() != 0)){ // Looks like it's our move.

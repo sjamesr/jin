@@ -866,7 +866,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       position.makeMove(move);
       newGameInfo.moves.addElement(move);
 
-      fireGameEvent(new MoveMadeEvent(this, newGame, move));
+      fireGameEvent(new MoveMadeEvent(this, newGame, move, false));
     }
 
     newGameInfo.isFlipped = gameInfo.isFlipped;
@@ -1000,7 +1000,7 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
       position.makeMove(move);
       gameInfo.moves.addElement(move);
 
-      fireGameEvent(new MoveMadeEvent(this, game, move));
+      fireGameEvent(new MoveMadeEvent(this, game, move, gameInfo.numMovesToFollow == 0));
 
       if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
