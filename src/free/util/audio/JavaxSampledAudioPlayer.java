@@ -24,7 +24,7 @@ package free.util.audio;
 import javax.sound.sampled.*;
 import java.util.Hashtable;
 import java.net.URL;
-import java.util.Vector;
+import free.util.BlockingQueue;
 
 
 /**
@@ -32,15 +32,14 @@ import java.util.Vector;
  * to play sounds. This API is only available since JDK1.3.
  */
 
-public class JavaxSampledAudioPlayer implements AudioPlayer, LineListener{
-
+public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
 
   /**
-   * The maximum Clips we're willing to queue.
+   * The current thread playing the sound.
    */
 
-  private static final int MAX_QUEUE_SIZE = 2;
+  private Thread playerThread = null;
 
 
 
@@ -54,19 +53,10 @@ public class JavaxSampledAudioPlayer implements AudioPlayer, LineListener{
 
 
   /**
-   * A Vector of queued Clips.
+   * A BlockingQueue of queued AudioClips.
    */
 
-  private final Vector clipQueue = new Vector(MAX_QUEUE_SIZE);
-
-
-
-  /**
-   * The currently playing clip.
-   */
-
-  private Clip playingClip = null;
-
+  private final BlockingQueue clipQueue = new BlockingQueue();
 
 
 
@@ -86,25 +76,51 @@ public class JavaxSampledAudioPlayer implements AudioPlayer, LineListener{
    * Plays the given AudioClip.
    */
 
-  public void play(AudioClip clip) throws java.io.IOException{
-    Clip newClip = (Clip)clips.get(clip);
-    if (newClip == null){
-      try{
-        newClip = createClip(clip.getData());
-      } catch (LineUnavailableException e){
-          return; // Will try again later.
-        }
-        catch (UnsupportedAudioFileException e){
-          throw new RuntimeException("Unable to load clip due to: "+e.getMessage());
-        }
-      clips.put(clip, newClip);
+  public synchronized void play(AudioClip clip) throws java.io.IOException{
+    // Lazily initialize player thread.
+    if (playerThread == null){
+      playerThread = new Thread(this, "JavaxSampledAudioPlayer");
+      playerThread.setDaemon(true);
+      playerThread.start();
     }
 
-    synchronized(this){
-      if (playingClip == null) // Nothing is playing.
+    clipQueue.push(clip);
+  }
+
+
+
+  /**
+   * <code>Runnable</code> implementation. Plays the queued clips.
+   */
+
+  public void run(){
+    while (true){
+      AudioClip clip;
+      try{
+        clip = (AudioClip)clipQueue.pop();
+      } catch (InterruptedException e){
+          e.printStackTrace();
+          return;
+        }
+
+      Clip newClip = (Clip)clips.get(clip);
+      if (newClip == null){
+        try{
+          newClip = createClip(clip.getData());
+        } catch (LineUnavailableException e){
+            e.printStackTrace();
+            // Ignore, will try again later.
+          }
+          catch (UnsupportedAudioFileException e){
+            e.printStackTrace();
+            // Ignore, nothing we can do about it...
+          }
+
+        clips.put(clip, newClip);
+      }
+
+      if (newClip != null)
         startPlaying(newClip);
-      else
-        clipQueue.addElement(newClip);
     }
   }
 
@@ -116,33 +132,10 @@ public class JavaxSampledAudioPlayer implements AudioPlayer, LineListener{
    */
 
   private void startPlaying(Clip clip){
-    playingClip = clip;
-    playingClip.addLineListener(this);
-    playingClip.setFramePosition(0);
-    playingClip.start();
+    clip.setFramePosition(0);
+    clip.start();
   }
 
-
-
-
-  /**
-   * LineListener implementation. Starts any queued clips.
-   */
-
-  public void update(LineEvent evt){
-    if (evt.getType() == LineEvent.Type.STOP){
-      synchronized(this){
-        playingClip.removeLineListener(this);
-        if (!clipQueue.isEmpty()){
-          Clip clip = (Clip)clipQueue.firstElement();
-          clipQueue.removeElementAt(0);
-          startPlaying(clip);
-        }
-        else
-          playingClip = null;
-      }
-    }
-  }
 
 
 
@@ -150,31 +143,36 @@ public class JavaxSampledAudioPlayer implements AudioPlayer, LineListener{
    * Creates and loads a Clip from the given audio data.
    */
 
-  private static Clip createClip(byte [] data) throws java.io.IOException, LineUnavailableException, UnsupportedAudioFileException{
-    AudioInputStream stream = AudioSystem.getAudioInputStream(new java.io.ByteArrayInputStream(data));
+  private static Clip createClip(byte [] data) throws LineUnavailableException, UnsupportedAudioFileException{
+    try{
+      AudioInputStream stream = AudioSystem.getAudioInputStream(new java.io.ByteArrayInputStream(data));
 
-    // At present, ALAW and ULAW encodings must be converted
-    // to PCM_SIGNED before it can be played
-    AudioFormat format = stream.getFormat();
-    if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
-      format = new AudioFormat(
-              AudioFormat.Encoding.PCM_SIGNED,
-              format.getSampleRate(),
-              format.getSampleSizeInBits()*2,
-              format.getChannels(),
-              format.getFrameSize()*2,
-              format.getFrameRate(),
-              true);        // big endian
-      stream = AudioSystem.getAudioInputStream(format, stream);
-    }
+      // At present, ALAW and ULAW encodings must be converted
+      // to PCM_SIGNED before it can be played
+      AudioFormat format = stream.getFormat();
+      if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
+        format = new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED,
+                format.getSampleRate(),
+                format.getSampleSizeInBits()*2,
+                format.getChannels(),
+                format.getFrameSize()*2,
+                format.getFrameRate(),
+                true);        // big endian
+        stream = AudioSystem.getAudioInputStream(format, stream);
+      }
 
-    // Create the clip
-    DataLine.Info info = new DataLine.Info(Clip.class, stream.getFormat(), ((int)stream.getFrameLength()*format.getFrameSize()));
-    Clip clip = (Clip) AudioSystem.getLine(info);
+      // Create the clip
+      DataLine.Info info = new DataLine.Info(Clip.class, stream.getFormat(), ((int)stream.getFrameLength()*format.getFrameSize()));
+      Clip clip = (Clip)AudioSystem.getLine(info);
 
-    clip.open(stream);
+      if (!clip.isOpen())
+        clip.open(stream);
 
-    return clip;
+      return clip;
+    } catch (java.io.IOException e){
+        throw new InternalError("java.io.IOException thrown when reading from ByteArrayInputStream");
+      }
   }
 
 
