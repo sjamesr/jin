@@ -361,7 +361,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     boolean isIconified = soughtGraphFrame.isIcon();
     setProperty("iconified", String.valueOf(isIconified));
 
-    boolean isVisible = (soughtGraphFrame.getParent() != null);
+    boolean isVisible = (soughtGraphFrame.getParent() != null) ||
+                        (soughtGraphFrame.getDesktopIcon().getParent() != null);
     setProperty("visible", String.valueOf(isVisible));
 
     boolean isSelected = soughtGraphFrame.isSelected();
