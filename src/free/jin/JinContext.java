@@ -59,11 +59,11 @@ public interface JinContext{
   
   
   /**
-   * Performs any required cleanup/saving and shuts the application down. This
-   * method will usually not return.
+   * Quits the application, possible asking the user to confirm quitting first.
+   * This method doesn't necessarily return.
    */
 
-  void shutdown();
+  void quit(boolean askToConfirm);
 
 
 
