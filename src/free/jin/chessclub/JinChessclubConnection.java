@@ -1002,7 +1002,6 @@ public class JinChessclubConnection extends ChessclubConnection implements JinCo
 
       boolean isNewMove = (moveInfo.variationCode != MoveStruct.MOVE_INITIAL) &&
                           (moveInfo.variationCode != MoveStruct.MOVE_FORWARD);
-      System.out.println(moveInfo.variationCode);
 
       fireGameEvent(new MoveMadeEvent(this, game, move, isNewMove));
 
