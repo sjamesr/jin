@@ -138,6 +138,20 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
+   * Sets the premove ivar to the specified state.
+   */
+
+  public synchronized void setPremove(boolean val){
+    if (isLoggedIn()){
+      sendCommand("iset premove " + (val ? "1" : "0"));
+      filterLine("premove " + (val ? "" : "un") + "set.");
+    }
+  }
+
+
+
+
+  /**
    * Performs various on-login tasks. Also notifies all interested
    * ConnectionListeners that we've successfully logged in.
    */
@@ -146,12 +160,10 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     sendCommand("set bell 0");
     sendCommand("iset gameinfo 1");
     sendCommand("iset showownseek 1");
-    sendCommand("iset premove 1");
 
     filterLine("Bell off.");
     filterLine("gameinfo set.");
     filterLine("showownseek set.");
-    filterLine("premove set.");
 
     super.onLogin();
 
@@ -654,7 +666,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Invokes <code>illegalMoveAttempted</code>.
    */
 
-  protected boolean processIllegalMove(String moveString){
+  protected boolean processIllegalMove(String moveString, String reason){
     illegalMoveAttempted(moveString);
 
     return false;
@@ -917,7 +929,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   private void illegalMoveAttempted(String moveString){
-    Integer gameNumber = null; // We must find the played game, since the server doesn't provide its game number.
+    Integer gameNumber = null; // We must find the played game, since the
+                               // server doesn't provide its game number.
     InternalGameData gameData = null; 
     
     Enumeration gameNumbers = ongoingGamesData.keys();
@@ -942,8 +955,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) 
       return;
 
+
     Move move = (Move)unechoedGameMoves.elementAt(0);
-    if (moveToString(game, move).equals(moveString)){ // Our move
+
+    // We have no choice but to allow (moveString == null) because the server
+    // doesn't always send us the move string (for example if it's not our turn).
+    if ((moveString == null) || moveToString(game, move).equals(moveString)){ // Our move, probably
       unechoedGameMoves.removeAllElements();
       listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
     }
