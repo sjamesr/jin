@@ -36,14 +36,6 @@ public class Session{
 
 
   /**
-   * The context.
-   */
-
-  private final JinContext context;
-
-
-
-  /**
    * The <code>User</code> object representing the account we're logging in for.
    */
 
@@ -109,10 +101,8 @@ public class Session{
    * plugins fails.
    */
 
-  public Session(JinContext context, User user, ConnectionDetails connDetails)
+  public Session(User user, ConnectionDetails connDetails)
       throws PluginStartException{
-    if (context == null)
-      throw new IllegalArgumentException("context may not be null");
     if (user == null)
       throw new IllegalArgumentException("user may not be null");
     if (connDetails == null)
@@ -120,11 +110,10 @@ public class Session{
    
     Server server = user.getServer();
 
-    this.context = context;
     this.user = user;
     this.connDetails = connDetails; 
     this.conn =
-      server.createConnection(context, connDetails.getUsername(), connDetails.getPassword());
+      server.createConnection(connDetails.getUsername(), connDetails.getPassword());
 
     this.actions = createActions();
     this.plugins = createPlugins();
@@ -138,7 +127,7 @@ public class Session{
    */
    
   private JinAction [] createActions() throws PluginStartException{
-    ActionInfo [] actionsInfo = context.getActions(getServer());
+    ActionInfo [] actionsInfo = Jin.getInstance().getActions(getServer());
     Vector actions = new Vector(actionsInfo.length);
     
     for (int i = 0; i < actionsInfo.length; i++){
@@ -158,7 +147,7 @@ public class Session{
           throw new PluginStartException(e, "Unable to instantiate " + actionClass);
         }
       
-      ActionContext actionContext = new ActionContext(context, conn, user, prefs);
+      ActionContext actionContext = new ActionContext(conn, user, prefs);
       
       if (action.setContext(actionContext))
         actions.addElement(action);
@@ -178,7 +167,7 @@ public class Session{
    */
 
   private Plugin [] createPlugins() throws PluginStartException{
-    PluginInfo [] pluginsInfo = context.getPlugins(getServer());
+    PluginInfo [] pluginsInfo = Jin.getInstance().getPlugins(getServer());
     Plugin [] plugins = new Plugin[pluginsInfo.length];
 
     Preferences [] pluginPrefs = new Preferences[pluginsInfo.length];
@@ -199,7 +188,7 @@ public class Session{
     }
 
     // Create plugin context
-    PluginContext pluginContext = new PluginContext(context, conn, user, plugins, pluginPrefs, actions);
+    PluginContext pluginContext = new PluginContext(conn, user, plugins, pluginPrefs, actions);
 
     // Set context on plugins
     for (int i = 0; i < plugins.length; i++)
