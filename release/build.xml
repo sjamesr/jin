@@ -39,12 +39,8 @@
 		<property name="win.setup.maker" value="makensis.exe" />
 		<property name="cf.host" value="cf-shell.sourceforge.net" />
 
-		<!-- Ask for Jin version and update app.props -->
+		<!-- Ask for Jin version -->
 		<input message="Please specify the release version:" addproperty="release.version" />
-		<echo message="Changing version in app.props to ${release.version}" /> 
-		<propertyfile file="${source.dir}/free/jin/resources/app.props">
-			<entry key="app.version" value="${release.version}" />
-		</propertyfile>
 		
 		<property name="release.dir" value="jin-${release.version}" />
     
@@ -58,6 +54,8 @@
 		<echo message="Building Jin for ${release.platform}" />
 		<ant target="build" dir="${jin.dir}">
 			<property name="release.platform" value="${release.platform}" />
+			<property name="release.name" value="${release.name}" />
+			<property name="release.version" value="${release.version}" />
 		</ant>
 	</target>
 	
@@ -74,6 +72,7 @@
 		<mkdir dir="${release.unix.dir}" />
 		
 		<antcall target="build">
+			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="unix" />
 		</antcall>
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/jin-${release.version}" />
@@ -107,6 +106,7 @@
 		<mkdir dir="${release.win.dir}" />
     
 		<antcall target="build">
+			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="windows" />
 		</antcall>
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
@@ -143,6 +143,7 @@
 		<mkdir dir="${release.osx.dir}" />
 		
 		<antcall target="build">
+			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="macosx" />
 		</antcall>
 		<property name="app-dir.name" value="Jin-${release.version}.app" />
@@ -212,21 +213,13 @@
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.applet.dir}" />
 
- 		<propertyfile file="${source.dir}/free/jin/resources/app.props">
-			<entry key="app.name" value="JinApplet" />
-			<entry key="lf.extra.count" value="0" />
-		</propertyfile>
-		
 		<antcall target="build">
+			<param name="release.name" value="Jin Applet" />
 			<param name="release.platform" value="applet" />
 			<param name="build.compress" value="yes" />
 			<param name="build.manifest" value="release/applet/manifest.txt" />
 		</antcall>
 
- 		<propertyfile file="${source.dir}/free/jin/resources/app.props">
-			<entry key="app.name" value="Jin" />
-		</propertyfile>
-    
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="icc" />
 			<param name="server.file" value="chessclub.jar" />
@@ -311,6 +304,11 @@
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="src" includes="COMPILING" />
 		</copy>
+		
+ 		<propertyfile file="${src-archive-dir}/src/free/jin/resources/app.props">
+			<entry key="app.version" value="${release.version}" />
+		</propertyfile>
+		
 		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-src.tar" />
 		<property name="src-gz" value="${src-tar}.gz" />
 		<tar destfile="${src-tar}">
