@@ -799,11 +799,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
+   * True when we need to re-add all the components.
+   */
+
+  private boolean reAddComponents = true;
+
+
+
+
+  /**
    * Are we currently in vertical layout (width < height)? null for when we
    * don't know yet.
    */
 
-  private Boolean isVerticalLayout = null;
+  private boolean isVerticalLayout;
 
 
 
@@ -848,7 +857,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     Dimension size = getSize();
 
-    if (isVerticalLayout.booleanValue()){
+    if (isVerticalLayout){
       topInfoBox = new JPanel();
       topInfoBox.setBorder(new EmptyBorder(5,5,5,5));
       topInfoBox.setLayout(new BoxLayout(topInfoBox, BoxLayout.X_AXIS));
@@ -984,11 +993,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Sets isVerticalLayout to null.
+   * Sets reAddComponents to true.
    */
 
   public void addNotify(){
-    isVerticalLayout = null;
+    reAddComponents = true;
 
     super.addNotify();
   }
@@ -1003,13 +1012,14 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Dimension size = getSize();
 
     boolean newIsVerticalLayout = size.width < size.height;
-    if ((isVerticalLayout == null) || (isVerticalLayout.booleanValue() != newIsVerticalLayout)){
+    if (reAddComponents || (isVerticalLayout != newIsVerticalLayout)){
       removeAll();
-      isVerticalLayout = newIsVerticalLayout ? Boolean.TRUE : Boolean.FALSE;
+      reAddComponents = false;
+      isVerticalLayout = newIsVerticalLayout;
       addComponents(game, isFlipped());
     }
 
-    if (isVerticalLayout.booleanValue()){
+    if (isVerticalLayout){
       int infoBoxHeight = (size.height - size.width) / 2;
       topInfoBox.setBounds(0, 0, size.width, infoBoxHeight);
       board.setBounds(0, infoBoxHeight, size.width, size.width);
@@ -1046,6 +1056,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (isFlipped()!=b){
       isFlipped = b;
       board.setFlipped(isFlipped);
+      reAddComponents = true;
       revalidate();
     }
   }
