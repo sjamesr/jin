@@ -23,6 +23,7 @@ package free.freechess;
 
 import java.io.*;
 import jregex.*;
+import free.chess.Player;
 import java.util.StringTokenizer;
 
 
@@ -155,6 +156,21 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
 
+  /**
+   * Returns a Player object corresponding to the specified string. If the
+   * string is "W", returns <code>Player.WHITE</code>. If it's "B", returns
+   * <code>Player.BLACK</code>. Otherwise, throws an IllegalArgumentException.
+   */
+
+  public static Player playerForString(String s){
+    if (s.equals("B"))
+      return Player.BLACK_PLAYER;
+    else if (s.equals("W"))
+      return Player.WHITE_PLAYER;
+    else
+      throw new IllegalArgumentException("Bad player string: "+s);
+  }
+
 
 
   /**
@@ -189,7 +205,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     sendCommand("set style "+style);
     sendCommand("set interface "+interfaceVar);
     sendCommand("iset nowrap 1");
-    sendCommand("iset lock 1");
+    sendCommand("iset ms 1");
+//    sendCommand("iset lock 1");
   }
 
 
@@ -273,6 +290,16 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     if (handleGameInfo(line))
       return;
     if (handleStyle12(line))
+      return;
+    if (handleDeltaBoard(line))
+      return;
+    if (handleGameEnd(line))
+      return;
+    if (handleStoppedObserving(line))
+      return;
+    if (handleStoppedExamining(line))
+      return;
+    if (handleIllegalMove(line))
       return;
     if (handleChannelTell(line))
       return;
@@ -856,7 +883,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a gameinfo line arrives. 
+   * This method is called when a gameinfo line arrives. To turn gameinfo lines
+   * on, use <code>sendCommand("iset gameinfo 1")</code>
    */
 
   protected boolean processGameInfo(GameInfoStruct data){return false;}
@@ -896,10 +924,227 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * This method is called when a style12 line arrives. 
+   * This method is called when a style12 line arrives. To turn on style 12,
+   * use <code>setStyle(12)</code>.
    */
 
   protected boolean processStyle12(Style12Struct data){return false;}
+
+
+
+
+  /**
+   * The regular expression matching delta board lines.
+   */
+
+  private static final Pattern deltaBoardPattern = new Pattern("^<d1> .*");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a delta board line
+   * and to further process it if it is.
+   */
+
+  private boolean handleDeltaBoard(String line){
+    Matcher matcher = deltaBoardPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    DeltaBoardStruct data = DeltaBoardStruct.parseDeltaBoardLine(line);
+
+    if (!processDeltaBoard(data))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a delta board line arrives. To turn delta board
+   * on, use <code>sendCommand("iset compressmove 1")</code>. Note, however,
+   * that it will disable the sending of a full board (like a style12 board) in
+   * some cases.
+   */
+
+  protected boolean processDeltaBoard(DeltaBoardStruct data){return false;}
+
+
+
+
+  /**
+   * The regular expression matching game end lines, like the following:<br>
+   * {Game 6 (Strakh vs. Svag) Strakh forfeits on time} 0-1.
+   */
+
+  private static final Pattern gameEndPattern = 
+    new Pattern("^\\{Game (\\d+) \\(("+usernameRegex+") vs\\. ("+usernameRegex+")\\) ([^\\}]+)\\} (.*)");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a game end line
+   * and to further process it if it is.
+   */
+
+  private boolean handleGameEnd(String line){
+    Matcher matcher = gameEndPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    int gameNumber = Integer.parseInt(matcher.group(1));
+    String whiteName = matcher.group(2);
+    String blackName = matcher.group(3);
+    String reason = matcher.group(4);
+    String result = matcher.group(5);
+
+    if (!processGameEnd(gameNumber, whiteName, blackName, reason, result))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a game end line arrives.
+   */
+
+  protected boolean processGameEnd(int gameNumber, String whiteName, String blackName, String reason, String result){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that we've stopped
+   * observing a game, like the following:<br>
+   * Removing game 7 from observation list.
+   */
+
+  private static final Pattern stoppedObservingPattern = 
+    new Pattern("^Removing game (\\d+) from observation list\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that we've stopped observing a game and to further process it if it is.
+   */
+
+  private boolean handleStoppedObserving(String line){
+    Matcher matcher = stoppedObservingPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    int gameNumber = Integer.parseInt(matcher.group(1));
+
+    if (!processStoppedObserving(gameNumber))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that we've stopped observing a
+   * game arrives.
+   */
+
+  protected boolean processStoppedObserving(int gameNumber){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that we've stopped
+   * examining a game, like the following:<br>
+   * You are no longer examining game 114.
+   */
+
+  private static final Pattern stoppedExaminingPattern = 
+    new Pattern("^You are no longer examining game (\\d+)\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that we've stopped examining a game and to further process it if it is.
+   */
+
+  private boolean handleStoppedExamining(String line){
+    Matcher matcher = stoppedExaminingPattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    int gameNumber = Integer.parseInt(matcher.group(1));
+
+    if (!processStoppedExamining(gameNumber))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that we've stopped examining a
+   * game arrives.
+   */
+
+  protected boolean processStoppedExamining(int gameNumber){return false;}
+
+
+
+
+  /**
+   * The regular expression matching lines specifying that an illegal move has
+   * been attempted.
+   */
+
+  private static final Pattern illegalMovePattern = 
+    new Pattern("^Illegal move \\((.*)\\)\\.$");
+
+
+
+
+  /**
+   * Called to determine whether the given line of text is a line specifying
+   * that an illegal move has been attempted and to further process it if it is.
+   */
+
+  private boolean handleIllegalMove(String line){
+    Matcher matcher = illegalMovePattern.matcher(line);
+    if (!matcher.find())
+      return false;
+
+    String moveString = matcher.group(1);
+
+    if (!processIllegalMove(moveString))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+
+  /**
+   * This method is called when a line specifying that an illegal move has been
+   * attempted. The specified string is the move string that was sent to the
+   * server.
+   */
+
+  protected boolean processIllegalMove(String moveString){return false;}
 
 
 
@@ -933,6 +1178,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
             if (s.length() == 0) // An all prompt line
               continue mainLoop;
           }
+          System.out.print("Sending line: \""+s+"\"");
           execRunnable(new HandleLineRunnable(s));
           buf.setLength(0);
         }
