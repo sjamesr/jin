@@ -415,6 +415,7 @@ public class ChesslikeGenericVariant implements WildVariant{
     if (pos.getPieceAt(startingSquare)==null)
       throw new IllegalArgumentException("The moving piece may not be null");
 
+    Player movingPlayer = pos.getCurrentPlayer();
     ChessPiece promotionChessTarget = (ChessPiece)promotionTarget;
 
     boolean isEnPassant = isEnPassant(pos, startingSquare, endingSquare, promotionChessTarget);
@@ -422,7 +423,7 @@ public class ChesslikeGenericVariant implements WildVariant{
     boolean isLongCastling = isLongCastling(pos, startingSquare, endingSquare, promotionChessTarget);
     ChessPiece capturedPiece = getCapturedPiece(pos, startingSquare, endingSquare, promotionChessTarget, isEnPassant);
 
-    return new ChessMove(pos, startingSquare, endingSquare, isEnPassant, isShortCastling, 
+    return new ChessMove(startingSquare, endingSquare, movingPlayer, isEnPassant, isShortCastling, 
       isLongCastling, capturedPiece, promotionChessTarget, stringRepresentation);
   }
 

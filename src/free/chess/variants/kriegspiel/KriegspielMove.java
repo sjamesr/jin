@@ -67,8 +67,8 @@ public class KriegspielMove extends Move{
    * a string constructed from the move data will be returned by toString()..
    */
 
-  public KriegspielMove(String stringRepresentation){
-    super(null, null, stringRepresentation);
+  public KriegspielMove(Player player, String stringRepresentation){
+    super(null, null, player, stringRepresentation);
 
     this.endingSquare = null;
     this.capturedPiece = null;
@@ -87,7 +87,7 @@ public class KriegspielMove extends Move{
    */
 
   public KriegspielMove(Position pos, Square endingSquare, String stringRepresentation){
-    super(null, endingSquare, stringRepresentation);
+    super(null, endingSquare, pos.getCurrentPlayer(), stringRepresentation);
 
     this.endingSquare = endingSquare;
     this.capturedPiece = (ChessPiece)pos.getPieceAt(endingSquare);

@@ -87,11 +87,11 @@ public class ChessMove extends Move{
    * it isn't specific to any variant.
    */
 
-  public ChessMove(Position pos, Square startingSquare, Square endingSquare, 
+  public ChessMove(Square startingSquare, Square endingSquare, Player movingPlayer,
       boolean isEnPassant, boolean isShortCastling, boolean isLongCastling,
       ChessPiece capturedPiece, ChessPiece promotionTarget, String stringRepresentation){
 
-    super(startingSquare, endingSquare, stringRepresentation);
+    super(startingSquare, endingSquare, movingPlayer, stringRepresentation);
 
     this.promotionTarget = promotionTarget;
     this.isEnPassant = isEnPassant;
@@ -116,7 +116,7 @@ public class ChessMove extends Move{
   public ChessMove(Position pos, Square startingSquare, Square endingSquare, 
       ChessPiece promotionTarget, String stringRepresentation){
     
-    super(startingSquare, endingSquare, stringRepresentation);
+    super(startingSquare, endingSquare, pos.getCurrentPlayer(), stringRepresentation);
 
     if (pos.getPieceAt(startingSquare)==null)
       throw new IllegalArgumentException("The moving piece may not be null");
