@@ -126,7 +126,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Conne
       getHostname(), getPort()));
 
     sendCommand("set-quietly wrap 0");
-    sendCommand("set-quietly bell 0");
 
     // Hack, currently, the server has a bug which causes it not to send us
     // the current event list even if we have turned DG_TOURNEY on at the login
