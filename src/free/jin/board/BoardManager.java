@@ -917,12 +917,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     Object source = pce.getSource();
 
     if (source instanceof JInternalFrame){
-      JInternalFrame boardFrame =  (JInternalFrame)source;
-      BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(boardFrame);
-      if (boardPanel.isActive()){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
-        Game game = ((BoardPanel)internalFramesToBoardPanels.get(boardFrame)).getGame();
-        if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
-              pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
+      if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
+          pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
+        JInternalFrame boardFrame =  (JInternalFrame)source;
+        BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(boardFrame);
+
+        if (boardPanel.isActive()){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
+          Game game = ((BoardPanel)internalFramesToBoardPanels.get(boardFrame)).getGame();
 
           int result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(),"Are you sure you want to quit this game?","Select an option",JOptionPane.YES_NO_OPTION);
           if (result==JOptionPane.YES_OPTION)
