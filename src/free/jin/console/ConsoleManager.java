@@ -537,15 +537,14 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Saves the current state into the user file.
    */
 
-  private void saveState(){
+  protected void saveState(){
     User user = getUser();
-    String prefix = getID()+".";
 
     boolean isMaximized = consoleFrame.isMaximum();
-    user.setProperty(prefix+"maximized", String.valueOf(isMaximized), false);
+    setProperty("maximized", String.valueOf(isMaximized), false);
 
     boolean isIconified = consoleFrame.isIcon();
-    user.setProperty(prefix+"iconified", String.valueOf(isIconified), false);
+    setProperty("iconified", String.valueOf(isIconified), false);
 
     // This is the only way to retrieve the "normal" bounds of the frame under
     // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
@@ -558,10 +557,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     Rectangle consoleFrameBounds = consoleFrame.getBounds();
     // If something bad happened, let's not save that state.
     if ((consoleFrameBounds.width>10)&&(consoleFrameBounds.height>10))
-      user.setProperty(prefix+"frame-bounds",StringEncoder.encodeRectangle(consoleFrameBounds),false);
+      setProperty("frame-bounds",StringEncoder.encodeRectangle(consoleFrameBounds),false);
 
-    if (!getProperty("game-list-display-style", "embedded").equalsIgnoreCase(gameListDisplayStyle))
-      user.setProperty(prefix+"game-list-display-style", gameListDisplayStyle, true);
+    setProperty("game-list-display-style", gameListDisplayStyle, true);
   }
 
 
