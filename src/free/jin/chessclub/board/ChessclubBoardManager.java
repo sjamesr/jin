@@ -86,7 +86,7 @@ public class ChessclubBoardManager extends BoardManager{
       if (!gameID.equals(primaryGameID)){
         if ((myGamesCount > 1) && (gameType == Game.MY_GAME))
           conn.sendCommand("goto "+gameID);
-        else
+        else if (gameType != Game.ISOLATED_BOARD)
           conn.sendCommand("primary "+gameID);
         primaryGameID = gameID;
       }
