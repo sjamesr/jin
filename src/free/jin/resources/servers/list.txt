@@ -1,1 +1,2 @@
 resources/servers/icc.server
+resources/servers/fics.server
