@@ -281,7 +281,7 @@ public abstract class Connection{
    * @see #getUsername()
    */
 
-  protected synchronized final void setUsername(String username){
+  protected final synchronized void setUsername(String username){
     if (this.username != null)
       throw new IllegalStateException("A username may only be assigned once");
 

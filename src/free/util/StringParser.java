@@ -45,7 +45,7 @@ public class StringParser{
    * @see StringEncoder#encodeRectangle(Rectangle)
    */
 
-  public static Rectangle parseRectangle(String rectString) throws FormatException{
+  public static Rectangle parseRectangle(String rectString){
     StringTokenizer tokenizer = new StringTokenizer(rectString,";");
     if (tokenizer.countTokens()!=4)
       throw new FormatException("Wrong Rectangle format: "+rectString);
@@ -73,7 +73,7 @@ public class StringParser{
    * @throws FormatException if the given String is not in the correct format.
    */
 
-  public static Color parseColor(String colorString) throws FormatException{
+  public static Color parseColor(String colorString){
     try{
       int colorInt = Integer.parseInt(colorString,16);
       if ((colorInt<0)||(colorInt>0xffffffL))

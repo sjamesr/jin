@@ -65,7 +65,7 @@ class LoggingRule{
    * parseable.
    */
 
-  public LoggingRule(String name, String condition, String filename) throws EvalError, IllegalArgumentException{
+  public LoggingRule(String name, String condition, String filename) throws EvalError{
     setName(name);
     setCondition(condition);
     setFilename(filename);
@@ -127,7 +127,7 @@ class LoggingRule{
    * Sets the name of this logging rule.
    */
 
-  public void setName(String name) throws IllegalArgumentException{
+  public void setName(String name){
     if ((name == null) || "".equals(name))
       throw new IllegalArgumentException();
 
@@ -152,7 +152,7 @@ class LoggingRule{
    * Sets the filename of the file into which to save the game.
    */
 
-  public void setFilename(String filename) throws IllegalArgumentException{
+  public void setFilename(String filename){
     if ((filename == null) || "".equals(filename))
       throw new IllegalArgumentException();
 

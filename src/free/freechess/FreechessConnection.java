@@ -167,7 +167,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * is saved and sent immediately after logging in.
    */
 
-  public synchronized final void setStyle(int style){
+  public final synchronized void setStyle(int style){
     this.style = style;
     if (isLoggedIn()){
       sendCommand("set style "+style);
@@ -185,7 +185,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * the login procedure.
    */
 
-  public synchronized final void setInterface(String interfaceVar){
+  public final synchronized void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
 
@@ -203,7 +203,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * sent to the server on login.
    */
 
-  public synchronized final void setSeekInfo(boolean state){
+  public final synchronized void setSeekInfo(boolean state){
     if (seekInfoOn == state)
       return;
 
@@ -226,7 +226,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * Returns the current state of seek information sending.
    */
 
-  public synchronized final boolean getSeekInfo(){
+  public final synchronized boolean getSeekInfo(){
     return seekInfoOn;
   }
 
@@ -238,7 +238,7 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * information sending is "on". The call is ignored otherwise.
    */
 
-  public synchronized final void askSeeksRefresh(){
+  public final synchronized void askSeeksRefresh(){
     if (seekInfoOn && isLoggedIn()){
       sendCommand("iset seekinfo 1");
       filterLine("seekinfo set.");

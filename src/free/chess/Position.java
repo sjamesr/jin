@@ -268,7 +268,7 @@ public final class Position{
    * expected format.
    */
   
-  public void setLexigraphic(String pos) throws PositionFormatException{
+  public void setLexigraphic(String pos){
     if (pos.length()<64)
       throw new PositionFormatException("Less than 64 letters in the string: "+pos);
 

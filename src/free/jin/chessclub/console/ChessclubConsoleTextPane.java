@@ -57,4 +57,5 @@ public class ChessclubConsoleTextPane extends ConsoleTextPane{
     return super.isWordChar(c) || (c == '-');
   }
 
+
 }

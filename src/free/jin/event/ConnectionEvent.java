@@ -98,4 +98,5 @@ public class ConnectionEvent extends JinEvent{
     return id;
   }
 
+
 }

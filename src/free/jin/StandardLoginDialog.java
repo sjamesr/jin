@@ -755,6 +755,4 @@ public abstract class StandardLoginDialog implements LoginDialog{
   }
 
 
-
-
 }

@@ -90,7 +90,7 @@ public class InternalFrameSwitcher implements ContainerListener{
    * Are we running under JDK 1.1?
    */
 
-  private final static boolean isJava1_1 =
+  private static final boolean isJava1_1 =
     (System.getProperty("java.version").compareTo("1.2") < 0);
 
 

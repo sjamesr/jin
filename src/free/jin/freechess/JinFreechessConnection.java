@@ -1252,7 +1252,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Makes the given move in the given game.
    */
 
-  public void makeMove(Game game, Move move) throws IllegalArgumentException{
+  public void makeMove(Game game, Move move){
     Enumeration gamesDataEnum = ongoingGamesData.elements();
     boolean ourGame = false;
     while (gamesDataEnum.hasMoreElements()){

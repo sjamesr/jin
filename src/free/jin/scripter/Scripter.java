@@ -221,7 +221,7 @@ public class Scripter extends Plugin{
    * not supported.
    */
 
-  public void addScript(Script script) throws IllegalArgumentException{
+  public void addScript(Script script){
     if (script == null)
       throw new IllegalArgumentException("Null script specified");
 

@@ -34,7 +34,7 @@ public final class False implements Conditional{
    * A sole instance of this class.
    */
 
-  private final static False instance = new False();
+  private static final False instance = new False();
 
 
 

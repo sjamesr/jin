@@ -614,4 +614,4 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
 
-} 
+}

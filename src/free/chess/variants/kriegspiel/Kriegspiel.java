@@ -87,10 +87,10 @@ public class Kriegspiel implements WildVariant{
 
   /**
    * Checks if the given position's wild variant is Kriegspiel and returns
-   * normally if it is. Throws an IllegalArgumentException otherwise.
+   * normally if it is, throws an IllegalArgumentException otherwise.
    */
 
-  private void checkPosition(Position pos) throws IllegalArgumentException{
+  private void checkPosition(Position pos){
     if (!pos.getVariant().equals(this))
       throw new IllegalArgumentException("Wrong position variant: "+pos.getVariant());
   }
@@ -200,7 +200,7 @@ public class Kriegspiel implements WildVariant{
    * @throws IllegalArgumentException if the given string is in a bad format.
    */
 
-  public Piece parsePiece(String piece) throws IllegalArgumentException{
+  public Piece parsePiece(String piece){
     return ChesslikeGenericVariant.parseChessPiece(piece);
   }
 

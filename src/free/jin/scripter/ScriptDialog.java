@@ -50,7 +50,7 @@ abstract class ScriptDialog extends JDialog{
    * The default string we show in the event type choice.
    */
 
-  private final static String selectEventTypeString = "Select Event Type";
+  private static final String selectEventTypeString = "Select Event Type";
 
 
 
@@ -361,5 +361,6 @@ abstract class ScriptDialog extends JDialog{
 
     return script;
   }
+
 
 }

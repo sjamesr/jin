@@ -94,4 +94,6 @@ public interface LoginDialog{
 
   User getUser();
 
+
+
 }

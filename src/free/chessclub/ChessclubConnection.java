@@ -551,7 +551,7 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #isDGOn(int)
    */
 
-  public synchronized final boolean setDGState(int dgNumber, boolean state){
+  public final synchronized boolean setDGState(int dgNumber, boolean state){
     if ((state == false) && isEssentialDG(dgNumber))
       return false;
 
@@ -609,7 +609,7 @@ public class ChessclubConnection extends free.util.Connection{
    * the login procedure.
    */
 
-  public synchronized final void setInterface(String interfaceVar){
+  public final synchronized void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
     this.interfaceVar = interfaceVar;
@@ -627,7 +627,7 @@ public class ChessclubConnection extends free.util.Connection{
    * this method will throw an IllegalAccessException.
    */
 
-  public synchronized final boolean setStyle(int style){
+  public final synchronized boolean setStyle(int style){
     int essentialStyle = getEssentialStyle();
     if ((essentialStyle!=-1)&&(essentialStyle!=style))
       return false;
@@ -3425,7 +3425,7 @@ public class ChessclubConnection extends free.util.Connection{
    * is terminated.
    */
 
-  synchronized final void handleDisconnection(){
+  final synchronized void handleDisconnection(){
     if (echoStream!=null)
       echoStream.println("DISCONNECTED");
 
@@ -3451,4 +3451,4 @@ public class ChessclubConnection extends free.util.Connection{
   }
 
 
-} 
+}

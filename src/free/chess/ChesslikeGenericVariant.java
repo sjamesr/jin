@@ -307,7 +307,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * by calling the <code>equals(Object)</code> method.
    */
 
-  protected void checkPosition(Position pos) throws IllegalArgumentException{
+  protected void checkPosition(Position pos){
     if (!pos.getVariant().equals(this))
       throw new IllegalArgumentException("Wrong position variant: "+pos.getVariant());
   }
@@ -400,7 +400,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    */
 
   public Move createMove(Position pos, Square startingSquare, Square endingSquare,
-      Piece promotionTarget, String moveSAN) throws IllegalArgumentException{
+      Piece promotionTarget, String moveSAN){
 
     checkPosition(pos);
 
@@ -515,7 +515,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
 
-  public Piece parsePiece(String piece) throws IllegalArgumentException{
+  public Piece parsePiece(String piece){
     return parseChessPiece(piece);
   }
 
@@ -530,7 +530,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
 
-  public static ChessPiece parseChessPiece(String piece) throws IllegalArgumentException{
+  public static ChessPiece parseChessPiece(String piece){
     return ChessPiece.fromShortString(piece);
   }
 

@@ -90,13 +90,14 @@ public class Square{
    * @param file The file index [0-7].
    * @param rank The rank index [0-7].
    *
-   * @throws IllegalArgumentException if either the file or rank are out of
+   * @throws SquareFormatException if either the file or rank are out of
    * the valid range.
    */
 
-  public static Square getInstance(int file, int rank) throws SquareFormatException{
-    if ((file<0) || (file>7) || (rank<0) || (rank > 7))
-      throw new SquareFormatException("file and rank must be in the range [0-7] (file:"+file+" rank:"+rank+")");
+  public static Square getInstance(int file, int rank){
+    if ((file < 0) || (file > 7) || (rank<0) || (rank > 7))
+      throw new SquareFormatException("file and rank must be in the range [0-7] "+
+                                      "(file:" + file + " rank:" + rank + ")");
     if (pool[file][rank] == null)
       pool[file][rank] = new Square(file,rank);
     return pool[file][rank];
@@ -118,7 +119,7 @@ public class Square{
    * expected format or the coordinates are out of the valid range.
    */
 
-  public static Square parseSquare(String square) throws IllegalArgumentException{
+  public static Square parseSquare(String square){
     try{
       int file = (int)square.charAt(0)-(int)'a';
       int rank = (int)square.charAt(1)-(int)'1';

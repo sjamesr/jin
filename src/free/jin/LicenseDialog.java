@@ -44,7 +44,7 @@ public class LicenseDialog extends JDialog{
    * The font of the text area displaying the license text.
    */
 
-  private final static Font LICENSE_TEXT_FONT = new Font("Monospaced", Font.PLAIN, 12);
+  private static final Font LICENSE_TEXT_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
 
 

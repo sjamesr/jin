@@ -58,4 +58,5 @@ public class FreechessConsoleTextPane extends ConsoleTextPane{
     return super.isWordChar(c) || (c == '_');
   }
 
+
 }

@@ -88,7 +88,7 @@ public interface WildVariant{
    * a piece in this WildVariant.
    */
 
-  Piece parsePiece(String s) throws IllegalArgumentException;
+  Piece parsePiece(String s);
 
 
 
@@ -102,7 +102,7 @@ public interface WildVariant{
    * by this WildVariant.
    */
 
-  String pieceToString(Piece piece) throws IllegalArgumentException;
+  String pieceToString(Piece piece);
 
 
 

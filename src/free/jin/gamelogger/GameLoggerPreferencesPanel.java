@@ -751,5 +751,4 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
   }
 
 
-
 }
