@@ -30,7 +30,8 @@ import free.util.swing.FontSelectorPanel;
 
 
 /**
- * A common panel allowing to choose the font and the foreground color of text.
+ * A common panel allowing to choose the font, foreground and optionally, 
+ * background color of text.
  */
 
 public class TextStyleChooserPanel extends JPanel{
@@ -46,34 +47,56 @@ public class TextStyleChooserPanel extends JPanel{
 
 
   /**
-   * The ColorChooserButton used to select the color.
+   * The ColorChooserButton used to select the foreground color.
    */
 
-  public final ColorChooserButton colorChooser;
+  private final ColorChooserButton foregroundChooser;
 
 
 
 
   /**
-   * Creates a new TextStyleChooserPanel with the given initial font and color.
+   * The ColorChooserButton used to select the background color.
    */
 
-  public TextStyleChooserPanel(Font initialFont, Color initialForegroundColor, Color backgroundColor){
+  private final ColorChooserButton backgroundChooser;
+
+
+
+
+  /**
+   * Creates a new TextStyleChooserPanel with the given initial font,
+   * foreground and background colors. The <code>allowBackgroundSelection</code>
+   * argument specifies whether the user should be allowed to change the
+   * background.
+   */
+
+  public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor, boolean allowBackgroundSelection){
     fontSelector = new FontSelectorPanel();
-    colorChooser = new ColorChooserButton("Foreground color", initialForegroundColor);
+    foregroundChooser = new ColorChooserButton("Foreground", initForegroundColor);
+    if (allowBackgroundSelection)
+      backgroundChooser = new ColorChooserButton("Background", initBackgroundColor);
+    else
+      backgroundChooser = null;
 
     fontSelector.setSelectedFont(initialFont);
     fontSelector.getPreviewPanel().setOpaque(true);
-    fontSelector.getPreviewPanel().setBackground(backgroundColor);
-    fontSelector.getPreviewPanel().setForeground(initialForegroundColor);
+    fontSelector.getPreviewPanel().setBackground(initBackgroundColor);
+    fontSelector.getPreviewPanel().setForeground(initForegroundColor);
 
     createUI();
 
-    colorChooser.addChangeListener(new ChangeListener(){
+    ChangeListener colorChangeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        fontSelector.getPreviewPanel().setForeground(colorChooser.getColor());
+        fontSelector.getPreviewPanel().setForeground(foregroundChooser.getColor());
+        if (backgroundChooser != null)
+          fontSelector.getPreviewPanel().setBackground(backgroundChooser.getColor());
       }
-    });
+    };
+
+    foregroundChooser.addChangeListener(colorChangeListener);
+    if (backgroundChooser != null)
+      backgroundChooser.addChangeListener(colorChangeListener);
   }
 
 
@@ -84,10 +107,16 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   private void createUI(){
-    setLayout(new BorderLayout());
+    setLayout(new BorderLayout(5,5));
 
-    JPanel colorChooserPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-    colorChooserPanel.add(colorChooser);
+    JPanel colorChooserPanel = new JPanel(new GridLayout(1, (foregroundChooser == null) ? 1 : 2, 5, 5));
+    colorChooserPanel.add(foregroundChooser);
+    foregroundChooser.setDefaultCapable(false);
+
+    if (backgroundChooser != null){
+      colorChooserPanel.add(backgroundChooser);
+      backgroundChooser.setDefaultCapable(false);
+    }
 
     add(BorderLayout.CENTER, fontSelector);
     add(BorderLayout.SOUTH, colorChooserPanel);
@@ -101,7 +130,7 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   public void setSelectedForeground(Color color){
-    colorChooser.setColor(color);
+    foregroundChooser.setColor(color);
   }
 
 
@@ -112,7 +141,7 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   public Color getSelectedForeground(){
-    return colorChooser.getColor();
+    return foregroundChooser.getColor();
   }
 
 
@@ -144,9 +173,24 @@ public class TextStyleChooserPanel extends JPanel{
    * Returns the background color.
    */
 
-  public void setTextBackgroundColor(Color color){
+  public void setSelectedBackground(Color color){
     fontSelector.getPreviewPanel().setBackground(color);
+    if (backgroundChooser != null)
+      backgroundChooser.setColor(color);
   }
 
+
+
+
+  /**
+   * Returns the selected background color.
+   */
+
+  public Color getSelectedBackground(){
+    if (backgroundChooser == null)
+      return fontSelector.getPreviewPanel().getBackground();
+    else
+      return backgroundChooser.getColor();
+  }
 
 }
