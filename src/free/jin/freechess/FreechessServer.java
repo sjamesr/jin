@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2003 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,65 +21,61 @@
 
 package free.jin.freechess;
 
-import free.jin.LoginDialog;
-import free.jin.Server;
-import free.jin.User;
-import java.util.Properties;
-import java.util.Hashtable;
+import free.jin.*;
 
 
 /**
- * An encapsulation of the properties of the freechess.org server.
+ * The <code>Server</code> implementation representing the freechess.org server.
+ * See http://www.freechess.org for more information.
  */
 
-public class FreechessServer extends Server{
+public class FreechessServer extends AbstractServer{
 
 
-
+  
   /**
-   * The default constructor.
+   * Creates the username policy.
    */
 
-  public FreechessServer(){
+  protected UsernamePolicy createUsernamePolicy(){
+    return new UsernamePolicy(){
 
+      public boolean isSame(String username1, String username2){
+        return username1.equalsIgnoreCase(username2);
+      }
+
+      public String invalidityReason(String username){
+        int usernameLength = username.length();
+        if ((usernameLength < 3) || (usernameLength > 17))
+          return "Usernames must be between 3 and 17 characters long";
+
+        for (int i = 0; i < usernameLength; i++){
+          int c = username.charAt(i);
+          if (!((c >= 97) && (c <= 122) || // Lowercase characters.
+                (c >= 65) && (c <= 90)))    // Uppercase characters.
+            return "Your username contains at least one illegal character: " + (char)c;
+        }
+
+        return null;
+      }
+
+      public String getGuestUsername(){
+        return "guest";
+      }
+
+    };
   }
 
 
 
   /**
-   * Creates a login dialog.
+   * Creates and returns a new <code>JinFreechessConnection</code>.
    */
 
-  public LoginDialog createLoginDialog(){
-    return new FreechessLoginDialog(this);
+  public Connection createConnection(JinContext context, String username, String password){
+    return new JinFreechessConnection(context, username, password);
   }
 
-
-
-  /**
-   * Creates a login dialog.
-   */
-
-  public LoginDialog createLoginDialog(User user){
-    if (user == null)
-      return createLoginDialog();
-
-    return new FreechessLoginDialog(user);
-  }
-
-
-
-  /**
-   * Creates a guest <code>User</code>.
-   */
-
-  protected User createGuest(){
-    Properties props = new Properties();
-    props.put("login.username", "guest");
-
-    return createUser(props, new Hashtable());
-  }
 
 
 }
-

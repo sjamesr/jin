@@ -32,7 +32,7 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
-import free.jin.event.JinListenerManager;
+import free.jin.event.ListenerManager;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.fischerrandom.FischerRandom;
@@ -47,8 +47,16 @@ import free.util.Pair;
  * server.
  */
 
-public class JinFreechessConnection extends FreechessConnection implements JinConnection,
-    SeekJinConnection, PGNJinConnection{
+public class JinFreechessConnection extends FreechessConnection implements Connection,
+    SeekConnection, PGNConnection{
+
+
+
+  /**
+   * The context.
+   */
+  
+  private final JinContext context;
 
 
 
@@ -56,7 +64,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * Our listener manager.
    */
 
-  private final FreechessJinListenerManager listenerManager = new FreechessJinListenerManager(this);
+  private final FreechessListenerManager listenerManager = new FreechessListenerManager(this);
 
 
 
@@ -67,10 +75,15 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * requested username and password.
    */
 
-  public JinFreechessConnection(String hostname, int port, String username, String password){
-    super(hostname, port, username, password);
+  public JinFreechessConnection(JinContext context, String username, String password){
+    super(username, password);
 
-    setInterface(Jin.getInterfaceName());
+    this.context = context;
+
+    setInterface(context.getAppName() + " " + context.getAppVersion() +
+      " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
+      "," + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
+
     setStyle(12);
 
     setIvarState(Ivar.GAMEINFO, true);
@@ -103,24 +116,36 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
-   * Returns our JinListenerManager.
+   * Returns our ListenerManager.
    */
 
-  public JinListenerManager getJinListenerManager(){
-    return getFreechessJinListenerManager();
+  public ListenerManager getListenerManager(){
+    return getFreechessListenerManager();
   }
 
 
 
 
   /**
-   * Returns out JinListenerManager as a reference to FreechessJinListenerManager.
+   * Returns out ListenerManager as a reference to FreechessListenerManager.
    */
 
-  public FreechessJinListenerManager getFreechessJinListenerManager(){
+  public FreechessListenerManager getFreechessListenerManager(){
     return listenerManager;
   }
 
+
+
+  /**
+   * Fires an ATTEMPING connection event and invokes the superclass' method.
+   */
+
+  public boolean connectAndLogin(String hostname, int port) throws IOException{
+    listenerManager.fireConnectionEvent(
+      new ConnectionEvent(this, ConnectionEvent.ATTEMPTING, hostname, port));
+
+    return super.connectAndLogin(hostname, port);
+  }
 
 
 
@@ -130,14 +155,14 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    * thread of course).
    */
 
-  protected java.net.Socket createSocket(String hostname, int port) throws IOException{
+  protected java.net.Socket createSocket(final String hostname, final int port) throws IOException{
     java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port); // Comment this to disable timesealing
 //    java.net.Socket sock = new java.net.Socket(hostname, port); // Comment this to enable timesealing
 
     execRunnable(new Runnable(){
 
       public void run(){
-        listenerManager.fireConnectionEvent(new ConnectionEvent(JinFreechessConnection.this, ConnectionEvent.ESTABLISHED));
+        listenerManager.fireConnectionEvent(new ConnectionEvent(JinFreechessConnection.this, ConnectionEvent.ESTABLISHED, hostname, port));
       }
 
     });
@@ -161,7 +186,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     sendCommand("$set bell 0");
     filterLine("Bell off.");
 
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN));
+    listenerManager.fireConnectionEvent(
+      new ConnectionEvent(this, ConnectionEvent.LOGGED_IN, getHostname(), getPort()));
   }
 
 
@@ -173,7 +199,8 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
    */
 
   protected void processDisconnection(){
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOST));
+    listenerManager.fireConnectionEvent(
+      new ConnectionEvent(this, ConnectionEvent.LOST, getHostname(), getPort()));
   }
 
 
@@ -1294,12 +1321,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
 
 
   /**
-   * Returns the SeekJinListenerManager via which you can register and
-   * unregister SeekListeners.
+   * Returns the SeekListenerManager via which you can register and unregister
+   * SeekListeners.
    */
 
-  public SeekJinListenerManager getSeekJinListenerManager(){
-    return getFreechessJinListenerManager();
+  public SeekListenerManager getSeekListenerManager(){
+    return getFreechessListenerManager();
   }
 
 
