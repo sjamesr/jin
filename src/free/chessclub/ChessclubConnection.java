@@ -463,6 +463,16 @@ public class ChessclubConnection extends free.util.Connection{
 
 
 
+
+  /**
+   * This is set to <code>true</code> when the "level2settings=..." line has
+   * been sent.
+   */
+
+  private boolean level2SettingsSent = false;
+
+
+
   /**
    * The OutputStream to the server.
    */
@@ -542,7 +552,7 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public synchronized final boolean setDGState(int dgNumber, boolean state){
-    if ((state==false)&&isEssentialDG(dgNumber))
+    if ((state == false) && isEssentialDG(dgNumber))
       return false;
 
     if (state)
@@ -550,8 +560,12 @@ public class ChessclubConnection extends free.util.Connection{
     else
       requestedLevel2Settings.clear(dgNumber);
 
-    if (isLoggedIn())
-      sendCommand("set-2 "+dgNumber+" "+(state ? "1" : "0"));
+    if (level2SettingsSent){
+      if (isLoggedIn())
+        sendCommand("set-2 "+dgNumber+" "+(state ? "1" : "0"));
+      // Otherwise, we will set it onLogin(). We don't do it here because it's
+      // not a good idea to send anything in the middle of the login procedure.
+    }
     else{
       if (state)
         level2Settings.set(dgNumber);
@@ -702,23 +716,27 @@ public class ChessclubConnection extends free.util.Connection{
   protected boolean login() throws IOException{
     out = sock.getOutputStream();
 
-    int largestSetDGNumber = level2Settings.size();
-    while ((largestSetDGNumber>=0)&&(!level2Settings.get(largestSetDGNumber)))
-      largestSetDGNumber--;
-    if (largestSetDGNumber>=0){
-      StringBuffer buf = new StringBuffer("level2settings=");
-      for (int i=0;i<=largestSetDGNumber;i++){
-        buf.append(level2Settings.get(i) ? "1" : "0");
+    synchronized(this){
+      int largestSetDGNumber = level2Settings.size();
+      while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
+        largestSetDGNumber--;
+      if (largestSetDGNumber >= 0){
+        StringBuffer buf = new StringBuffer("level2settings=");
+        for (int i = 0; i <= largestSetDGNumber; i++){
+          buf.append(level2Settings.get(i) ? "1" : "0");
+        }
+        sendCommand(buf.toString());
+        level2SettingsSent = true;
       }
-      sendCommand(buf.toString());
+
+      String requestedUsername = getRequestedUsername();
+      String password = getPassword();
+      if ((password == null) || (password.length() == 0))
+        sendCommand(requestedUsername);
+      else
+        sendCommand(requestedUsername+" "+password);
     }
 
-    String requestedUsername = getRequestedUsername();
-    String password = getPassword();
-    if ((password == null) || (password.length() == 0))
-      sendCommand(requestedUsername);
-    else
-      sendCommand(requestedUsername+" "+password);
     synchronized(loginLock){
       try{
         loginLock.wait(); // Wait until we receive DG_WHO_AM_I or DG_LOGIN_FAILED
@@ -741,6 +759,12 @@ public class ChessclubConnection extends free.util.Connection{
 
   protected void onLogin(){
     super.onLogin();
+
+    for (int i = 0; i < requestedLevel2Settings.size(); i++){
+      boolean state = requestedLevel2Settings.get(i);
+      if (state != level2Settings.get(i))
+        sendCommand("set-2 "+i+" "+(state ? "1" : "0"));
+    }
 
     sendCommand("set-quietly prompt 0");
     sendCommand("set-quietly style "+style);
