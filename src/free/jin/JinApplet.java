@@ -21,23 +21,25 @@
 
 package free.jin;
 
-import java.awt.*;
-import java.io.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.applet.Applet;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
-import java.util.Properties;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
 import free.jin.action.ActionInfo;
-import free.jin.plugin.PluginInfo;
 import free.jin.plugin.Plugin;
-import free.util.IOUtilities;
+import free.jin.plugin.PluginInfo;
 import free.util.AWTUtilities;
 import free.util.BrowserControl;
+import free.util.IOUtilities;
+
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 
 /**
@@ -349,16 +351,21 @@ public class JinApplet extends Applet implements JinContext{
       return new Resource[0];
     
     StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
-    Resource [] resources = new Resource[resourceNames.countTokens()];
-    for (int i = 0; i < resources.length; i++){
+    Vector resources = new Vector(resourceNames.countTokens());
+    while (resourceNames.hasMoreTokens()){
       try{
         URL resourceURL = new URL(getCodeBase(), "resources/" + resourceType + "/" 
           + resourceNames.nextToken() + "/");
-        resources[i] = loadResource(resourceURL, plugin);
+        Resource res = loadResource(resourceURL, plugin);
+        if (res != null)
+          resources.addElement(res);
       } catch (IOException e){e.printStackTrace();}
     }
     
-    return resources;
+    Resource [] resArr = new Resource[resources.size()];
+    resources.copyInto(resArr);
+    
+    return resArr;
   }
   
   
