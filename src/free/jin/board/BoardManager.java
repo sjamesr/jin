@@ -36,6 +36,7 @@ import free.jin.board.event.UserMoveEvent;
 import free.util.StringParser;
 import free.util.StringEncoder;
 import free.util.SingleItemEnumeration;
+import free.workarounds.FixedJInternalFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
@@ -1067,7 +1068,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected JInternalFrame createBoardFrame(BoardPanel boardPanel){
-    JInternalFrame boardFrame = new JInternalFrame();
+    JInternalFrame boardFrame = new FixedJInternalFrame();
 
     boardFrame.setResizable(true);
     boardFrame.setClosable(true);

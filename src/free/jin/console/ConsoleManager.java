@@ -35,6 +35,7 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PreferencesPanel;
 import free.util.StringParser;
 import free.util.StringEncoder;
+import free.workarounds.FixedJInternalFrame;
 import java.net.URL;
 
 
@@ -120,7 +121,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   private void openConsole(){
     console = createConsole();
 
-    consoleFrame = new JInternalFrame("Main Console", true, true, true, true);
+    consoleFrame = new FixedJInternalFrame("Main Console", true, true, true, true);
 
     String iconImageName = getProperty("icon-image");
     if (iconImageName != null){
@@ -511,7 +512,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       console.addToOutput(scrollPane);
     }
     else{
-      JInternalFrame frame = new JInternalFrame(title, true, true, true, true);
+      JInternalFrame frame = new FixedJInternalFrame(title, true, true, true, true);
       frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
       frame.getContentPane().add(scrollPane);
 
