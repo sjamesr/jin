@@ -32,6 +32,6 @@ package free.chess;
  * <A HREF="http://eboard.sourceforge.net/">the eboard website</A>
  */
 
-public class DefaultPiecePainter extends free.chess.art.EboardVectorPiecePainter{
+public class DefaultPiecePainter extends free.chess.EboardVectorPiecePainter{
 
 }
