@@ -24,6 +24,8 @@ package free.util;
 import java.io.*;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Properties;
+
 
 /**
  * Various utility methods that have something to do with I/O.
@@ -201,7 +203,7 @@ public class IOUtilities{
    */
 
   public static int pump(InputStream in, OutputStream out, int amount, byte [] buf) throws IOException{ 
-    if (buf.length==0)
+    if (buf.length == 0)
       throw new IllegalArgumentException("Cannot use a 0 length buffer");
 
     int amountRead = 0;
@@ -247,6 +249,22 @@ public class IOUtilities{
     byte [] arr = new byte[amountRead];
     System.arraycopy(buf, 0, arr, 0, amountRead);
     return arr;
+  }
+
+
+
+  /**
+   * Reads the specified amount of bytes from the specified input stream and
+   * returns the resulting array. Throws an <code>EOFException</code> if the
+   * stream ends before the specified amount of bytes is read.
+   */
+
+  public static byte [] read(InputStream in, int amount) throws IOException{
+    ByteArrayOutputStream buf = new ByteArrayOutputStream(amount);
+    if (pump(in, buf, amount) != amount)
+      throw new EOFException();
+
+    return buf.toByteArray();
   }
 
 
@@ -365,5 +383,51 @@ public class IOUtilities{
         return null;
       }
   }
+
+
+
+  /**
+   * Creates and returns a new <code>java.util.Properties</code> object loaded
+   * from the specified <code>InputStream</code>.
+   */
+
+  public static Properties loadProperties(InputStream in) throws IOException{
+    Properties props = new Properties();
+    props.load(in);
+    return props;
+  }
+
+
+
+  /**
+   * Creates and returns a new <code>java.util.Properties</code> object loaded
+   * from the specified <code>File</code>.
+   */
+
+  public static Properties loadProperties(File file) throws IOException{
+    InputStream in = new FileInputStream(file);
+    try{
+      return loadProperties(in);
+    } finally{
+        in.close();
+      }
+  }
+
+
+
+  /**
+   * Creates and returns a new <code>java.util.Properties</code> object loaded
+   * from the specified <code>URL</code>.
+   */
+
+  public static Properties loadProperties(URL url) throws IOException{
+    InputStream in = url.openStream();
+    try{
+      return loadProperties(in);
+    } finally{
+        in.close();
+      }
+  }
+
 
 }

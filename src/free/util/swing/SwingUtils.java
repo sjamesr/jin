@@ -21,6 +21,8 @@
 
 package free.util.swing;
 
+import java.awt.Frame;
+import java.awt.Component;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
@@ -55,6 +57,29 @@ public class SwingUtils{
 
     ActionListener closer = new WindowDisposingListener(window);
     rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+  }
+
+
+
+  /**
+   * Returns the parent Frame of the specified <code>Component</code> or
+   * <code>null</code> if none exists. This does the same as
+   * <code>free.util.AWTUtilities.frameForComponent</code> but also takes care
+   * of various swing quirks.
+   */
+
+  public static Frame frameForComponent(Component component){
+    while (component != null){
+      if (component instanceof Frame)
+        return (Frame)component;
+
+      if (component instanceof JPopupMenu) // The parent of a popup menu seems to be null
+        component = ((JPopupMenu)component).getInvoker();
+      else
+        component = component.getParent();
+    }
+
+    return null;
   }
 
 

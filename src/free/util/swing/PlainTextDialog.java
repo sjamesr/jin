@@ -53,7 +53,6 @@ public class PlainTextDialog extends JDialog{
 
 
 
-
   /**
    * The text area displaying the text.
    */
@@ -63,12 +62,20 @@ public class PlainTextDialog extends JDialog{
 
 
   /**
+   * The "OK" button.
+   */
+
+  private final JButton closeButton;
+
+
+
+  /**
    * Creates a new LicenseTextDialog with the given parent, title and text.
    * The title may be <code>null</code>
    */
 
   public PlainTextDialog(Component parent, String title, String text){
-    super(AWTUtilities.frameForComponent(parent), title == null ? "" : title, true);
+    super(SwingUtils.frameForComponent(parent), title == null ? "" : title, true);
 
     this.title = title;
     this.text = text;
@@ -78,6 +85,7 @@ public class PlainTextDialog extends JDialog{
     SwingUtils.registerEscapeCloser(this);
 
     textArea = new FixedJTextArea(text, 20, 81);
+    closeButton = new JButton("OK");
 
     createUI();
   }
@@ -115,6 +123,7 @@ public class PlainTextDialog extends JDialog{
 
     contentPane.add(Box.createVerticalStrut(10));
 
+    textArea.setRequestFocusEnabled(false);
     textArea.setEditable(false);
     textArea.setLineWrap(true);
     textArea.setWrapStyleWord(true);
@@ -123,11 +132,12 @@ public class PlainTextDialog extends JDialog{
 
     contentPane.add(Box.createVerticalStrut(20));
 
-    JButton closeButton = new JButton("OK");
     closeButton.addActionListener(new WindowDisposingListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);
     contentPane.add(closeButton);
   }
+
+
 
 }

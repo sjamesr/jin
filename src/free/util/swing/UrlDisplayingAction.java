@@ -24,13 +24,14 @@ package free.util.swing;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
-import java.awt.Frame;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import free.util.BrowserControl;
 
 
 /**
- * An <code>Action</code> menu item, which, when activated, opens a browser at a specified url.
+ * An <code>Action</code>, which, when activated, opens a browser at a specified
+ * url.
  */
 
 public class UrlDisplayingAction extends AbstractAction{
@@ -45,70 +46,49 @@ public class UrlDisplayingAction extends AbstractAction{
 
 
   /**
-   * The parent frame.
+   * Creates a new <code>UrlDisplayingAction</code> with the specified URL.
    */
 
-  private final Frame parent;
-
-
-
-  /**
-   * Creates a new <code>UrlDisplayingAction</code> with the specified parent
-   * frame, and url.
-   */
-
-  public UrlDisplayingAction(Frame parent, String url){
+  public UrlDisplayingAction(String url){
     super();
 
-    if (parent == null)
-      throw new IllegalArgumentException("The parent frame may not be null");
     if ((url == null) || (url.length() == 0))
       throw new IllegalArgumentException("The url may not be null or empty");
 
     this.url = url;
-    this.parent = parent;
   }
 
 
 
-
   /**
-   * Creates a new <code>UrlDisplayingAction</code> with the specified parent
-   * frame, url and name.
+   * Creates a new <code>UrlDisplayingAction</code> with the specified URL and
+   * name.
    */
 
-  public UrlDisplayingAction(Frame parent, String url, String name){
+  public UrlDisplayingAction(String url, String name){
     super(name);
 
-    if (parent == null)
-      throw new IllegalArgumentException("The parent frame may not be null");
     if ((url == null) || (url.length() == 0))
       throw new IllegalArgumentException("The url may not be null or empty");
 
     this.url = url;
-    this.parent = parent;
   }
-
 
 
 
   /**
-   * Creates a new <code>UrlDisplayingAction</code> with the specified parent
-   * frame, url, name and icon.
+   * Creates a new <code>UrlDisplayingAction</code> with the specified URL,
+   * name and icon.
    */
 
-  public UrlDisplayingAction(Frame parent, String url, String name, Icon icon){
+  public UrlDisplayingAction(String url, String name, Icon icon){
     super(name, icon);
 
-    if (parent == null)
-      throw new IllegalArgumentException("The parent frame may not be null");
     if ((url == null) || (url.length() == 0))
       throw new IllegalArgumentException("The url may not be null or empty");
 
     this.url = url;
-    this.parent = parent;
   }
-
 
 
 
@@ -122,18 +102,20 @@ public class UrlDisplayingAction extends AbstractAction{
 
 
 
-
   /**
    * Tries to show the url using <code>BrowserControl</code>. Displays an error
    * message to the user if fails.
    */
 
   public void actionPerformed(ActionEvent evt){
-    try{
-      BrowserControl.displayURL(getURL());
-    } catch (java.io.IOException e){
-        JOptionPane.showMessageDialog(parent, "Unable to display URL: "+getURL(), "Error", JOptionPane.ERROR_MESSAGE);
-      }
+    if (!BrowserControl.displayURL(getURL())){
+      Object source = evt.getSource();
+      Component parent = null;
+      if (source instanceof Component)
+        parent = SwingUtils.frameForComponent((Component)source);
+
+      BrowserControl.showDisplayBrowserFailedDialog(getURL(), parent, true);
+    }
   }
 
 

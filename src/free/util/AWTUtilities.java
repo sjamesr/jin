@@ -35,17 +35,20 @@ public class AWTUtilities{
 
 
   /**
-   * Packs and centers the given Window relative to the given Component.
+   * Packs and centers the given window relative to the given component. The
+   * specified component may be <code>null</code>, in which case the window will
+   * be centered on the screen.
    */
 
   public static void centerWindow(Window target, Component parent){
     target.pack();
 
     Dimension size = target.getSize();
-    Dimension parentSize = parent.getSize();
-    Point parentLocation = parent.getLocationOnScreen();
+    Rectangle parentBounds = parent == null || !parent.isShowing() ? 
+      new Rectangle(target.getToolkit().getScreenSize()) :
+      new Rectangle(parent.getLocationOnScreen(), parent.getSize());
 
-    target.setLocation(parentLocation.x + (parentSize.width - size.width)/2, parentLocation.y + (parentSize.height - size.height)/2);
+    target.setLocation(parentBounds.x + (parentBounds.width - size.width)/2, parentBounds.y + (parentBounds.height - size.height)/2);
   }
 
 

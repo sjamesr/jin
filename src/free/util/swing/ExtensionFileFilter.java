@@ -97,7 +97,7 @@ public class ExtensionFileFilter extends FileFilter{
 
   public ExtensionFileFilter(String fileFilterName, String [] endStrings, boolean isCaseSensitive){
     this.endStrings = new String[endStrings.length];
-    for (int i=0;i<endStrings.length;i++){
+    for (int i = 0; i < endStrings.length; i++){
       this.endStrings[i] = endStrings[i];
     }
 
@@ -120,14 +120,16 @@ public class ExtensionFileFilter extends FileFilter{
     for (int i = 0; i < endStrings.length; i++){
       String endString = endStrings[i];
       String filename = file.getName();
-      String filenameEnd = filename.substring(filename.length() - endString.length());
-      if (isCaseSensitive){
-        if (filenameEnd.equals(endString))
-          return true;
+
+      if (!isCaseSensitive){
+        endString = endString.toLowerCase();
+        filename = filename.toLowerCase();
       }
-      else if (filenameEnd.equalsIgnoreCase(endString))
+
+      if (filename.endsWith(endString))
         return true;
     }
+
     return false;
   }
 

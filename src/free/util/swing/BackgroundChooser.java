@@ -149,21 +149,21 @@ public class BackgroundChooser extends JDialog{
 
     int curStyle = desktop.getWallpaperLayoutStyle();
     final JRadioButton tileButton = new JRadioButton("Tile", curStyle == AdvancedJDesktopPane.TILE);
-    final JRadioButton stretchButton = new JRadioButton("Stretch", curStyle == AdvancedJDesktopPane.STRETCH);
+    final JRadioButton scaleButton = new JRadioButton("Scale", curStyle == AdvancedJDesktopPane.SCALE);
     final JRadioButton centerButton = new JRadioButton("Center", curStyle == AdvancedJDesktopPane.CENTER);
 
     tileButton.setMnemonic('T');
-    stretchButton.setMnemonic('S');
+    scaleButton.setMnemonic('S');
     centerButton.setMnemonic('C');
 
     ButtonGroup group = new ButtonGroup();
     group.add(tileButton);
-    group.add(stretchButton);
+    group.add(scaleButton);
     group.add(centerButton);
 
     JPanel boxesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
     boxesPanel.add(tileButton);
-    boxesPanel.add(stretchButton);
+    boxesPanel.add(scaleButton);
     boxesPanel.add(centerButton);
 
     mainPanel.add(pickColor);
@@ -240,8 +240,8 @@ public class BackgroundChooser extends JDialog{
         int style = -1;
         if (src == tileButton)
           style = AdvancedJDesktopPane.TILE;
-        else if (src == stretchButton)
-          style = AdvancedJDesktopPane.STRETCH;
+        else if (src == scaleButton)
+          style = AdvancedJDesktopPane.SCALE;
         else if (src == centerButton)
           style = AdvancedJDesktopPane.CENTER;
 
@@ -252,7 +252,7 @@ public class BackgroundChooser extends JDialog{
     };
 
     tileButton.addActionListener(imageLayoutListener);
-    stretchButton.addActionListener(imageLayoutListener);
+    scaleButton.addActionListener(imageLayoutListener);
     centerButton.addActionListener(imageLayoutListener);
 
     closeButton.addActionListener(new ActionListener(){

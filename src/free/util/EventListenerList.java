@@ -69,7 +69,7 @@ public class EventListenerList{
    */
 
   public void remove(Class listenerType, EventListener listener){
-    if (listener==null)
+    if (listener == null)
       return;
     if (!listenerType.isInstance(listener))
       throw new IllegalArgumentException("The listener is not an instance of the listener class.");
@@ -125,8 +125,6 @@ public class EventListenerList{
   public Object [] getListenerList(){
     return listenerList;
   }
-
-
 
 
 

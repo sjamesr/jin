@@ -23,6 +23,9 @@
 
 package free.util;
 
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.io.IOException; 
 import java.io.InterruptedIOException;
 import java.util.Properties;
@@ -61,42 +64,45 @@ public class BrowserControl{
 
   /** 
    * Display a file in the system browser. If you want to display a 
-   * file, you must include the absolute path name. 
+   * file, you must include the absolute path name. Returns whether successful.
    * 
    * @param url the file's url (the url must start with either "http://" or 
    * "file://"). 
    */ 
 
-  public static void displayURL(String url) throws IOException{ 
-    if (isWindows()){ 
-      if (url.endsWith(".html")||url.endsWith(".htm")){
+  public static boolean displayURL(String url){
+    try{
+      if (isWindows()){ 
+        if (url.endsWith(".html")||url.endsWith(".htm")){
 
-        // url-encode the last character because windows refuses to display URLs
-        // ending with ".html" or ".htm", but works fine
-        // for ".htm%6c" or ".ht%6d"
-        int lastChar = url.charAt(url.length()-1);
-        url = url.substring(0,url.length()-1)+"%"+Integer.toHexString(lastChar);
-      }
-      String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
-      Runtime.getRuntime().exec(cmd); 
-    } 
-    else if (isMacOS()){
-      String [] commandLine = {"netscape", url}; 
-      Runtime.getRuntime().exec(commandLine); 
-    }
-    else if (isLinux()){
-      synchronized(BrowserControl.class){
-        if (environment == null){
-          environment = new Properties();
-          try{
-            Process env = Runtime.getRuntime().exec("env");
-            environment.load(env.getInputStream());
-          } catch (IOException e){}
+          // url-encode the last character because windows refuses to display URLs
+          // ending with ".html" or ".htm", but works fine
+          // for ".htm%6c" or ".ht%6d"
+          int lastChar = url.charAt(url.length()-1);
+          url = url.substring(0,url.length()-1)+"%"+Integer.toHexString(lastChar);
         }
+        String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
+        Runtime.getRuntime().exec(cmd); 
+      } 
+      else if (isMacOS()){
+        String [] commandLine = {"netscape", url}; 
+        Runtime.getRuntime().exec(commandLine); 
       }
+      else if (isLinux()){
+        synchronized(BrowserControl.class){
+          if (environment == null){
+            environment = new Properties();
+            try{
+              Process env = Runtime.getRuntime().exec("env");
+              environment.load(env.getInputStream());
+            } catch (IOException e){}
+          }
+        }
 
-      String browsers = environment.getProperty("BROWSER");
-      if (browsers!=null){
+        String browsers = environment.getProperty("BROWSER");
+        if (browsers == null)
+          return false;
+
         StringTokenizer tokenizer = new StringTokenizer(browsers, ":");
         String browser = tokenizer.nextToken();
         int percentPercentIndex;
@@ -110,37 +116,41 @@ public class BrowserControl{
           commandline = browser+" "+url;
         Runtime.getRuntime().exec(commandline);
       }
-    }
-    else{ 
-      // Too many unix platforms to check, so we'll just assume it *is* unix.
-      // Under Unix, Netscape has to be running for the "-remote" 
-      // command to work. So, we try sending the command and 
-      // check for an exit value. If the return value is 0, 
-      // it worked, otherwise we need to start the browser. 
+      else{ 
+        // Too many unix platforms to check, so we'll just assume it *is* unix.
+        // Under Unix, Netscape has to be running for the "-remote" 
+        // command to work. So, we try sending the command and 
+        // check for an exit value. If the return value is 0, 
+        // it worked, otherwise we need to start the browser. 
 
-      // cmd = 'netscape -remote openURL(http://www.javaworld.com)' 
-      String cmd = "netscape -remote -raise openURL("+url+")"; 
-      Process p = Runtime.getRuntime().exec(cmd); 
+        // cmd = 'netscape -remote openURL(http://www.javaworld.com)' 
+        String cmd = "netscape -remote -raise openURL("+url+")"; 
+        Process p = Runtime.getRuntime().exec(cmd); 
 
-      try{ 
-        // wait for exit code -- if it's 0, command worked, 
-        // otherwise we need to start the browser up. 
-        int exitCode = p.waitFor(); 
+        try{ 
+          // wait for exit code -- if it's 0, command worked, 
+          // otherwise we need to start the browser up. 
+          int exitCode = p.waitFor(); 
 
-        if (exitCode != 0){ 
-          // Command failed, start up the browser 
-      
-          // cmd = 'netscape http://www.javaworld.com' 
-          cmd = "netscape " + url; 
-          p = Runtime.getRuntime().exec(cmd); 
+          if (exitCode != 0){ 
+            // Command failed, start up the browser 
+        
+            // cmd = 'netscape http://www.javaworld.com' 
+            cmd = "netscape " + url; 
+            p = Runtime.getRuntime().exec(cmd); 
+          } 
         } 
+        catch(InterruptedException x){ 
+          System.err.println("Error bringing up browser, cmd='" + cmd + "'"); 
+          System.err.println("Caught: " + x); 
+          throw new InterruptedIOException(x.getMessage());
+        }
       } 
-      catch(InterruptedException x){ 
-        System.err.println("Error bringing up browser, cmd='" + cmd + "'"); 
-        System.err.println("Caught: " + x); 
-        throw new InterruptedIOException(x.getMessage());
+    } catch (IOException e){
+        return false;
       }
-    } 
+
+    return true;
   } 
 
 
@@ -148,28 +158,33 @@ public class BrowserControl{
 
   /**
    * Brings up the default mailer with the given address in the "to:" field.
+   * Returns whether successful.
    */
 
-  public static void displayMailer(String address) throws IOException{
-    if (isLinux()){
-      synchronized(BrowserControl.class){
-        if (environment == null){
-          try{
-            environment = new Properties();
-            Process env = Runtime.getRuntime().exec("env");
-            environment.load(env.getInputStream());
-          } catch (IOException e){}
+  public static boolean displayMailer(String address){
+    try{
+      if (isLinux()){
+        synchronized(BrowserControl.class){
+          if (environment == null){
+            try{
+              environment = new Properties();
+              Process env = Runtime.getRuntime().exec("env");
+              environment.load(env.getInputStream());
+            } catch (IOException e){}
+          }
+        }
+
+        String mailer = environment.getProperty("MAILER");
+        if (mailer != null){
+          Runtime.getRuntime().exec(mailer + " " + address);
+          return true;
         }
       }
-
-      String mailer = environment.getProperty("MAILER");
-      if (mailer!=null){
-        Runtime.getRuntime().exec(mailer+" "+address);
-        return;
+    } catch (IOException e){
+        return false;
       }
-    }
 
-    displayURL("mailto:"+address);
+    return displayURL("mailto:"+address);
   }
 
 
@@ -232,7 +247,70 @@ public class BrowserControl{
       return true; 
     else 
       return false; 
-  } 
+  }
 
 
+
+  /**
+   * Displays an error dialog to the user appropriate to when the
+   * <code>displayURL</code> call fails. If <code>modal</code> is true, this
+   * method will block until the user closes the dialog. The specified parent 
+   * component must have a <code>Frame</code> parent.
+   */
+
+  public static void showDisplayBrowserFailedDialog(String url, Component parent, boolean modal){
+    final Dialog dialog = new Dialog(AWTUtilities.frameForComponent(parent), "Error displaying URL", modal);
+    dialog.setLayout(new BorderLayout(5, 5));
+    dialog.add(new Label("Unable to show url, copy/paste it into your browser:"), BorderLayout.NORTH);
+    TextField urlTextField = new TextField(url);
+    urlTextField.setEditable(false);
+    dialog.add(urlTextField, BorderLayout.CENTER);
+
+    Button okButton = new Button("OK");
+    okButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        dialog.dispose();
+      }
+    });
+    Panel okButtonPanel = new Panel(new FlowLayout());
+    okButtonPanel.add(okButton);
+    dialog.add(okButtonPanel, BorderLayout.SOUTH);
+
+    AWTUtilities.centerWindow(dialog, parent);
+    dialog.setVisible(true);
+  }
+
+
+
+  /**
+   * Displays an error dialog to the user appropriate to when the
+   * <code>displayMailer</code> call fails. If <code>modal</code> is true, this
+   * method will block until the user closes the dialog. The specified parent 
+   * component must have a <code>Frame</code> parent.
+   */
+
+  public static void showDisplayMailerFailedDialog(String address, Component parent, boolean modal){
+    final Dialog dialog = new Dialog(AWTUtilities.frameForComponent(parent), "Error displaying mailer", modal);
+    dialog.setLayout(new BorderLayout(5, 5));
+    dialog.add(new Label("Unable to display mailer, copy/paste the address into your mailer:"), BorderLayout.NORTH);
+    TextField addressTextField = new TextField(address);
+    addressTextField.setEditable(false);
+    dialog.add(addressTextField, BorderLayout.CENTER);
+
+    Button okButton = new Button("OK");
+    okButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        dialog.dispose();
+      }
+    });
+    Panel okButtonPanel = new Panel(new FlowLayout());
+    okButtonPanel.add(okButton);
+    dialog.add(okButtonPanel, BorderLayout.SOUTH);
+
+    AWTUtilities.centerWindow(dialog, parent);
+    dialog.setVisible(true);
+  }
+
+
+                            
 }

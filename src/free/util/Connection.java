@@ -26,16 +26,16 @@ import java.net.Socket;
 
 
 /**
- * This is the base class for all classes that define a connection to some server.
- * It implements the framework for the connection.
+ * This is the base class for all classes that define a connection to some
+ * server. It implements the framework for the connection.
  */
 
 public abstract class Connection{
 
 
   /**
-   * The requested username, note that the actual username assigned by the server
-   * may be unknown until the login procedure is finished.
+   * The requested username, note that the actual username assigned by the
+   * server may be unknown until the login procedure is finished.
    */ 
 
   private final String requestedUsername;
@@ -57,36 +57,16 @@ public abstract class Connection{
 
   private final String password;
 
-
   
 
   /**
-   * The hostname of the server to which we will connect.
-   */
-
-  private final String hostname;
-
-
-
-
-  /**
-   * The port on which we will connect to the server.
-   */
-
-  private final int port;
-
-
-
-
-  /**
    * Are we currently connected to the server. The Connection is initially 
-   * unconnected, it becomes connected after the connect() method returns.
-   * It becomes disconnected again when either the disconnect method is
+   * unconnected, it becomes connected after the socked to the server is
+   * created. It becomes disconnected again when either the disconnect method is
    * called or when connection to the server is lost.
    */
   
   private volatile boolean isConnected = false;
-
 
 
 
@@ -98,7 +78,6 @@ public abstract class Connection{
 
 
 
-
   /**
    * The login error message.
    */
@@ -107,13 +86,11 @@ public abstract class Connection{
 
 
 
-
   /**
    * The socket to the server.
    */
 
-  protected Socket sock;
-
+  protected volatile Socket sock;
 
 
 
@@ -125,28 +102,19 @@ public abstract class Connection{
 
 
 
-
   /**
-   * Creates a new Connection. Note that the Connection is initially unconnected,
-   * after creating the session, you can adjust the various Connection settings
-   * and then call the connect() method.
+   * Creates a new Connection.
    *
-   * @param hostname The server we will connect to.
-   * @param port The port we will connect on.
-   * @param username The name of the account, note that the actual username may be
-   * assigned by the server and will thus be known only after the login procedure
-   * is done.
+   * @param username The name of the account, note that the actual username may
+   * be assigned by the server and will thus be known only after the login
+   * procedure is done.
    * @param password The password of the account.
    */
 
-  public Connection(String hostname, int port, String requestedUsername, String password){
-    this.hostname = hostname;
-    this.port = port;
+  public Connection(String requestedUsername, String password){
     this.requestedUsername = requestedUsername;
     this.password = password;
   }
- 
-
 
 
 
@@ -154,30 +122,35 @@ public abstract class Connection{
    * Connects and logs in to the server. Returns <code>true</code> if the
    * procedure finished successfully, <code>false</code> otherwise. The reason
    * for login failure may be obtained via the
-   * <code>getLoginErrorMessage()</code> method. Note that this method blocks
-   * until the connection is established and the login procedure is finished.
-   * Also note that since communication with the reader thread is done via the
-   * <code>execRunnable(Runnable)</code> method, and in order to complete the 
-   * login procedure, communication with it <strong>is<strong> required, this
-   * method should NOT be called in the same thread
-   * <code>execRunnable(Runnable)</code> executes the runnable. Doing that will
-   * cause this method to never return.
+   * <code>getLoginErrorMessage()</code> method. Note that the connection may
+   * be reused if this method fails (either by throwing an exception or
+   * returning false), by invoking this method again.
+   * <strong>IMORTANT:</strong> This method blocks until the connection is
+   * established and the login procedure is finished. Since communication with
+   * the reader thread is done via the <code>execRunnable(Runnable)</code>
+   * method, and in order to complete the login procedure, communication with it
+   * <strong>is<strong> required, this method should NOT be called in the same
+   * thread <code>execRunnable(Runnable)</code> executes the runnable. Doing
+   * that will cause this method to never return.
+   *
+   * @param hostname The name of the host to connect to.
+   * @param port The port to connect on.
    *
    * @throws IOException if an I/O error occured when connecting to the server.
    * @throws IllegalStateException If a connection was already established.
    *
-   * @return True if the connection and login procedure finished successfully,
-   * false otherwise.
+   * @return whether login succeeded.
    *
    * @see #isConnected()
    * @see #disconnect()
    */
 
-  public boolean connectAndLogin() throws IOException{
+  public boolean connectAndLogin(String hostname, int port) throws IOException{
     synchronized(this){
       if (isConnected())
         throw new IllegalStateException();
-      sock = createSocket(hostname,port);
+
+      sock = createSocket(hostname, port);
 
       isConnected = true;
     }
@@ -187,10 +160,14 @@ public abstract class Connection{
 
     isLoggedIn = login();
 
-    if (!isLoggedIn)
+    if (!isLoggedIn){
+      readerThread = null;
+      sock.close();
+      isConnected = false;
       return false;
+    }
     else if (getUsername() == null)
-      throw new Error("The login() method MUST set the username if the login procedure finishes successfully");
+      throw new IllegalStateException("The login() method MUST set the username if the login procedure finishes successfully");
 
     execRunnable(new Runnable(){
       public void run(){
@@ -257,6 +234,29 @@ public abstract class Connection{
    */
 
   protected void onLogin(){}
+
+
+
+  /**
+   * Returns the hostname to which we're connected, or were connected if we've
+   * been disconnected. Returns <code>null</code> if we haven't been connected
+   * yet/
+   */
+
+  public String getHostname(){
+    return sock == null ? null : sock.getInetAddress().getHostName();
+  }
+
+
+
+  /**
+   * Returns the (remote) port on which we're connected, or were connected if
+   * we've been disconnected. Returns -1 if we're not connected.
+   */
+
+  public int getPort(){
+    return sock == null ? -1 : sock.getPort();
+  }
 
 
 
@@ -355,29 +355,6 @@ public abstract class Connection{
 
 
   /**
-   * Returns the hostname of the server.
-   */
-
-  public String getHostname(){
-    return hostname;
-  }
-
-
-
-
-  /**
-   * Returns the port on which we are connecting.
-   */
-
-  public int getPort(){
-    return port;
-  }
-  
-
-
-
-
-  /**
    * Disconnects from the server.
    *
    * @throws IOException if an I/O error occured when disconnecting from the 
@@ -390,11 +367,11 @@ public abstract class Connection{
   public synchronized void disconnect() throws IOException{
     if (!isConnected())
       throw new IllegalArgumentException();
+
     isConnected = false;
     isLoggedIn = false;
     readerThread = null;
     sock.close();
-    sock = null;
   }
 
 

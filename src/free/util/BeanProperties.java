@@ -22,6 +22,8 @@
 package free.util;
 
 import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -63,11 +65,22 @@ public class BeanProperties{
 
 
   /**
-   * Creates a new BeanProperties with the specified source bean.
+   * Creates a new <code>BeanProperties</code> object with the specified source
+   * bean.
    */
 
   public BeanProperties(Object source){
     this.source = source;
+  }
+
+
+
+  /**
+   * Creates a new <code>BeanProperties</code> object with itself as the source.
+   */
+
+  public BeanProperties(){
+    this.source = this;
   }
 
 
@@ -112,6 +125,16 @@ public class BeanProperties{
 
 
   /**
+   * Returns an enumeration of all the property names.
+   */
+
+  public Enumeration getPropertyNames(){
+    return props.keys();
+  }
+
+
+
+  /**
    * Sets the property with the specified name to the specified value.
    */
 
@@ -125,12 +148,29 @@ public class BeanProperties{
 
 
   /**
-   * Returns the value of the property with the specified name. Returns
-   * <code>null</code> if there is no property with the specified name.
+   * Returns the value of the property with the specified name. Throws a
+   * <code>NoSuchElementException</code> if no property with the specified name
+   * exists.
    */
 
   public Object getProperty(String propertyName){
-    return props.get(propertyName);
+    Object result = getProperty(propertyName, null);
+    if (result == null)
+      throw new NoSuchElementException(propertyName);
+
+    return result;
+  }
+
+
+
+  /**
+   * Returns the value of the property with the specified name or the specified
+   * default value if there is no property with the specified name.
+   */
+
+  public Object getProperty(String propertyName, Object defaultValue){
+    Object value = props.get(propertyName);
+    return value == null ? defaultValue : value;
   }
 
 
@@ -150,15 +190,13 @@ public class BeanProperties{
    * Returns the value of the <code>boolean</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Boolean</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public boolean getBooleanProperty(String propertyName){
-    Boolean value = (Boolean)getProperty(propertyName);
-    return value.booleanValue();
+    return ((Boolean)getProperty(propertyName)).booleanValue();
   }
-
 
 
 
@@ -171,11 +209,8 @@ public class BeanProperties{
    */
 
   public boolean getBooleanProperty(String propertyName, boolean defaultValue){
-    Boolean value = (Boolean)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.booleanValue();
+    Boolean value = (Boolean)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.booleanValue();
   }
 
 
@@ -195,15 +230,13 @@ public class BeanProperties{
    * Returns the value of the <code>byte</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Byte</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public byte getByteProperty(String propertyName){
-    Byte value = (Byte)getProperty(propertyName);
-    return value.byteValue();
+    return ((Byte)getProperty(propertyName)).byteValue();
   }
-
 
 
 
@@ -216,13 +249,9 @@ public class BeanProperties{
    */
 
   public byte getByteProperty(String propertyName, byte defaultValue){
-    Byte value = (Byte)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.byteValue();
+    Byte value = (Byte)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.byteValue();
   }
-
 
 
 
@@ -241,15 +270,13 @@ public class BeanProperties{
    * Returns the value of the <code>short</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Short</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public short getShortProperty(String propertyName){
-    Short value = (Short)getProperty(propertyName);
-    return value.shortValue();
+    return ((Short)getProperty(propertyName)).shortValue();
   }
-
 
 
 
@@ -262,13 +289,9 @@ public class BeanProperties{
    */
 
   public short getShortProperty(String propertyName, short defaultValue){
-    Short value = (Short)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.shortValue();
+    Short value = (Short)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.shortValue();
   }
-
 
 
 
@@ -287,15 +310,13 @@ public class BeanProperties{
    * Returns the value of the <code>int</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Integer</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public int getIntegerProperty(String propertyName){
-    Integer value = (Integer)getProperty(propertyName);
-    return value.intValue();
+    return ((Integer)getProperty(propertyName)).intValue();
   }
-
 
 
 
@@ -308,13 +329,9 @@ public class BeanProperties{
    */
 
   public int getIntegerProperty(String propertyName, int defaultValue){
-    Integer value = (Integer)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.intValue();
+    Integer value = (Integer)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.intValue();
   }
-
 
 
 
@@ -329,20 +346,17 @@ public class BeanProperties{
 
 
 
-
   /**
    * Returns the value of the <code>long</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Long</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public long getLongProperty(String propertyName){
-    Long value = (Long)getProperty(propertyName);
-    return value.longValue();
+    return ((Long)getProperty(propertyName)).longValue();
   }
-
 
 
 
@@ -355,14 +369,9 @@ public class BeanProperties{
    */
 
   public long getLongProperty(String propertyName, long defaultValue){
-    Long value = (Long)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.longValue();
+    Long value = (Long)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.longValue();
   }
-
-
 
 
 
@@ -381,15 +390,13 @@ public class BeanProperties{
    * Returns the value of the <code>float</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Float</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public float getFloatProperty(String propertyName){
-    Float value = (Float)getProperty(propertyName);
-    return value.floatValue();
+    return ((Float)getProperty(propertyName)).floatValue();
   }
-
 
 
 
@@ -402,13 +409,9 @@ public class BeanProperties{
    */
 
   public float getFloatProperty(String propertyName, float defaultValue){
-    Float value = (Float)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.floatValue();
+    Float value = (Float)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.floatValue();
   }
-
 
 
 
@@ -427,15 +430,13 @@ public class BeanProperties{
    * Returns the value of the <code>double</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Double</code>. If there is
-   * no property with the specified name, a <code>NullPointerException</code> is
-   * thrown.
+   * no property with the specified name, a <code>NoSuchElementException</code>
+   * is thrown.
    */
 
   public double getDoubleProperty(String propertyName){
-    Double value = (Double)getProperty(propertyName);
-    return value.doubleValue();
+    return ((Double)getProperty(propertyName)).doubleValue();
   }
-
 
 
 
@@ -448,13 +449,9 @@ public class BeanProperties{
    */
 
   public double getDoubleProperty(String propertyName, double defaultValue){
-    Double value = (Double)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.doubleValue();
+    Double value = (Double)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.doubleValue();
   }
-
 
 
 
@@ -474,12 +471,11 @@ public class BeanProperties{
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.Character</code>. If there
    * is no property with the specified name, a
-   * <code>NullPointerException</code> is thrown.
+   * <code>NoSuchElementException</code> is thrown.
    */
 
   public char getCharacterProperty(String propertyName){
-    Character value = (Character)getProperty(propertyName);
-    return value.charValue();
+    return ((Character)getProperty(propertyName)).charValue();
   }
 
 
@@ -493,11 +489,8 @@ public class BeanProperties{
    */
 
   public char getCharacterProperty(String propertyName, char defaultValue){
-    Character value = (Character)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value.charValue();
+    Character value = (Character)getProperty(propertyName, null);
+    return value == null ? defaultValue : value.charValue();
   }
 
 
@@ -517,16 +510,13 @@ public class BeanProperties{
    * Returns the value of the <code>String</code> property with the specified
    * name. Throws a <code>ClassCastException</code> if current value of the
    * property is not an instance of <code>java.lang.String</code>. If there is
-   * no property with the specified name, <code>null</code> is returned.
+   * no property with the specified name,  a
+   * <code>NoSuchElementException</code> is thrown.
    */
 
   public String getStringProperty(String propertyName){
-    String value = (String)getProperty(propertyName);
-    if (value == null)
-      throw new NullPointerException();
-    return value;
+    return (String)getProperty(propertyName);
   }
-
 
 
 
@@ -539,12 +529,10 @@ public class BeanProperties{
    */
 
   public String getStringProperty(String propertyName, String defaultValue){
-    String value = (String)getProperty(propertyName);
-    if (value == null)
-      return defaultValue;
-    else
-      return value;
+    String value = (String)getProperty(propertyName, null);
+    return value == null ? defaultValue : value;
   }
+
 
 
 }

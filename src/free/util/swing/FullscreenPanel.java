@@ -168,7 +168,7 @@ public class FullscreenPanel extends FixedJPanel{
 
   private RootPaneContainer setRealFullscreen(){
     try{
-      JFrame frame = new JFrame(AWTUtilities.frameForComponent(this).getTitle());
+      JFrame frame = new JFrame(SwingUtils.frameForComponent(this).getTitle());
 
       Method setUndecorated = 
         Frame.class.getDeclaredMethod("setUndecorated", new Class[]{boolean.class});
@@ -188,10 +188,10 @@ public class FullscreenPanel extends FixedJPanel{
         graphicsDeviceClass.getDeclaredMethod("setFullScreenWindow", new Class[]{Window.class});
 
       Object graphicsConfiguration = 
-        getGraphicsConfiguration.invoke(AWTUtilities.frameForComponent(this), null);
+        getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), null);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, null);
 
-      AWTUtilities.frameForComponent(this).setVisible(false);
+      SwingUtils.frameForComponent(this).setVisible(false);
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{frame});
 
       return frame;
@@ -209,7 +209,7 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private RootPaneContainer setFakeFullscreen(){
-    JWindow window = new JWindow(AWTUtilities.frameForComponent(this));
+    JWindow window = new JWindow(SwingUtils.frameForComponent(this));
 
     Dimension screenSize = window.getToolkit().getScreenSize();
     window.setBounds(0, 0, screenSize.width, screenSize.height);
@@ -264,7 +264,7 @@ public class FullscreenPanel extends FixedJPanel{
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{null});
 
       frame.dispose();
-      AWTUtilities.frameForComponent(this).setVisible(true);
+      SwingUtils.frameForComponent(this).setVisible(true);
     } catch (Exception e){e.printStackTrace();}
   }
 

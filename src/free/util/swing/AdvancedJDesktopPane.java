@@ -54,10 +54,10 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
 
   /**
-   * The code for stretching the wallpaper image.
+   * The code for scaling the wallpaper image to match the size of the desktop.
    */
 
-  public static final int STRETCH = 3;
+  public static final int SCALE = 3;
 
 
   
@@ -77,7 +77,6 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
 
 
-
   /**
    * Sets the wallpaper.
    */
@@ -85,7 +84,7 @@ public class AdvancedJDesktopPane extends JDesktopPane{
   public void setWallpaper(Image wallpaper){
     this.wallpaper = wallpaper;
 
-    if (wallpaper!=null){
+    if (wallpaper != null){
       try{
         free.util.ImageUtilities.preload(wallpaper);
       } catch (InterruptedException e){
@@ -112,14 +111,14 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
   /**
    * Sets the wallpaper layout style. Possible values are {@link #CENTER}, 
-   * {@link #STRETCH} and {@link #TILE}.
+   * {@link #SCALE} and {@link #TILE}.
    */
 
   public void setWallpaperLayoutStyle(int wallpaperLayoutStyle){
     switch(wallpaperLayoutStyle){
       case CENTER:
       case TILE:
-      case STRETCH:
+      case SCALE:
         break;
       default:
        throw new IllegalArgumentException("Illegal wallpaper layout style: "+wallpaperLayoutStyle);
@@ -152,7 +151,7 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
       if ((imageWidth == -1) || (imageHeight == -1))
         return;
-      else if (wallpaperLayoutStyle == STRETCH)
+      else if (wallpaperLayoutStyle == SCALE)
         g.drawImage(wallpaper, 0, 0, size.width, size.height, this);
       else if (wallpaperLayoutStyle == CENTER){
         int x = (size.width - imageWidth) / 2;

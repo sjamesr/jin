@@ -31,18 +31,18 @@ import java.beans.PropertyChangeEvent;
 
 
 /**
- * A JMenu which contains JCheckBoxMenuItems controlling and reflecting the
- * current look&feel.
+ * A menu which allows the user to change the current look and feel.
  */
 
 public class LookAndFeelMenu extends JMenu{
+
 
 
   /**
    * The Components that need to be updated when the look and feel changes.
    */
 
-  private final Vector componentsToUpdate = new Vector();
+  private final Vector treeRoots;
 
 
 
@@ -62,7 +62,6 @@ public class LookAndFeelMenu extends JMenu{
 
 
 
-
   /**
    * The ButtonGroup of all the look and feel buttons.
    */
@@ -71,23 +70,39 @@ public class LookAndFeelMenu extends JMenu{
 
 
 
-  
   /**
-   * Creates a new LookAndFeelMenu.
-   *
-   * @param componentTreeToUpdate A component whose children to update
-   * (recursively) when the LookAndFeel changes.
+   * Creates a new <code>LookAndFeelMenu</code>.
+   * 
+   * @param treeRoot The component whose tree to update when the l&f changes.
    */
 
-  public LookAndFeelMenu(Component componentTreeToUpdate){
+  public LookAndFeelMenu(Component treeRoot){
+    this(new Component[]{treeRoot});
+  }
+
+  
+
+  /**
+   * Creates a new <code>LookAndFeelMenu</code>.
+   *
+   * @param treeRoots The list of component roots whose tree to update when the
+   * l&f changes.
+   */
+
+  public LookAndFeelMenu(Component [] treeRoots){
     super("Look&Feel");
+    setMnemonic('L');
+
+    this.treeRoots = new Vector(treeRoots.length);
+    for (int i = 0; i < treeRoots.length; i++)
+      this.treeRoots.addElement(treeRoots[i]);
 
     ActionListener lnfActionListener = new LookAndFeelChoiceListener();
 
     UIManager.LookAndFeelInfo [] lnfs = UIManager.getInstalledLookAndFeels();
     String currentLookAndFeelClassName = UIManager.getLookAndFeel().getClass().getName();
     lnfButtonGroup = new ButtonGroup();
-    for (int i=0;i<lnfs.length;i++){
+    for (int i = 0; i < lnfs.length; i++){
       UIManager.LookAndFeelInfo lnf = lnfs[i];
       JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(lnf.getName());
       menuItem.addActionListener(lnfActionListener);
@@ -104,41 +119,29 @@ public class LookAndFeelMenu extends JMenu{
       add(menuItem);
     }
 
-    addComponentTreeToBeUpdated(componentTreeToUpdate);
-
     UIManager.addPropertyChangeListener(new LookAndFeelChangeListener());
-
-    setMnemonic('L');
   }
-
-
 
 
 
   /**
-   * Adds the given component to have it and all its children (and sub-children,
-   * recursively) to be updated when the LookAndFeel changes.
+   * Adds the specified tree root to be updated when the look and feel changes.
    */
 
-  private void addComponentTreeToBeUpdated(Component component){
-    if (!componentsToUpdate.contains(component))
-      componentsToUpdate.addElement(component);
+  public void addTreeRoot(Component component){
+    treeRoots.addElement(component);
   }
-
-
 
 
 
   /**
-   * Removes the given component from the list of components whose tree is 
-   * updated when the LookAndFeel changes.
+   * Removes the specified tree root from being updated when the look and feel
+   * changes.
    */
 
-  private void removeComponentTreeToBeUpdated(Component component){
-    componentsToUpdate.removeElement(component);
+  public void removeTreeRoot(Component component){
+    treeRoots.removeElement(component);
   }
-
-
 
 
 
@@ -147,14 +150,11 @@ public class LookAndFeelMenu extends JMenu{
    */
 
   private void updateComponents(){
-    for (int i=0;i<componentsToUpdate.size();i++){
-      Component component = (Component)componentsToUpdate.elementAt(i);
+    for (int i = 0 ; i < treeRoots.size(); i++){
+      Component component = (Component)treeRoots.elementAt(i);
       SwingUtilities.updateComponentTreeUI(component);
     }
   }
-
-  
-
 
 
 
@@ -193,6 +193,8 @@ public class LookAndFeelMenu extends JMenu{
    */
 
   private class LookAndFeelChangeListener implements PropertyChangeListener{
+
+
     
     /**
      * Changes the button corresponding to the new LookAndFeel to be pressed

@@ -149,4 +149,21 @@ public class TextUtilities{
   }
 
 
+
+  /**
+   * Parses the specified list of integers delimited by the specified
+   * delimiters.
+   */
+
+  public static int [] parseIntList(String text, String delimiters){
+    StringTokenizer tokenizer = new StringTokenizer(text, delimiters);
+    int [] tokens = new int[tokenizer.countTokens()];
+    for (int i = 0; i < tokens.length; i++)
+      tokens[i] = Integer.parseInt(tokenizer.nextToken());
+
+    return tokens;
+  }
+
+
+
 }

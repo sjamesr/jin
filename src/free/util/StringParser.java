@@ -23,6 +23,7 @@ package free.util;
 
 import java.util.StringTokenizer;
 import java.awt.Rectangle;
+import java.awt.Dimension;
 import java.awt.Color;
 
 
@@ -33,6 +34,7 @@ import java.awt.Color;
  */
 
 public class StringParser{
+
 
   
   /**
@@ -46,23 +48,75 @@ public class StringParser{
    */
 
   public static Rectangle parseRectangle(String rectString){
-    StringTokenizer tokenizer = new StringTokenizer(rectString,";");
-    if (tokenizer.countTokens()!=4)
-      throw new FormatException("Wrong Rectangle format: "+rectString);
+    StringTokenizer tokenizer = new StringTokenizer(rectString, ";");
+    if (tokenizer.countTokens() != 4)
+      throw new FormatException("Wrong Rectangle format: " + rectString);
     
-    int x,y,width,height;
     try{
-      x = Integer.parseInt(tokenizer.nextToken());
-      y = Integer.parseInt(tokenizer.nextToken());
-      width = Integer.parseInt(tokenizer.nextToken());
-      height = Integer.parseInt(tokenizer.nextToken());
+      int x = Integer.parseInt(tokenizer.nextToken());
+      int y = Integer.parseInt(tokenizer.nextToken());
+      int width = Integer.parseInt(tokenizer.nextToken());
+      int height = Integer.parseInt(tokenizer.nextToken());
+      return new Rectangle(x, y, width, height);
     } catch (NumberFormatException e){
-        throw new FormatException(e,"Wrong Rectangle format: "+rectString);
+        throw new FormatException(e,"Wrong Rectangle format: " + rectString);
       }
-
-    return new Rectangle(x,y,width,height);
   }
 
+
+
+  /**
+   * Parses the given String as a RectDouble object. The expected format is:
+   * "<x>;<y>;<width>;<height>" where <value> is replaced by a double value,
+   * parseable by {@link Double#valueOf(String)}.
+   *
+   * @throws FormatException if the given String is not in the expected wrong
+   * format.
+   *
+   * @see StringEncoder#encodeRectDouble(RectDouble)
+   */
+
+  public static RectDouble parseRectDouble(String rectString){
+    StringTokenizer tokenizer = new StringTokenizer(rectString, ";");
+    if (tokenizer.countTokens() != 4)
+      throw new FormatException("Wrong Rectangle format: " + rectString);
+    
+    try{
+      double x = Double.valueOf(tokenizer.nextToken()).doubleValue();
+      double y = Double.valueOf(tokenizer.nextToken()).doubleValue();
+      double width = Double.valueOf(tokenizer.nextToken()).doubleValue();
+      double height = Double.valueOf(tokenizer.nextToken()).doubleValue();
+      return new RectDouble(x, y, width, height);
+    } catch (NumberFormatException e){
+        throw new FormatException(e,"Wrong Rectangle format: " + rectString);
+      }
+  }
+
+
+
+  /**
+   * Parses the given String as a Dimension object. The expected format is:
+   * "<width>;<height>" where <value> is replaced by an integer value.
+   *
+   * @throws FormatException if the given String is not in the expected wrong
+   * format.
+   *
+   * @see StringEncoder#encodeDimension(Dimension)
+   */
+
+  public static Dimension parseDimension(String dimString){
+    StringTokenizer tokenizer = new StringTokenizer(dimString, ";");
+    if (tokenizer.countTokens() != 2)
+      throw new FormatException("Wrong Dimension format: " + dimString);
+    
+    try{
+      int width = Integer.parseInt(tokenizer.nextToken());
+      int height = Integer.parseInt(tokenizer.nextToken());
+      return new Dimension(width, height);
+    } catch (NumberFormatException e){
+        throw new FormatException(e,"Wrong Dimension format: " + dimString);
+      }
+  }
 
 
 
@@ -75,14 +129,53 @@ public class StringParser{
 
   public static Color parseColor(String colorString){
     try{
-      int colorInt = Integer.parseInt(colorString,16);
-      if ((colorInt<0)||(colorInt>0xffffffL))
-        throw new FormatException("Wrong Color format: "+colorString);
+      int colorInt = Integer.parseInt(colorString, 16);
+      if ((colorInt < 0) || (colorInt > 0xffffffL))
+        throw new FormatException("Wrong Color format: " + colorString);
 
       return new Color(colorInt);
     } catch (NumberFormatException e){
-        throw new FormatException(e,"Wrong Color format: "+colorString);
+        throw new FormatException(e, "Wrong Color format: " + colorString);
       }
+  }
+
+
+
+  /**
+   * Parses the given string as a list of integers.
+   */
+
+  public static int [] parseIntList(String text){
+    return TextUtilities.parseIntList(text, " ");
+  }
+
+
+
+  /**
+   * Unescapes the specified string.
+   */
+
+  public static String parseString(String s){
+    StringBuffer buf = new StringBuffer();
+    for (int i = 0; i < s.length(); i++){
+      char c = s.charAt(i);
+      if (c == '\\'){
+        c = s.charAt(++i);
+        switch (c){
+          case 'n': buf.append('\n'); break;
+          case 'r': buf.append('\r'); break;
+          case 't': buf.append('\t'); break;
+          case '\\': buf.append('\\'); break;
+          default:
+            buf.append('\'');
+            buf.append(c);
+        }
+      }
+      else
+        buf.append(c);
+    }
+
+    return buf.toString();
   }
 
 }
