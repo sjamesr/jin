@@ -36,6 +36,18 @@
 		<property name="source.dir" value="${jin.dir}/src" />
 		<property name="win.setup.maker" value="makensis.exe" />
     <property name="cf.host" value="cf-shell.sourceforge.net" />
+
+	  <!-- Ask for Jin version and update app.props -->
+		<input message="Please specify the release version:" addproperty="release.version" />
+		<echo message="Changing version in app.props to ${release.version}" /> 
+		<propertyfile file="${source.dir}/free/jin/resources/app.props">
+			<entry key="app.version" value="${release.version}" />
+		</propertyfile>
+    
+    <property name="release.dir" value="jin-${release.version}" />
+		<delete dir="${release.dir}" />
+		<mkdir dir="${release.dir}" />
+    
 	</target>
 
 
@@ -48,48 +60,15 @@
 			<property name="release.platform" value="${release.platform}" />
 		</ant>
 	</target>
+  
 
-	
-	<!-- Makes releases for windows, unix and os x -->
-	<target name="release" depends="init">
-
-	  <!-- Ask for Jin version and update app.props -->
-		<input message="Please specify the release version:" addproperty="release.version" />
-		<echo message="Changing version in app.props to ${release.version}" /> 
-		<propertyfile file="${source.dir}/free/jin/resources/app.props">
-			<entry key="app.version" value="${release.version}" />
-		</propertyfile>
+  <!-- Unix release. Resulting file is ${unix-archive} -->
+  <target name="unix" depends="init">
+    <echo message="Creating unix/linux release" />
     
-    <!-- Ask for SourceForge Compile Farm username and private key passphrase, then test them -->
-    <input message="Please specify ${cf.host} username:" addproperty="cf.username" />
-    <input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
-    <echo message="Testing connection to Compile Farm, please wait" />
-    <sshexec host="${cf.host}"
-             username="${cf.username}"
-             keyfile="${user.home}/.ssh/id_dsa"
-             passphrase="${cf.passphrase}"
-             command="echo works"
-    />
-
-
-		<!-- Specifies where the release directories are -->
-		<property name="release.dir" value="jin-${release.version}" />
 		<property name="release.unix.dir" value="${release.dir}/unix" />
-		<property name="release.win.dir" value="${release.dir}/win" />
-		<property name="release.osx.dir" value="${release.dir}/osx" />
-		<property name="release.src.dir" value="${release.dir}/src" />
-
-		<!-- Creates the release directories -->
-		<delete dir="${release.dir}" />
-		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.unix.dir}" />
-		<mkdir dir="${release.win.dir}" />
-		<mkdir dir="${release.osx.dir}" />
-		<mkdir dir="${release.src.dir}" />
-
-
-		<!-- Unix release. Resulting file is ${unix-archive} -->
-		<echo message="Creating unix/linux release" />
+    
 		<antcall target="build">
 			<param name="release.platform" value="unix" />
 		</antcall>
@@ -110,10 +89,17 @@
 		<delete dir="${unix-dir-to-tar}" />
 		<delete file="${unix-tar}" />
     <property name="unix-archive" value="${unix-gz}" />
-   
-    
-    <!-- Windows release. Resulting files are ${win-install} and ${win-archive} -->
+  </target>
+  
+
+  
+  <!-- Windows release. Resulting files are ${win-install} and ${win-archive} -->
+  <target name="windows" depends="init">
 		<echo message="Creating windows release" />
+  
+    <property name="release.win.dir" value="${release.dir}/win" />
+    <mkdir dir="${release.win.dir}" />
+    
 		<antcall target="build">
 			<param name="release.platform" value="windows" />
 		</antcall>
@@ -138,10 +124,16 @@
     <delete dir="${dir-to-inst}" />
     <property name="win-install" value="${exe}" />
     <property name="win-archive" value="${zip}" />
-    
-    
-    <!-- OS X release. Resulting file is ${osx-install} -->
+  </target>
+  
+
+  <!-- OS X release. Resulting file is ${osx-install} -->
+  <target name="osx" depends="init, ask-cf-info">
     <echo message="Creating Mac OS X release" />
+    
+		<property name="release.osx.dir" value="${release.dir}/osx" />
+		<mkdir dir="${release.osx.dir}" />
+    
     <antcall target="build">
       <param name="release.platform" value="macosx" />
     </antcall>
@@ -197,10 +189,15 @@
     <delete dir="${app-dir}" />
     <delete dir="${app-dir}" />
     <property name="osx-install" value="jin-${release.version}-osx.dmg" />
-    
-    
-    <!-- Source. Resulting file is ${src-archive} -->
+  </target>
+
+  <!-- Source. Resulting file is ${src-archive} -->
+  <target name="src" depends="init">
     <echo message="Creating Source release" />
+
+    <property name="release.src.dir" value="${release.dir}/src" />
+    <mkdir dir="${release.src.dir}" />
+    
     <property name="src-archive-dir.name" value="jin-${release.version}" />
     <property name="src-archive-dir" value="${release.src.dir}/${src-archive-dir.name}" />
     <mkdir dir="${src-archive-dir}" />
@@ -219,7 +216,24 @@
 		<delete file="${src-tar}" />
     <property name="src-archive" value="${src-gz}" />
     
-    
-	</target>
+  </target>
+
+  
+  <!-- Ask for SourceForge Compile Farm username and private key passphrase, then test them -->
+  <target name="ask-cf-info" unless="cf.username">
+    <input message="Please specify ${cf.host} username:" addproperty="cf.username" />
+    <input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
+    <echo message="Testing connection to Compile Farm, please wait" />
+    <sshexec host="${cf.host}"
+             username="${cf.username}"
+             keyfile="${user.home}/.ssh/id_dsa"
+             passphrase="${cf.passphrase}"
+             command="echo works"
+    />
+  </target>
+
+	
+	<!-- Makes releases for windows, unix and os x -->
+	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" />
 	
 </project>
