@@ -748,14 +748,32 @@ public class JinMain implements JinContext{
     DelegatingClassLoader libsLoader = new DelegatingClassLoader();
     File libDir = new File(JIN_DIR, "libs");
     checkDirectoryExists(libDir);
-
-    String [] jars = libDir.list(new ExtensionFilenameFilter(".jar"));
-    for (int i = 0; i < jars.length; i++){
-      File jar = new File(libDir, jars[i]);
-      libsLoader.addDelegate(new ZipClassLoader(jar, libsLoader));
+    
+    addDelegateZipClassLoaders(libsLoader, libDir);
+    
+    String [] files = libDir.list();
+    for (int i = 0; i < files.length; i++){
+      File file = new File(libDir, files[i]);
+      if (file.isDirectory())
+        addDelegateZipClassLoaders(libsLoader, file);
     }
 
     return libsLoader;
+  }
+  
+  
+  
+  /**
+   * Adds delegate zip classloaders for all jar files inside the specified
+   * directory.
+   */
+   
+  private static void addDelegateZipClassLoaders(DelegatingClassLoader loader, File dir) throws IOException{
+    String [] jars = dir.list(new ExtensionFilenameFilter(".jar"));
+    for (int i = 0; i < jars.length; i++){
+      File jar = new File(dir, jars[i]);
+      loader.addDelegate(new ZipClassLoader(jar, loader));
+    }
   }
 
 
