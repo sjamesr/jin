@@ -33,6 +33,7 @@ import javax.swing.border.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PreferencesPanel;
 import free.util.StringParser;
 import free.util.StringEncoder;
 import free.util.GraphicsUtilities;
@@ -562,5 +563,31 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     if (!getProperty("game-list-display-style", "embedded").equalsIgnoreCase(gameListDisplayStyle))
       user.setProperty(prefix+"game-list-display-style", gameListDisplayStyle, true);
   }
+
+
+
+
+  /**
+   * Overrides <code>hasPreverencesUI</code> to return whether the plugin
+   * will display a preferences UI (the setting is taken from the
+   * <pre>"preferences.show"</pre> property.
+   */
+
+  public boolean hasPreferencesUI(){
+    return new Boolean(getProperty("preferences.show", "true")).booleanValue();
+  }
+
+
+
+
+  /**
+   * Return a PreferencesPanel for changing the console manager's settings.
+   */
+
+  public PreferencesPanel getPreferencesUI(){
+    return new ConsolePreferencesPanel(this);
+  }
+
+
 
 } 
