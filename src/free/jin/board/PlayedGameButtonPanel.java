@@ -31,7 +31,7 @@ import free.jin.event.GameListener;
 import free.jin.event.OfferEvent;
 import free.jin.event.GameEndEvent;
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 import free.jin.plugin.Plugin;
 import free.workarounds.FixedJPanel;
 
@@ -229,7 +229,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       if (evt.getGame() != game)
         return;
 
-      plugin.getConnection().getJinListenerManager().removeGameListener(this);
+      plugin.getConn().getListenerManager().removeGameListener(this);
 
       super.gameEnded(evt);
     }
@@ -270,7 +270,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     setAdjournState(OFFER_STATE);
     setResignState(CLAIM_STATE);
 
-    plugin.getConnection().getJinListenerManager().addGameListener(gameListener);
+    plugin.getConn().getListenerManager().addGameListener(gameListener);
   }
 
 
@@ -312,7 +312,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
 
   protected void createComponents(Plugin plugin, Game game){
-    JinConnection conn = plugin.getConnection();
+    Connection conn = plugin.getConn();
 
     resignButton = createResignButton(plugin, game);
     drawButton = createDrawButton(plugin, game);
@@ -558,7 +558,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   public void actionPerformed(ActionEvent evt){
     Object source = evt.getSource();
 
-    JinConnection conn = plugin.getConnection();
+    Connection conn = plugin.getConn();
     if (source==resignButton){
       int result = JOptionPane.showConfirmDialog(parentComponent, "Are you sure you want to resign?", "Resign?", JOptionPane.YES_NO_OPTION);
       if (result==JOptionPane.YES_OPTION)

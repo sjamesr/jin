@@ -27,7 +27,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.jin.Game;
-import free.jin.JinConnection;
+import free.jin.Connection;
 import free.jin.plugin.Plugin;
 import free.workarounds.FixedJPanel;
 
@@ -238,7 +238,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   public void actionPerformed(ActionEvent evt){
     Object source = evt.getSource();
 
-    JinConnection conn = plugin.getConnection();
+    Connection conn = plugin.getConn();
     if (source==startButton){
       conn.goToBeginning(game);
     }

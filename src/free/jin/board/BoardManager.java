@@ -27,21 +27,14 @@ import javax.swing.*;
 import free.chess.*;
 import java.util.*;
 import javax.swing.event.*;
-import free.jin.Game;
-import free.jin.User;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PreferencesPanel;
+import free.jin.plugin.*;
+import free.jin.*;
 import free.jin.board.event.UserMoveListener;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.sound.SoundManager;
-import free.util.StringParser;
-import free.util.StringEncoder;
 import free.util.BeanProperties;
-import free.workarounds.FixedJInternalFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -53,7 +46,7 @@ import java.net.URL;
  */
 
 public class BoardManager extends Plugin implements GameListener, UserMoveListener,
-    VetoableChangeListener, InternalFrameListener{
+    PluginUIListener{
 
 
 
@@ -87,8 +80,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public static final int PREMOVE_MOVE_SENDING_MODE = 3;
 
-
-
+  
 
   /**
    * A reference to the sound manager, if one exists.
@@ -128,38 +120,28 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * A list of JInternalFrames which are still on the screen but contain
-   * inactive BoardPanels.
+   * A Hashtable mapping PluginUIContainer objects to BoardPanels they contain.
    */
 
-  protected final Vector unusedInternalFrames = new Vector();
+  protected final Hashtable containersToBoardPanels = new Hashtable();
 
 
 
 
   /**
-   * A Hashtable mapping JInternalFrame objects to BoardPanels they contain.
+   * A Hashtable mapping BoardPanels to their PluginUIContainers.
    */
 
-  protected final Hashtable internalFramesToBoardPanels = new Hashtable();
+  protected final Hashtable boardPanelsToContainers = new Hashtable();
 
 
 
 
   /**
-   * A Hashtable mapping BoardPanels to their JInternalFrame containers.
+   * A list of the PluginUIContainers in the order they were created.
    */
 
-  protected final Hashtable boardPanelsToInternalFrames = new Hashtable();
-
-
-
-
-  /**
-   * A list of the JInternalFrames in the order they were created.
-   */
-
-  protected final Vector internalFrames = new Vector();
+  protected final Vector containers = new Vector();
 
 
 
@@ -201,7 +183,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public void stop(){
     unregisterConnListeners();
-    removeBoards();
   }
 
 
@@ -212,11 +193,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   private void obtainSoundManager(){
-    String pluginName = getProperty("sound-manager-plugin.name");
-    if (pluginName != null)
-      soundManager = (SoundManager)getPluginContext().getPlugin(pluginName);
+    soundManager = (SoundManager)getPlugin("sound");
   }
-
 
 
 
@@ -235,15 +213,17 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected void initPreferences(){
-    setAutoPromote(Boolean.valueOf(getProperty("auto-promote", "false")).booleanValue());
+    Preferences prefs = getPrefs();
 
-    setMoveInputStyle("click'n'click".equals(getProperty("move-input-style")) ? 
+    setAutoPromote(prefs.getBool("auto-promote", false));
+
+    setMoveInputStyle("click'n'click".equals(prefs.getString("move-input-style", null)) ? 
       JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP);
 
-    setDraggedPieceStyle("target-cursor".equals(getProperty("dragged-piece-style")) ?
+    setDraggedPieceStyle("target-cursor".equals(prefs.getString("dragged-piece-style", null)) ?
       JBoard.CROSSHAIR_DRAGGED_PIECE : JBoard.NORMAL_DRAGGED_PIECE);
 
-    String moveHighlightingStyleString = getProperty("move-highlight.style", "square");
+    String moveHighlightingStyleString = prefs.getString("move-highlight.style", "square");
     if ("square".equals(moveHighlightingStyleString))
       setMoveHighlightingStyle(JBoard.SQUARE_MOVE_HIGHLIGHTING);
     else if ("arrow".equals(moveHighlightingStyleString))
@@ -251,16 +231,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else
       setMoveHighlightingStyle(JBoard.NO_MOVE_HIGHLIGHTING);
 
-    setHighlightingOwnMoves(
-      Boolean.valueOf(getProperty("move-highlight.highlight-own", "false")).booleanValue());
+    setHighlightingOwnMoves(prefs.getBool("move-highlight.highlight-own", false));
 
-    setMoveHighlightingColor(
-      StringParser.parseColor(getProperty("move-highlight.color", "00b2b2")));
+    setMoveHighlightingColor(prefs.getColor("move-highlight.color", Color.red));
 
     setDragSquareHighlightingColor(
-      StringParser.parseColor(getProperty("drag-square-highlighting.color", "0000ff")));
+      prefs.getColor("drag-square-highlighting.color", new Color(0x0000ff)));
 
-    String moveSendingModeString = getProperty("move-sending-mode", "predrag");
+    String moveSendingModeString = prefs.getString("move-sending-mode", "predrag");
     if ("legal-chess".equals(moveSendingModeString))
       setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
     else if ("premove".equals(moveSendingModeString))
@@ -269,28 +247,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setMoveSendingMode(PREDRAG_MOVE_SENDING_MODE);
 
     
-    setWhitePieceColor(parseColor(getProperty("white-piece-color")));
-    setBlackPieceColor(parseColor(getProperty("black-piece-color")));
-    setWhiteOutlineColor(parseColor(getProperty("white-outline-color")));
-    setBlackOutlineColor(parseColor(getProperty("black-outline-color")));
+    setWhitePieceColor(prefs.getColor("white-piece-color", Color.white));
+    setBlackPieceColor(prefs.getColor("black-piece-color", Color.black));
+    setWhiteOutlineColor(prefs.getColor("white-outline-color", Color.black));
+    setBlackOutlineColor(prefs.getColor("black-outline-color", Color.white));
 
-    setLightSquareColor(parseColor(getProperty("light-square-color")));
-    setDarkSquareColor(parseColor(getProperty("dark-square-color")));
+    setLightSquareColor(prefs.getColor("light-square-color", Color.cyan));
+    setDarkSquareColor(prefs.getColor("dark-square-color", Color.magenta));
 
-
-    setPiecePainter(getProperty("piece-painter-class-name"));
-    setBoardPainter(getProperty("board-painter-class-name"));
-  }
-
-
-
-  /**
-   * Returns null if the specified <code>String</code> is <code>null</code>,
-   * otherwise parses it as a color and returns the resulting color.
-   */
-
-  private static Color parseColor(String color){
-    return color == null ? null : StringParser.parseColor(color);
+    setPiecePainter(prefs.getString("piece-painter-class-name"));
+    setBoardPainter(prefs.getString("board-painter-class-name"));
   }
 
 
@@ -330,7 +296,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     if (piecePainter == null){
       try{
-        piecePainter = (PiecePainter)Class.forName(className).newInstance();
+        // We do this because in 1.1, Class.forName will use the class loader
+        // of this, BoardManager, class but we want the classloader of the
+        // actual class, which may be a subclass of BoardManager
+        ClassLoader classLoader = getClass().getClassLoader();
+        piecePainter = (PiecePainter)classLoader.loadClass(className).newInstance();
       } catch (ClassNotFoundException e){
           System.err.println("Unable to find class "+className);
         }
@@ -397,7 +367,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     if (boardPainter == null){
       try{
-        boardPainter = (BoardPainter)Class.forName(className).newInstance();
+        // We do this because in 1.1, Class.forName will use the class loader
+        // of this, BoardManager, class but we want the classloader of the
+        // actual class, which may be a subclass of BoardManager
+        ClassLoader classLoader = getClass().getClassLoader();
+        boardPainter = (BoardPainter)classLoader.loadClass(className).newInstance();
       } catch (ClassNotFoundException e){
           System.err.println("Unable to find class "+className);
         }
@@ -451,7 +425,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getWhitePieceColor(){
-    return (Color)props.getProperty("whitePieceColor");
+    return (Color)props.getProperty("whitePieceColor", null);
   }
 
 
@@ -472,7 +446,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getBlackPieceColor(){
-    return (Color)props.getProperty("blackPieceColor");
+    return (Color)props.getProperty("blackPieceColor", null);
   }
 
 
@@ -493,7 +467,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getWhiteOutlineColor(){
-    return (Color)props.getProperty("whiteOutlineColor");
+    return (Color)props.getProperty("whiteOutlineColor", null);
   }
 
 
@@ -514,7 +488,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getBlackOutlineColor(){
-    return (Color)props.getProperty("blackOutlineColor");
+    return (Color)props.getProperty("blackOutlineColor", null);
   }
 
 
@@ -535,7 +509,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getLightSquareColor(){
-    return (Color)props.getProperty("lightSquareColor");
+    return (Color)props.getProperty("lightSquareColor", null);
   }
 
 
@@ -556,7 +530,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public Color getDarkSquareColor(){
-    return (Color)props.getProperty("darkSquareColor");
+    return (Color)props.getProperty("darkSquareColor", null);
   }
 
 
@@ -819,7 +793,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public PiecePainter getPiecePainter(){
-    return (PiecePainter)props.getProperty("piecePainter");
+    return (PiecePainter)props.getProperty("piecePainter", null);
   }
 
 
@@ -830,7 +804,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public BoardPainter getBoardPainter(){
-    return (BoardPainter)props.getProperty("boardPainter");
+    return (BoardPainter)props.getProperty("boardPainter", null);
   }
 
 
@@ -864,7 +838,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected void registerConnListeners(){
-    JinListenerManager listenerManager = getConnection().getJinListenerManager();
+    ListenerManager listenerManager = getConn().getListenerManager();
 
     listenerManager.addGameListener(this);
   }
@@ -1115,7 +1089,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected JMenu createPieceSetsMenu(){
-    int pieceSetCount = Integer.parseInt(getProperty("piece-set-count", "0"));
+    Preferences prefs = getPrefs();
+    int pieceSetCount = prefs.getInt("piece-set-count", 0);
     if (pieceSetCount < 2)
       return null;
 
@@ -1132,8 +1107,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     String piecePainterClassName = getPiecePainter().getClass().getName();
     ButtonGroup pieceSetsCheckBoxGroup = new ButtonGroup();
     for (int i = 0; i < pieceSetCount; i++){
-      String pieceSet = getProperty("piece-set-"+i);
-      StringTokenizer tokenizer = new StringTokenizer(pieceSet, ";");
+      String pieceSet = prefs.getString("piece-set-" + i);
+      StringTokenizer tokenizer = new StringTokenizer(pieceSet, ",");
       String pieceSetName = tokenizer.nextToken();
       String className = tokenizer.nextToken();
       if (pieceSet == null){
@@ -1162,7 +1137,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected JMenu createBoardsMenu(){
-    int boardCount = Integer.parseInt(getProperty("board-count", "0"));
+    Preferences prefs = getPrefs();
+    int boardCount = prefs.getInt("board-count", 0);
     if (boardCount < 2)
       return null;
 
@@ -1179,8 +1155,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     String boardPainterClassName = getBoardPainter().getClass().getName();
     ButtonGroup boardsCheckBoxGroup = new ButtonGroup();
     for (int i = 0 ; i < boardCount; i++){
-      String board = getProperty("board-"+i);
-      StringTokenizer tokenizer = new StringTokenizer(board, ";");
+      String board = prefs.getString("board-" + i);
+      StringTokenizer tokenizer = new StringTokenizer(board, ",");
       String boardName = tokenizer.nextToken();
       String className = tokenizer.nextToken();
       if (board == null){
@@ -1207,31 +1183,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   protected void unregisterConnListeners(){
-    JinListenerManager listenerManager = getConnection().getJinListenerManager();
+    ListenerManager listenerManager = getConn().getListenerManager();
 
     listenerManager.removeGameListener(this);
   } 
-
-
-
-  /**
-   * Removes the JInternalFrames of all the displayed BoardPanels. Also loses
-   * references to all the BoardPanels.
-   */
-
-  private void removeBoards(){
-    Enumeration frames = internalFramesToBoardPanels.keys();
-    while (frames.hasMoreElements()){
-      JInternalFrame boardFrame = (JInternalFrame)frames.nextElement();
-      boardFrame.dispose();
-    }
-
-    internalFramesToBoardPanels.clear();
-    gamesToBoardPanels.clear();
-    boardPanelsToInternalFrames.clear();
-    unusedInternalFrames.removeAllElements();
-  }
-
 
 
 
@@ -1246,10 +1201,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-
   /**
-   * Gets called when a game starts. Creates a new BoardPanel and a
-   * JInternalFrame to put it in and displays it.
+   * Gets called when a game starts. Creates a new BoardPanel and a container
+   * for it and displays it.
    */
 
   public void gameStarted(GameStartEvent evt){
@@ -1264,39 +1218,43 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
 
-
   /**
-   * Creates and configures a new JInternalFrame for use.
+   * Obtains and returns a PluginUIContainer to be used for a board.
+   * An unused container is looked for, and if none is found, a new one is
+   * created.
    */
 
-  private JInternalFrame createNewBoardFrame(BoardPanel boardPanel){
-    JInternalFrame boardFrame = createBoardFrame(boardPanel);
-
-    int index = internalFrames.size();
-    for (int i = 0; i < internalFrames.size(); i++){
-      if (internalFrames.elementAt(i) == null){
-        index = i;
-        break;
-      }
+  private PluginUIContainer createBoardContainer(){
+    for (int i = 0; i < containers.size(); i++){
+      PluginUIContainer container = (PluginUIContainer)containers.elementAt(i);
+      BoardPanel panel = (BoardPanel)containersToBoardPanels.get(container);
+      if ((panel == null) || !panel.isActive())
+        return recycleContainer(container);
     }
-    internalFrames.insertElementAt(boardFrame, index);
-    boardFrame.addInternalFrameListener(this);
 
-    JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-    desktop.add(boardFrame);
+    return createNewBoardContainer();
+  }
 
-    configureBoardFrame(boardFrame, index);
 
-    Container boardFrameContentPane = boardFrame.getContentPane();
-    boardFrameContentPane.setLayout(new BorderLayout());
-    boardFrameContentPane.add(boardPanel, BorderLayout.CENTER);
 
-    /* See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
-       reason I do this instead of adding an InternalFrameListener like a sane person. */
-    boardFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-    boardFrame.addVetoableChangeListener(this);
 
-    return boardFrame;
+  /**
+   * Creates and configures a new PluginUIContainer for use with a board.
+   */
+
+  private PluginUIContainer createNewBoardContainer(){
+    PluginUIContainer boardContainer = createContainer(String.valueOf(containers.size()));
+
+    containers.addElement(boardContainer);
+
+    URL iconImageURL = BoardManager.class.getResource("icon.gif");
+    if (iconImageURL!= null)
+      boardContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+
+    boardContainer.setCloseOperation(PluginUIContainer.DO_NOTHING_ON_CLOSE);
+    boardContainer.addPluginUIListener(this);
+
+    return boardContainer;
   }
 
 
@@ -1304,31 +1262,20 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Takes a JInternalFrame from the unused board frames list and configures it
-   * to be reused.
+   * Recycles the specified container, making it ready to be used again.
    */
 
-  private JInternalFrame reuseBoardFrame(BoardPanel boardPanel){
-    JInternalFrame boardFrame = (JInternalFrame)unusedInternalFrames.lastElement();
-    unusedInternalFrames.removeElementAt(unusedInternalFrames.size()-1);
-
-    BoardPanel oldBoardPanel = (BoardPanel)internalFramesToBoardPanels.remove(boardFrame);
-    oldBoardPanel.done();
-    boardPanelsToInternalFrames.remove(oldBoardPanel);
-
-    Container contentPane = boardFrame.getContentPane();
-    contentPane.removeAll();
-    contentPane.add(boardPanel, BorderLayout.CENTER);
-    contentPane.invalidate();
-    contentPane.validate();
-
-    if (boardFrame.isIcon()){
-      try{
-        boardFrame.setIcon(false);
-      } catch (PropertyVetoException e){}
+  private PluginUIContainer recycleContainer(PluginUIContainer container){
+    BoardPanel oldBoardPanel = (BoardPanel)containersToBoardPanels.remove(container);
+    if (oldBoardPanel != null){
+      oldBoardPanel.done();
+      boardPanelsToContainers.remove(oldBoardPanel);
     }
 
-    return boardFrame;
+    Container contentPane = container.getContentPane();
+    contentPane.removeAll(); // wash it
+
+    return container;
   }
 
   
@@ -1353,105 +1300,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   protected void initBoardPanel(Game game, BoardPanel boardPanel){
     boardPanel.addUserMoveListener(this);
-    getConnection().getJinListenerManager().addGameListener(boardPanel);
+    getConn().getListenerManager().addGameListener(boardPanel);
     gamesToBoardPanels.put(game, boardPanel);
 
-    JInternalFrame boardFrame;
-    if (unusedInternalFrames.isEmpty()){
-      boardFrame = createNewBoardFrame(boardPanel);
-    }
-    else{
-      boardFrame = reuseBoardFrame(boardPanel);
-    }
+    PluginUIContainer boardContainer = createBoardContainer();
+    Container content = boardContainer.getContentPane();
+    content.setLayout(new BorderLayout());
+    content.add(boardPanel, BorderLayout.CENTER);
+    content.invalidate(); // Better wash this container - no 
+    content.validate();   // knowing what used to be in it ;-)
 
-    boardFrame.setTitle(boardPanel.getTitle());
-    boardFrame.repaint(); // It doesn't seem to repaint itself automatically.
+    boardContainer.setTitle(boardPanel.getTitle());
 
-    internalFramesToBoardPanels.put(boardFrame, boardPanel);
-    boardPanelsToInternalFrames.put(boardPanel, boardFrame);
+    containersToBoardPanels.put(boardContainer, boardPanel);
+    boardPanelsToContainers.put(boardPanel, boardContainer);
 
-    if (!boardFrame.isVisible())
-      boardFrame.setVisible(true);
-
-    boardFrame.toFront();
-    try{
-      boardFrame.setSelected(true);
-    } catch (java.beans.PropertyVetoException e){} // Ignore.
+    boardContainer.setActive(true);
   }
-
-
-
-
-  /**
-   * Creates a JInternalFrame to be used for displaying the given
-   * BoardPanel. 
-   */
-
-  protected JInternalFrame createBoardFrame(BoardPanel boardPanel){
-    JInternalFrame boardFrame = new FixedJInternalFrame();
-
-    boardFrame.setResizable(true);
-    boardFrame.setClosable(true);
-    boardFrame.setMaximizable(true);
-    boardFrame.setIconifiable(true);
-
-    return boardFrame;
-  }
-
-
-
-
-
-  /**
-   * Sets the various properties of the given JInternalFrame from the saved
-   * properties of the JInternalFrame with the same index. If no JInternalFrame
-   * with the given index ever existed, sets those properties to some reasonable
-   * defaults.
-   */
-
-  private void configureBoardFrame(JInternalFrame boardFrame, int index){
-    JDesktopPane desktop = getPluginContext().getMainFrame().getDesktop();
-
-    Rectangle desktopBounds = new Rectangle(desktop.getSize());
-    String boundsString = getProperty("frame-bounds-"+index);
-    Rectangle bounds = null;
-    if (boundsString!=null)
-      bounds = StringParser.parseRectangle(boundsString);
-
-    if (bounds==null)
-      boardFrame.setBounds(desktopBounds.width/4, 0, desktopBounds.width*3/4, desktopBounds.height*3/4);
-    else
-      boardFrame.setBounds(bounds);
-
-    boolean isMaximized = Boolean.valueOf(getProperty("maximized-"+index,"false")).booleanValue();
-    if (isMaximized){
-      try{
-        boardFrame.setMaximum(true);
-      } catch (java.beans.PropertyVetoException e){}
-    }
-
-    boolean isIconified = Boolean.valueOf(getProperty("iconified-"+index,"false")).booleanValue();
-    if (isIconified){
-      try{
-        boardFrame.setIcon(true);
-      } catch (java.beans.PropertyVetoException e){}
-    }
-
-    JComponent icon = boardFrame.getDesktopIcon();
-    String iconBoundsString = getProperty("frame-icon-bounds-"+index);
-    if (iconBoundsString!=null){
-      Rectangle iconBounds = StringParser.parseRectangle(iconBoundsString);
-      icon.setBounds(iconBounds);
-    }
-
-    String iconImageName = getProperty("icon-image");
-    if (iconImageName != null){
-      URL iconImageURL = BoardManager.class.getResource(iconImageName);
-      if (iconImageURL!= null)
-        boardFrame.setFrameIcon(new ImageIcon(iconImageURL));
-    } 
-  }
-
 
 
 
@@ -1478,24 +1343,17 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void gameEnded(GameEndEvent evt){
     BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.remove(evt.getGame());
     if (boardPanel != null){
-      getConnection().getJinListenerManager().removeGameListener(boardPanel);
+      getConn().getListenerManager().removeGameListener(boardPanel);
       boardPanel.removeUserMoveListener(this);
       boardPanel.setInactive();
-      JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.get(boardPanel);
-//      JInternalFrame boardFrame = (JInternalFrame)boardPanelsToInternalFrames.remove(boardPanel);
-//      internalFramesToBoardPanels.remove(boardFrame);
-      boardFrame.setTitle(boardPanel.getTitle());
-      boardFrame.repaint(); // It doesn't seem to repaint itself.
-      if (boardFrame.isClosed()){
-        internalFramesToBoardPanels.remove(boardFrame);
-        boardPanelsToInternalFrames.remove(boardPanel);
-      }
-      else
-        unusedInternalFrames.addElement(boardFrame);
+
+      PluginUIContainer boardContainer =
+        (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
+
+      if (boardContainer != null) // It could be null if the container has been closed
+        boardContainer.setTitle(boardPanel.getTitle());
     }
   }
-
-
 
 
 
@@ -1509,130 +1367,70 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (src instanceof BoardPanel){
       BoardPanel boardPanel = (BoardPanel)src;
       Game game = boardPanel.getGame();
-      getConnection().makeMove(game, evt.getMove());
+      getConn().makeMove(game, evt.getMove());
     }
   }
 
 
 
-
   /**
-   * VetoableChangeListener implementation. See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html
-   * for the reason this is needed.
+   * PluginUIListener implementation. Handles proper closing of the frame.
    */
 
-  public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
-    Object source = pce.getSource();
+  public void pluginUIClosing(PluginUIEvent evt){
+    PluginUIContainer boardContainer = evt.getPluginUIContainer();
+    BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.get(boardContainer);
 
-    if (source instanceof JInternalFrame){
-      if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY) &&
-          pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
-        JInternalFrame boardFrame =  (JInternalFrame)source;
-        BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(boardFrame);
+    if (boardPanel.isActive()){ // otherwise, the user is just closing a "dead" frame.
+      Game game = boardPanel.getGame();
 
-        if (boardPanel.isActive()){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
-          Game game = ((BoardPanel)internalFramesToBoardPanels.get(boardFrame)).getGame();
+      boolean shouldAsk = false;
+      String question = null;
 
-          boolean shouldAsk = false;
-          String question = null;
+      if (game.getGameType() == Game.MY_GAME){
+        shouldAsk = true;
+        if (game.isPlayed())
+          question = "RESIGN this game?";
+        else
+          question = "Stop examining this game?";
+      }
 
-          if (game.getGameType() == Game.MY_GAME){
-            shouldAsk = true;
-            if (game.isPlayed())
-              question = "Are you sure you want to RESIGN this game?";
-            else
-              question = "Are you sure you want to stop examining this game?";
-          }
+      Object result = OptionPanel.OK;
+      if (shouldAsk)
+        result = OptionPanel.confirm(getUIProvider(), "Select an option", question, OptionPanel.OK);
 
-          int result;
-          if (shouldAsk)
-            result = JOptionPane.showConfirmDialog(getPluginContext().getMainFrame(), question, "Select an option", JOptionPane.YES_NO_OPTION);
-          else
-            result = JOptionPane.YES_OPTION;
-          if (result == JOptionPane.YES_OPTION)
-            getConnection().quitGame(game);
-          else
-            throw new PropertyVetoException("Canceled closing", pce);
-        }
+      if (result == OptionPanel.OK){
+        getConn().quitGame(game);
+        boardContainer.setVisible(false);
       }
     }
-  }
-
-
-
-
-
-  /**
-   * InternalFrameListener implementation.
-   */
-
-  public void internalFrameClosed(InternalFrameEvent e){
-    JInternalFrame frame = (JInternalFrame)e.getSource();
-
-    int index = -1;
-    for (int i = 0 ; i < internalFrames.size(); i++){
-      if (internalFrames.elementAt(i) == frame){
-        index = i;
-        break;
-      }
-    }
-    if (index==-1)
-      throw new IllegalStateException("No matching frame found");
-
-    User user = getUser();
-    String prefix = getID()+".";
-
-    boolean isMaximized = frame.isMaximum();
-    user.setProperty(prefix+"maximized-"+index, String.valueOf(isMaximized));
-
-    boolean isIconified = frame.isIcon();
-    user.setProperty(prefix+"iconified-"+index, String.valueOf(isIconified));
-
-    // This is the only way to retrieve the "normal" bounds of the frame under
-    // JDK1.2 and earlier. JDK1.3 has a getNormalBounds() method.
-    if (isMaximized){
-      try{
-        frame.setMaximum(false);
-      } catch (java.beans.PropertyVetoException ex){}
-    }
-
-    Rectangle frameBounds = frame.getBounds();
-    // If something bad happened, let's not save that state.
-    if ((frameBounds.width > 10) && (frameBounds.height > 10))
-      user.setProperty(prefix + "frame-bounds-" + index,
-        StringEncoder.encodeRectangle(frameBounds));
-
-    Rectangle iconBounds = frame.getDesktopIcon().getBounds();
-    user.setProperty(prefix + "frame-icon-bounds-" + index,
-      StringEncoder.encodeRectangle(iconBounds));
-
-    internalFrames.setElementAt(null, index);
-    frame.removeInternalFrameListener(this);
-    unusedInternalFrames.removeElement(frame);
-
-    BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(frame);
-
-    if (!boardPanel.isActive()){
-      internalFramesToBoardPanels.remove(frame);
-      boardPanelsToInternalFrames.remove(boardPanel);
-    }
-
-    boardPanel.done();
+    else
+      boardContainer.setVisible(false);
   }
 
 
 
   /**
-   * InternalFrameListener implementation.
+   * Performs any necessary cleanup.
    */
 
-  public void internalFrameActivated(InternalFrameEvent e){}
-  public void internalFrameClosing(InternalFrameEvent e){}
-  public void internalFrameDeactivated(InternalFrameEvent e){}
-  public void internalFrameDeiconified(InternalFrameEvent e){}
-  public void internalFrameIconified(InternalFrameEvent e){}
-  public void internalFrameOpened(InternalFrameEvent e){}
+  public void pluginUIHidden(PluginUIEvent evt){
+    PluginUIContainer boardContainer = evt.getPluginUIContainer();
+    BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.remove(boardContainer);
+    boardPanelsToContainers.remove(boardPanel);
 
+    boardPanel.done();  
+  }
+
+
+
+  /**
+   * PluginUIListener implementation.
+   */
+
+  public void pluginUIShown(PluginUIEvent evt){}
+  public void pluginUIActivated(PluginUIEvent evt){}
+  public void pluginUIDeactivated(PluginUIEvent evt){}
 
 
 
@@ -1665,17 +1463,19 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
 
   public void saveState(){
-    setProperty("piece-painter-class-name", getPiecePainter().getClass().getName());    
+    Preferences prefs = getPrefs();
 
-    setProperty("board-painter-class-name", getBoardPainter().getClass().getName());
+    prefs.setString("piece-painter-class-name", getPiecePainter().getClass().getName());    
 
-    setProperty("auto-promote", String.valueOf(isAutoPromote()));
+    prefs.setString("board-painter-class-name", getBoardPainter().getClass().getName());
 
-    setProperty("move-input-style", getMoveInputStyle() == JBoard.CLICK_N_CLICK ?
+    prefs.setBool("auto-promote", isAutoPromote());
+
+    prefs.setString("move-input-style", getMoveInputStyle() == JBoard.CLICK_N_CLICK ?
       "click'n'click" : "drag'n'drop");
 
-    setProperty("dragged-piece-style", getDraggedPieceStyle() == JBoard.CROSSHAIR_DRAGGED_PIECE ?
-      "target-cursor" : "normal-cursor");
+    prefs.setString("dragged-piece-style",
+      getDraggedPieceStyle() == JBoard.CROSSHAIR_DRAGGED_PIECE ? "target-cursor" : "normal");
 
     int moveHighlightingStyle = getMoveHighlightingStyle();
     String moveHighlightingString;
@@ -1685,14 +1485,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       moveHighlightingString = "square";
     else // if (moveHighlightingStyle == JBoard.ARROW_MOVE_HIGHLIGHTING)
       moveHighlightingString = "arrow";
-    setProperty("move-highlight.style", moveHighlightingString);
+    prefs.setString("move-highlight.style", moveHighlightingString);
 
-    setProperty("move-highlight.highlight-own", String.valueOf(isHighlightingOwnMoves()));
+    prefs.setBool("move-highlight.highlight-own", isHighlightingOwnMoves());
 
-    setProperty("move-highlight.color", StringEncoder.encodeColor(getMoveHighlightingColor()));
+    prefs.setColor("move-highlight.color", getMoveHighlightingColor());
 
-    setProperty("drag-square-highlighting.color",
-      StringEncoder.encodeColor(getDragSquareHighlightingColor()));
+    prefs.setColor("drag-square-highlighting.color",getDragSquareHighlightingColor());
 
     int moveSendingMode = getMoveSendingMode();
     String moveSendingModeString;
@@ -1702,29 +1501,36 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       moveSendingModeString = "predrag";
     else // if (moveSendingMode == PREMOVE_MOVE_SENDING_MODE)
       moveSendingModeString = "premove";
-    setProperty("move-sending-mode", moveSendingModeString);
+    prefs.setString("move-sending-mode", moveSendingModeString);
 
-    setProperty("white-piece-color", encodeColor(getWhitePieceColor()));
-    setProperty("black-piece-color", encodeColor(getBlackPieceColor()));
-    setProperty("white-outline-color", encodeColor(getWhiteOutlineColor()));
-    setProperty("black-outline-color", encodeColor(getBlackOutlineColor()));
+    prefs.setColor("white-piece-color", getWhitePieceColor());
+    prefs.setColor("black-piece-color", getBlackPieceColor());
+    prefs.setColor("white-outline-color", getWhiteOutlineColor());
+    prefs.setColor("black-outline-color", getBlackOutlineColor());
 
-    setProperty("light-square-color", encodeColor(getLightSquareColor()));
-    setProperty("dark-square-color", encodeColor(getDarkSquareColor()));
+    prefs.setColor("light-square-color", getLightSquareColor());
+    prefs.setColor("dark-square-color", getDarkSquareColor());
+  }
+
+
+
+
+  /**
+   * Returns the string "board".
+   */
+
+  public String getId(){
+    return "board";
   }
 
 
 
   /**
-   * If the specified color is null, returns null. Otherwise encodes it and
-   * returns the resulting string.
+   * Returns "Chess Board".
    */
 
-  private static String encodeColor(Color color){
-    if (color == null)
-      return null;
-    else
-      return StringEncoder.encodeColor(color);
+  public String getName(){
+    return "Chess Board";
   }
 
 

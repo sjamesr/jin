@@ -368,8 +368,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   private ActionListener fullscreenAction = new ActionListener(){
     public void actionPerformed(ActionEvent evt){
-      fullscreenPanel.setFullscreen(!fullscreenPanel.isFullscreen());
-      contentPanel.requestFocus();
+      setFullscreen(!fullscreenPanel.isFullscreen());
     }
   };
 
@@ -445,6 +444,21 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         listener.userMadeMove(evt);
       }
     }
+  }
+
+
+
+  /**
+   * Sets this BoardPanel's fullscreen mode to the specified one.
+   */
+
+  private void setFullscreen(boolean isFullscreen){
+    if (fullscreenPanel.isFullscreen() == isFullscreen)
+      return;
+
+    fullscreenButton.setSelected(isFullscreen);
+    fullscreenPanel.setFullscreen(isFullscreen);
+    contentPanel.requestFocus();
   }
 
 
@@ -587,10 +601,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
             board.getPosition().makeMove(moveEnRoute);
           isBoardPositionUpdating = false;
         }
-        else if (fullscreenPanel.isFullscreen()){
-          fullscreenPanel.setFullscreen(false);
-          contentPanel.requestFocus();
-        }
+        else
+          setFullscreen(false);
       }
     };
 
