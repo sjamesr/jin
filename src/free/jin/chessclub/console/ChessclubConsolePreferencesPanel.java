@@ -130,6 +130,26 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
 
 
   /**
+   * The textfield where the user chooses the channel number on the channel
+   * settings panel.
+   */
+
+  private final JTextField channelNumberField = new JTextField(new IntegerStrictPlainDocument(0, 400), "", 3);
+
+
+
+
+
+  /**
+   * The TextStyleChooserPanel for channels.
+   */
+
+  private final TextStyleChooserPanel channelTextStyleChooser;
+
+
+
+
+  /**
    * Creates a new ChessclubConsolePreferencesPanel for the given
    * ChessclubConsoleManager.
    */
@@ -158,6 +178,7 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     selectedChooserButton = new ColorChooserButton("Selected text", selectedColor);
 
     addCategory("", new String[]{""}, bgColor);
+    addCategory("channel-tell", new String[]{"channel-tell", "channel-atell"}, bgColor);
     addCategory("tell", new String[]{"tell"}, bgColor);
     addCategory("say", new String[]{"say"}, bgColor);
     addCategory("qtell", new String[]{"qtell", "channel-qtell"}, bgColor);
@@ -169,6 +190,29 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     addCategory("link", new String[]{"link"}, bgColor);
     addCategory("user", new String[]{"user"}, bgColor);
     addCategory("info", new String[]{"info"}, bgColor);
+
+    TextStyleChooserPanel defaultChChooser = (TextStyleChooserPanel)categoriesToTextStyleChoosers.get("channel-tell");
+    channelTextStyleChooser = new TextStyleChooserPanel(defaultChChooser.getSelectedFont(), defaultChChooser.getSelectedForeground(),
+      defaultChChooser.getSelectedBackground(), false);
+    channelTextStyleChooser.addChangeListener(propsChangeListener);
+
+    channelNumberField.getDocument().addDocumentListener(new DocumentListener(){
+      public void changedUpdate(DocumentEvent e){
+        channelsPanelChanging = true;
+        updateChannelsPanel();
+        channelsPanelChanging = false;
+      }
+      public void insertUpdate(DocumentEvent e){
+        channelsPanelChanging = true;
+        updateChannelsPanel();
+        channelsPanelChanging = false;
+      }
+      public void removeUpdate(DocumentEvent e){
+        channelsPanelChanging = true;
+        updateChannelsPanel();
+        channelsPanelChanging = false;
+      }
+    });
 
     createUI();
   }
@@ -192,84 +236,6 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
       return propertyValue;
   }
 
-
-
-  /**
-   * A boolean we set to true so we know not to handle echo change events.
-   */
-
-  private boolean handlingChangeEvent = false;
-
-
-
-  /**
-   * The listener that listens to text style changes in the various panels
-   * and updates the properties accordingly.
-   */
-
-  ChangeListener propsChangeListener = new ChangeListener(){
-    public void stateChanged(ChangeEvent evt){
-      if (handlingChangeEvent)
-        return;
-
-      handlingChangeEvent = true;
-      TextStyleChooserPanel source = (TextStyleChooserPanel)evt.getSource();
-      String categoryName = (String)textStyleChoosersToCategories.get(source);
-      String [] categoriesToUpdate = (String [])visibleCategoriesToTotal.get(categoryName);
-
-      Font selectedFont = source.getSelectedFont();
-      Color selectedBG = source.getSelectedBackground();
-      Color selectedFG = source.getSelectedForeground();
-
-      for (int i = 0; i < categoriesToUpdate.length; i++){
-        String category = categoriesToUpdate[i];
-        props.put(propertyName(category, "font-family"), selectedFont.getFamily());
-        props.put(propertyName(category, "font-size"), String.valueOf(selectedFont.getSize()));
-        props.put(propertyName(category, "font-bold"), String.valueOf(selectedFont.isBold()));
-        props.put(propertyName(category, "font-italic"), String.valueOf(selectedFont.isItalic()));
-        props.put(propertyName(category, "foreground"), StringEncoder.encodeColor(selectedFG));
-      }
-
-      if (categoryName.equals(""))
-        props.put("output-background", StringEncoder.encodeColor(selectedBG));
-
-      updatePanels();
-      handlingChangeEvent = false;
-    }
-  };
-
-
-
-
-
-  /**
-   * Refreshes the settings on all the panels from the properties.
-   */
-
-  private void updatePanels(){
-    Color background = StringParser.parseColor(props.getProperty("output-background"));
-
-    Enumeration categoriesEnum = categoriesToTextStyleChoosers.keys();
-    while (categoriesEnum.hasMoreElements()){
-      String categoryName = (String)categoriesEnum.nextElement();
-      TextStyleChooserPanel chooserPanel = (TextStyleChooserPanel)categoriesToTextStyleChoosers.get(categoryName);
-
-      String fontFamily = lookupProperty("font-family."+categoryName);
-      int fontSize = Integer.parseInt(lookupProperty("font-size."+categoryName));
-      int fontStyle = 0;
-      if (new Boolean(lookupProperty("font-bold."+categoryName)).booleanValue())
-        fontStyle |= Font.BOLD;
-      if (new Boolean(lookupProperty("font-italic."+categoryName)).booleanValue())
-        fontStyle |= Font.ITALIC;
-      Color foreground = StringParser.parseColor(lookupProperty("foreground."+categoryName));
-
-      Font font = new Font(fontFamily, fontStyle, fontSize);
-
-      chooserPanel.setSelectedFont(font);
-      chooserPanel.setSelectedBackground(background);
-      chooserPanel.setSelectedForeground(foreground);
-    }
-  }
 
 
 
@@ -319,6 +285,20 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
     addPanel("Default settings", categoriesModel, defaultPanel);
     selectionChooserButton.setDefaultCapable(false);
     selectedChooserButton.setDefaultCapable(false);
+
+    JPanel defaultChannelPanel = (JPanel)categoriesToTextStyleChoosers.get("channel-tell");
+    addPanel("Default channel settings", categoriesModel, defaultChannelPanel);
+
+    JPanel channelsPanel = new JPanel(new BorderLayout(5, 5));
+    JPanel chNumberPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    chNumberPanel.add(new JLabel("Channel number"));
+    chNumberPanel.add(channelNumberField);
+    JPanel chNumberAndSeparatorPanel = new JPanel(new BorderLayout(5, 5));
+    chNumberAndSeparatorPanel.add(BorderLayout.NORTH, chNumberPanel);
+    chNumberAndSeparatorPanel.add(BorderLayout.CENTER, new JSeparator(JSeparator.HORIZONTAL));
+    channelsPanel.add(BorderLayout.NORTH, chNumberAndSeparatorPanel);
+    channelsPanel.add(BorderLayout.CENTER, channelTextStyleChooser);
+    addPanel("Channels", categoriesModel, channelsPanel);
 
     JPanel tellPanel = (JPanel)categoriesToTextStyleChoosers.get("tell");
     addPanel("Personal tells", categoriesModel, tellPanel);
@@ -392,6 +372,149 @@ public class ChessclubConsolePreferencesPanel extends PreferencesPanel{
   private void addPanel(String categoryName, DefaultListModel listModel, Component panel){
     listModel.addElement(categoryName);
     categoriesToPanels.put(categoryName, panel);
+  }
+
+
+
+
+
+  /**
+   * A boolean we set to true so we know not to handle echo change events.
+   */
+
+  private boolean handlingChangeEvent = false;
+
+
+
+
+  /**
+   * A boolean we set to true when we're changing the channels panel because the
+   * user changed the currently selected channel. In this case, a ChangeEvent
+   * is fired by the channels TextStyleChooserPanel, but we shouldn't respond to
+   * it.
+   */
+
+  private boolean channelsPanelChanging = false;
+
+
+
+  /**
+   * The listener that listens to text style changes in the various panels
+   * and updates the properties accordingly.
+   */
+
+  ChangeListener propsChangeListener = new ChangeListener(){
+    public void stateChanged(ChangeEvent evt){
+      if (handlingChangeEvent || channelsPanelChanging)
+        return;
+
+      handlingChangeEvent = true;
+      TextStyleChooserPanel source = (TextStyleChooserPanel)evt.getSource();
+
+      String selectedChannel = channelNumberField.getText();
+      String categoryName;
+      if (source == channelTextStyleChooser){
+        if ("".equals(selectedChannel))
+          categoryName = "channel-tell";
+        else
+          categoryName = "channel-tell."+selectedChannel;
+      }
+      else
+        categoryName = (String)textStyleChoosersToCategories.get(source);
+
+      String [] categoriesToUpdate;
+      if ((source == channelTextStyleChooser) && !"".equals(selectedChannel))
+        categoriesToUpdate = new String[]{"channel-tell."+selectedChannel, "channel-atell."+selectedChannel};
+      else
+        categoriesToUpdate= (String [])visibleCategoriesToTotal.get(categoryName);
+
+      Font selectedFont = source.getSelectedFont();
+      Color selectedBG = source.getSelectedBackground();
+      Color selectedFG = source.getSelectedForeground();
+
+      for (int i = 0; i < categoriesToUpdate.length; i++){
+        String category = categoriesToUpdate[i];
+        props.put(propertyName(category, "font-family"), selectedFont.getFamily());
+        props.put(propertyName(category, "font-size"), String.valueOf(selectedFont.getSize()));
+        if (!category.equals("channel-atell")) // atells should remain bold
+          props.put(propertyName(category, "font-bold"), String.valueOf(selectedFont.isBold()));
+        props.put(propertyName(category, "font-italic"), String.valueOf(selectedFont.isItalic()));
+        props.put(propertyName(category, "foreground"), StringEncoder.encodeColor(selectedFG));
+      }
+
+      if (categoryName.equals(""))
+        props.put("output-background", StringEncoder.encodeColor(selectedBG));
+
+      updatePanels();
+      handlingChangeEvent = false;
+    }
+  };
+
+
+
+
+
+  /**
+   * Refreshes the settings on all the panels from the properties.
+   */
+
+  private void updatePanels(){
+    Color background = StringParser.parseColor(props.getProperty("output-background"));
+
+    Enumeration categoriesEnum = categoriesToTextStyleChoosers.keys();
+    while (categoriesEnum.hasMoreElements()){
+      String categoryName = (String)categoriesEnum.nextElement();
+      TextStyleChooserPanel chooserPanel = (TextStyleChooserPanel)categoriesToTextStyleChoosers.get(categoryName);
+
+      updatePanel(chooserPanel, categoryName, background);
+    }
+
+    updateChannelsPanel();
+  }
+
+
+
+
+
+  /**
+   * Refreshes the channel panel's settings from the properties and according
+   * to the currently selected channel.
+   */
+
+  private void updateChannelsPanel(){
+    Color background = StringParser.parseColor(props.getProperty("output-background"));
+
+    String selectedChannel = channelNumberField.getText();
+    if ("".equals(selectedChannel))
+      updatePanel(channelTextStyleChooser, "channel-tell", background);
+    else
+      updatePanel(channelTextStyleChooser, "channel-tell."+selectedChannel, background);
+  }
+
+
+
+
+
+  /**
+   * Refreshes the given TextStyleChooserPanel's settings from the properties of
+   * the given category.
+   */
+
+  private void updatePanel(TextStyleChooserPanel chooserPanel, String categoryName, Color background){
+    String fontFamily = lookupProperty("font-family."+categoryName);
+    int fontSize = Integer.parseInt(lookupProperty("font-size."+categoryName));
+    int fontStyle = 0;
+    if (new Boolean(lookupProperty("font-bold."+categoryName)).booleanValue())
+      fontStyle |= Font.BOLD;
+    if (new Boolean(lookupProperty("font-italic."+categoryName)).booleanValue())
+      fontStyle |= Font.ITALIC;
+    Color foreground = StringParser.parseColor(lookupProperty("foreground."+categoryName));
+
+    Font font = new Font(fontFamily, fontStyle, fontSize);
+
+    chooserPanel.setSelectedFont(font);
+    chooserPanel.setSelectedBackground(background);
+    chooserPanel.setSelectedForeground(foreground);
   }
 
 
