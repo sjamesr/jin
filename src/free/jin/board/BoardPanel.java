@@ -37,6 +37,7 @@ import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 import free.util.swing.NonEditableTableModel;
 import free.util.swing.FullscreenPanel;
+import free.util.SquareLayout;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.border.EmptyBorder;
@@ -1168,18 +1169,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         blackClock.setAlignmentY(Component.CENTER_ALIGNMENT);
         fullscreenButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        Box whiteLabelBox = Box.createHorizontalBox();
-        whiteLabelBox.add(whiteLabel);
-        whiteLabelBox.add(Box.createHorizontalGlue());
+        JComponent whiteLabelBox = new JPanel(new BorderLayout());
+        whiteLabelBox.add(whiteLabel, BorderLayout.CENTER);
 
-        Box blackLabelBox = Box.createHorizontalBox();
-        blackLabelBox.add(blackLabel);
-        blackLabelBox.add(Box.createHorizontalGlue());
+        JComponent blackLabelBox = new JPanel(new BorderLayout());
+        blackLabelBox.add(blackLabel, BorderLayout.CENTER);
+        
+        Container fullscreenButtonWrapper = 
+          SquareLayout.createSquareContainer(fullscreenButton);
 
         if (flipped)
-          whiteLabelBox.add(fullscreenButton);
+          whiteLabelBox.add(fullscreenButtonWrapper, BorderLayout.EAST);
         else
-          blackLabelBox.add(fullscreenButton);
+          blackLabelBox.add(fullscreenButtonWrapper, BorderLayout.EAST);
 
         Box gameLabelBox = Box.createHorizontalBox();
         gameLabelBox.add(gameLabel);
