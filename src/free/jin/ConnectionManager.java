@@ -173,8 +173,7 @@ public class ConnectionManager{
       user.setPreferredConnDetails(connDetails);
 
       if (!context.isSavePrefsCapable()){
-        // The context can't save the user anyway, so why bother asking the user?
-        if (!JinUtilities.isKnownUser(context, user))
+        if (!user.isGuest() && !JinUtilities.isKnownUser(context, user))
           context.addUser(user);
       }
       else if (user.isGuest()){
