@@ -23,6 +23,7 @@ package free.util;
 
 import java.io.*;
 import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * Various utility methods that have something to do with I/O.
@@ -338,6 +339,31 @@ public class IOUtilities{
     }
 
     return true;
+  }
+
+
+
+
+  /**
+   * Returns a <code>URL</code> corresponding to the specified <code>File</code>
+   * or <code>null</code> if the <code>File</code> cannot be converted into a
+   * <code>URL</code>.
+   * NOTE: This is copied from the JDK1.3 source, File.java
+   */
+
+  public static URL fileToURL(File file){
+    try{
+      String path = file.getAbsolutePath();
+      if (File.separatorChar != '/')
+        path = path.replace(File.separatorChar, '/');
+      if (!path.startsWith("/"))
+        path = "/" + path;
+      if (!path.endsWith("/") && file.isDirectory())
+        path = path + "/";
+      return new URL("file", "", path);
+    } catch (MalformedURLException e){
+        return null;
+      }
   }
 
 }
