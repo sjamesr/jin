@@ -22,7 +22,6 @@
 package free.jin.action.getserverhelp;
 
 import free.jin.action.JinAction;
-import free.jin.action.ActionContext;
 
 
 /**
@@ -54,26 +53,11 @@ public class GetServerHelpAction extends JinAction{
   
   
   /**
-   * Overrides <code>setContext</code> to make sure the context is of a
-   * supported server.
-   */
-   
-  public void setContext(ActionContext context){
-    super.setContext(context);
-    
-    String serverId = getServer().getId();
-    if ((!"icc".equals(serverId)) && (!"fics".equals(serverId)))
-      throw new IllegalArgumentException("Unsupported server: " + getServer());
-  }
-  
-  
-  
-  /**
    * Causes the server specific help to be shown to the user.
    */
    
   public void go(){
-    getConn().sendCommand("help");
+    getConn().showServerHelp();
   }
   
   
