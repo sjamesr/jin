@@ -595,9 +595,12 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       
     }
 
-    if (scrollToBottom&&didScrollToBottom){
-      didScrollToBottom = false;
-      SwingUtilities.invokeLater(new BottomScroller(numAddToOutputCalls));
+    if (scrollToBottom && didScrollToBottom){
+      // This may be false if the frame containing us (for example), is iconified
+      if (getPeer() != null){
+        didScrollToBottom = false;
+        SwingUtilities.invokeLater(new BottomScroller(numAddToOutputCalls));
+      }
     }
   }
 
