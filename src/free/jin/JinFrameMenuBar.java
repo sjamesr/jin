@@ -60,7 +60,6 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
 
-
   /**
    * The "Connection" menu.
    */
@@ -78,13 +77,11 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
 
-
   /**
    * Holds a list of all the plugin menus we've added.
    */
 
   private final Vector pluginMenus = new Vector(4);
-
 
 
 
@@ -97,13 +94,12 @@ public class JinFrameMenuBar extends JMenuBar{
 
 
 
-
   /**
-   * Holds a list of connection creating JMenuItems which need to be disabled
-   * when a connection is established.
+   * Holds a list of JMenuItems whose state (enabled/disabled) needs to be
+   * flipped when a connection/disconnection occurs.
    */
 
-  private final Vector connectionMenuItems = new Vector();
+  private final Vector connectionSensitiveMenuItems = new Vector();
 
 
 
@@ -171,23 +167,23 @@ public class JinFrameMenuBar extends JMenuBar{
     final JMenu connMenu = new JMenu("Connection");
     connMenu.setMnemonic(KeyEvent.VK_C);
 
-    JMenuItem newConn = new JMenuItem("New Connection...");
-    newConn.setMnemonic(KeyEvent.VK_N);
-    newConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
-    newConn.addActionListener(new ActionListener(){
+    JMenuItem newConnMenuItem = new JMenuItem("New Connection...");
+    newConnMenuItem.setMnemonic(KeyEvent.VK_N);
+    newConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
+    newConnMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
         jinFrame.showConnectionCreationUI();
       }
 
     });
-    connectionMenuItems.addElement(newConn);
+    connectionSensitiveMenuItems.addElement(newConnMenuItem);
 
 
-    JMenuItem openConn = new JMenuItem("Open Connection...");
-    openConn.setMnemonic(KeyEvent.VK_O);
-    openConn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
-    openConn.addActionListener(new ActionListener(){
+    JMenuItem openConnMenuItem = new JMenuItem("Open Connection...");
+    openConnMenuItem.setMnemonic(KeyEvent.VK_O);
+    openConnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));
+    openConnMenuItem.addActionListener(new ActionListener(){
 
       public void actionPerformed(ActionEvent evt){
         JFileChooser chooser = new JFileChooser(Jin.usersDir);
@@ -208,8 +204,22 @@ public class JinFrameMenuBar extends JMenuBar{
       }
 
     });
-    connectionMenuItems.addElement(openConn);
+    connectionSensitiveMenuItems.addElement(openConnMenuItem);
 
+    JMenuItem closeConnMenuItem = new JMenuItem("Close connection");
+    closeConnMenuItem.setMnemonic('l'); 
+    closeConnMenuItem.addActionListener(new ActionListener(){
+
+      public void actionPerformed(ActionEvent evt){
+        int result = JOptionPane.showConfirmDialog(jinFrame, "Are you sure you want to log out and close the connection?", "Select an option", JOptionPane.YES_NO_OPTION);
+
+        if (result==JOptionPane.YES_OPTION)
+          jinFrame.closeConnection();
+      }
+
+    });
+    closeConnMenuItem.setEnabled(false);
+    connectionSensitiveMenuItems.addElement(closeConnMenuItem);
 
     JMenuItem exitMenuItem = new JMenuItem("Exit");
     exitMenuItem.setMnemonic(KeyEvent.VK_X);
@@ -221,9 +231,9 @@ public class JinFrameMenuBar extends JMenuBar{
 
     });
 
-
-    connMenu.add(newConn);
-    connMenu.add(openConn);
+    connMenu.add(newConnMenuItem);
+    connMenu.add(openConnMenuItem);
+    connMenu.add(closeConnMenuItem);
     connMenu.add(startUserConnSep);
     connMenu.add(endUserConnSep);
     update(connMenu);
@@ -326,10 +336,10 @@ public class JinFrameMenuBar extends JMenuBar{
         addPluginPreferenceUIMenuItem(plugin);
     }
 
-    int size = connectionMenuItems.size();
+    int size = connectionSensitiveMenuItems.size();
     for (int i = 0; i < size; i++){
-      JMenuItem menuItem = (JMenuItem)connectionMenuItems.elementAt(i);
-      menuItem.setEnabled(false);
+      JMenuItem menuItem = (JMenuItem)connectionSensitiveMenuItems.elementAt(i);
+      menuItem.setEnabled(!menuItem.isEnabled());
     }
     
     // Bugfix
@@ -351,10 +361,10 @@ public class JinFrameMenuBar extends JMenuBar{
     removePluginMenus();
     removePluginPreferenceUIMenuItems();
 
-    int size = connectionMenuItems.size();
+    int size = connectionSensitiveMenuItems.size();
     for (int i = 0; i < size; i++){
-      JMenuItem menuItem = (JMenuItem)connectionMenuItems.elementAt(i);
-      menuItem.setEnabled(true);
+      JMenuItem menuItem = (JMenuItem)connectionSensitiveMenuItems.elementAt(i);
+      menuItem.setEnabled(!menuItem.isEnabled());
     }
   }
 
@@ -548,10 +558,11 @@ public class JinFrameMenuBar extends JMenuBar{
     while (connMenu.getMenuComponent(startSeparatorIndex+1)!=endUserConnSep){
       JMenuItem menuItem = connMenu.getItem(startSeparatorIndex+1);
       connMenu.remove(startSeparatorIndex+1);
-      connectionMenuItems.removeElement(menuItem);
+      connectionSensitiveMenuItems.removeElement(menuItem);
     }
 
 
+    boolean areMenuItemsEnabled = (jinFrame.getConnection() == null);
     ListModel users = Jin.getUsers();
     int usersCount = users.getSize();
     for (int i=0;i<usersCount;i++){
@@ -561,8 +572,9 @@ public class JinFrameMenuBar extends JMenuBar{
       menuItem.addActionListener(userConnectionListener);
       if (usersCount - i <= 9)
         menuItem.setMnemonic(Character.forDigit(usersCount - i,10));
+      menuItem.setEnabled(areMenuItemsEnabled);
       connMenu.insert(menuItem, startSeparatorIndex+1);
-      connectionMenuItems.addElement(menuItem);
+      connectionSensitiveMenuItems.addElement(menuItem);
     }
   }
 
