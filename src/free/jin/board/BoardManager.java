@@ -919,7 +919,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (source instanceof JInternalFrame){
       JInternalFrame boardFrame =  (JInternalFrame)source;
       BoardPanel boardPanel = (BoardPanel)internalFramesToBoardPanels.get(boardFrame);
-      if (boardPanel!=null){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
+      if (boardPanel.isActive()){ // isActive()==true, otherwise, the user is just closing a "dead" frame.
         Game game = ((BoardPanel)internalFramesToBoardPanels.get(boardFrame)).getGame();
         if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY)&&
               pce.getOldValue().equals(Boolean.FALSE)&&pce.getNewValue().equals(Boolean.TRUE)){
