@@ -35,6 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import free.jin.DialogPanel;
 import free.jin.UIProvider;
 import free.jin.OptionPanel;
+import free.util.PlatformUtils;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedTableColumn;
 import free.workarounds.FixedJTable;
@@ -342,7 +343,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       setDefaultButton(runScriptButton);
 
       // So that the default button is activated on ENTER and the dialog closes on ESCAPE
-      if (System.getProperty("java.version").compareTo("1.3") >= 0){
+      if (PlatformUtils.isJavaBetterThan("1.3")){
         Action defaultButtonAction = new AbstractAction(){
           public void actionPerformed(ActionEvent evt){
             runScriptButton.doClick();

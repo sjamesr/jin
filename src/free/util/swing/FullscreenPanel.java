@@ -25,6 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.*;
 import free.workarounds.FixedJPanel;
+import free.util.PlatformUtils;
 
 
 /**
@@ -40,8 +41,7 @@ public class FullscreenPanel extends FixedJPanel{
    * Are we running under JDK 1.3 or earlier?
    */
 
-  private static final boolean IS_FULLSCREEN_API_AVAILABLE =
-    (System.getProperty("java.version").compareTo("1.4") >= 0);
+  private static final boolean IS_FULLSCREEN_API_AVAILABLE = PlatformUtils.isJavaBetterThan("1.4");
 
 
 

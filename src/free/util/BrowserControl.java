@@ -72,7 +72,7 @@ public class BrowserControl{
 
   public static boolean displayURL(String url){
     try{
-      if (isWindows()){
+      if (PlatformUtils.isWindows()){
         if (url.endsWith(".html")||url.endsWith(".htm")){
 
           // url-encode the last character because windows refuses to display URLs
@@ -84,17 +84,17 @@ public class BrowserControl{
         String cmd = "rundll32 url.dll,FileProtocolHandler "+url;
         Runtime.getRuntime().exec(cmd); 
       }
-      else if (isMacOSX()){
+      else if (PlatformUtils.isMacOSX()){
         if (url.indexOf(":") == -1) // No protocol specified, like in "www.chessclub.com"
           url = "http://" + url;
         String [] commandLine = new String[]{"open", url};
         Runtime.getRuntime().exec(commandLine);
       }
-      else if (isMacOS()){
+      else if (PlatformUtils.isMacOS()){
         String [] commandLine = new String[]{"netscape", url}; 
         Runtime.getRuntime().exec(commandLine); 
       }
-      else if (isLinux()){
+      else if (PlatformUtils.isLinux()){
         synchronized(BrowserControl.class){
           if (environment == null){
             environment = new Properties();
@@ -187,7 +187,7 @@ public class BrowserControl{
 
   public static boolean displayMailer(String address){
     try{
-      if (isLinux()){
+      if (PlatformUtils.isLinux()){
         synchronized(BrowserControl.class){
           if (environment == null){
             try{
@@ -208,85 +208,12 @@ public class BrowserControl{
         return false;
       }
 
-    return displayURL("mailto:"+address);
+    return displayURL("mailto:" + address);
   }
 
 
 
-
-  /** 
-   * Tries to determine whether this application is running under Windows 
-   * by examing the "os.name" property. Returns true if the value of the
-   * "os.name" property starts (case insensitively) with the string "windows".
-   * 
-   * @return true if this application is running under Windows.
-   */ 
-
-  public static boolean isWindows(){ 
-    String os = System.getProperty("os.name"); 
-
-    if ((os!=null) && os.toLowerCase().startsWith("windows"))
-      return true; 
-    else 
-      return false; 
-  } 
-
-
-
-  /** 
-   * Tries to determine whether this application is running under MacOS 
-   * by examing the "os.name" property. Returns <code>true</code> if the value
-   * of the "os.name" property starts (case insensitively) with the string
-   * "mac".
-   * 
-   * @return true if this application is running under MacOS .
-   */ 
-
-  public static boolean isMacOS(){ 
-    String os = System.getProperty("os.name"); 
-
-    return ((os!=null) && os.toLowerCase().startsWith("mac"));
-  } 
-
-
   
-  
-  /** 
-   * Tries to determine whether this application is running under MacOS X 
-   * by examing the "os.name" property.
-   * 
-   * @return true if this application is running under MacOS X.
-   */ 
-
-  public static boolean isMacOSX(){ 
-    String os = System.getProperty("os.name"); 
-
-    return ((os != null) && os.equals("Mac OS X"));
-  } 
-
-  
-
-
-  /** 
-   * Tries to determine whether this application is running under Linux 
-   * by examing the "os.name" property. Returns <code>true</code> if the value
-   * of the "os.name" property starts (case insensitively) with the string
-   * "linux".
-   * 
-   * @return true if this application is running under Linux.
-   */ 
-
-  public static boolean isLinux(){ 
-    String os = System.getProperty("os.name"); 
-
-    if ((os!=null) && os.toLowerCase().startsWith("linux"))
-      return true; 
-    else 
-      return false; 
-  }
-
-
-
   /**
    * Displays an error dialog to the user appropriate to when the
    * <code>displayURL</code> call fails. If <code>modal</code> is true, this

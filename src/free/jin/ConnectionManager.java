@@ -23,6 +23,7 @@ package free.jin;
 
 import free.jin.plugin.PluginStartException;
 import free.util.Utilities;
+import free.util.PlatformUtils;
 
 
 /**
@@ -175,9 +176,7 @@ public class ConnectionManager{
         // Microsoft VM returns "C:\windows\java" as the user.home directory.
         // Since this is shared between all users of the computer, we warn the
         // user about it.
-        boolean isShared = System.getProperty("java.vendor").startsWith("Microsoft") &&
-                           (System.getProperty("java.version").compareTo("1.2") < 0);
-        if (isShared){
+        if (PlatformUtils.isOldMicrosoftVM()){
           Object result = OptionPanel.question(context.getUIProvider(), "Save Preferences?",
             "Would you like to save the preferences for the guest account?\n" +
             "Note that they will be shared with other users of this computer", OptionPanel.YES);

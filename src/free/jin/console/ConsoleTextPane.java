@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.text.*;
 import free.util.GraphicsUtilities;
+import free.util.PlatformUtils;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -214,49 +215,14 @@ public class ConsoleTextPane extends JTextPane{
   }
 
 
-
-
-  /**
-   * Are we running inside a Java 2 (or later) Virtual Machine? This is used to
-   * determine whether we need the hack that prevents the console from becoming
-   * taller than Short.MAX_VALUE pixels.
-   */
-
-  private static final boolean IS_JAVA2 =
-    System.getProperty("java.version").compareTo("1.2") >= 0;
-
-
-
-  /**
-   * Is this a Windows 95/98/Me machine?
-   */
-
-  private static final boolean IS_OLD_WINDOWS =
-    System.getProperty("os.name").startsWith("Windows") &&
-    (System.getProperty("os.version").compareTo("5.0") < 0) &&
-    !System.getProperty("os.name").startsWith("Windows NT");
-
-
-
-
-  /**
-   * Is this a Solaris machine?
-   */
-
-  private static final boolean IS_SOLARIS =
-    System.getProperty("os.name").startsWith("Solaris") ||
-    System.getProperty("os.name").startsWith("SunOS");
-
-
-
-
+  
   /**
    * Should we use the hack that prevents the text pane from becoming taller
    * than Short.MAX_VALUE pixels?
    */
 
   private static final boolean SHOULD_USE_16_BIT_GRAPHICS_HACK = 
-    !IS_JAVA2 && (IS_OLD_WINDOWS || IS_SOLARIS);
+    !PlatformUtils.isJavaBetterThan("1.2") && (PlatformUtils.isOldWindows() || PlatformUtils.isSolaris());
 
 
 
@@ -599,16 +565,6 @@ public class ConsoleTextPane extends JTextPane{
 
 
   /**
-   * True if we're running under 1.1 MS VM.
-   */
-
-  private static final boolean MS_VM = (System.getProperty("java.version").compareTo("1.2") < 0) &&
-                                        System.getProperty("java.vendor").startsWith("Microsoft");
-
-
-
-
-  /**
    * Due to a bug in MS VM, which never sends mouse events with clickCount more
    * than 2, we're forced to count clicks ourselves. 
    */
@@ -623,7 +579,7 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   private void updateClickCount(MouseEvent evt){
-    if (MS_VM){
+    if (PlatformUtils.isOldMicrosoftVM()){
       switch (evt.getID()){
         case MouseEvent.MOUSE_MOVED:
         case MouseEvent.MOUSE_DRAGGED:
@@ -651,10 +607,7 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   private int getClickCount(MouseEvent evt){
-    if (MS_VM)
-      return clickCount;
-    else
-      return evt.getClickCount();
+    return PlatformUtils.isOldMicrosoftVM() ? clickCount : evt.getClickCount();
   }
 
 

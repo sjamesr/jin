@@ -24,6 +24,7 @@ package free.util.audio;
 import javax.sound.sampled.*;
 import java.util.Hashtable;
 import free.util.BlockingQueue;
+import free.util.PlatformUtils;
 
 
 /**
@@ -61,11 +62,11 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
 
   /**
-   * Returns true if the value of "java.version" is 1.3 or later.
+   * Returns true if we're running under Java 1.3 or later.
    */
 
   public boolean isSupported(){
-    return System.getProperty("java.version").compareTo("1.3") >= 0;
+    return PlatformUtils.isJavaBetterThan("1.3");
   }
 
 

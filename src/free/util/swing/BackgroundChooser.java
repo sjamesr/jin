@@ -29,6 +29,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import free.util.AWTUtilities;
+import free.util.PlatformUtils;
 
 
 /**
@@ -309,7 +310,7 @@ public class BackgroundChooser extends JDialog{
     JFileChooser fileChooser = new JFileChooser();
 
     String [] supportedImageTypes;
-    if (System.getProperty("java.version").compareTo("1.3") >= 0)
+    if (PlatformUtils.isJavaBetterThan("1.3"))
       supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg", ".png"};
     else
       supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg"};

@@ -101,7 +101,7 @@ public class AWTUtilities{
    */
 
   public static String [] getAvailableFontNames(){
-    if (System.getProperty("java.version").compareTo("1.3") >= 0){
+    if (PlatformUtils.isJavaBetterThan("1.2")){
       try{
         // The equivalent of "return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();"
         Class geClass = Class.forName("java.awt.GraphicsEnvironment");
@@ -130,7 +130,7 @@ public class AWTUtilities{
    */
    
   public static int getExtendedFrameState(Frame frame){
-    if (System.getProperty("java.version").compareTo("1.4") >= 0){
+    if (PlatformUtils.isJavaBetterThan("1.4")){
       try{
         Class frameClass = Class.forName("java.awt.Frame");
         Method getExtendedStateMethod = frameClass.getMethod("getExtendedState", null);
@@ -155,7 +155,7 @@ public class AWTUtilities{
    */
    
   public static void setExtendedFrameState(Frame frame, int state){
-    if (System.getProperty("java.version").compareTo("1.4") >= 0){
+    if (PlatformUtils.isJavaBetterThan("1.4")){
       try{
         Class frameClass = Class.forName("java.awt.Frame");
         Method setExtendedStateMethod = frameClass.getMethod("setExtendedState", new Class[]{int.class});

@@ -22,6 +22,7 @@
 package free.util.audio;
 
 import java.util.Hashtable;
+import free.util.PlatformUtils;
 
 
 /**
@@ -44,11 +45,11 @@ public class JDK1_2AudioPlayer implements AudioPlayer{
 
 
   /**
-   * Returns true if the value of "java.version" is 1.2 or later.
+   * Returns true if we're running under Java 1.2 or later.
    */
 
   public boolean isSupported(){
-    return System.getProperty("java.version").compareTo("1.2") >= 0;
+    return PlatformUtils.isJavaBetterThan("1.2");
   }
 
 
