@@ -1291,7 +1291,6 @@ public class InternalFramesUIProvider implements UIProvider{
 
     public void internalFrameActivated(InternalFrameEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ACTIVATED));
-      frame.requestDefaultFocus();
     }
     public void internalFrameDeactivated(InternalFrameEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DEACTIVATED));
