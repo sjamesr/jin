@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 # Follow links
 filename=`readlink -f $0`
 if [ -z "$filename" ]
 then
-  filename = $0
+  filename=$0
 fi
 
 # Change to Jin's directory - Jin needs to be run from its directory
