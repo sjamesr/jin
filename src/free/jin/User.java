@@ -39,6 +39,14 @@ public class User{
 
 
   /**
+   * The server of this user.
+   */
+
+  private final Server server;
+
+
+
+  /**
    * The properties of the User.
    */
 
@@ -76,12 +84,28 @@ public class User{
 
 
 
+  /**
+   * Creates a new User with no properties and the specified
+   * <code>Server</code>.
+   */
+  
+  public User(Server server){
+    if (server == null)
+      throw new IllegalArgumentException("The specified Server object may not be null");
+
+    this.server = server;
+    props = new Properties();
+    props.put("server", server.getName());
+  }
+
+
+
 
   /**
    * Creates a new User from the given File.
    */
 
-  private User(File file) throws IOException{
+  public User(File file) throws IOException{
     FileInputStream in = new FileInputStream(file);
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     IOUtilities.pump(in,buf);
@@ -90,6 +114,13 @@ public class User{
     this.props = new Properties();
     props.load(new ByteArrayInputStream(data));
     this.filename = file.getName();
+
+    String serverName = getProperty("server");
+    if (serverName == null)
+      throw new IOException("Missing \"server\" property in user properties file: "+file);
+    this.server = Jin.getServer(serverName);
+    if (server == null)
+      throw new IOException("Unknown server: "+serverName);
   }
 
 
@@ -106,6 +137,7 @@ public class User{
     this.data = buf.toByteArray();
     this.props = new Properties();
     props.load(new ByteArrayInputStream(data));
+    this.server = Jin.getServer(getProperty("server"));
   }
 
 
@@ -119,20 +151,10 @@ public class User{
     props = (Properties)source.props.clone();
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     props.save(out, "");
-    data = out.toByteArray();
+    this.data = out.toByteArray();
+    this.server = source.server;
   }
 
-
-
-
-
-  /**
-   * Loads a User object from the given File.
-   */
-
-  public static User load(File file) throws IOException{
-    return new User(file);
-  }
 
 
 
@@ -202,7 +224,7 @@ public class User{
 
   /**
    * Returns the name of the file from which this User was loaded or into which
-   * it was last saved. Returns null if this is a new user.
+   * it was last saved. Returns <code>null</code> if this is a new user.
    */
 
   public String getFilename(){
@@ -214,24 +236,13 @@ public class User{
 
 
   /**
-   * Returns this User's properties. Absolutely no modification is allowed to
-   * the returned Properties.
-   */
-
-  public Properties getProperties(){
-    return new ImmutableProperties(props);
-  }
-
-
-
-
-  /**
    * Returns the value of the property of the user with the given name or null
    * if the user has no property with the given name.
    */
 
   public String getProperty(String propertyName){
-    return props.getProperty(propertyName);
+    String propertyValue = props.getProperty(propertyName);
+    return propertyValue == null ? getServer().getProperty(propertyName) : propertyValue;
   }
 
 
@@ -243,7 +254,8 @@ public class User{
    */
 
   public String getProperty(String propertyName, String defaultValue){
-    return props.getProperty(propertyName, defaultValue);
+    String propertyValue = getProperty(propertyName);
+    return propertyValue == null ? defaultValue : propertyValue;
   }
 
 
@@ -301,7 +313,7 @@ public class User{
    */
 
   public Server getServer(){
-    return Jin.getServer(getProperty("server"));
+    return server;
   }
 
 
@@ -320,9 +332,9 @@ public class User{
       return false;
 
     User user = (User)o;
-    if ((getUsername()==null)||(user.getUsername()==null))
+    if ((getUsername() == null) || (user.getUsername() == null))
       return false;
-    return getUsername().equalsIgnoreCase(user.getUsername())&&getServer().equals(user.getServer());
+    return getUsername().equalsIgnoreCase(user.getUsername()) && getServer().equals(user.getServer());
   }
 
 
@@ -333,7 +345,7 @@ public class User{
    */
 
   public int hashCode(){
-    return getUsername().hashCode()*getServer().hashCode();
+    return getUsername().hashCode()^getServer().hashCode();
   }
 
 
@@ -343,7 +355,7 @@ public class User{
    */
 
   public String toString(){
-    return "User[server="+getProperty("server")+",login.username="+getProperty("login.username")+"]";
+    return "User[server=\""+getServer()+"\",login.username="+getProperty("login.username")+"]";
   } 
 
 }
