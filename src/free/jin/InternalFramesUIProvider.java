@@ -28,10 +28,8 @@ import free.jin.plugin.*;
 import free.util.*;
 import free.util.swing.*;
 import javax.swing.event.*;
+import java.awt.event.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
@@ -95,6 +93,14 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   private final ConnectionMenu connMenu;
+  
+  
+  
+  /**
+   * The look and feel menu.
+   */
+   
+  private final LookAndFeelMenu lnfMenu;
 
 
 
@@ -138,9 +144,20 @@ public class InternalFramesUIProvider implements UIProvider{
     mainContainer.setMenuBar(menubar);
 
     menubar.add(connMenu = new ConnectionMenu());
-    menubar.add(new LookAndFeelMenu(mainContainer.getTopMostFrame()));
+    menubar.add(lnfMenu = new LookAndFeelMenu(mainContainer.getTopMostFrame()));
     menubar.add(prefsMenu = new PreferencesMenu());
     menubar.add(helpMenu = new HelpMenu(context));
+    
+    // Workaround for an OS X bug
+    mainContainer.getTopMostFrame().addWindowListener(new WindowAdapter(){
+      public void windowActivated(WindowEvent evt){
+        for (int i = 0; i < menubar.getMenuCount(); i++){
+          JMenu menu = menubar.getMenu(i);
+          menu.setEnabled(false);
+          menu.setEnabled(true);
+        }
+      }
+    });
 
     frameSwitcher = new InternalFrameSwitcher(desktop);
     desktop.setDesktopManager(new DesktopManager());
@@ -261,13 +278,20 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   private void addPluginMenus(Plugin [] plugins){
-    int menuIndex = menubar.getComponentIndex(prefsMenu) + 1;
+    menubar.removeAll();
+    
+    menubar.add(connMenu);
+    menubar.add(lnfMenu);
+    menubar.add(prefsMenu);
+    
     for (int i = 0; i < plugins.length; i++){
       Plugin plugin = plugins[i];
       JMenu menu = plugin.createPluginMenu();
       if (menu != null)
-        menubar.add(menu, menuIndex++);
+        menubar.add(menu);
     }
+    
+    menubar.add(helpMenu);    
   }
 
 
@@ -277,9 +301,19 @@ public class InternalFramesUIProvider implements UIProvider{
    */
 
   private void removePluginMenus(){
-    int prefsMenuIndex = menubar.getComponentIndex(prefsMenu);
-    while (menubar.getMenu(prefsMenuIndex + 1) != helpMenu)
-      menubar.remove(prefsMenuIndex + 1);
+    menubar.removeAll();
+    
+    menubar.add(connMenu);
+    menubar.add(lnfMenu);
+    menubar.add(prefsMenu);
+    menubar.add(helpMenu);
+
+    // OS X workaround.
+    for (int i = 0; i < menubar.getMenuCount(); i++){
+      JMenu menu = menubar.getMenu(i);
+      menu.setEnabled(false);
+      menu.setEnabled(true);
+    }
   }
 
 
@@ -345,32 +379,6 @@ public class InternalFramesUIProvider implements UIProvider{
     pluginContainers.clear();
   }
   
-  
-  /**
-   * Returns the desired initial proportions for the frame of a plugin ui
-   * container for the specified plugin, with the specified id.
-   */
-
-  private static RectDouble getInitialBoundsFor(Plugin plugin, String id){
-    String pluginId = plugin.getId();
-    if ("console".equals(pluginId)){
-      if ("".equals(id))
-        return new RectDouble(0, 0, 0.75, 0.75);
-    }
-    else if ("seek".equals(pluginId)){
-      if ("".equals(id))
-        return new RectDouble(0.5, 0.5, 0.5, 0.5);
-    }
-    else if ("board".equals(pluginId)){
-      try{
-        int boardIndex = Integer.parseInt(id);
-        return new RectDouble(0.25, 0.05*(boardIndex%6), 0.75, 0.75);
-      } catch (NumberFormatException e){}
-    }
-
-    return new RectDouble(0.2, 0.2, 0.6, 0.6);
-  }
-
 
   
   /**
@@ -997,7 +1005,44 @@ public class InternalFramesUIProvider implements UIProvider{
     }
 
 
-
+  
+    /**
+     * Returns the desired initial proportions for the frame of this plugin
+     * container.
+     */
+  
+    private RectDouble getInitialBounds(){
+      String pluginId = plugin.getId();
+      
+      if ("console".equals(pluginId)){
+        if ("".equals(id))
+          return new RectDouble(0, 0, 0.75, 0.75);
+      }
+      else if ("seek".equals(pluginId)){
+        if ("".equals(id))
+          return new RectDouble(0.5, 0.5, 0.5, 0.5);
+      }
+      else if ("board".equals(pluginId)){
+        try{
+          int boardIndex = Integer.parseInt(id);
+          return new RectDouble(0.25, 0.05*(boardIndex%6), 0.75, 0.75);
+        } catch (NumberFormatException e){}
+      }
+  
+      int margin = 50;
+      Dimension prefSize = frame.getPreferredSize();
+      Dimension contentPaneSize = mainContainer.getContentPane().getSize();
+      double w = Math.min(prefSize.width, contentPaneSize.width - margin);
+      double h = Math.min(prefSize.height, contentPaneSize.height - margin);
+      double x = (contentPaneSize.width - margin - w)/2;
+      double y = (contentPaneSize.height - margin - h)/2;
+      
+      return new RectDouble(x / contentPaneSize.width, y / contentPaneSize.height,
+                            w / contentPaneSize.width, h / contentPaneSize.height);
+    }
+  
+  
+  
     /**
      * Disposes of this plugin container.
      */
@@ -1235,7 +1280,7 @@ public class InternalFramesUIProvider implements UIProvider{
       Preferences prefs = plugin.getPrefs();
       String prefix = "".equals(id) ? "" : id + ".";
 
-      RectDouble defaultBounds = getInitialBoundsFor(plugin, id);
+      RectDouble defaultBounds = getInitialBounds();
       RectDouble bounds = (id == null ? defaultBounds :
         prefs.getRectDouble(prefix + "iframe.bounds", defaultBounds));
 
