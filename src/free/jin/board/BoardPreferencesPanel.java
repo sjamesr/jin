@@ -21,26 +21,26 @@
 
 package free.jin.board;
 
+import free.chess.Position;
 import free.jin.board.prefs.*;
-import javax.swing.*;
+import free.jin.ui.CompositePreferencesPanel;
+import free.jin.ui.PreferencesPanel;
+import free.util.SquareLayout;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import free.jin.PreferencesPanel;
-import free.jin.BadChangesException;
-import free.util.SquareLayout;
-import free.chess.Position;
+
+import javax.swing.*;
 
 
 /**
- * The preferences panel for the BoardManager plugin.
+ * The preferences panel for the <code>BoardManager</code> plugin.
  */
 
-public class BoardPreferencesPanel extends PreferencesPanel{
+public class BoardPreferencesPanel extends CompositePreferencesPanel{
 
 
 
@@ -61,37 +61,13 @@ public class BoardPreferencesPanel extends PreferencesPanel{
   
   
   /**
-   * The "Board Looks" panel.
+   * The tabbed pane.
    */
-   
-  protected final BoardModifyingPrefsPanel boardLooksPanel;
+  
+  private final JTabbedPane tabs = new JTabbedPane();
   
   
   
-  /**
-   * The "Move Input" panel.
-   */
-   
-  protected final BoardModifyingPrefsPanel moveInputPanel;
-  
-  
-  
-  /**
-   * The "Move Highlighting" panel.
-   */
-   
-  protected final BoardModifyingPrefsPanel moveHighlightingPanel;
-  
-  
-  
-  /**
-   * The "Square Coordinates" panel.
-   */
-   
-  protected final BoardModifyingPrefsPanel squareCoordsPanel;
-
-
-
   /**
    * Creates a new BoardPreferencesPanel for the specified board manager. 
    */
@@ -99,30 +75,6 @@ public class BoardPreferencesPanel extends PreferencesPanel{
   public BoardPreferencesPanel(BoardManager boardManager){
     this.boardManager = boardManager;
     this.previewBoard = createPreviewBoard();
-    
-    boardLooksPanel = createBoardLooksPanel();
-    moveInputPanel = createMoveInputPanel();
-    moveHighlightingPanel = createMoveHighlightingPanel();
-    squareCoordsPanel = createSquareCoordsPanel();
-    
-    initPreviewBoard();
-    
-    JTabbedPane tabs = new JTabbedPane();
-    tabs.addTab("Board Looks", null, boardLooksPanel, "Specify preferred piece set and board pattern");
-    tabs.addTab("Move Input", null, moveInputPanel, "Specify how moves are made by the user");
-    tabs.addTab("Move Highlighting", null, moveHighlightingPanel, "Specify how the last move is highlighted");
-    tabs.addTab("Coordinates", null, squareCoordsPanel, "Specify how square coordinates are displayed");
-    
-    ChangeListener changeListener = new ChangeListener(){
-      public void stateChanged(ChangeEvent evt){
-        fireStateChanged();
-      }
-    };
-    
-    boardLooksPanel.addChangeListener(changeListener);
-    moveInputPanel.addChangeListener(changeListener);
-    moveHighlightingPanel.addChangeListener(changeListener);
-    squareCoordsPanel.addChangeListener(changeListener);
     
     JPanel squarePanel = new JPanel(new SquareLayout());
     squarePanel.add(previewBoard);
@@ -154,8 +106,24 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     setLayout(new BorderLayout(5, 0));
     add(tabs, BorderLayout.WEST);
     add(boardPanel, BorderLayout.CENTER);
+    
+    addPanel(createBoardLooksPanel(), "Board Looks", "Specify preferred piece set and board pattern");
+    addPanel(createMoveInputPanel(), "Move Input", "Specify how moves are made by the user");
+    addPanel(createMoveHighlightingPanel(), "Move Highlighting", "Specify how the last move is highlighted");
+    addPanel(createSquareCoordsPanel(), "Coordinates", "Specify how square coordinates are displayed");
+    
+    initPreviewBoard();
   }
   
+  
+  
+  /**
+   * Adds the specified panel to a new tab.
+   */
+  
+  protected void addPanelToUi(PreferencesPanel panel, String name, String tooltip){
+    tabs.addTab(name, null, panel, tooltip);
+  }
   
   
   /**
@@ -176,23 +144,8 @@ public class BoardPreferencesPanel extends PreferencesPanel{
     Position pos = previewBoard.getPosition();
     pos.setLexigraphic("rn-qkbnrPPP-pppp-------------b---------------------PPPPPRNBQKBNR");
     
-    boardLooksPanel.initPreviewBoard();
-    moveInputPanel.initPreviewBoard();
-    moveHighlightingPanel.initPreviewBoard();
-    squareCoordsPanel.initPreviewBoard();
-  }
-  
-  
-  
-  /**
-   * Applies any changes the user has made.
-   */
-   
-  public void applyChanges() throws BadChangesException{
-    boardLooksPanel.applyChanges();
-    moveInputPanel.applyChanges();
-    moveHighlightingPanel.applyChanges();
-    squareCoordsPanel.applyChanges();
+    for (int i = 0; i < panels.size(); i++)
+      ((BoardModifyingPrefsPanel)panels.elementAt(i)).initPreviewBoard();
   }
   
   
