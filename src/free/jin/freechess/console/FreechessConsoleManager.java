@@ -71,6 +71,7 @@ public class FreechessConsoleManager extends ConsoleManager{
     String type = evt.getType();
     String sender = evt.getSender();
     String title = evt.getSenderTitle();
+    int rating = evt.getSenderRating();
     String message = evt.getMessage();
     Object forum = evt.getForum();
 
@@ -90,9 +91,9 @@ public class FreechessConsoleManager extends ConsoleManager{
 
     // Kibitzes and whispers
     else if (type.equals("kibitz"))
-      return sender+title+"["+forum+"] kibitzes: "+message;
+      return sender+title+"("+rating+")["+forum+"] kibitzes: "+message;
     else if (type.equals("whisper"))
-      return sender+title+"["+forum+"] whispers: "+message;
+      return sender+title+"("+rating+")["+forum+"] whispers: "+message;
 
     // Shouts
     else if (type.equals("shout"))
