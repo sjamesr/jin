@@ -36,15 +36,15 @@ import free.util.AWTUtilities;
 public class FontSelectorPanel extends JPanel{
 
 
-
+  
   /**
-   * The textfield showing the currently selected font name.
+   * The default font sizes list.
    */
-
-  private final JTextField fontNameField = new free.workarounds.FixedJTextField();
-
-
-
+   
+  private static final int [] DEFAULT_FONT_SIZES =
+    new int[]{5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
+      
+      
 
   /**
    * The list displaying possible font names.
@@ -54,22 +54,11 @@ public class FontSelectorPanel extends JPanel{
 
 
 
-
-  /**
-   * The textfield showing the currently selected font size.
-   */
-
-  private final JTextField fontSizeField = new free.workarounds.FixedJTextField(new IntegerStrictPlainDocument(1, 72), "", 2);
-
-
-
-
   /**
    * The list displaying possible font sizes.
    */
 
-  private final JList fontSizesList = new JList(new String[]{"5", "6", "7", "8", "9",
-    "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"});
+  private final JList fontSizesList;
 
 
 
@@ -90,7 +79,6 @@ public class FontSelectorPanel extends JPanel{
    */
 
   private Hashtable fontOptionCheckBoxes = new Hashtable();
-
 
 
 
@@ -124,15 +112,13 @@ public class FontSelectorPanel extends JPanel{
 
 
 
-
-
   /**
    * Creates a new <code>FontSelectorPanel</code> which will allow choosing from
    * the list of fonts available to the default Toolkit.
    */
 
   public FontSelectorPanel(){
-    this(AWTUtilities.getAvailableFontNames(), new BooleanFontOption[]{
+    this(new BooleanFontOption[]{
       createBoldFontOption(),
       createItalicFontOption()
     });
@@ -150,20 +136,69 @@ public class FontSelectorPanel extends JPanel{
   public FontSelectorPanel(BooleanFontOption [] fontOptions){
     this(AWTUtilities.getAvailableFontNames(), fontOptions);
   }
-
-
+  
+  
+  /**
+   * Creates a new </code>FontSelectorPanel</code> which will allow choosing
+   * from the list of fonts available to the default Toolkit at the specified
+   * sizes.
+   */
+   
+  public FontSelectorPanel(int [] fontSizes){
+    this(fontSizes, new BooleanFontOption[]{
+      createBoldFontOption(),
+      createItalicFontOption()
+    }); 
+  }
+  
+  
+  
+  /**
+   * Creates a new </code>FontSelectorPanel</code> which will allow choosing
+   * from the list of fonts available to the default Toolkit at the specified
+   * sizes and will allow the user to select from the specified
+   * BooleanFontOptions.
+   */
+   
+  public FontSelectorPanel(int [] fontSizes, BooleanFontOption [] fontOptions){
+    this(AWTUtilities.getAvailableFontNames(), fontSizes, fontOptions);
+  }
+   
 
 
   /**
    * Creates a new </code>FontSelectorPanel</code> which will allow choosing
-   * from the list of specified fonts.
+   * from the specified list of fonts.
    */
 
   public FontSelectorPanel(String [] fontNames){
-    this(fontNames, new BooleanFontOption[]{
+    this(fontNames, DEFAULT_FONT_SIZES);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>FontSelectorPanel</code> which will allow choosing
+   * from the specified list of fonts at specified sizes.
+   */
+   
+  public FontSelectorPanel(String [] fontNames, int [] fontSizes){
+    this(fontNames, fontSizes, new BooleanFontOption[]{
       createBoldFontOption(),
       createItalicFontOption()
     });
+  }
+  
+  
+  
+   
+  /**
+   * Creates a new <code>FontSelectorPanel</code> which will allow choosing
+   * from the specified list of fonts with specified options.
+   */
+   
+  public FontSelectorPanel(String [] fontNames, BooleanFontOption [] fontOptions){
+    this(fontNames, DEFAULT_FONT_SIZES, fontOptions);
   }
 
 
@@ -171,12 +206,18 @@ public class FontSelectorPanel extends JPanel{
 
   /**
    * Creates a new FontSelectorPanel which will allow choosing from the
-   * specified list of fonts.
+   * specified list of fonts at specified sizes with specified options.
    */
 
-  public FontSelectorPanel(String [] fontNames, BooleanFontOption [] fontOptions){
+  public FontSelectorPanel(String [] fontNames, int [] fontSizes,
+                           BooleanFontOption [] fontOptions){
     fontNamesList = new JList(fontNames);
     fontNamesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    
+    Integer [] fontSizesInts = new Integer[fontSizes.length];
+    for (int i = 0; i < fontSizes.length; i++)
+      fontSizesInts[i] = new Integer(fontSizes[i]);
+    fontSizesList = new JList(fontSizesInts); 
     fontSizesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     for (int i = 0; i < fontOptions.length; i++){
@@ -186,31 +227,23 @@ public class FontSelectorPanel extends JPanel{
     }
 
     previewPanelHolder = new JPanel(new BorderLayout());
-    Border outsideBorder = new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED);
+    Border outsideBorder = 
+      new TitledBorder(new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED), "Preview");
     Border insideBorder = new EmptyBorder(10, 10, 10, 10);
     previewPanelHolder.setBorder(new CompoundBorder(outsideBorder, insideBorder));
 
     setPreviewPanel(new DefaultPreviewPanel(this));
 
     createUI(fontOptions);
-
-    fontNamesList.addListSelectionListener(new ListSelectionListener(){
+    
+    ListSelectionListener changeListener = new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
-        String selectedItem = (String)fontNamesList.getSelectedValue();
-        fontNameField.setText(selectedItem);
-
         fireStateChanged();
       }
-    });
+    };
 
-    fontSizesList.addListSelectionListener(new ListSelectionListener(){
-      public void valueChanged(ListSelectionEvent evt){
-        String selectedItem = (String)fontSizesList.getSelectedValue();
-        fontSizeField.setText(selectedItem);
-
-        fireStateChanged();
-      }
-    });
+    fontNamesList.addListSelectionListener(changeListener);
+    fontSizesList.addListSelectionListener(changeListener);
 
   }
 
@@ -276,30 +309,24 @@ public class FontSelectorPanel extends JPanel{
    */
 
   private void createUI(BooleanFontOption [] fontOptions){
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    setLayout(new BorderLayout(10, 10));
 
     JPanel topPanel = new JPanel(new BorderLayout(5, 5));
 
-    JPanel fontNamePanel = new JPanel(new BorderLayout());
+    JPanel fontNamePanel = new JPanel(new BorderLayout(2,2));
     JScrollPane fontNamesListScrollPane = new JScrollPane(fontNamesList);
-    JPanel fontNameLabelAndField = new JPanel(new BorderLayout(2, 2));
     JLabel fontNameLabel = new JLabel("Font name", JLabel.CENTER);
     fontNameLabel.setDisplayedMnemonic('n');
-    fontNameLabel.setLabelFor(fontNameField);
-    fontNameLabelAndField.add(fontNameLabel, BorderLayout.NORTH);
-    fontNameLabelAndField.add(fontNameField, BorderLayout.SOUTH);
-    fontNamePanel.add(fontNameLabelAndField, BorderLayout.NORTH);
+    fontNameLabel.setLabelFor(fontNamesList);
+    fontNamePanel.add(fontNameLabel, BorderLayout.NORTH);
     fontNamePanel.add(fontNamesListScrollPane, BorderLayout.CENTER);
 
-    JPanel fontSizePanel = new JPanel(new BorderLayout());
+    JPanel fontSizePanel = new JPanel(new BorderLayout(2,2));
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
-    JPanel fontSizeLabelAndField = new JPanel(new BorderLayout(2, 2));
     JLabel fontSizeLabel = new JLabel("Font size", JLabel.CENTER);
     fontSizeLabel.setDisplayedMnemonic('s');
-    fontSizeLabel.setLabelFor(fontSizeField);
-    fontSizeLabelAndField.add(fontSizeLabel, BorderLayout.NORTH);
-    fontSizeLabelAndField.add(fontSizeField, BorderLayout.SOUTH);
-    fontSizePanel.add(fontSizeLabelAndField, BorderLayout.NORTH);
+    fontSizeLabel.setLabelFor(fontSizesList);
+    fontSizePanel.add(fontSizeLabel, BorderLayout.NORTH);
     fontSizePanel.add(fontSizesListScrollPane, BorderLayout.CENTER);
 
     topPanel.add(fontNamePanel, BorderLayout.CENTER);
@@ -317,6 +344,7 @@ public class FontSelectorPanel extends JPanel{
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
 
     Box checkBoxesPanel = Box.createVerticalBox();
+    checkBoxesPanel.add(Box.createVerticalGlue());
 
     for (int i = 0; i < fontOptions.length; i++){
       BooleanFontOption fontOption = fontOptions[i];
@@ -326,13 +354,14 @@ public class FontSelectorPanel extends JPanel{
       checkBoxesPanel.add(checkbox);
       fontOptionCheckBoxes.put(fontOption, checkbox);
     }
+    
+    checkBoxesPanel.add(Box.createVerticalGlue());
 
     bottomPanel.add(checkBoxesPanel, BorderLayout.WEST);
     bottomPanel.add(previewPanelHolder, BorderLayout.CENTER);
 
-    add(topPanel);
-    add(Box.createVerticalStrut(10));
-    add(bottomPanel);
+    add(topPanel, BorderLayout.CENTER);
+    add(bottomPanel, BorderLayout.SOUTH);
   }
 
 
@@ -343,13 +372,10 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public Font getSelectedFont(){
-    String fontName = fontNameField.getText();
-    String fontSizeString = fontSizeField.getText();
+    String fontName = (String)(fontNamesList.getSelectedValue());
+    Integer fontSize = (Integer)(fontSizesList.getSelectedValue());
 
-    if ((fontName == null) || fontName.equals(""))
-      return null;
-
-    if ((fontSizeString == null) || fontSizeString.equals(""))
+    if ((fontName == null) || (fontSize == null))
       return null;
 
     int style = 0;
@@ -360,7 +386,7 @@ public class FontSelectorPanel extends JPanel{
     if ((italicOption != null) && italicOption.getValue())
       style |= Font.ITALIC;
 
-    return new Font(fontName, style, Integer.parseInt(fontSizeString));
+    return new Font(fontName, style, fontSize.intValue());
   }
 
 
@@ -371,9 +397,6 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public void setSelectedFont(Font font){
-    fontNameField.setText(font.getFamily());
-    fontSizeField.setText(String.valueOf(font.getSize()));
-
     BooleanFontOption boldOption = getFontOption("Bold");
     BooleanFontOption italicOption = getFontOption("Italic");
 
@@ -383,7 +406,7 @@ public class FontSelectorPanel extends JPanel{
       italicOption.setValue(font.isItalic());
 
     fontNamesList.setSelectedValue(font.getFamily(), true);
-    fontSizesList.setSelectedValue(String.valueOf(font.getSize()), true);
+    fontSizesList.setSelectedValue(new Integer(font.getSize()), true);
 
     fireStateChanged();
   }
@@ -516,6 +539,19 @@ public class FontSelectorPanel extends JPanel{
     public void stateChanged(ChangeEvent evt){
       setFont(fontSelectorPanel.getSelectedFont());
       repaint();
+    }
+    
+    
+    
+    /**
+     * Returns the preferred size of this preview panel.
+     */
+     
+    public Dimension getPreferredSize(){
+      Dimension prefSize = super.getPreferredSize();
+      prefSize.height += 20;
+      
+      return prefSize;
     }
 
   }
