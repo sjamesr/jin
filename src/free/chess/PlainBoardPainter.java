@@ -31,33 +31,17 @@ import java.awt.Component;
  * An implementation of BoardPainter which fills the squares with colors.
  */
 
-public class PlainBoardPainter implements ColoredBoardPainter{
+public class PlainBoardPainter extends AbstractColoredBoardPainter{
 
 
-  /**
-   * The color of the light squares.
-   */
-
-  private Color lightColor;
-
-
-
-  /**
-   * The color of the dark squares.
-   */
-
-  private Color darkColor;
-
-
-
+  
   /**
    * Creates a new <code>PlainBoardPainter</code> which paints squares with the
    * given light square color and dark square color.
    */
 
   public PlainBoardPainter(Color lightColor, Color darkColor){
-    this.lightColor = lightColor;
-    this.darkColor = darkColor;
+    super(lightColor, darkColor);
   }
   
   
@@ -71,63 +55,8 @@ public class PlainBoardPainter implements ColoredBoardPainter{
     this(new Color(255,207,144),new Color(143,96,79));
   }
 
-
-
-
-  /**
-   * Returns the color with which light squares are drawn.
-   */
-
-  public Color getLightColor(){
-    return lightColor;
-  }
-
-
-
-
-  /**
-   * Sets the color of the light squares.
-   */
-
-  public void setLightColor(Color color){
-    this.lightColor = color;
-  }
-
-
-
-
-  /**
-   * Returns the color with which dark squares are drawn.
-   */
-
-  public Color getDarkColor(){
-    return darkColor;
-  }
-
-
-
-
-  /**
-   * Sets the color of the dark squares.
-   */
-
-  public void setDarkColor(Color color){
-    this.darkColor = color;
-  }
-
-
-
-
-  /**
-   * Returns a 0x0 Dimension since we don't care at which size to draw the board.
-   */
-
-  public Dimension getPreferredBoardSize(){
-    return new Dimension(0,0);
-  }
-
-
-
+  
+  
   /**
    * Paints the board at the given location on the given Graphics scaled to
    * the given size.
@@ -136,6 +65,9 @@ public class PlainBoardPainter implements ColoredBoardPainter{
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     int squareWidth = width/8;
     int squareHeight = height/8;
+    Color lightColor = getLightColor();
+    Color darkColor = getDarkColor();
+    
     for (int i=0;i<8;i++)
       for (int j=0;j<8;j++){
         if ((i+j)%2==0)
