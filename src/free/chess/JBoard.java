@@ -1689,7 +1689,7 @@ public class JBoard extends JComponent{
             Piece promotionTarget;
             if (isManualPromote()){
               isShowingModalDialog = true;
-              promotionTarget = PieceChooser.showPieceChooser(this, promotionTargets, getPiecePainter(), promotionTargets[0]);
+              promotionTarget = PieceChooser.showPieceChooser(this, x, y, promotionTargets, getPiecePainter(), promotionTargets[0]);
               isShowingModalDialog = false;
             }
             else
