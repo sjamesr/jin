@@ -91,4 +91,19 @@ public class GraphicsUtilities{
   }
 
 
+
+
+  /**
+   * Returns true if the two specified rectangles intersect. Two rectangles
+   * intersect if their intersection is nonempty. This method is not really
+   * needed because Rectangle.intersects(Rectangle) exists in JDK1.1, but I
+   * still like having it here for symmetry.
+   */
+
+  public static boolean intersect(Rectangle rect1, Rectangle rect2){
+    return rect1.intersects(rect2);
+  }
+
+
+
 }
