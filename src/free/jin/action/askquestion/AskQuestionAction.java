@@ -68,7 +68,7 @@ public class AskQuestionAction extends JinAction{
    */
    
   public void go(){
-    String question = new QuestionPanel().getQuestion(getUIProvider());
+    String question = new QuestionPanel().getQuestion();
     
     if ((question != null) && !"".equals(question.trim()))
       getConn().sendHelpQuestion(question);
@@ -146,8 +146,8 @@ public class AskQuestionAction extends JinAction{
      * <code>null</code> if the user canceled the dialog.
      */
      
-    public String getQuestion(UIProvider uiProvider){
-      return (String)askResult(uiProvider);
+    public String getQuestion(){
+      return (String)askResult();
     }
     
     
