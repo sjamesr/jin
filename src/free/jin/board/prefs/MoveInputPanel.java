@@ -222,7 +222,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       public void actionPerformed(ActionEvent evt){
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
-          OptionPanel.error(boardManager.getUIProvider(), "Unable to change setting",
+          OptionPanel.error("Unable to change setting",
             "Moving in advance settings may not be modified while playing a game");
             
           disallowMoveInAdvance.setSelected(
