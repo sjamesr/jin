@@ -28,7 +28,6 @@ import java.awt.event.*;
 import free.chess.*;
 import free.jin.event.*;
 import free.jin.Game;
-import free.jin.plugin.Plugin;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
 import free.jin.sound.SoundManager;
@@ -41,6 +40,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.border.EmptyBorder;
 import java.util.Vector;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 
 /**
@@ -52,14 +53,14 @@ import java.util.Vector;
  */
 
 public class BoardPanel extends FixedJPanel implements MoveListener, GameListener, 
-    ActionListener, AdjustmentListener{
+    ActionListener, AdjustmentListener, PropertyChangeListener{
 
 
   /**
-   * The Plugin this BoardPanel is used by.
+   * The <code>BoardManager</code> this BoardPanel is used by.
    */
 
-  protected final Plugin plugin;
+  protected final BoardManager boardManager;
 
 
 
@@ -91,20 +92,21 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Is this BoardPanel highlighting the user's moves, or only others' moves.
-   */
-
-  protected boolean highlightOwnMoves = false;
-
-
-
-  /**
    * The JBoard showing the current position.
    */
 
   protected JBoard board;
 
 
+
+  /**
+   * True if we're highlighting our own moves. False if only opponent's moves.
+   */
+
+  private boolean highlightOwnMoves;
+
+  
+  
 
   /**
    * The list of made moves.
@@ -316,14 +318,18 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Creates a new BoardPanel which will be used by the given Plugin, will 
-   * display the given Game and will have the given move input mode.
+   * Creates a new <code>BoardPanel</code> which will be used by the given
+   * <code>BoardManager</code>, will display the given Game and will have the
+   * given move input mode.
    */
 
-  public BoardPanel(Plugin plugin, Game game){
+  public BoardPanel(BoardManager boardManager, Game game){
     this.game = game;
-    this.plugin = plugin;
+    this.boardManager = boardManager;
     this.realPosition = game.getInitialPosition();
+
+    boardManager.addPropertyChangeListener(this);
+
     init(game);
   }
 
@@ -381,8 +387,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void init(Game game){
     isFlipped = game.isBoardInitiallyFlipped();
+    highlightOwnMoves = boardManager.isHighlightingOwnMoves();
     timer = createTimer(game);
     createComponents(game);
+    
 //    addComponents(game, isFlipped); 
     // We're not adding them because the layout depends on the size, which is unknown at this point.
     // See the doLayout() method.
@@ -495,6 +503,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (isFlipped())
       board.setFlipped(true);
+
+    board.setPiecePainter(boardManager.getPiecePainter());
+    board.setBoardPainter(boardManager.getBoardPainter());
+    board.setMoveInputStyle(boardManager.getMoveInputStyle());
+    board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
+    board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
+    board.setManualPromote(!boardManager.isAutoPromote());
+    board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
+    board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
 
 
     ActionListener escapeListener = new ActionListener(){
@@ -614,9 +631,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (game.getGameType() != Game.MY_GAME)
       return null;
     else if (game.isPlayed())
-      buttonPanel = new PlayedGameButtonPanel(plugin, game, this);
+      buttonPanel = new PlayedGameButtonPanel(boardManager, game, this);
     else
-      buttonPanel = new ExaminedGameButtonPanel(plugin, game);
+      buttonPanel = new ExaminedGameButtonPanel(boardManager, game);
 
     return buttonPanel;
   }
@@ -813,6 +830,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
 
+
   /**
    * Updates the move highlighting on the board. The boolean argument specifies
    * whether the last made move (on the board, not the real position) is a move
@@ -823,7 +841,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   private void updateMoveHighlighting(boolean isOwnMove){
-    if ((displayedMoveNumber == 0) || (isOwnMove && !isHighlightingOwnMoves()))
+    if ((displayedMoveNumber == 0) || (isOwnMove && !highlightOwnMoves))
       board.setHighlightedMove(null);
     else{
       Move move = (Move)madeMoves.elementAt(displayedMoveNumber - 1);
@@ -1082,7 +1100,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   public final boolean isFlipped(){
     // Final because we directly set the isFlipped *variable* in init(Game) and
-    // thus must not let anyone redefine the meaning if "flipped".
+    // thus must not let anyone redefine the meaning of "flipped".
 
     return isFlipped;
   }
@@ -1095,7 +1113,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void setFlipped(boolean b){
-    if (isFlipped()!=b){
+    if (isFlipped() != b){
       isFlipped = b;
       board.setFlipped(isFlipped);
       reAddComponents = true;
@@ -1105,50 +1123,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
 
-
-  /**
-   * Specifies whether the board should highlight the user's moves as well as
-   * others' moves. If the passed argument is <code>true</code>, the user's
-   * moves will be highlighted, if <code>false</code>, only others' moves.
-   */
-
-  public void setHighlightingOwnMoves(boolean highlightOwn){
-    this.highlightOwnMoves = highlightOwn;
-  }
-
-
-
-
-  /**
-   * Returns <code>true</code> if the board is highlighting the user's moves
-   * as well as others' moves. Returns <code>false</code> if it only highlights
-   * others' moves.
-   */
-
-  public boolean isHighlightingOwnMoves(){
-    return highlightOwnMoves;
-  } 
-
-
-
-
   /**
    * Returns the Game displayed by this BoardPanel.
    */
 
   public Game getGame(){
     return game;
-  }
-
-
-
-
-  /**
-   * Returns the JBoard used by this BoardPanel to display the position.
-   */
-
-  public JBoard getBoard(){
-    return board;
   }
 
 
@@ -1202,11 +1182,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   private SoundManager getSoundManager(){
-    String pluginName = plugin.getProperty("sound-manager-plugin.name");
+    String pluginName = boardManager.getProperty("sound-manager-plugin.name");
     if (pluginName == null)
       return null;
 
-    return (SoundManager)plugin.getPluginContext().getPlugin(pluginName);
+    return (SoundManager)boardManager.getPluginContext().getPlugin(pluginName);
   }
 
 
@@ -1572,9 +1552,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected boolean isUserTurn(){
-    if (game.getGameType()==Game.OBSERVED_GAME)
+    if (game.getGameType() == Game.OBSERVED_GAME)
       return false;
-    else if (game.getGameType()==Game.ISOLATED_BOARD)
+    else if (game.getGameType() == Game.ISOLATED_BOARD)
       return false;
     else{ // MY_GAME
       if (game.isPlayed()){
@@ -1707,7 +1687,39 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
       isPositionScrollBarUpdating = false;
     }
-  } 
+  }
+
+
+
+
+  /**
+   * <code>PropertyChangeListener</code> implementation.
+   */
+
+  public void propertyChange(PropertyChangeEvent evt){
+    Object src = evt.getSource();
+    String propertyName = evt.getPropertyName();
+    if (src == boardManager){
+      if ("piecePainter".equals(propertyName))
+        board.setPiecePainter(boardManager.getPiecePainter());
+      else if ("boardPainter".equals(propertyName))
+        board.setBoardPainter(boardManager.getBoardPainter());
+      else if ("moveInputStyle".equals(propertyName))
+        board.setMoveInputStyle(boardManager.getMoveInputStyle());
+      else if ("draggedPieceStyle".equals(propertyName))
+        board.setDraggedPieceStyle(boardManager.getDraggedPieceStyle());
+      else if ("moveHighlightingStyle".equals(propertyName))
+        board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
+      else if ("autoPromote".equals(propertyName))
+        board.setManualPromote(!boardManager.isAutoPromote());
+      else if ("moveHighlightingColor".equals(propertyName))
+        board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
+      else if ("dragSquareHighlightingColor".equals(propertyName))
+        board.setDragSquareHighlightingColor(boardManager.getDragSquareHighlightingColor());
+      else if ("highlightingOwnMoves".equals(propertyName))
+        highlightOwnMoves = boardManager.isHighlightingOwnMoves();
+    }
+  }
 
 
 
@@ -1733,6 +1745,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     this.isActive = false;
     board.getPosition().removeMoveListener(this);
     board.setMoveInputMode(JBoard.ALL_PIECES_MOVE);
+  }
+
+
+
+  /**
+   * This method is called by the <code>BoardManager</code> when this
+   * <code>BoardPanel</code> is no longer required.
+   */
+
+  public void done(){
+    boardManager.removePropertyChangeListener(this); 
   }
 
 
