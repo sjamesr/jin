@@ -439,6 +439,11 @@ public class ChessclubConnection extends free.util.Connection{
     out = sock.getOutputStream();
 
     synchronized(this){
+      // We could be disconnected between opening
+      // the socket and getting the lock
+      if (!isConnected())
+        return false;
+      
       int largestSetDGNumber = level2Settings.size();
       while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
         largestSetDGNumber--;
@@ -500,12 +505,12 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * If the connection is currently connected, sends the "exit" command to the
+   * If the connection is currently logged in, sends the "exit" command to the
    * server. Otherwise the call is simply ignored.
    */
 
   public void quit(){
-    if (isConnected())
+    if (isLoggedIn())
       sendCommand("exit");
   }
 
@@ -539,8 +544,10 @@ public class ChessclubConnection extends free.util.Connection{
     if (echo && (echoStream != null))
       echoStream.println("SENDING COMMAND: " + command);
 
-    if (!isConnected())
-      throw new IllegalStateException("Not connected");
+    // We can't check isLoggedIn() here because sendCommand is used by 
+    // login(), at which point we're obviously not logged in yet
+    if (out == null) 
+      throw new IllegalStateException("Not logged in");
     try{
       out.write(command.getBytes());
       out.write('\n');
@@ -548,7 +555,9 @@ public class ChessclubConnection extends free.util.Connection{
     } catch (IOException e){
         e.printStackTrace();
         try{
-          sock.close(); // Disconnect
+          if (isConnected())
+            disconnect();
+          out = null;
         } catch (IOException ex){
             ex.printStackTrace();
           }
