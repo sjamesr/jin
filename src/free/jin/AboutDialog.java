@@ -102,6 +102,7 @@ public class AboutDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(10));
 
     JButton closeButton = new JButton("OK");
+    closeButton.setMnemonic('O');
     closeButton.addActionListener(new WindowDisposingActionListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);

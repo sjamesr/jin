@@ -139,25 +139,25 @@ public class BackgroundChooser extends JDialog{
     JPanel mainPanel = new JPanel(new GridLayout(4, 1, 10, 10));
     mainPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
 
-    JButton pickColor = new JButton("Pick color");
-    JButton pickImage = new JButton("Pick image");
-    JButton useDefault = new JButton("Use default");
+    JButton pickColor = new JButton("Pick Color");
+    JButton pickImage = new JButton("Pick Image");
+    JButton useDefault = new JButton("Use Default");
 
     pickColor.setMnemonic('P');
-    pickImage.setMnemonic('i');
-    useDefault.setMnemonic('d');
+    pickImage.setMnemonic('I');
+    useDefault.setMnemonic('D');
 
     pickColor.setDefaultCapable(false);
     pickImage.setDefaultCapable(false);
     useDefault.setDefaultCapable(false);
 
     int curStyle = desktop.getWallpaperLayoutStyle();
-    final JRadioButton tileButton = new JRadioButton("tile", curStyle == AdvancedJDesktopPane.TILE);
-    final JRadioButton stretchButton = new JRadioButton("stretch", curStyle == AdvancedJDesktopPane.STRETCH);
-    final JRadioButton centerButton = new JRadioButton("center", curStyle == AdvancedJDesktopPane.CENTER);
+    final JRadioButton tileButton = new JRadioButton("Tile", curStyle == AdvancedJDesktopPane.TILE);
+    final JRadioButton stretchButton = new JRadioButton("Stretch", curStyle == AdvancedJDesktopPane.STRETCH);
+    final JRadioButton centerButton = new JRadioButton("Center", curStyle == AdvancedJDesktopPane.CENTER);
 
-    tileButton.setMnemonic('t');
-    stretchButton.setMnemonic('s');
+    tileButton.setMnemonic('T');
+    stretchButton.setMnemonic('S');
     centerButton.setMnemonic('e');
 
     ButtonGroup group = new ButtonGroup();

@@ -81,7 +81,7 @@ public class PlainTextDialog extends JDialog{
     ActionListener closer = new WindowDisposingActionListener(this);
     getRootPane().registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-    textArea = new FixedJTextArea(text, 20, 80);
+    textArea = new FixedJTextArea(text, 20, 81);
 
     createUI();
   }
@@ -128,6 +128,7 @@ public class PlainTextDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(20));
 
     JButton closeButton = new JButton("Close");
+    closeButton.setMnemonic('C');
     closeButton.addActionListener(new WindowDisposingActionListener(this));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     getRootPane().setDefaultButton(closeButton);

@@ -362,8 +362,8 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createConnectAsGuestButton(){
-    JButton button = new JButton("Connect as guest");
-    button.setMnemonic('g');
+    JButton button = new JButton("Connect as Guest");
+    button.setMnemonic('G');
     return button;
   }
 
@@ -484,8 +484,8 @@ public abstract class StandardLoginDialog implements LoginDialog{
   public Component createAdvancedOptionsPanel(final JDialog parentDialog){
     JPanel hostnameLabelPanel = new JPanel(new GridLayout(3,1));
     hostnameLabelPanel.add(new JLabel("Server"));
-    hostnameLabelPanel.add(new JLabel("hostname or"));
-    JLabel hostnameLabel = new JLabel("IP number");
+    hostnameLabelPanel.add(new JLabel("Hostname or"));
+    JLabel hostnameLabel = new JLabel("IP Number");
     hostnameLabel.setDisplayedMnemonic('I');
     hostnameLabelPanel.add(hostnameLabel);
 
@@ -516,7 +516,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
 
     portPanel.add(portField);
     portPanel.add(Box.createHorizontalStrut(10));
-    JLabel portLabel = new JLabel("Port number");
+    JLabel portLabel = new JLabel("Port Number");
     portLabel.setDisplayedMnemonic('n');
     portLabel.setLabelFor(portField);
     portPanel.add(portLabel);
@@ -552,7 +552,7 @@ public abstract class StandardLoginDialog implements LoginDialog{
    */
 
   protected JButton createForgotPasswordButton(){
-    JButton button = new JButton("Forgot your password?");
+    JButton button = new JButton("Retrieve Password");
     button.setMnemonic('F');
     return button;
   }

@@ -128,29 +128,29 @@ public class BoardPreferencesPanel extends PreferencesPanel{
   public BoardPreferencesPanel(BoardManager boardManager){
     this.boardManager = boardManager;
 
-    whiteColorChooser = new ColorChooserButton("White pieces", getColorProperty("white-piece-color", Color.white));
-    blackColorChooser = new ColorChooserButton("Black pieces", getColorProperty("black-piece-color", Color.black));
-    whiteOutlineChooser = new ColorChooserButton("White pieces' outline", getColorProperty("white-outline-color", Color.black));
-    blackOutlineChooser = new ColorChooserButton("Black pieces' outline", getColorProperty("black-outline-color", Color.white));
+    whiteColorChooser = new ColorChooserButton("White Pieces", getColorProperty("white-piece-color", Color.white));
+    blackColorChooser = new ColorChooserButton("Black Pieces", getColorProperty("black-piece-color", Color.black));
+    whiteOutlineChooser = new ColorChooserButton("White Pieces' Outline", getColorProperty("white-outline-color", Color.black));
+    blackOutlineChooser = new ColorChooserButton("Black Pieces' Outline", getColorProperty("black-outline-color", Color.white));
 
     whiteColorChooser.setMnemonic('W');
     blackColorChooser.setMnemonic('B');
-    whiteOutlineChooser.setMnemonic('p');
+    whiteOutlineChooser.setMnemonic('P');
     blackOutlineChooser.setMnemonic('k');
 
 
-    lightColorChooser = new ColorChooserButton("Light squares", getColorProperty("light-square-color", new Color(255,207,144)));
-    darkColorChooser = new ColorChooserButton("Dark squares", getColorProperty("dark-square-color", new Color(143,96,79)));
+    lightColorChooser = new ColorChooserButton("Light Squares", getColorProperty("light-square-color", new Color(255,207,144)));
+    darkColorChooser = new ColorChooserButton("Dark Squares", getColorProperty("dark-square-color", new Color(143,96,79)));
 
     lightColorChooser.setMnemonic('L');
     darkColorChooser.setMnemonic('D');
 
 
-    moveHighlightingColorChooser = new ColorChooserButton("Move highlighting", getColorProperty("move-highlighting-color", boardManager.getMoveHighlightingColor()));
-    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag square highlighting", getColorProperty("drag-square-highlighting-color", boardManager.getDragSquareHighlightingColor()));
+    moveHighlightingColorChooser = new ColorChooserButton("Move Highlighting", getColorProperty("move-highlighting-color", boardManager.getMoveHighlightingColor()));
+    dragSquareHighlightingColorChooser = new ColorChooserButton("Drag Square Highlighting", getColorProperty("drag-square-highlighting-color", boardManager.getDragSquareHighlightingColor()));
 
     moveHighlightingColorChooser.setMnemonic('M');
-    dragSquareHighlightingColorChooser.setMnemonic('s');
+    dragSquareHighlightingColorChooser.setMnemonic('S');
 
 
     ChangeListener changeNotifyListener = new ChangeListener(){

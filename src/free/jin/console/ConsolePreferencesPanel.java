@@ -456,7 +456,7 @@ public class ConsolePreferencesPanel extends PreferencesPanel{
 
   protected ColorChooserButton createSelectedColorButton(){
     Color selectedColor = StringParser.parseColor(getProperty("output-selected"));
-    ColorChooserButton button = new ColorChooserButton("Selected text", selectedColor);
+    ColorChooserButton button = new ColorChooserButton("Selected Text", selectedColor);
     button.setMnemonic('e');
 
     return button;

@@ -185,9 +185,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     String allGamesLogFile = gameLogger.getLogFileForAll();
     Vector loggingRules = gameLogger.getLoggingRules();
 
-    logNoneButton = new JRadioButton("Don't log games");
-    logAllButton = new JRadioButton("Log all games to file:");
-    useRulesButton = new JRadioButton("Specify logging rules");
+    logNoneButton = new JRadioButton("Don't Log Games");
+    logAllButton = new JRadioButton("Log All Games to File:");
+    useRulesButton = new JRadioButton("Specify Logging Rules");
 
     logNoneButton.setMnemonic('D');
     logAllButton.setMnemonic('L');

@@ -301,6 +301,7 @@ public class LicenseDialog extends JDialog{
     contentPane.add(Box.createVerticalStrut(15));
 
     JButton closeButton = new JButton("Close");
+    closeButton.setMnemonic('C');
     closeButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         dispose();
