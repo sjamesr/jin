@@ -31,7 +31,6 @@ import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Properties;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -48,14 +47,10 @@ public class Jin{
   
   
   /**
-   * Maps <code>ThreadGroup</code>s to <code>Jin</code> instances.
-   * This map is used to determine the correct Jin instance to return from
-   * <code>Jin.getInstance()</code>. We don't use a simple instance because
-   * Jin may be run more than once in the same JVM (such as in the case of an
-   * applet).
+   * The sole Jin instance.
    */
    
-  private static final Hashtable instances = new Hashtable();
+  private static volatile Jin instance = null;
   
   
   
@@ -139,44 +134,14 @@ public class Jin{
   
   
   /**
-   * Returns the object we use for identifying this instance of jin (the
-   * application, not the class). We use this to locate the Jin instance, of
-   * which there may be more than one (such as when running more than once as an
-   * applet).
-   */
-  
-  private static Object getInstanceKey(){
-    if (PlatformUtils.isOldMicrosoftVM())
-      return Jin.class;
-    else
-      return Thread.currentThread().getThreadGroup();
-    
-    // IE throws a SecurityException when trying to access the thread group.
-    // I would simply catch the SecurityException and then return Jin.class
-    // but the problem is that IE is inconsistent about throwing that exception
-    
-    // Failing the threadgroup, try use our class as the key.
-    // Maybe whoever is running us is smart enough to use separate class 
-    // instances in separate jin instances, and if not, then at least jin will
-    // run once.
-  }
-  
-  
-  
-  /**
    * Creates the sole Jin instance, with the specified context.
    */
    
   public synchronized static void createInstance(JinContext context){
-    Object instanceKey = getInstanceKey();
-    Jin instance = (Jin)instances.get(instanceKey);
-    
     if (instance != null)
       throw new IllegalStateException("Jin instance already exists");
     
     instance = new Jin(context);
-    
-    instances.put(instanceKey, instance);
   }
   
   
@@ -186,8 +151,6 @@ public class Jin{
    */
    
   public synchronized static Jin getInstance(){
-    Jin instance = (Jin)instances.get(getInstanceKey());
-    
     if (instance == null)
       throw new IllegalStateException("Jin instance doesn't yet exist");
     
@@ -547,7 +510,7 @@ public class Jin{
       users.copyInto(usersArr);
       context.setUsers(usersArr);
 
-      instances.remove(getInstanceKey());
+      instance = null;
       
       context.shutdown();
     }
