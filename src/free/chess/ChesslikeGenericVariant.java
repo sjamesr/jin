@@ -69,7 +69,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
   public static final ChessMove WHITE_SHORT_CASTLING = 
     new ChessMove(Square.parseSquare("e1"), Square.parseSquare("g1"), Player.WHITE_PLAYER,
-    false, true, false, null, null, "O-O");
+    false, true, false, null, -1, null, "O-O");
 
 
 
@@ -79,7 +79,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
   public static final ChessMove WHITE_LONG_CASTLING = 
     new ChessMove(Square.parseSquare("e1"), Square.parseSquare("c1"), Player.WHITE_PLAYER,
-    false, false, true, null, null, "O-O-O");
+    false, false, true, null, -1, null, "O-O-O");
 
 
 
@@ -89,7 +89,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
   public static final ChessMove BLACK_SHORT_CASTLING = 
     new ChessMove(Square.parseSquare("e8"), Square.parseSquare("g8"), Player.BLACK_PLAYER,
-    false, true, false, null, null, "O-O");
+    false, true, false, null, -1, null, "O-O");
 
 
 
@@ -99,7 +99,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
   public static final ChessMove BLACK_LONG_CASTLING = 
     new ChessMove(Square.parseSquare("e8"), Square.parseSquare("c8"), Player.BLACK_PLAYER,
-    false, false, true, null, null, "O-O-O");
+    false, false, true, null, -1, null, "O-O-O");
 
 
 
@@ -332,6 +332,28 @@ public class ChesslikeGenericVariant implements WildVariant{
     else
       return takenPiece;
   }
+  
+  
+  
+  /**
+   * Returns the double pawn push file of the move defined by the given
+   * arguments, or -1 if that move is not a double pawn push.
+   */
+   
+  public int getDoublePawnPushFile(Position pos, Square startingSquare, Square endingSquare){
+    Piece piece = pos.getPieceAt(startingSquare);
+    if (((piece == ChessPiece.WHITE_PAWN) && 
+          (startingSquare.getRank() == 1) && (endingSquare.getRank() == 3) &&
+          (startingSquare.getFile() == endingSquare.getFile()) &&
+          (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 2)) == null)) ||
+        ((piece == ChessPiece.BLACK_PAWN) &&
+          (startingSquare.getRank() == 6) && (endingSquare.getRank() == 4) &&
+          (startingSquare.getFile() == endingSquare.getFile()) &&
+          (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 5)) == null)))
+      return startingSquare.getFile();
+    else
+      return -1;
+  }
 
 
 
@@ -458,9 +480,10 @@ public class ChesslikeGenericVariant implements WildVariant{
     boolean isShortCastling = isShortCastling(pos, startingSquare, endingSquare, promotionChessTarget);
     boolean isLongCastling = isLongCastling(pos, startingSquare, endingSquare, promotionChessTarget);
     ChessPiece capturedPiece = getCapturedPiece(pos, startingSquare, endingSquare, promotionChessTarget, isEnPassant);
+    int doublePawnPushFile = getDoublePawnPushFile(pos, startingSquare, endingSquare);
 
     return new ChessMove(startingSquare, endingSquare, movingPlayer, isEnPassant, isShortCastling, 
-      isLongCastling, capturedPiece, promotionChessTarget, moveSAN);
+      isLongCastling, capturedPiece, doublePawnPushFile, promotionChessTarget, moveSAN);
   }
 
 
