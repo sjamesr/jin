@@ -346,6 +346,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     this.realPosition = game.getInitialPosition();
 
     boardManager.addPropertyChangeListener(this);
+    game.addPropertyChangeListener(this);
 
     init(game);
 
@@ -581,9 +582,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JLabel createGameLabel(Game game){
-    JLabel gameLabel = new JLabel((game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + game.getVariant().getName());
+    JLabel gameLabel = new JLabel(createGameLabelText(game));
     gameLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
     return gameLabel;
+  }
+
+
+
+  /**
+   * Returns the text that should be displayed on the game label.
+   */
+
+  protected String createGameLabelText(Game game){
+    return (game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + game.getVariant().getName();
   }
 
 
@@ -595,12 +606,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JLabel createWhiteLabel(Game game){
-    String title = game.getWhiteTitles();
-    JLabel whiteLabel = new JLabel(game.getWhiteName()+title+" "+game.getWhiteRating());
+    JLabel whiteLabel = new JLabel(createWhiteLabelText(game));
     whiteLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
     return whiteLabel;
   }
 
+
+
+  /**
+   * Returns the text that should be displayed by the white player's label.
+   */
+
+  protected String createWhiteLabelText(Game game){
+    return game.getWhiteName() + game.getWhiteTitles() + " " + game.getWhiteRating();
+  }
 
 
 
@@ -611,12 +630,21 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JLabel createBlackLabel(Game game){
-    String title = game.getBlackTitles();
-    JLabel blackLabel = new JLabel(game.getBlackName()+title+" "+game.getBlackRating());
+    JLabel blackLabel = new JLabel(createBlackLabelText(game));
     blackLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
     return blackLabel;
   }
 
+
+
+
+  /**
+   * Returns the text that should be displayed by the black player's label.
+   */
+
+  protected String createBlackLabelText(Game game){
+    return game.getBlackName() + game.getBlackTitles() + " " + game.getBlackRating();
+  }
 
 
 
@@ -1809,6 +1837,21 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
                "darkSquareColor".equals(propertyName)){
         board.repaint();
       }
+    }
+    else if (src == game){
+      if ("whiteName".equals(propertyName)){
+        whiteLabel.setText(createWhiteLabelText(game));
+      }
+      else if ("blackName".equals(propertyName)){
+        blackLabel.setText(createBlackLabelText(game));
+      }
+      else if ("whiteTime".equals(propertyName) || 
+               "blackTime".equals(propertyName) || 
+               "whiteInc".equals(propertyName)  ||
+               "blackInc".equals(propertyName)){
+        gameLabel.setText(createGameLabelText(game));
+      }
+      // implement the rest of the properties.
     }
   }
 
