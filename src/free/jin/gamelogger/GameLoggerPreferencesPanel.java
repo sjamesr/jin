@@ -741,6 +741,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         if (path == null)
           path = fileChooser.getSelectedFile().getAbsolutePath();
 
+        if (path.indexOf(".") == -1) // User forgot to specify the pgn extension.
+          path = path+".pgn";
+
         textfield.setText(path);
       }
     }
