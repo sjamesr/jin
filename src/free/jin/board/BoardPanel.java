@@ -55,7 +55,7 @@ import java.beans.PropertyChangeEvent;
  */
 
 public class BoardPanel extends FixedJPanel implements MoveListener, GameListener, 
-    ActionListener, AdjustmentListener, PropertyChangeListener{
+    AdjustmentListener, PropertyChangeListener{
 
 
   /**
@@ -297,34 +297,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
 
-
-  /**
-   * The Timer we use to update the clock.
-   */
-
-  private Timer timer;
-
-
-
-
-  /**
-   * The last time the white clock was updated.
-   */
-
-  private long lastWhiteUpdateTimestamp;
-
-
-
-
-  /**
-   * The last time the black clock was updated.
-   */
-
-  private long lastBlackUpdateTimestamp;
-
-
-
-
   /**
    * The move made when we've fired a UserMadeMove and it hasn't been echoed to
    * us yet. Null if none.
@@ -475,7 +447,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     isFlipped = game.isBoardInitiallyFlipped();
     highlightOwnMoves = boardManager.isHighlightingOwnMoves();
     moveSendingMode = boardManager.getMoveSendingMode();
-    timer = createTimer(game);
     createComponents(game);
     
 //    addComponents(game, isFlipped); 
@@ -483,18 +454,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     // See the doLayout() method.
   }
 
-
-
-
-
-
-  /**
-   * Creates the Timer which will be used to update the clocks.
-   */
-
-  protected Timer createTimer(Game game){
-    return new Timer(100, this);
-  }
 
 
 
@@ -526,9 +485,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     fullscreenButton = createFullscreenButton();
     fullscreenButton.addActionListener(fullscreenAction);
     whiteClock = createWhiteClock(game);
-    setClockDisplayMode(whiteClock, game.getWhiteTime()); 
     blackClock = createBlackClock(game);
-    setClockDisplayMode(blackClock, game.getBlackTime());
     buttonPanel = createButtonPanel(game);
     moveListTableModel = createMoveListTableModel(game);
     moveListTable = createMoveListTable(game, moveListTableModel);
@@ -1536,7 +1493,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     else
       moveEnRoute = null;
 
-    timer.stop();
     updateClockActiveness();
     addMoveToListTable(move);
   }
@@ -1650,15 +1606,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     updateClockActiveness();
     setDisplayedMove(madeMoves.size());
     updateMoveListTable();
-    timer.start();
   }
 
 
 
 
   /**
-   * GameListener implementation. Adjusts the clock labels and the timer
-   * appropriately.
+   * GameListener implementation. Adjusts the clock time and activeness.
    */
 
   public void clockAdjusted(ClockAdjustmentEvent evt){
@@ -1668,53 +1622,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Player player = evt.getPlayer();
     int time = evt.getTime();
     boolean isRunning = evt.isClockRunning();
+    AbstractChessClock clock = player.equals(Player.WHITE_PLAYER) ?
+      whiteClock : blackClock;
+    
 
-    if (player.equals(Player.WHITE_PLAYER)){
-      whiteClock.setTime(time);
-      lastWhiteUpdateTimestamp = System.currentTimeMillis();
-      setClockDisplayMode(whiteClock, time); 
-    }
-    else{
-      blackClock.setTime(time);
-      lastBlackUpdateTimestamp = System.currentTimeMillis();
-      setClockDisplayMode(blackClock, time);
-    }
-
-    if (isRunning){
-      if (!timer.isRunning()){
-        int delay = time%timer.getDelay();
-        if (delay < 0)
-          delay += timer.getDelay();
-        
-        timer.setInitialDelay(delay);
-        timer.start();
-      }
-    }
-    else{
-      if (timer.isRunning()&&realPosition.getCurrentPlayer().equals(player)){
-        timer.stop();
-      }
-    }
+    clock.setTime(time);
+    clock.setRunning(isRunning);
   }
   
   
   
-  /**
-   * Sets the clock's display mode based on the amount of time on it.
-   */
-   
-  private void setClockDisplayMode(AbstractChessClock clock, int time){
-    time = Math.abs(time);
-    if (time < 10*1000) // Less than 10sec
-      clock.setDisplayMode(AbstractChessClock.SECOND_TENTHS_DISPLAY_MODE);
-    else if (time < 20*60*1000) // Between 10sec and 20min
-      clock.setDisplayMode(AbstractChessClock.MINUTE_SECOND_DISPLAY_MODE);
-    else
-      clock.setDisplayMode(AbstractChessClock.HOUR_MINUTE_DISPLAY_MODE);
-  }
-
-
-
 
   /**
    * GameListener implementation.
@@ -1748,8 +1665,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (evt.getGame()!=game)
       return;
 
-    if (timer.isRunning())
-      timer.stop();
+    whiteClock.setRunning(false);
+    blackClock.setRunning(false);
 
     setInactive();
   }
@@ -1800,7 +1717,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         UserMoveEvent evt2 = new UserMoveEvent(this, evt.getMove());
         fireUserMadeMove(evt2);
         moveEnRoute = evt.getMove();
-        timer.stop();
+        whiteClock.setRunning(false);
+        blackClock.setRunning(false);
         updateClockActiveness();
 
         if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
@@ -1833,35 +1751,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         return true;
     }
   }
-
-
-
-
-
-  /**
-   * ActionListener implementation. This is called by the Timer and updates the
-   * clocks as necessary.
-   */
-
-  public void actionPerformed(ActionEvent evt){
-    Object source = evt.getSource();
-
-    if (source == timer){
-      if (!timer.isRunning())
-        return; // These are residue from invokeLater calls done by the Timer before it was stopped :-)
-      Player curPlayer = realPosition.getCurrentPlayer();
-      AbstractChessClock clockToUpdate = curPlayer.equals(Player.WHITE_PLAYER) ? whiteClock : blackClock;
-      long lastUpdateTimestamp = (clockToUpdate == whiteClock ? lastWhiteUpdateTimestamp : lastBlackUpdateTimestamp);
-
-      long now = System.currentTimeMillis();
-      clockToUpdate.setTime((int)(clockToUpdate.getTime()-(now-lastUpdateTimestamp)));
-      if (clockToUpdate == whiteClock)
-        lastWhiteUpdateTimestamp = now;
-      else
-        lastBlackUpdateTimestamp = now;
-    }
-  }
-
 
 
 
