@@ -1691,9 +1691,27 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
     String offerType = parser.group(3);
     String offerParams = parser.group(4);
 
-    boolean consume;
+    if (!processOffer(toUser, offerType, offerIndex, username, offerParams))
+      processLine(line);
+
+    return true;
+  }
+
+
+
+	/**
+	 * Gets called when an offer is made. The <code>toUser</code> argument
+   * specified whether the offer was made to or by the user. Possible
+	 * offer types are (according to DAV) match, bughouse (I think that's
+	 * when your partner is challenged), simul, draw, abort, adjourn,
+	 * seal (currently unused), takeback, switch, pause, unpause, partner.
+	 */
+
+	protected boolean processOffer(boolean toUser, String offerType, int offerIndex,
+		String oppName, String offerParams){
+
     if ("match".equals(offerType)){
-      consume = processMatchOffered(toUser, offerIndex, username, offerParams);
+      return processMatchOffered(toUser, offerIndex, oppName, offerParams);
       // Maybe I should parse the offer parameters here, but I'm not sure about
       // the format and I don't need them right now.
     }
@@ -1701,25 +1719,21 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       // Use a tokenizer just in case new fields are added
       StringTokenizer tokenizer = new StringTokenizer(offerParams, " ");
       int plies = Integer.parseInt(tokenizer.nextToken());
-      consume = processTakebackOffered(toUser, offerIndex, username, plies);
+      return processTakebackOffered(toUser, offerIndex, oppName, plies);
     }
     else if ("draw".equals(offerType)){
-      consume = processDrawOffered(toUser, offerIndex, username);
+      return processDrawOffered(toUser, offerIndex, oppName);
     }
     else if ("abort".equals(offerType)){
-      consume = processAbortOffered(toUser, offerIndex, username);
+      return processAbortOffered(toUser, offerIndex, oppName);
     }
     else if ("adjourn".equals(offerType)){
-      consume = processAdjournOffered(toUser, offerIndex, username);
+      return processAdjournOffered(toUser, offerIndex, oppName);
     }
     else // Unknown type
-      consume = false;
-
-    if (!consume)
-      processLine(line);
-
-    return true;
-  }
+      return false;
+	}
+	
 
 
 
