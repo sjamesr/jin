@@ -28,6 +28,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.border.EmptyBorder;
 import free.util.swing.SwingUtils;
+import free.util.BrowserControl;
 
 
 /**
@@ -104,20 +105,23 @@ public class ServerChoiceDialog extends JDialog{
 
     final JButton okButton = new JButton("OK");
     JButton cancelButton = new JButton("Cancel");
+    final JButton showWebsiteButton = new JButton("Server's Website");
+    showWebsiteButton.setMnemonic('s');
 
     okButton.setEnabled(false);
+    showWebsiteButton.setEnabled(false);
 
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttonPanel.add(okButton);
     buttonPanel.add(cancelButton);
+    buttonPanel.add(showWebsiteButton);
 
     list.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
         int selectedIndex = list.getSelectedIndex();
-        if (selectedIndex == -1)
-          okButton.setEnabled(false);
-        else
-          okButton.setEnabled(true);
+        boolean enabled = (selectedIndex != -1);
+        okButton.setEnabled(enabled);
+        showWebsiteButton.setEnabled(enabled);
       }
     });
 
@@ -142,6 +146,18 @@ public class ServerChoiceDialog extends JDialog{
       public void actionPerformed(ActionEvent evt){
         server = null;
         dispose();
+      }
+    });
+
+    showWebsiteButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        server = (Server)list.getSelectedValue();
+        String url = server.getWebsite().toExternalForm();
+        try{
+          BrowserControl.displayURL(url);
+        } catch (java.io.IOException e){
+            JOptionPane.showMessageDialog(getParent(), "Unable to display URL: "+url, "Error", JOptionPane.ERROR_MESSAGE);
+          }
       }
     });
 
