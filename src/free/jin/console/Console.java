@@ -975,6 +975,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
             case KeyEvent.VK_END: // Ctrl-End
               vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
               break;
+            // case KeyEvent.VK_A: // Ctrl-A
+            //   int documentLength = outputComponent.getDocument().getLength();
+            //   outputComponent.setSelectionStart(0);
+            //   outputComponent.setSelectionEnd(documentLength - 1);
+              // The -1 here is important because otherwise it selects the end of
+              // line at the end too, and then adding more text selects it too.
+            //   break;
           }
         }
       }
