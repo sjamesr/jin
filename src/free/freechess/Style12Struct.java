@@ -648,6 +648,8 @@ public class Style12Struct extends Struct{
 
   /**
    * Returns a verbose representation of the move, or <code>null</code> if none.
+   * The format is either "o-o", "o-o-o" or something like "Q/c7-c5" or
+   * for promotions "P/g7-h8=Q".
    */
 
   public String getMoveVerbose(){
