@@ -139,6 +139,9 @@ public class ActionsPlugin extends Plugin{
     
     if (getPrefs().getBool("visible", true))
       buttonContainer.setVisible(true);
+    else
+      hiddenButton.setSelected(false);
+      // In the "true" case, the button is made selected by the listener.
   }
   
   
