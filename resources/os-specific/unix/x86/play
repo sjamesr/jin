@@ -15,9 +15,9 @@ else
   if [ "$arch" = "Linux" ]; then
   
     if [ `/sbin/pidof -s artsd` ] ; then
-        artsdsp ./sox -t .au /dev/stdin -t ossdsp -w -c 2 -s /dev/dsp $@
+        artsdsp ./sox -t .au /dev/stdin -t ossdsp -w -c 1 -s /dev/dsp $@
     else
-        ./sox -t .au /dev/stdin -t ossdsp -w -c 2 -s /dev/dsp $@
+        ./sox -t .au /dev/stdin -t ossdsp -w -c 1 -s /dev/dsp $@
     fi
   fi
 fi
