@@ -275,6 +275,9 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    */
 
   public void arrowAdded(ArrowEvent evt){
+    if (evt.getGame() != game)
+      return;
+
     handlingArrowCircleEvent = true;
     ((ChessclubJBoard)getBoard()).removeArrow(evt.getFromSquare(), evt.getToSquare());
     ((ChessclubJBoard)getBoard()).addArrow(evt.getFromSquare(), evt.getToSquare(), Color.blue);
@@ -289,6 +292,9 @@ public class ChessclubBoardPanel extends BoardPanel implements MouseListener, Ch
    */
 
   public void circleAdded(CircleEvent evt){
+    if (evt.getGame() != game)
+      return;
+
     handlingArrowCircleEvent = true;
     ((ChessclubJBoard)getBoard()).removeCircle(evt.getCircleSquare());
     ((ChessclubJBoard)getBoard()).addCircle(evt.getCircleSquare(), Color.blue);
