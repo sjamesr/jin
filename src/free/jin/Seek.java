@@ -80,7 +80,7 @@ public class Seek extends Struct{
     setIntegerProperty("SeekerRating", rating);
     setBooleanProperty("IsProvisional", isProvisional);
     setBooleanProperty("IsRegistered", isRegistered);
-    setBooleanProperty("IsSeekerRated", isRegistered);
+    setBooleanProperty("IsSeekerRated", isSeekerRated);
     setBooleanProperty("IsComputer", isComputer);
     setProperty("Variant", variant);
     setStringProperty("RatingCategoryString", ratingCategoryString);
