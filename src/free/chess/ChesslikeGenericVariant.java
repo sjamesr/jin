@@ -68,12 +68,10 @@ public class ChesslikeGenericVariant implements WildVariant{
 
 
   /**
-   * The initial position of this variant, specified as a 64 character string
-   * in lexigraphic format as described by
-   * {@link Position#setLexigraphic(String)}
+   * The initial position of this variant, in FEN format.
    */
 
-  private final String initialPositionLexigraphic;
+  private final String initialPositionFEN;
 
 
 
@@ -90,17 +88,16 @@ public class ChesslikeGenericVariant implements WildVariant{
 
   /**
    * Creates a new ChesslikeGenericVariant with the given initial position and
-   * name. The position is specified by a 64 character string in lexigraphic
-   * format as described by {@link Position#setLexigraphic(String)}
+   * name. The position is specified in FEN format.
    */
 
-  public ChesslikeGenericVariant(String initialPositionLexigraphic, String variantName){
-    if (initialPositionLexigraphic == null)
+  public ChesslikeGenericVariant(String initialPositionFEN, String variantName){
+    if (initialPositionFEN == null)
       throw new IllegalArgumentException("The initial position argument may not be null");
     if (variantName == null)
       throw new IllegalArgumentException("The variant name argument may not be null");
 
-    this.initialPositionLexigraphic = initialPositionLexigraphic;
+    this.initialPositionFEN = initialPositionFEN;
     this.variantName = variantName;
   }
 
@@ -330,7 +327,7 @@ public class ChesslikeGenericVariant implements WildVariant{
   public void init(Position pos){
     checkPosition(pos);
 
-    pos.setLexigraphic(initialPositionLexigraphic);
+    pos.setFEN(initialPositionFEN);
   }
 
 
@@ -405,11 +402,11 @@ public class ChesslikeGenericVariant implements WildVariant{
    */
 
   public Move createMove(Position pos, Square startingSquare, Square endingSquare,
-      Piece promotionTarget, String stringRepresentation) throws IllegalArgumentException{
+      Piece promotionTarget, String moveSAN) throws IllegalArgumentException{
 
     checkPosition(pos);
 
-    if ((promotionTarget!=null)&&!(promotionTarget instanceof ChessPiece))
+    if ((promotionTarget != null) && !(promotionTarget instanceof ChessPiece))
       throw new IllegalArgumentException("Wrong promotion target type: "+promotionTarget.getClass());
 
     if (pos.getPieceAt(startingSquare)==null)
@@ -424,7 +421,7 @@ public class ChesslikeGenericVariant implements WildVariant{
     ChessPiece capturedPiece = getCapturedPiece(pos, startingSquare, endingSquare, promotionChessTarget, isEnPassant);
 
     return new ChessMove(startingSquare, endingSquare, movingPlayer, isEnPassant, isShortCastling, 
-      isLongCastling, capturedPiece, promotionChessTarget, stringRepresentation);
+      isLongCastling, capturedPiece, promotionChessTarget, moveSAN);
   }
 
 
