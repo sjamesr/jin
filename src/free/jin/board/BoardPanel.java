@@ -420,6 +420,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void createComponents(Game game){
     board = createBoard(game);
+    configureBoard(game, board);
     board.getPosition().addMoveListener(this);
     gameLabel = createGameLabel(game);
     whiteLabel = createWhiteLabel(game);
@@ -459,12 +460,22 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Creates the JBoard and configures it.
+   * Creates and returns the JBoard.
    */
 
   protected JBoard createBoard(Game game){
-    JBoard board = new JBoard(game.getInitialPosition());
+    return new JBoard(game.getInitialPosition());
+  }
 
+
+
+
+
+  /**
+   * Configures the board.
+   */
+
+  protected void configureBoard(Game game, JBoard board){
     int moveInputMode;
     if (game.getGameType()==Game.MY_GAME){
       String username = plugin.getConnection().getUsername();
@@ -484,8 +495,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     if (isFlipped())
       board.setFlipped(true);
-
-    return board;
   }
 
 
@@ -945,10 +954,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void gameStarted(GameStartEvent evt){
-    if (evt.getGame()!=game)
+    if (evt.getGame() != game)
       return;
 
-    if ((game.getGameType()==Game.MY_GAME) && game.isPlayed())
+    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
       playSound("GameStart");
   }
 
@@ -959,7 +968,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   public void moveMade(MoveMadeEvent evt){
-    if (evt.getGame()!=game)
+    if (evt.getGame() != game)
       return;
 
     Move move = evt.getMove();
