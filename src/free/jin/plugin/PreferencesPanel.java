@@ -22,6 +22,8 @@
 package free.jin.plugin;
 
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -31,11 +33,63 @@ import javax.swing.JPanel;
 public abstract class PreferencesPanel extends JPanel{
 
 
+
+  /**
+   * The sole ChangeEvent we need.
+   */
+
+  private final ChangeEvent changeEvent = new ChangeEvent(this);
+
+
+
   /**
    * Applies the changes done by the user.
    */
 
   public abstract void applyChanges();
+
+
+
+
+  /**
+   * Adds a ChangeListener to the list of listeners receiving notifications when
+   * the preferences change.
+   */
+
+  public void addChangeListener(ChangeListener listener){
+    listenerList.add(ChangeListener.class, listener);
+  }
+
+
+
+
+  /**
+   * Removes the given Changelistener from the list of listeners receiving
+   * notifications when the preferences change.
+   */
+
+  public void removeChangeListener(ChangeListener listener){
+    listenerList.remove(ChangeListener.class, listener);
+  }
+
+
+
+
+  /**
+   * Fires a ChangeEvent to all interested listeners. This method should be
+   * called by subclasses whenever the user changes one of the settings.
+   */
+
+  protected void fireChangeEvent(){
+    Thread.dumpStack();
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ChangeListener.class){
+        ChangeListener listener = (ChangeListener)listeners[i+1];
+        listener.stateChanged(changeEvent);
+      }
+    }
+  }
 
 
 }
