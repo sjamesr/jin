@@ -159,7 +159,7 @@ public class FontSelectorPanel extends JPanel{
         String selectedItem = (String)fontNamesList.getSelectedValue();
         fontNameField.setText(selectedItem);
 
-        fireChangeEvent();
+        fireStateChanged();
       }
     });
 
@@ -168,13 +168,13 @@ public class FontSelectorPanel extends JPanel{
         String selectedItem = (String)fontSizesList.getSelectedValue();
         fontSizeField.setText(selectedItem);
 
-        fireChangeEvent();
+        fireStateChanged();
       }
     });
 
     ChangeListener checkBoxChangeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        fireChangeEvent();
+        fireStateChanged();
       }
     };
 
@@ -270,7 +270,7 @@ public class FontSelectorPanel extends JPanel{
     fontNamesList.setSelectedValue(font.getFamily(), true);
     fontSizesList.setSelectedValue(String.valueOf(font.getSize()), true);
 
-    fireChangeEvent();
+    fireStateChanged();
   }
 
 
@@ -304,7 +304,7 @@ public class FontSelectorPanel extends JPanel{
    * Fires a ChangeEvent to all interested listeners.
    */
 
-  protected void fireChangeEvent(){
+  protected void fireStateChanged(){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChangeListener.class){

@@ -102,7 +102,7 @@ public class TextStyleChooserPanel extends JPanel{
         if (backgroundChooser != null)
           fontSelector.getPreviewPanel().setBackground(backgroundChooser.getColor());
 
-        fireChangeEvent();
+        fireStateChanged();
       }
     };
 
@@ -112,7 +112,7 @@ public class TextStyleChooserPanel extends JPanel{
 
     fontSelector.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        fireChangeEvent();
+        fireStateChanged();
       }
     });
   }
@@ -172,7 +172,7 @@ public class TextStyleChooserPanel extends JPanel{
    * Fires a ChangeEvent to all interested listeners.
    */
 
-  protected void fireChangeEvent(){
+  protected void fireStateChanged(){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ChangeListener.class){
@@ -240,7 +240,7 @@ public class TextStyleChooserPanel extends JPanel{
     else{
       // In this case the event isn't fired automatically because the 
       // backgroundChooser isn't there to fire one to use.
-      fireChangeEvent();
+      fireStateChanged();
     }
   }
 
