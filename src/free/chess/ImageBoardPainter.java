@@ -44,7 +44,7 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
-   * The image scaled to the size given in the last call to scaleHint.
+   * The image scaled to the size given in the last call to scaleImages.
    */
 
   private Image scaled = null;
@@ -209,10 +209,10 @@ public class ImageBoardPainter implements BoardPainter{
 
 
   /**
-   * Starts scaling the board image.
+   * Scales the board image.
    */
 
-  public void scaleHint(int width, int height){
+  private void scaleImages(int width, int height){
     if (boardImage == null){
       if ((scaledLight != null) && (scaledLight.getWidth(null) == width/8) && (scaledLight.getHeight(null) == height/8))
         return;
@@ -265,7 +265,7 @@ public class ImageBoardPainter implements BoardPainter{
    */
 
   public void paintBoard(Graphics g, ImageObserver observer, int x, int y, int width, int height){
-    scaleHint(width, height);
+    scaleImages(width, height);
 
     if (boardImage == null){
       Rectangle clipRect = g.getClipBounds();

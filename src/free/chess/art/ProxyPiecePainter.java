@@ -71,15 +71,6 @@ public class ProxyPiecePainter implements PiecePainter{
 
 
 
-  /**
-   * Delegates the call to the "real" <code>PiecePainter</code>.
-   */
-
-  public void scaleHint(int width, int height){
-    delegate.scaleHint(width, height);
-  }
-
-
 
   /**
    * Delegates the call to the "real" <code>PiecePainter</code>.

@@ -167,17 +167,6 @@ public class ImagePiecePainter implements PiecePainter{
 
 
 
-  /**
-   * Does nothing since this <code>ImagePiecePainter</code> does not attempt to
-   * scale the images.
-   */
-
-  public void scaleHint(int width, int height){
-
-  }
-
-
-
 
   /**
    * Returns the preferred size of the pieces.

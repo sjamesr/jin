@@ -35,16 +35,6 @@ public interface BoardPainter{
 
 
   /**
-   * Hints this BoardPainter that the next paintBoard call will probably be with
-   * the given width and height. If relevant, the BoardPainter can use this
-   * call to pre-scale the drawn image.
-   */
-
-  void scaleHint(int width, int height);
-
-
-
-  /**
    * Returns the preferred board size. Should return a dimension that has no area
    * if this BoardPainter has no preferred size.
    */

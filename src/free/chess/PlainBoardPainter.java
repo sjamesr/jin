@@ -108,17 +108,6 @@ public class PlainBoardPainter implements ColoredBoardPainter{
 
 
   /**
-   * Does nothing, since there's no need to pre-scale anything.
-   */
-
-  public void scaleHint(int width, int height){
-
-  }
-
-
-
-
-  /**
    * Returns a 0x0 Dimension since we don't care at which size to draw the board.
    */
 

@@ -34,17 +34,6 @@ public interface PiecePainter{
 
 
   /**
-   * Hints this PiecePainter that the next paintPiece calls will probably be
-   * with the given width and height. If relevant, the PiecePainter can use this
-   * call to pre-scale the drawn images.
-   */
-
-  void scaleHint(int width, int height);
-
-
-
-
-  /**
    * Returns the preferred size of the pieces. Should return a dimension that
    * has no area (width<=0 or height<=0) if this PiecePainter doesn't have a 
    * preferred piece size.

@@ -314,18 +314,6 @@ public abstract class VectorPiecePainter implements ColoredPiecePainter{
 
 
   /**
-   * Does nothing.
-   */
-
-  public void scaleHint(int width, int height){
-
-  }
-
-
-
-
-
-  /**
    * Clears the caching of piece polygons.
    */
 
