@@ -66,7 +66,7 @@ public class FreechessJinListenerManager extends BasicJinListenerManager{
     super.addSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 1)
-      source.setSeekInfoState(true);
+      source.setSeekInfo(true);
     else
       source.notFirstListenerAdded(listener);
   }
@@ -83,7 +83,7 @@ public class FreechessJinListenerManager extends BasicJinListenerManager{
     super.removeSeekListener(listener);
 
     if (listenerList.getListenerCount(SeekListener.class) == 0){
-      source.setSeekInfoState(false);
+      source.setSeekInfo(false);
 
       source.lastSeekListenerRemoved();
     }
