@@ -25,6 +25,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Keymap;
+import javax.swing.text.DefaultEditorKit;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.net.URL;
@@ -120,6 +122,13 @@ public class ConsoleTextPane extends JTextPane{
 
     tooltipManager.registerComponent(this);
 
+    Action copyAction = new DefaultEditorKit.CopyAction();
+    Keymap keymap = getKeymap();
+    keymap.removeBindings();
+    keymap.setResolveParent(null);
+    keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(0xFFCD, 0), copyAction);
+    keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), copyAction);
+
     enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
@@ -135,12 +144,13 @@ public class ConsoleTextPane extends JTextPane{
    */
 
   protected void processComponentKeyEvent(KeyEvent evt){
-    if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null))
+    if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null)){
+      evt.consume(); // Otherwise the parent scrollpane gets it and starts doing things we already do, like scrolling on PAGE_UP
       return;
+    }
 
     super.processComponentKeyEvent(evt);
   }
-
 
 
 
