@@ -32,28 +32,61 @@ import javax.swing.JComponent;
 public abstract class AbstractChessClock extends JComponent{
 
 
-
   /**
-   * The time displayed by this JChessClock, in milliseconds.
+   * The code for the mode where only hours and minutes are displayed. 
+   */
+   
+  public static final int HOUR_MINUTE_DISPLAY_MODE = 0;
+  
+  
+  
+  /**
+   * The code for the mode where minutes and seconds are displayed.
+   */
+   
+  public static final int MINUTE_SECOND_DISPLAY_MODE = 1;
+  
+  
+  
+  /**
+   * The code for the mode where minutes, seconds and second tenths are
+   * displayed.
+   */
+   
+  public static final int SECOND_TENTHS_DISPLAY_MODE = 2;
+
+   
+   
+  /**
+   * The time displayed by this clock, in milliseconds.
    */
 
   private int time;
+  
+  
+
+  /**
+   * The current display mode of this clock. Possible values are
+   * {@link #HOUR_MINUTE_DISPLAY_MODE}, {@link #MINUTE_SECOND_DISPLAY_MODE) and
+   * {@link #SECOND_TENTHS_DISPLAY_MODE}.
+   */
+
+  private int displayMode = MINUTE_SECOND_DISPLAY_MODE;
 
 
 
   /**
-   * Is the clock currently active (the current turn belongs to the owner of this
-   * clock).
+   * Is the clock currently active (the current turn belongs to the owner of
+   * this clock).
    */
 
   private boolean isActive = false;
 
 
 
-
   /**
-   * Creates a new AbstractChessClock with the given initial amount of time 
-   * (in milliseconds) on it.
+   * Creates a new <code>AbstractChessClock</code> with the given initial amount
+   * of time (in milliseconds) on it.
    */
 
   public AbstractChessClock(int time){
@@ -64,7 +97,7 @@ public abstract class AbstractChessClock extends JComponent{
 
 
   /**
-   * Sets the time displayed by this AbstractChessClock, in milliseconds.
+   * Sets the time displayed by this clock, in milliseconds.
    */
 
   public void setTime(int time){
@@ -76,7 +109,7 @@ public abstract class AbstractChessClock extends JComponent{
 
 
   /**
-   * Returns the time displayed by this AbstractChessClock, in milliseconds.
+   * Returns the time displayed by this clock, in milliseconds.
    */
 
   public int getTime(){
@@ -85,28 +118,61 @@ public abstract class AbstractChessClock extends JComponent{
 
 
 
+  /**
+   * Sets the display mode of this clock. Possible values are
+   * {@link #HOUR_MINUTE_DISPLAY_MODE}, {@link #MINUTE_SECOND_DISPLAY_MODE) and
+   * {@link #SECOND_TENTHS_DISPLAY_MODE}. Note that concrete implementations may
+   * ignore this setting.
+   */
+
+  public void setDisplayMode(int displayMode){
+    switch (displayMode){
+      case HOUR_MINUTE_DISPLAY_MODE:
+      case MINUTE_SECOND_DISPLAY_MODE:
+      case SECOND_TENTHS_DISPLAY_MODE:
+        break;
+      default:
+        throw new IllegalArgumentException("Unrecognized display mode value: " + displayMode);
+    }
+    
+    this.displayMode = displayMode;
+    repaint();
+  }
+  
+  
 
   /**
-   * Sets the active flag of this AbstractChessClock. The clock should be set
-   * to be active when its owner is also the owner of the current turn.
+   * Returns the current display mode of the clock. Possible values are
+   * {@link #HOUR_MINUTE_DISPLAY_MODE}, {@link #MINUTE_SECOND_DISPLAY_MODE) and
+   * {@link #SECOND_TENTHS_DISPLAY_MODE}.
+   */
+
+  public int getDisplayMode(){
+    return displayMode;
+  }
+
+  
+
+  /**
+   * Sets the active flag of this clock. The clock should be set to be active
+   * when its owner is also the owner of the current turn.
    */
 
   public void setActive(boolean isActive){
     this.isActive = isActive;
+    repaint();
   }
 
 
 
-
   /**
-   * Returns true if this AbstractChessClock is active, false otherwise.
+   * Returns whether this clock is active.
    */
 
   public boolean isActive(){
     return isActive;
   }
 
-
-
+  
 
 }

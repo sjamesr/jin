@@ -28,19 +28,11 @@ import free.util.GraphicsUtilities;
 
 /**
  * A Component for displaying a simple, text based chess clock. It also has the
- * property of taking up as much space as it can, regardless of the set font size.
+ * property of taking up as much space as it can, regardless of the set font
+ * size.
  */
 
 public class JChessClock extends AbstractChessClock{
-
-
-
-  /**
-   * Is this JChessClock showing second tenths?
-   */
-
-  private boolean isShowingTenths = false;
-
 
 
 
@@ -115,30 +107,6 @@ public class JChessClock extends AbstractChessClock{
     super(time);
     setFont(new Font("Monospaced", Font.BOLD, 50));
   }
-
-
-
-
-  /**
-   * Returns true if this JChessClock is showing tenths of a second, false
-   * otherwise.
-   */
-
-  public boolean isShowingTenths(){
-    return isShowingTenths;
-  }
-
-
-
-
-  /**
-   * Sets whether this JChessClock should be displaying tenths of a second.
-   */
-
-  public void setShowingTenths(boolean isShowingTenths){
-    this.isShowingTenths = isShowingTenths;
-  }
-
 
 
 
@@ -257,15 +225,22 @@ public class JChessClock extends AbstractChessClock{
     time -= tenths*100;
 
     String signString = isNegative ? "-" : "";
-    String hoursString = String.valueOf(hours);
-    String minutesString = TextUtilities.padStart(String.valueOf(minutes), '0', 2);
-    String secondsString = TextUtilities.padStart(String.valueOf(seconds), '0', 2);
-    String tenthsString = isShowingTenths() ? ("."+tenths) : "";
 
-    if (hours!=0)
-      return signString+hoursString+":"+minutesString+":"+secondsString+tenthsString;
-    else
-      return signString+minutesString+":"+secondsString+tenthsString;
+    switch (getDisplayMode()){
+      case HOUR_MINUTE_DISPLAY_MODE:
+        String sepString = (Math.abs(tenths) > 4) || !isActive() ? ":" : " "; 
+        return signString + String.valueOf(hours) + 
+          sepString + TextUtilities.padStart(String.valueOf(minutes), '0', 2);  
+      case MINUTE_SECOND_DISPLAY_MODE:
+        return signString + TextUtilities.padStart(String.valueOf(60*hours+minutes), '0', 2) +
+          ":" + TextUtilities.padStart(String.valueOf(seconds), '0', 2);
+      case SECOND_TENTHS_DISPLAY_MODE:
+        return signString + TextUtilities.padStart(String.valueOf(60*hours+minutes), '0', 2) +
+          ":" + TextUtilities.padStart(String.valueOf(seconds), '0', 2) + "." +
+          String.valueOf(tenths);
+      default:
+        throw new IllegalStateException("Bad display mode value: " + getDisplayMode()); 
+    }
   }
 
 
