@@ -64,13 +64,20 @@ public abstract class Move{
 
   /**
    * Creates a new Move from the given starting Square to the given ending
-   * Square, with the given moving Player. The given stringRepresentation will
-   * be the string returned from the toString() method. It may be null, in which
-   * case a string constructed from the move data will be returned by
-   * toString().
+   * Square, with the given moving Player. 
+   * <P>Both the starting and ending squares may be null, as they sometimes are,
+   * for example in Kriegspiel.
+   * <P>The given stringRepresentation will be the string returned from the
+   * toString() method. It may be <code>null</code>, in which case a string
+   * constructed from the move data will be returned by toString().
    */
 
-  public Move(Square startingSquare, Square endingSquare, Player player, String stringRepresentation){
+  public Move(Square startingSquare, Square endingSquare, Player player,
+      String stringRepresentation){
+
+    if (player == null)
+      throw new IllegalArgumentException("The moving player may not be null");
+
     this.startingSquare = startingSquare;
     this.endingSquare = endingSquare;
     this.player = player;
@@ -81,7 +88,8 @@ public abstract class Move{
 
 
   /**
-   * Returns the initial square of the moving piece.
+   * Returns the initial square of the moving piece or <code>null</code> if
+   * unknown.
    */
 
   public Square getStartingSquare(){
@@ -91,7 +99,8 @@ public abstract class Move{
 
  
   /**
-   * Returns the square to which the moving piece moved.
+   * Returns the square to which the moving piece moved or <code>null</code> if
+   * unknown
    */
 
   public Square getEndingSquare(){
@@ -126,7 +135,13 @@ public abstract class Move{
    */
 
   public String getMoveString(){
-    return getStartingSquare().toString()+getEndingSquare().toString();
+    Square startingSquare = getStartingSquare();
+    Square endingSquare = getEndingSquare();
+
+    String startingString = startingSquare == null ? "??" : startingSquare.toString();
+    String endingString = endingSquare == null ? "??" : endingSquare.toString();
+
+    return startingString + endingString;
   }
 
 
