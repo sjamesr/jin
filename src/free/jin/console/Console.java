@@ -30,6 +30,8 @@ import javax.swing.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import free.jin.Connection;
 import free.jin.Preferences;
 import free.jin.plugin.Plugin;
@@ -196,6 +198,10 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
     add(inputComponent, BorderLayout.SOUTH);
+    
+    // Hack
+    if (System.getProperty("java.version").compareTo("1.4") >= 0)
+      fixFocus(); 
 
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
@@ -1111,6 +1117,30 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       for (int i=0; i<numChildren; i++)
         unregisterAsListenerToHierarchy(container.getComponent(i));        
     }
+  }
+  
+  
+  
+  /**
+   * Fixes the focus via an ugly hack.
+   */
+   
+  private void fixFocus(){
+    try{
+      
+      // The following is equivalent to:
+      // outputScrollPane.setFocusCycleRoot(true)
+      // which has the side effect that the scrollpane or its children don't
+      // get the focus by default. We are interested in the side effect only.
+      Class containerClass = Container.class;
+      Method setFocusCycleRoot =
+        containerClass.getDeclaredMethod("setFocusCycleRoot", new Class[]{boolean.class});
+      setFocusCycleRoot.invoke(outputScrollPane, new Object[]{Boolean.TRUE});
+      
+    } catch (IllegalAccessException e){e.printStackTrace();}
+      catch (IllegalArgumentException e){e.printStackTrace();}
+      catch (InvocationTargetException e){e.printStackTrace();}
+      catch (NoSuchMethodException e){e.printStackTrace();}
   }
 
 
