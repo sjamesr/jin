@@ -37,7 +37,7 @@ public class ArrayEnumeration implements Enumeration{
    * The array.
    */
 
-  private final Object [] arr;
+  private Object [] arr;
 
 
 
@@ -75,10 +75,11 @@ public class ArrayEnumeration implements Enumeration{
    */
 
   public ArrayEnumeration(Object [] arr, int offset, int count){
-    if ((offset<0)||(offset+count>arr.length)||(count<0))
+    if ((offset < 0) || (offset + count > arr.length) || (count < 0))
       throw new IllegalArgumentException("Invalid enumeration range");
 
-    this.arr = arr;
+    this.arr = new Object[arr.length];
+    System.arraycopy(arr, 0, this.arr, 0, arr.length);
     this.offset = offset;
     this.count = count;
 
@@ -106,7 +107,11 @@ public class ArrayEnumeration implements Enumeration{
     if (!hasMoreElements())
       throw new NoSuchElementException();
       
-    return arr[curIndex++];
+    Object item = arr[curIndex];
+    arr[curIndex++] = null; // We don't want to keep a reference to it any longer than we have to.
+    if (!hasMoreElements())
+      arr = null; // Neither do we need this any more.
+    return item;
   }
 
 
@@ -116,7 +121,7 @@ public class ArrayEnumeration implements Enumeration{
    */
 
   public boolean hasMoreElements(){
-    return curIndex<offset+count;
+    return curIndex < offset + count;
   }
 
 
