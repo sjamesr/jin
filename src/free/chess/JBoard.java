@@ -744,6 +744,9 @@ public class JBoard extends JPanel{
     if (!isEnabled())
       return;
 
+    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) != MouseEvent.BUTTON1_MASK) 
+      return;
+
     int inputStyle = getMoveInputStyle();
 
     int evtID = evt.getID();
@@ -836,6 +839,10 @@ public class JBoard extends JPanel{
     super.processMouseMotionEvent(evt);
 
     if (!isEnabled())
+      return;
+
+    // Only respond to the left mouse button.
+    if ((evt.getModifiers() & MouseEvent.BUTTON1_MASK) != MouseEvent.BUTTON1_MASK) 
       return;
 
     int inputStyle = getMoveInputStyle();
