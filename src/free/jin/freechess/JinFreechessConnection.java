@@ -593,14 +593,12 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       Style12Struct oldBoardData = gameData.boardData;
       int plyDifference = boardData.getPlayedPlyCount() - oldBoardData.getPlayedPlyCount();
 
-      if (plyDifference < 0){
-        if ((gameData.getMoveCount() < -plyDifference) || // Can't issue takeback
-            gameData.isBSetup)
-          changePosition(gameData, boardData);
-        else
-          issueTakeback(gameData, boardData);
-      }
+      if (plyDifference < 0)
+        tryIssueTakeback(gameData, boardData);
       else if (plyDifference == 0){
+        if (!oldBoardData.getBoardFEN().equals(boardData.getBoardFEN()))
+          changePosition(gameData, boardData);
+
         // This happens if you:
         // 1. Issue "refresh".
         // 2. Make an illegal move, because the server will re-send us the board
@@ -1043,10 +1041,6 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
     if ((oldBoardData != null) && (oldBoardData.isBoardFlipped() != boardData.isBoardFlipped()))
       flipBoard(gameData, boardData);
 
-    // Change the position
-    if ((oldBoardData != null) && !oldBoardData.getBoardFEN().equals(boardData.getBoardFEN()))
-      changePosition(gameData, boardData);
-
     game.setWhiteName(boardData.getWhiteName()); // Change white name
     game.setBlackName(boardData.getBlackName()); // Change black name
     game.setWhiteTime(1000 * boardData.getInitialTime()); // Change white's initial time
@@ -1156,7 +1150,7 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
       game.setResult(result);
       listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
 
-      if (game.getGameType() == Game.MY_GAME)
+      if ((game.getGameType() == Game.MY_GAME) && getIvarState(Ivar.SEEKINFO))
         setIvarState(Ivar.SEEKINFO, true); // Refresh the seeks
     }
     else
@@ -1203,6 +1197,45 @@ public class JinFreechessConnection extends FreechessConnection implements JinCo
         listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
       }
     } catch (NoSuchGameException e){}
+  }
+
+
+
+
+  /**
+   * Determines whether it's possible to issue a takeback for the specified
+   * game change and if so calls issueTakeback, otherwise calls changePosition.
+   */
+
+  private void tryIssueTakeback(InternalGameData gameData, Style12Struct boardData){
+    Style12Struct oldBoardData = gameData.boardData;
+    int plyDifference =  oldBoardData.getPlayedPlyCount() - boardData.getPlayedPlyCount();
+
+    if ((gameData.getMoveCount() < plyDifference)) // Can't issue takeback
+      changePosition(gameData, boardData);
+    else if (gameData.isBSetup)
+      changePosition(gameData, boardData);
+    else{
+      Game game = gameData.game;
+      Vector moveList = gameData.moveList;
+      // Check whether the positions match, otherwise it could just be someone
+      // issuing "bsetup fen ..." after making a few moves which resets the ply
+      // count.
+
+      Position oldPos = game.getInitialPosition();
+      for (int i = 0; i < moveList.size() - plyDifference; i++){
+        Move move = (Move)moveList.elementAt(i);
+        oldPos.makeMove(move);
+      }
+
+      Position newPos = game.getInitialPosition();
+      newPos.setFEN(boardData.getBoardFEN());
+
+      if (newPos.equals(oldPos))
+        issueTakeback(gameData, boardData);
+      else
+        changePosition(gameData, boardData);
+    }
   }
 
 
