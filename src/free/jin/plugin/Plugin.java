@@ -28,8 +28,22 @@ import free.util.MemoryFile;
 
 
 /**
- * The superclass of all Plugins. Usually, a plugin only needs to override the
- * start(), saveState() and stop() methods.
+ * The base class for all Plugins. Usually, a plugin only needs to override the
+ * start(), saveState() and stop() methods. During the lifetime of a plugin
+ * object, the following things will occur:
+ * <ol>
+ *   <li>The <code>Plugin</code> object is created via a no-arg constructor.
+ *   <li>The <code>setContext(PluginContext)</code> method is called.
+ *   <li>The <code>start()</code> method is called.
+ *   <li>The <code>createPluginMenu()</code> method is called.
+ *   <li>The <code>hasPreferencesUI()</code> method is called.
+ *   <li>The <code>getPreferencesUI()</code> method may be called multiple
+ *       times.
+ *   <li>When the user closes the session, the <code>saveState()</code> method
+ *       is invoked.
+ *   <li>When the <code>saveState()</code> method returns, <code>stop()</code>
+ *       is invoked.
+ * </ol>
  */
 
 
@@ -38,7 +52,7 @@ public abstract class Plugin{
 
 
   /**
-   * The PluginContext of this Plugin.
+   * The context of this Plugin.
    */
 
   private PluginContext context = null;
@@ -47,11 +61,15 @@ public abstract class Plugin{
 
 
   /**
-   * Sets this plugin's context to the given PluginContext.
+   * Sets this plugin's context to the given <code>PluginContext</code>. The
+   * subclass is allowed to override this method and throw an
+   * <code>UnsupportedContextException</code> if the specified context
+   * (typically the connection object) does not provide one of the features
+   * required by the plugin.
    */
 
   public void setContext(PluginContext context) throws UnsupportedContextException{
-    if (this.context!=null)
+    if (this.context != null)
       throw new IllegalStateException("Already has a PluginContext");
 
     this.context = context;
@@ -59,15 +77,13 @@ public abstract class Plugin{
 
 
 
-
   /**
    * Returns the PluginContext of this Plugin.
    */
 
-  public PluginContext getPluginContext(){
+  public final PluginContext getPluginContext(){
     return context;
   }
-
 
 
   
@@ -79,7 +95,6 @@ public abstract class Plugin{
   public String getUserProperty(String propertyName){
     return getUser().getProperty(propertyName);
   }
-
 
 
 
