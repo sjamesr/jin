@@ -1348,8 +1348,10 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
           String s = buf.toString();
           while (s.startsWith(prompt)){
             s = s.substring(promptLength);
-            if (s.length() == 0) // An all prompt line
+            if (s.length() == 0){ // An all prompt line
+              buf.setLength(0);
               continue mainLoop;
+            }
           }
           System.out.print("Sending line: \""+s+"\"");
           execRunnable(new HandleLineRunnable(s));
