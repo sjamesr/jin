@@ -604,6 +604,29 @@ public class AppletJinContext implements JinContext{
   
   
   /**
+   * Returns text warning the user about saving his password and asking him to
+   * confirm it.
+   */
+   
+  public String getPasswordSaveWarning(){
+    boolean isSecure = applet.getDocumentBase().getProtocol().equals("https");
+    
+    if (isSecure)
+      return "Your password will be stored on the server and transferred to the applet\n" +
+             "in encrypted form. This is reasonably safe, but your password will still" +
+             "be visible via the \"View Page Source\" option in your browser.\n"+
+             "Are you sure you want your password saved?";
+    else
+      return "Your password will be stored on the server and transferred to the applet\n" +
+             "as plain text HTML - anyone with access to a router or proxy between your\n" +
+             "computer and the server will be able to view your password. This is\n" +
+             "dangerous and advised against.\n" +
+             "Are you sure you want your password saved?";
+  }
+  
+  
+  
+  /**
    * The result string of saving the preferences. <code>null</code> if
    * successful or a description of the error if not successful.
    */

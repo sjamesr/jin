@@ -663,6 +663,21 @@ public class JinMain implements JinContext{
   public ConnectionManager getConnManager(){
     return connManager;
   }
+  
+  
+  
+  /**
+   * Returns text warning the user about saving his password and asking him to
+   * confirm it.
+   */
+   
+  public String getPasswordSaveWarning(){
+    return "Your password will be stored in your home directory, on your computer,\n" +
+           "as plain text. If there are other people using this computer, they may\n" +
+           "be able to obtain this password.\n" +
+           "Are you sure you want to save your password?";
+  }
+  
 
 
 
