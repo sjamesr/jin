@@ -143,6 +143,41 @@ public abstract class Move{
 
     return startingString + endingString;
   }
+  
+  
+  
+  /**
+   * Breaks the given move string, represented in Smith Warren format into
+   * starting square, ending square and promotion target, and using
+   * WildVariant.parsePiece(String) and
+   * WildVariant.createMove(Position, Square, Square, Piece) creates a Move
+   * object.
+   */
+
+  public static Move parseWarrenSmith(String moveSmith, Position position, String moveString){
+    WildVariant variant = position.getVariant();
+    
+    char lastChar = moveSmith.charAt(moveSmith.length() - 1);
+    if (lastChar == 'c') // Short castling
+      return variant.createShortCastling(position);
+    else if (lastChar == 'C') // Long castling
+      return variant.createLongCastling(position);
+
+    Square startSquare = Square.parseSquare(moveSmith.substring(0, 2));
+    Square endSquare = Square.parseSquare(moveSmith.substring(2, 4));
+    
+    Piece promotionTarget = null;
+    if ("NBRQK".indexOf(lastChar) != -1){
+      // The 'K' can happen in Giveaway, where you can promote to a king
+      String promotionTargetString = String.valueOf(moveSmith.charAt(moveSmith.length() - 1));
+      if (position.getCurrentPlayer().isBlack())
+        promotionTargetString = promotionTargetString.toLowerCase();
+      promotionTarget = variant.parsePiece(promotionTargetString);
+    }
+
+    return variant.createMove(position, startSquare, endSquare, promotionTarget, moveString);
+  }
+  
 
 
 
@@ -158,5 +193,7 @@ public abstract class Move{
     else
       return getStringRepresentation();
   }
+  
+  
 
 }
