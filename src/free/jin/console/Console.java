@@ -947,17 +947,23 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       }
     }
 
-    if (SwingUtilities.isDescendingFrom(evt.getComponent(),outputComponent)&&(evt.getID()==KeyEvent.KEY_PRESSED)){
+    if (SwingUtilities.isDescendingFrom(evt.getComponent(),outputComponent)&&(evt.getID() == KeyEvent.KEY_PRESSED)){
       KeyEvent fakeKeyPressedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_PRESSED, evt.getWhen(), evt.getModifiers(), evt.getKeyCode(), evt.getKeyChar());
       Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyPressedEvent);
 
-      if (evt.getKeyChar()!=KeyEvent.CHAR_UNDEFINED){
-        KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
-      }
+      // We do the weird KeyEvent.class.getField("CHAR_UNDEFINED").getChar() call
+      // because Sun changed the value of CHAR_UNDEFINED somewhere between
+      // JDK 1.1 and JDK 1.3
+      try{
+        if (evt.getKeyChar() != KeyEvent.class.getField("CHAR_UNDEFINED").getChar(null)){
+          KeyEvent fakeKeyTypedEvent = new KeyEvent(inputComponent, KeyEvent.KEY_TYPED, evt.getWhen(), evt.getModifiers(), KeyEvent.VK_UNDEFINED, evt.getKeyChar());
+          Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(fakeKeyTypedEvent);
+        }
+      } catch (IllegalAccessException e){e.printStackTrace();}
+        catch (NoSuchFieldException e){e.printStackTrace();}
 
       // We request the focus in invokeLater because otherwise the KEY_RELEASED event is sent
-      // to the input component and 1.0-1.3 handle it by adding a KEY_TYPED event while 1.4
+      // to the input component and 1.0-1.3 handles it by adding a KEY_TYPED event while 1.4
       // does not.
       SwingUtilities.invokeLater(new Runnable(){
         public void run(){
