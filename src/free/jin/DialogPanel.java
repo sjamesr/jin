@@ -139,6 +139,17 @@ public abstract class DialogPanel extends JPanel{
 
     dialog.setVisible(true);
   }
+  
+  
+  
+  /**
+   * Resizes the container of the panel to match the its preferred size.
+   */
+   
+  public void resizeContainerToFit(){
+    if (dialog != null)
+      dialog.setSize(dialog.getPreferredSize());
+  }
 
 
 
