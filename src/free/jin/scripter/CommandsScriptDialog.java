@@ -81,7 +81,7 @@ class CommandsScriptDialog extends ScriptDialog{
    */
 
   public CommandsScriptDialog(Component parent, Scripter scripter, CommandScript templateScript){
-    super(parent, "New Commands Script", scripter, templateScript);
+    super(parent, "Commands Script", scripter, templateScript);
 
     createUI();
   }
