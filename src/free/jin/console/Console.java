@@ -51,15 +51,6 @@ import jregex.*;
 public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
-
-  /**
-   * The "Console" menu.
-   */
-
-  private static JMenu consoleMenu;
-
-
-
   /**
    * The listener list.
    */
