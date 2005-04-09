@@ -21,7 +21,9 @@
 
 package free.jin.ui;
 
-import free.jin.*;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.SessionEvent;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
@@ -29,8 +31,10 @@ import free.util.AWTUtilities;
 import free.util.RectDouble;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Enumeration;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -45,6 +49,14 @@ import javax.swing.JMenuBar;
  */
 
 public class SdiUiProvider extends AbstractUiProvider{
+  
+  
+  
+  /**
+   * The number of currently open dialogs.
+   */
+  
+  private int openDialogsCount = 0;
 
 
 
@@ -107,8 +119,46 @@ public class SdiUiProvider extends AbstractUiProvider{
     Frame parentFrame = parent == null ? 
         null : AWTUtilities.frameForComponent(parent);
 
-    dialog.show(new JDialog(parentFrame), parent);
+    JDialog jdialog = new JDialog(parentFrame);
+    // Count how many open dialogs we have
+    jdialog.addWindowListener(new WindowAdapter(){
+      // Can't depend on the system to be consistent about open/close events
+      private boolean isOpen = false;
+
+      public void windowOpened(WindowEvent evt){
+        if (!isOpen){
+          isOpen = true;
+          openDialogsCount++;
+        }
+      }
+      public void windowClosed(WindowEvent evt){
+        if (isOpen){
+          isOpen = false;
+          openDialogsCount--;
+        }
+      }
+    });
+    
+    dialog.show(jdialog, parent);
   }
+  
+  
+  
+  /**
+   * Returns whether any plugin containers or dialogs are visible.
+   */
+  
+  public boolean isUiVisible(){
+    Enumeration containers = getExistingPluginUIContainers();
+    while (containers.hasMoreElements()){
+      PluginUIContainer c = (PluginUIContainer)containers.nextElement();
+      if (c.isVisible())
+        return true;
+    }
+    
+    return openDialogsCount > 0;
+  }
+
 
 
 

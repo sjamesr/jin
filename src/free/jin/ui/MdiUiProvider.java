@@ -170,7 +170,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     mainFrame.setVisible(true);
   }
-
+  
   
   
   /**
@@ -299,6 +299,16 @@ public class MdiUiProvider extends AbstractUiProvider{
     addPluginContainer(plugin, id, container);
     
     return container;
+  }
+  
+  
+  
+  /**
+   * Returns whether the main frame is visible.
+   */
+  
+  public boolean isUiVisible(){
+    return mainFrame.isVisible();
   }
 
 
