@@ -30,9 +30,13 @@ import free.jin.ui.SdiUiProvider;
 import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
+import free.util.TextUtilities;
+
 import java.io.IOException;
 import java.util.Properties;
+
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.UIManager;
 
@@ -199,14 +203,25 @@ public class Jin{
 
   private void restoreLookAndFeel(){
     String defaultLnf = UIManager.getSystemLookAndFeelClassName();
-    if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf)) // The GKT look and feel is still broken
+
+    // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
+    // Remove this when Sun fixes it.
+    if ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5") && 
+        ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf)))
       defaultLnf = UIManager.getCrossPlatformLookAndFeelClassName();
     
-    String lfClassName = getPrefs().getString("lookAndFeel.classname", defaultLnf);
+    String lfClassName = getPrefs().getString("lookAndFeel.classname", null);
     
     try{
-      UIManager.setLookAndFeel(lfClassName);
-    } catch (Exception e){}
+      if (lfClassName != null)
+        UIManager.setLookAndFeel(lfClassName);
+      else
+        UIManager.setLookAndFeel(defaultLnf);
+    } catch (Exception e){
+        if (lfClassName != null)
+          JOptionPane.showMessageDialog(null, "Unable to use the specified look and feel: \n" +
+              TextUtilities.breakIntoLines(e.getMessage(), 60), "Jin Error", JOptionPane.ERROR_MESSAGE);
+      }
     
     // lnf selection UI needs to know this, if we're using the default one 
     getPrefs().setString("lookAndFeel.classname", UIManager.getLookAndFeel().getClass().getName()); 
