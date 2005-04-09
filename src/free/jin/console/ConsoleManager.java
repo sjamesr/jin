@@ -26,7 +26,9 @@ import free.jin.GameListConnection;
 import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.*;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 
@@ -164,10 +166,16 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
       consoleContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
-
+    
     Container content = consoleContainer.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(console, BorderLayout.CENTER);
+    
+    consoleContainer.addPluginUIListener(new PluginUIAdapter(){
+      public void pluginUIActivated(PluginUIEvent evt){
+        console.requestDefaultFocus();
+      }
+    });
 
     consoleContainer.setVisible(true);
   }
