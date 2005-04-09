@@ -189,8 +189,9 @@ public class Jin{
           Class.forName(className);
           UIManager.installLookAndFeel(name, className);
         } catch (ClassNotFoundException e){
-            System.err.println("Unable to load class " + className + " for the " + name + " look and feel");
-          }
+            // We used to print a message here, but too many people panic and
+            // think something is terribly wrong.
+          } 
       }
     }
   }
