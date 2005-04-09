@@ -196,7 +196,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
-   * Returns an array of existing plugin ui containers.
+   * Returns a list of existing plugin ui containers.
    */
   
   public Enumeration getExistingPluginUIContainers(){
