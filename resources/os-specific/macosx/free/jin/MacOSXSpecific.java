@@ -24,7 +24,6 @@ package free.jin;
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
 import com.apple.eawt.ApplicationEvent;
-import free.jin.JinMain;
  
  
 /**
