@@ -363,7 +363,7 @@
 	</target>
   
 
-	<!-- Source. Resulting file is ${src-archive} -->
+	<!-- Source. Resulting files are ${src-archive} and ${src-archive-no-extras} -->
 	<target name="src" depends="init">
 		<echo message="Creating Source release" />
 
@@ -372,28 +372,40 @@
 		<delete dir="${release.src.dir}" />
 		<mkdir dir="${release.src.dir}" />
 		
-		<property name="src-archive-dir.name" value="jin-${release.version}" />
-		<property name="src-archive-dir" value="${release.src.dir}/${src-archive-dir.name}" />
+		<property name="src-archive-dir" value="${release.src.dir}/tmp" />
+		<property name="src-archive-files" value="${src-archive-dir}/jin-${release.version}" />
 		<mkdir dir="${src-archive-dir}" />
-		<copy todir="${src-archive-dir}">
+		<mkdir dir="${src-archive-files}" />		
+		<copy todir="${src-archive-files}">
 			<fileset dir="${jin.dir}" includes="src/** resources/** build.xml manifest.txt" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="src" includes="COMPILING" />
 		</copy>
 		
- 		<propertyfile file="${src-archive-dir}/src/free/jin/resources/app.props">
+ 		<propertyfile file="${src-archive-files}/src/free/jin/resources/app.props">
 			<entry key="app.version" value="${release.version}" />
 		</propertyfile>
 		
 		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-src.tar" />
-		<property name="src-gz" value="${src-tar}.gz" />
+		<property name="src-archive" value="${src-tar}.gz" />
 		<tar destfile="${src-tar}">
-			<tarfileset dir="${release.src.dir}" includes="${src-archive-dir.name}/**" />
+			<tarfileset dir="${src-archive-dir}" />
 		</tar>
-		<gzip src="${src-tar}" zipfile="${src-gz}" />
-		<delete dir="${src-archive-dir}" />
+		<gzip src="${src-tar}" zipfile="${src-archive}" />
 		<delete file="${src-tar}" />
-		<property name="src-archive" value="${src-gz}" />
+		
+		<property name="src-tar-no-extras" value="${release.src.dir}/jin-${release.version}-src-no-extras.tar" />
+		<property name="src-archive-no-extras" value="${src-tar-no-extras}.gz" />		
+		<tar destfile="${src-tar-no-extras}">
+			<tarfileset dir="${src-archive-dir}" excludes="*/resources/pieces/**" />
+			<tarfileset dir="${src-archive-dir}"
+				includes="*/resources/pieces/xboard.zip 
+				          */resources/pieces/icc/** */resources/pieces/fics/**" />
+		</tar>
+		<gzip src="${src-tar-no-extras}" zipfile="${src-archive-no-extras}" />
+		<delete file="${src-tar-no-extras}" />
+		
+		<delete dir="${src-archive-dir}" />
 	</target>
 
 	
