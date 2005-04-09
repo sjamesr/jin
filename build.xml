@@ -457,11 +457,13 @@
 
 	<!-- If the property x86 is set, does things required for unix on x86 -->
 	<target name="doUnixOnx86Stuff" if="x86">		
+		<!--
 		<copy todir="${build.dir}">
 			<fileset dir="resources/os-specific/unix/x86" />
 		</copy>
 		<chmod file="${build.dir}/sox" perm="a+x" />
 		<chmod file="${build.dir}/play" perm="a+x" />
+		-->
 	</target>
 
 
