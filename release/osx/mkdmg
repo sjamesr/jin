@@ -1,12 +1,20 @@
-#/bin/bash
+#!/bin/bash
 
-imagename=jin-@VERSION@-osx.dmg
-volumename=Jin-@VERSION@
-targetname=@APPDIRNAME@
+# The name of the created .dmg file
+imagename=$1
 
-# Create a 5MB disk image
+# The size of the sparse image. It needs to be bigger than the real size
+imagesize=$2
+
+volumename=Jin-Volume
+
+# The directory to create the image from 
+targetname=$3
+
+
+# Create a disk image.
 echo "Creating disk image"
-hdiutil create -megabytes 5 $imagename -layout NONE
+hdiutil create -megabytes $imagesize $imagename -layout NONE
 
 # Associate a device with this but don't mount it
 echo "Associating a device with $imagename"
