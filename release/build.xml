@@ -49,7 +49,7 @@
 
 
 	<!-- Builds for a specific platform -->
-	<target name="build" depends="init">
+	<target name="build">
 		<ant target="clean" dir="${jin.dir}" />
 		<echo message="Building Jin for ${release.platform}" />
 		<ant target="build" dir="${jin.dir}">
