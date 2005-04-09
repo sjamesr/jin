@@ -213,6 +213,36 @@ public class TextUtilities{
     
     return path;
   }
+  
+  
+  
+  /**
+   * Breaks the specified text into lines no longer than the specified length,
+   * without breaking words. The breaking is done by inserting newlines at
+   * appropriate locations. Note that if there are words longer than
+   * <code>maxLength</code>, they will not be broken.
+   */
+  
+  public static String breakIntoLines(String text, int maxLength){
+    StringBuffer buf = new StringBuffer(text);
+    text = text + " "; // Fake an extra space at the end to simplify the algorithm 
+    
+    int lastNewline = -1; // The index of the last newline
+    int lastSpace = -1; // The index of the last space
+    int curSpace; // The index of the current space
+    
+    while ((curSpace = text.indexOf(' ', lastSpace + 1)) != -1){
+      if ((curSpace - lastNewline - 1 > maxLength) && (lastSpace > lastNewline)){
+        // lastSpace == lastNewline means the current word is longer than maxLength
+        buf.setCharAt(lastSpace, '\n');
+        lastNewline = lastSpace;
+      }
+    
+      lastSpace = curSpace;
+    }
+  
+    return buf.toString();
+  }
 
 
 
