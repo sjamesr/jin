@@ -385,10 +385,17 @@ public class JinApplication implements JinContext{
     String classname = serverDef.getProperty("classname");
     if (classname == null)
       throw new IOException("Server definition file in " + jar + " does not contain a classname property");
-    Server server = (Server)loader.loadClass(classname).newInstance();
 
-    mainLoader.addDelegate(loader);
-
+    Class serverClass;
+    try{
+      serverClass = Class.forName(classname);
+    } catch (ClassNotFoundException e){
+        serverClass = loader.loadClass(classname);
+        mainLoader.addDelegate(loader);
+      }
+    
+    Server server = (Server)serverClass.newInstance();
+    
     File guestDir = new File(new File(new File(prefsDir, "accounts"), server.getId()),
       server.getUsernamePolicy().getGuestUsername());
     server.setGuestUser(loadUser(guestDir, server));
@@ -774,8 +781,13 @@ public class JinApplication implements JinContext{
       return null;
     }
     
-    Class actionClass = loader.loadClass(classname);
-
+    Class actionClass;
+    try{
+      actionClass = Class.forName(classname);
+    } catch (ClassNotFoundException e){
+        actionClass = loader.loadClass(classname);
+      }
+    
     InputStream actionPrefsIn = actionClass.getResourceAsStream("preferences");
     Preferences actionPrefs = (actionPrefsIn == null ? Preferences.createNew() : Preferences.load(actionPrefsIn));
 
@@ -903,7 +915,12 @@ public class JinApplication implements JinContext{
       return null;
     }
     
-    Class pluginClass = loader.loadClass(classname);
+    Class pluginClass;
+    try{
+      pluginClass = Class.forName(classname);
+    } catch (ClassNotFoundException e){
+        pluginClass = loader.loadClass(classname);
+      }
 
     InputStream pluginPrefsIn = pluginClass.getResourceAsStream("preferences");
     Preferences pluginPrefs = (pluginPrefsIn == null ? Preferences.createNew() : Preferences.load(pluginPrefsIn));
