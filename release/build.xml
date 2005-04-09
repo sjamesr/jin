@@ -60,7 +60,7 @@
 	</target>
 	
 
-	<!-- Unix release. Resulting file is ${unix-archive} -->
+	<!-- Unix release. Resulting files are ${unix-archive} and ${unix-archive-no-extras} -->
 	<target name="unix" depends="init">
 		<echo message="Creating unix/linux release" />
 		
@@ -75,28 +75,51 @@
 			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="unix" />
 		</antcall>
-		<property name="unix-dir-to-tar" value="${release.unix.dir}/jin-${release.version}" />
+		
+		<property name="unix-dir-to-tar" value="${release.unix.dir}/tmp" />
+		<property name="unix-files-dir" value="${unix-dir-to-tar}/jin-${release.version}" />
 		<mkdir dir="${unix-dir-to-tar}" />
-		<copy todir="${unix-dir-to-tar}">
+		<mkdir dir="${unix-files-dir}" />
+		<copy todir="${unix-files-dir}">
 			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/jgoodies-windows.jar" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="unix" includes="README" />
 		</copy>
+		
 		<property name="unix-tar" value="${release.unix.dir}/jin-${release.version}-unix.tar" />
+		<property name="unix-tar-no-extras" value="${release.unix.dir}/jin-${release.version}-unix-no-extras.tar" />
 		<property name="unix-gz" value="${unix-tar}.gz" />
+		<property name="unix-gz-no-extras" value="${unix-tar-no-extras}.gz" />
+		
 		<tar destfile="${unix-tar}">
-			<tarfileset dir="${release.unix.dir}" excludes="*/sox */play */jin" />
-			<tarfileset dir="${release.unix.dir}" includes="*/sox */play */jin" mode="755" />
+			<tarfileset dir="${unix-dir-to-tar}" excludes="*/jin" />
+			<tarfileset dir="${unix-dir-to-tar}" includes="*/jin" mode="755" />
 		</tar>
+		<tar destfile="${unix-tar-no-extras}">
+			<tarfileset dir="${unix-dir-to-tar}" excludes="*/jin */resources/pieces/**" />
+			<tarfileset dir="${unix-dir-to-tar}" includes="*/jin" mode="755" />
+			<tarfileset dir="${unix-dir-to-tar}"
+				includes="*/resources/pieces/xboard.zip 
+				          */resources/pieces/icc/** */resources/pieces/fics/**" />
+		</tar>
+		
 		<gzip src="${unix-tar}" zipfile="${unix-gz}" />
+		<gzip src="${unix-tar-no-extras}" zipfile="${unix-gz-no-extras}" />
+		
 		<delete dir="${unix-dir-to-tar}" />
 		<delete file="${unix-tar}" />
+		<delete file="${unix-tar-no-extras}" />
+		
 		<property name="unix-archive" value="${unix-gz}" />
+		<property name="unix-archive-no-extras" value="${unix-gz-no-extras}" />
 	</target>
 	
 
 	
-	<!-- Windows release. Resulting files are ${win-install} and ${win-archive} -->
+	<!-- 
+	     Windows release. Resulting files are ${win-install}, ${win-archive}, 
+	     ${win-install-no-extras} and ${win-archive-no-extras} 
+	-->
 	<target name="windows" depends="init">
 		<echo message="Creating windows release" />
 	
@@ -109,14 +132,54 @@
 			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="windows" />
 		</antcall>
+
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
+		<property name="win-install" value="${release.win.dir}/jin-${release.version}-win.exe" />
+		<property name="win-archive" value="${release.win.dir}/jin-${release.version}-win.zip" />
+		<property name="win-install-no-extras" value="${release.win.dir}/jin-${release.version}-win-no-extras.exe" />
+		<property name="win-archive-no-extras" value="${release.win.dir}/jin-${release.version}-win-no-extras.zip" />
+
+		<!-- Build the standard release -->
 		<mkdir dir="${dir-to-inst}" />
 		<copy todir="${dir-to-inst}">
 			<fileset dir="${build.dir}" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="win" includes="readme.txt" />
 		</copy>
-		<property name="exe" value="${release.win.dir}/jin-${release.version}-win.exe" />
+		<antcall target="win-create-install">
+			<param name="target-dir" value="${dir-to-inst}" />
+			<param name="exe" value="${win-install}" />
+			<param name="zip" value="${win-archive}" />
+		</antcall>
+		<delete dir="${dir-to-inst}" />
+
+		
+		<!-- Build the no-extras release -->
+		<mkdir dir="${dir-to-inst}" />
+		<copy todir="${dir-to-inst}">
+			<fileset dir="${build.dir}" excludes="resources/pieces/**" />
+			<fileset dir="${build.dir}" 
+				includes="resources/pieces/xboard.zip 
+			              resources/pieces/icc/** resources/pieces/fics/**" />
+			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+			<fileset dir="win" includes="readme.txt" />
+		</copy>
+		<antcall target="win-create-install">
+			<param name="target-dir" value="${dir-to-inst}" />
+			<param name="exe" value="${win-install-no-extras}" />
+			<param name="zip" value="${win-archive-no-extras}" />
+		</antcall>
+		<delete dir="${dir-to-inst}" />		
+	</target>
+	
+	<!-- 
+	    Helper target for the windows target. Builds a single windows release
+	    (an installer and an archive). Parameters are:
+	    target-dir: The directory to install.
+	    exe: The name of the install executable
+	    zip: The name of tha archive
+	-->
+	<target name="win-create-install">
 		<exec dir="." executable="${win.setup.maker}" failonerror="yes">
 			<arg value="/NOCD" /> <!-- Don't change into the .nsi file's directory -->
 			<arg value="/V2" /> <!-- Low verbosity --> 
@@ -125,15 +188,12 @@
 			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
 			<arg value="win/installer.nsi" />
 		</exec>
-		<property name="zip" value="${release.win.dir}/jin-${release.version}-win.zip" />
 		<zip destfile="${zip}" basedir="${dir-to-inst}" />
-		<delete dir="${dir-to-inst}" />
-		<property name="win-install" value="${exe}" />
-		<property name="win-archive" value="${zip}" />
 	</target>
 	
+	
 
-	<!-- OS X release. Resulting file is ${osx-install} -->
+	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
 	<target name="osx" depends="init, ask-cf-info">
 		<echo message="Creating Mac OS X release" />
 		
@@ -150,11 +210,7 @@
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
 		<copy todir="${release.osx.dir}">
-			<fileset dir="osx" includes="mkdmg" />
-			<filterset>
-				<filter token="VERSION" value="${release.version}" />
-				<filter token="APPDIRNAME" value="${app-dir.name}" />
-			</filterset>
+			<fileset dir="osx" includes="mkinstall mkdmg" />
 		</copy>
 		<copy todir="${app-dir}">
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
@@ -179,21 +235,27 @@
 		         username="${cf.username}"
 		         keyfile="${user.home}/.ssh/id_dsa"
 		         passphrase="${cf.passphrase}"
-		         command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; mkdir ${app-dir.name}/Contents/MacOS &amp;&amp; cp /System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub ${app-dir.name}/Contents/MacOS/ &amp;&amp;	/Developer/Tools/SetFile -a B ${app-dir.name} &amp;&amp; chmod u+x mkdmg &amp;&amp; ./mkdmg&quot;"
+		         command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; chmod u+x ./mkinstall &amp;&amp; ./mkinstall ${release.version} ${app-dir.name}&quot;"
 		/>
 		<scp keyfile="${user.home}/.ssh/id_dsa"
 		     passphrase="${cf.passphrase}"
 		     file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}-osx.dmg" 
 		     todir="${release.osx.dir}"					
 		/>
+		<scp keyfile="${user.home}/.ssh/id_dsa"
+		     passphrase="${cf.passphrase}"
+		     file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}-osx-no-extras.dmg" 
+		     todir="${release.osx.dir}"					
+		/>
 		<sshexec host="${cf.host}"
 		         username="${cf.username}"
 		         keyfile="${user.home}/.ssh/id_dsa"
 		         passphrase="${cf.passphrase}"
-		         command="rm -rf bundle.zip ${app-dir.name} mkdmg jin-${release.version}-osx.dmg"
+		         command="rm -rf bundle.zip ${app-dir.name} mkdmg mkinstall jin-${release.version}-osx.dmg jin-${release.version}-osx-no-extras.dmg"
 		/> 
 		<delete file="${release.osx.dir}/bundle.zip" />
 		<delete file="${release.osx.dir}/mkdmg" />
+		<delete file="${release.osx.dir}/mkinstall" />
 		<delete dir="${app-dir}" />
 		<delete dir="${app-dir}" />
 		<property name="osx-install" value="jin-${release.version}-osx.dmg" />
@@ -349,7 +411,7 @@
 	</target>
 
 	
-	<!-- Makes releases for windows, unix and os x -->
-	<target name="release" depends="init, ask-cf-info, unix, windows, osx, applet, src" />
+	<!-- Makes releases for windows, unix, os x and plain source code -->
+	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" />
 	
 </project>
