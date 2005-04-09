@@ -80,8 +80,10 @@ public class ConnectionManager{
     User user = findLoginUser(server);
     
     ConnectionDetails connDetails = findConnDetails(server, user);
-    if (connDetails == null)
+    if (connDetails == null){
+      Jin.getInstance().quitIfNoUiVisible();
       return;
+    }
     
     login(connDetails);
   }
@@ -246,8 +248,10 @@ public class ConnectionManager{
     
     ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
       
-    if (connDetails == null) // user canceled the dialog
+    if (connDetails == null){ // user canceled the dialog
+      Jin.getInstance().quitIfNoUiVisible();
       return;
+    }
     
     login(connDetails);
   }
@@ -262,9 +266,11 @@ public class ConnectionManager{
     ConnectionDetails connDetails = 
       new LoginPanel(user.getPreferredConnDetails()).askConnectionDetails();
       
-    if (connDetails == null) // user canceled the dialog
+    if (connDetails == null){ // user canceled the dialog
+      Jin.getInstance().quitIfNoUiVisible();
       return;
-    
+    }
+      
     login(connDetails);
   }
   
