@@ -9,8 +9,9 @@
 * The format of piece sets and board patterns (the way they are packaged in the
   zip/jar file) has changed. See http://www.jinchess.com/docs/customart/ and
   the piece set/board pattern specific pages for more information.
+* Jin can now run as an applet - see the websites of the relevant chess servers.
 * Changed the Event field in logged PGN files to "(un)rated [category] game".
-* Changed the default color of links a bit brighter.
+* Changed the default color of links to be a bit brighter.
 * Added a new mechanism for extending Jin: Actions. An Action is smaller than
   a plugin, and is easier to implement. It implements a single operation, which
   is made available to plugins, and which they can use. Also, implemented an
@@ -21,6 +22,36 @@
   - Ask a Question: Lets the user type in a question, which is then sent to
     the server help channel.
   - Find an Opponent: Lets the user select seek options and issue a seek.
+* Rewrote the entire startup mechanism, mainly to avoid some code duplication.
+* Fixed a bug which prevented the board from painting at all in Kriegspiel.
+* Fixed a bug which prevented an error message from being displayed in case
+  connecting to the ICC failed. See bug 1049036 for more details.
+* The chess board options "Piece follows mouse cursor" and "Highlight the
+  squares of the move currently being made" are now separate, so that you can
+  choose either, both or none. Previously you were only able to select either
+  one or the other.
+* Moved the Look and Feel selection to a dialog invoked from the Preferences
+  menu instead of having a whole menu just for Look and Feel selection.
+* Jin no longer sets the server bell variable to 0 on ICC.
+* The login dialog will now allow you to switch between the supported servers,
+  existing (remembered) accounts or create a new account. This is crucial for
+  the upcoming SDI mode, where there is no other way to achieve these options.
+* Disbanded the console menu - the "clear console" menu item is now a button
+  to the right of the console's input field and the preferences are in their
+  own (new) tab under Preferences->Main Console.
+* Removed the option to create or run user invoked scripts until a better way
+  to use them is written.
+* Setting sound on/off is now done from the Preferences menu.
+* Added a "Windows" menu which allows showing/hiding certain windows (like the
+  sought graph and the actions window) and also lists currently open windows.
+* Implemented SDI (Single Document Interface) mode! YAY! The windowing mode can
+  be selected from Preferences->User Interface. The default is SDI on Mac OS and
+  MDI on all other platforms.
+* Fixed the "weird looking queen" bug which sometimes ocurred when you promoted
+  a piece while using any of the vector piece sets. See bug 1073175 for more
+  details.
+* The default release now comes with all the extra piece sets.
+
 
 
 
