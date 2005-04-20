@@ -15,6 +15,9 @@
 
 
 <CENTER>
+<?php echo beforeApplet(); ?>
+<br>
+
 <P>
 <APPLET CODE="free.jin.JinApplet"
         ARCHIVE="jin.jar, <?php if ($_REQUEST['oldjava']) echo "swingall.jar," ?>chess.jar, util.jar, libs/jregex.jar, libs/icc/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
@@ -64,10 +67,10 @@
 <?php
 	}
 ?>
+<br>
+<?php echo afterApplet(); ?>
 
-<H3><A HREF="http://www.jinchess.com">The Jin website</A></H3>
 </CENTER>
-
 
 <?php
   include("end.php");
