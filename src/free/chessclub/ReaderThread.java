@@ -120,8 +120,6 @@ public class ReaderThread extends Thread{
 
         maybeFireData(data, in);
         while ((b = in.read()) != '\n'){
-          if (b == 7)  // Ignore bell
-            continue;
           if (b == '\r'){ // Ignore '\r' if followed by '\n'
             maybeFireData(data, in);
             b = in.read();
@@ -135,7 +133,9 @@ public class ReaderThread extends Thread{
             fireDisconnection();
             return;
           }
-          buf.append((char)b);
+          
+          if (b != 7)  // Ignore bell
+            buf.append((char)b);
 
           // Level2 parsing.
           if (b == Datagram.DG_DELIM){
