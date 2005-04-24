@@ -74,6 +74,7 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
     if (playerThread == null){
       playerThread = new Thread(this, "JavaxSampledAudioPlayer");
       playerThread.setDaemon(true);
+      playerThread.setPriority(Thread.MAX_PRIORITY);
       playerThread.start();
     }
 
@@ -92,10 +93,14 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
       try{
         AudioClip audioClip;
         try{
-          audioClip = (AudioClip)clipQueue.pop();
+          if ((dataLine != null) && dataLine.isOpen())
+            audioClip = (AudioClip)clipQueue.pop(500);
+          else
+            audioClip = (AudioClip)clipQueue.pop();
         } catch (InterruptedException e){
-          e.printStackTrace();
-          return;
+            if (dataLine.isOpen() && !dataLine.isActive())
+              dataLine.close();
+            continue;
         }
         
         byte [] data = audioClip.getData();
@@ -107,57 +112,18 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
           dataLine = (SourceDataLine)AudioSystem.getLine(info);
         }
         
-        if (!dataLine.isOpen()){
+        if (!dataLine.isOpen())
           dataLine.open(format);
-        }
         
         if (!format.matches(dataLine.getFormat())){
           dataLine.close();
           dataLine.open(format);
         }
         
-        long startTime = System.currentTimeMillis();
         if (!dataLine.isRunning())
           dataLine.start();
         
         dataLine.write(data, 0, data.length);
-        
-        try{
-          int framesTotal = data.length/format.getFrameSize();
-          int idleSleepTime = 0;
-
-          // Sleep until the dataLine says it's done          
-          while (dataLine.getFramePosition() < framesTotal){
-            int framesRemaining = framesTotal - dataLine.getFramePosition();
-            long timeToSleep = 1 + (long)(1000*framesRemaining/format.getFrameRate());
-            if (timeToSleep > 0){
-              Thread.sleep(timeToSleep);
-            
-              // Bugfix, the line sometimes gets stuck without finishing playing
-              if (framesRemaining == framesTotal - dataLine.getFramePosition()){
-                idleSleepTime += timeToSleep;
-                if (idleSleepTime > 100){ // Waited for longer than 100ms without any progress
-                  dataLine.close(); // Close and
-                  dataLine = null;  // discard the defective line
-                  break;
-                }
-              }
-              else
-                idleSleepTime = 0;
-            }
-          }
-          
-          // Bugfix - sleep until the earliest moment the sound can finish
-          // playing because the dataLine sometimes reports it's done before
-          // it's really done.
-          long timeToSleep = (long)(1000*framesTotal/format.getFrameRate() -
-            (System.currentTimeMillis() - startTime));
-          if (timeToSleep > 0)
-            Thread.sleep(timeToSleep);
-          
-          if (dataLine != null)  
-            dataLine.close();
-        } catch (InterruptedException e){e.printStackTrace();}
       } catch (IOException e){
         e.printStackTrace();
       } catch (UnsupportedAudioFileException e){
