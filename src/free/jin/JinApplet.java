@@ -27,6 +27,7 @@ import free.jin.plugin.PluginInfo;
 import free.util.AWTUtilities;
 import free.util.BrowserControl;
 import free.util.IOUtilities;
+import free.util.audio.AppletContextAudioPlayer;
 
 import java.applet.Applet;
 import java.awt.*;
@@ -122,6 +123,7 @@ public class JinApplet extends Applet implements JinContext{
   public void init(){
     try{
       BrowserControl.setAppletContext(getAppletContext());
+      AppletContextAudioPlayer.setAppletContext(getAppletContext());
       
       // Load the server we'll be connecting to
       server = loadServer();
