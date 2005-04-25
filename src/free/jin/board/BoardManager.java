@@ -288,7 +288,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     String moveHighlightingStyleString = prefs.getString("move-highlight.style", "square");
     if ("target-square".equals(moveHighlightingStyleString))
       setMoveHighlightingStyle(JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
-    if ("square".equals(moveHighlightingStyleString))
+    else if ("square".equals(moveHighlightingStyleString))
       setMoveHighlightingStyle(JBoard.BOTH_SQUARES_MOVE_HIGHLIGHTING);
     else if ("arrow".equals(moveHighlightingStyleString))
       setMoveHighlightingStyle(JBoard.ARROW_MOVE_HIGHLIGHTING);
