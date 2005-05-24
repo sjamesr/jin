@@ -381,6 +381,9 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
     JRadioButtonMenuItem item = (JRadioButtonMenuItem)containersToActiveRadioButtons.remove(pc);
     activeRadioButtonsToContainers.remove(item);
     removeActiveRadioButton(item);
+    
+    pc.removePluginUIListener(this);
+    pc.removePropertyListener(this);
   }
   
   
