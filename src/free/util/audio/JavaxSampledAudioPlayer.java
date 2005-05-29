@@ -31,11 +31,14 @@ import free.util.IOUtilities;
 
 
 /**
- * This is an AudioPlayer implementation which uses the javax.sound.sampled API
+ * An abstract AudioPlayer implementation which uses the javax.sound.sampled API
  * to play sounds. This API is only available since JDK1.3.
+ * Runnable.run is left to be implemented by the concrete subclass. Its function
+ * is to loop forever, obtaining <code>free.util.AudiClip</code> instances from
+ * the <code>clipQueue</code> and playing them. 
  */
 
-public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
+public abstract class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
 
 
@@ -51,7 +54,7 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    * A BlockingQueue of AudioClips queued for playing.
    */
 
-  private final BlockingQueue clipQueue = new BlockingQueue();
+  protected final BlockingQueue clipQueue = new BlockingQueue();
 
 
 
@@ -83,70 +86,13 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
 
 
 
-  /**
-   * <code>Runnable</code> implementation. Plays the queued clips.
-   */
-
-  public void run(){
-    SourceDataLine dataLine = null;
-    while (true){
-      try{
-        AudioClip audioClip;
-        try{
-          if ((dataLine != null) && dataLine.isOpen())
-            audioClip = (AudioClip)clipQueue.pop(500);
-          else
-            audioClip = (AudioClip)clipQueue.pop();
-        } catch (InterruptedException e){
-            if (dataLine.isOpen() && !dataLine.isActive())
-              dataLine.close();
-            continue;
-        }
-        
-        byte [] data = audioClip.getData();
-        AudioFormat format = getFormatForPlaying(data);
-        data = convertAudioData(data, format);
-        
-        if (dataLine == null){
-          DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-          dataLine = (SourceDataLine)AudioSystem.getLine(info);
-        }
-        
-        if (!dataLine.isOpen())
-          dataLine.open(format);
-        
-        if (!format.matches(dataLine.getFormat())){
-          dataLine.close();
-          dataLine.open(format);
-        }
-        
-        if (!dataLine.isRunning())
-          dataLine.start();
-        
-        dataLine.write(data, 0, data.length);
-      } catch (IOException e){
-        e.printStackTrace();
-      } catch (UnsupportedAudioFileException e){
-        e.printStackTrace();
-      } catch (LineUnavailableException e){
-        e.printStackTrace();
-      } catch (IllegalArgumentException e){
-        e.printStackTrace();
-      } catch (Throwable t){
-        t.printStackTrace();
-      }
-    }
-  }
-
-
-
 
   /**
    * Finds and returns the AudioFormat appropriate for playing the specified
    * audio data.
    */
 
-  private static AudioFormat getFormatForPlaying(byte [] audioData)
+  protected static AudioFormat getFormatForPlaying(byte [] audioData)
       throws UnsupportedAudioFileException, IOException{
     AudioFormat format = AudioSystem.getAudioFileFormat(
         new ByteArrayInputStream(audioData)).getFormat();
@@ -168,7 +114,7 @@ public class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    * Converts the specified audio data to the specified format. 
    */
 
-  private static byte [] convertAudioData(byte [] audioData, AudioFormat format)
+  protected static byte [] convertAudioData(byte [] audioData, AudioFormat format)
       throws UnsupportedAudioFileException, IOException{
     AudioInputStream stream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(
         audioData));
