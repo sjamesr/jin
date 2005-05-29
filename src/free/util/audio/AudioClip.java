@@ -130,13 +130,41 @@ public class AudioClip{
    */
 
   public synchronized void play(){
-    try{
-      if (successfulPlayer!=null){
+    if (successfulPlayer != null){
+      try{
         successfulPlayer.play(this);
         return;
+      } catch (Exception e){} // Ignore any exceptions
+    }
+    
+    String cmdSpecifiedPlayer;
+    try{
+      cmdSpecifiedPlayer = System.getProperty("free.util.audio.player");
+    } catch (SecurityException e){
+      cmdSpecifiedPlayer = null;
+    }
+    
+    if (cmdSpecifiedPlayer != null){
+      try{
+        Class playerClass = Class.forName(cmdSpecifiedPlayer);
+        AudioPlayer player = (AudioPlayer)playerClass.newInstance();
+        if (!player.isSupported()){
+          System.err.println(cmdSpecifiedPlayer + " is not supported on your system - audio disabled.");
+          successfulPlayer = new NullAudioPlayer();
+          return;
+        }
+        
+        player.play(this);
+        successfulPlayer = player;
+      } catch (Throwable e){
+        if (e instanceof ThreadDeath)
+          throw (ThreadDeath)e;
+        System.err.println(cmdSpecifiedPlayer + " failed - audio disabled.");
+        successfulPlayer = new NullAudioPlayer();
       }
-
-      for (int i=0;i<PLAYER_CLASSNAMES.length;i++){
+    }
+    else{
+      for (int i = 0; i < PLAYER_CLASSNAMES.length; i++){
         String classname = PLAYER_CLASSNAMES[i];
         try{
           Class playerClass = Class.forName(classname);
@@ -144,16 +172,21 @@ public class AudioClip{
           if (!player.isSupported())
             continue;
           player.play(this);
-          System.out.println("Will now use "+classname+" to play audio clips.");
+          System.err.println("Will now use " + classname + " to play audio clips.");
           successfulPlayer = player;
         } catch (Throwable e){
-            if (e instanceof ThreadDeath)
-              throw (ThreadDeath)e;
-            continue;
-          }
+          if (e instanceof ThreadDeath)
+            throw (ThreadDeath)e;
+          continue;
+        }
         break;
       }
-    } catch (Exception e){} // Silently ignore any exceptions
+      
+      if (successfulPlayer == null){
+        System.err.println("All supported players failed - audio disabled");
+        successfulPlayer = new NullAudioPlayer();
+      }
+    }
   }
 
 
