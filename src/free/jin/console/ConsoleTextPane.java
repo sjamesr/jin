@@ -860,6 +860,18 @@ public class ConsoleTextPane extends FixedJTextPane{
       regCursor = cursor;
   }
 
+  
+  
+  /**
+   * Returns the block scroll amount.
+   */
+  
+  public int getScrollableBlockIncrement(Rectangle viewRect, int orientation, int direction){
+    if (orientation == SwingConstants.HORIZONTAL)
+      return super.getScrollableBlockIncrement(viewRect, orientation, direction);
+    
+    return 5*viewRect.height/6;
+  }
 
 
 
