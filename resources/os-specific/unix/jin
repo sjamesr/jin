@@ -11,4 +11,4 @@ fi
 cd `dirname $filename`
 
 # Run Jin
-java -jar jin.jar $*
+java $JAVA_OPTS -jar jin.jar $*
