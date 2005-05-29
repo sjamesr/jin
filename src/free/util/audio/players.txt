@@ -1,5 +1,5 @@
+free.util.audio.BlockingJavaxSampledAudioPlayer
 free.util.audio.AppletContextAudioPlayer
-free.util.audio.JavaxSampledAudioPlayer
 free.util.audio.AppletAudioPlayer
 free.util.audio.ExternalAppAudioPlayer
 free.util.audio.SunAudioPlayer
