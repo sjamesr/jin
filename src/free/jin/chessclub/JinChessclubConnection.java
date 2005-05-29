@@ -1953,9 +1953,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       // It seems that "; goto <gamenum> ; <movestring>" will abort making the
       // move (or whatever other command follows it) if you aren't playing
       // a game with the specified number.
-      sendCommand("; goto " + game.getID() + " ; " + moveString);
+      sendCommand("; goto " + game.getID() + " ; chessmove " + moveString);
     else
-      sendCommand(moveString);
+      sendCommand("chessmove " + moveString);
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if (unechoedGameMoves == null){
