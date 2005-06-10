@@ -991,6 +991,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
           if ("gameType".equals(propertyName) || "played".equals(propertyName)){
             gameEndCleanup(game);
             createNewBoardPanel(game);
+            // We're kind of relying on the plugin container recycling mechanism
+            // here to create the illusion that the board panel merely changes
+            // instead of being replaced with a new one. Without the recycling
+            // mechanism, the location of the the plugin container would be
+            // different, thus breaking the illusion.
           }
           else if (boardContainer != null) // It could be null if the container has been closed
             boardContainer.setTitle(getBoardTitle(boardPanel));
