@@ -1167,8 +1167,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
 
-      // We should really change all the parameters of the existing Game object instead,
-      // but since BoardPanel doesn't currently support modifying them all...
       updateGame(game.getGameType(), gameNumber, whiteName, blackName, ratingCategoryString,
         isRated, 60*1000*whiteInitial, 1000*whiteIncrement, 60*1000*blackInitial, 1000*blackIncrement,
         isPlayedGame, whiteRating, blackRating, String.valueOf(gameID), whiteTitles, blackTitles);
