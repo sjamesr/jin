@@ -21,13 +21,13 @@
 
 package free.jin.console.icc;
 
-import javax.swing.text.BadLocationException;
+import free.jin.Connection;
+import free.jin.Preferences;
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
-import free.jin.Connection;
-import free.jin.Preferences;
-import free.util.TextUtilities;
+
+import javax.swing.text.BadLocationException;
 
 
 /**
@@ -82,13 +82,14 @@ public class ChessclubConsole extends Console{
    */
    
   protected void addToOutputImpl(String text, String textType) throws BadLocationException{
-    String delim = "        :";
-    int index;
-    while ((index = text.indexOf(delim)) != -1){
-      String line = TextUtilities.trimRight(text.substring(0, index));
-      super.addToOutputImpl(line, textType);
-      text = text.substring(index + delim.length() - 3);
-    }
+    // As of 02.06.2005, the ICC server does the wrapping thing itself 
+//    String delim = "        :";
+//    int index;
+//    while ((index = text.indexOf(delim)) != -1){
+//      String line = TextUtilities.trimRight(text.substring(0, index));
+//      super.addToOutputImpl(line, textType);
+//      text = text.substring(index + delim.length() - 3);
+//    }
     
     super.addToOutputImpl(text, textType);
   }
