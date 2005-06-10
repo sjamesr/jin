@@ -958,30 +958,41 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Gets called when a game starts. Creates a new BoardPanel and a container
-   * for it and displays it.
+   * Gets called when a game starts.
    */
 
   public void gameStarted(GameStartEvent evt){
-    Game game = evt.getGame();
+    createNewBoardPanel(evt.getGame());
+  }
+  
+  
+  
+  /**
+   * Creates a new BoardPanel for the specified game, a container for it and
+   * displays them.
+   */
+  
+  protected void createNewBoardPanel(Game game){
     BoardPanel boardPanel = createBoardPanel(game);
     initBoardPanel(game, boardPanel);
 
-    // Artificially invoke this, since it would not get called otherwise
-    // (we're already in the middle of the dispatching of that event).
-    boardPanel.gameStarted(evt);
-    
-    // Listener that updates the container title whenever anything changes. 
     game.addPropertyChangeListener(new PropertyChangeListener(){
       public void propertyChange(PropertyChangeEvent evt){
+        String propertyName = evt.getPropertyName();
         Game game = (Game)evt.getSource();
         BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.get(game);        
         
         if (boardPanel != null){
           PluginUIContainer boardContainer =
             (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
-  
-          if (boardContainer != null) // It could be null if the container has been closed
+
+          // To serious a change - BoardPanel doesn't support such drastic
+          // changes, so we create a new one and replace the current one with it.
+          if ("gameType".equals(propertyName) || "played".equals(propertyName)){
+            gameEndCleanup(game);
+            createNewBoardPanel(game);
+          }
+          else if (boardContainer != null) // It could be null if the container has been closed
             boardContainer.setTitle(getBoardTitle(boardPanel));
         }
       }

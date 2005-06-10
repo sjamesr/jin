@@ -638,6 +638,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           contentPanel.requestFocus();
       }
     });
+    
+    if (!isUserTurn() && (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE))
+      board.setEditable(false);
   }
 
 
@@ -1453,16 +1456,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * GameListener implementation. 
+   * GameListener implementation. Note that this method is never actually called
+   * because a BoardPanel is created (by the BoardManager) in response to a game
+   * start event, so when we register for game events, the game start event has
+   * already been dispatched.
    */
 
-  public void gameStarted(GameStartEvent evt){
-    if (evt.getGame() != game)
-      return;
-
-    if (!isUserTurn() && (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE))
-      board.setEditable(false);
-  }
+  public void gameStarted(GameStartEvent evt){}
 
 
 
@@ -1998,17 +1998,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     }
     else if (src == game){
+      gameLabel.setText(createGameLabelText(game));
       if ("whiteName".equals(propertyName)){
         whiteLabel.setText(createWhiteLabelText(game));
       }
       else if ("blackName".equals(propertyName)){
         blackLabel.setText(createBlackLabelText(game));
-      }
-      else if ("whiteTime".equals(propertyName) || 
-               "blackTime".equals(propertyName) || 
-               "whiteInc".equals(propertyName)  ||
-               "blackInc".equals(propertyName)){
-        gameLabel.setText(createGameLabelText(game));
       }
       // implement the rest of the properties.
     }
