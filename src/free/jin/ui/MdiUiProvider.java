@@ -962,14 +962,20 @@ public class MdiUiProvider extends AbstractUiProvider{
       RectDouble defaultBounds = getInitialBounds(frame, mainFrame.getContentPane().getSize());
       RectDouble bounds = (id == null ? defaultBounds :
         prefs.getRectDouble(prefix + "iframe.bounds", defaultBounds));
-        
-      // Fix the bounds in case they went bad for some reason.
-      bounds.setX(Math.min(1, Math.max(0, bounds.getX())));
-      bounds.setY(Math.min(1, Math.max(0, bounds.getY())));
-      bounds.setWidth(Math.min(1, Math.max(0.02, bounds.getWidth())));
-      bounds.setHeight(Math.min(1, Math.max(0.02, bounds.getHeight())));
 
-      frame.setBounds(bounds.scale(desktop.getWidth(), desktop.getHeight()).toRect());
+      int desktopWidth = desktop.getWidth();
+      int desktopHeight = desktop.getHeight();
+      
+      // Scale to the desktop size
+      bounds = bounds.scale(desktopWidth, desktopHeight);
+      
+      // Fix the bounds in case they went bad for some reason.
+      bounds.setX(Math.min(desktopWidth - 40, Math.max(0, bounds.getX())));
+      bounds.setY(Math.min(desktopHeight - 40, Math.max(0, bounds.getY())));
+      bounds.setWidth(Math.min(desktopWidth, Math.max(40, bounds.getWidth())));
+      bounds.setHeight(Math.min(desktopHeight, Math.max(40, bounds.getHeight())));
+
+      frame.setBounds(bounds.toRect());
 
       try{
         frame.setMaximum(prefs.getBool(prefix + "iframe.isMaximized", false));
