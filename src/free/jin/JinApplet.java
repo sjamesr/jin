@@ -459,10 +459,15 @@ public class JinApplet extends Applet implements JinContext{
       settingsUploadThread = new Thread(){
         public void run(){
           try{
-            String result = uploadSettings();
-            if (!"OK".equals(result)){
-              showErrorDialog(result);
-              return;
+            String result = null;
+            while (!"OK".equals(result = uploadSettings())){
+              // Hackish, I know
+              if (result.toLowerCase().indexOf("password") != -1){
+                if (!showPasswordDialog(result))
+                  break;
+              }
+              else 
+                showErrorDialog(result);
             }
           } catch (IOException e){
               ByteArrayOutputStream buf = new ByteArrayOutputStream();
@@ -487,7 +492,25 @@ public class JinApplet extends Applet implements JinContext{
             new SettingsUploadErrorDialog(AWTUtilities.frameForComponent(JinApplet.this), message);
           AWTUtilities.centerWindow(errorDialog, JinApplet.this);
           errorDialog.setVisible(true);
+        }
+        
+        /**
+         * Shows a password dialog and returns whether preferences upload should
+         * be retried. 
+         */
+        
+        private boolean showPasswordDialog(String message){
+          PasswordDialog passDialog =
+            new PasswordDialog(AWTUtilities.frameForComponent(JinApplet.this), message, username);
+          AWTUtilities.centerWindow(passDialog, JinApplet.this);
           
+          boolean result = passDialog.shouldRetry();
+          
+          if (result){
+            username = passDialog.getUsername();
+            password = passDialog.getPassword();
+          }
+          return result;
         }
       };
       
@@ -1086,7 +1109,7 @@ public class JinApplet extends Applet implements JinContext{
     
     /**
      * Creates a new <code>SettingsUploadErrorDialog</code> with the specified
-     * parent frame and the specified error text.
+     * parent frame and error text.
      */
      
     public SettingsUploadErrorDialog(Frame parent, String errorMessage){
@@ -1106,7 +1129,8 @@ public class JinApplet extends Applet implements JinContext{
       
       this.add(BorderLayout.NORTH, new Label("An error has occurred while uploading your settings:"));
       
-      TextArea errorArea = new TextArea(errorMessage);
+      TextArea errorArea = new TextArea(errorMessage, 3, 40);
+      
       errorArea.setEditable(false);
       this.add(BorderLayout.CENTER, errorArea);
       
@@ -1124,6 +1148,146 @@ public class JinApplet extends Applet implements JinContext{
      
      
      
+  }
+  
+  
+  
+  /**
+   * A dialog which asks the user to input his password and retry uploading the
+   * preferences.
+   */
+  
+  private class PasswordDialog extends Dialog{
+    
+    
+    /**
+     * The username field.
+     */
+    
+    private final TextField usernameField;
+    
+    
+    
+    /**
+     * The password field.
+     */
+    
+    private final TextField passwordField;
+    
+    
+    
+    /**
+     * Whether prefs upload should be retried.
+     */
+    
+    private boolean shouldRetry;
+
+    
+    
+    /**
+     * Creates a new <code>PasswordDialog</code> with the specified
+     * parent frame, error text and current username.
+     */
+     
+    public PasswordDialog(Frame parent, String errorMessage, String username){
+      super(parent, "Settings Upload Error", true);
+      
+      usernameField = new TextField(username);
+      passwordField = new TextField();
+      passwordField.setEchoChar('*');
+      
+      createUI(errorMessage);
+    }
+    
+    
+
+    /**
+     * Creates the UI of this dialog.
+     */
+     
+    private void createUI(String errorMessage){
+      this.setLayout(new BorderLayout(5, 5));
+      
+      this.add(BorderLayout.NORTH, new Label("An error has occurred while uploading your settings:"));
+      
+      Panel centerPanel = new Panel(new BorderLayout(5, 5));
+      
+      TextArea errorArea = new TextArea(errorMessage, 3, 40);
+      errorArea.setEditable(false);
+      centerPanel.add(BorderLayout.CENTER, errorArea);
+      
+      Panel userInfoPanel = new Panel(new BorderLayout());
+      Panel labelsPanel = new Panel(new GridLayout(2, 1, 10, 10));
+      Panel textFieldsPanel = new Panel(new GridLayout(2, 1, 10, 10));
+      
+      labelsPanel.add(new Label("Username: "));
+      textFieldsPanel.add(usernameField);
+            
+      labelsPanel.add(new Label("Password: "));
+      textFieldsPanel.add(passwordField);
+      
+      userInfoPanel.add(BorderLayout.WEST, labelsPanel);
+      userInfoPanel.add(BorderLayout.CENTER, textFieldsPanel);
+      centerPanel.add(BorderLayout.SOUTH, userInfoPanel);
+      this.add(BorderLayout.CENTER, centerPanel);
+      
+      
+      Button retryButton = new Button("Retry");
+      Button closeButton = new Button("Close");
+      
+      Panel buttonPanel = new Panel(new FlowLayout());
+      buttonPanel.add(retryButton);
+      buttonPanel.add(closeButton);
+      this.add(BorderLayout.SOUTH, buttonPanel);
+      
+      retryButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          shouldRetry = true;
+          dispose();
+        }
+      });
+      
+      closeButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          shouldRetry = false;
+          dispose(); 
+        }
+      });
+    }
+    
+    
+    
+    /**
+     * Displays the dialog and returns whether the user asked to retry
+     * prefs upload.
+     */
+    
+    public boolean shouldRetry(){
+      this.setVisible(true);
+      return shouldRetry;
+    }
+    
+    
+    
+    /**
+     * Returns the username specified by the user.
+     */
+    
+    public String getUsername(){
+      return usernameField.getText();
+    }
+    
+    
+    
+    /**
+     * Returns the password specified by the user.
+     */
+    
+    public String getPassword(){
+      return passwordField.getText();
+    }
+    
+    
   }
    
 }
