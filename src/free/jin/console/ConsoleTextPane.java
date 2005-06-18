@@ -870,7 +870,8 @@ public class ConsoleTextPane extends FixedJTextPane{
     if (orientation == SwingConstants.HORIZONTAL)
       return super.getScrollableBlockIncrement(viewRect, orientation, direction);
     
-    return 5*viewRect.height/6;
+    int scroll = viewRect.height-3*getScrollableUnitIncrement(viewRect, orientation, direction); 
+    return scroll <= 0 ? viewRect.height : scroll;
   }
 
 
