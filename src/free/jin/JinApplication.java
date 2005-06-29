@@ -1055,6 +1055,8 @@ public class JinApplication implements JinContext{
   private Resource loadResource(File file, Plugin plugin) throws IOException{
     ZipClassLoader cl = new ZipClassLoader(file); 
     Properties def = IOUtilities.loadProperties(cl.getResourceAsStream("definition"));
+    if (def == null)
+      return null;
     String classname = def.getProperty("classname");
     if (classname == null)
       return null;
