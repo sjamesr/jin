@@ -283,7 +283,7 @@ public class Style12Struct extends Struct{
     int minutes = Integer.parseInt(timeTokens.nextToken());
     int seconds = Integer.parseInt(timeTokens.nextToken());
     int milliseconds = Integer.parseInt(timeTokens.nextToken());
-    int moveTime = 60*1000*minutes + 60*seconds + milliseconds;
+    int moveTime = 60*1000*minutes + 1000*seconds + milliseconds;
 
     String moveSAN = tokens.nextToken(); // The move in SAN notation
     if (moveSAN.equals("none"))
