@@ -31,11 +31,15 @@ import free.util.AWTUtilities;
 import free.util.RectDouble;
 
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Enumeration;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
 
 
@@ -134,8 +138,6 @@ public class SdiUiProvider extends AbstractUiProvider{
         }
       }
     });
-    
-    jdialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     
     dialog.show(jdialog, parent);
   }
