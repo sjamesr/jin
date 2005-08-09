@@ -134,6 +134,7 @@ public abstract class DialogPanel extends JPanel{
     content.add(this, BorderLayout.CENTER);
     dialog.setContentPane(content);
     dialog.getRootPane().setDefaultButton(defaultButton);
+    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     
     AWTUtilities.centerWindow(dialog, hintParent);
 
