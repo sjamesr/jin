@@ -13,11 +13,11 @@ cp /System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/
 
 # Build standard release
 echo "Building standard release: jin-$version-osx.dmg ($appdirname)"
-./mkdmg jin-$version-osx.dmg 15 $appdirname
+./mkdmg jin-$version-osx.dmg 15 Jin-$version $appdirname
 
 # Build no-extras release
 echo "Building no-extras release: jin-$version-osx-no-extras.dmg ($appdirname)"
 mv $appdirname/Contents/Resources/Java/resources/pieces/xboard.zip .
 rm -f $appdirname/Contents/Resources/Java/resources/pieces/*.zip
 mv xboard.zip $appdirname/Contents/Resources/Java/resources/pieces/
-./mkdmg jin-$version-osx-no-extras.dmg 5 $appdirname
+./mkdmg jin-$version-osx-no-extras.dmg 5 Jin-$version $appdirname
