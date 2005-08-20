@@ -6,13 +6,13 @@ imagename=$1
 # The size of the sparse image. It needs to be bigger than the real size
 imagesize=$2
 
-volumename=Jin-Volume
+volumename=$3
 
-# The directory to create the image from 
-targetname=$3
+# The directory to create the image from
+targetname=$4
 
 
-# Create a disk image.
+# Create a disk image
 echo "Creating disk image"
 hdiutil create -megabytes $imagesize $imagename -layout NONE
 
@@ -32,8 +32,8 @@ mkdir mnt/
 mount_hfs $MYDEV ./mnt/
 
 # Copy stuff to it
-echo "Copying $targetname into mnt/" 
-ditto -rsrcFork $targetname mnt/$targetname 
+echo "Copying $targetname into mnt/"
+ditto -rsrcFork $targetname mnt/$targetname
 
 # Unmount
 echo "Unmounting"
