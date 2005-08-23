@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: free.jin.JinApplication
 Class-Path: util.jar chess.jar lnfs/kunststoff.jar lnfs/metouia.jar lnfs/liquid.jar lnfs/jgoodies-plastic.jar lnfs/jgoodies-windows.jar
+
