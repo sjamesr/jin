@@ -66,6 +66,14 @@ public class JinApplication implements JinContext{
    */
 
   private static final File JIN_DIR = new File(System.getProperty("user.dir"));
+  
+  
+  
+  /**
+   * Are we loading plugins, actions etc. dynamically with special classloaders?
+   */
+  
+  private static final boolean dynamicLoad = !System.getProperty("jin.noDynamicLoad").equals("true");
 
 
   
@@ -92,7 +100,7 @@ public class JinApplication implements JinContext{
   private final Preferences userPrefs;
   
   
-
+  
   /**
    * Our class loader. Initially it has no delegates - they are added as the
    * various jars for plugins, server definitions etc. are loaded. The structure
@@ -139,6 +147,7 @@ public class JinApplication implements JinContext{
    * </ul>
    *
    * This variable is a reference to the top delegating classloader.
+   * Note: this is <code>null</code> when in jin.noDynamicLoad mode.
    */
 
   private final DelegatingClassLoader mainLoader;
@@ -148,6 +157,7 @@ public class JinApplication implements JinContext{
   /**
    * The libraries' classloader. See the documentation of the
    * <code>mainClassLoader</code> instance variable for more details.
+   * Note: this is <code>null</code> when in jin.noDynamicLoad mode.
    */
 
   private final ChildClassLoader libsLoader;
@@ -210,10 +220,17 @@ public class JinApplication implements JinContext{
     // Load user preferences
     userPrefs = loadUserPrefs();
     
-    // Create our own special classloader. The delegate classloaders will be
-    // added as the various jars (for plugins, server definitions) are loaded.
-    libsLoader = createLibsClassLoader();
-    mainLoader = new DelegatingClassLoader(libsLoader);
+    
+    if (dynamicLoad){
+      // Create our own special classloader. The delegate classloaders will be
+      // added as the various jars (for plugins, server definitions) are loaded.
+      libsLoader = createLibsClassLoader();
+      mainLoader = new DelegatingClassLoader(libsLoader);
+    }
+    else{
+      libsLoader = null;
+      mainLoader = null;
+    }
     
     // Load servers
     servers = loadServers();
@@ -353,7 +370,7 @@ public class JinApplication implements JinContext{
 
     String [] jars = serversDir.list(new ExtensionFilenameFilter(".jar"));
     if (jars.length == 0)
-      throw new IllegalStateException("No server jar files found in:\n" + serversDir);
+      throw new IllegalStateException("No server specifications found in:\n" + serversDir);
 
     Server [] servers = new Server[jars.length];
     for (int i = 0; i < jars.length; i++)
@@ -387,12 +404,12 @@ public class JinApplication implements JinContext{
       throw new IOException("Server definition file in " + jar + " does not contain a classname property");
 
     Class serverClass;
-    try{
+    if (dynamicLoad){
+      serverClass = loader.loadClass(classname);
+      mainLoader.addDelegate(loader);
+    }
+    else
       serverClass = Class.forName(classname);
-    } catch (ClassNotFoundException e){
-        serverClass = loader.loadClass(classname);
-        mainLoader.addDelegate(loader);
-      }
     
     Server server = (Server)serverClass.newInstance();
     
@@ -781,12 +798,7 @@ public class JinApplication implements JinContext{
       return null;
     }
     
-    Class actionClass;
-    try{
-      actionClass = Class.forName(classname);
-    } catch (ClassNotFoundException e){
-        actionClass = loader.loadClass(classname);
-      }
+    Class actionClass = dynamicLoad ? loader.loadClass(classname) : Class.forName(classname);
     
     InputStream actionPrefsIn = actionClass.getResourceAsStream("preferences");
     Preferences actionPrefs = (actionPrefsIn == null ? Preferences.createNew() : Preferences.load(actionPrefsIn));
@@ -915,12 +927,7 @@ public class JinApplication implements JinContext{
       return null;
     }
     
-    Class pluginClass;
-    try{
-      pluginClass = Class.forName(classname);
-    } catch (ClassNotFoundException e){
-        pluginClass = loader.loadClass(classname);
-      }
+    Class pluginClass = dynamicLoad ? loader.loadClass(classname) : Class.forName(classname);
 
     InputStream pluginPrefsIn = pluginClass.getResourceAsStream("preferences");
     Preferences pluginPrefs = (pluginPrefsIn == null ? Preferences.createNew() : Preferences.load(pluginPrefsIn));
