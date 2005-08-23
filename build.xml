@@ -56,11 +56,6 @@
 		       includes="**"
 		       classpathref="compile.class.path"
 		       debug="${build.debug}">
-
-			<!-- <compilerarg compiler="jikes" value="+Pnaming-convention" /> -->
-			<compilerarg compiler="jikes" value="+Punused-type-imports" />
-			<compilerarg compiler="jikes" value="+Punused-package-imports" />
-			<compilerarg compiler="jikes" value="+Pno-shadow" />
 		</javac>
 
 	</target>
