@@ -73,7 +73,7 @@ public class JinApplication implements JinContext{
    * Are we loading plugins, actions etc. dynamically with special classloaders?
    */
   
-  private static final boolean dynamicLoad = !System.getProperty("jin.noDynamicLoad").equals("true");
+  private static final boolean dynamicLoad = !"true".equals(System.getProperty("jin.noDynamicLoad"));
 
 
   
