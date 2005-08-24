@@ -1,0 +1,63 @@
+%%Excelsior JET v3.70 project file for Jin
+
++inline
+-inlinelimit=100
+-inlinetolimit=1000
+
+-classabsence=ERR
+-heaplimit=30M
+-jetrt=Classic
+-main=free/jin/JinApplication
+
++bindresources
++genstackalloc
++gui
+
+-jetvmprop=-Djin.noDynamicLoad=true
+
+-lookup=*.jar=.
+-lookup=*.jar=lnfs
+-lookup=*.jar=libs;libs/icc;libs/fics
+-lookup=*.jar=actions;actions/icc;actions/fics
+-lookup=*.jar=plugins;plugins/icc;plugins/fics
+-lookup=*.jar=servers
+
+!module jin.jar
+!module chess.jar
+!module util.jar
+
+!module servers/chessclub.jar
+!module servers/freechess.jar
+
+!module lnfs/kunststoff.jar
+!module lnfs/metouia.jar
+!module lnfs/liquid.jar
+!module lnfs/jgoodies-plastic.jar
+
+!module actions/askquestion.jar
+!module actions/getserverhelp.jar
+!module actions/seek.jar
+
+!module libs/board.jar
+!module libs/bsh-core-1.2b7.jar
+!module libs/console.jar
+!module libs/jregex.jar
+!module libs/scripter.jar
+!module libs/seek.jar
+!module libs/sound.jar
+!module libs/fics/timesealing.jar
+!module libs/icc/timestamping.jar
+
+!module plugins/actions.jar
+!module plugins/gamelogger.jar
+!module plugins/fics/fics_board.jar
+!module plugins/fics/fics_console.jar
+!module plugins/fics/fics_scripter.jar
+!module plugins/fics/fics_seek.jar
+!module plugins/fics/fics_sound.jar
+!module plugins/icc/icc_board.jar
+!module plugins/icc/icc_console.jar
+!module plugins/icc/icc_scripter.jar
+!module plugins/icc/icc_seek.jar
+!module plugins/icc/icc_sound.jar
+
