@@ -30,6 +30,10 @@
 
 <project name="Jin Release" default="release">
 
+	<!-- Makes releases for windows, unix, os x and plain source code -->
+	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" description="Build all normal releases"/>
+	
+
 	<target name="init">
 		<dirname property="jin.dir" file="." />
 		<property name="build.dir" value="${jin.dir}/build" />
@@ -61,7 +65,7 @@
 	
 
 	<!-- Unix release. Resulting files are ${unix-archive} and ${unix-archive-no-extras} -->
-	<target name="unix" depends="init">
+	<target name="unix" depends="init" description="Builds a release for Unix/Linux">
 		<echo message="Creating unix/linux release" />
 		
 		<property name="release.unix.dir" value="${release.dir}/unix" />
@@ -120,7 +124,7 @@
 	     Windows release. Resulting files are ${win-install}, ${win-archive}, 
 	     ${win-install-no-extras} and ${win-archive-no-extras} 
 	-->
-	<target name="windows" depends="init">
+	<target name="windows" depends="init" description="Builds a release for Windows">
 		<echo message="Creating windows release" />
 	
 		<property name="release.win.dir" value="${release.dir}/win" />
@@ -194,7 +198,7 @@
 	
 
 	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
-	<target name="osx" depends="init, ask-cf-info">
+	<target name="osx" depends="init, ask-cf-info" description="Builds a release for Mac OS X">
 		<echo message="Creating Mac OS X release" />
 		
 		<property name="release.osx.dir" value="${release.dir}/osx" />
@@ -206,7 +210,7 @@
 			<param name="release.name" value="Jin" />
 			<param name="release.platform" value="macosx" />
 		</antcall>
-		<property name="app-dir.name" value="Jin-${release.version}.app" />
+		<property name="app-dir.name" value="Jin.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
 		<copy todir="${release.osx.dir}">
@@ -263,7 +267,7 @@
   
 
 	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
-	<target name="applet" depends="init">
+	<target name="applet" depends="init" description="Builds an applet release (JinApplet)">
 		<echo message="Creating applet release" />
     
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
@@ -364,7 +368,7 @@
   
 
 	<!-- Source. Resulting files are ${src-archive} and ${src-archive-no-extras} -->
-	<target name="src" depends="init">
+	<target name="src" depends="init" description="Builds a source release">
 		<echo message="Creating Source release" />
 
 		<property name="release.src.dir" value="${release.dir}/src" />
@@ -421,9 +425,82 @@
 		         command="echo works"
 		/>
 	</target>
-
 	
-	<!-- Makes releases for windows, unix, os x and plain source code -->
-	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" />
+	
+	<!-- Builds a release compiled with Excelsior JET 3.7 for Linux -->
+	<target name="jet-linux" depends="init" description="Builds a release compiled with Excelsior JET">
+		<echo message="Creating JET Linux release" />
+		
+		<taskdef resource="net/sf/antcontrib/antlib.xml" />
+		
+		<input message="Please specify JET's directory:" addproperty="jet.dir" />
+		<property name="release.jet.dir" value="${release.dir}/jet" />
+		<property name="jin.compilespec" value="jet/jin.prj" />
+		<property name="jin.releasespec" value="jet/jin-linux.jpn" />
+		
+		<delete dir="${release.jet.dir}" />
+		<mkdir dir="${release.dir}" />
+		<mkdir dir="${release.jet.dir}" />
+		
+		<antcall target="build">
+			<param name="release.name" value="Jin" />
+			<param name="release.platform" value="jet-linux" />
+			<param name="build.compiler" value="modern" />
+		</antcall>
+		
+		<property name="tmpdir" value="${basedir}/jet/tmp" />
+		<mkdir dir="${tmpdir}" />
+		<copy todir="${tmpdir}">
+			<fileset dir="${build.dir}" excludes="swingall.jar plugins/*/*.jar" />
+		</copy>
+		<copy todir="${tmpdir}">
+			<fileset dir="${build.dir}" includes="plugins/*/*.jar" />
+			<mapper type="regexp" from="plugins/(.*)/(.*)\.jar" to="plugins/\1/\1_\2.jar" />
+		</copy>
+		
+		<exec executable="${jet.dir}/bin/jc" dir="${tmpdir}">
+			<arg line="=p ${basedir}/${jin.compilespec}" />
+		</exec>
+		
+		<foreach target="package-definition" param="jar.name" inheritall="yes">
+			<fileset dir="${tmpdir}" includes="**/*.jar" excludes="resources/** lnfs/**" />
+		</foreach>
+		
+		<property name="dir-to-tar" value="${release.jet.dir}/jin-${release.version}" />
+		<mkdir dir="${dir-to-tar}" />
+		
+		<exec executable="${jet.dir}/bin/jpiib" dir="${tmpdir}">
+			<arg line="${basedir}/${jin.releasespec} -imagedir ${basedir}/${dir-to-tar}" />
+		</exec>
+		<delete dir="${tmpdir}" />
+		
+		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${release.version}-jet-linux.tar" />
+		<tar destfile="${jet-linux-tar}">
+			<tarfileset dir="${release.jet.dir}" excludes="*/jin" />
+			<tarfileset dir="${release.jet.dir}" includes="*/jin" mode="755"/>
+		</tar>
+		<gzip src="${jet-linux-tar}" zipfile="${jet-linux-tar}.gz" />
+		<delete file="${jet-linux-tar}" />
+
+		<delete dir="${dir-to-tar}" />
+	</target>
+	
+	
+	<!-- Removes all but the definition file from the specified jar file. If the jar file
+	     doesn't have a definition file, it is removed. -->
+	<target name="package-definition">
+		<dirname file="${jar.name}" property="dir.name" />
+		<basename file="${jar.name}" property="file.name" />
+		
+		<unjar dest="${dir.name}">
+			<fileset dir="${dir.name}" includes="${file.name}" />
+		    <patternset includes="definition" />
+		</unjar>
+		
+		<delete file="${jar.name}" />
+		<zip destfile="${jar.name}" basedir="${dir.name}" includes="definition" whenempty="skip"/>
+		<delete file="${dir.name}/definition" />
+	</target>
+
 	
 </project>
