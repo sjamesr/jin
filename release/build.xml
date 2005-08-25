@@ -433,7 +433,7 @@
 		
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
 		
-		<input message="Please specify JET's directory:" addproperty="jet.dir" />
+		<input message="Please specify JET's directory:" addproperty="jet.home" />
 		<property name="release.jet.dir" value="${release.dir}/jet" />
 		<property name="jin.compilespec" value="jet/jin.prj" />
 		<property name="jin.releasespec" value="jet/jin-linux.jpn" />
@@ -458,8 +458,9 @@
 			<mapper type="regexp" from="plugins/(.*)/(.*)\.jar" to="plugins/\1/\1_\2.jar" />
 		</copy>
 		
-		<exec executable="${jet.dir}/bin/jc" dir="${tmpdir}">
+		<exec executable="${jet.home}/bin/jc" dir="${tmpdir}">
 			<arg line="=p ${basedir}/${jin.compilespec}" />
+			<env key="LD_LIBRARY_PATH" value="${jet.home}/lib/x86/shared" />
 		</exec>
 		
 		<foreach target="package-definition" param="jar.name" inheritall="yes">
@@ -469,9 +470,14 @@
 		<property name="dir-to-tar" value="${release.jet.dir}/jin-${release.version}" />
 		<mkdir dir="${dir-to-tar}" />
 		
-		<exec executable="${jet.dir}/bin/jpiib" dir="${tmpdir}">
+		<exec executable="${jet.home}/bin/jpiib" dir="${tmpdir}">
 			<arg line="${basedir}/${jin.releasespec} -imagedir ${basedir}/${dir-to-tar}" />
+			<env key="PATH" value="${jet.home}/bin" />
+			<env key="LD_LIBRARY_PATH" value="${jet.home}/lib/x86/shared" />
 		</exec>
+		<!-- jpiib rewrites the spec file, saving the old one as .bak -->
+		<delete file="${jin.releasespec}" />
+		<move file="${jin.releasespec}.bak" tofile="${jin.releasespec}" preservelastmodified="true" />
 		<delete dir="${tmpdir}" />
 		
 		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${release.version}-jet-linux.tar" />
