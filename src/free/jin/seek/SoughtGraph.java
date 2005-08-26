@@ -104,6 +104,14 @@ public class SoughtGraph extends JComponent{
    */
 
   protected final Plugin plugin;
+  
+  
+  
+  /**
+   * The size of the smallest seek image. 
+   */
+  
+  private final int minSeekImageSize;
 
 
 
@@ -187,10 +195,15 @@ public class SoughtGraph extends JComponent{
     this.bgImage = bgImage;
 
     int [] seekImageSizes = prefs.getIntList("seek-image.sizes");
-    int maxSize = 0;
-    for (int i = 0; i < seekImageSizes.length; i++)
+    int maxSize = 0, minSize = Integer.MAX_VALUE;
+    for (int i = 0; i < seekImageSizes.length; i++){
       if (seekImageSizes[i] > maxSize)
         maxSize = seekImageSizes[i];
+      if (seekImageSizes[i] < minSize)
+        minSize = seekImageSizes[i];
+    }
+    
+    minSeekImageSize = minSize;
 
     seekImageCache = new Hashtable[maxSize+1];
     for (int i = 0; i < seekImageSizes.length; i++)
@@ -309,7 +322,7 @@ public class SoughtGraph extends JComponent{
     seekMatrix[actualSlot.x][actualSlot.y] = seek;
 
     Rectangle seekBounds = getSeekBounds(actualSlot.x, actualSlot.y, null);
-    repaint(seekBounds.x, seekBounds.y, seekBounds.width, seekBounds.height);
+    repaint(seekBounds.x - 2, seekBounds.y - 2, seekBounds.width + 4, seekBounds.height + 4);
 
     if (curMouseLocation!=null)
       updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
@@ -330,7 +343,7 @@ public class SoughtGraph extends JComponent{
     seekMatrix[location.x][location.y] = null;
 
     Rectangle seekBounds = getSeekBounds(location.x, location.y, null);
-    repaint(seekBounds.x, seekBounds.y, seekBounds.width, seekBounds.height);
+    repaint(seekBounds.x - 2, seekBounds.y - 2, seekBounds.width + 4, seekBounds.height + 4);
 
     if ((seek == curSeek) && (curMouseLocation != null)) // The !=null check is just in case.
       updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
@@ -363,7 +376,7 @@ public class SoughtGraph extends JComponent{
    */
 
   protected Rectangle getSeekBounds(int x, int y, Rectangle rect){
-    if (rect==null)
+    if (rect == null)
       rect = new Rectangle();
 
     int width = getWidth();
@@ -557,7 +570,7 @@ public class SoughtGraph extends JComponent{
 
         seekBounds = getSeekBounds(i, j, seekBounds);
         if (seekBounds.intersects(clipRect)){
-          g.setClip(clipRect);
+//          g.setClip(clipRect);
           drawSeek(g, seek, seekBounds);
         }
       }
@@ -860,5 +873,19 @@ public class SoughtGraph extends JComponent{
       }
     }
   }
+  
+  
+  
+  /**
+   * Returns the minimum size of the sought graph.
+   */
+ 
+  public Dimension getMinimumSize(){
+    int width = (int)(minSeekImageSize * (BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS) / GRAPH_WIDTH_PERCENTAGE);
+    int height = (int)(minSeekImageSize * RATING_SLOTS / GRAPH_HEIGHT_PERCENTAGE);
+    return new Dimension(width, height);
+  }
+  
+  
 
 }
