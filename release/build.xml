@@ -36,7 +36,7 @@
 <project name="Jin Release" default="release">
 
 	<!-- Makes releases for windows, unix, os x and plain source code -->
-	<target name="release" depends="init, ask-cf-info, unix, windows, osx, src" description="Build all normal releases"/>
+	<target name="release" depends="init, unix, windows, osx, src" description="Build all normal releases"/>
 	
 
 	<target name="init">
@@ -45,7 +45,6 @@
 		<property name="build.compiler" value="jikes" />
 		<property name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
 		<property name="source.dir" value="${jin.dir}/src" />
-		<property name="cf.host" value="cf-shell.sourceforge.net" />
 
 		<!-- Ask for Jin version -->
 		<input message="Please specify the release version:" addproperty="release.version" />
@@ -203,11 +202,13 @@
 	
 
 	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
-	<target name="osx" depends="init, ask-cf-info" description="Builds a release for Mac OS X">
+	<target name="osx" depends="init" description="Builds a release for Mac OS X">
 		<echo message="Creating Mac OS X release" />
+
+		<property name="cf.host" value="cf-shell.sourceforge.net" />
+		<antcall target="ask-cf-info" />
 		
 		<property name="release.osx.dir" value="${release.dir}/osx" />
-    
 		<delete dir="${release.osx.dir}" />
 		<mkdir dir="${release.osx.dir}" />
 		
@@ -269,8 +270,24 @@
 		<delete dir="${app-dir}" />
 		<property name="osx-install" value="jin-${release.version}-osx.dmg" />
 	</target>
-  
+	
 
+	<!-- Helper target for the osx target.
+	     Asks for SourceForge Compile Farm username and private key passphrase, then tests them -->
+	<target name="ask-cf-info">
+		<input message="Please specify ${cf.host} username:" addproperty="cf.username" />
+		<input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
+		<echo message="Testing connection to Compile Farm, please wait" />
+		<sshexec host="${cf.host}"
+		         username="${cf.username}"
+		         keyfile="${user.home}/.ssh/id_dsa"
+		         passphrase="${cf.passphrase}"
+		         command="echo works"
+		/>
+	</target>
+	
+
+	
 	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
 	<target name="applet" depends="init" description="Builds an applet release (JinApplet)">
 		<echo message="Creating applet release" />
@@ -417,20 +434,6 @@
 		<delete dir="${src-archive-dir}" />
 	</target>
 
-	
-	<!-- Ask for SourceForge Compile Farm username and private key passphrase, then test them -->
-	<target name="ask-cf-info" unless="cf.username">
-		<input message="Please specify ${cf.host} username:" addproperty="cf.username" />
-		<input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
-		<echo message="Testing connection to Compile Farm, please wait" />
-		<sshexec host="${cf.host}"
-		         username="${cf.username}"
-		         keyfile="${user.home}/.ssh/id_dsa"
-		         passphrase="${cf.passphrase}"
-		         command="echo works"
-		/>
-	</target>
-	
 	
 	<!-- Builds a release compiled with Excelsior JET 3.7 -->
 	<target name="jet" depends="init" description="Builds a release compiled with Excelsior JET">
