@@ -665,8 +665,8 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     
   }
-
- 
+  
+  
   
   
   /**
@@ -680,10 +680,10 @@ public class MdiUiProvider extends AbstractUiProvider{
 
     
     /**
-     * The <code>JInternalFrame</code>.
+     * The actual internal frame.
      */
 
-    private final JInternalFrame frame;
+    private final MdiInternalFrame frame;
     
     
     
@@ -694,7 +694,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     public InternalFramePluginUIContainer(Plugin plugin, String id, int mode){
       super(plugin, id, mode);
       
-      this.frame = new FixedJInternalFrame("", true, true, true, true);
+      this.frame = new MdiInternalFrame();
       
       // See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
       // reason I do this instead of adding an InternalFrameListener like a sane person.
@@ -1004,6 +1004,40 @@ public class MdiUiProvider extends AbstractUiProvider{
     public void internalFrameIconified(InternalFrameEvent e){}
     
     
+    
+    private class MdiInternalFrame extends FixedJInternalFrame{
+      
+      
+      
+      /**
+       * Creates a new MdiInternalFrame.
+       */
+      
+      public MdiInternalFrame(){
+        super("", true, true, true, true);
+      }
+      
+
+      
+      
+      /**
+       * Returns the minimum size of the frame, based on the minimum size of its
+       * contents.
+       */
+      
+      public Dimension getMinimumSize(){
+        Insets insets = getInsets();
+        Dimension dim = ((JComponent)getContentPane()).getMinimumSize();
+        dim.width += insets.left + insets.right;
+        dim.height += insets.top + insets.bottom;
+        return dim;
+      }
+
+      
+      
+    }
+    
+    
   }
 
 
@@ -1091,12 +1125,16 @@ public class MdiUiProvider extends AbstractUiProvider{
 
       // Determine which border is being dragged by checking which sides are
       // not at their original locations.
-
       boolean left = (jifBounds.x != newX);
       boolean top = (jifBounds.y != newY);
       boolean right = (newX + newWidth != jifBounds.x + jifBounds.width);
       boolean bottom = (newY + newHeight != jifBounds.y + jifBounds.height);
-
+      
+      // Don't allow sizes smaller than the minimum size of the component
+      Dimension minSize = f.getMinimumSize();
+      newWidth = Math.max(newWidth, minSize.width);
+      newHeight = Math.max(newHeight, minSize.height);
+      
       int x1 = newX;
       int y1 = newY;
       int x2 = x1 + newWidth;
