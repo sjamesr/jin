@@ -23,8 +23,13 @@
   4. The scp and sshexec tasks are used for connecting to the SourceForge
      compile farm (for the OS X release), which in turn require the JSch library.
      See ant documentation for further details.
-  5. Building an applet release requires some tasks from the ant-contrib project
+  5. Building an applet or JET release requires some tasks from the ant-contrib project
      which you can get from http://sourceforge.net/projects/ant-contrib/.
+  6. Building a JET release requires Excelsior JET 3.7. They used to offer free,
+     non-expiring licenses for personal use, but seem to have discontinued that
+     offer. They do offer a time-limited free trial, however.
+     Note that JET does not support cross compiling, so this buildfile creates
+     a Linux release when run on Linux and a Windows release when run on Windows.
 
 -->
 
@@ -40,7 +45,6 @@
 		<property name="build.compiler" value="jikes" />
 		<property name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
 		<property name="source.dir" value="${jin.dir}/src" />
-		<property name="win.setup.maker" value="makensis.exe" />
 		<property name="cf.host" value="cf-shell.sourceforge.net" />
 
 		<!-- Ask for Jin version -->
@@ -126,7 +130,8 @@
 	-->
 	<target name="windows" depends="init" description="Builds a release for Windows">
 		<echo message="Creating windows release" />
-	
+
+		<input message="Specify the NSIS executable" addproperty="win.setup.maker" />
 		<property name="release.win.dir" value="${release.dir}/win" />
     
 		<delete dir="${release.win.dir}" />
@@ -427,16 +432,20 @@
 	</target>
 	
 	
-	<!-- Builds a release compiled with Excelsior JET 3.7 for Linux -->
-	<target name="jet-linux" depends="init" description="Builds a release compiled with Excelsior JET">
-		<echo message="Creating JET Linux release" />
-		
+	<!-- Builds a release compiled with Excelsior JET 3.7 -->
+	<target name="jet" depends="init" description="Builds a release compiled with Excelsior JET">
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
+		
+		<condition property="os" value="linux"><os name="linux" /></condition>
+		<condition property="os" value="windows"><os family="windows" /></condition>
+		<fail unless="os" message="Can only build JET releases on Linux or Windows" />
+		
+		<echo message="Creating JET ${os} release" />
 		
 		<input message="Please specify JET's directory:" addproperty="jet.home" />
 		<property name="release.jet.dir" value="${release.dir}/jet" />
 		<property name="jin.compilespec" value="jet/jin.prj" />
-		<property name="jin.releasespec" value="jet/jin-linux.jpn" />
+		<property name="jin.releasespec" value="jet/jin-${os}.jpn" />
 		
 		<delete dir="${release.jet.dir}" />
 		<mkdir dir="${release.dir}" />
@@ -453,12 +462,13 @@
 		<copy todir="${tmpdir}">
 			<fileset dir="${build.dir}" excludes="swingall.jar plugins/*/*.jar" />
 		</copy>
+		<property name="efsep" value="\${file.separator}" /> <!-- Escaped File Separator-->
 		<copy todir="${tmpdir}">
 			<fileset dir="${build.dir}" includes="plugins/*/*.jar" />
-			<mapper type="regexp" from="plugins/(.*)/(.*)\.jar" to="plugins/\1/\1_\2.jar" />
+			<mapper type="regexp" from="plugins${efsep}(.*)${efsep}(.*)\.jar" to="plugins${efsep}\1${efsep}\1_\2.jar" />
 		</copy>
 		
-		<exec executable="${jet.home}/bin/jc" dir="${tmpdir}">
+		<exec executable="${jet.home}/bin/jc" dir="${tmpdir}" failonerror="yes">
 			<arg line="=p ${basedir}/${jin.compilespec}" />
 			<env key="LD_LIBRARY_PATH" value="${jet.home}/lib/x86/shared" />
 		</exec>
@@ -466,34 +476,27 @@
 		<foreach target="package-definition" param="jar.name" inheritall="yes">
 			<fileset dir="${tmpdir}" includes="**/*.jar" excludes="resources/** lnfs/**" />
 		</foreach>
+
+		<property name="dir-to-inst" value="${release.jet.dir}/jin-${release.version}" />
+		<mkdir dir="${dir-to-inst}" />
 		
-		<property name="dir-to-tar" value="${release.jet.dir}/jin-${release.version}" />
-		<mkdir dir="${dir-to-tar}" />
-		
-		<exec executable="${jet.home}/bin/jpiib" dir="${tmpdir}">
-			<arg line="${basedir}/${jin.releasespec} -imagedir ${basedir}/${dir-to-tar}" />
+		<exec executable="${jet.home}/bin/jpiib" dir="${tmpdir}" failonerror="yes">
+			<arg line="${basedir}/${jin.releasespec} -imagedir ${basedir}/${dir-to-inst}" />
 			<env key="PATH" value="${jet.home}/bin" />
 			<env key="LD_LIBRARY_PATH" value="${jet.home}/lib/x86/shared" />
 		</exec>
 		<!-- jpiib rewrites the spec file, saving the old one as .bak -->
-		<delete file="${jin.releasespec}" />
 		<move file="${jin.releasespec}.bak" tofile="${jin.releasespec}" preservelastmodified="true" />
 		<delete dir="${tmpdir}" />
 		
-		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${release.version}-jet-linux.tar" />
-		<tar destfile="${jet-linux-tar}">
-			<tarfileset dir="${release.jet.dir}" excludes="*/jin" />
-			<tarfileset dir="${release.jet.dir}" includes="*/jin" mode="755"/>
-		</tar>
-		<gzip src="${jet-linux-tar}" zipfile="${jet-linux-tar}.gz" />
-		<delete file="${jet-linux-tar}" />
-
-		<delete dir="${dir-to-tar}" />
+		<antcall target="jet-package-${os}" />
+		
+		<delete dir="${dir-to-inst}" />
 	</target>
 	
 	
-	<!-- Removes all but the definition file from the specified jar file. If the jar file
-	     doesn't have a definition file, it is removed. -->
+	<!-- Helper target for "jet" target. Removes all but the definition file from the specified jar file.
+	     If the jar file doesn't have a definition file, it is removed. -->
 	<target name="package-definition">
 		<dirname file="${jar.name}" property="dir.name" />
 		<basename file="${jar.name}" property="file.name" />
@@ -508,5 +511,31 @@
 		<delete file="${dir.name}/definition" />
 	</target>
 
+
+	<!-- Helper target for "jet" target on Linux. Packages the installable directory into a tar.gz file. -->
+	<target name="jet-package-linux">
+		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${release.version}-jet-linux.tar" />
+		<tar destfile="${jet-linux-tar}">
+			<tarfileset dir="${release.jet.dir}" excludes="*/jin" />
+			<tarfileset dir="${release.jet.dir}" includes="*/jin" mode="755"/>
+		</tar>
+		<gzip src="${jet-linux-tar}" zipfile="${jet-linux-tar}.gz" />
+		<delete file="${jet-linux-tar}" />
+	</target>
 	
+	
+	<!-- Helper target for "jet" target" on Windows. Creates an installer. -->
+	<target name="jet-package-windows">
+		<input message="Specify the NSIS executable" addproperty="win.setup.maker" />
+		<property name="exe" value="${release.jet.dir}/jin-${release.version}-jet-windows.exe" />
+		<exec dir="." executable="${win.setup.maker}" failonerror="yes">
+			<arg value="/NOCD" /> <!-- Don't change into the .nsi file's directory -->
+			<arg value="/V2" /> <!-- Low verbosity --> 
+			<arg value="/Ddir=${dir-to-inst}${file.separator}" /> <!-- The directory whose contents to install -->
+			<arg value="/Dfile=${exe}" /> <!-- The installer file -->
+			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
+			<arg value="jet/installer.nsi" />
+		</exec>
+	</target>
+
 </project>
