@@ -15,6 +15,7 @@
 
 	<!-- Initializes stuff -->
 	<target name="init">
+		<tstamp />
 		<property name="build.dir" value="build" />
 		<property name="build.debug" value="yes" />
 		<property name="build.compress" value="no" />
@@ -31,8 +32,8 @@
 		<property name="lnfs.dir" value="${build.dir}/lnfs" />
 		
 		<property file="${source.dir}/free/jin/resources/app.props" prefix="jin" />
-		<property name="release.name" value="${jin.app.name}" />
-		<property name="release.version" value="${jin.app.version}" />
+		<property name="release.name" value="Jin" />
+		<property name="release.version" value="${DSTAMP}" />
 	</target>
 
 
