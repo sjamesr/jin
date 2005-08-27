@@ -36,13 +36,12 @@
 <project name="Jin Release" default="release">
 
 	<!-- Makes releases for windows, unix, os x and plain source code -->
-	<target name="release" depends="init, unix, windows, osx, src" description="Build all normal releases"/>
+	<target name="release" depends="osx, unix, windows, src" description="Build all normal releases"/>
 	
 
 	<target name="init">
 		<dirname property="jin.dir" file="." />
 		<property name="build.dir" value="${jin.dir}/build" />
-		<property name="build.compiler" value="jikes" />
 		<property name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
 		<property name="source.dir" value="${jin.dir}/src" />
 
@@ -55,15 +54,11 @@
 	</target>
 
 
-	<!-- Builds for a specific platform -->
-	<target name="build">
+	<!-- Rebuilds for a specific platform -->
+	<target name="rebuild">
+		<echo message="Rebuilding Jin for ${release.platform}" />
 		<ant target="clean" dir="${jin.dir}" />
-		<echo message="Building Jin for ${release.platform}" />
-		<ant target="build" dir="${jin.dir}">
-			<property name="release.platform" value="${release.platform}" />
-			<property name="release.name" value="${release.name}" />
-			<property name="release.version" value="${release.version}" />
-		</ant>
+		<ant target="build" dir="${jin.dir}" />
 	</target>
 	
 
@@ -78,8 +73,7 @@
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.unix.dir}" />
 		
-		<antcall target="build">
-			<param name="release.name" value="Jin" />
+		<antcall target="rebuild">
 			<param name="release.platform" value="unix" />
 		</antcall>
 		
@@ -136,9 +130,9 @@
 		<delete dir="${release.win.dir}" />
 		<mkdir dir="${release.win.dir}" />
     
-		<antcall target="build">
-			<param name="release.name" value="Jin" />
+		<antcall target="rebuild">
 			<param name="release.platform" value="windows" />
+			<param name="build.compiler" value="jikes" />
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
@@ -202,18 +196,14 @@
 	
 
 	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
-	<target name="osx" depends="init" description="Builds a release for Mac OS X">
+	<target name="osx" depends="init, ask-cf-info" description="Builds a release for Mac OS X">
 		<echo message="Creating Mac OS X release" />
 
-		<property name="cf.host" value="cf-shell.sourceforge.net" />
-		<antcall target="ask-cf-info" />
-		
 		<property name="release.osx.dir" value="${release.dir}/osx" />
 		<delete dir="${release.osx.dir}" />
 		<mkdir dir="${release.osx.dir}" />
 		
-		<antcall target="build">
-			<param name="release.name" value="Jin" />
+		<antcall target="rebuild">
 			<param name="release.platform" value="macosx" />
 		</antcall>
 		<property name="app-dir.name" value="Jin.app" />
@@ -236,10 +226,11 @@
 			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/**" />
 		</copy>
 		<zip destfile="${release.osx.dir}/bundle.zip" basedir="${release.osx.dir}" />
+		<echo message="${cf.passphrase}" />
 		<scp keyfile="${user.home}/.ssh/id_dsa"
 		     passphrase="${cf.passphrase}"
 		     file="${release.osx.dir}/bundle.zip" 
-		     todir="${cf.username}@cf-shell.sourceforge.net:~"				 
+		     todir="${cf.username}@${cf.host}:~"				 
 		/>
 		<sshexec host="${cf.host}"
 		         username="${cf.username}"
@@ -254,7 +245,7 @@
 		/>
 		<scp keyfile="${user.home}/.ssh/id_dsa"
 		     passphrase="${cf.passphrase}"
-		     file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}-osx-no-extras.dmg" 
+		     file="${cf.username}@${cf.host}:~/jin-${release.version}-osx-no-extras.dmg" 
 		     todir="${release.osx.dir}"					
 		/>
 		<sshexec host="${cf.host}"
@@ -275,6 +266,7 @@
 	<!-- Helper target for the osx target.
 	     Asks for SourceForge Compile Farm username and private key passphrase, then tests them -->
 	<target name="ask-cf-info">
+		<property name="cf.host" value="cf-shell.sourceforge.net" />		
 		<input message="Please specify ${cf.host} username:" addproperty="cf.username" />
 		<input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
 		<echo message="Testing connection to Compile Farm, please wait" />
@@ -301,7 +293,7 @@
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.applet.dir}" />
 
-		<antcall target="build">
+		<antcall target="rebuild">
 			<param name="release.name" value="Jin Applet" />
 			<param name="release.platform" value="applet" />
 			<param name="build.compress" value="yes" />
@@ -454,10 +446,8 @@
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.jet.dir}" />
 		
-		<antcall target="build">
-			<param name="release.name" value="Jin" />
+		<antcall target="rebuild">
 			<param name="release.platform" value="jet-linux" />
-			<param name="build.compiler" value="modern" />
 		</antcall>
 		
 		<property name="tmpdir" value="${basedir}/jet/tmp" />
