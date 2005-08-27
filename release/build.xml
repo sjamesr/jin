@@ -482,6 +482,10 @@
 		<move file="${jin.releasespec}.bak" tofile="${jin.releasespec}" preservelastmodified="true" />
 		<delete dir="${tmpdir}" />
 		
+		<copy todir="${dir-to-inst}">
+			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+		</copy>
+		
 		<antcall target="jet-package-${os}" />
 		
 		<delete dir="${dir-to-inst}" />
