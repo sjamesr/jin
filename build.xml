@@ -17,6 +17,7 @@
 	<target name="init">
 		<tstamp />
 		<property name="build.dir" value="build" />
+		<property name="build.compiler" value="modern" />
 		<property name="build.debug" value="yes" />
 		<property name="build.compress" value="no" />
 		<property name="build.manifest" value="manifest.txt" />
