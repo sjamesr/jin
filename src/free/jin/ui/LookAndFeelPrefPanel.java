@@ -43,6 +43,14 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
   
   
   /**
+   * Have we installed the extra look and feels already?
+   */
+  
+  private static boolean extraLnFsInstalled = false;
+  
+  
+  
+  /**
    * The list of available Look and Feels. This actually holds instances of
    * <code>LnF</code>.
    */
@@ -56,6 +64,8 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
    */
   
   public LookAndFeelPrefPanel(){
+    installExtraLookAndFeels();
+    
     UIManager.LookAndFeelInfo [] installedLnfs = UIManager.getInstalledLookAndFeels(); 
     LnF [] lnfs = new LnF[installedLnfs.length];
     for (int i = 0; i < lnfs.length; i++){
@@ -97,6 +107,36 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     
     createUI();
   }
+  
+  
+
+  
+  /**
+   * Installs any extra look and feels Jin is using.
+   */
+  
+  private static synchronized void installExtraLookAndFeels(){
+    if (extraLnFsInstalled)
+      return;
+    extraLnFsInstalled = true;
+    
+    int extraLooksCount = Integer.parseInt(Jin.getInstance().getAppProperty("lf.extra.count", "0"));
+    for (int i = 0; i < extraLooksCount; i++){
+      String name = Jin.getInstance().getAppProperty("lf.extra." + i + ".name", null);
+      String className = Jin.getInstance().getAppProperty("lf.extra." + i + ".class", null);
+      String minRequiredJavaVer = Jin.getInstance().getAppProperty("lf.extra." + i + ".minRequiredJava", "0");
+      if (PlatformUtils.isJavaBetterThan(minRequiredJavaVer)){
+        try{
+          Class.forName(className);
+          UIManager.installLookAndFeel(name, className);
+        } catch (ClassNotFoundException e){
+            // We used to print a message here, but too many people panic and
+            // think something is terribly wrong.
+          } 
+      }
+    }
+  }
+
   
   
   

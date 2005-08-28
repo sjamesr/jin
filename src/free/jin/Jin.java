@@ -119,9 +119,6 @@ public class Jin{
     for (int i = 0; i < usersArr.length; i++)
       users.addElement(usersArr[i]);
       
-    // Install any extra look and feels we're using
-    installExtraLookAndFeels();
-
     // Restore the look and feel
     restoreLookAndFeel();
     
@@ -172,31 +169,6 @@ public class Jin{
   }
   
   
-  
-  
-  /**
-   * Installs any extra look and feels Jin is using.
-   */
-
-  private void installExtraLookAndFeels(){
-    int extraLooksCount = Integer.parseInt(appProps.getProperty("lf.extra.count", "0"));
-    for (int i = 0; i < extraLooksCount; i++){
-      String name = appProps.getProperty("lf.extra." + i + ".name");
-      String className = appProps.getProperty("lf.extra." + i + ".class");
-      String minRequiredJavaVer = appProps.getProperty("lf.extra." + i + ".minRequiredJava", "0");
-      if (PlatformUtils.isJavaBetterThan(minRequiredJavaVer)){
-        try{
-          Class.forName(className);
-          UIManager.installLookAndFeel(name, className);
-        } catch (ClassNotFoundException e){
-            // We used to print a message here, but too many people panic and
-            // think something is terribly wrong.
-          } 
-      }
-    }
-  }
-
-
 
   /**
    * Sets the current look and feel to the one specified in user preferences.
@@ -282,6 +254,17 @@ public class Jin{
 
   public String getAppVersion(){
     return appProps.getProperty("app.version");
+  }
+  
+  
+  
+  /**
+   * Returns the value of the specified application property, or
+   * the specified default value if none exists.
+   */
+  
+  public String getAppProperty(String propName, String defaultValue){
+    return appProps.getProperty(propName, defaultValue);
   }
   
   
