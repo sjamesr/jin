@@ -21,15 +21,32 @@
 
 package free.jin;
 
-import java.io.*;
-import free.util.*;
-import java.util.NoSuchElementException;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+
+import free.util.BeanProperties;
+import free.util.EventListenerList;
+import free.util.FilteringEnumeration;
+import free.util.FormatException;
+import free.util.IOUtilities;
+import free.util.MappingEnumeration;
+import free.util.RectDouble;
+import free.util.StringEncoder;
+import free.util.StringParser;
 
 
 /**
@@ -525,7 +542,7 @@ public abstract class Preferences{
    *       <li> <code>integer</code> - An integer in standard notation, fitting
    *            into a 32-bit signed int.
    *       <li> <code>double</code> - A fractional number, in standard notation.
-   *       <li> <code>string</code> - Any string.
+   *       <li> <code>string</code> - A string, with escaped \n, \t, \r and \\.
    *       <li> <code>intlist</code> - A list of integers in standard notation,
    *            separated by spaces (each must fit into a 32-bit signed int).
    *       <li> <code>color</code> - An integer in hexadecimal notation in the
@@ -538,29 +555,52 @@ public abstract class Preferences{
    *            <code>x;y;width;height</code> where the values are specified as
    *            fractions and usually mean a part of some bigger rectangle.
    *     </ul>
+   *     The preference type, along with the ';' character may be omitted, in
+   *     which case, the preference is assumed to be a string, and it is not
+   *     unescaped.  
    * </ul>
+   * Note: This method does what it does in a somewhat unusual manner for
+   *       performance reasons, with the main goal being to avoid allocating
+   *       too many <code>String</code> objects.  
    */
 
   public static Preferences load(InputStream in) throws IOException{
     BeanPreferences prefs = new BeanPreferences();
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
+    String text = IOUtilities.loadText(in); 
+    StringTokenizer tokenizer = new StringTokenizer(text, "\n");
+    
     // parse and map the preferences
-    String line;    
-    while ((line = reader.readLine()) != null){
+    while (tokenizer.hasMoreTokens()){
+      String line = tokenizer.nextToken();
+      
       if (line.startsWith("#")) // Comment line
         continue;
+      
+      int lineLength = line.length();
 
-      if (line.trim().length() == 0) // Empty line
+      boolean isLineEmpty = true;
+      for (int i = 0; i < lineLength; i++)
+        if (line.charAt(i) > ' '){
+          isLineEmpty = false;
+        }
+      if (isLineEmpty)
         continue;
 
       int eqIndex = line.indexOf("=");
       if (eqIndex == -1)
         throw new FormatException("No \'=\' found on line: " + line);
+      
+      int nameEndIndex = eqIndex - 1;
+      while ((nameEndIndex >= 0) && (line.charAt(nameEndIndex) <= ' '))
+        nameEndIndex--;
+      
+      int valStartIndex = eqIndex + 1;
+      while ((nameEndIndex < lineLength) && (line.charAt(valStartIndex) <= ' '))
+        valStartIndex++;
 
-      String prefName = line.substring(0, eqIndex).trim();
-      String prefValue = line.substring(eqIndex + 1).trim();
+      String prefName = line.substring(0, nameEndIndex + 1).trim();
+      String prefValue = line.substring(valStartIndex).trim();
       prefs.set(prefName, parsePreference(prefValue));
     }
 
@@ -601,37 +641,34 @@ public abstract class Preferences{
   /**
    * Parses the specified property value and returns a corresponding preference
    * object.
+   * 
+   * Note: This method does what it does in a somewhat unusual manner for
+   *       performance reasons, with the main goal being to avoid allocating
+   *       too many <code>String</code> objects.  
    *
    * @see #encodePreference(Object)
    * @see #loadPreferences(InputStream, Preferences)
    */
 
-  private static Object parsePreference(String propValue){
-    int indexOfSeparator = propValue.indexOf(";");
-    if (indexOfSeparator == -1)
-      throw new FormatException("No ';' found in " + propValue);
-
-    String prefType = propValue.substring(0, indexOfSeparator);
-    String prefValue = propValue.substring(indexOfSeparator + 1);
-
-    if ("boolean".equals(prefType))
-      return Boolean.valueOf(prefValue);
-    else if ("integer".equals(prefType))
-      return new Integer(prefValue);
-    else if ("double".equals(prefType))
-      return new Double(prefValue);
-    else if ("string".equals(prefType))
-      return StringParser.parseString(prefValue);
-    else if ("intlist".equals(prefType))
-      return StringParser.parseIntList(prefValue);
-    else if ("color".equals(prefType))
-      return StringParser.parseColor(prefValue);
-    else if ("rect.int".equals(prefType))
-      return StringParser.parseRectangle(prefValue);
-    else if ("rect.double".equals(prefType))
-      return StringParser.parseRectDouble(prefValue);
+  private static Object parsePreference(String s){
+    if (s.startsWith("boolean;"))
+      return Boolean.valueOf(s.substring("boolean;".length()));
+    else if (s.startsWith("integer;"))
+      return new Integer(s.substring("integer;".length()));
+    else if (s.startsWith("double;"))
+      return new Double(s.substring("double;".length()));
+    else if (s.startsWith("string;"))
+      return StringParser.parseString(s.substring("string;".length()));
+    else if (s.startsWith("intlist;"))
+      return StringParser.parseIntList(s.substring("intlist;".length()));
+    else if (s.startsWith("color;"))
+      return StringParser.parseColor(s.substring("color;".length()));
+    else if (s.startsWith("rect.int;"))
+      return StringParser.parseRectangle(s.substring("rect.int;".length()));
+    else if (s.startsWith("rect.double;"))
+      return StringParser.parseRectDouble(s.substring("rect.double;".length()));
     else
-      throw new IllegalArgumentException("Unrecognized preference type: " + prefType);
+      return s;
   }
 
 
