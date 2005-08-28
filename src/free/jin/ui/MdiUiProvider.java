@@ -1027,7 +1027,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       
       public Dimension getMinimumSize(){
         Insets insets = getInsets();
-        Dimension dim = ((JComponent)getContentPane()).getMinimumSize();
+        Dimension dim = ((JComponent)this.getContentPane()).getMinimumSize();
         dim.width += insets.left + insets.right;
         dim.height += insets.top + insets.bottom;
         return dim;
