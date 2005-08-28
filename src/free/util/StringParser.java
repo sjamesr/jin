@@ -156,10 +156,12 @@ public class StringParser{
    */
 
   public static String parseString(String s){
-    StringBuffer buf = new StringBuffer();
+    StringBuffer buf = null;
     for (int i = 0; i < s.length(); i++){
       char c = s.charAt(i);
       if (c == '\\'){
+        if (buf == null)
+          buf = new StringBuffer(s.substring(0, i)); // Initialize lazily.
         c = s.charAt(++i);
         switch (c){
           case 'n': buf.append('\n'); break;
@@ -171,11 +173,11 @@ public class StringParser{
             buf.append(c);
         }
       }
-      else
+      else if (buf != null)
         buf.append(c);
     }
 
-    return buf.toString();
+    return buf == null ? s : buf.toString();
   }
 
 }
