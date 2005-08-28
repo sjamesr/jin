@@ -30,7 +30,6 @@ import javax.swing.event.ChangeListener;
 import java.util.Vector;
 import free.util.PaintHook;
 import free.util.Utilities;
-import free.util.GraphicsUtilities;
 import free.chess.event.MoveProgressListener;
 import free.chess.event.MoveProgressEvent;
 
@@ -1231,11 +1230,9 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    int textWidth = squareWidth/4;
-    int textHeight = squareHeight/4;
+    Rectangle clipRect = g.getClipBounds();
     
-    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 8);
+    int fontSize = Math.max(Math.min(squareWidth, squareHeight)/4, 8);
     Font font = new Font(COORDS_FONT.getName(), Font.BOLD, fontSize);
     g.setFont(font);
     
@@ -1244,21 +1241,26 @@ public class JBoard extends JComponent{
     int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
 
     int dir = isFlipped() ? 1 : -1;
-    
+
     // Row coordinates
-    char row = isFlipped() ? '1' : '8';
-    for (int i = 0; i < 8; i++){
-      g.drawString(String.valueOf(row),
-        boardRect.x + 3, boardRect.y + i*squareHeight + fontHeight);
-      row += dir;
+    if (clipRect.intersects(new Rectangle(boardRect.x, boardRect.y, squareWidth/2, boardRect.height))){
+      char row = isFlipped() ? '1' : '8';
+      for (int i = 0; i < 8; i++){
+        g.drawString(String.valueOf(row),
+          boardRect.x + 3, boardRect.y + i*squareHeight + fontHeight);
+        row += dir;
+      }
     }
-    
+
     // Column coordinates
-    char col = isFlipped() ? 'h' : 'a';
-    for (int i = 0; i < 8; i++){
-      g.drawString(String.valueOf(col),
-        boardRect.x + (i+1)*squareWidth - fontWidth - 3, boardRect.y + boardRect.height - 3);
-      col -= dir;
+    if (clipRect.intersects(new Rectangle(boardRect.x, boardRect.y + boardRect.height - squareHeight/2,
+                                          boardRect.width, squareHeight/2))){
+      char col = isFlipped() ? 'h' : 'a';
+      for (int i = 0; i < 8; i++){
+        g.drawString(String.valueOf(col),
+          boardRect.x + (i+1)*squareWidth - fontWidth - 3, boardRect.y + boardRect.height - 3);
+        col -= dir;
+      }
     }
   }
   
@@ -1274,12 +1276,13 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    // If you modify this, you need to modify getBoardRect too
+    Rectangle clipRect = g.getClipBounds();
+    
+    // IMPORTANT: If you modify this, you need to modify getBoardRect too
     int textWidth = squareWidth/3;
     int textHeight = squareHeight/3;
     
-    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 8);
+    int fontSize = Math.max(Math.min(textWidth, textHeight), 8);
     Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
     g.setFont(font);
     
@@ -1289,22 +1292,26 @@ public class JBoard extends JComponent{
     int dir = isFlipped() ? 1 : -1;
     
     // Row coordinates
-    char row = isFlipped() ? '1' : '8';
-    for (int i = 0; i < 8; i++){
-      g.drawString(String.valueOf(row),
-        insets.left + (boardRect.x - insets.left - fontWidth + 1)/2,
-        boardRect.y + i*squareHeight + (squareHeight + fm.getAscent())/2 - 1);
-      row += dir;
+    if (clipRect.intersects(new Rectangle(insets.left, insets.top, boardRect.x - insets.left, boardRect.height))){
+      char row = isFlipped() ? '1' : '8';
+      for (int i = 0; i < 8; i++){
+        g.drawString(String.valueOf(row),
+          insets.left + (boardRect.x - insets.left - fontWidth + 1)/2,
+          boardRect.y + i*squareHeight + (squareHeight + fm.getAscent())/2 - 1);
+        row += dir;
+      }
     }
     
     // Column coordinates
-    int bottomBorderHeight = getHeight() - boardRect.y - boardRect.height - insets.bottom; 
-    char col = isFlipped() ? 'h' : 'a';
-    for (int i = 0; i < 8; i++){
-      g.drawString(String.valueOf(col),
-        boardRect.x + i*squareWidth + (squareWidth - fontWidth)/2,
-        boardRect.y + boardRect.height + (bottomBorderHeight + fm.getAscent())/2 - 1); 
-      col -= dir;
+    int bottomBorderHeight = getHeight() - boardRect.y - boardRect.height - insets.bottom;
+    if (clipRect.intersects(new Rectangle(boardRect.x, boardRect.y + boardRect.height, boardRect.width, bottomBorderHeight))){
+      char col = isFlipped() ? 'h' : 'a';
+      for (int i = 0; i < 8; i++){
+        g.drawString(String.valueOf(col),
+          boardRect.x + i*squareWidth + (squareWidth - fontWidth)/2,
+          boardRect.y + boardRect.height + (bottomBorderHeight + fm.getAscent())/2 - 1); 
+        col -= dir;
+      }
     }
   }
   
@@ -1319,27 +1326,29 @@ public class JBoard extends JComponent{
     int squareWidth = boardRect.width/8;
     int squareHeight = boardRect.height/8;
     
-    int textWidth = squareWidth/5;
-    int textHeight = squareHeight/5;
+    Rectangle clipRect = g.getClipBounds();
     
-    int fontSize = Math.max(GraphicsUtilities.getMaxFittingFontSize(g, COORDS_FONT, "a",
-        new Dimension(textWidth, textHeight)), 8);
+    int fontSize = Math.max(Math.min(squareWidth, squareHeight)/5, 8);
+    
     Font font = new Font(COORDS_FONT.getName(), COORDS_FONT.getStyle(), fontSize);
     g.setFont(font);
     
     FontMetrics fm = g.getFontMetrics(font);
     int fontHeight = fm.getMaxAscent() + fm.getMaxDescent();
+    
+    Rectangle rect = new Rectangle(boardRect.x, boardRect.y, squareWidth, squareHeight);
 
     int dir = isFlipped() ? 1 : -1;
     char row = isFlipped() ? '1' : '8';    
     for (int i = 0; i < 8; i++){
       char col = isFlipped() ? 'h' : 'a';      
       for (int j = 0; j < 8; j++){
-        g.drawString(String.valueOf(col) + String.valueOf(row),
-          boardRect.x + j*squareWidth + 3, boardRect.y + i*squareHeight + fontHeight);
+        rect.x = boardRect.x + j*squareWidth;
+        rect.y = boardRect.y + i*squareHeight;
         
-        // g.drawString(String.valueOf(col) + String.valueOf(row),
-        //   boardRect.x + j*squareWidth + dx, boardRect.y + i*squareHeight + dy);
+        if (clipRect.intersects(rect))
+          g.drawString(String.valueOf(col) + String.valueOf(row), rect.x + 3, rect.y + fontHeight);
+        
         col -= dir;
       }
       row += dir;
@@ -1689,9 +1698,9 @@ public class JBoard extends JComponent{
     }
     throw new IllegalStateException();
   }
-
-
-
+  
+  
+  
   /**
    * Processes a mouse event.
    */
@@ -1751,7 +1760,7 @@ public class JBoard extends JComponent{
         repaint(helpRect = squareToRect(square, helpRect));
         if (isPieceFollowsCursor())
           repaint(helpRect = getMovedPieceGraphicRect(helpRect));
-        
+       
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_STARTED));
       }
       else{
