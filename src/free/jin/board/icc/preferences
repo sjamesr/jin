@@ -1,6 +1,6 @@
 
-piece-set-id = string;blitzin
-board-pattern-id = string;wooden-light
+piece-set-id = blitzin
+board-pattern-id = wooden-light
 
 white-piece-color=color;ffffff
 black-piece-color=color;000000
@@ -15,11 +15,11 @@ move-highlight.highlight-own=boolean;false
 drag-square-highlighting.color=color;0000ff
 
 coords-display.color=color;b2
-coords-display.style=string;none
+coords-display.style=none
 
 auto-promote=boolean;false
-move-highlight.style=string;square
-dragged-piece-style=string;normal
-move-sending-mode=string;predrag
+move-highlight.style=square
+dragged-piece-style=normal
+move-sending-mode=predrag
 
-move-input-style=string;drag'n'drop
+move-input-style=drag'n'drop

@@ -1,87 +1,87 @@
-tell-last-teller-keystroke = string;F9
-tell-next-teller-keystroke = string;shift F9
+tell-last-teller-keystroke = F9
+tell-next-teller-keystroke = shift F9
 
 # Output properties
 #output-selection = color;000080
 #output-selected = color;ffffff
 
 output-popup.num-commands = integer;16
-output-popup.command-0 = string;finger !@
-output-popup.command-0-name = string;finger
-output-popup.command-1 = string;vars !@
-output-popup.command-1-name = string;vars
-output-popup.command-2 = string;ping !@
-output-popup.command-2-name = string;ping
-output-popup.command-3 = string;match !@
-output-popup.command-3-name = string;match
-output-popup.command-4 = string;assess !@
-output-popup.command-4-name = string;assess
-output-popup.command-5 = string;separator
-output-popup.command-6 = string;observe !@
-output-popup.command-6-name = string;observe
-output-popup.command-7 = string;follow !@
-output-popup.command-7-name = string;follow
-output-popup.command-8 = string;separator
-output-popup.command-9 = string;history !@
-output-popup.command-9-name = string;history
-output-popup.command-10 = string;stored !@
-output-popup.command-10-name = string;stored
-output-popup.command-11 = string;journal !@
-output-popup.command-11-name = string;journal
-output-popup.command-12 = string;separator
-output-popup.command-13 = string;$copy
-output-popup.command-13-name = string;Copy
-output-popup.command-14 = string;$expurgate
-output-popup.command-14-name = string;Expurgate
-output-popup.command-15 = string;$execute
-output-popup.command-15-name = string;Execute
+output-popup.command-0 = finger !@
+output-popup.command-0-name = finger
+output-popup.command-1 = vars !@
+output-popup.command-1-name = vars
+output-popup.command-2 = ping !@
+output-popup.command-2-name = ping
+output-popup.command-3 = match !@
+output-popup.command-3-name = match
+output-popup.command-4 = assess !@
+output-popup.command-4-name = assess
+output-popup.command-5 = separator
+output-popup.command-6 = observe !@
+output-popup.command-6-name = observe
+output-popup.command-7 = follow !@
+output-popup.command-7-name = follow
+output-popup.command-8 = separator
+output-popup.command-9 = history !@
+output-popup.command-9-name = history
+output-popup.command-10 = stored !@
+output-popup.command-10-name = stored
+output-popup.command-11 = journal !@
+output-popup.command-11-name = journal
+output-popup.command-12 = separator
+output-popup.command-13 = $copy
+output-popup.command-13-name = Copy
+output-popup.command-14 = $expurgate
+output-popup.command-14-name = Expurgate
+output-popup.command-15 = $execute
+output-popup.command-15-name = Execute
 
 
 output-link.num-patterns = integer;9
 
 #Matches "finger <playername>"
-output-link.pattern-0 = string;(["'])([Ff][Ii][Nn][Gg][Ee][Rr] +[A-z]{3,17})\\1
-output-link.command-0 = string;$2
+output-link.pattern-0 = (["'])([Ff][Ii][Nn][Gg][Ee][Rr] +[A-z]{3,17})\1
+output-link.command-0 = $2
 output-link.index-0 = integer;2
 
 #Matches "help <topic>"
-output-link.pattern-1 = string;(["'])([Hh][Ee][Ll][Pp] +[-_0-9A-z\.]{1,})\\1
-output-link.command-1 = string;$2
+output-link.pattern-1 = (["'])([Hh][Ee][Ll][Pp] +[-_0-9A-z\.]{1,})\1
+output-link.command-1 = $2
 output-link.index-1 = integer;2
 
 #Matches "ping <playername>"
-output-link.pattern-2 = string;(["'])([Pp][Ii][Nn][Gg] +[A-z]{3,17})\\1
-output-link.command-2 = string;$2
+output-link.pattern-2 = (["'])([Pp][Ii][Nn][Gg] +[A-z]{3,17})\1
+output-link.command-2 = $2
 output-link.index-2 = integer;2
 
 #Matches "match <playername>"
-output-link.pattern-3 = string;(["'])([Mm][Aa][Tt][Cc][Hh] +[A-z]{3,17})\\1
-output-link.command-3 = string;$2
+output-link.pattern-3 = (["'])([Mm][Aa][Tt][Cc][Hh] +[A-z]{3,17})\1
+output-link.command-3 = $2
 output-link.index-3 = integer;2
 
 #Matches "follow <playername>"
-output-link.pattern-4 = string;(["'])([Ff][Oo][Ll][Ll][Oo][Ww] +[A-z]{3,17})\\1
-output-link.command-4 = string;$2
+output-link.pattern-4 = (["'])([Ff][Oo][Ll][Ll][Oo][Ww] +[A-z]{3,17})\1
+output-link.command-4 = $2
 output-link.index-4 = integer;2
 
 #Matches "observe <playername or gamenumber>"
-output-link.pattern-5 = string;(["'])([Oo][Bb]([Ss][Ee][Rr][Vv][Ee])? [0-9A-z]{1,15})\\1
-output-link.command-5 = string;$2
+output-link.pattern-5 = (["'])([Oo][Bb]([Ss][Ee][Rr][Vv][Ee])? [0-9A-z]{1,15})\1
+output-link.command-5 = $2
 output-link.index-5 = integer;2
 
 #Matches "news <number>"
-output-link.pattern-6 = string;(["'])([Nn][Ee][Ww][Ss] +[0-9]+)\\1
-output-link.command-6 = string;$2
+output-link.pattern-6 = (["'])([Nn][Ee][Ww][Ss] +[0-9]+)\1
+output-link.command-6 = $2
 output-link.index-6 = integer;2
 
 #Matches the "Type [next] to see next page." sent by the server when the text is longer than height
-output-link.pattern-7 = string;^Type \\[(next)\\] to see next page\\.
-output-link.command-7 = string;$1
+output-link.pattern-7 = ^Type \[(next)\] to see next page\.
+output-link.command-7 = $1
 output-link.index-7 = integer;1
 
 #Matches "examine <playername, optional> <history or library number>"
-output-link.pattern-8 = string;(["'])([Ee][Xx][Aa][Mm][Ii][Nn][Ee] +[0-9A-z]{1,15} +((%?[0-9]+)|[A-z]))\\1
-output-link.command-8 = string;$2
+output-link.pattern-8 = (["'])([Ee][Xx][Aa][Mm][Ii][Nn][Ee] +[0-9A-z]{1,15} +((%?[0-9]+)|[A-z]))\1
+output-link.command-8 = $2
 output-link.index-8 = integer;2
 
 
@@ -89,7 +89,7 @@ output-link.index-8 = integer;2
 font-underlined.link = boolean;true
 foreground.link = color;5080ff
                      
-font-family = string;Monospaced
+font-family = Monospaced
 font-size = integer;14
 font-bold = boolean;false
 font-italic = boolean;false
@@ -144,56 +144,56 @@ input-foreground = color;000000
 preferences.show = boolean;true
 preferences.categories.count = integer;17
 
-preferences.categories.0.name = string;Default channel settings
+preferences.categories.0.name = Default channel settings
 preferences.categories.0.ids = string;channel-tell;channel-atell
 
 preferences.categories.1.custom = boolean;true
-preferences.categories.1.id = string;channels-panel
+preferences.categories.1.id = channels-panel
 preferences.categories.channels-panel.ids = string;channel-tell;channel-atell
 preferences.categories.channels-panel.channels-count = integer;256
-preferences.categories.channels-panel.name = string;Channels
+preferences.categories.channels-panel.name = Channels
 
-preferences.categories.2.name = string;Personal tells
-preferences.categories.2.ids = string;tell
+preferences.categories.2.name = Personal tells
+preferences.categories.2.ids = tell
 
-preferences.categories.3.name = string;Opponent tells
-preferences.categories.3.ids = string;say
+preferences.categories.3.name = Opponent tells
+preferences.categories.3.ids = say
 
-preferences.categories.4.name = string;Bughouse partner tells
-preferences.categories.4.ids = string;ptell
+preferences.categories.4.name = Bughouse partner tells
+preferences.categories.4.ids = ptell
 
-preferences.categories.5.name = string;QTells (Bot tells)
-preferences.categories.5.ids = string;qtell
+preferences.categories.5.name = QTells (Bot tells)
+preferences.categories.5.ids = qtell
 
-preferences.categories.6.name = string;Tourney Tells
-preferences.categories.6.ids = string;qtell.tourney
+preferences.categories.6.name = Tourney Tells
+preferences.categories.6.ids = qtell.tourney
 
-preferences.categories.7.name = string;TShouts (Bot shouts)
-preferences.categories.7.ids = string;tshout
+preferences.categories.7.name = TShouts (Bot shouts)
+preferences.categories.7.ids = tshout
 
-preferences.categories.8.name = string;Shouts
+preferences.categories.8.name = Shouts
 preferences.categories.8.ids = string;shout;ishout
 
-preferences.categories.9.name = string;C-Shouts
-preferences.categories.9.ids = string;cshout
+preferences.categories.9.name = C-Shouts
+preferences.categories.9.ids = cshout
 
-preferences.categories.10.name = string;Announcements
-preferences.categories.10.ids = string;announcement
+preferences.categories.10.name = Announcements
+preferences.categories.10.ids = announcement
 
-preferences.categories.11.name = string;Kibitzes
-preferences.categories.11.ids = string;kibitz
+preferences.categories.11.name = Kibitzes
+preferences.categories.11.ids = kibitz
 
-preferences.categories.12.name = string;Whispers
-preferences.categories.12.ids = string;whisper
+preferences.categories.12.name = Whispers
+preferences.categories.12.ids = whisper
 
-preferences.categories.13.name = string;Links
-preferences.categories.13.ids = string;link
+preferences.categories.13.name = Links
+preferences.categories.13.ids = link
 
-preferences.categories.14.name = string;User commands
-preferences.categories.14.ids = string;user
+preferences.categories.14.name = User commands
+preferences.categories.14.ids = user
 
-preferences.categories.15.name = string;System information
-preferences.categories.15.ids = string;info
+preferences.categories.15.name = System information
+preferences.categories.15.ids = info
 
-preferences.categories.16.name = string;Special information
-preferences.categories.16.ids = string;special
+preferences.categories.16.name = Special information
+preferences.categories.16.ids = special

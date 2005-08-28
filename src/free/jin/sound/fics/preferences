@@ -6,11 +6,11 @@ on=boolean;true
 
 num-chat-patterns = integer;2
 
-chat-pattern-0 = string;^tell\\..*
-chat-sound-0 = string;whistle.au
+chat-pattern-0 = ^tell\..*
+chat-sound-0 = whistle.au
 
-chat-pattern-1 = string;^say\\..*
-chat-sound-1 = string;whistle.au
+chat-pattern-1 = ^say\..*
+chat-sound-1 = whistle.au
 
 
 # Text patterns on which sounds are generated. The match is done against the
@@ -18,30 +18,30 @@ chat-sound-1 = string;whistle.au
 
 num-text-patterns = integer;3
 
-text-pattern-0 = string;^Notification: [A-z]{3,17} has arrived\\.$
-text-sound-0 = string;ding.au
+text-pattern-0 = ^Notification: [A-z]{3,17} has arrived\.$
+text-sound-0 = ding.au
 
-text-pattern-1 = string;^Notification: [A-z]{3,17} has departed\\.$
-text-sound-1 = string;cork.au
+text-pattern-1 = ^Notification: [A-z]{3,17} has departed\.$
+text-sound-1 = cork.au
 
-text-pattern-2 = string;^Notification: [A-z]{3,17}, who has an adjourned game with you, has arrived\\.$
-text-sound-2 = string;ding.au
+text-pattern-2 = ^Notification: [A-z]{3,17}, who has an adjourned game with you, has arrived\.$
+text-sound-2 = ding.au
 
 
 
-OnLogin = string;welcome-fics.au
-OnDisconnect = string;goodbye.au
-Move = string;move-fics.au
-Capture = string;capture-fics.au
-Castling = string;castle-fics.au
-Check = string;check.au
-Checkmate = string;checkmate.au
-DrawOffer = string;draw.au
-AbortOffer = string;abort.au
-AdjournOffer = string;adjourn.au
-TakebackOffer = string;takeback.au
-IllegalMove = string;buzzer.au
-GameEnd = string;fitebell.au
-GameStart = string;fitebell.au
-FriendConnected = string;ding.au
-FriendDisconnected = string;cork.au
+OnLogin = welcome-fics.au
+OnDisconnect = goodbye.au
+Move = move-fics.au
+Capture = capture-fics.au
+Castling = castle-fics.au
+Check = check.au
+Checkmate = checkmate.au
+DrawOffer = draw.au
+AbortOffer = abort.au
+AdjournOffer = adjourn.au
+TakebackOffer = takeback.au
+IllegalMove = buzzer.au
+GameEnd = fitebell.au
+GameStart = fitebell.au
+FriendConnected = ding.au
+FriendDisconnected = cork.au
