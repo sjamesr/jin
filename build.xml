@@ -15,7 +15,9 @@
 
 	<!-- Initializes stuff -->
 	<target name="init">
-		<tstamp />
+		<tstamp>
+			<format property="date" pattern="dd.MM.yyyy" />
+		</tstamp>
 		<property name="build.dir" value="build" />
 		<property name="build.compiler" value="modern" />
 		<property name="build.debug" value="yes" />
