@@ -226,7 +226,6 @@
 			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/**" />
 		</copy>
 		<zip destfile="${release.osx.dir}/bundle.zip" basedir="${release.osx.dir}" />
-		<echo message="${cf.passphrase}" />
 		<scp keyfile="${user.home}/.ssh/id_dsa"
 		     passphrase="${cf.passphrase}"
 		     file="${release.osx.dir}/bundle.zip" 
