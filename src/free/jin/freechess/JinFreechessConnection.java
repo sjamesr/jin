@@ -2426,7 +2426,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void sendHelpQuestion(String question){
-    sendCommand("tell 1 * " + question);    
+    sendCommand("tell 1 [" + Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() + "] "+ question);    
   }
 
 
