@@ -36,7 +36,7 @@
 		
 		<property file="${source.dir}/free/jin/resources/app.props" prefix="jin" />
 		<property name="release.name" value="Jin" />
-		<property name="release.version" value="${DSTAMP}" />
+		<property name="release.version" value="${date}" />
 	</target>
 
 
