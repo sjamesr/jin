@@ -21,29 +21,78 @@
 
 package free.jin.board;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import free.chess.*;
-import free.chess.event.*;
-import free.jin.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Vector;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import free.chess.AbstractChessClock;
+import free.chess.ChessMove;
+import free.chess.JChessClock;
+import free.chess.Move;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.event.MoveEvent;
+import free.chess.event.MoveListener;
 import free.jin.Game;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
+import free.util.PlatformUtils;
+import free.util.SquareLayout;
+import free.util.Utilities;
+import free.util.models.ModelUtils;
+import free.util.swing.FullscreenPanel;
+import free.util.swing.NonEditableTableModel;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
-import free.util.swing.NonEditableTableModel;
-import free.util.swing.FullscreenPanel;
-import free.util.SquareLayout;
-import free.util.PlatformUtils;
-import free.util.Utilities;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.border.EmptyBorder;
-import java.util.Vector;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
 
 /**
@@ -334,21 +383,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
 
 
-
-  /**
-   * An action listener which sets the FullscreenPanel to fullscreen mode and
-   * back to normal mode.
-   */
-
-  private ActionListener fullscreenAction = new ActionListener(){
-    public void actionPerformed(ActionEvent evt){
-      setFullscreen(!fullscreenPanel.isFullscreen());
-    }
-  };
-
-
-
-
   /**
    * Creates a new <code>BoardPanel</code> which will be used by the given
    * <code>BoardManager</code>, will display the given Game and will have the
@@ -365,6 +399,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
     this.contentPanel = new ContentPanel();
     this.fullscreenPanel = new FullscreenPanel(contentPanel);
+    fullscreenPanel.setAllowExclusiveMode(false); // Too buggy
 
     init(game);
 
@@ -374,14 +409,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     // Fullscreen mode locks up the application under OS X (older versions of Java).
     // Fullscreen mode is broken under Java 1.5.0, see
     // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5085648
-    if ((PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2"))||
+    if (!PlatformUtils.isJavaBetterThan("1.4") ||
+        (PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2"))||
         ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))){
       fullscreenButton.setEnabled(false);
       fullscreenButton.setToolTipText("Fullscreen board mode is unavailable on your system");
     }
     else{
       KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
-      contentPanel.registerKeyboardAction(fullscreenAction, fullscreenKeyStroke, WHEN_FOCUSED);
+      contentPanel.registerKeyboardAction(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          fullscreenPanel.getFullscreenModeModel().flip();
+        }
+      }, fullscreenKeyStroke, WHEN_FOCUSED);
     }
   }
   
@@ -419,27 +459,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void fireUserMadeMove(UserMoveEvent evt){
     Object [] listenerList = this.listenerList.getListenerList();
-    for (int i=0;i<listenerList.length;i+=2){
-      if (listenerList[i]==UserMoveListener.class){
+    for (int i = 0; i < listenerList.length; i += 2){
+      if (listenerList[i] == UserMoveListener.class){
         UserMoveListener listener = (UserMoveListener)listenerList[i+1];
         listener.userMadeMove(evt);
       }
     }
-  }
-
-
-
-  /**
-   * Sets this BoardPanel's fullscreen mode to the specified one.
-   */
-
-  private void setFullscreen(boolean isFullscreen){
-    if (fullscreenPanel.isFullscreen() == isFullscreen)
-      return;
-
-    fullscreenButton.setSelected(isFullscreen);
-    fullscreenPanel.setFullscreen(isFullscreen);
-    contentPanel.requestFocus();
   }
 
 
@@ -533,7 +558,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     whiteLabel = createWhiteLabel(game);
     blackLabel = createBlackLabel(game);
     fullscreenButton = createFullscreenButton();
-    fullscreenButton.addActionListener(fullscreenAction);
     whiteClock = createWhiteClock(game);
     blackClock = createBlackClock(game);
     buttonPanel = createButtonPanel(game);
@@ -620,7 +644,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           isBoardPositionUpdating = false;
         }
         else
-          setFullscreen(false);
+          fullscreenPanel.getFullscreenModeModel().setOff();
       }
     };
 
@@ -749,6 +773,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     button.setRequestFocusEnabled(false);
     button.setMargin(new Insets(0, 0, 0, 0));
     button.setToolTipText("Toggle fullscreen mode");
+    
+    ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 
     return button;
   }
@@ -807,7 +833,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JPanel createPlayedGameButtonPanel(Game game){
-    return new PlayedGameButtonPanel(boardManager, game, this);
+    return new PlayedGameButtonPanel(boardManager, game, contentPanel);
   }
 
 
@@ -2067,8 +2093,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
    
   public void removeNotify(){
-    if (fullscreenPanel.isFullscreen())
-      fullscreenPanel.setFullscreen(false);
+    if (fullscreenPanel.getFullscreenModeModel().isOn())
+      fullscreenPanel.getFullscreenModeModel().set(false);
     
     super.removeNotify();
   }
