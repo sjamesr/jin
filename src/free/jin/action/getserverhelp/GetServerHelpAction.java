@@ -47,7 +47,7 @@ public class GetServerHelpAction extends JinAction{
    */
    
   public String getName(){
-    return "Get Server Help"; 
+    return "Get Server Documentation"; 
   }
   
   
