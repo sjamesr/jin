@@ -89,6 +89,35 @@ public class BooleanModel extends Model implements ConstBooleanModel{
   
   
   /**
+   * Sets the current state to "on".
+   */
+  
+  public void setOn(){
+    set(true);
+  }
+  
+  
+  
+  /**
+   * Sets the current state to "off".
+   */
+  public void setOff(){
+    set(false);
+  }
+  
+  
+  
+  /**
+   * Flips the current state, changing "on" to "off" and vice versa.
+   */
+  
+  public void flip(){
+    set(!state);
+  }
+  
+  
+  
+  /**
    * Returns whether the model's state is currently "on" (<code>true</code>). 
    */
   
