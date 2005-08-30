@@ -56,7 +56,7 @@ public class AskQuestionAction extends JinAction{
    */
    
   public String getName(){
-    return "Ask a Question..."; 
+    return "Ask for Help..."; 
   }
   
   
