@@ -34,6 +34,7 @@ import free.jin.event.GameEndEvent;
 import free.jin.Game;
 import free.jin.Connection;
 import free.jin.plugin.Plugin;
+import free.jin.ui.OptionPanel;
 import free.workarounds.FixedJPanel;
 import free.util.TableLayout;
 
@@ -146,7 +147,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
 
   /**
-   * The component over which JOptionPane dialogs are displayed.
+   * The component over which confirmation dialogs are displayed.
    */
 
   protected final Component parentComponent;
@@ -732,8 +733,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     Connection conn = plugin.getConn();
     if (source == resignButton){
-      int result = JOptionPane.showConfirmDialog(parentComponent, "Are you sure you want to resign?", "Resign?", JOptionPane.YES_NO_OPTION);
-      if (result == JOptionPane.YES_OPTION)
+      Object result = OptionPanel.confirm(parentComponent, "Resign?", "Are you sure you want to resign?", OptionPanel.YES);
+      if (result == OptionPanel.YES)
         conn.resign(game);
     }
     else if (source == drawButton)
