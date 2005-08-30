@@ -21,17 +21,37 @@
 
 package free.util.swing;
 
-import javax.swing.*;
-import java.awt.*;
-import java.lang.reflect.*;
-import free.workarounds.FixedJPanel;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import free.util.AWTUtilities;
 import free.util.PlatformUtils;
+import free.util.models.BooleanListener;
+import free.util.models.BooleanModel;
+import free.util.models.ConstBooleanModel;
+import free.workarounds.FixedJPanel;
 
 
 /**
  * A <code>JPanel</code> which allows its content (always a single component)
- * to be displayed in fullscreen mode. 
+ * to be displayed in fullscreen mode. Note: this class only works properly on
+ * JDK 1.4 or later.
  */
 
 public class FullscreenPanel extends FixedJPanel{
@@ -39,10 +59,10 @@ public class FullscreenPanel extends FixedJPanel{
 
 
   /**
-   * Are we running under JDK 1.3 or earlier?
+   * Are we running under JDK 1.4 or later?
    */
 
-  private static final boolean IS_FULLSCREEN_API_AVAILABLE = PlatformUtils.isJavaBetterThan("1.4");
+  private static final boolean SUFFICIENT_JAVA_VERSION = PlatformUtils.isJavaBetterThan("1.4");
 
 
 
@@ -51,6 +71,30 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private final Component target;
+  
+  
+  
+  /**
+   * The panel displayed in place of the target.
+   */
+  
+  private final JPanel restorePanel;
+  
+  
+  
+  /**
+   * Are we allowed to use fullscreen exclusive mode?
+   */
+  
+  private boolean allowExclusiveMode;
+  
+  
+  
+  /**
+   * The model specifying whether we're in fullscreen mode.
+   */
+  
+  private final BooleanModel fullscreenModeModel;
 
 
 
@@ -63,10 +107,19 @@ public class FullscreenPanel extends FixedJPanel{
 
 
   /**
-   * The window which contains this panel when it's in fullscreen mode.
+   * The frame which contains this panel when it's in fullscreen mode.
    */
 
-  private RootPaneContainer fullscreenWindow = null;
+  private JFrame fullscreenFrame = null;
+  
+  
+  
+  /**
+   * Are we in real fullscreen mode (as opposed to fake fullscreen mode)? Only
+   * relevant if we really are in fullscreen mode
+   */
+  
+  private boolean isRealFullscreen;
   
   
   
@@ -103,7 +156,46 @@ public class FullscreenPanel extends FixedJPanel{
     beingModified = true;
     add(target, BorderLayout.CENTER);
     beingModified = false;
+    
+    fullscreenModeModel = new BooleanModel(false);
+    fullscreenModeModel.addListener(new BooleanListener(){
+      public void modelChanged(ConstBooleanModel model){
+        setFullscreen(model.isOn());
+      }
+    });
+    restorePanel = createRestorePanel();
   }
+  
+  
+  
+  /**
+   * Creates the panel displayed in place of the target component when in
+   * fullscreen mode.
+   */
+  
+  private JPanel createRestorePanel(){
+    JButton restore = new JButton("Restore normal mode");
+    restore.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        getFullscreenModeModel().setOff();
+      }
+    });
+    restore.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    
+    JLabel label = new JLabel("This panel is in fullscreen mode.");
+    label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.add(Box.createVerticalGlue());
+    panel.add(label);
+    panel.add(Box.createVerticalStrut(10));
+    panel.add(restore);
+    panel.add(Box.createVerticalGlue());
+    
+    return panel;
+  }
+  
 
 
 
@@ -130,6 +222,18 @@ public class FullscreenPanel extends FixedJPanel{
     else
       throw new IllegalStateException("You may not remove components from FullscreenPanel");
   }
+  
+  
+  
+  /**
+   * Sets whether we are allowed to use fullscreen exclusive mode (if
+   * available). If not, fullscreen mode will always be faked via an undecorated
+   * frame placed over the entire screen.  
+   */
+  
+  public void setAllowExclusiveMode(boolean allowExclusiveMode){
+    this.allowExclusiveMode = allowExclusiveMode;
+  }
 
 
 
@@ -137,10 +241,12 @@ public class FullscreenPanel extends FixedJPanel{
    * Sets this panel's fullscreen mode.
    */
 
-  public void setFullscreen(boolean on){
-    if (on == isFullscreen())
+  private void setFullscreen(boolean on){
+    if (!SUFFICIENT_JAVA_VERSION){
+      System.err.println("Ignored request to modify fullscreen mode: only available for JRE 1.4 or later");
       return;
-
+    }
+    
     beingModified = true;
     if (on)
       makeFullscreen();
@@ -153,30 +259,35 @@ public class FullscreenPanel extends FixedJPanel{
 
 
   /**
-   * Returns true if this panel is already in fullscreen mode.
+   * Returns the <code>BooleanModel</code> specifying whether we're in
+   * fullscreen mode.
    */
 
-  public boolean isFullscreen(){
-    return fullscreenWindow != null;
+  public BooleanModel getFullscreenModeModel(){
+    return fullscreenModeModel;
   }
 
 
 
   /**
-   * Puts this panel into fullscreen mode.
+   * Puts this panel into fullscreen mode. 
    */
 
   private void makeFullscreen(){
     remove(target);
+    add(restorePanel);
+    validate();
 
-    if (IS_FULLSCREEN_API_AVAILABLE && securityManagerAllowsFullscreen())
-      fullscreenWindow = setRealFullscreen();
+    if (allowExclusiveMode && securityManagerAllowsFullscreen()){
+      fullscreenFrame = setRealFullscreen();
+      isRealFullscreen = true;
+    }
     else
-      fullscreenWindow = setFakeFullscreen();
+      fullscreenFrame = setFakeFullscreen();
 
-    fullscreenWindow.getContentPane().setLayout(new BorderLayout());
-    fullscreenWindow.getContentPane().add(target, BorderLayout.CENTER);
-    fullscreenWindow.getContentPane().validate();
+    fullscreenFrame.getContentPane().setLayout(new BorderLayout());
+    fullscreenFrame.getContentPane().add(target, BorderLayout.CENTER);
+    fullscreenFrame.getContentPane().validate();
   }
   
   
@@ -220,7 +331,7 @@ public class FullscreenPanel extends FixedJPanel{
    * JDK 1.4 fullscreen API.
    */
 
-  private RootPaneContainer setRealFullscreen(){
+  private JFrame setRealFullscreen(){
     try{
       originalFrame = SwingUtils.frameForComponent(this);
       JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle());
@@ -270,15 +381,27 @@ public class FullscreenPanel extends FixedJPanel{
    * size of the screen.
    */
 
-  private RootPaneContainer setFakeFullscreen(){
-    JWindow window = new JWindow(SwingUtils.frameForComponent(this));
-
-    Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
-    window.setBounds(0, 0, screenSize.width, screenSize.height);
-    window.setVisible(true);
-    window.toFront();
-
-    return window;
+  private JFrame setFakeFullscreen(){
+    try{
+      originalFrame = SwingUtils.frameForComponent(this);
+      JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle());
+      
+      Method setUndecorated = 
+        Frame.class.getMethod("setUndecorated", new Class[]{boolean.class});
+      Method setResizable = 
+        Frame.class.getMethod("setResizable", new Class[]{boolean.class});
+  
+      setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
+      setResizable.invoke(frame, new Object[]{Boolean.FALSE});
+      
+      Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
+      frame.setBounds(0, 0, screenSize.width, screenSize.height);
+      frame.setVisible(true);
+      frame.toFront();
+  
+      return frame;
+    } catch (Exception e){e.printStackTrace();}
+    return null;
   }
 
 
@@ -289,17 +412,18 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private void makeNormal(){
-    fullscreenWindow.getContentPane().remove(target);
+    fullscreenFrame.getContentPane().remove(target);
 
-    if (IS_FULLSCREEN_API_AVAILABLE && securityManagerAllowsFullscreen())
+    if (isRealFullscreen)
       makeRealNormal();
     else
       makeFakeNormal();
 
+    remove(restorePanel);
     add(target, BorderLayout.CENTER);
     validate();
 
-    fullscreenWindow = null;
+    fullscreenFrame = null;
   }
 
 
@@ -310,8 +434,6 @@ public class FullscreenPanel extends FixedJPanel{
 
   private void makeRealNormal(){
     try{
-      JFrame frame = (JFrame)fullscreenWindow;
-
       Class windowClass = Window.class;
       Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
       Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
@@ -321,11 +443,11 @@ public class FullscreenPanel extends FixedJPanel{
       Method setFullScreenWindow =
         graphicsDeviceClass.getMethod("setFullScreenWindow", new Class[]{Window.class});
 
-      Object graphicsConfiguration = getGraphicsConfiguration.invoke(frame, new Object[0]);
+      Object graphicsConfiguration = getGraphicsConfiguration.invoke(fullscreenFrame, new Object[0]);
       Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
       setFullScreenWindow.invoke(graphicsDevice, new Object[]{null});
 
-      frame.dispose();
+      fullscreenFrame.dispose();
 
       
       if (originalFrame != null){
@@ -344,8 +466,7 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private void makeFakeNormal(){
-    JWindow window = (JWindow)fullscreenWindow;
-    window.dispose();
+    fullscreenFrame.dispose();
   }
 
 
