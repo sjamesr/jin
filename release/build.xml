@@ -448,7 +448,7 @@
 		<mkdir dir="${release.jet.dir}" />
 		
 		<antcall target="rebuild">
-			<param name="release.platform" value="jet-{os}" />
+			<param name="release.platform" value="jet-${os}" />
 		</antcall>
 		
 		<property name="tmpdir" value="${basedir}/jet/tmp" />
