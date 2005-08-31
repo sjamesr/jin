@@ -42,7 +42,6 @@
 	<target name="init">
 		<dirname property="jin.dir" file="." />
 		<property name="build.dir" value="${jin.dir}/build" />
-		<property name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->		
 		<property name="source.dir" value="${jin.dir}/src" />
 
 		<!-- Ask for Jin version -->
@@ -133,6 +132,7 @@
 		<antcall target="rebuild">
 			<param name="release.platform" value="windows" />
 			<param name="build.compiler" value="jikes" />
+			<param name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
@@ -295,6 +295,8 @@
 		<antcall target="rebuild">
 			<param name="release.name" value="Jin Applet" />
 			<param name="release.platform" value="applet" />
+			<param name="build.compiler" value="jikes" />
+			<param name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->
 			<param name="build.compress" value="yes" />
 			<param name="build.manifest" value="release/applet/manifest.txt" />
 		</antcall>
