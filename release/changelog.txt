@@ -1,3 +1,43 @@
+2.13.1
+
+* ICC: Fixed a bug which caused text ending with a bell to not be displayed
+  until the next line of text arrived.
+* Fixed a bug which caused the move highlighting style to revert to "none" after
+  a restart of Jin, if you selected the "Target square only" mode.
+* Reverted to the normal method of playing audio, which is to avoid closing the
+  audio data line after each played clip (closing it every time caused problems
+  under some OS X and Windows systems). This will cause Jin to hog the audio
+  device on some Linux systems. You can use the non-hogging version by setting
+  the environment variable $JAVA_OPTS to:
+  -Dfree.util.audio.player=free.util.audio.NonBlockingJavaxSampledAudioPlayer
+* Page up and page down in the console will now scroll about 2 lines less than
+  the visible height to make it easier to follow the text when scrolling page
+  up/down.
+* ICC: Removed the hack to get specially formatted finger notes on ICC to wrap
+  properly because the server does it by itself now (02.06.2005).
+* When creating a new internal frame in MDI mode, Jin will now force at least a
+  small portion of it to be visible (to avoid various situations where a
+  window becomes unreachable).
+* When a JinApplet user changes his password during a session, the password
+  remembered by the applet (for preferences upload purposes) becomes invalid.
+  When the user would end the session, he would get a "wrong password" error.
+  This is now fixed by displaying a dialog allowing the user to enter his new
+  password.
+* Fixed mexamine - Jin didn't "react" to the user being mexamined in a game
+  (didn't allow moving pieces, didn't add playback controls).
+* In MDI mode, the seek graph can no longer be resized smaller than the smallest
+  size at which it looks ok.
+* Significantly improved board painting performance.
+* Fixed a performance issue with the console - it should no longer paint much
+  more slowly when containing a lot of text.
+* FICS: Questions asked in channel 1 via the "Ask a Question..." dialog will now
+  include the name and version of the interface.
+* Fixed fullscreen board mode - it was causing Jin to freeze when either the
+  resign confirmation dialog or promotion piece selection dialogs were
+  displayed. Fullscreen board mode, however, is no longer available under Java
+  versions earlier than 1.4.
+
+
 2.13
 
 * Again, fiddled with sound under Linux. There should now no longer be delay
@@ -78,14 +118,14 @@
 * Made the size of the font for the board buttons a bit smaller.
 * Updated the arrows-circles script example on the website to work with
   Jin 2.12.1
-* Implemented proper response to the unarrow and uncircle commands on ICC. Also,
-  (right) dragging another arrow where one already exists or (right) clicking
-  where a circle already exists will now remove the arrow or circle (and send
-  the corresponding unarrow/uncircle command to the server).
+* ICC: Implemented proper response to the unarrow and uncircle commands on ICC.
+  Also, (right) dragging another arrow where one already exists or (right)
+  clicking where a circle already exists will now remove the arrow or circle
+  (and send the corresponding unarrow/uncircle command to the server).
 * Trying to capture your own piece in standard chess will now be rejected
   immediately, instead of sending to the server.
-* Fixed a bug where your clock would not resume ticking if you tried to make
-  an illegal move (only on ICC).
+* ICC: Fixed a bug where your clock would not resume ticking if you tried to
+  make an illegal move.
 * Move legality checking (which is still incomplete) is now applied to regular
   moves too (in addition to premoves).
 * The "Moving in Advance" section on the move input panel for board preferences
@@ -98,10 +138,10 @@
 
 * Jin now allows the user to add custom piece sets and board patterns. The
   specific details are documented at http://www.jinchess.com/docs/customart/.
-* Implemented a hack to get specially layed out text like in "finger Live" on
-  ICC to display properly.
-* Both framed and embedded game lists display styles were fairly broken (on
-  ICC). Now fixed.
+* ICC: Implemented a hack to get specially formatted out text like in 
+  "finger Live" on ICC to display properly.
+* ICC: Both framed and embedded game lists display styles were fairly broken -
+  now fixed.
 * Fixed the console preferences dialog taking forever to display.
 * Fixed focus problems in the console under JDK 1.4 and later.
 * Implemented square coordinates for the board, in 3 styles:
@@ -112,9 +152,9 @@
   2. With less than 20 minutes but more than 10 seconds displays
      "minutes.seconds"
   3. With less than 10 seconds displays "00.seconds.tenths"
-* Now parsing out bughouse holdings lines like
+* FICS: Now parsing out bughouse holdings lines like
   <b1> game 175 white [NNBQ] black [PPNBQ]
-  instead of dumping them to the console (on FICS).
+  instead of dumping them to the console.
 * Added alt+(RIGHT,LEFT,HOME,END) shortcuts to move through an examined game.
 * Added mnemonics to the Abort, Adjourn, Draw and Resign buttons on a played
   board panel.
@@ -164,12 +204,12 @@
 * Now setting the movecase var on by xivarmy's request. It shouldn't change
   anything currently, but might even be required in the future (for example to
   unambiguate pgn uploads).
-* Added parsing and coloring of tourney tells on FICS. Tourney tells are qtells
+* FICS: Added parsing and coloring of tourney tells. Tourney tells are qtells
   that look like this:
   :AlexTheGreat(T9): Hello World!
-* wname and bname on FICS will now work properly.
-* The radio button setting the sending mode to premove is now disabled when the
-  user is playing a game on FICS.
+* FICS: wname and bname will now work properly.
+* FICS: The radio button setting the sending mode to premove is now disabled when the
+  user is playing a game.
 * Fixed a bug causing an en-passant premove to be recognized as such one move
   after it was made.
 * Implemented very primitive legality checking for premoves. It currently only
@@ -222,12 +262,12 @@
 
 2.07rc4
 
-* Changed the default piece set on FICS to the eboard vector pieces - they paint
+* FICS: Changed the default piece set to the eboard vector pieces - they paint
   faster than the xboard pieces.
 * Changed the default move sending mode to "predrag", since the previous
   default, "legal chess" seems confusing (you can't start dragging your piece
   when it's not your turn).
-* bsetup mode on FICS seemed to be completely broken - fixed now.
+* FICS: bsetup mode seemed to be completely broken - fixed now.
 * FischerRandom and other variants with nonstandard castling rules were broken.
   They are now fixed, and as long as the castling move isn't ambiguous, you
   can make it on the board instead of typing it in. Thanks to xivarmy for
@@ -239,7 +279,7 @@
 * Fixed a bug causing the seek graph plugin to fail starting the next time if
   you closed a session when the seek graph was minimized (iconified).
 * Fixed a bug which broke auto-scroll sometimes if you minimized the console.
-* Added Atomic support on FICS.
+* FICS: Added Atomic support.
 * Observing a game of an unsupported variant should no longer cause a board to
   be displayed when a move is made.
 * Choosing a new move highlighting color for the board didn't properly 
@@ -248,7 +288,7 @@
 
 2.07rc2:
 
-* Fixed a bug which prevented users from resuming adjourned games on FICS.
+* FICS: Fixed a bug which prevented users from resuming adjourned games.
 * Kriegspiel support was broken - fixed now.
 * Fixed blanking/special commands - hitting shift+enter on the console
   "commandline" will now hide your command and not add it to history,
@@ -288,8 +328,8 @@
 * Fixed the console flashing when it's being resized. It used to momentarily
   show the text at its very top (the server's ASCII logo, usually).
 * The Game Logger will now log ratings too.
-* Qtells are now parsed on FICS too. They are also available as Chat Event
-  subtype in the scripter.
+* FICS: Qtells are now parsed too. They are also available as Chat Event subtype
+  in the scripter.
 * There are now 3 move sending modes:
   - Legal Chess: You can't touch or move pieces when it's not your move.
   - Predrag:     You are allowed to make moves when it's not your turn to move,
@@ -300,12 +340,12 @@
   The premove variable on FICS is set to 1 in premove mode and to 0 otherwise.
 * Added credits for Denis DesLauriers, who designed the Jin logo in 
   Help->Licensing and Copyrights...
-* The move number in the move list will now be correct even if Jin doesn't have
-  the entire move list. This only applies to FICS - on ICC Jin always has the
-  complete move list.
+* FICS: The move number in the move list will now be correct even if Jin doesn't
+  have the entire move list. This only applies to FICS - on ICC Jin always has
+  the complete move list.
 * Playing a simul now works.
-* Now doing "iset nohighlight 1" on login for FICS. This is needed to work
-  properly on accounts with highlight set to 1.
+* FICS: Now doing "iset nohighlight 1" on login. This is needed to work properly
+  on accounts with highlight set to 1.
 * Fixed a bug where sometimes closing an internal frame didn't cause a different
   one to pick up the focus.
 * Shift+Insert will now paste into the console's textfield as well.
