@@ -62,9 +62,8 @@
 		       classpathref="compile.class.path"
 		       target="${build.target}"
 		       source="1.1"
-		       debug="${build.debug}">
-		</javac>
-
+		       debug="${build.debug}"
+		/>
 	</target>
 	
 	<!-- Compiles a single piece set -->
@@ -75,6 +74,8 @@
 		       includes="**"
 		       classpath="${classes.dir}"
 		       debug="${build.debug}"
+		       target="${build.target}"
+		       source="1.1"
 		/>
 	</target>
 
@@ -482,7 +483,9 @@
 		<javac srcdir="resources/os-specific/macosx"
 		       destdir="${classes.dir}"
 		       includes="free/jin/MacOSXSpecific.java"
-		       debug="${build.debug}">
+		       debug="${build.debug}"
+		       target="${build.target}"
+		       source="1.1">
 		       
 			<classpath>
 				<pathelement location="resources/os-specific/macosx/ui.jar"/>
@@ -497,8 +500,10 @@
 		<javac srcdir="resources/os-specific/applet"
 		       destdir="${build.dir}"
 		       includes="DetectJava.java"
-		       debug="${build.debug}">
-		</javac>
+		       debug="${build.debug}"
+		       target="${build.target}"
+		       source="1.1"
+		/>
 		<copy todir="${build.dir}">
 			<fileset file="resources/os-specific/applet/**" excludes="**.java"/>
 		</copy>
