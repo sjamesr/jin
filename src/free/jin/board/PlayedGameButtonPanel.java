@@ -733,8 +733,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     Connection conn = plugin.getConn();
     if (source == resignButton){
-      Object result = OptionPanel.confirm(parentComponent, "Resign?", "Are you sure you want to resign?", OptionPanel.YES);
-      if (result == OptionPanel.YES)
+      Object result = OptionPanel.confirm(parentComponent, "Resign?", "RESIGN this game?", OptionPanel.OK);
+      if (result == OptionPanel.OK)
         conn.resign(game);
     }
     else if (source == drawButton)
