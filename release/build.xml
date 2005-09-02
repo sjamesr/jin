@@ -74,6 +74,7 @@
 		
 		<antcall target="rebuild">
 			<param name="release.platform" value="unix" />
+			<param name="build.target" value="1.3" />
 		</antcall>
 		
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/tmp" />
@@ -205,6 +206,7 @@
 		
 		<antcall target="rebuild">
 			<param name="release.platform" value="macosx" />
+			<param name="build.target" value="1.3" />
 		</antcall>
 		<property name="app-dir.name" value="Jin.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
