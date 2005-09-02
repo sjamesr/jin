@@ -1253,18 +1253,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       boolean shouldAsk = false;
       String question = null;
+      String title = null;
 
       if (game.getGameType() == Game.MY_GAME){
         shouldAsk = true;
-        if (game.isPlayed())
+        if (game.isPlayed()){
           question = "RESIGN this game?";
-        else
+          title = "Resign?";
+        }
+        else{
           question = "Stop examining this game?";
+          title = "Unexamine?";
+        }
       }
 
       Object result = OptionPanel.OK;
       if (shouldAsk)
-        result = OptionPanel.confirm(boardPanel, "Select an option", question, OptionPanel.OK);
+        result = OptionPanel.confirm(boardPanel, title, question, OptionPanel.OK);
 
       if (result == OptionPanel.OK){
         getConn().quitGame(game);
