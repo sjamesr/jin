@@ -20,6 +20,7 @@
 		</tstamp>
 		<property name="build.dir" value="build" />
 		<property name="build.compiler" value="modern" />
+		<property name="build.target" value="${java.specification.version}" />
 		<property name="build.debug" value="yes" />
 		<property name="build.compress" value="no" />
 		<property name="build.manifest" value="manifest.txt" />
@@ -59,6 +60,8 @@
 		       destdir="${classes.dir}"
 		       includes="**"
 		       classpathref="compile.class.path"
+		       target="${build.target}"
+		       source="1.1"
 		       debug="${build.debug}">
 		</javac>
 
