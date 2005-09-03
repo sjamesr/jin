@@ -1,0 +1,14 @@
+#!/bin/sh
+
+source=$1
+
+hmkdir $source
+hcd $source
+cd $source
+
+for file in `ls`
+do
+	hcopy -r $file : &> /dev/null || $0 $file
+done
+cd ..
+hcd ::
