@@ -129,7 +129,6 @@
 		<antcall target="rebuild">
 			<param name="release.platform" value="windows" />
 			<param name="build.compiler" value="jikes" />
-			<param name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
