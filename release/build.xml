@@ -17,15 +17,11 @@
      as-is under Linux, but the author promised to fix it sometime soon. In the
      meanwhile you can get the extra required files from
      http://sourceforge.net/tracker/download.php?group_id=22049&atid=373085&file_id=85769&aid=945832.
-  3. The SourceForge OS X compile server is used to create the OS X install, so
-     you will need to be a developer in some project if you want to use this
-     file to make OS X releases.
-  4. The scp and sshexec tasks are used for connecting to the SourceForge
-     compile farm (for the OS X release), which in turn require the JSch library.
-     See ant documentation for further details.
-  5. Building an applet or JET release requires some tasks from the ant-contrib project
+  3. OS X releases require a Unix-like machine with dd, bash and hfsutils
+     (http://www.mars.org/home/rob/proj/hfs).
+  4. Building an applet or JET release requires some tasks from the ant-contrib project
      which you can get from http://sourceforge.net/projects/ant-contrib/.
-  6. Building a JET release requires Excelsior JET 3.7. They used to offer free,
+  5. Building a JET release requires Excelsior JET 3.7. They used to offer free,
      non-expiring licenses for personal use, but seem to have discontinued that
      offer. They do offer a time-limited free trial, however.
      Note that JET does not support cross compiling, so this buildfile creates
@@ -197,7 +193,7 @@
 	
 
 	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
-	<target name="osx" depends="init, ask-cf-info" description="Builds a release for Mac OS X">
+	<target name="osx" depends="init" description="Builds a release for Mac OS X">
 		<echo message="Creating Mac OS X release" />
 
 		<property name="release.osx.dir" value="${release.dir}/osx" />
@@ -211,9 +207,6 @@
 		<property name="app-dir.name" value="Jin.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
-		<copy todir="${release.osx.dir}">
-			<fileset dir="osx" includes="mkinstall mkdmg" />
-		</copy>
 		<copy todir="${app-dir}">
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 		</copy>
@@ -227,58 +220,39 @@
 		<copy todir="${app-dir}/Contents/Resources/Java">
 			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/**" />
 		</copy>
-		<zip destfile="${release.osx.dir}/bundle.zip" basedir="${release.osx.dir}" />
-		<scp keyfile="${user.home}/.ssh/id_dsa"
-		     passphrase="${cf.passphrase}"
-		     file="${release.osx.dir}/bundle.zip" 
-		     todir="${cf.username}@${cf.host}:~"				 
-		/>
-		<sshexec host="${cf.host}"
-		         username="${cf.username}"
-		         keyfile="${user.home}/.ssh/id_dsa"
-		         passphrase="${cf.passphrase}"
-		         command="ssh ppc-osx2 &quot;unzip -q bundle.zip &amp;&amp; chmod u+x ./mkinstall &amp;&amp; ./mkinstall ${release.version} ${app-dir.name}&quot;"
-		/>
-		<scp keyfile="${user.home}/.ssh/id_dsa"
-		     passphrase="${cf.passphrase}"
-		     file="${cf.username}@cf-shell.sourceforge.net:~/jin-${release.version}-osx.dmg" 
-		     todir="${release.osx.dir}"					
-		/>
-		<scp keyfile="${user.home}/.ssh/id_dsa"
-		     passphrase="${cf.passphrase}"
-		     file="${cf.username}@${cf.host}:~/jin-${release.version}-osx-no-extras.dmg" 
-		     todir="${release.osx.dir}"					
-		/>
-		<sshexec host="${cf.host}"
-		         username="${cf.username}"
-		         keyfile="${user.home}/.ssh/id_dsa"
-		         passphrase="${cf.passphrase}"
-		         command="rm -rf bundle.zip ${app-dir.name} mkdmg mkinstall jin-${release.version}-osx.dmg jin-${release.version}-osx-no-extras.dmg"
-		/> 
-		<delete file="${release.osx.dir}/bundle.zip" />
-		<delete file="${release.osx.dir}/mkdmg" />
-		<delete file="${release.osx.dir}/mkinstall" />
-		<delete dir="${app-dir}" />
+		<mkdir dir="${app-dir}/Contents/MacOS" />
+		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
+
+		<antcall target="osx-package">
+			<param name="release.name" value="jin-${release.version}-osx" />
+		</antcall>
+		<delete>
+			<fileset dir="${app-dir}/Contents/Resources/Java/resources/pieces" includes="*.zip" excludes="xboard.zip" />
+		</delete>
+		<antcall target="osx-package">
+			<param name="release.name" value="jin-${release.version}-osx-no-extras" />
+		</antcall>
+		
 		<delete dir="${app-dir}" />
 		<property name="osx-install" value="jin-${release.version}-osx.dmg" />
 	</target>
 	
-
-	<!-- Helper target for the osx target.
-	     Asks for SourceForge Compile Farm username and private key passphrase, then tests them -->
-	<target name="ask-cf-info">
-		<property name="cf.host" value="cf-shell.sourceforge.net" />		
-		<input message="Please specify ${cf.host} username:" addproperty="cf.username" />
-		<input message="Please specify the passphrase for your private key:" addproperty="cf.passphrase" />
-		<echo message="Testing connection to Compile Farm, please wait" />
-		<sshexec host="${cf.host}"
-		         username="${cf.username}"
-		         keyfile="${user.home}/.ssh/id_dsa"
-		         passphrase="${cf.passphrase}"
-		         command="echo works"
-		/>
-	</target>
 	
+	<!-- Helper target for the osx target. Builds a .dmg.gz file from the Jin.app directory -->
+	<target name="osx-package">
+		<property name="dmg-filename" value="${release.name}.dmg" />
+		<exec executable="dd" dir="${release.osx.dir}" failonerror="yes">
+			<arg line="if=/dev/zero of=${dmg-filename} bs=1M count=15" />
+		</exec>
+		<exec executable="hformat" dir="${release.osx.dir}" failonerror="yes">
+			<arg line="-l Jin-${release.version} ${dmg-filename}" />
+		</exec>
+		<exec executable="${basedir}/osx/hcp" dir="${release.osx.dir}" failonerror="yes">
+			<arg line="${app-dir.name}" />
+		</exec>
+		<gzip src="${release.osx.dir}/${dmg-filename}" zipfile="${release.osx.dir}/${dmg-filename}.gz" />
+		<delete file="${release.osx.dir}/${dmg-filename}" />
+	</target>
 
 	
 	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
@@ -382,8 +356,8 @@
     	<unzip src="${build.dir}/resources/${resource.type}/${resource.name}.zip"
     	       dest="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
 	</target>
-  
-
+	
+	
 	<!-- Source. Resulting files are ${src-archive} and ${src-archive-no-extras} -->
 	<target name="src" depends="init" description="Builds a source release">
 		<echo message="Creating Source release" />
