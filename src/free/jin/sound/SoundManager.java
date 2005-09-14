@@ -21,6 +21,16 @@
 
 package free.jin.sound;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import jregex.Matcher;
+import jregex.Pattern;
+import jregex.PatternSyntaxException;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.Preferences;
@@ -30,21 +40,13 @@ import free.util.audio.AudioClip;
 import free.util.models.BooleanModel;
 import free.util.models.Model;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import jregex.Matcher;
-import jregex.Pattern;
-import jregex.PatternSyntaxException;
-
 
 /**
  * The plugin responsible for producing sound on all the relevant events.
  */
 
-public class SoundManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListener{
+public class SoundManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListener,
+    PropertyChangeListener{
 
 
   
@@ -399,7 +401,6 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
 
 
-
   /**
    * Plays the sound mapped to the "OnDisconnect" event.
    */
@@ -420,9 +421,30 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
-    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
+    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed()){
       playEventSound("GameStart");
+      game.addPropertyChangeListener(this);
+    }
   }
+  
+  
+  
+  /**
+   * If a game changes mode from played (by the user) to examined, plays
+   * the sound mapped to the "GameEnd" event.
+   */
+  
+  public void propertyChange(PropertyChangeEvent evt){
+    Object src = evt.getSource();
+    String propertyName = evt.getPropertyName();
+    if (src instanceof Game){
+      Game game = (Game)src;
+      if ((game.getGameType() == Game.MY_GAME) && "played".equals(propertyName)
+          && evt.getOldValue().equals(Boolean.TRUE) && evt.getNewValue().equals(Boolean.FALSE))
+        playEventSound("GameEnd");
+    }
+  }
+ 
 
 
 
@@ -444,8 +466,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
-    if ((game.getGameType()==Game.MY_GAME)&&(game.isPlayed()))
+    if ((game.getGameType()==Game.MY_GAME) && (game.isPlayed()))
       playEventSound("GameEnd");
+    game.removePropertyChangeListener(this);
   }
 
 
