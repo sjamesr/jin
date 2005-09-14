@@ -78,8 +78,8 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * ArrowCircleListener to the board.
    */
 
-  protected void configureBoard(Game game, JinBoard board){
-    super.configureBoard(game, board);
+  protected void initBoard(Game game, JinBoard board){
+    super.initBoard(game, board);
 
     if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed()){
       board.addArrowCircleListener(this);
