@@ -552,8 +552,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected void createComponents(Game game){
     board = createBoard(game);
-    configureBoard(game, board);
+    initBoard(game, board);
     board.getPosition().addMoveListener(this);
+    
     gameLabel = createGameLabel(game);
     whiteLabel = createWhiteLabel(game);
     blackLabel = createBlackLabel(game);
@@ -610,25 +611,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * Configures the board.
+   * Initializes the board.
    */
 
-  protected void configureBoard(Game game, JinBoard board){
+  protected void initBoard(Game game, JinBoard board){
     if (isFlipped())
       board.setFlipped(true);
 
-    board.setMoveInputMode(calcMoveInputMode(game));
-    board.setPiecePainter(boardManager.getPiecePainter());
-    board.setBoardPainter(boardManager.getBoardPainter());
-    board.setMoveInputStyle(boardManager.getMoveInputStyle());
-    board.setPieceFollowsCursor(boardManager.isPieceFollowsCursor());
-    board.setHighlightMadeMoveSquares(boardManager.isHighlightMadeMoveSquares());
-    board.setMadeMoveSquaresHighlightColor(boardManager.getMadeMoveSquaresHighlightColor());
-    board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
-    board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
-    board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
-    board.setManualPromote(!boardManager.isAutoPromote());
-    board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
+    configureBoardFromGame(game, board);
+    configureBoardFromBoardManager(board);
 
     ActionListener escapeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -666,13 +657,42 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (!isUserTurn() && (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE))
       board.setEditable(false);
   }
+  
+  
+  
+  /**
+   * Configures the board according to the <code>Game</code> settings.
+   */
+  
+  protected void configureBoardFromGame(Game game, JinBoard board){
+    board.setMoveInputMode(calcMoveInputMode(game));
+  }
+  
+  
+  
+  /**
+   * Configures the board according to the <code>BoardManager</code> settings.
+   */
+  
+  protected void configureBoardFromBoardManager(JinBoard board){
+    board.setPiecePainter(boardManager.getPiecePainter());
+    board.setBoardPainter(boardManager.getBoardPainter());
+    board.setMoveInputStyle(boardManager.getMoveInputStyle());
+    board.setPieceFollowsCursor(boardManager.isPieceFollowsCursor());
+    board.setHighlightMadeMoveSquares(boardManager.isHighlightMadeMoveSquares());
+    board.setMadeMoveSquaresHighlightColor(boardManager.getMadeMoveSquaresHighlightColor());
+    board.setMoveHighlightingStyle(boardManager.getMoveHighlightingStyle());
+    board.setCoordsDisplayStyle(boardManager.getCoordsDisplayStyle());
+    board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
+    board.setManualPromote(!boardManager.isAutoPromote());
+    board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
+  }
 
 
 
 
   /**
-   * Returns the move input mode that should be used for the specified game
-   * and move sending mode.
+   * Returns the move input mode that should be used for the specified game.
    */
 
   protected int calcMoveInputMode(Game game){
@@ -2025,12 +2045,20 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     }
     else if (src == game){
       gameLabel.setText(createGameLabelText(game));
-      if ("whiteName".equals(propertyName)){
+      if ("whiteName".equals(propertyName))
         whiteLabel.setText(createWhiteLabelText(game));
-      }
-      else if ("blackName".equals(propertyName)){
+      else if ("blackName".equals(propertyName))
         blackLabel.setText(createBlackLabelText(game));
+      else if ("gameType".equals(propertyName) || "played".equals(propertyName)){
+        configureBoardFromGame(game, board);
+        board.setEditable(isUserTurn() || (moveSendingMode != BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE));
+        buttonPanel = createButtonPanel(game);
+        gameLabel = createGameLabel(game);
+        contentPanel.reAddComponents = true;
+        contentPanel.revalidate();
       }
+      
+        
       // implement the rest of the properties.
     }
   }

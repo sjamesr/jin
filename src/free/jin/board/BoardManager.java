@@ -978,7 +978,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     game.addPropertyChangeListener(new PropertyChangeListener(){
       public void propertyChange(PropertyChangeEvent evt){
-        String propertyName = evt.getPropertyName();
         Game game = (Game)evt.getSource();
         BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.get(game);        
         
@@ -986,18 +985,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
           PluginUIContainer boardContainer =
             (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
 
-          // To serious a change - BoardPanel doesn't support such drastic
-          // changes, so we create a new one and replace the current one with it.
-          if ("gameType".equals(propertyName) || "played".equals(propertyName)){
-            gameEndCleanup(game);
-            createNewBoardPanel(game);
-            // We're kind of relying on the plugin container recycling mechanism
-            // here to create the illusion that the board panel merely changes
-            // instead of being replaced with a new one. Without the recycling
-            // mechanism, the location of the the plugin container would be
-            // different, thus breaking the illusion.
-          }
-          else if (boardContainer != null) // It could be null if the container has been closed
+          if (boardContainer != null) // It could be null if the container has been closed
             boardContainer.setTitle(getBoardTitle(boardPanel));
         }
       }
