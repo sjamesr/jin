@@ -29,11 +29,6 @@
 !module servers/chessclub.jar
 !module servers/freechess.jar
 
-!module lnfs/kunststoff.jar
-!module lnfs/metouia.jar
-!module lnfs/liquid.jar
-!module lnfs/jgoodies-plastic.jar
-
 !module actions/askquestion.jar
 !module actions/getserverhelp.jar
 !module actions/seek.jar
