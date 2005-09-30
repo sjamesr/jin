@@ -429,7 +429,7 @@
 		<property name="tmpdir" value="${basedir}/jet/tmp" />
 		<mkdir dir="${tmpdir}" />
 		<copy todir="${tmpdir}">
-			<fileset dir="${build.dir}" excludes="swingall.jar plugins/*/*.jar" />
+			<fileset dir="${build.dir}" excludes="swingall.jar plugins/*/*.jar lnfs/**" />
 		</copy>
 		<property name="efsep" value="\${file.separator}" /> <!-- Escaped File Separator-->
 		<copy todir="${tmpdir}">
