@@ -1015,9 +1015,9 @@ public class MdiUiProvider extends AbstractUiProvider{
       
       public MdiInternalFrame(){
         super("", true, true, true, true);
+        setContentPane(new JPanel());
       }
       
-
       
       
       /**
@@ -1027,15 +1027,16 @@ public class MdiUiProvider extends AbstractUiProvider{
       
       public Dimension getMinimumSize(){
         Insets insets = getInsets();
-        Dimension dim = ((JComponent)this.getContentPane()).getMinimumSize();
+        Dimension dim = this.getContentPane().getLayout().minimumLayoutSize(this.getContentPane());
         dim.width += insets.left + insets.right;
         dim.height += insets.top + insets.bottom;
         return dim;
       }
-
+    
       
       
     }
+    
     
     
   }
