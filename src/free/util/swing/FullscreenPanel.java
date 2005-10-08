@@ -21,24 +21,14 @@
 
 package free.util.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import free.util.AWTUtilities;
 import free.util.PlatformUtils;
@@ -394,8 +384,8 @@ public class FullscreenPanel extends FixedJPanel{
       setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
       setResizable.invoke(frame, new Object[]{Boolean.FALSE});
       
-      Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
-      frame.setBounds(0, 0, screenSize.width, screenSize.height);
+      Rectangle screenBounds = AWTUtilities.getUsableScreenBounds();
+      frame.setBounds(screenBounds);
       frame.setVisible(true);
       frame.toFront();
   
