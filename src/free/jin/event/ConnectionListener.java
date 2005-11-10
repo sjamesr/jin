@@ -23,6 +23,8 @@ package free.jin.event;
 
 import java.util.EventListener;
 
+import free.jin.Connection;
+
 
 /**
  * A listener for receiving notifications about changes in the state of the 
@@ -37,7 +39,7 @@ public interface ConnectionListener extends EventListener{
    * Gets called when a connection attempt is made.
    */
 
-  void connectionAttempted(ConnectionEvent evt);
+  void connectionAttempted(Connection conn, String hostname, int port);
 
 
 
@@ -45,15 +47,31 @@ public interface ConnectionListener extends EventListener{
    * Gets called when the connection to the server is established.
    */
 
-  void connectionEstablished(ConnectionEvent evt);
+  void connectionEstablished(Connection conn);
+  
+  
+  
+  /**
+   * Gets called when the connection attempt failed.
+   */
+  
+  void connectingFailed(Connection conn, String reason);
 
 
 
   /**
-   * Gets called when the login procedure is done.
+   * Gets called when the login procedure is successful.
    */
 
-  void connectionLoggedIn(ConnectionEvent evt);
+  void loginSucceeded(Connection conn);
+  
+  
+  
+  /**
+   * Gets called when the login procedure fails. Note that <code>reason</code> may be null.
+   */
+  
+  void loginFailed(Connection conn, String reason);
 
 
 
@@ -61,6 +79,8 @@ public interface ConnectionListener extends EventListener{
    * Gets called when the connection to the server is lost.
    */
 
-  void connectionLost(ConnectionEvent evt);
-
+  void connectionLost(Connection conn);
+  
+  
+  
 }
