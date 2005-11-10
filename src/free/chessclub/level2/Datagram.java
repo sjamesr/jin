@@ -22,8 +22,13 @@
 
 package free.chessclub.level2;
 
-import free.util.FormatException;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.Vector;
+
+import free.util.FormatException;
 
 
 /**
@@ -49,7 +54,7 @@ public class Datagram{
    * The start-of-datagram delimiter.
    */
    
-  public static final String DG_START = "" + DG_DELIM + "("; 
+  private static final char DG_START = '('; 
 
   
 
@@ -57,7 +62,7 @@ public class Datagram{
    * The end-of-datagram delimiter.
    */
    
-  public static final String DG_END = "" + DG_DELIM + ")";
+  private static final char DG_END = ')';
     
 
 
@@ -290,9 +295,37 @@ public class Datagram{
   public boolean getBoolean(int fieldIndex){
     return getField(fieldIndex).equals("1");
   }
-
-
-
+  
+  
+  
+  /**
+   * Reads and parses a datagram from the specified input stream.
+   * 
+   * @throws IOException if an I/O error occurs while reading the datagram
+   * @throws FormatException if the data read from the input stream can't be parsed as a datagram. 
+   */
+  
+  public static Datagram readDatagram(InputStream in) throws IOException{
+    int len = 0;
+    StringBuffer buf = new StringBuffer();
+    
+    // Basically read until ^Y) is encountered
+    while (true){
+      int b = in.read(); 
+      if (b < 0)
+        throw new EOFException();
+      
+      if ((b == ')') && (len > 1) && (buf.charAt(len - 1) == DG_DELIM)){
+        buf.append((char)b);
+        return parseDatagram(buf.toString());
+      }
+      
+      buf.append((char)b);
+      len++;
+    }
+  }
+  
+  
 
   /**
    * Parses the specified string and returns a <code>Datagram</code> object
@@ -305,13 +338,15 @@ public class Datagram{
   public static Datagram parseDatagram(String dgString) throws FormatException{
     try{
       
+      int len = dgString.length();
+      
       // Check that it starts with DG_START
-      if (!dgString.startsWith(DG_START))
-        throw new FormatException("The string (" + dgString + ") does not start with \"^Y(\"");
+      if ((len < 2) || (dgString.charAt(0) != DG_DELIM) || (dgString.charAt(1) != DG_START))
+        throw new FormatException("dgString does not start with \"^Y(\": " + dgString);
   
       // Check that it ends with DG_END
-      if (!dgString.endsWith(DG_END))
-        throw new FormatException("The string (" + dgString + ") does not end with \"^Y)\"");
+      if ((len < 2) || (dgString.charAt(len - 2) != DG_DELIM) || (dgString.charAt(len - 1) != DG_END))
+        throw new FormatException("dgString does not end with \"^Y)\": " + dgString);
   
       // Strip DG_START and DG_END and add an extra space at the end to make it
       // easier to parse
