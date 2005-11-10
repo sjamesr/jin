@@ -58,6 +58,22 @@ public class PluginContext{
    */
 
   private final Plugin [] plugins;
+  
+  
+  
+  /**
+   * Specifies which plugins passed <code>Plugin.setContext</code>.
+   */
+  
+  private final boolean [] isPluginActive;
+  
+  
+  
+  /**
+   * The number of "active" plugins.
+   */
+  
+  private int activePluginsCount;
 
 
 
@@ -93,11 +109,41 @@ public class PluginContext{
         
     this.conn = conn;
     this.user = user;
-    this.plugins = plugins;
-    this.prefs = prefs;
+    this.plugins = (Plugin[])plugins.clone();
+    this.isPluginActive = new boolean[plugins.length];
+    this.prefs = (Preferences[])prefs.clone();
     
     for (int i = 0; i < actions.length; i++)
       this.actions.addElement(actions[i]);
+  }
+  
+  
+  
+  /**
+   * Invokes {@link Plugin#setContext(PluginContext)} on all the plugins in this context. Any
+   * incompatible plugins are removed, and on the rest, {@link Plugin#start()} is invoked.
+   */
+  
+  public void setAndStart() throws PluginStartException{
+    activePluginsCount = 0;
+    for (int i = 0; i < plugins.length; i++){
+      boolean ok = plugins[i].setContext(this);
+      isPluginActive[i] = ok;
+      if (ok)
+        activePluginsCount++;
+    }
+    
+    // Start the plugins
+    for (int i = 0; i < plugins.length; i++){
+      if (isPluginActive[i]){
+        Plugin plugin = plugins[i];
+        try{
+          plugin.start();
+        } catch (Exception e){
+            throw new PluginStartException(e, "Failed to start plugin: " + plugin);
+          }
+      }
+    }
   }
 
 
@@ -130,7 +176,7 @@ public class PluginContext{
 
   public Plugin getPlugin(String id){
     for (int i = 0; i < plugins.length; i++)
-      if (plugins[i].getId().equals(id))
+      if (isPluginActive[i] && plugins[i].getId().equals(id))
         return plugins[i];
 
     return null;
@@ -143,10 +189,12 @@ public class PluginContext{
    */
    
   public Plugin [] getPlugins(){
-    Plugin [] plugins = new Plugin[this.plugins.length];
+    Plugin [] plugins = new Plugin[activePluginsCount];
     
-    for (int i = 0; i < plugins.length; i++)
-      plugins[i] = this.plugins[i];
+    int pluginCount = 0;
+    for (int i = 0; i < this.plugins.length; i++)
+      if (isPluginActive[i])
+        plugins[pluginCount++] = this.plugins[i];
     
     return plugins;
   }
