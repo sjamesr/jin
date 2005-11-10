@@ -136,21 +136,11 @@ public interface Connection{
 
 
   /**
-   * Connects and logs in to the server.  Throws an <code>IOException</code>
-   * if couldn't connect successfully. Returns <code>true</code> if
-   * successfully logged in, <code>false</code> otherwise.
+   * Initiates a connect-and-login procedure. The actual procedure should be
+   * performed asynchronously, and this method should return without blocking.
    */
 
-  boolean connectAndLogin(String hostname, int port) throws IOException;
-
-
-
-  /**
-   * Returns a message describing the error that occurred during the login
-   * procedure, if any.
-   */
-
-  String getLoginErrorMessage();
+  void initiateConnectAndLogin(String hostname, int port);
 
 
 
@@ -164,10 +154,13 @@ public interface Connection{
 
 
   /**
-   * Disconnects from the server.
+   * Closes the connection. The actual disconnection should be performed
+   * asynchronously, and this method should return without blocking.
+   * This method may be invoked at any time, even if the connection is
+   * not currently connected or logged in.
    */
 
-  void disconnect() throws IOException;
+  void close() throws IOException;
 
 
 
@@ -193,7 +186,7 @@ public interface Connection{
 
   /**
    * Sends the command closing the session to the server - this is usually "quit",
-   * or "exit".
+   * or "exit". This method will not be called unless the connection is connected.
    */
 
   void exit();
