@@ -21,8 +21,13 @@
 
 package free.jin.seek;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Toolkit;
+import java.net.URL;
+
+import free.jin.Connection;
 import free.jin.SeekConnection;
-import free.jin.event.ConnectionEvent;
 import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
 import free.jin.event.SeekListener;
@@ -30,11 +35,6 @@ import free.jin.plugin.*;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
-
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Toolkit;
-import java.net.URL;
 
 
 /**
@@ -65,15 +65,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
-   * Sets the plugin context - if the connection is not an instance of
-   * SeekJinConnection, this method throws an UnsupportedContextException.
+   * Sets the plugin context - return <code>false</code> if the connection is
+   * not an instance of <code>SeekJinConnection</code>.
    */
 
-  public void setContext(PluginContext context) throws PluginStartException{
+  public boolean setContext(PluginContext context){
     if (!(context.getConnection() instanceof SeekConnection))
-      throw new PluginStartException("The connection does not implement seeking functionality");
+      return false;
 
-    super.setContext(context);
+    return super.setContext(context);
   }
 
 
@@ -221,24 +221,24 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   
-  /*
-   * ConnectionListener implementation.
-   */
-  
-  public void connectionAttempted(ConnectionEvent evt){}
-  public void connectionEstablished(ConnectionEvent evt){}
-  public void connectionLoggedIn(ConnectionEvent evt){}
-  
-  
-  
   /**
    * Remove all seeks on disconnection. This just seems to make more sense than
    * leaving them on.   
    */
   
-  public void connectionLost(ConnectionEvent evt){
+  public void connectionLost(Connection conn){
     soughtGraph.removeAllSeeks();
   }
+  
+  
+  
+  // The rest of ConnectionListener's methods.
+  public void connectingFailed(Connection conn, String reason){}
+  public void connectionAttempted(Connection conn, String hostname, int port){}
+  public void connectionEstablished(Connection conn){}
+  public void loginFailed(Connection conn, String reason){}
+  public void loginSucceeded(Connection conn){}
+
 
 
   /**
