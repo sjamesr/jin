@@ -90,32 +90,16 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
 
 
   /**
-   * Fires the given <code>ConnectionEvent</code> to all interested listeners.
+   * Notifies all interested <code>Connection</code> listeners that an attempt to connect is being made.
    */
 
-  public void fireConnectionEvent(ConnectionEvent evt){
-    int evtID = evt.getID();
+  public void fireConnectionAttempted(Connection conn, String hostname, int port){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == ConnectionListener.class){
         ConnectionListener listener = (ConnectionListener)listeners[i+1];
         try{
-          switch (evtID){
-            case ConnectionEvent.ATTEMPTING:
-              listener.connectionAttempted(evt);
-              break;
-            case ConnectionEvent.ESTABLISHED:
-              listener.connectionEstablished(evt);
-              break;
-            case ConnectionEvent.LOGGED_IN:
-              listener.connectionLoggedIn(evt);
-              break;
-            case ConnectionEvent.LOST:
-              listener.connectionLost(evt);
-              break;
-            default:
-              throw new IllegalArgumentException("Unknown ConnectionEvent id: "+evtID);
-          }
+          listener.connectionAttempted(conn, hostname, port);
         } catch (RuntimeException e){
             e.printStackTrace();
           }
@@ -123,6 +107,106 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
     }
   }
 
+
+
+  /**
+   * Notifies all interested <code>Connection</code> listeners that a connection to the server has been established. 
+   */
+
+  public void fireConnectionEstablished(Connection conn){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ConnectionListener.class){
+        ConnectionListener listener = (ConnectionListener)listeners[i+1];
+        try{
+          listener.connectionEstablished(conn);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Notifies all interested <code>Connection</code> listeners that the attempt to connect failed.
+   */
+
+  public void fireConnectingFailed(Connection conn, String reason){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ConnectionListener.class){
+        ConnectionListener listener = (ConnectionListener)listeners[i+1];
+        try{
+          listener.connectingFailed(conn, reason);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Notifies all interested <code>Connection</code> listeners that login succeeded.
+   */
+
+  public void fireLoginSucceeded(Connection conn){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ConnectionListener.class){
+        ConnectionListener listener = (ConnectionListener)listeners[i+1];
+        try{
+          listener.loginSucceeded(conn);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Notifies all interested <code>Connection</code> listeners that login failed.
+   */
+
+  public void fireLoginFailed(Connection conn, String reason){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ConnectionListener.class){
+        ConnectionListener listener = (ConnectionListener)listeners[i+1];
+        try{
+          listener.loginFailed(conn, reason);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Notifies all interested <code>Connection</code> listeners that the connection to the server was lost.
+   */
+
+  public void fireConnectionLost(Connection conn){
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == ConnectionListener.class){
+        ConnectionListener listener = (ConnectionListener)listeners[i+1];
+        try{
+          listener.connectionLost(conn);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
 
 
   /**
