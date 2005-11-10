@@ -21,24 +21,27 @@
 
 package free.jin.freechess;
 
-import free.jin.*;
-import free.jin.event.*;
-import free.chess.*;
-import free.freechess.*;
-import jregex.Pattern;
-import jregex.Matcher;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.net.Socket;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
+
 import javax.swing.SwingUtilities;
-import free.jin.event.ListenerManager;
-import free.jin.freechess.event.IvarStateChangeEvent;
+
+import jregex.Matcher;
+import jregex.Pattern;
+import free.chess.*;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
+import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
-import free.chess.variants.atomic.Atomic;
+import free.chessclub.ChessclubConnection;
+import free.freechess.*;
+import free.jin.*;
+import free.jin.event.*;
+import free.jin.freechess.event.IvarStateChangeEvent;
 import free.util.Pair;
 import free.util.TextUtilities;
 
@@ -66,8 +69,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * requested username and password.
    */
 
-  public JinFreechessConnection(String username, String password){
-    super(username, password);
+  public JinFreechessConnection(String requestedUsername, String password){
+    super(requestedUsername, password, System.out);
 
     setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
@@ -139,79 +142,95 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public FreechessListenerManager getFreechessListenerManager(){
     return listenerManager;
   }
-
-
-
+  
+  
+  
   /**
-   * Fires an ATTEMPING connection event and invokes the superclass' method.
+   * Fires an "attempting" connection event and invokes {@link free.util.Connection#initiateConnect(String, int)}.
    */
+  
+  public void initiateConnectAndLogin(String hostname, int port){
+    listenerManager.fireConnectionAttempted(this, hostname, port);
 
-  public boolean connectAndLogin(String hostname, int port) throws IOException{
-    listenerManager.fireConnectionEvent(
-      new ConnectionEvent(this, ConnectionEvent.ATTEMPTING, hostname, port));
-
-    return super.connectAndLogin(hostname, port);
+    initiateConnect(hostname, port);
   }
-
-
-
+  
+  
+  
   /**
-   * Overrides createSocket() to fire a ConnectionEvent specifying that the connection
-   * was established when super.createSocket() returns (in the Event dispatching
-   * thread of course).
+   * Fires an "established" connection event.
    */
-
-  protected java.net.Socket createSocket(final String hostname, final int port) throws IOException{
-    java.net.Socket sock = new free.freechess.timeseal.TimesealingSocket(hostname, port);
-    // Comment this to disable timesealing
+  
+  protected void handleConnected(){
+    listenerManager.fireConnectionEstablished(this);
     
-    //java.net.Socket sock = new java.net.Socket(hostname, port);
-    // Comment this to enable timesealing
-
-    execRunnable(new Runnable(){
-
-      public void run(){
-        listenerManager.fireConnectionEvent(new ConnectionEvent(JinFreechessConnection.this, ConnectionEvent.ESTABLISHED, hostname, port));
-      }
-
-    });
-
-    return sock;
+    super.handleConnected();
   }
-
-
-
-
-
-
+  
+  
+  
   /**
-   * Performs various on-login tasks. Also notifies all interested
-   * ConnectionListeners that we've successfully logged in.
+   * Fires a "failed" connection event.
    */
-
-  public void onLogin(){
-    super.onLogin();
-
+  
+  protected void handleConnectingFailed(IOException e){
+    listenerManager.fireConnectingFailed(this, e.getMessage());
+    
+    super.handleConnectingFailed(e);
+  }
+  
+  
+  
+  /**
+   * Fires a "login succeeded" connection event and performs other on-login tasks.
+   */
+  
+  protected void handleLoginSucceeded(){
+    super.handleLoginSucceeded();
+    
     sendCommand("$set bell 0");
     filterLine("Bell off.");
-
-    listenerManager.fireConnectionEvent(
-      new ConnectionEvent(this, ConnectionEvent.LOGGED_IN, getHostname(), getPort()));
+    
+    listenerManager.fireLoginSucceeded(this);
   }
-
+  
+  
+  
+  /**
+   * Fires a "login failed" connection event.
+   */
+  
+  protected void handleLoginFailed(String reason){
+    listenerManager.fireLoginFailed(this, reason);
+    
+    super.handleLoginFailed(reason);
+  }
+  
+  
+  
+  /**
+   * Fires a "connection lost" connection event.
+   */
+  
+  protected void handleDisconnection(IOException e){
+    listenerManager.fireConnectionLost(this);
+    
+    super.handleDisconnection(e);
+  }
 
 
 
   /**
-   * Overrides processDisconnection() to fire a ConnectionEvent specifying that
-   * the connection was lost.
+   * Overrides {@link free.util.Connection#connectImpl(String, int)} to return a timesealing socket.
    */
 
-  protected void processDisconnection(){
-    listenerManager.fireConnectionEvent(
-      new ConnectionEvent(this, ConnectionEvent.LOST, getHostname(), getPort()));
+  protected Socket connectImpl(String hostname, int port) throws IOException{
+    // Comment this to disable timesealing
+    return new free.freechess.timeseal.TimesealingSocket(hostname, port);
+    
+    // Comment this to enable timesealing
+    // return new Socket(hostname, port);
   }
-
 
 
 

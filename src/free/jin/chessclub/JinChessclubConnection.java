@@ -120,30 +120,46 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
   /**
-   * Fires an ATTEMPING connection event and invokes the superclass' method.
+   * Fires an "attempting" connection event and invokes {@link free.util.Connection#initiateConnect(String, int)}.
    */
+  
+  public void initiateConnectAndLogin(String hostname, int port){
+    listenerManager.fireConnectionAttempted(this, hostname, port);
 
-  public boolean connectAndLogin(String hostname, int port) throws IOException{
-    listenerManager.fireConnectionEvent(
-      new ConnectionEvent(this, ConnectionEvent.ATTEMPTING, hostname, port));
-
-    return super.connectAndLogin(hostname, port);
+    initiateConnect(hostname, port);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Performs various on-login tasks. Also notifies all interested
-   * ConnectionListeners that we've successfully logged in.
+   * Fires an "established" connection event.
    */
-
-  public void onLogin(){
-    super.onLogin();
-
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOGGED_IN,
-      getHostname(), getPort()));
-
+  
+  protected void handleConnected(){
+    listenerManager.fireConnectionEstablished(this);
+    
+    super.handleConnected();
+  }
+  
+  
+  
+  /**
+   * Fires a "failed" connection event.
+   */
+  
+  protected void handleConnectingFailed(IOException e){
+    listenerManager.fireConnectingFailed(this, e.getMessage());
+    
+    super.handleConnectingFailed(e);
+  }
+  
+  
+  
+  /**
+   * Fires a "login succeeded" connection event and performs other on-login tasks.
+   */
+  
+  protected void handleLoginSucceeded(){
     sendCommand("set-quietly wrap 0");
 
     // Hack, currently, the server has a bug which causes it not to send us
@@ -151,6 +167,34 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     // line. Remove when Bert fixes it.
     if (isDGOn(Datagram.DG_TOURNEY))
       setDGOnAgain(Datagram.DG_TOURNEY);
+
+    listenerManager.fireLoginSucceeded(this);
+    
+    super.handleLoginSucceeded();
+  }
+  
+  
+  
+  /**
+   * Fires a "login failed" connection event.
+   */
+  
+  protected void handleLoginFailed(String reason){
+    listenerManager.fireLoginFailed(this, reason);
+    
+    super.handleLoginFailed(reason);
+  }
+  
+  
+  
+  /**
+   * Fires a "connection lost" connection event.
+   */
+  
+  protected void handleDisconnection(IOException e){
+    listenerManager.fireConnectionLost(this);
+    
+    super.handleDisconnection(e);
   }
 
 
@@ -211,30 +255,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
   /**
-   * Overrides createSocket() to fire a ConnectionEvent specifying that the connection
-   * was established when super.createSocket() returns (in the Event dispatching
-   * thread of course).
+   * Overrides {@link free.util.Connection#connectImpl(String, int)} to return a timestamping socket.
    */
 
-  protected Socket createSocket(final String hostname, final int port) throws IOException{
-    Socket sock = new free.chessclub.timestamp.TimestampingSocket(hostname, port);
-    // Comment this to disable timestamping
+  protected Socket connectImpl(String hostname, int port) throws IOException{
+    // Uncomment the following line to enable timestamping
+    return new free.chessclub.timestamp.TimestampingSocket(hostname, port);
     
-    //java.net.Socket sock = new java.net.Socket(hostname, port);
-    // Comment this to enable timestamping
-
-    execRunnable(new Runnable(){
-
-      public void run(){
-        listenerManager.fireConnectionEvent(new ConnectionEvent(JinChessclubConnection.this, ConnectionEvent.ESTABLISHED, hostname, port));
-      }
-
-    });
-
-    return sock;
+    // Uncomment the following line to disable timestamping
+    // return new java.net.Socket(hostname, port);
   }
-
-
 
 
 
@@ -410,19 +440,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void exit(){
     quit();
   }
-
-
-
-  /**
-   * Overrides processDisconnection() to fire a ConnectionEvent specifying that
-   * the connection was lost.
-   */
-
-  protected void processDisconnection(){
-    listenerManager.fireConnectionEvent(new ConnectionEvent(this, ConnectionEvent.LOST, getHostname(), getPort()));
-  }
-
-
 
 
 
