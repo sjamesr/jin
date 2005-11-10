@@ -66,17 +66,20 @@ public abstract class Plugin{
 
 
   /**
-   * Sets the plugin's context. The plugin may override this method to check
-   * that the context has the properties (usually the right type of Connection)
-   * required by the plugin and throw a <code>PluginStartException</code> if
-   * not.
+   * Sets the plugin's context. Returns whether it can operate properly with
+   * the specified context. Plugins that require special types of context
+   * (usually the right type of Connection) should override this method and
+   * check for their requirements. Plugins which return <code>false</code>
+   * will not be started.
    */
 
-  public void setContext(PluginContext context) throws PluginStartException{
+  public boolean setContext(PluginContext context){
     if (this.context != null)
       throw new IllegalStateException("PluginContext already set");
 
     this.context = context;
+    
+    return true;
   }
 
 
