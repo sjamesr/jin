@@ -25,7 +25,6 @@ package free.chessclub.level2;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.util.Vector;
 
 import free.util.FormatException;
