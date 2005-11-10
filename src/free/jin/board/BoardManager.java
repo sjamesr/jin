@@ -21,18 +21,6 @@
 
 package free.jin.board;
 
-import free.chess.*;
-import free.jin.Game;
-import free.jin.Preferences;
-import free.jin.board.event.UserMoveEvent;
-import free.jin.board.event.UserMoveListener;
-import free.jin.event.*;
-import free.jin.plugin.*;
-import free.jin.ui.OptionPanel;
-import free.jin.ui.PreferencesPanel;
-import free.jin.ui.UIProvider;
-import free.util.BeanProperties;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -45,6 +33,19 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import free.chess.*;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.Preferences;
+import free.jin.board.event.UserMoveEvent;
+import free.jin.board.event.UserMoveListener;
+import free.jin.event.*;
+import free.jin.plugin.*;
+import free.jin.ui.OptionPanel;
+import free.jin.ui.PreferencesPanel;
+import free.jin.ui.UIProvider;
+import free.util.BeanProperties;
 
 
 /**
@@ -1121,13 +1122,15 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   
-  /*
+  /**
    * ConnectionListener implementation.
    */
   
-  public void connectionAttempted(ConnectionEvent evt){}
-  public void connectionEstablished(ConnectionEvent evt){}
-  public void connectionLoggedIn(ConnectionEvent evt){}
+  public void connectingFailed(Connection conn, String reason){}
+  public void connectionAttempted(Connection conn, String hostname, int port){}
+  public void connectionEstablished(Connection conn){}
+  public void loginFailed(Connection conn, String reason){}
+  public void loginSucceeded(Connection conn){}
   
   
   
@@ -1136,7 +1139,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * dandy, and so may the user.   
    */
   
-  public void connectionLost(ConnectionEvent evt){
+  public void connectionLost(Connection conn){
     // We need to copy them to a Vector because you can't use an Enumeration
     // while modifying its HashTable, and gameEndCleanup modifies the HashTable
     Vector games = new Vector();
@@ -1406,6 +1409,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     return "Chess Board";
   }
   
-
-
+  
+  
 }
