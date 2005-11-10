@@ -612,7 +612,7 @@ public class Scripter extends Plugin{
       String [] supportedSubtypes = getEventSubtypesImpl();
       if ((supportedSubtypes != null) && ((eventSubtype == null) ||
                                          !Utilities.contains(supportedSubtypes, eventSubtype))){
-        System.err.println("Unknown event subtype occurred: "+eventSubtype);
+        System.err.println("Unknown event subtype occurred: " + eventSubtype);
         return;
       }
 
@@ -695,11 +695,16 @@ public class Scripter extends Plugin{
       listenerManager.removeConnectionListener(this);
     }
 
-    public void connectionAttempted(ConnectionEvent evt){runScripts(evt, subtypes[0], null);}
-    public void connectionEstablished(ConnectionEvent evt){runScripts(evt, subtypes[1], null);}
-    public void connectionLoggedIn(ConnectionEvent evt){runScripts(evt, subtypes[2], null);}
-    public void connectionLost(ConnectionEvent evt){runScripts(evt, subtypes[3], null);}
+    public void connectionAttempted(Connection conn, String hostname, int port){runScripts(null, subtypes[0], null);}
+    public void connectionEstablished(Connection conn){runScripts(null, subtypes[1], null);}
+    public void loginSucceeded(Connection conn){runScripts(null, subtypes[2], null);}
+    public void connectionLost(Connection conn){runScripts(null, subtypes[3], null);}
+    
+    // The rest of ConnectionListener's methods
+    public void connectingFailed(Connection conn, String reason){}
+    public void loginFailed(Connection conn, String reason){}
 
+    
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return null;
     }
