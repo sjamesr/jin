@@ -285,7 +285,7 @@ public class ConnectionManager{
     try{
       session = new Session(connDetails);
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
-      new LoginThread(session).start();
+      session.initiateLogin();
     } catch (PluginStartException e){
         e.printStackTrace();
         Exception reason = e.getReason();
@@ -294,6 +294,24 @@ public class ConnectionManager{
           (reason == null ? "" : reason.getClass().getName() + ": " + reason.getMessage());
         OptionPanel.error("Error", errorMessage);
       }
+  }
+  
+  
+  
+  /**
+   * Invoked by Session if login fails.
+   * 
+   * @param message The message with which login failed.
+   */
+  
+  void loginFailed(String message){
+    String errorMessage = "Error logging in:\n" + message;
+    OptionPanel.error("Login Error", errorMessage);
+    
+    // Reopen the connection UI
+    User user = session.getUser();
+    closeSession();
+    displayNewConnUI(user);
   }
   
   
@@ -438,58 +456,6 @@ public class ConnectionManager{
         user.isGuest() || !Jin.getInstance().isKnownUser(user) ? null : user.getUsername());
     else if (!user.isGuest())
       prefs.setString("last-login.username", user.getUsername());
-  }
-
-
-
-  /**
-   * The thread that connects and logs in to the server.
-   */
-
-  private class LoginThread extends Thread{
-
-
-
-    /**
-     * The session.
-     */
-
-    private final Session session;
-
-
-
-    /**
-     * Creates a new <code>LoginThread</code> with the specified session.
-     */
-
-    public LoginThread(Session session){
-      super("LoginThread-" + session.getServer().getId());
-
-      this.session = session;
-    }
-
-
-
-    /**
-     * Invoked {@link Session#login()} on the <code>Session</code> object
-     * specified in the constructor.
-     */
-
-    public void run(){
-      try{
-        session.login();
-      } catch (LoginException e){
-          String errorMessage = "Error logging in:\n" + e.getMessage();
-          OptionPanel.error("Login Error", errorMessage);
-          
-          // Reopen the connection UI
-          User user = session.getUser();
-          closeSession();
-          displayNewConnUI(user);
-        }
-    }
-
-
   }
 
 
