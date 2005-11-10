@@ -21,10 +21,17 @@
 
 package free.jin;
 
-import free.jin.plugin.*;
-import free.jin.action.*;
 import java.io.IOException;
 import java.util.Vector;
+
+import free.jin.action.ActionContext;
+import free.jin.action.ActionInfo;
+import free.jin.action.JinAction;
+import free.jin.event.ConnectionListener;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginContext;
+import free.jin.plugin.PluginInfo;
+import free.jin.plugin.PluginStartException;
 
 
 /**
@@ -185,21 +192,10 @@ public class Session{
     pluginContext = 
       new PluginContext(conn, getUser(), plugins, pluginPrefs, actions);
 
-    // Set context on plugins
-    for (int i = 0; i < plugins.length; i++)
-      plugins[i].setContext(pluginContext);
+    // Set context on plugins and start them
+    pluginContext.setAndStart();
     
-    // Start the plugins
-    for (int i = 0; i < plugins.length; i++){
-      Plugin plugin = plugins[i];
-      try{
-        plugin.start();
-      } catch (Exception e){
-          throw new PluginStartException(e, "Failed to start plugin: " + plugin);
-        }
-    }
-
-    return plugins;
+    return pluginContext.getPlugins();
   }
 
 
@@ -267,68 +263,18 @@ public class Session{
 
 
   /**
-   * Creates and starts the plugins, then connects and logs on to the server.
-   * Note that this method blocks until the connection is established (or until
-   * it fails to connect) and the account is logged in. Returns whether actually
-   * logged in (it is possible to fail without an error, if, for example we were
-   * closed while logging in).
-   *
-   * @throws LoginException if login fails with an error.
+   * Initiates connecting and logging in on the server.
+   * The method itself returns without waiting for a connection to be established or for login to finish, but it causes
+   * {@link ConnectionManager#loginFailed(String)} to be invoked if login fails.
    */
 
-  public boolean login() throws LoginException{
-    synchronized(this){
-      if (conn.isConnected())
-        throw new IllegalArgumentException("Session already logged in");
-      if (isClosed)
-        throw new IllegalArgumentException("Session already closed - can't reuse session");
-    }
-
-    String hostname = connDetails.getHost();
-    int [] ports = connDetails.getPorts();
-
-    // The error message for trying to connect to the corresponding port.
-    String [] errorMessages = new String[ports.length];
-
-    // Try the ports until one works
-    for (int portIndex = 0; portIndex < ports.length; portIndex++){
-      try{
-        boolean result = conn.connectAndLogin(hostname, ports[portIndex]);
-        synchronized(this){
-          if (!result)
-            throw new LoginException(conn.getLoginErrorMessage());
-          this.port = ports[portIndex];
-          break;
-        }
-      } catch (IOException e){
-          synchronized(this){
-            if (isClosed) // We got closed while logging in
-              return false;
-            errorMessages[portIndex] = e.getMessage();
-          }
-        }
-    }
-
-    synchronized(this){
-      // Failed to establish connection on all ports
-      if (!conn.isConnected()){
-        isClosed = true;
-
-        // Stop plugins
-        for (int i = 0; i < plugins.length; i++)
-          plugins[i].stop();
-
-        // Create and throw a login exception
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < errorMessages.length; i++)
-          buf.append("Port " + ports[i] + ": " + errorMessages[i] + "\n");
-
-        buf.setLength(buf.length() - 1);
-        throw new LoginException(buf.toString());
-      }
-      else
-        return true;
-    }
+  synchronized void initiateLogin(){
+    if (conn.isConnected())
+      throw new IllegalArgumentException("Session already logged in");
+    if (isClosed)
+      throw new IllegalArgumentException("Session already closed - can't reuse session");
+    
+    new ConnectionInitializer(connDetails.getHost(), connDetails.getPorts()).go();
   }
 
 
@@ -357,16 +303,143 @@ public class Session{
       plugins[i].stop();
 
     try{
-      if (conn.isConnected()){
+      if (conn.isConnected())
         conn.exit();
-        conn.disconnect();
-      }
+      
+      conn.close();
     } catch (IOException e){
         System.err.println("Failed to disconnect connection: " + conn);
         e.printStackTrace();
       } 
 
     isClosed = true;
+  }
+  
+  
+  
+  /**
+   * Initiates connection and login and then listens for results. If login fails, informs ConnectionManager.
+   */
+  
+  private class ConnectionInitializer implements ConnectionListener{
+    
+    
+    
+    /**
+     * The hostname to connect to.
+     */
+    
+    private final String hostname;
+    
+    
+    
+    /**
+     * The ports to connect on.
+     */
+    
+    private final int [] ports;
+    
+    
+    
+    /**
+     * The error messages we receive when logging in on each port.
+     */
+    
+    private final String [] errorMessages;
+    
+    
+    
+    /**
+     * The index of the current port on which we're trying to connect.
+     */
+    
+    private int portIndex = 0;
+    
+    
+    
+    /**
+     * Creates a new ConnectionInitializer with the specified hostname to connect to and the specified ports to connect
+     * on.
+     */
+    
+    public ConnectionInitializer(String hostname, int [] ports){
+      this.hostname = hostname;
+      this.ports = ports;
+      this.errorMessages = new String[ports.length];
+    }
+    
+    
+    
+    /**
+     * Initiates connection and login.
+     */
+    
+    public void go(){
+      conn.getListenerManager().addConnectionListener(this);
+      conn.initiateConnectAndLogin(hostname, ports[portIndex]);
+    }
+    
+    
+    
+    /**
+     * Tries to connect on the next port, or, if all ports have been tried, notifies the ConnectionManager.
+     */
+    
+    public void connectingFailed(Connection conn, String reason){
+      errorMessages[portIndex] = reason;
+      if (portIndex == ports.length - 1){ // All ports failed
+        
+        // Stop plugins
+        for (int i = 0; i < plugins.length; i++)
+          plugins[i].stop();
+
+        // Create the error message
+        StringBuffer errorMessage = new StringBuffer();
+        for (int i = 0; i < errorMessages.length; i++)
+          errorMessage.append("Port " + ports[i] + ": " + errorMessages[i] + "\n");
+        errorMessage.setLength(errorMessage.length() - 1);
+        
+        Jin.getInstance().getConnManager().loginFailed(errorMessage.toString());
+      }
+      else{
+        portIndex++;
+        conn.initiateConnectAndLogin(hostname, ports[portIndex]);
+      }
+    }
+    
+    
+    
+    
+    /**
+     * Notifies the connection manager that login failed.
+     */
+
+    public void loginFailed(Connection conn, String reason){
+      // Stop plugins
+      for (int i = 0; i < plugins.length; i++)
+        plugins[i].stop();
+      
+      Jin.getInstance().getConnManager().loginFailed(reason);
+    }
+    
+    
+    
+    /**
+     * Unregisters us as a connection listener, since connection succeeded.
+     */
+    
+    public void loginSucceeded(Connection conn){
+      conn.getListenerManager().removeConnectionListener(this);
+    }
+    
+    
+    // The rest of ConnectionListener's methods.
+    public void connectionAttempted(Connection conn, String hostname, int port){}
+    public void connectionEstablished(Connection conn){}
+    public void connectionLost(Connection conn){}
+    
+    
+    
   }
 
 
