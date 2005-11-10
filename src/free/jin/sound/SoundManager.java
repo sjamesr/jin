@@ -384,7 +384,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnConnect" event.
    */
 
-  public void connectionEstablished(ConnectionEvent evt){
+  public void connectionEstablished(Connection conn){
     playEventSound("OnConnect");
   }
 
@@ -395,7 +395,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnLogin" event.
    */
 
-  public void connectionLoggedIn(ConnectionEvent evt){
+  public void loginSucceeded(Connection conn){
     playEventSound("OnLogin");
   }
 
@@ -405,16 +405,19 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnDisconnect" event.
    */
 
-  public void connectionLost(ConnectionEvent evt){
+  public void connectionLost(Connection conn){
     playEventSound("OnDisconnect");
   }
 
 
   
-  public void connectionAttempted(ConnectionEvent evt){}
+  // The rest of ConnectionListener's methods.
+  public void connectingFailed(Connection conn, String reason){}
+  public void connectionAttempted(Connection conn, String hostname, int port){}
+  public void loginFailed(Connection conn, String reason){}
 
 
-  
+
   /**
    * Plays the sound mapped to the "GameStart" event.
    */

@@ -390,16 +390,15 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   protected String translateChat(ChatEvent evt){
     return evt.toString();
   }
-
-
-
+  
+  
+  
   /**
    * Gets called when a connection is attempted.
    */
 
-  public void connectionAttempted(ConnectionEvent evt){
-    console.addToOutput("Trying to connect to " + evt.getHost() + 
-                        " on port " + evt.getPort() + "...", "info");
+  public void connectionAttempted(Connection conn, String hostname, int port){
+    console.addToOutput("Trying to connect to " + hostname + " on port " + port + "...", "info");
   }
 
 
@@ -408,7 +407,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Gets called when the connection to the server is established.
    */
 
-  public void connectionEstablished(ConnectionEvent evt){
+  public void connectionEstablished(Connection conn){
     console.addToOutput("Connected", "info");  
   }
 
@@ -418,7 +417,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Gets called when the login procedure is done.
    */
 
-  public void connectionLoggedIn(ConnectionEvent evt){
+  public void loginSucceeded(Connection conn){
     consoleContainer.setTitle("Main Console - " + getConn().getUsername() +
       " on " + getServer().getLongName());
   }
@@ -429,10 +428,15 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    * Gets called when the connection to the server is lost.
    */
 
-  public void connectionLost(ConnectionEvent evt){
+  public void connectionLost(Connection conn){
     console.addToOutput("WARNING: Disconnected", "info");
   }
-
+  
+  
+  
+  // The rest of ConnectionListener's methods.
+  public void connectingFailed(Connection conn, String reason){}
+  public void loginFailed(Connection conn, String reason){}
 
 
 
