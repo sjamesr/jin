@@ -32,7 +32,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
-import free.jin.plugin.PluginStartException;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
 import bsh.Interpreter;
@@ -128,16 +127,15 @@ public class GameLogger extends Plugin implements GameListener{
 
 
   /**
-   * Sets the plugin context - if the connection is not an instance of
-   * <code>PGNConnection</code>, this method throws a
-   * <code>PluginStartException</code>.
+   * Sets the plugin context - returns <code>false</code> if the connection is
+   * not an instance of <code>PGNConnection</code>.
    */
 
-  public void setContext(PluginContext context) throws PluginStartException{
+  public boolean setContext(PluginContext context){
     if (!(context.getConnection() instanceof PGNConnection))
-      throw new PluginStartException("The connection doesn't implement the features necessary for game logging");
+      return false;
 
-    super.setContext(context);
+    return super.setContext(context);
   }
 
 
