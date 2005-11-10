@@ -23,11 +23,13 @@
 package free.freechess;
 
 import java.io.*;
-import jregex.*;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
 import java.util.BitSet;
-import java.util.Vector;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+
+import jregex.Matcher;
+import jregex.Pattern;
+import free.util.Connection;
 
 
 /**
@@ -49,7 +51,7 @@ import java.util.Vector;
  * use for printing the output to the screen or a file.
  */
 
-public class FreechessConnection extends free.util.Connection implements Runnable{
+public class FreechessConnection extends Connection{
 
 
 
@@ -66,24 +68,14 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   protected static final String TITLES_REGEX = "\\([A-Z\\*\\(\\)]*\\)";
-
-
-
+  
+  
+  
   /**
-   * The lock we wait on when logging.
-   */
-
-  private final Object loginLock = new String("Login Lock");
-
-
-
-
-  /**
-   * The OutputStream to the server.
+   * The stream where we log the commands sent to the server and data arriving from the server.
    */
   
-  private OutputStream out;
-
+  private final PrintStream logStream;
 
 
 
@@ -134,27 +126,21 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   /**
    * Creates a new <code>FreechessConnection</code> with the given requested 
-   * username and password.
+   * username, password and optional log stream. Note that the actual
+   * username is assigned by the server and is not known until after the
+   * login. The echo stream, if not <code>null</code> is used to log any
+   * commands we send to the server and information we receive from it.
    */
 
-  public FreechessConnection(String username, String password){
-    super(username, password);
+  public FreechessConnection(String requestedUsername, String password, PrintStream logStream){
+    super(requestedUsername, password);
+    
+    this.logStream = logStream;
 
     setIvarState(Ivar.NOWRAP, true);
     setIvarState(Ivar.DEFPROMPT, true); // Sets it to the default, which we filter out.
     setIvarState(Ivar.MS, true);
     setIvarState(Ivar.NOHIGHLIGHT, true);
-  }
-
-
-
-
-  /**
-   * Creates a new ReaderThread that will do the reading from the server.
-   */
-
-  protected Thread createReaderThread() throws IOException{
-    return new Thread(this);
   }
 
 
@@ -290,36 +276,27 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
 
   /**
-   * Logs in.
+   * Invoked when a connection to the server is established. Sends ivar settings to the server.
+   */
+  
+  protected void handleConnected(){
+    sendCommand(createLoginIvarsSettingString(requestedIvarStates));
+    ivarStates = (BitSet)requestedIvarStates.clone();
+    
+    super.handleConnected();
+  }
+  
+  
+  
+  /**
+   * Sends the login information to the server.
    */
 
-  protected boolean login() throws IOException{
-    out = sock.getOutputStream();
-
-    synchronized(this){
-      sendCommand(createLoginIvarsSettingString(requestedIvarStates));
-
-      ivarStates = (BitSet)requestedIvarStates.clone();
-
-      sendCommand(getRequestedUsername());
-      if (getPassword() != null)
-        sendCommand(getPassword(), false);
-    }
-
-
-    synchronized(loginLock){
-      try{
-        loginLock.wait(); // Wait until we receive the login line.
-      } catch (InterruptedException e){
-          throw new InterruptedIOException(e.getMessage());
-        } 
-    }
-
-    // We always set the login error message on error, so this is a valid way
-    // to check whether there was an error.
-    return getLoginErrorMessage() == null; 
+  protected void sendLoginSequence(){
+    sendCommand(getRequestedUsername());
+    if (getPassword() != null)
+      sendCommand(getPassword(), false);
   }
-
 
 
 
@@ -347,8 +324,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    * Sets the various things we need to set on login.
    */
 
-  protected void onLogin(){
-    super.onLogin();
+  protected void handleLoginSucceeded(){
+    super.handleLoginSucceeded();
 
     // Apply any ivar changes which might have occurred when we were waiting
     // for login.
@@ -382,7 +359,6 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   }
 
 
-
   
   /**
    * Sends the specified command to the server.
@@ -391,8 +367,9 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   public void sendCommand(String command){
     sendCommand(command, true);
   }
-
-
+  
+  
+  
   /**
    * Sends the given command to the server, optionally echoing it to System.out.
    */
@@ -405,16 +382,12 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
       System.out.println("SENDING COMMAND: " + command);
 
     try{
+      OutputStream out = getOutputStream();
       out.write(command.getBytes());
       out.write('\n');
       out.flush();
     } catch (IOException e){
-        e.printStackTrace();
-        try{
-          sock.close(); // Disconnect
-        } catch (IOException ex){
-            ex.printStackTrace();
-          }
+        connectionInterrupted(e);
       }
   }
 
@@ -436,37 +409,81 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
    */
 
   protected void processDisconnection(){}
-
-
-
-
-
+  
+  
+  
   /**
-   * This method is called by the reader thread when the connection the server
-   * is terminated.
+   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the
+   * specified <code>InputStream</code> in a <code>BufferedInputStream</code>
+   * and a <code>PushbackInputStream</code>.
    */
-
-  private synchronized void handleDisconnection(){
-    if (isConnected())
-      try{
-        disconnect();
-      } catch (IOException e){
-          e.printStackTrace();
-        }
-
-    processDisconnection();
+  
+  protected InputStream createInputStream(InputStream in){
+    return new PushbackInputStream(new BufferedInputStream(in));
   }
 
 
 
-
   /**
-   * This method is called by the reader thread when a line of text arrives from
-   * the server. The method is responsible for determining the type of the
+   * Reads a single line from the server.
+   */
+  
+  protected Object readMessage(InputStream inputStream) throws IOException{
+    PushbackInputStream pin = (PushbackInputStream)inputStream;
+    StringBuffer buf = new StringBuffer();
+    
+    boolean lineStartsWithPrompt = false;
+    while (true){
+      int b = pin.read();
+      
+      if (b < 0){
+        if (buf.length() == 0) // Clean disconnection
+          return null;
+        break;
+      }
+            
+      // End of line
+      if (b == '\n'){
+        // FICS uses \n\r for an end-of-line marker!?
+        // Eat the following '\r', if there is one
+        b = pin.read();
+        if ((b > 0) && (b != '\r'))
+          pin.unread(b);
+        
+        // Ignore all-prompt lines
+        if (lineStartsWithPrompt && (buf.length() == 0)){
+          lineStartsWithPrompt = false;
+          continue;
+        }
+        else
+          break;
+      }
+      
+      buf.append((char)b);
+      
+      // Filter out the prompt
+      if (buf.toString().equals("fics% ")){
+        buf.setLength(0);
+        lineStartsWithPrompt = true;
+      }
+    }
+    
+    return buf.toString();
+  }
+  
+  
+  
+  /**
+   * The method is responsible for determining the type of the
    * information, parsing it and sending it for further processing.
    */
 
-  private void handleLine(String line){
+  protected void handleMessage(Object lineObj){
+    String line = (String)lineObj;
+    
+    if (logStream != null)
+      logStream.println(line);
+    
     if (handleGameInfo(line))
       return;
     if (handleStyle12(line))
@@ -619,22 +636,15 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
 
   private boolean handleLogin(String line){
     Matcher matcher = LOGIN_REGEX.matcher(line);
-    if (matcher.matches()){
-      synchronized(loginLock){
-        setUsername(matcher.group(1));
-        loginLock.notify();
-      }
+    if ((!isLoggedIn()) && matcher.matches()){
+      loginSucceeded(matcher.group(1));
 
       processLine(line);
 
       return true;
     }
-    else if (WRONG_PASSWORD_REGEX.matcher(line).matches()){
-      synchronized(loginLock){
-        setLoginErrorMessage("Invalid password");
-        loginLock.notify();
-      }
-    }
+    else if ((!isLoggedIn()) && WRONG_PASSWORD_REGEX.matcher(line).matches())
+      loginFailed("Invalid password");
 
     return false;
   }
@@ -2211,118 +2221,8 @@ public class FreechessConnection extends free.util.Connection implements Runnabl
   protected boolean processPrimaryGameChanged(int gameNumber){
     return true;
   }
-
-
-
-
-  /**
-   * The run() method. This is called by the reader thread. Continuously reads
-   * lines of text from the server and sends them for further processing.
-   */
-
-  public void run(){
-    try{
-      final String prompt = "fics% ";
-      final int promptLength = prompt.length();
-
-      Vector lines = new Vector(50);
-
-      InputStream in = new BufferedInputStream(sock.getInputStream());
-
-      StringBuffer buf = new StringBuffer();
-      int b;
-      mainLoop: while ((b = in.read()) != -1){
-//        if (b == '\r')
-//          System.out.print("\\r");
-//        else if (b == '\n')
-//          System.out.print("\\n");
-//        System.out.print((char)b);
-        if (b == '\r')
-          continue;
-        else if (b == '\n'){
-          String s = buf.toString();
-          while (s.startsWith(prompt)){
-            s = s.substring(promptLength);
-            if (s.length() == 0){ // An all prompt line
-              buf.setLength(0);
-              continue mainLoop;
-            }
-          }
-          System.out.println(s);
-          lines.addElement(s);
-          buf.setLength(0);
-        }
-        else{
-          buf.append((char)b);
-        }
-                                    // <= 1 and not == 0 because of a bug in MS VM which 
-                                    // returns 1 and then blocks the next read() call.
-        if ((lines.size() > 100) || ((in.available() <= 1) && !lines.isEmpty())){
-          execRunnable(new HandleLinesRunnable(lines));
-          lines.removeAllElements();
-        }
-      }
-    } catch (IOException e){}
-    execRunnable(new Runnable(){
-
-      public void run(){
-        handleDisconnection();
-      }
-
-    });
-  }
-
-
-
-
-  /**
-   * A runnable which takes a vector of lines and invokes handleLine(String)
-   * with them when run. Used by the reader thread to communicate with the 
-   * data handling code.
-   */
-
-  private class HandleLinesRunnable implements Runnable{
-
-
-    /**
-     * The lines.
-     */
-
-    private final Vector lines;
-
-
-
-    /**
-     * Creates a new HandleLinesRunnable with the specified vector of lines.
-     */
-
-    public HandleLinesRunnable(Vector lines){
-      int size = lines.size();
-      this.lines = new Vector(size);
-      for (int i = 0; i < size; i++)
-        this.lines.addElement(lines.elementAt(i));
-    }
-
-
-
-
-    /**
-     * Calls the outer class' handleLine method with the string given in the
-     * constructor.
-     */
-
-    public void run(){
-      int size = lines.size();
-      for (int i = 0; i < size; i++){
-        String line = (String)lines.elementAt(i);
-        handleLine(line);
-      }
-    }
-
-
-  }
-
-
-
+  
+  
+  
 }
 

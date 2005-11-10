@@ -25,6 +25,7 @@ package free.chessclub;
 import java.io.*;
 import java.util.*;
 import free.chessclub.level2.*;
+import free.util.Connection;
 import free.util.EventListenerList;
 
 
@@ -39,10 +40,9 @@ import free.util.EventListenerList;
  */
 
 public class ChessclubConnection extends free.util.Connection{
-
-
-
-
+  
+  
+  
   /**
    * Maps rating keys to their english names.
    */
@@ -62,12 +62,12 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * The PrintStream where this ChessclubConnection echoes the information sent by the 
-   * server and the commands sent by it to the standard output stream. Null
-   * if it doesn't echo.
+   * The PrintStream where this <code>ChessclubConnection</code> logs the
+   * commands we send to the server and information we receive from it. May be
+   * <code>null</code> if we're not logging the above information.
    */
 
-  private final PrintStream echoStream;
+  private final PrintStream logStream;
 
   
 
@@ -123,22 +123,6 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * The OutputStream to the server.
-   */
-
-  private OutputStream out;
-
-
-
-  /**
-   * The lock we synchronize the login on.
-   */
-
-  private final Object loginLock = new String("Login Lock");
-
-
-
-  /**
    * A list of listeners to our datagram events, lazily instantiated.
    */
    
@@ -152,20 +136,21 @@ public class ChessclubConnection extends free.util.Connection{
    * ChessclubConnection, you can set the various settings (level2 settings for 
    * example) and then call the <code>connectAndLogin</code> method.
    *
-   * @param username The requested username, note that the actual username is
-   * unknown until after the login.
+   * @param requestedUsername The requested username, note that the actual
+   * username is unknown until after the login.
    * @param password The password of the account.
-   * @param echoStream The PrintStream where this ChessclubConnection will echo
-   * all information sent by the server and commands sent by this
-   * ChessclubConnection. Pass null if you don't want echoing.
+   * @param logStream The PrintStream where this ChessclubConnection will
+   * log all information sent by the server and commands sent by this
+   * <code>ChessclubConnection</code>. Pass <code>null</code> if you don't
+   * want logging.
    *
    * @see #setDGState(int, boolean)
    */
 
-  public ChessclubConnection(String username, String password, PrintStream echoStream){
-    super(username, password);
-
-    this.echoStream = echoStream;
+  public ChessclubConnection(String requestedUsername, String password, PrintStream logStream){
+    super(requestedUsername, password);
+    
+    this.logStream = logStream;
 
     // We need this to get the real username
     setDGState(Datagram.DG_WHO_AM_I, true); 
@@ -344,6 +329,7 @@ public class ChessclubConnection extends free.util.Connection{
   public final synchronized void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
+    
     this.interfaceVar = interfaceVar;
   }
 
@@ -426,55 +412,36 @@ public class ChessclubConnection extends free.util.Connection{
   
 
   /**
-   * Goes through the login procedure on a chessclub.com server.
-   *
-   * @throws IOException if an I/O error occured when connecting or logging on
-   * to the server.
-   *
-   * @see #isConnected()
-   * @see #disconnect()
+   * Sends the login information to the server.
    */
 
-  protected boolean login() throws IOException{
-    out = sock.getOutputStream();
-
-    synchronized(this){
-      // We could be disconnected between opening
-      // the socket and getting the lock
-      if (!isConnected())
-        return false;
-      
-      int largestSetDGNumber = level2Settings.size();
-      while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
-        largestSetDGNumber--;
-      if (largestSetDGNumber >= 0){
-        StringBuffer buf = new StringBuffer("level2settings=");
-        for (int i = 0; i <= largestSetDGNumber; i++){
-          buf.append(level2Settings.get(i) ? "1" : "0");
-        }
-        sendCommand(buf.toString());
-        level2SettingsSent = true;
+  protected void sendLoginSequence(){
+    if ((getPassword() == null) || (getPassword().length() == 0))
+      sendCommand(getRequestedUsername());
+    else
+      sendCommand(getRequestedUsername() + " " + getPassword(), false);
+  }
+  
+  
+  
+  /**
+   * Invoked when a connection to the server is established. Sends level2settings information to the server.
+   */
+  
+  protected void handleConnected(){
+    int largestSetDGNumber = level2Settings.size();
+    while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
+      largestSetDGNumber--;
+    if (largestSetDGNumber >= 0){
+      StringBuffer buf = new StringBuffer("level2settings=");
+      for (int i = 0; i <= largestSetDGNumber; i++){
+        buf.append(level2Settings.get(i) ? "1" : "0");
       }
-
-      String requestedUsername = getRequestedUsername();
-      String password = getPassword();
-      if ((password == null) || (password.length() == 0))
-        sendCommand(requestedUsername);
-      else
-        sendCommand(requestedUsername + " " + password, false);
+      sendCommand(buf.toString());
+      level2SettingsSent = true;
     }
-
-    synchronized(loginLock){
-      try{
-        loginLock.wait(); // Wait until we receive DG_WHO_AM_I or DG_LOGIN_FAILED
-      } catch (InterruptedException e){
-          throw new InterruptedIOException(e.getMessage());
-        } 
-    }
-
-    // We always set the login error message on error, so this is a valid way
-    // to check whether there was an error.
-    return getLoginErrorMessage() == null; 
+    
+    super.handleConnected();
   }
 
 
@@ -484,9 +451,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Sets the various things we need to set on login.
    */
 
-  protected void onLogin(){
-    super.onLogin();
-
+  protected void handleLoginSucceeded(){
     synchronized(this){
       // Apply any level2 changes which might have occurred when we were waiting
       // for login.
@@ -497,13 +462,149 @@ public class ChessclubConnection extends free.util.Connection{
       }
 
       sendCommand("set-quietly prompt 0");
+      sendCommand("set-quietly highlight 0");
       sendCommand("set-quietly style " + style);
       sendCommand("set-quietly interface " + interfaceVar);
     }
+    
+    super.handleLoginSucceeded();
   }
+  
+  
+  
+  /**
+   * Passes the message to either {@link #handleDatagram(Datagram)} or {@link #handleLine(String)}.
+   */
+  
+  protected void handleMessage(Object message){
+    if (message instanceof String)
+      handleLine((String)message);
+    else if (message instanceof Datagram)
+      handleDatagram((Datagram)message);
+    else
+      throw new IllegalArgumentException("Unrecognized message type: " + message.getClass().getName());
+  }
+  
+  
+  
+  /**
+   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the
+   * specified <code>InputStream</code> in a <code>BufferedInputStream</code>
+   * and a <code>PushbackInputStream</code>.
+   */
+  
+  protected InputStream createInputStream(InputStream in){
+    return new PushbackInputStream(new BufferedInputStream(in));
+  }
+  
+  
+  
+  /**
+   * Reads either a line of plain text or a datagram from the server.
+   */
+  
+  protected Object readMessage(InputStream in) throws IOException{
+    PushbackInputStream pin = (PushbackInputStream)in;
+    
+    while (true){
+      int b = pin.read();
+      
+      if (b < 0) // Clean disconnection
+        return null;
+      
+      pin.unread(b);
+      
+      if (b == Datagram.DG_DELIM) // Datagram
+        return Datagram.readDatagram(pin);
+      else{
+        String line = readLine(pin);
+        line = filterLine(line);
+        if (line != null)
+          return line;
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Read a line of plain text from the server.
+   */
+  
+  private String readLine(PushbackInputStream in) throws IOException{
+    StringBuffer buf = new StringBuffer();
+    
+    while (true){
+      int b = in.read();
+      
+      if (b < 0)
+        break;
+      
+      // End of line
+      if (b == '\n')
+        break;
+      
+      // '\r' is also a line delimiter
+      if (b == '\r'){
+        b = in.read(); // Eat the following '\n', if any
+        if ((b > 0) && (b != '\n'))
+          in.unread(b);
+        break;
+      }
+      
+      // Don't read any datagrams
+      if (b == Datagram.DG_DELIM){
+        in.unread(b);
+        break;
+      }
+      
+      buf.append((char)b);
+    }
+    
+    return buf.toString();
+  }
+  
+  
+  
+  /**
+   * Filters certain characters and character sequences (such as BEL and the prompt) from plain lines of text. Returns
+   * the string after filter, or <code>null</code> if the line should be completely ignored. 
+   */
+  
+  private String filterLine(String line){
+    int len = line.length();
 
-
-
+    // Keep initially empty lines.
+    if (len == 0)
+      return "";
+    
+    StringBuffer buf = new StringBuffer();
+    
+    int i = 0;
+    
+    // Skip leading prompt
+    while (line.startsWith("aics% ", i))
+      i += "aics% ".length();
+    
+    for (; i < len; i++){
+      char c = line.charAt(i);
+      
+      // Ignore BEL
+      if (c == 7)
+        continue;
+      
+      buf.append(c);
+    }
+    
+    // Ignore lines which have been completely filtered out
+    if (buf.length() == 0)
+      return null;
+    
+    return buf.toString();
+  }
+  
+  
+  
   /**
    * If the connection is currently logged in, sends the "exit" command to the
    * server. Otherwise the call is simply ignored.
@@ -517,16 +618,6 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Creates a new ReaderThread that will do the reading from the server.
-   */
-
-  protected Thread createReaderThread() throws IOException{
-    return new ReaderThread(new BufferedInputStream(sock.getInputStream()), this);
-  }
-
-
-  
-  /**
    * Sends the specified command to the server.
    */
    
@@ -537,30 +628,23 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * Sends the given command to the server, optionally echoing it to System.out.
+   * Sends the given command to the server, optionally logging it to the log stream.
    */
 
-  public synchronized void sendCommand(String command, boolean echo){
-    if (echo && (echoStream != null))
-      echoStream.println("SENDING COMMAND: " + command);
+  public synchronized void sendCommand(String command, boolean log){
+    if (!isConnected())
+      throw new IllegalStateException("Not connected");
+    
+    if (log && (logStream != null))
+      logStream.println("SENDING COMMAND: " + command);
 
-    // We can't check isLoggedIn() here because sendCommand is used by 
-    // login(), at which point we're obviously not logged in yet
-    if (out == null) 
-      throw new IllegalStateException("Not logged in");
     try{
+      OutputStream out = getOutputStream();
       out.write(command.getBytes());
       out.write('\n');
       out.flush();
     } catch (IOException e){
-        e.printStackTrace();
-        try{
-          if (isConnected())
-            disconnect();
-          out = null;
-        } catch (IOException ex){
-            ex.printStackTrace();
-          }
+        connectionInterrupted(e);
       }
   }
 
@@ -597,8 +681,7 @@ public class ChessclubConnection extends free.util.Connection{
 
 
   /**
-   * This method is called by the ReaderThread when a new level2 datagram 
-   * arrives from the server.
+   * This method is called when a new level2 datagram arrives from the server.
    *
    * @param datagram The level2 datagram that was received.
    *
@@ -606,22 +689,14 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public final void handleDatagram(Datagram datagram){
-    if (echoStream != null)
-      echoStream.println(datagram);
+    if (logStream != null)
+      logStream.println(datagram);
 
     int id = datagram.getId();
-    if ((id == Datagram.DG_WHO_AM_I) && !isLoggedIn()){
-      synchronized(loginLock){
-        setUsername(datagram.getString(0));
-        loginLock.notify();
-      }
-    }
-    else if ((id == Datagram.DG_LOGIN_FAILED) && !isLoggedIn()){
-      synchronized(loginLock){
-        setLoginErrorMessage(datagram.getString(1));
-        loginLock.notify();
-      }
-    }
+    if ((id == Datagram.DG_WHO_AM_I) && !isLoggedIn())
+      loginSucceeded(datagram.getString(0));
+    else if ((id == Datagram.DG_LOGIN_FAILED) && !isLoggedIn())
+      loginFailed(datagram.getString(1));
     else if (id == Datagram.DG_RATING_TYPE_KEY){
       int index = datagram.getInteger(0);
       String name = datagram.getString(1);
@@ -647,8 +722,7 @@ public class ChessclubConnection extends free.util.Connection{
   
   
   /**
-   * This method is called by the ReaderThread when a new line of plain text
-   * arrives from the server.
+   * This method is called when a new line of plain text arrives from the server.
    *
    * @param line The line that was received, '\n' not included.
    *
@@ -656,11 +730,11 @@ public class ChessclubConnection extends free.util.Connection{
    */
 
   public final void handleLine(String line){
-    if (echoStream != null)
-      echoStream.println(line);
+    if (logStream != null)
+      logStream.println(line);
+    
     processLine(line);
   }
-
 
 
 
@@ -675,38 +749,6 @@ public class ChessclubConnection extends free.util.Connection{
     
   }
 
-
-
-
-  /**
-   * This method is called by the ReaderThread when the connection the server
-   * is terminated.
-   */
-
-  final synchronized void handleDisconnection(){
-    if (echoStream != null)
-      echoStream.println("DISCONNECTED");
-
-    if (isConnected())
-      try{
-        disconnect();
-      } catch (IOException e){
-          e.printStackTrace();
-        }
-
-    processDisconnection();
-  }
-
-
-
-
-  /**
-   * This method is called to process disconnection from the server.
-   */
-
-  protected void processDisconnection(){
-
-  }
 
 
 }
