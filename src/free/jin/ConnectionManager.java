@@ -163,7 +163,7 @@ public class ConnectionManager{
     
     // Last logged in user
     User lastUser = getLastUser();
-    if (lastUser != null)
+    if ((lastUser != null) && (lastUser.getServer() == server))
       return lastUser;
     
     return null;
