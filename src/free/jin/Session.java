@@ -433,9 +433,21 @@ public class Session{
     }
     
     
+    
+    /**
+     * Sets the connection port in Session.
+     */
+    
+    public void connectionEstablished(Connection conn){
+      synchronized(Session.this){
+        Session.this.port = ports[portIndex];
+      }
+    }
+
+    
+    
     // The rest of ConnectionListener's methods.
     public void connectionAttempted(Connection conn, String hostname, int port){}
-    public void connectionEstablished(Connection conn){}
     public void connectionLost(Connection conn){}
     
     
