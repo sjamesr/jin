@@ -46,7 +46,7 @@ public class AskQuestionAction extends JinAction{
    */
    
   public String getId(){
-    return "getserverhelp";
+    return "askquestion";
   }
   
   
