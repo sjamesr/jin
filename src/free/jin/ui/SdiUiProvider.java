@@ -21,15 +21,6 @@
 
 package free.jin.ui;
 
-import free.jin.Jin;
-import free.jin.Preferences;
-import free.jin.SessionEvent;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginUIContainer;
-import free.jin.plugin.PluginUIEvent;
-import free.util.AWTUtilities;
-import free.util.RectDouble;
-
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,6 +31,16 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.SessionEvent;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
+import free.util.AWTUtilities;
+import free.util.RectDouble;
+import free.workarounds.FixedJFrame;
 
 
 
@@ -205,7 +206,7 @@ public class SdiUiProvider extends AbstractUiProvider{
     public FramePluginUIContainer(Plugin plugin, String id, int mode){
       super(plugin, id, mode);
       
-      this.frame = new JFrame("");
+      this.frame = new FixedJFrame("");
       
       frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       frame.addWindowListener(this);
