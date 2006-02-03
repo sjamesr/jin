@@ -21,23 +21,22 @@
 
 package free.jin.ui;
 
-import free.jin.Jin;
-import free.util.AWTUtilities;
-import free.util.IOUtilities;
-import free.util.swing.LinkLabel;
-import free.util.swing.PlainTextDialog;
-import free.util.swing.UrlDisplayingAction;
-
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.*;
+
+import free.jin.Jin;
+import free.util.AWTUtilities;
+import free.util.IOUtilities;
+import free.util.swing.LinkLabel;
+import free.util.swing.PlainTextDialog;
+import free.util.swing.UrlDisplayingAction;
 
 
 /**
@@ -72,14 +71,6 @@ public class LicensePanel extends DialogPanel{
 
 
 
-  /**
-   * The text of the jregex copyright, loaded lazily.
-   */
-
-  private String jregexCopyrightText = null;
-
-
-  
   /**
    * The text of the jgoodies copyright, loaded lazily.
    */
@@ -195,24 +186,6 @@ public class LicensePanel extends DialogPanel{
       }
     };
 
-    ActionListener jregexActionListener = new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        if (jregexCopyrightText == null){
-          try{
-            jregexCopyrightText = IOUtilities.loadText(Jin.class.getResource("legal/jregex.txt"));
-          } catch (IOException e){
-              e.printStackTrace();
-              return;
-            }
-        }
-
-        PlainTextDialog textDialog = new PlainTextDialog(LicensePanel.this, "The jregex License (BSD)", jregexCopyrightText);
-        textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
-        AWTUtilities.centerWindow(textDialog, getParent());
-        textDialog.setVisible(true);
-      }
-    };
-    
     
     ActionListener jgoodiesActionListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -275,20 +248,6 @@ public class LicensePanel extends DialogPanel{
     add(new JSeparator());
     add(Box.createVerticalStrut(10));
 
-    JPanel jregexPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    jregexPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-    LinkLabel jregexWebsiteLabel = new LinkLabel("jregex regular expression library");
-    jregexWebsiteLabel.setToolTipText("http://jregex.sourceforge.net");
-    jregexWebsiteLabel.addActionListener(new UrlDisplayingAction("http://jregex.sourceforge.net"));
-    jregexPanel.add(jregexWebsiteLabel);
-    jregexPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel jregexLicenseLabel = new LinkLabel("BSD license");
-    jregexLicenseLabel.addActionListener(jregexActionListener);
-    jregexPanel.add(jregexLicenseLabel);
-    jregexPanel.add(new JLabel("<html>.</html>"));
-    add(jregexPanel);
-    add(Box.createVerticalStrut(5));
-
     try{
       // Throws ClassNotFoundException if not found
       Class.forName("bsh.EvalError"); 
@@ -308,24 +267,7 @@ public class LicensePanel extends DialogPanel{
       add(Box.createVerticalStrut(5));
     } catch (ClassNotFoundException e){}
 
-    try{
-      if (new File("./sox").exists()){
-        JPanel soxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        soxPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-        LinkLabel soxWebsiteLabel = new LinkLabel("SoX - Sound eXchange commandline utility");
-        soxWebsiteLabel.setToolTipText("http://sox.sourceforge.net");
-        soxWebsiteLabel.addActionListener(new UrlDisplayingAction("http://sox.sourceforge.net"));
-        soxPanel.add(soxWebsiteLabel);
-        soxPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-        LinkLabel soxLicenseLabel = new LinkLabel("GNU Lesser General Public License");
-        soxLicenseLabel.addActionListener(lgplActionListener);
-        soxPanel.add(soxLicenseLabel);
-        soxPanel.add(new JLabel("<html>.</html>"));
-        add(soxPanel);
-        add(Box.createVerticalStrut(5));
-      }
-    } catch (SecurityException e){}
-    
+   
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     xboardPanel.add(new JLabel("<html>Jin contains a piece set from&nbsp</html>"));
     LinkLabel xboardWebsiteLabel = new LinkLabel("xboard/winboard");
