@@ -21,14 +21,13 @@
 
 package free.jin.console;
 
-import free.jin.Connection;
-import free.jin.Preferences;
-import free.util.BrowserControl;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -36,10 +35,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.*;
 
-import jregex.MatchIterator;
-import jregex.MatchResult;
-import jregex.Pattern;
-import jregex.PatternSyntaxException;
+import free.jin.Connection;
+import free.jin.Preferences;
+import free.util.BrowserControl;
 
 
 /**
@@ -131,7 +129,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting URLs.
    */
 
-  private static final Pattern URL_REGEX = new Pattern("((([Ff][Tt][Pp]|[Hh][Tt][Tt][Pp]([Ss])?)://)|([Ww][Ww][Ww]\\.))([^\\s()<>\"])*[^\\s.,()<>\"'!?]");
+  private static final Pattern URL_REGEX = Pattern.compile("((([Ff][Tt][Pp]|[Hh][Tt][Tt][Pp]([Ss])?)://)|([Ww][Ww][Ww]\\.))([^\\s()<>\"])*[^\\s.,()<>\"'!?]");
 
 
 
@@ -139,7 +137,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * The regular expression we use for detecting emails.
    */
 
-  private static final Pattern EMAIL_REGEX = new Pattern("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"'?]+");
+  private static final Pattern EMAIL_REGEX = Pattern.compile("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"'?]+");
 
 
   
@@ -538,7 +536,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         int subexpressionIndex = prefs.getInt("output-link.index-"+i);
 
         linkSubexpressionIndices[i] = subexpressionIndex;
-        Pattern regex = new Pattern(linkPattern);
+        Pattern regex = Pattern.compile(linkPattern);
         linkREs[i] = regex;
         linkCommands[i] = linkCommand;
       } catch (PatternSyntaxException e){
@@ -720,11 +718,10 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     AttributeSet emailAttributes = attributesForTextType("link.email");
     AttributeSet commandAttributes = attributesForTextType("link.command");
 
-    MatchIterator urlMatches = URL_REGEX.matcher(text).findAll();
-    while (urlMatches.hasMore()){
-      MatchResult result = urlMatches.nextMatch();
-      int matchStart = result.start();
-      int matchEnd = result.end();
+    Matcher urlMatcher = URL_REGEX.matcher(text);
+    while (urlMatcher.find()){
+      int matchStart = urlMatcher.start();
+      int matchEnd = urlMatcher.end();
 
       Command command = new Command("url "+text.substring(matchStart,matchEnd),
         Command.SPECIAL_MASK | Command.BLANKED_MASK);
@@ -736,11 +733,10 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       outputComponent.addLink(link);
     }
 
-    MatchIterator emailMatches = EMAIL_REGEX.matcher(text).findAll();
-    while (emailMatches.hasMore()){
-      MatchResult result = emailMatches.nextMatch();
-      int matchStart = result.start();
-      int matchEnd = result.end();
+    Matcher emailMatcher = EMAIL_REGEX.matcher(text);
+    while (emailMatcher.find()){
+      int matchStart = emailMatcher.start();
+      int matchEnd = emailMatcher.end();
 
       Command command = new Command("email "+text.substring(matchStart,matchEnd),
         Command.SPECIAL_MASK | Command.BLANKED_MASK);
@@ -758,23 +754,21 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       if (linkRE == null) // Bad pattern was given in properties.
         continue;
 
-      MatchIterator matches = linkRE.matcher(text).findAll();      
-      while(matches.hasMore()){
+      Matcher linkMatcher = linkRE.matcher(text);      
+      while(linkMatcher.find()){
         String linkCommand = linkCommands[i];
-
-        MatchResult result = matches.nextMatch();
 
         int index = -1;
         while ((index = linkCommand.indexOf("$", index+1))!=-1){
           if ((index<linkCommand.length()-1)&&(Character.isDigit(linkCommand.charAt(index+1)))){
             int subexpressionIndex = Character.digit(linkCommand.charAt(index+1),10);
-            linkCommand = linkCommand.substring(0,index)+result.group(subexpressionIndex)+linkCommand.substring(index+2);
+            linkCommand = linkCommand.substring(0,index) + linkMatcher.group(subexpressionIndex) + linkCommand.substring(index+2);
           }
         }
 
         int linkSubexpressionIndex = linkSubexpressionIndices[i];
-        int matchStart = result.start(linkSubexpressionIndex);
-        int matchEnd = result.end(linkSubexpressionIndex);
+        int matchStart = linkMatcher.start(linkSubexpressionIndex);
+        int matchEnd = linkMatcher.end(linkSubexpressionIndex);
 
         document.setCharacterAttributes(matchStart + oldTextLength, matchEnd - matchStart,
           commandAttributes, false);

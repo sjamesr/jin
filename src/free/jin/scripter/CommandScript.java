@@ -21,7 +21,9 @@
 
 package free.jin.scripter;
 
-import jregex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 import free.jin.Connection;
@@ -149,9 +151,9 @@ public class CommandScript extends Script{
       String varName = (String)var[0];
       String varValue = String.valueOf(var[1]);
 
-      Pattern pattern = new Pattern("\\$"+varName);
-      Replacer replacer = pattern.replacer(varValue);
-      code = replacer.replace(code);
+      Pattern pattern = Pattern.compile("\\$" + varName);
+      Matcher replacer = pattern.matcher(code);
+      code = replacer.replaceAll(varValue);
     }
     
     return code;
@@ -182,6 +184,7 @@ public class CommandScript extends Script{
       for (int i = 0; i < commands.length; i++){
         String line = preprocess(commands[i], vars);
         conn.sendCommand(line);
+        System.out.println("Script sent command: " + line);
       }
 
     } catch (EvalError e){

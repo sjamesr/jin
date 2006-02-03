@@ -26,9 +26,9 @@ import java.io.*;
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import jregex.Matcher;
-import jregex.Pattern;
 import free.util.Connection;
 
 
@@ -566,7 +566,7 @@ public class FreechessConnection extends Connection{
    * state of an ivar changing.
    */
 
-  private static final Pattern IVAR_SET_REGEX = new Pattern("^(\\w+) (un)?set.$");
+  private static final Pattern IVAR_SET_REGEX = Pattern.compile("^(\\w+) (un)?set.$");
 
 
 
@@ -613,7 +613,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern LOGIN_REGEX =
-    new Pattern("^\\*\\*\\*\\* Starting FICS session as ("+USERNAME_REGEX+")("+TITLES_REGEX+")? \\*\\*\\*\\*");
+    Pattern.compile("^\\*\\*\\*\\* Starting FICS session as ("+USERNAME_REGEX+")("+TITLES_REGEX+")? \\*\\*\\*\\*");
 
 
 
@@ -622,7 +622,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern WRONG_PASSWORD_REGEX = 
-    new Pattern("^\\*\\*\\*\\* Invalid password! \\*\\*\\*\\*");
+    Pattern.compile("^\\*\\*\\*\\* Invalid password! \\*\\*\\*\\*");
 
 
 
@@ -657,7 +657,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PERSONAL_TELL_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? tells you: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? tells you: (.*)");
 
 
 
@@ -702,7 +702,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern SAY_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?(\\[(\\d+)\\])? says: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?(\\[(\\d+)\\])? says: (.*)");
 
 
 
@@ -752,7 +752,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PTELL_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? \\(your partner\\) tells you: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? \\(your partner\\) tells you: (.*)");
 
 
 
@@ -797,7 +797,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern CHANNEL_TELL_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\((\\d+)\\): (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\((\\d+)\\): (.*)");
 
 
 
@@ -845,7 +845,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern KIBITZ_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\( {,3}([\\-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\( {0,3}([\\-0-9]+)\\)\\[(\\d+)\\] kibitzes: (.*)");
 
 
 
@@ -898,7 +898,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern WHISPER_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\( {,3}([\\-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\( {0,3}([\\-0-9]+)\\)\\[(\\d+)\\] whispers: (.*)");
 
 
 
@@ -948,7 +948,7 @@ public class FreechessConnection extends Connection{
    * The regular expression matching qtells.
    */
 
-  private static final Pattern QTELL_REGEX = new Pattern("^:(.*)");
+  private static final Pattern QTELL_REGEX = Pattern.compile("^:(.*)");
 
 
 
@@ -992,7 +992,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern SHOUT_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? shouts: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? shouts: (.*)");
 
 
 
@@ -1037,7 +1037,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern ISHOUT_REGEX = 
-    new Pattern("^--> ("+USERNAME_REGEX+")("+TITLES_REGEX+")? ?(.*)");
+    Pattern.compile("^--> ("+USERNAME_REGEX+")("+TITLES_REGEX+")? ?(.*)");
 
 
 
@@ -1083,7 +1083,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern TSHOUT_REGEX = 
-    new Pattern("^:("+USERNAME_REGEX+")("+TITLES_REGEX+")? t-shouts: (.*)");
+    Pattern.compile("^:("+USERNAME_REGEX+")("+TITLES_REGEX+")? t-shouts: (.*)");
 
 
 
@@ -1129,7 +1129,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern CSHOUT_REGEX = 
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? c-shouts: (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")? c-shouts: (.*)");
 
 
 
@@ -1174,7 +1174,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern ANNOUNCEMENT_REGEX = 
-    new Pattern("^    \\*\\*ANNOUNCEMENT\\*\\* from ("+USERNAME_REGEX+"): (.*)");
+    Pattern.compile("^    \\*\\*ANNOUNCEMENT\\*\\* from ("+USERNAME_REGEX+"): (.*)");
 
 
 
@@ -1328,7 +1328,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern GAME_END_REGEX = 
-    new Pattern("^\\{Game (\\d+) \\(("+USERNAME_REGEX+") vs\\. ("+USERNAME_REGEX+")\\) ([^\\}]+)\\} (.*)");
+    Pattern.compile("^\\{Game (\\d+) \\(("+USERNAME_REGEX+") vs\\. ("+USERNAME_REGEX+")\\) ([^\\}]+)\\} (.*)");
 
 
 
@@ -1377,7 +1377,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern STOPPED_OBSERVING_REGEX = 
-    new Pattern("^Removing game (\\d+) from observation list\\.$");
+    Pattern.compile("^Removing game (\\d+) from observation list\\.$");
 
 
 
@@ -1423,7 +1423,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern STOPPED_EXAMINING_REGEX = 
-    new Pattern("^You are no longer examining game (\\d+)\\.$");
+    Pattern.compile("^You are no longer examining game (\\d+)\\.$");
 
 
 
@@ -1517,7 +1517,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern ILLEGAL_MOVE_REGEX = 
-    new Pattern("^Illegal move \\((.*)\\)\\.(.*)");
+    Pattern.compile("^Illegal move \\((.*)\\)\\.(.*)");
 
     
     
@@ -1528,7 +1528,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern NOT_YOUR_TURN_REGEX =
-    new Pattern("^(It is not your move\\.)$");
+    Pattern.compile("^(It is not your move\\.)$");
     
     
     
@@ -1538,7 +1538,7 @@ public class FreechessConnection extends Connection{
    */
   
   private static final Pattern MOVED_WHEN_GAME_PAUSED = 
-    new Pattern("^(The clock is paused, use \"unpause\" to resume\\.)$");
+    Pattern.compile("^(The clock is paused, use \"unpause\" to resume\\.)$");
 
 
 
@@ -1704,7 +1704,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern OFFER_PARSER = 
-    new Pattern("^(\\d+) w=("+USERNAME_REGEX+") t=(\\S+) p=(.*)");
+    Pattern.compile("^(\\d+) w=("+USERNAME_REGEX+") t=(\\S+) p=(.*)");
 
   
   
@@ -1713,7 +1713,7 @@ public class FreechessConnection extends Connection{
    * made to the user.
    */
 
-  private static final Pattern OFFER_REGEX = new Pattern("^<p([tf])> (.*)");
+  private static final Pattern OFFER_REGEX = Pattern.compile("^<p([tf])> (.*)");
 
 
 
@@ -1888,7 +1888,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_OFFERED_DRAW_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") offers a draw\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") offers a draw\\.$");
   
 
 
@@ -1898,7 +1898,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_OFFERED_ABORT_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") requests to abort the game\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") requests to abort the game\\.$");
 
 
 
@@ -1908,7 +1908,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_OFFERED_ADJOURN_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") requests to adjourn the game\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") requests to adjourn the game\\.$");
 
 
 
@@ -1918,7 +1918,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_OFFERED_TAKEBACK_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") requests to take back (\\d+) half move\\(s\\)\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") requests to take back (\\d+) half move\\(s\\)\\.$");
 
 
 
@@ -1993,7 +1993,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_DECLINED_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") declines the (\\w+) request\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") declines the (\\w+) request\\.$");
 
 
 
@@ -2007,7 +2007,7 @@ public class FreechessConnection extends Connection{
       return false;
       
     Matcher matcher = PLAYER_DECLINED_REGEX.matcher(line);
-    if (!matcher.matches(line))
+    if (!matcher.matches())
       return false;
 
     int gameNum = Integer.parseInt(matcher.group(1));
@@ -2041,7 +2041,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_WITHDREW_REGEX = 
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") withdraws the (\\w+) request\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") withdraws the (\\w+) request\\.$");
 
 
 
@@ -2055,7 +2055,7 @@ public class FreechessConnection extends Connection{
       return false;
     
     Matcher matcher = PLAYER_WITHDREW_REGEX.matcher(line);
-    if (!matcher.matches(line))
+    if (!matcher.matches())
       return false;
 
     int gameNum = Integer.parseInt(matcher.group(1));
@@ -2090,7 +2090,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PLAYER_COUNTER_TAKEBACK_OFFER_REGEX =
-    new Pattern("^Game (\\d+): ("+USERNAME_REGEX+") proposes a different number \\((\\d+)\\) of half-move\\(s\\) to take back\\.$");
+    Pattern.compile("^Game (\\d+): ("+USERNAME_REGEX+") proposes a different number \\((\\d+)\\) of half-move\\(s\\) to take back\\.$");
 
 
 
@@ -2140,7 +2140,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern AT_BOARD_REGEX = 
-    new Pattern("^You are now at ("+USERNAME_REGEX+")'s board \\(game (\\d+)\\)\\.$");
+    Pattern.compile("^You are now at ("+USERNAME_REGEX+")'s board \\(game (\\d+)\\)\\.$");
 
 
 
@@ -2186,7 +2186,7 @@ public class FreechessConnection extends Connection{
    */
 
   private static final Pattern PRIMARY_GAME_CHANGED_REGEX =
-    new Pattern("^Your primary game is now game (\\d+)\\.$");
+    Pattern.compile("^Your primary game is now game (\\d+)\\.$");
 
 
 
@@ -2200,7 +2200,7 @@ public class FreechessConnection extends Connection{
       return false;
     
     Matcher matcher = PRIMARY_GAME_CHANGED_REGEX.matcher(line);
-    if (!matcher.matches(line))
+    if (!matcher.matches())
       return false;
 
     int gameNumber = Integer.parseInt(matcher.group(1));

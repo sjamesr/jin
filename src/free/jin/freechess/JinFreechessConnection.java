@@ -26,11 +26,11 @@ import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
-import jregex.Matcher;
-import jregex.Pattern;
 import free.chess.*;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
@@ -358,7 +358,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   private static final Pattern TOURNEY_TELL_REGEX =
-    new Pattern("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\(T(\\d+)\\): (.*)");
+    Pattern.compile("^("+USERNAME_REGEX+")("+TITLES_REGEX+")?\\(T(\\d+)\\): (.*)");
 
 
 

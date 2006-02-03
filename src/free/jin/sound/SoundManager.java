@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import jregex.Matcher;
-import jregex.Pattern;
-import jregex.PatternSyntaxException;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.Preferences;
@@ -195,7 +195,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
       try{
         String filename = prefs.getString(type + "-sound-" + i);
         String pattern = prefs.getString(type + "-pattern-" + i);
-        Pattern regex = new Pattern(pattern);
+        Pattern regex = Pattern.compile(pattern);
         
         if (!FILENAMES_TO_AUDIO_CLIPS.containsKey(filename)){
           // Currently all the sounds are located in the same directory as
