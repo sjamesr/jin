@@ -21,21 +21,30 @@
 
 package free.jin.gamelogger;
 
-import java.io.*;
-import free.jin.event.*;
-import free.chess.*;
-import free.jin.*;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Date;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import bsh.EvalError;
+import bsh.Interpreter;
+import free.chess.*;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.PGNConnection;
+import free.jin.Preferences;
+import free.jin.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
-import bsh.Interpreter;
-import bsh.EvalError;
 
 
 
@@ -43,7 +52,7 @@ import bsh.EvalError;
  * A plugin which allows logging games.
  */
 
-public class GameLogger extends Plugin implements GameListener{
+public class GameLogger extends Plugin implements GameListener, PropertyChangeListener{
 
 
 
@@ -404,12 +413,25 @@ public class GameLogger extends Plugin implements GameListener{
    */
 
   protected boolean canLog(Game game){
-    return (game.getVariant() instanceof Chess) && (game.getGameType() == Game.MY_GAME) && game.isPlayed();
+    return game.getVariant() instanceof Chess;
   }
 
 
 
-
+  /**
+   * Logs the specified game to all the files it should be logged into.
+   */
+  
+  private void log(Game game){
+    String [] filenames = getFilesToLogInto(game);
+    if (filenames != null){
+      for (int i = 0; i < filenames.length; i++)
+        log(game, filenames[i]);
+    }
+  }
+  
+  
+    
   /**
    * Logs the specified game into the specified file.
    */
@@ -539,6 +561,8 @@ public class GameLogger extends Plugin implements GameListener{
     Position initPos = game.getInitialPosition();
     GameInfo gameInfo = new GameInfo(initPos);
     gamesToGameInfo.put(game, gameInfo);
+    
+    game.addPropertyChangeListener(this);
   }
 
 
@@ -550,18 +574,26 @@ public class GameLogger extends Plugin implements GameListener{
 
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
-    if (canLog(game)){
-      String [] filenames = getFilesToLogInto(game);
-      if (filenames != null){
-        for (int i = 0; i < filenames.length; i++)
-          log(game, filenames[i]);
-      }
-    }
+    if (canLog(game) && (game.getGameType() == Game.MY_GAME) && game.isPlayed())
+      log(game);
     gamesToGameInfo.remove(game);
   }
+  
+  
+  
+  
+  /**
+   * Observes changes in the game which we care about.
+   */
+  
+  public void propertyChange(PropertyChangeEvent evt){
+    Game game = (Game)evt.getSource();
+    if (evt.getPropertyName().equals("played") && !game.isPlayed()) // The game ended and became examined
+      log(game);
+  }
 
-
-
+  
+  
 
   /**
    * Saves the move.
@@ -574,7 +606,7 @@ public class GameLogger extends Plugin implements GameListener{
     gameInfo.movelist.addElement(move);
   }
 
-
+  
 
 
   /**
@@ -586,7 +618,6 @@ public class GameLogger extends Plugin implements GameListener{
     GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
     gameInfo.initPos = evt.getPosition();
   }
-
 
 
 
