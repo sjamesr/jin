@@ -4,6 +4,9 @@
 
 1. Check whether you already hava Java installed by typing "java -version" at
    the commandline.
+   IMPORTANT: The result should not say something about "gcj" or "kaffe". If
+   it does, what you have is an incomplete Java implementation which cannot
+   run Jin. You will need to install a good version.
 2. If you don't, Install one of the following Java Runtime Environments:
    * Linux - Download and install one of the following 
      * IBM's 1.4 - 
@@ -20,7 +23,7 @@
    * Solaris - Usually Java comes preinstalled, but if it isn't, you can get one
        from http://java.sun.com/j2se/1.4/download.html.
 
-   * For other systems, I suggest a websearch for a 1.2 compatible JVM.
+   * For other systems, I suggest a websearch for a 1.4 compatible JVM.
 
 
 ***********************************
