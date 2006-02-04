@@ -55,12 +55,9 @@ Section "Jin"
     Goto no_delete_start_menu 
   
   no_delete_start_menu:
-  CreateDirectory $SMPROGRAMS\Jin
-  CreateShortCut $SMPROGRAMS\Jin\Jin.lnk $INSTDIR\jin.exe
-  CreateShortCut "$SMPROGRAMS\Jin\Jin (Standard Java).lnk" $INSTDIR\jin.jar
-  CreateShortCut "$SMPROGRAMS\Jin\Jin (Microsoft VM).lnk" $INSTDIR\jin_ms.exe
-  CreateShortCut $SMPROGRAMS\Jin\Readme.lnk $INSTDIR\readme.txt
-  CreateShortCut $SMPROGRAMS\Jin\Uninstall.lnk $INSTDIR\uninstall.exe
+    CreateDirectory $SMPROGRAMS\Jin
+    CreateShortCut $SMPROGRAMS\Jin\Jin.lnk $INSTDIR\jin.exe
+    CreateShortCut $SMPROGRAMS\Jin\Uninstall.lnk $INSTDIR\uninstall.exe
 SectionEnd
 
 
@@ -68,5 +65,3 @@ Section "Uninstall"
   RMDir /r $INSTDIR
   RMDir /r $SMPROGRAMS\Jin
 SectionEnd
-
-
