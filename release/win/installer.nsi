@@ -43,7 +43,7 @@ FunctionEnd
 
 Section "Jin"
   SetOutPath $INSTDIR
-  File /r ${dir}*.*
+  File /r ${dir}
 
   WriteUninstaller uninstall.exe
   
