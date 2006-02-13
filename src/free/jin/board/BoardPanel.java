@@ -1825,39 +1825,23 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           (isMoveEnRoute() || !isUserTurn()))
         setQueuedMove(move);
       else{
-        if ((!game.isPlayed()) || checkLegality(realPosition, move)){
-          UserMoveEvent evt2 = new UserMoveEvent(this, move);
-          fireUserMadeMove(evt2);
-          moveEnRoute = evt.getMove();
-          
-          // Stop the clock of the player who moved
-          getClockForPlayer(move.getPlayer()).setRunning(false);
-          
-          // Remember the time when it was stopped because if the move is illegal
-          // we will need to restart the clock with the correct amount of time
-          // (including the time the move spent in transit).
-          sentMoveTimestamp = System.currentTimeMillis();
-          
-          // Update clock activeness
-          updateClockActiveness();
-  
-          if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
-            board.setEditable(false);
-        }
-        else{ // Illegal move attempted
-          
-          // We do this in invokeLater because moveMade is called already in response
-          // to a position update, and updating it during an update breaks things
-          // (like the board's ability to know which pieces to repaint).
-          SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-              isBoardPositionUpdating = true;
-              board.getPosition().copyFrom(realPosition);
-              isBoardPositionUpdating = false;
-              playSound("IllegalMove");
-            }
-          });
-        }
+        UserMoveEvent evt2 = new UserMoveEvent(this, move);
+        fireUserMadeMove(evt2);
+        moveEnRoute = evt.getMove();
+        
+        // Stop the clock of the player who moved
+        getClockForPlayer(move.getPlayer()).setRunning(false);
+        
+        // Remember the time when it was stopped because if the move is illegal
+        // we will need to restart the clock with the correct amount of time
+        // (including the time the move spent in transit).
+        sentMoveTimestamp = System.currentTimeMillis();
+        
+        // Update clock activeness
+        updateClockActiveness();
+        
+        if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
+          board.setEditable(false);
       }
     }
   }
