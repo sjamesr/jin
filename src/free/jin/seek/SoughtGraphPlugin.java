@@ -105,7 +105,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   protected void initSoughtGraph(){
     soughtGraphContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
-    soughtGraphContainer.setTitle("Seek Graph");
+    soughtGraphContainer.setTitle("Sought Games Graph");
 
     URL iconImageURL = SoughtGraphPlugin.class.getResource("icon.gif");
     if (iconImageURL!= null)
