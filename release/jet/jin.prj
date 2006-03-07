@@ -16,7 +16,6 @@
 -jetvmprop=-Djin.noDynamicLoad=true
 
 -lookup=*.jar=.
--lookup=*.jar=lnfs
 -lookup=*.jar=libs;libs/icc;libs/fics
 -lookup=*.jar=actions;actions/icc;actions/fics
 -lookup=*.jar=plugins;plugins/icc;plugins/fics
@@ -36,7 +35,6 @@
 !module libs/board.jar
 !module libs/bsh-core-1.2b7.jar
 !module libs/console.jar
-!module libs/jregex.jar
 !module libs/scripter.jar
 !module libs/seek.jar
 !module libs/sound.jar
