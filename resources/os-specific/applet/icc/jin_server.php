@@ -40,24 +40,5 @@
 		else
 			return null;
 	}
-	
-	
-	// Returns text which will be placed before the applet.
-	function beforeApplet(){
-		return "";
-	}
-	
-	
-	// Returns text which will be placed after the applet.
-	function afterApplet(){
-		$s = "";
-		if (!isSSLPrefs())
-			$s = $s . "<strong>Warning:</strong> Your username and password will be sent " . 
-						"unencrypted to the server.";
-			
-		$s = $s . "<P><H3><A HREF=\"http://www.jinchess.com\">The Jin website</A></H3>";
 		
-		return $s;
-	}
-	
 ?>
