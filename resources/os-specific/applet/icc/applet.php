@@ -1,26 +1,10 @@
 <?php
-   $page_title = "Jin Applet";
-   include("begin.php");
-?>
- 
-<H1>
-	<img src="/images/bullet.gif" align="absmiddle" width="12" height="12" border="1">
-	<?php echo $page_title; ?>
-</H1>
-
-
-<?php
+	include "begin.php";
 	require_once 'jin_server.php';
 ?>
 
-
-<CENTER>
-<?php echo beforeApplet(); ?>
-<br>
-
-<P>
 <APPLET CODE="free.jin.JinApplet"
-        ARCHIVE="jin.jar, <?php if ($_REQUEST['oldjava']) echo "swingall.jar," ?>chess.jar, util.jar, libs/jregex.jar, libs/icc/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
+        ARCHIVE="jin.jar, chess.jar, util.jar, libs/icc/timestamping.jar, servers/chessclub.jar, libs/console.jar, plugins/icc/console.jar, libs/board.jar, plugins/icc/board.jar, libs/seek.jar, plugins/icc/seek.jar, libs/sound.jar, plugins/icc/sound.jar, plugins/actions.jar, actions/getserverhelp.jar, actions/askquestion.jar, actions/seek.jar"
 		WIDTH="450" HEIGHT="250">
 	
 	<PARAM NAME="prefsProtocol" VALUE="http<?php if (isSSLPrefs()) echo "s"?>">
@@ -52,26 +36,5 @@
 </APPLET>
 
 <?php
-	// This only works in IE, which waits for applets to load before firing
-	// an onLoad event. This is ok, though, because the applet only takes
-	// a long time to load under MS VM.
-
-	if ($_REQUEST['oldjava']){
-?>
-	<H2 id="waitMessage">Jin is loading - this may take a few minutes</H2>
-	<SCRIPT type="text/javascript">
-		function clearWaitMessage(){
-			document.getElementById('waitMessage').innerHTML = "";
-		}
-	</SCRIPT>
-<?php
-	}
-?>
-<br>
-<?php echo afterApplet(); ?>
-
-</CENTER>
-
-<?php
-  include("end.php");
+  include "end.php";
 ?>
