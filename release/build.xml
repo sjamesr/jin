@@ -6,24 +6,13 @@
   If nevertheless you decide to ignore this wise advice (and have tried
   the shower solution), here is a partial list of things you need to know:
 
-  1. Until the bug described at  
-     http://www-124.ibm.com/developerworks/bugs/?func=detailbug&bug_id=3099&group_id=10
-     is resolved, the only Java compiler that produces bytecode Microsoft VM
-     doesn't implode on is Jikes-1.15. Debug information must not be included
-     for this to work. No other compiler will work, trust me. Target flags don't
-     help either. Good luck installing and running jikes-1.15. *Evil grin* 
-  2. For windows releases, this buildfile uses the NSIS installer compiler from
-     http://nsis.sourceforge.net/. This currently (version 2.0) does not build
-     as-is under Linux, but the author promised to fix it sometime soon. In the
-     meanwhile you can get the extra required files from
-     http://sourceforge.net/tracker/download.php?group_id=22049&atid=373085&file_id=85769&aid=945832.
-  3. OS X releases require a Unix-like machine with dd, bash and hfsutils
+  1. To build a Windows installer, this buildfile uses the NSIS installer compiler from
+     http://nsis.sourceforge.net/.
+  2. OS X releases require a Unix-like machine with dd, bash and hfsutils
      (http://www.mars.org/home/rob/proj/hfs).
-  4. Building an applet or JET release requires some tasks from the ant-contrib project
+  3. Building an applet or JET release requires some tasks from the ant-contrib project
      which you can get from http://sourceforge.net/projects/ant-contrib/.
-  5. Building a JET release requires Excelsior JET 3.7. They used to offer free,
-     non-expiring licenses for personal use, but seem to have discontinued that
-     offer. They do offer a time-limited free trial, however.
+  4. Building a JET release requires Excelsior JET 4.1.
      Note that JET does not support cross compiling, so this buildfile creates
      a Linux release when run on Linux and a Windows release when run on Windows.
 
@@ -53,11 +42,13 @@
 	<target name="rebuild">
 		<echo message="Rebuilding Jin for ${release.platform}" />
 		<ant target="clean" dir="${jin.dir}" />
-		<ant target="build" dir="${jin.dir}" />
+		<ant target="build" dir="${jin.dir}">
+			<property name="build.target" value="1.4" />
+		</ant>
 	</target>
 	
 
-	<!-- Unix release. Resulting files are ${unix-archive} and ${unix-archive-no-extras} -->
+	<!-- Unix release. Resulting file is ${unix-archive} -->
 	<target name="unix" depends="init" description="Builds a release for Unix/Linux">
 		<echo message="Creating unix/linux release" />
 		
@@ -78,44 +69,31 @@
 		<mkdir dir="${unix-dir-to-tar}" />
 		<mkdir dir="${unix-files-dir}" />
 		<copy todir="${unix-files-dir}">
-			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/jgoodies-windows.jar" />
+			<fileset dir="${build.dir}" excludes="lnfs/jgoodies-windows.jar" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="unix" includes="README" />
 		</copy>
 		
 		<property name="unix-tar" value="${release.unix.dir}/jin-${release.version}-unix.tar" />
-		<property name="unix-tar-no-extras" value="${release.unix.dir}/jin-${release.version}-unix-no-extras.tar" />
 		<property name="unix-gz" value="${unix-tar}.gz" />
-		<property name="unix-gz-no-extras" value="${unix-tar-no-extras}.gz" />
 		
 		<tar destfile="${unix-tar}">
 			<tarfileset dir="${unix-dir-to-tar}" excludes="*/jin" />
 			<tarfileset dir="${unix-dir-to-tar}" includes="*/jin" mode="755" />
 		</tar>
-		<tar destfile="${unix-tar-no-extras}">
-			<tarfileset dir="${unix-dir-to-tar}" excludes="*/jin */resources/pieces/**" />
-			<tarfileset dir="${unix-dir-to-tar}" includes="*/jin" mode="755" />
-			<tarfileset dir="${unix-dir-to-tar}"
-				includes="*/resources/pieces/xboard.zip 
-				          */resources/pieces/icc/** */resources/pieces/fics/**" />
-		</tar>
 		
 		<gzip src="${unix-tar}" zipfile="${unix-gz}" />
-		<gzip src="${unix-tar-no-extras}" zipfile="${unix-gz-no-extras}" />
 		
 		<delete dir="${unix-dir-to-tar}" />
 		<delete file="${unix-tar}" />
-		<delete file="${unix-tar-no-extras}" />
 		
 		<property name="unix-archive" value="${unix-gz}" />
-		<property name="unix-archive-no-extras" value="${unix-gz-no-extras}" />
 	</target>
 	
 
 	
 	<!-- 
-	     Windows release. Resulting files are ${win-install}, ${win-archive}, 
-	     ${win-install-no-extras} and ${win-archive-no-extras} 
+	     Windows release. Resulting files are ${win-install} and ${win-archive}.
 	-->
 	<target name="windows" depends="init" description="Builds a release for Windows">
 		<echo message="Creating windows release" />
@@ -128,21 +106,17 @@
     
 		<antcall target="rebuild">
 			<param name="release.platform" value="windows" />
-			<param name="build.compiler" value="jikes" />
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
 		<property name="win-install" value="${release.win.dir}/jin-${release.version}-win.exe" />
 		<property name="win-archive" value="${release.win.dir}/jin-${release.version}-win.zip" />
-		<property name="win-install-no-extras" value="${release.win.dir}/jin-${release.version}-win-no-extras.exe" />
-		<property name="win-archive-no-extras" value="${release.win.dir}/jin-${release.version}-win-no-extras.zip" />
 
-		<!-- Build the standard release -->
+		<!-- Build the release -->
 		<mkdir dir="${dir-to-inst}" />
 		<copy todir="${dir-to-inst}">
 			<fileset dir="${build.dir}" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
-			<fileset dir="win" includes="readme.txt" />
 		</copy>
 		<antcall target="win-create-install">
 			<param name="target-dir" value="${dir-to-inst}" />
@@ -151,23 +125,6 @@
 		</antcall>
 		<delete dir="${dir-to-inst}" />
 
-		
-		<!-- Build the no-extras release -->
-		<mkdir dir="${dir-to-inst}" />
-		<copy todir="${dir-to-inst}">
-			<fileset dir="${build.dir}" excludes="resources/pieces/**" />
-			<fileset dir="${build.dir}" 
-				includes="resources/pieces/xboard.zip 
-			              resources/pieces/icc/** resources/pieces/fics/**" />
-			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
-			<fileset dir="win" includes="readme.txt" />
-		</copy>
-		<antcall target="win-create-install">
-			<param name="target-dir" value="${dir-to-inst}" />
-			<param name="exe" value="${win-install-no-extras}" />
-			<param name="zip" value="${win-archive-no-extras}" />
-		</antcall>
-		<delete dir="${dir-to-inst}" />		
 	</target>
 	
 	<!-- 
@@ -178,20 +135,24 @@
 	    zip: The name of tha archive
 	-->
 	<target name="win-create-install">
+		<!-- Get the command prefix for NSIS -->
+		<condition property="nsis-prefix" value="/" else="-">
+			<os family="windows"/>
+		</condition>
 		<exec dir="." executable="${win.setup.maker}" failonerror="yes">
-			<arg value="/NOCD" /> <!-- Don't change into the .nsi file's directory -->
-			<arg value="/V2" /> <!-- Low verbosity --> 
-			<arg value="/Ddir=${dir-to-inst}${file.separator}" /> <!-- The directory whose contents to install -->
-			<arg value="/Dfile=${exe}" /> <!-- The installer file -->
-			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
-			<arg value="win/installer.nsi" />
+			<arg value="${nsis-prefix}NOCD" /> <!-- Don't change into the .nsi file's directory -->
+			<arg value="${nsis-prefix}V2" /> <!-- Low verbosity --> 
+			<arg value="${nsis-prefix}Ddir=${target-dir}${file.separator}" /> <!-- The directory whose contents to install -->
+			<arg value="${nsis-prefix}Dfile=${exe}" /> <!-- The installer file -->
+			<arg value="${nsis-prefix}Dver=${release.version}" /> <!-- The Jin version -->
+			<arg value="win${file.separator}installer.nsi" />
 		</exec>
 		<zip destfile="${zip}" basedir="${dir-to-inst}" />
 	</target>
 	
 	
-
-	<!-- OS X release. Resulting file is ${osx-install} and ${osx-install-no-extras} -->
+	
+	<!-- OS X release. Resulting file is ${osx-install} -->
 	<target name="osx" depends="init" description="Builds a release for Mac OS X">
 		<echo message="Creating Mac OS X release" />
 
@@ -201,7 +162,6 @@
 		
 		<antcall target="rebuild">
 			<param name="release.platform" value="macosx" />
-			<param name="build.target" value="1.3" />
 		</antcall>
 		<property name="app-dir.name" value="Jin.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
@@ -217,19 +177,13 @@
 		</copy>
 		<copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
 		<copy todir="${app-dir}/Contents/Resources/Java">
-			<fileset dir="${build.dir}" excludes="swingall.jar lnfs/**" />
+			<fileset dir="${build.dir}" excludes="lnfs/**" />
 		</copy>
 		<mkdir dir="${app-dir}/Contents/MacOS" />
 		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
-
+		
 		<antcall target="osx-package">
 			<param name="release.name" value="jin-${release.version}-osx" />
-		</antcall>
-		<delete>
-			<fileset dir="${app-dir}/Contents/Resources/Java/resources/pieces" includes="*.zip" excludes="xboard.zip" />
-		</delete>
-		<antcall target="osx-package">
-			<param name="release.name" value="jin-${release.version}-osx-no-extras" />
 		</antcall>
 		
 		<delete dir="${app-dir}" />
@@ -241,7 +195,7 @@
 	<target name="osx-package">
 		<property name="dmg-filename" value="${release.name}.dmg" />
 		<exec executable="dd" dir="${release.osx.dir}" failonerror="yes">
-			<arg line="if=/dev/zero of=${dmg-filename} bs=1M count=15" />
+			<arg line="if=/dev/zero of=${dmg-filename} bs=1M count=30" />
 		</exec>
 		<exec executable="hformat" dir="${release.osx.dir}" failonerror="yes">
 			<arg line="-l Jin-${release.version} ${dmg-filename}" />
@@ -252,7 +206,8 @@
 		<gzip src="${release.osx.dir}/${dmg-filename}" zipfile="${release.osx.dir}/${dmg-filename}.gz" />
 		<delete file="${release.osx.dir}/${dmg-filename}" />
 	</target>
-
+	
+	
 	
 	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
 	<target name="applet" depends="init" description="Builds an applet release (JinApplet)">
@@ -270,8 +225,6 @@
 		<antcall target="rebuild">
 			<param name="release.name" value="Jin Applet" />
 			<param name="release.platform" value="applet" />
-			<param name="build.compiler" value="jikes" />
-			<param name="build.debug" value="no" /> <!-- Doesn't work under MS VM with debug on -->
 			<param name="build.compress" value="yes" />
 			<param name="build.manifest" value="release/applet/manifest.txt" />
 		</antcall>
@@ -279,7 +232,7 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="icc" />
 			<param name="server.file" value="chessclub.jar" />
-			<param name="libs" value="icc/timestamping.jar jregex.jar seek.jar board.jar sound.jar console.jar" />
+			<param name="libs" value="icc/timestamping.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
@@ -289,7 +242,7 @@
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="fics" />
 			<param name="server.file" value="freechess.jar" />
-			<param name="libs" value="fics/timesealing.jar jregex.jar seek.jar board.jar sound.jar console.jar" />
+			<param name="libs" value="fics/timesealing.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
@@ -306,7 +259,7 @@
 	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="util.jar chess.jar swingall.jar jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
+			<fileset dir="${build.dir}" includes="util.jar chess.jar jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
 		</copy>
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}/${server.name}" />
@@ -388,22 +341,11 @@
 		<gzip src="${src-tar}" zipfile="${src-archive}" />
 		<delete file="${src-tar}" />
 		
-		<property name="src-tar-no-extras" value="${release.src.dir}/jin-${release.version}-src-no-extras.tar" />
-		<property name="src-archive-no-extras" value="${src-tar-no-extras}.gz" />		
-		<tar destfile="${src-tar-no-extras}">
-			<tarfileset dir="${src-archive-dir}" excludes="*/resources/pieces/**" />
-			<tarfileset dir="${src-archive-dir}"
-				includes="*/resources/pieces/xboard.zip 
-				          */resources/pieces/icc/** */resources/pieces/fics/**" />
-		</tar>
-		<gzip src="${src-tar-no-extras}" zipfile="${src-archive-no-extras}" />
-		<delete file="${src-tar-no-extras}" />
-		
 		<delete dir="${src-archive-dir}" />
 	</target>
 
 	
-	<!-- Builds a release compiled with Excelsior JET 3.7 -->
+	<!-- Builds a release compiled with Excelsior JET 4.1 -->
 	<target name="jet" depends="init" description="Builds a release compiled with Excelsior JET">
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
 		
@@ -429,7 +371,7 @@
 		<property name="tmpdir" value="${basedir}/jet/tmp" />
 		<mkdir dir="${tmpdir}" />
 		<copy todir="${tmpdir}">
-			<fileset dir="${build.dir}" excludes="swingall.jar plugins/*/*.jar lnfs/**" />
+			<fileset dir="${build.dir}" excludes="plugins/*/*.jar lnfs/**" />
 		</copy>
 		<property name="efsep" value="\${file.separator}" /> <!-- Escaped File Separator-->
 		<copy todir="${tmpdir}">
