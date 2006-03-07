@@ -83,20 +83,17 @@
 		<mkdir dir="${libs.dir}" />
 		<mkdir dir="${servers.dir}" />
 		<mkdir dir="${plugins.dir}" />
-		<mkdir dir="${plugins.dir}/fics" />
 		<mkdir dir="${plugins.dir}/icc" />
+		<mkdir dir="${plugins.dir}/fics" />
 		<mkdir dir="${actions.dir}" />
-		<mkdir dir="${actions.dir}/fics" />
 		<mkdir dir="${actions.dir}/icc" />
+		<mkdir dir="${actions.dir}/fics" />
 		<mkdir dir="${lnfs.dir}" />
 		
 		
 		<!-- Copy libs -->
 		<copy todir="${libs.dir}">
-			<fileset dir="resources/libs" excludes="swingall.jar" />
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset dir="resources/libs" includes="swingall.jar" />
+			<fileset dir="resources/libs" />
 		</copy>
 		
 		<!-- Copy Look and Feels -->
@@ -234,6 +231,15 @@
 
 
 		
+		<!-- Internet Chess Club support -->
+		<jar jarfile="${servers.dir}/chessclub.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/chessclub/** free/chessclub/**" 
+			         excludes="free/jin/chessclub/definition" />
+			<fileset dir="${classes.dir}/free/jin/chessclub"
+			         includes="definition" />
+		</jar>
+		
 		<!-- Free Internet Chess Server support -->
 		<jar jarfile="${servers.dir}/freechess.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
@@ -243,14 +249,6 @@
 			         includes="definition" />
 		</jar>
 
-		<!-- Internet Chess Club support -->
-		<jar jarfile="${servers.dir}/chessclub.jar" compress="${build.compress}">
-			<fileset dir="${classes.dir}"
-			         includes="free/jin/chessclub/** free/chessclub/**" 
-			         excludes="free/jin/chessclub/definition" />
-			<fileset dir="${classes.dir}/free/jin/chessclub"
-			         includes="definition" />
-		</jar>
 
 		
 
@@ -272,7 +270,7 @@
 			<param name="server.id" value="fics" />
 			<param name="plugin.id" value="console" />
 		</antcall>
-
+		
 
 		
 		<!-- Sound plugin library -->
