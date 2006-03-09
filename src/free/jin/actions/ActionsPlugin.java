@@ -65,7 +65,7 @@ public class ActionsPlugin extends Plugin{
    */
   
   public String getName(){
-    return "Actions";
+    return getI18n().getString("pluginName");
   }
   
   
@@ -98,7 +98,7 @@ public class ActionsPlugin extends Plugin{
    
   private PluginUIContainer createButtonContainer(){
     PluginUIContainer container = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
-    container.setTitle("Actions");
+    container.setTitle(getI18n().getString("buttonPanelTitle"));
     
     return container;
   }
