@@ -21,12 +21,18 @@
 
 package free.jin.action.askquestion;
 
-import javax.swing.*;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
 import free.workarounds.FixedJTextField;
@@ -56,7 +62,7 @@ public class AskQuestionAction extends JinAction{
    */
    
   public String getName(){
-    return "Ask for Help..."; 
+    return getI18n().getString("actionName");
   }
   
   
@@ -79,7 +85,7 @@ public class AskQuestionAction extends JinAction{
    * A panel which asks the user to type in a question.
    */
    
-  private static class QuestionPanel extends DialogPanel{
+  private class QuestionPanel extends DialogPanel{
     
     
     
@@ -90,17 +96,16 @@ public class AskQuestionAction extends JinAction{
     public QuestionPanel(){
       setLayout(new BorderLayout(10, 10));
       
-      String [] labelText = new String[]{
-        "Type in a question and press the OK button.",
-        "Please be patient and watch for a response in the console window."
-      };
+      ResourceBundle i18n = getI18n();
+      String [] labelText = i18n.getString("instructionsLabel").split("\n");
+        
       JPanel labelsPanel = new JPanel(new GridLayout(labelText.length, 1));
       for (int i = 0; i < labelText.length; i++)
         labelsPanel.add(new JLabel(labelText[i]));
       
       
       final JTextField questionField = new FixedJTextField(30);
-      JLabel questionLabel = new JLabel("Question:");
+      JLabel questionLabel = new JLabel(i18n.getString("questionLabel"));
       questionLabel.setDisplayedMnemonic('Q');
       questionLabel.setLabelFor(questionField);
       JPanel textFieldPanel = new JPanel(new BorderLayout(10, 10));
@@ -108,9 +113,9 @@ public class AskQuestionAction extends JinAction{
       textFieldPanel.add(questionField, BorderLayout.CENTER);
       
       JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      JButton okButton = new JButton("OK");
-      JButton cancelButton = new JButton("Cancel");
-      buttonsPanel.add(okButton);
+      JButton sendButton = new JButton(i18n.getString("sendButtonText"));
+      JButton cancelButton = new JButton(i18n.getString("cancelButtonText"));
+      buttonsPanel.add(sendButton);
       buttonsPanel.add(cancelButton);
       
       add(labelsPanel, BorderLayout.NORTH);
@@ -118,8 +123,8 @@ public class AskQuestionAction extends JinAction{
       add(buttonsPanel, BorderLayout.SOUTH);
       
       
-      setDefaultButton(okButton);
-      okButton.addActionListener(new ActionListener(){
+      setDefaultButton(sendButton);
+      sendButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
           close(questionField.getText());
         }
@@ -135,7 +140,7 @@ public class AskQuestionAction extends JinAction{
      */
      
     public String getTitle(){
-      return "Ask a Question"; 
+      return getI18n().getString("dialogTitle"); 
     }
     
     
