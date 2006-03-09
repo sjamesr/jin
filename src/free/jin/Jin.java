@@ -21,6 +21,16 @@
 
 package free.jin;
 
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
+
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -31,14 +41,6 @@ import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
-
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import javax.swing.UIManager;
 
 
 
@@ -71,6 +73,14 @@ public class Jin{
    */
 
   private final Properties appProps;
+  
+  
+  
+  /**
+   * The locale for this instance of Jin.
+   */
+  
+  private final Locale locale;
   
   
   
@@ -112,6 +122,9 @@ public class Jin{
         e.printStackTrace();
         throw new IllegalStateException("Unable to load application properties from resources/app.props");
       }
+    
+    // Determine locale
+    locale = determineLocale();
       
     // Get known users (accounts on various servers);
     users = new DefaultListModel();
@@ -166,6 +179,31 @@ public class Jin{
 
   public void start(){
     uiProvider.start();
+  }
+  
+  
+  
+  /**
+   * Determines the locale for this instance of Jin. The locale is determined
+   * by the application properties, but may be overridden by user preferences,
+   * which may in turn be overridden by application parameters.
+   */
+  
+  private Locale determineLocale(){
+    String language, country;
+    
+    if ((language = getParameter("locale.language")) != null) // Check app params
+      country = getParameter("locale.country");
+    else if ((language = getPrefs().getString("locale.language", null)) != null) // Check user prefs
+      country = getPrefs().getString("locale.country"); 
+    else if ((language = getAppProperty("locale.language", null)) != null) // Check app properties
+       country = getAppProperty("locale.country", null);
+    else{ // default
+      language = "";
+      country = "";
+    }
+    
+    return new Locale(language, country == null ? "" : country);
   }
   
   
@@ -289,6 +327,31 @@ public class Jin{
     return context.getPrefs();
   }
   
+  
+  
+  /**
+   * Returns the locale for this instance of Jin.
+   */
+  
+  public Locale getLocale(){
+    return locale;
+  }
+  
+  
+  
+  /**
+   * Returns the <code>ResourceBundle</code> for the specified class.
+   */
+  
+  public ResourceBundle getResourceBundle(Class requestingClass){
+    String className = requestingClass.getName();
+    int lastDotIndex = className.lastIndexOf(".");
+    String packageName = lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
+    String bundleName = "".equals(packageName) ? "localization" : packageName + "." + "localization"; 
+    
+    return ResourceBundle.getBundle(bundleName, getLocale(), requestingClass.getClassLoader());
+  }
+
   
   
   /**
