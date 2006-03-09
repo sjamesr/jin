@@ -22,8 +22,10 @@
 package free.jin.action;
 
 import free.jin.*;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 
 /**
@@ -54,6 +56,14 @@ public abstract class JinAction implements ActionListener{
    */
   
   private Preferences prefs;
+  
+  
+  
+  /**
+   * The <code>ResourceBundle</code> for this action.
+   */
+  
+  private ResourceBundle i18n;
   
   
 
@@ -112,6 +122,7 @@ public abstract class JinAction implements ActionListener{
   }
   
   
+  
   /**
    * Returns the action's preferences.
    */
@@ -124,6 +135,19 @@ public abstract class JinAction implements ActionListener{
     }
 
     return prefs;
+  }
+  
+  
+  
+  /**
+   * A helper function which returns the <code>ResourceBundle</code> for this action.
+   */
+  
+  protected ResourceBundle getI18n(){
+    if (i18n == null)
+      i18n = Jin.getInstance().getResourceBundle(getClass());
+    
+    return i18n;
   }
   
   
