@@ -21,6 +21,8 @@
 
 package free.jin.plugin;
 
+import java.util.ResourceBundle;
+
 import free.jin.*;
 import free.jin.action.JinAction;
 import free.jin.ui.PreferencesPanel;
@@ -61,7 +63,14 @@ public abstract class Plugin{
    */
 
   private Preferences prefs;
-
+  
+  
+  
+  /**
+   * The <code>ResourceBundle</code> for this plugin.
+   */
+  
+  private ResourceBundle i18n;
 
 
 
@@ -132,6 +141,19 @@ public abstract class Plugin{
    
   public Resource getResource(String resourceType, String resourceId){
     return Jin.getInstance().getResource(resourceType, resourceId, this);
+  }
+  
+  
+  
+  /**
+   * A helper function which returns the <code>ResourceBundle</code> for this plugin.
+   */
+  
+  public ResourceBundle getI18n(){
+    if (i18n == null)
+      i18n = Jin.getInstance().getResourceBundle(getClass());
+    
+    return i18n;
   }
 
 
