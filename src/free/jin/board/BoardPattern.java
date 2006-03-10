@@ -59,8 +59,8 @@ public class BoardPattern implements Resource{
   
   static{
     DEFAULT_BOARD_PATTERN = new BoardPattern();
-    DEFAULT_BOARD_PATTERN.name = "default";
-    DEFAULT_BOARD_PATTERN.id = "Default";
+    DEFAULT_BOARD_PATTERN.name = "Default";
+    DEFAULT_BOARD_PATTERN.id = "default";
     DEFAULT_BOARD_PATTERN.boardPainter = new DefaultBoardPainter();
   }
   

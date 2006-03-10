@@ -58,8 +58,8 @@ public class PieceSet implements Resource{
   
   static{
     DEFAULT_PIECE_SET = new PieceSet();
-    DEFAULT_PIECE_SET.name = "default";
-    DEFAULT_PIECE_SET.id = "Default";
+    DEFAULT_PIECE_SET.name = "Default";
+    DEFAULT_PIECE_SET.id = "default";
     DEFAULT_PIECE_SET.piecePainter = new DefaultPiecePainter();
   }
   
