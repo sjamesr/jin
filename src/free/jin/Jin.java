@@ -24,7 +24,6 @@ package free.jin;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -340,28 +339,12 @@ public class Jin{
   
   
   /**
-   * Returns the <code>ResourceBundle</code> for the specified class.
-   */
-  
-  public ResourceBundle getResourceBundle(Class requestingClass){
-    String className = requestingClass.getName();
-    int lastDotIndex = className.lastIndexOf(".");
-    String packageName = lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
-    String bundleName = "".equals(packageName) ? "localization" : packageName + "." + "localization"; 
-    
-    return ResourceBundle.getBundle(bundleName, getLocale(), requestingClass.getClassLoader());
-  }
-
-  
-  
-  /**
    * Returns a list of supported servers.
    */
    
   public Server [] getServers(){
     return (Server [])context.getServers().clone();
   }
-
 
 
 
