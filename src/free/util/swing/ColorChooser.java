@@ -136,6 +136,16 @@ public class ColorChooser extends JComponent implements ActionListener{
   
   
   /**
+   * Sets the displayed mnemonic index.
+   */
+  
+  public void setDisplayedMnemonicIndex(int mnemonicIndex){
+    label.setDisplayedMnemonicIndex(mnemonicIndex);
+  }
+  
+  
+  
+  /**
    * Sets the enabled state of this color chooser.
    */
    
