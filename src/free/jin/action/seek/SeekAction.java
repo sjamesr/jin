@@ -27,12 +27,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ResourceBundle;
 
 import javax.swing.*;
 
 import free.chess.Player;
 import free.chess.WildVariant;
+import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.SeekConnection;
 import free.jin.UserSeek;
@@ -212,18 +212,18 @@ public class SeekAction extends JinAction{
      */
      
     private void createUI(){
-      ResourceBundle i18n = getI18n();
+      I18n i18n = getI18n();
       
       final int labelPad = 4; // To align labels with checkboxes
       
       
       // Time controls
       JLabel timeLabel = new JLabel(i18n.getString("timeLabel"));
-      timeLabel.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("timeLabel.displayedMnemonicIndex")));
+      timeLabel.setDisplayedMnemonicIndex(i18n.getInt("timeLabel.displayedMnemonicIndex"));
       timeLabel.setLabelFor(timeField);
       JLabel minutesLabel = new JLabel(i18n.getString("minutesLabel"));
       JLabel incLabel = new JLabel(i18n.getString("incrementLabel"));
-      incLabel.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("incrementLabel.displayedMnemonicIndex")));
+      incLabel.setDisplayedMnemonicIndex(i18n.getInt("incrementLabel.displayedMnemonicIndex"));
       incLabel.setLabelFor(incField);
       JLabel secondsLabel = new JLabel(i18n.getString("secondsLabel"));
       timeField.setMaximumSize(timeField.getPreferredSize());
@@ -244,12 +244,12 @@ public class SeekAction extends JinAction{
 
       // Game ratedness
       isRatedBox.setText(i18n.getString("ratedBoxLabel"));
-      isRatedBox.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("ratedBoxLabel.displayedMnemonicIndex")));
+      isRatedBox.setDisplayedMnemonicIndex(i18n.getInt("ratedBoxLabel.displayedMnemonicIndex"));
       
       
       // Variant
       JLabel variantLabel = new JLabel(i18n.getString("variantLabel"));
-      variantLabel.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("variantLabel.displayedMnemonicIndex")));
+      variantLabel.setDisplayedMnemonicIndex(i18n.getInt("variantLabel.displayedMnemonicIndex"));
       variantLabel.setLabelFor(variantChoice);
       variantChoice.setMaximumSize(variantChoice.getPreferredSize());
       
@@ -263,11 +263,11 @@ public class SeekAction extends JinAction{
 
       // Color
       autoColor.setText(i18n.getString("autoColorChoice"));
-      autoColor.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("autoColorChoice.displayedMnemonicIndex")));
+      autoColor.setDisplayedMnemonicIndex(i18n.getInt("autoColorChoice.displayedMnemonicIndex"));
       whiteColor.setText(i18n.getString("whiteColorChoice"));
-      whiteColor.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("whiteColorChoice.displayedMnemonicIndex")));
+      whiteColor.setDisplayedMnemonicIndex(i18n.getInt("whiteColorChoice.displayedMnemonicIndex"));
       blackColor.setText(i18n.getString("blackColorChoice"));
-      blackColor.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("blackColorChoice.displayedMnemonicIndex")));
+      blackColor.setDisplayedMnemonicIndex(i18n.getInt("blackColorChoice.displayedMnemonicIndex"));
       
       JLabel colorLabel = new JLabel(i18n.getString("colorLabel"));
       
@@ -285,14 +285,13 @@ public class SeekAction extends JinAction{
       
       // Limit opponent rating
       limitRatingBox.setText(i18n.getString("limitRatingLabel"));
-      limitRatingBox.setDisplayedMnemonicIndex(
-        Integer.parseInt(i18n.getString("limitRatingLabel.displayedMnemonicIndex")));
+      limitRatingBox.setDisplayedMnemonicIndex(i18n.getInt("limitRatingLabel.displayedMnemonicIndex"));
       
       JLabel minLabel = new JLabel(i18n.getString("minRatingLabel"));
-      minLabel.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("minRatingLabel.displayedMnemonicIndex")));
+      minLabel.setDisplayedMnemonicIndex(i18n.getInt("minRatingLabel.displayedMnemonicIndex"));
       minLabel.setLabelFor(minRatingField);
       JLabel maxLabel = new JLabel(i18n.getString("maxRatingLabel"));
-      maxLabel.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("maxRatingLabel.displayedMnemonicIndex")));
+      maxLabel.setDisplayedMnemonicIndex(i18n.getInt("maxRatingLabel.displayedMnemonicIndex"));
       maxLabel.setLabelFor(maxRatingField);
       minRatingField.setMaximumSize(minRatingField.getPreferredSize());
       maxRatingField.setMaximumSize(minRatingField.getPreferredSize());
@@ -321,12 +320,12 @@ public class SeekAction extends JinAction{
       
       // Manual accept
       manualAcceptBox.setText(i18n.getString("manualAcceptLabel"));
-      manualAcceptBox.setDisplayedMnemonicIndex(Integer.parseInt(i18n.getString("manualAcceptLabel.displayedMnemonicIndex")));
+      manualAcceptBox.setDisplayedMnemonicIndex(i18n.getInt("manualAcceptLabel.displayedMnemonicIndex"));
       
       
       // Use formula
       useFormulaBox.setText(i18n.getString("useFormulaLabel"));
-      useFormulaBox.setMnemonic(Integer.parseInt(i18n.getString("useFormulaLabel.displayedMnemonicIndex")));
+      useFormulaBox.setMnemonic(i18n.getInt("useFormulaLabel.displayedMnemonicIndex"));
       
 
       // Buttons panel

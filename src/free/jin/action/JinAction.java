@@ -21,11 +21,10 @@
 
 package free.jin.action;
 
-import free.jin.*;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
+import java.awt.event.ActionListener;
+
+import free.jin.*;
 
 
 /**
@@ -60,10 +59,10 @@ public abstract class JinAction implements ActionListener{
   
   
   /**
-   * The <code>ResourceBundle</code> for this action.
+   * The <code>I18n</code> for this action.
    */
   
-  private ResourceBundle i18n;
+  private I18n i18n;
   
   
 
@@ -140,12 +139,12 @@ public abstract class JinAction implements ActionListener{
   
   
   /**
-   * A helper function which returns the <code>ResourceBundle</code> for this action.
+   * A helper function which returns the <code>I18n</code> for this action.
    */
   
-  protected ResourceBundle getI18n(){
+  public I18n getI18n(){
     if (i18n == null)
-      i18n = Jin.getInstance().getResourceBundle(getClass());
+      i18n = I18n.createI18nHierarchy(getClass(), JinAction.class, Jin.getInstance().getLocale());
     
     return i18n;
   }

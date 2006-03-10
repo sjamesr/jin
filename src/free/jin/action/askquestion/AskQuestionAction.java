@@ -26,13 +26,13 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import free.jin.I18n;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
 import free.workarounds.FixedJTextField;
@@ -96,7 +96,7 @@ public class AskQuestionAction extends JinAction{
     public QuestionPanel(){
       setLayout(new BorderLayout(10, 10));
       
-      ResourceBundle i18n = getI18n();
+      I18n i18n = getI18n();
       String [] labelText = i18n.getString("instructionsLabel").split("\n");
         
       JPanel labelsPanel = new JPanel(new GridLayout(labelText.length, 1));

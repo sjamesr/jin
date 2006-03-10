@@ -21,7 +21,7 @@
 
 package free.jin.plugin;
 
-import java.util.ResourceBundle;
+import javax.swing.ListModel;
 
 import free.jin.*;
 import free.jin.action.JinAction;
@@ -29,8 +29,6 @@ import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.MemoryFile;
 import free.util.models.Model;
-
-import javax.swing.ListModel;
 
 
 /**
@@ -67,10 +65,10 @@ public abstract class Plugin{
   
   
   /**
-   * The <code>ResourceBundle</code> for this plugin.
+   * The <code>I18n</code> for this plugin.
    */
   
-  private ResourceBundle i18n;
+  private I18n i18n;
 
 
 
@@ -146,12 +144,12 @@ public abstract class Plugin{
   
   
   /**
-   * A helper function which returns the <code>ResourceBundle</code> for this plugin.
+   * A helper function which returns the <code>I18n</code> for this plugin.
    */
   
-  public ResourceBundle getI18n(){
+  public I18n getI18n(){
     if (i18n == null)
-      i18n = Jin.getInstance().getResourceBundle(getClass());
+      i18n = I18n.createI18nHierarchy(getClass(), Plugin.class, Jin.getInstance().getLocale());
     
     return i18n;
   }
