@@ -149,7 +149,7 @@ public abstract class Plugin{
   
   public I18n getI18n(){
     if (i18n == null)
-      i18n = I18n.createI18nHierarchy(getClass(), Plugin.class, Jin.getInstance().getLocale());
+      i18n = I18n.getInstance(getClass(), Plugin.class, Jin.getInstance().getLocale());
     
     return i18n;
   }

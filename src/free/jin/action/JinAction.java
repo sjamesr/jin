@@ -144,7 +144,7 @@ public abstract class JinAction implements ActionListener{
   
   public I18n getI18n(){
     if (i18n == null)
-      i18n = I18n.createI18nHierarchy(getClass(), JinAction.class, Jin.getInstance().getLocale());
+      i18n = I18n.getInstance(getClass(), JinAction.class, Jin.getInstance().getLocale());
     
     return i18n;
   }

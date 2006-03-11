@@ -75,7 +75,7 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   public BoardModifyingPrefsPanel(BoardManager boardManager, JinBoard previewBoard){
     this.boardManager = boardManager;
     this.previewBoard = previewBoard;
-    this.i18n = new I18n(getClass(), Jin.getInstance().getLocale());
+    this.i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
   }
   
   
