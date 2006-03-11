@@ -21,9 +21,9 @@
 
 package free.jin.board.fics;
 
-import free.jin.board.BoardPanel;
-import free.jin.board.BoardManager;
 import free.jin.Game;
+import free.jin.board.BoardManager;
+import free.jin.board.BoardPanel;
 
 
 /**
@@ -68,21 +68,6 @@ public class FreechessBoardPanel extends BoardPanel{
     int rating = game.getBlackRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
     return game.getBlackName() + game.getBlackTitles() + ratingString;
-  }
-
-
-
-
-  /**
-   * Overrides BoardPanel.createGameLabelText(Game) to return a freechess.org
-   * specific version.
-   */
-
-  protected String createGameLabelText(Game game){
-    free.chess.WildVariant variant = game.getVariant();
-    String category = variant.equals(free.chess.Chess.getInstance()) ?
-      game.getRatingCategoryString() : variant.getName();
-    return (game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + category;
   }
 
 

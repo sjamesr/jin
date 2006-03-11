@@ -191,22 +191,6 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
 
 
 
-
-  /**
-   * Overrides BoardPanel.createGameLabelText(Game) to return a chessclub.com
-   * specific version.
-   */
-
-  protected String createGameLabelText(Game game){
-    free.chess.WildVariant variant = game.getVariant();
-    String category = variant.equals(free.chess.Chess.getInstance()) ?
-      game.getRatingCategoryString() : variant.getName();
-    return (game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + category;
-  }
-
-
-
-
   /**
    * Gets called when an arrow is added to the board (by the server).
    */
