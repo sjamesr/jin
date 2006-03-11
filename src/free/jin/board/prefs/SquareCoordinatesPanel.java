@@ -92,20 +92,12 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     super(boardManager, previewBoard);
     
     int coordsDisplayStyle = boardManager.getCoordsDisplayStyle();
-    none = new JRadioButton("None", coordsDisplayStyle == JBoard.NO_COORDS);
-    rim = new JRadioButton("On the rim of the board (like winboard)", coordsDisplayStyle == JBoard.RIM_COORDS);
-    outside = new JRadioButton("Outside the board", coordsDisplayStyle == JBoard.OUTSIDE_COORDS);
-    everySquare = new JRadioButton("In every square", coordsDisplayStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    none = createRadioButton("noSquareCoordsRadioButton", coordsDisplayStyle == JBoard.NO_COORDS);
+    rim = createRadioButton("rimSquareCoordsRadioButton", coordsDisplayStyle == JBoard.RIM_COORDS);
+    outside = createRadioButton("outsideSquareCoordsRadioButton", coordsDisplayStyle == JBoard.OUTSIDE_COORDS);
+    everySquare = createRadioButton("everySquareCoordsRadioButton", coordsDisplayStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
     
-    coordsColor = new ColorChooser("Coordinates' text color:", boardManager.getCoordsDisplayColor());
-    
-    none.setToolTipText("No square coordinates are displayed on the board");
-    rim.setToolTipText("Row and column coordinates are displayed on the "+
-                       "border of the leftmost and bottommost squares");
-    outside.setToolTipText("Row and column coordinates are displayed outside "+
-                           "the board, along its left and bottom borders");
-    everySquare.setToolTipText("Square coordinates are displayed in each square");
-    coordsColor.setToolTipText("The color of the coordinates' text");
+    coordsColor = createColorChooser("coordsColorChooser", boardManager.getCoordsDisplayColor());
     
     ButtonGroup group = new ButtonGroup();
     group.add(none);
@@ -113,19 +105,13 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     group.add(outside);
     group.add(everySquare);
     
-    none.setMnemonic('N');
-    rim.setMnemonic('r');
-    outside.setMnemonic('O');
-    everySquare.setMnemonic('I');
-    coordsColor.setMnemonic('C');
-    
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
     JPanel contentPanel = new PreferredSizedPanel();
     contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
     contentPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Square Coordinates"),
+      BorderFactory.createTitledBorder(getI18n().getString("squareCoordsPanelTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     none.setAlignmentX(JComponent.LEFT_ALIGNMENT);

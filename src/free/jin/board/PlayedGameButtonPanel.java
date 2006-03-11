@@ -21,22 +21,30 @@
 
 package free.jin.board;
 
-import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.I18n;
 import free.jin.event.GameAdapter;
+import free.jin.event.GameEndEvent;
 import free.jin.event.GameListener;
 import free.jin.event.OfferEvent;
-import free.jin.event.GameEndEvent;
-import free.jin.Game;
-import free.jin.Connection;
 import free.jin.plugin.Plugin;
 import free.jin.ui.OptionPanel;
-import free.workarounds.FixedJPanel;
 import free.util.TableLayout;
+import free.workarounds.FixedJPanel;
 
 
 /**
@@ -220,7 +228,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   
   
   /**
-   * The takeback (1) button.
+   * The takeback1 (1 ply) button.
    */
    
   protected JButton takeback1Button;
@@ -236,7 +244,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   
   
   /**
-   * The multiple takeback button.
+   * The takeback2 (2 plies) button.
    */
    
   protected JButton takebackNButton;
@@ -438,25 +446,26 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   protected void createComponents(Plugin plugin, Game game){
     Connection conn = plugin.getConn();
 
-    resignButton = createButton("Resign", 'r');
-    drawButton = createButton("Draw", 'd');
-    abortButton = conn.isAbortSupported() ? createButton("Abort", 'a') : null;
-    adjournButton = conn.isAdjournSupported() ? createButton("Adjourn", 'j') : null;
-    takeback1Button = conn.isTakebackSupported() ? createButton("Takeback", 't') : null;
+    resignButton = createButton("resignButton");
+    drawButton = createButton("drawButton");
+    abortButton = conn.isAbortSupported() ? createButton("abortButton") : null;
+    adjournButton = conn.isAdjournSupported() ? createButton("adjournButton") : null;
+    takeback1Button = conn.isTakebackSupported() ? createButton("takebackButton") : null;
     takebackNButton = conn.isMultipleTakebackSupported() ?
-      createButton("Takeback 2", 'k') : null;
+      createButton("multipleTakebackButton") : null;
   }
 
 
 
   /**
-   * Creates a button with the specified text, mnemonic and action command.
+   * Creates a button with the specified i18n key.
    */
    
-  private JButton createButton(String text, char mnemonic){
-    JButton button = new JButton(text);
+  private JButton createButton(String i18nKey){
+    I18n i18n = plugin.getI18n();
+    JButton button = new JButton(i18n.getString(i18nKey + ".text"));
+    button.setDisplayedMnemonicIndex(i18n.getInt(i18nKey + ".displayedMnemonicIndex"));
     button.addActionListener(this);
-    button.setMnemonic(mnemonic);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
     
@@ -475,6 +484,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
 
   protected void setDrawState(int state){
+    I18n i18n = plugin.getI18n();
+    
     drawButton.setEnabled(state != OFFERED_STATE);
     
     switch (state){
@@ -483,22 +494,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        drawButton.setToolTipText("Offer a draw");
+        drawButton.setToolTipText(i18n.getString("drawButton.offerTooltip"));
         drawButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        drawButton.setToolTipText("Claim a draw");
+        drawButton.setToolTipText(i18n.getString("drawButton.claimTooltip"));
         drawButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        drawButton.setToolTipText("Accept a draw");
+        drawButton.setToolTipText(i18n.getString("drawButton.acceptTooltip"));
         drawButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
 
@@ -513,6 +524,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (abortButton == null)
       return;
     
+    I18n i18n = plugin.getI18n();
+    
     abortButton.setEnabled(state != OFFERED_STATE);    
 
     switch (state){
@@ -521,22 +534,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        abortButton.setToolTipText("Offer to abort the game");
+        abortButton.setToolTipText(i18n.getString("abortButton.offerTooltip"));
         abortButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        abortButton.setToolTipText("Abort the game");
+        abortButton.setToolTipText(i18n.getString("abortButton.claimTooltip"));
         abortButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        abortButton.setToolTipText("Agree to abort the game");
+        abortButton.setToolTipText(i18n.getString("abortButton.acceptTooltip"));
         abortButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
 
@@ -551,6 +564,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (adjournButton == null)
       return;
     
+    I18n i18n = plugin.getI18n();
+    
     adjournButton.setEnabled(state != OFFERED_STATE);    
 
     switch (state){
@@ -559,22 +574,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        adjournButton.setToolTipText("Offer to adjourn the game");
+        adjournButton.setToolTipText(i18n.getString("adjournButton.offerTooltip"));
         adjournButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        adjournButton.setToolTipText("Adjourn the game");
+        adjournButton.setToolTipText(i18n.getString("adjournButton.claimTooltip"));
         adjournButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        adjournButton.setToolTipText("Agree to adjourn the game");
+        adjournButton.setToolTipText(i18n.getString("adjournButton.acceptTooltip"));
         adjournButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
   
@@ -588,6 +603,8 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (takeback1Button == null)
       return;
     
+    I18n i18n = plugin.getI18n();
+    
     takeback1Button.setEnabled(state != OFFERED_STATE);    
 
     switch (state){
@@ -596,22 +613,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        takeback1Button.setToolTipText("Offer to take back a move");
+        takeback1Button.setToolTipText(i18n.getString("takebackButton.offerTooltip"));
         takeback1ButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        takeback1Button.setToolTipText("Take back a move");
+        takeback1Button.setToolTipText(i18n.getString("takebackButton.claimTooltip"));
         takeback1ButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        takeback1Button.setToolTipText("Agree to take back a move");
+        takeback1Button.setToolTipText(i18n.getString("takebackButton.acceptTooltip"));
         takeback1ButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
 
@@ -625,8 +642,12 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (takebackNButton == null)
       return;
     
+    I18n i18n = plugin.getI18n();
+    
+    Object [] plyCountArr = new Object[]{new Integer(plyCount)};
+    
     takebackNButton.setEnabled(state != OFFERED_STATE);
-    takebackNButton.setText("Takeback " + plyCount);
+    takebackNButton.setText(MessageFormat.format(i18n.getString("multipleTakebackButton.textPattern"), plyCountArr));
     takebackNButton.setActionCommand(String.valueOf(plyCount));
     
 
@@ -636,22 +657,22 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        takebackNButton.setToolTipText("Offer to take back " + plyCount + " moves");
+        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.offerTooltip"), plyCountArr));
         takebackNButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        takebackNButton.setToolTipText("Take back " + plyCount + " moves");
+        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.claimTooltip"), plyCountArr));
         takebackNButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        takebackNButton.setToolTipText("Agree to take back " + plyCount + " moves");
+        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.claimTooltip"), plyCountArr));
         takebackNButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
   
@@ -667,7 +688,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       case OFFER_STATE: 
         throw new IllegalArgumentException("The resign button may only be in claim state");
       case CLAIM_STATE:{
-        resignButton.setToolTipText("Resign the game");
+        resignButton.setToolTipText(plugin.getI18n().getString("resignButton.tooltip"));
         resignButtonPanel.setBorder(new EmptyBorder(
           STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE));
         break;
@@ -675,7 +696,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       case ACCEPT_STATE:
         throw new IllegalArgumentException("The resign button may only be in claim state");
       default:
-        throw new IllegalArgumentException("Unrecognized state: "+state);
+        throw new IllegalArgumentException("Unrecognized state: " + state);
     }
   }
 
@@ -733,7 +754,11 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
 
     Connection conn = plugin.getConn();
     if (source == resignButton){
-      Object result = OptionPanel.confirm(parentComponent, "Resign?", "RESIGN this game?", OptionPanel.OK);
+      I18n i18n = plugin.getI18n();
+      Object result = OptionPanel.confirm(parentComponent,
+          i18n.getString("resignConfirmation.title"),
+          i18n.getString("resignConfirmation.message"),
+          OptionPanel.OK);
       if (result == OptionPanel.OK)
         conn.resign(game);
     }

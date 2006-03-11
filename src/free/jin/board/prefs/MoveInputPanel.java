@@ -21,18 +21,21 @@
 
 package free.jin.board.prefs;
 
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import free.chess.JBoard;
+import free.jin.BadChangesException;
+import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.ui.OptionPanel;
-import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
-import free.chess.JBoard;
 
 
 /**
@@ -126,21 +129,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   public MoveInputPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    dragndrop = new JRadioButton("Drag and drop", 
-      boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
-    clicknclick = new JRadioButton("Click and click",
-      boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
-    
-    dragndrop.setToolTipText("Moves are entered by dragging pieces and "+
-                             "dropping them into their target squares");
-    clicknclick.setToolTipText("Moves are entered by clicking a piece, moving it "+
-                               "to its target square and then clicking again");
+    dragndrop = createRadioButton("dragndropRadioButton", boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
+    clicknclick = createRadioButton("clicknclickRadioButton", boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
     
     ButtonGroup moveInputGroup = new ButtonGroup();
     moveInputGroup.add(dragndrop);
     moveInputGroup.add(clicknclick);
-    dragndrop.setMnemonic('D');
-    clicknclick.setMnemonic('C');
     ActionListener moveInputListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setMoveInputStyle(getMoveInputStyle());
@@ -151,10 +145,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     dragndrop.addActionListener(moveInputListener);
     clicknclick.addActionListener(moveInputListener);
       
-    autoPromote = new JCheckBox("Auto-Promote", boardManager.isAutoPromote());
-    autoPromote.setToolTipText("Automatically promotes to a queen instead of "+
-                               "asking the user which piece to promote to");
-    autoPromote.setMnemonic('A');
+    autoPromote = createCheckBox("autoPromoteCheckBox", boardManager.isAutoPromote());
     autoPromote.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setManualPromote(!autoPromote.isSelected());
@@ -163,10 +154,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
     
-    pieceFollowsCursor = new JCheckBox("Piece follows cursor", 
-      boardManager.isPieceFollowsCursor());
-    pieceFollowsCursor.setToolTipText("When in the process of moving a piece, the piece will follow the mouse cursor");
-    pieceFollowsCursor.setMnemonic('P');
+    pieceFollowsCursor = createCheckBox("pieceFollowsCursorCheckBox", boardManager.isPieceFollowsCursor());
     pieceFollowsCursor.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
@@ -175,10 +163,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
       
-    highlightMadeMoveSquares = new JCheckBox("Highlight move squares",
-      boardManager.isHighlightMadeMoveSquares());
-    highlightMadeMoveSquares.setToolTipText("When in the process of moving a piece, the origin square and the square under the cursor are highlighted");
-    highlightMadeMoveSquares.setMnemonic('H');
+    highlightMadeMoveSquares = createCheckBox("highlightMadeMoveSquaresCheckBox", boardManager.isHighlightMadeMoveSquares());
     highlightMadeMoveSquares.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         boolean selected = highlightMadeMoveSquares.isSelected();
@@ -190,10 +175,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     
-    madeMoveSquaresHighlightColor = 
-      new ColorChooser("Highlight color:", boardManager.getMadeMoveSquaresHighlightColor());
-    madeMoveSquaresHighlightColor.setToolTipText("The color of the highlight \"Highlight move squares\" mode");
-    madeMoveSquaresHighlightColor.setMnemonic('t');
+    madeMoveSquaresHighlightColor = createColorChooser("madeMoveSquaresHighlightColorChooser", 
+        boardManager.getMadeMoveSquaresHighlightColor());
     madeMoveSquaresHighlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(
@@ -204,30 +187,24 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     
-    disallowMoveInAdvance = new JRadioButton("Disallow",
+    disallowMoveInAdvance = createRadioButton("disallowMoveInAdvanceRadioButton",
       boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);
-    immediateSendMove = new JRadioButton("Send move immediately",
+    immediateSendMove = createRadioButton("immediateSendMoveRadioButton",
       boardManager.getMoveSendingMode() == BoardManager.PREDRAG_MOVE_SENDING_MODE);
-    premove = new JRadioButton("Wait for turn (premove)",
+    premove = createRadioButton("premoveRadioButton",
       boardManager.getMoveSendingMode() == BoardManager.PREMOVE_MOVE_SENDING_MODE);
-    
-    disallowMoveInAdvance.setToolTipText("Disallows entering a move when it isn't your turn");
-    immediateSendMove.setToolTipText("Moves entered when it isn't your turn are sent immediately to the server");
-    premove.setToolTipText("Moves entered when it isn't your turn are sent when it becomes your turn");
     
     ButtonGroup movingInAdvanceButtonGroup = new ButtonGroup();
     movingInAdvanceButtonGroup.add(disallowMoveInAdvance);
     movingInAdvanceButtonGroup.add(immediateSendMove);
     movingInAdvanceButtonGroup.add(premove);
-    disallowMoveInAdvance.setMnemonic('D');
-    immediateSendMove.setMnemonic('S');
-    premove.setMnemonic('W');
     ActionListener movingInAdvanceListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
-          OptionPanel.error(MoveInputPanel.this, "Unable to change setting",
-            "Moving in advance settings may not be modified while playing a game");
+          I18n i18n = getI18n();
+          OptionPanel.error(MoveInputPanel.this, i18n.getString("moveInAdvanceChangeError.title"),
+            i18n.getString("moveInAdvanceChangeError.message"));
             
           disallowMoveInAdvance.setSelected(
             boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);
@@ -342,7 +319,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new PreferredSizedPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Move Input"),
+      BorderFactory.createTitledBorder(getI18n().getString("moveInputPanelTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
         
     dragndrop.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -365,7 +342,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Promoting"),
+      BorderFactory.createTitledBorder(getI18n().getString("promotionPanelTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     autoPromote.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -386,7 +363,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Move Visualization"),
+      BorderFactory.createTitledBorder(getI18n().getString("moveVisualizationPanelTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
     pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);    
@@ -411,7 +388,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Moving in Advance"),
+      BorderFactory.createTitledBorder(getI18n().getString("movingInAdvancePanelTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     disallowMoveInAdvance.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -422,8 +399,9 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(immediateSendMove);
     panel.add(premove);
     panel.add(Box.createVerticalStrut(5));
-    panel.add(new JLabel("These settings may not")); 
-    panel.add(new JLabel("be modified during a game")); 
+    String [] warnings = getI18n().getString("moveInAdvanceChangeWarning").split("\n");
+    for (int i = 0; i < warnings.length; i++)
+      panel.add(new JLabel(warnings[i]));
     panel.add(Box.createVerticalGlue());
 
     return panel;    

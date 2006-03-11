@@ -21,9 +21,18 @@
 
 package free.jin.board.prefs;
 
+import java.awt.Color;
+
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
+
+import free.jin.I18n;
+import free.jin.Jin;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.ui.PreferencesPanel;
+import free.util.swing.ColorChooser;
 
 
 /**
@@ -51,6 +60,14 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   
   
   /**
+   * The <code>I18n</code> for this preferences panel.
+   */
+  
+  private final I18n i18n;
+  
+  
+  
+  /**
    * Creates a new BoardModifyingPrefsPanel for the specified
    * <code>BoardManager</code> and with the specified preview board.
    */
@@ -58,6 +75,7 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   public BoardModifyingPrefsPanel(BoardManager boardManager, JinBoard previewBoard){
     this.boardManager = boardManager;
     this.previewBoard = previewBoard;
+    this.i18n = new I18n(getClass(), Jin.getInstance().getLocale());
   }
   
   
@@ -71,5 +89,72 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   public abstract void initPreviewBoard();
   
   
-   
+  
+  /**
+   * Returns the <code>I18n</code> for this preferences panel.
+   */
+  
+  public I18n getI18n(){
+    return i18n;
+  }
+  
+  
+  
+  /**
+   * A helper method which creates a <code>JRadioButton</code> from the
+   * specified i18n key and with the specified initial state.
+   */
+  
+  protected JRadioButton createRadioButton(String i18nKey, boolean initialState){
+    return (JRadioButton)init(new JRadioButton(), i18nKey, initialState);
+  }
+
+  
+  
+  /**
+   * A helper method which creates a <code>JCheckBox</code> from the
+   * specified i18n key and with the specified initial state.
+   */
+  
+  protected JCheckBox createCheckBox(String i18nKey, boolean initialState){
+    return (JCheckBox)init(new JCheckBox(), i18nKey, initialState);
+  }
+  
+  
+  
+  /**
+   * A helper method which creates a <code>ColorChooser</code> from the
+   * specified i18n key and with the specified initial value. 
+   */
+  
+  protected ColorChooser createColorChooser(String i18nKey, Color initialValue){
+    I18n i18n = getI18n();
+    
+    ColorChooser colorChooser = new ColorChooser(i18n.getString(i18nKey + ".text"), initialValue);
+    colorChooser.setDisplayedMnemonicIndex(i18n.getInt(i18nKey + ".displayedMnemonicIndex"));
+    colorChooser.setToolTipText(i18n.getString(i18nKey + ".tooltip"));
+    
+    return colorChooser;
+  }
+
+  
+  
+  /**
+   * Initializes the specified <code>AbstractButton</code> from the specified
+   * i18n key and with the specified initial state.
+   */
+  
+  private AbstractButton init(AbstractButton button, String i18nKey, boolean initialState){
+    I18n i18n = getI18n();
+    
+    button.setText(i18n.getString(i18nKey + ".text"));
+    button.setDisplayedMnemonicIndex(i18n.getInt(i18nKey + ".displayedMnemonicIndex"));
+    button.setToolTipText(i18n.getString(i18nKey + ".tooltip"));
+    button.setSelected(initialState);
+    
+    return button;
+  }
+  
+  
+  
 }

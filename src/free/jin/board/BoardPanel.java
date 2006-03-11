@@ -21,70 +21,27 @@
 
 package free.jin.board;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.MessageFormat;
 import java.util.Vector;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import free.chess.AbstractChessClock;
-import free.chess.ChessMove;
-import free.chess.JChessClock;
-import free.chess.Move;
-import free.chess.Player;
-import free.chess.Position;
+import free.chess.*;
 import free.chess.event.MoveEvent;
 import free.chess.event.MoveListener;
 import free.jin.Game;
+import free.jin.I18n;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
-import free.jin.event.BoardFlipEvent;
-import free.jin.event.ClockAdjustmentEvent;
-import free.jin.event.GameEndEvent;
-import free.jin.event.GameListener;
-import free.jin.event.GameStartEvent;
-import free.jin.event.IllegalMoveEvent;
-import free.jin.event.MoveMadeEvent;
-import free.jin.event.OfferEvent;
-import free.jin.event.PositionChangedEvent;
-import free.jin.event.TakebackEvent;
+import free.jin.event.*;
 import free.util.PlatformUtils;
 import free.util.SquareLayout;
 import free.util.Utilities;
@@ -413,7 +370,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         (PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2"))||
         ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))){
       fullscreenButton.setEnabled(false);
-      fullscreenButton.setToolTipText("Fullscreen board mode is unavailable on your system");
+      fullscreenButton.setToolTipText(boardManager.getI18n().getString("fullscreenUnavailableMessage"));
     }
     else{
       KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
@@ -728,7 +685,18 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected String createGameLabelText(Game game){
-    return (game.isRated() ? "Rated" : "Unrated") + " " + game.getTCString()+ " " + game.getVariant().getName();
+    I18n i18n = boardManager.getI18n();
+    String gameLabelFormat = i18n.getString("gameLabelFormat");
+    
+    WildVariant variant = game.getVariant();
+    String category = variant.equals(Chess.getInstance()) ?
+      game.getRatingCategoryString() : variant.getName();
+    
+    return MessageFormat.format(gameLabelFormat, new Object[]{
+        game.isRated() ? i18n.getString("rated") : i18n.getString("unrated"),
+        game.getTCString(),
+        category
+      });
   }
 
 
@@ -875,7 +843,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected TableModel createMoveListTableModel(Game game){
-    return new NonEditableTableModel(new String[]{"Move No.", "White", "Black"}, 0);
+    I18n i18n = boardManager.getI18n();
+    return new NonEditableTableModel(new String[]{
+          i18n.getString("moveListTable.moveNo"),
+          i18n.getString("moveListTable.white"),
+          i18n.getString("moveListTable.black")
+        }, 0);
   }
 
 
@@ -2006,7 +1979,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
           else if (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE)
             board.setEditable(isUserTurn());
           else
-            throw new IllegalStateException("Unrecognized move sending mode: "+moveSendingMode);
+            throw new IllegalStateException("Unrecognized move sending mode: " + moveSendingMode);
         }
       }
       else if ("coordsDisplayStyle".equals(propertyName))

@@ -144,7 +144,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createStartGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/start.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText("Go to the beginning of the game");
+    button.setToolTipText(plugin.getI18n().getString("gameStartButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt HOME"), WHEN_IN_FOCUSED_WINDOW);    
     button.setDefaultCapable(false);
@@ -163,7 +163,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createEndGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/end.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText("Go to the end of the game");
+    button.setToolTipText(plugin.getI18n().getString("gameEndButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt END"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
@@ -182,7 +182,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createBackwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/backward.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText("Go one ply backward");
+    button.setToolTipText(plugin.getI18n().getString("backwardButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt LEFT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
@@ -200,7 +200,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createForwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/forward.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText("Go one ply forward");
+    button.setToolTipText(plugin.getI18n().getString("forwardButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt RIGHT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);

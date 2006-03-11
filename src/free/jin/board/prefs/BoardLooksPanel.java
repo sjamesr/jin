@@ -21,23 +21,33 @@
 
 package free.jin.board.prefs;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+
 import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import free.jin.board.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import free.chess.BoardPainter;
+import free.chess.ColoredBoardPainter;
+import free.chess.ColoredPiecePainter;
+import free.chess.PiecePainter;
+import free.jin.BadChangesException;
+import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Resource;
-import free.jin.BadChangesException;
+import free.jin.board.BoardManager;
+import free.jin.board.BoardPattern;
+import free.jin.board.JinBoard;
+import free.jin.board.PieceSet;
+import free.util.AWTUtilities;
+import free.util.TableLayout;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.swing.UrlDisplayingAction;
-import free.util.TableLayout;
-import free.util.AWTUtilities;
-import free.chess.ColoredBoardPainter;
-import free.chess.ColoredPiecePainter;
-import free.chess.BoardPainter;
-import free.chess.PiecePainter;
-import javax.swing.BorderFactory;
 
 
 /**
@@ -140,32 +150,19 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
   public BoardLooksPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
+    I18n i18n = getI18n();
+    
     pieceSets = new JList(getPieceSets());
     boardPatterns = new JList(getBoardPatterns());
-    whiteColor = new ColorChooser("White color:", boardManager.getWhitePieceColor());
-    blackColor = new ColorChooser("Black color:", boardManager.getBlackPieceColor());
-    whiteOutline = new ColorChooser("White outline:", boardManager.getWhiteOutlineColor());
-    blackOutline = new ColorChooser("Black outline:", boardManager.getBlackOutlineColor());
-    darkSquares = new ColorChooser("Dark squares:", boardManager.getDarkSquareColor());
-    lightSquares = new ColorChooser("Light squares:", boardManager.getLightSquareColor());
-    
-    whiteColor.setMnemonic('W');
-    blackColor.setMnemonic('B');
-    whiteOutline.setMnemonic('t');
-    blackOutline.setMnemonic('k');
-    darkSquares.setMnemonic('D');
-    lightSquares.setMnemonic('L');
-    
-    whiteColor.setToolTipText("The color of white's pieces");
-    blackColor.setToolTipText("The color of black's pieces");
-    whiteOutline.setToolTipText("The color of the outline of white's pieces");
-    blackOutline.setToolTipText("The color of the outline of black's pieces");
-    darkSquares.setToolTipText("The color of the dark squares");
-    lightSquares.setToolTipText("The color of the light squares");
+    whiteColor = createColorChooser("whiteColorChooser", boardManager.getWhitePieceColor());
+    blackColor = createColorChooser("blackColorChooser", boardManager.getBlackPieceColor());
+    whiteOutline = createColorChooser("whiteOutlineChooser", boardManager.getWhiteOutlineColor());
+    blackOutline = createColorChooser("blackOutlineChooser", boardManager.getBlackOutlineColor());
+    darkSquares = createColorChooser("darkSquaresChooser", boardManager.getDarkSquareColor());
+    lightSquares = createColorChooser("lightSquaresChooser", boardManager.getLightSquareColor());
     
     JComponent piecesPanel = createPiecesUI();
     JComponent boardPanel = createBoardUI();
-    
 
     pieceSets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     boardPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -245,8 +242,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     JButton downloadExtras = null;
     if (Jin.getInstance().isUserExtensible()){
-      downloadExtras = new JButton("Download Extras");
-      downloadExtras.setMnemonic('E');
+      downloadExtras = new JButton(i18n.getString("downloadExtrasButton.text"));
+      downloadExtras.setMnemonic(i18n.getInt("downloadExtrasButton.displayedMnemonicIndex"));
       downloadExtras.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/extras/"));
     }
     
@@ -268,7 +265,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     contentPanel.add(BorderLayout.CENTER, Box.createHorizontalStrut(10));
     contentPanel.add(BorderLayout.EAST, boardAndExtraPanel);
     
-    JLabel noticeLabel = new JLabel("Color settings apply only to some of the sets and patterns");
+    JLabel noticeLabel = new JLabel(i18n.getString("colorsNotice"));
     
     contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     noticeLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -379,15 +376,17 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createPiecesUI(){
+    I18n i18n = getI18n();
+    
     JComponent piecesPanel = new JPanel();
     piecesPanel.setLayout(new BoxLayout(piecesPanel, BoxLayout.Y_AXIS));
     piecesPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Pieces"),
+      BorderFactory.createTitledBorder(i18n.getString("piecesTitle")),
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
       
-    JLabel pieceSetLabel = new JLabel("Set:");
-    pieceSetLabel.setDisplayedMnemonic('S');
+    JLabel pieceSetLabel = new JLabel(i18n.getString("pieceSetLabel"));
+    pieceSetLabel.setDisplayedMnemonicIndex(i18n.getInt("pieceSetLabel.displayedMnemonicIndex"));
     pieceSetLabel.setLabelFor(pieceSets);
     pieceSetLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
@@ -422,15 +421,17 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createBoardUI(){
+    I18n i18n = getI18n();
+    
     JComponent boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Board"),
+      BorderFactory.createTitledBorder(i18n.getString("boardTitle")),
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
     
-    JLabel patternLabel = new JLabel("Pattern:");
-    patternLabel.setDisplayedMnemonic('P');
+    JLabel patternLabel = new JLabel(i18n.getString("boardPatternLabel"));
+    patternLabel.setDisplayedMnemonicIndex(i18n.getInt("boardPatternLabel.displayedMnemonicIndex"));
     patternLabel.setLabelFor(boardPatterns);
     patternLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 

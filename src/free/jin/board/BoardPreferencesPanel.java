@@ -21,12 +21,6 @@
 
 package free.jin.board;
 
-import free.chess.Position;
-import free.jin.board.prefs.*;
-import free.jin.ui.CompositePreferencesPanel;
-import free.jin.ui.PreferencesPanel;
-import free.util.SquareLayout;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -34,6 +28,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+
+import free.chess.Position;
+import free.jin.I18n;
+import free.jin.board.prefs.*;
+import free.jin.ui.CompositePreferencesPanel;
+import free.jin.ui.PreferencesPanel;
+import free.util.SquareLayout;
 
 
 /**
@@ -76,14 +77,16 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     this.boardManager = boardManager;
     this.previewBoard = createPreviewBoard();
     
+    I18n i18n = boardManager.getI18n();
+    
     JPanel squarePanel = new JPanel(new SquareLayout());
     squarePanel.add(previewBoard);
     previewBoard.setAlignmentX(Component.CENTER_ALIGNMENT);
     previewBoard.setAlignmentY(Component.CENTER_ALIGNMENT);
     previewBoard.setPreferredSize(new Dimension(320, 320));
     
-    JButton resetPosition = new JButton("Reset Position");
-    resetPosition.setMnemonic('R');
+    JButton resetPosition = new JButton(i18n.getString("resetPositionButton.text"));
+    resetPosition.setDisplayedMnemonicIndex(i18n.getInt("resetPositionButton.displayedMnemonicIndex"));
     resetPosition.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         initPreviewBoard();
@@ -93,7 +96,7 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     JPanel boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(null,  "Testing Board"),
+      BorderFactory.createTitledBorder(null,  i18n.getString("testBoardTitle")),
       BorderFactory.createEmptyBorder(5, 5, 5, 5)));
     
     squarePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -107,10 +110,10 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     add(tabs, BorderLayout.WEST);
     add(boardPanel, BorderLayout.CENTER);
     
-    addPanel(createBoardLooksPanel(), "Board Looks", "Specify preferred piece set and board pattern");
-    addPanel(createMoveInputPanel(), "Move Input", "Specify how moves are made by the user");
-    addPanel(createMoveHighlightingPanel(), "Move Highlighting", "Specify how the last move is highlighted");
-    addPanel(createSquareCoordsPanel(), "Coordinates", "Specify how square coordinates are displayed");
+    addPanel(createBoardLooksPanel(), i18n.getString("boardLooksPanel.title"), i18n.getString("boardLooksPanel.tooltip"));
+    addPanel(createMoveInputPanel(), i18n.getString("moveInputPanel.title"), i18n.getString("moveInputPanel.tooltip"));
+    addPanel(createMoveHighlightingPanel(), i18n.getString("moveHighlightPanel.title"), i18n.getString("moveHighlightPanel.tooltip"));
+    addPanel(createSquareCoordsPanel(), i18n.getString("coordsPanel.title"), i18n.getString("coordsPanel.tooltip"));
     
     initPreviewBoard();
   }

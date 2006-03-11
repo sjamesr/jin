@@ -21,19 +21,22 @@
 
 package free.jin.board.prefs;
 
-import javax.swing.*;
-import free.chess.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import free.chess.*;
+import free.chess.event.MoveEvent;
+import free.chess.event.MoveListener;
+import free.jin.BadChangesException;
+import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
-import free.chess.event.MoveListener;
-import free.chess.event.MoveEvent;
 
 
 /**
@@ -109,25 +112,17 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
   public MoveHighlightPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
+    I18n i18n = getI18n();
+    
     int highlightStyle = boardManager.getMoveHighlightingStyle();
-    none = new JRadioButton("None", highlightStyle == JBoard.NO_MOVE_HIGHLIGHTING);
-    targetSquare = new JRadioButton("Target square only", highlightStyle == JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
-    bothSquares = new JRadioButton("Both origin and target squares", highlightStyle == JBoard.BOTH_SQUARES_MOVE_HIGHLIGHTING);
-    arrow = new JRadioButton("Arrow from origin to target square", highlightStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    none = createRadioButton("noMoveHighlightRadioButton", highlightStyle == JBoard.NO_MOVE_HIGHLIGHTING);
+    targetSquare = createRadioButton("targetSquareHighlightRadioButton", highlightStyle == JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
+    bothSquares = createRadioButton("bothSquaresHighlightRadioButton", highlightStyle == JBoard.BOTH_SQUARES_MOVE_HIGHLIGHTING);
+    arrow = createRadioButton("arrowHighlightRadioButton", highlightStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
     
-    highlightOwnMoves = new JCheckBox("Highlight your own moves", boardManager.isHighlightingOwnMoves());
-    
-    highlightColor = new ColorChooser("Highlight color:", boardManager.getMoveHighlightingColor());
-    
-    none.setToolTipText("No move highlighting");
-    targetSquare.setToolTipText("Highlights the square into which the piece was moved");
-    bothSquares.setToolTipText("Highlights both the origin square of the piece that "+
-                               "was moved and the square it was moved into");
-    arrow.setToolTipText("Draws an arrow from the origin square of the piece that "+
-                         "was moved to the square it was moved into");
-    highlightOwnMoves.setToolTipText("Highlights your moves too, as opposed to "+
-                                     "highlighting only the opponent's moves");
-    highlightColor.setToolTipText("The color of the highlighting element");
+    highlightOwnMoves = createCheckBox("highlightOwnMovesCheckBox", boardManager.isHighlightingOwnMoves());
+
+    highlightColor = createColorChooser("moveHighlightColorChooser", boardManager.getMoveHighlightingColor());
         
     ButtonGroup group = new ButtonGroup();
     group.add(none);
@@ -135,20 +130,13 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     group.add(bothSquares);
     group.add(arrow);
     
-    none.setMnemonic('N');
-    targetSquare.setMnemonic('T');
-    bothSquares.setMnemonic('B');
-    arrow.setMnemonic('A');
-    highlightOwnMoves.setMnemonic('H');
-    highlightColor.setMnemonic('c');
-    
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
     JPanel contentPanel = new PreferredSizedPanel();
     contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
     contentPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Last Move Highlighting"),
+      BorderFactory.createTitledBorder(i18n.getString("moveHighlightTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     none.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -265,6 +253,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     boardManager.setHighlightingOwnMoves(highlightOwnMoves.isSelected());
     boardManager.setMoveHighlightingColor(highlightColor.getColor());
   }
+  
   
    
 }

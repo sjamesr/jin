@@ -30,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -37,6 +38,7 @@ import java.util.Vector;
 import free.chess.*;
 import free.jin.Connection;
 import free.jin.Game;
+import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
@@ -1180,19 +1182,23 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
   
   protected String getBoardTitle(BoardPanel boardPanel){
+    I18n i18n = getI18n();
+    String titleFormat;
     Game game = boardPanel.getGame();
     if (boardPanel.isActive()){
       if (game.getGameType() == Game.MY_GAME){
         if (game.isPlayed())
-          return game.toString();
+          titleFormat = i18n.getString("playingBoardTitle");
         else
-          return "Examining " + game.toString();
+          titleFormat = i18n.getString("examiningBoardTitle");
       }
       else
-        return "Observing " + game.toString();
+        titleFormat = i18n.getString("observingBoardTitle");
     }
     else
-      return "Was " + game.toString();
+      titleFormat = i18n.getString("inactiveBoardTitle");
+    
+    return MessageFormat.format(titleFormat, new Object[]{game}); 
   }
   
   
@@ -1248,13 +1254,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       if (game.getGameType() == Game.MY_GAME){
         shouldAsk = true;
+        I18n i18n = getI18n();
         if (game.isPlayed()){
-          question = "RESIGN this game?";
-          title = "Resign?";
+          question = i18n.getString("resignDialog.question");
+          title = i18n.getString("resignDialog.title");
         }
         else{
-          question = "Stop examining this game?";
-          title = "Unexamine?";
+          question = i18n.getString("unexamineDialog.question");
+          title = i18n.getString("unexamineDialog.title");
         }
       }
 
@@ -1402,11 +1409,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
 
   /**
-   * Returns "Chess Board".
+   * Returns the plugin name.
    */
 
   public String getName(){
-    return "Chess Board";
+    return getI18n().getString("pluginName");
   }
   
   
