@@ -322,9 +322,7 @@ public class LoginPanel extends DialogPanel{
    */
 
   private void showError(String title, String message){
-    OptionPanel panel = new OptionPanel(this, OptionPanel.ERROR, title,
-      new Object[]{OptionPanel.OK}, OptionPanel.OK, message);
-    panel.show();
+    OptionPanel.error(this, title, message);
   }
   
   
