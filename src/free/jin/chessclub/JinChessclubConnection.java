@@ -21,30 +21,33 @@
 
 package free.jin.chessclub;
 
-import free.jin.*;
-import free.jin.event.*;
-import free.chess.*;
-import java.io.*;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.Socket;
+import java.text.MessageFormat;
 import java.util.*;
+
+import javax.swing.SwingUtilities;
+
+import free.chess.*;
 import free.chess.variants.NoCastlingVariant;
-import free.chess.variants.kriegspiel.Kriegspiel;
-import free.chess.variants.shuffleboth.ShuffleBoth;
+import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.giveaway.Giveaway;
-import free.chess.variants.atomic.Atomic;
+import free.chess.variants.kriegspiel.Kriegspiel;
+import free.chess.variants.shuffleboth.ShuffleBoth;
 import free.chessclub.ChessclubConnection;
 import free.chessclub.ChessclubConstants;
 import free.chessclub.level2.Datagram;
-import free.chessclub.level2.DatagramListener;
 import free.chessclub.level2.DatagramEvent;
-import free.jin.chessclub.event.CircleEvent;
+import free.chessclub.level2.DatagramListener;
+import free.jin.*;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
+import free.jin.chessclub.event.CircleEvent;
+import free.jin.event.*;
 import free.util.Pair;
 import free.util.Utilities;
-import java.net.Socket;
-import javax.swing.SwingUtilities;
-import java.lang.reflect.Array;
 
 
 
@@ -423,12 +426,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * appropriate instead of sending your own message.
    */
 
-  protected void sendNotSupportedVariantMessage(int variantNumber){
+  protected void sendUnsupportedVariantMessage(int variantNumber){
     String variantName = getVariantName(variantNumber);
-    if (variantName==null)
-      variantName = "w"+variantNumber;
-    processLine("This version of Jin does not support the wild variant ("+variantName+") and is thus unable to display the game.");
-    processLine("Please activate the appropriate command to abort this game");
+    if (variantName == null)
+      variantName = "w" + variantNumber;
+    
+    String message = I18n.getInstance(getClass(), Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
+    String [] messageLines = message.split("\n");
+    
+    for (int i = 0; i < messageLines.length; i++)
+      processLine(MessageFormat.format(messageLines[i], new Object[]{variantName}));
   }
 
 
@@ -1000,7 +1007,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendNotSupportedVariantMessage(variantNumber);
+      sendUnsupportedVariantMessage(variantNumber);
       return;
     }
 
@@ -1059,7 +1066,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendNotSupportedVariantMessage(variantNumber);
+      sendUnsupportedVariantMessage(variantNumber);
       return;
     }
 
@@ -1120,7 +1127,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendNotSupportedVariantMessage(variantNumber);
+      sendUnsupportedVariantMessage(variantNumber);
       return;
     }
 
@@ -1332,9 +1339,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         gameInfo.numMovesToFollow = numMovesToFollow;
 
         fireGameEvent(new PositionChangedEvent(this, game, gameInfo.position));
-      } catch (NoSuchGameException e){
-          e.printStackTrace();
-        }
+      } catch (NoSuchGameException e){}
     }
 
   }
@@ -2046,7 +2051,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto "+game.getID()+" ; resign");
+      sendCommand("; goto " + game.getID() + " ; resign");
     else
       sendCommand("resign");
   }
@@ -2063,7 +2068,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto "+game.getID()+" ; draw");
+      sendCommand("; goto " + game.getID() + " ; draw");
     else
       sendCommand("draw");
   }
@@ -2091,7 +2096,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto "+game.getID()+" ; abort");
+      sendCommand("; goto " + game.getID() + " ; abort");
     else
       sendCommand("abort");
   }
@@ -2117,7 +2122,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto "+game.getID()+" ; adjourn");
+      sendCommand("; goto " + game.getID() + " ; adjourn");
     else
       sendCommand("adjourn");
   }
@@ -2184,7 +2189,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("backward "+plyCount);
+    sendCommand("backward " + plyCount);
   }
 
 
@@ -2202,7 +2207,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("forward "+plyCount);
+    sendCommand("forward " + plyCount);
   }
 
 
@@ -2695,7 +2700,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
-    sendCommand("play "+seek.getID());
+    sendCommand("play " + seek.getID());
   }
   
   
@@ -2938,162 +2943,22 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected String getEndExplanationString(int status, int mode, boolean isWhite){
-    String winner = (isWhite ? "Black" : "White");
-    String loser = (isWhite ? "White" : "Black");
+    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    
+    String white = i18n.getString("whitePlayer");
+    String black = i18n.getString("blackPlayer");
+    
+    String winner = (isWhite ? black : white);
+    String loser = (isWhite ? white : black);
     String result = (isWhite ? "(0-1)" : "(1-0)");
 
-    String endExplanationString = "(?) No result [specific reason unknown]";
-    switch (status){
-      case 0:
-        switch (mode){
-          case 0:
-            endExplanationString = "(Res) "+loser+" resigns";
-            break;
-          case 1:
-            endExplanationString = "(Mat) "+loser+" checkmated";
-            break;
-          case 2:
-            endExplanationString = "(Fla) "+loser+" forfeits on time.";
-            break;
-          case 3:
-            endExplanationString = "(Adj) "+winner+" declared the winner by adjudication";
-            break;
-          case 4:
-            endExplanationString = "(BQ) "+loser+" disconnected and forfeits";
-            break;
-          case 5:
-            endExplanationString = "(BQ) "+loser+" got disconnected and forfeits";
-            break;
-          case 6:
-            endExplanationString = "(BQ) Unregistered player "+loser+" disconnected and forfeits";
-            break;
-          case 7:
-            endExplanationString = "(Res) "+loser+"'s partner resigns";
-            break;
-          case 8:
-            endExplanationString = "(Mat) "+loser+"'s partner checkmated";
-            break;
-          case 9:
-            endExplanationString = "(Fla) "+loser+"'s partner forfeits on time";
-            break;
-          case 10:
-            endExplanationString = "(BQ) "+loser+"'s partner disconnected and forfeits";
-            break;
-          case 11:
-            endExplanationString = "(BQ) "+loser+" disconnected and forfeits [obsolete?]";
-            break;
-          case 12:
-            endExplanationString = result+" "+winner+" wins [specific reason unknown]";
-            break;
-        }
-        break;
-          
-      case 1:
-        switch (mode){
-          case 0:
-            endExplanationString = "(Agr) Game drawn by mutual agreement";
-            break;
-          case 1:
-            endExplanationString = "(Sta) "+loser+" stalemated";
-            break;
-          case 2:
-            endExplanationString = "(Rep) Game drawn by repetition";
-            break;
-          case 3:
-            endExplanationString = "(50) Game drawn by the 50 move rule";
-            break;
-          case 4:
-            endExplanationString = "(TM) "+loser+" ran out of time and "+winner+" has no material to mate";
-            break;
-          case 5:
-            endExplanationString = "(NM) Game drawn because neither player has mating material";
-            break;
-          case 6:
-            endExplanationString = "(NT) Game drawn because both players ran out of time";
-            break;
-          case 7:
-            endExplanationString = "(Adj) Game drawn by adjudication";
-            break;
-          case 8:
-            endExplanationString = "(Agr) Partner's game drawn by mutual agreement";
-            break;
-          case 9:
-            endExplanationString = "(NT) Partner's game drawn because both players ran out of time";
-            break;
-          case 10:
-            endExplanationString = "(1/2) Game drawn [specific reason unknown]";
-            break;
-        } 
-        break;
-          
-      case 2:
-        switch (mode){
-          case 0:
-            endExplanationString = "(?) Game adjourned by mutual agreement";
-            break;
-          case 1:
-            endExplanationString = "(?) Game adjourned when "+loser+" disconnected";
-            break;
-          case 2:
-            endExplanationString = "(?) Game adjourned by system shutdown";
-            break;
-          case 3:
-            endExplanationString = "(?) Game courtesyadjourned by "+loser+"";
-            break;
-          case 4:
-            endExplanationString = "(?) Game adjourned by an administrator";
-            break;
-          case 5:
-            endExplanationString = "(?) Game adjourned when "+loser+" got disconnected";
-            break;
-        }
-        break;
-      case 3:
-        switch (mode){
-          case 0:
-            endExplanationString = "(Agr) Game aborted by mutual agreement";
-            break;
-          case 1:
-            endExplanationString = "(BQ) Game aborted when "+loser+" disconnected";
-            break;
-          case 2:
-            endExplanationString = "(SD) Game aborted by system shutdown";
-            break;
-          case 3:
-            endExplanationString = "(BA) Game courtesyaborted by "+loser+"";
-            break;
-          case 4:
-            endExplanationString = "(Adj) Game aborted by an administrator";
-            break;
-          case 5:
-            endExplanationString = "(Sho) Game aborted because it's too short to adjourn";
-            break;
-          case 6:
-            endExplanationString = "(BQ) Game aborted when "+loser+"'s partner disconnected";
-            break;
-          case 7:
-            endExplanationString = "(Sho) Game aborted by "+loser+" at move 1";
-            break;
-          case 8:
-            endExplanationString = "(Sho) Game aborted by "+loser+"'s partner at move 1";
-            break;
-          case 9:
-            endExplanationString = "(Sho) Game aborted because it's too short";
-            break;
-          case 10:
-            endExplanationString = "(Adj) Game aborted because "+loser+"'s account expired";
-            break;
-          case 11:
-            endExplanationString = "(BQ) Game aborted when "+loser+" got disconnected";
-            break;
-          case 12:
-            endExplanationString = "(?) No result [specific reason unknown]";
-            break;
-        }
-        break;
-    }
-
-    return endExplanationString;
+    try{
+      String explanationKey = "gameEndExplanation" + "S" + status + "M" + mode;
+      String explanationPattern = i18n.getString(explanationKey);
+      return MessageFormat.format(explanationPattern, new Object[]{winner, loser, result});
+    } catch (MissingResourceException e){
+        return i18n.getString("defaultGameEndExplanation");
+      }
   }
 
 
@@ -3104,17 +2969,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected String getAdjournmentReason(int mode, String actor){
-    String adjournmentReason = "";
-    switch (mode){
-      case 0: adjournmentReason = "By mutual agreement"; break;
-      case 1: adjournmentReason = "When " + actor + " disconnected"; break;
-      case 2: adjournmentReason = "By system shutdown"; break;
-      case 3: adjournmentReason = "Courtesyadjourned by " + actor; break;
-      case 4: adjournmentReason = "By an administrator"; break;
-      case 5: adjournmentReason = "When " + actor + " got disconnected"; break;
-    }
-
-    return adjournmentReason;
+    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    
+    
+    try{
+      String adjournmentReasonKey = "adjournmentReason" + mode;
+      String adjournmentReasonPattern = i18n.getString(adjournmentReasonKey);
+      return MessageFormat.format(adjournmentReasonPattern, new Object[]{actor});
+    } catch (MissingResourceException e){
+        return "";
+      }
   }
 
 

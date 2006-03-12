@@ -21,6 +21,8 @@
 
 package free.jin.chessclub;
 
+import java.text.MessageFormat;
+
 import free.jin.*;
 
 
@@ -39,6 +41,23 @@ public class ChessclubServer extends AbstractServer{
 
   protected UsernamePolicy createUsernamePolicy(){
     return new UsernamePolicy(){
+      
+      private I18n i18n = null;
+      
+      private I18n getI18n(){
+        if (i18n == null)
+          i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+        
+        return i18n;
+      }
+      
+      private boolean isLetter(int c){
+        return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
+      }
+      
+      private boolean isDigit(int c){
+        return (c >= 48) && (c <= 57);
+      }
 
       public boolean isSame(String username1, String username2){
         return username1.equalsIgnoreCase(username2);
@@ -47,28 +66,30 @@ public class ChessclubServer extends AbstractServer{
       public String invalidityReason(String username){
         int usernameLength = username.length();
         if ((usernameLength < 2) || (usernameLength > 15))
-          return "Usernames must be between 2 and 15 characters long";
+          return getI18n().getString("usernameLengthErrorMessage");
 
         int firstChar = username.charAt(0);
-        if ((firstChar >= 48) && (firstChar <= 57))
-          return "The first character of a username may not be a digit";
+        if (!isLetter(firstChar))
+          return getI18n().getString("usernameBadFirstCharacterErrorMessage");
+        
+        int lastChar = username.charAt(username.length() - 1);
+        if (lastChar == '-')
+          return getI18n().getString("usernameLastCharHyphenErrorMessage");
 
         boolean hasHyphenAppeared = false;
         for (int i = 0; i < usernameLength; i++){
           char c = username.charAt(i);
           if (c == '-'){
             if (hasHyphenAppeared)
-              return "A username must contain at most one hyphen ('-')";
+              return getI18n().getString("usernameMultipleHyphensErrorMessage");
             else
               hasHyphenAppeared = true;
           }
 
           int val = c;
-          if (! ((val >= 97) && (val <= 122) || // Lowercase characters.
-                 (val >= 65) && (val <= 90)  || // Uppercase characters.
-                 (val >= 48) && (val <= 57) || // Digits
-                 (c=='-'))) // Hyphen
-            return "Your username contains at least one illegal character: " + c;
+          if (!(isLetter(val) || isDigit(val) || (c == '-')))
+            return MessageFormat.format(getI18n().getString("usernameIllegalCharacterErrorMessage"),
+              new Object[]{"" + c});
         }
 
         return null;
