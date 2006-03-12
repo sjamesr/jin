@@ -76,7 +76,28 @@ public class ColorChooser extends JComponent implements ActionListener{
   private final ChangeEvent changeEvent = new ChangeEvent(this);
 
 
-
+  
+  /**
+   * Creates a new <code>ColorChooser</code> with no text and initial color of black.
+   */
+  
+  public ColorChooser(){
+    this(null, Color.black);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>ColorChooser</code> with the specified text and the
+   * initial color of black.
+   */
+  
+  public ColorChooser(String text){
+    this(text, Color.black);
+  }
+  
+  
+  
   /**
    * Creates a new <code>ColorChooser</code> with no text and the given initial
    * color.
