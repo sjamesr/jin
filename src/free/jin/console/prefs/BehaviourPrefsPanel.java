@@ -21,16 +21,18 @@
 
 package free.jin.console.prefs;
 
-import free.jin.BadChangesException;
-import free.jin.GameListConnection;
-import free.jin.console.ConsoleManager;
-import free.jin.ui.PreferencesPanel;
-import free.util.swing.PreferredSizedPanel;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+
+import free.jin.BadChangesException;
+import free.jin.GameListConnection;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.console.ConsoleManager;
+import free.jin.ui.PreferencesPanel;
+import free.util.swing.PreferredSizedPanel;
 
 
 
@@ -48,6 +50,14 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
    */
   
   private final ConsoleManager consoleManager;
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this class.
+   */
+  
+  private final I18n i18n;
   
   
   
@@ -80,7 +90,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
    * manner.
    */
   
-  private final JRadioButton noGameLists;
+  private final JRadioButton textGameLists;
   
   
   
@@ -91,15 +101,17 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
   public BehaviourPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
     
+    this.i18n = I18n.getInstance(getClass(), BehaviourPrefsPanel.class, Jin.getInstance().getLocale());
+    
     if (consoleManager.getConn() instanceof GameListConnection){
-      embeddedGameLists = new JRadioButton();
-      externalGameLists = new JRadioButton();
-      noGameLists = new JRadioButton();
+      embeddedGameLists = i18n.createRadioButton("embeddedGameListsRadioButton");
+      externalGameLists = i18n.createRadioButton("externalGameListsRadioButton");
+      textGameLists = i18n.createRadioButton("textGameListsRadioButton");
       
       switch (consoleManager.getGameListsDisplayStyle()){
         case ConsoleManager.EMBEDDED_GAME_LISTS: embeddedGameLists.setSelected(true); break;
         case ConsoleManager.EXTERNAL_GAME_LISTS: externalGameLists.setSelected(true); break;
-        case ConsoleManager.NO_GAME_LISTS: noGameLists.setSelected(true); break;
+        case ConsoleManager.NO_GAME_LISTS: textGameLists.setSelected(true); break;
         default:
           throw new IllegalStateException();
       }
@@ -111,15 +123,15 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
       };
       embeddedGameLists.addActionListener(gameListsDisplayStyleListener);
       externalGameLists.addActionListener(gameListsDisplayStyleListener);
-      noGameLists.addActionListener(gameListsDisplayStyleListener);
+      textGameLists.addActionListener(gameListsDisplayStyleListener);
     }
     else{
       embeddedGameLists = null;
       externalGameLists = null;
-      noGameLists = null;
+      textGameLists = null;
     }
     
-    copyOnSelect = new JCheckBox();
+    copyOnSelect = i18n.createCheckBox("copyOnSelectCheckBox");
     copyOnSelect.setSelected(consoleManager.isCopyOnSelect());
     copyOnSelect.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -141,49 +153,33 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     if (embeddedGameLists != null){
-      embeddedGameLists.setText("Embedded in the console");
-      externalGameLists.setText("External to the console");
-      noGameLists.setText("Not displayed specially");
-      
-      embeddedGameLists.setMnemonic('E');
-      externalGameLists.setMnemonic('x');
-      noGameLists.setMnemonic('N');
-      
-      embeddedGameLists.setToolTipText("Display game lists as a table inside the console");
-      externalGameLists.setToolTipText("Display game lists as a table in a separate frame");
-      noGameLists.setToolTipText("Do not display game lists as a table");
-      
-      ButtonGroup bg= new ButtonGroup();
+      ButtonGroup bg = new ButtonGroup();
       bg.add(embeddedGameLists);
       bg.add(externalGameLists);
-      bg.add(noGameLists);
+      bg.add(textGameLists);
       
       JPanel panel = new PreferredSizedPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
       panel.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createTitledBorder("Game Lists Display"),
+        BorderFactory.createTitledBorder(i18n.getString("gameListsDisplayTitle")),
         BorderFactory.createEmptyBorder(0, 5, 5, 5)));
           
       embeddedGameLists.setAlignmentX(JComponent.LEFT_ALIGNMENT);
       externalGameLists.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-      noGameLists.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      textGameLists.setAlignmentX(JComponent.LEFT_ALIGNMENT);
       
       panel.add(embeddedGameLists);
       panel.add(externalGameLists);
-      panel.add(noGameLists);
+      panel.add(textGameLists);
       
       add(panel);
       add(Box.createVerticalStrut(10));
     }
 
-    copyOnSelect.setText("Copy on select");
-    copyOnSelect.setMnemonic('C');
-    copyOnSelect.setToolTipText("Copy text to the clipboard as it is being selected");
-    
     JPanel panel = new PreferredSizedPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder("Text Selection"),
+      BorderFactory.createTitledBorder(i18n.getString("textSelectionTitle")),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     copyOnSelect.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     panel.add(copyOnSelect);

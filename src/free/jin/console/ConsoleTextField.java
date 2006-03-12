@@ -21,15 +21,17 @@
 
 package free.jin.console;
 
-import free.workarounds.FixedJTextField;
-import free.workarounds.FixUtils;
-import free.jin.Preferences;
+import java.awt.Font;
 import java.awt.event.*;
 import java.util.Vector;
-import java.awt.Font;
-import javax.swing.KeyStroke;
-import javax.swing.JPopupMenu;
+
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+
+import free.jin.Preferences;
+import free.workarounds.FixUtils;
+import free.workarounds.FixedJTextField;
 
 
 /**
@@ -434,9 +436,9 @@ public class ConsoleTextField extends FixedJTextField{
    */
    
   protected JPopupMenu createPopup(){
-    cut = new JMenuItem("Cut");
-    copy = new JMenuItem("Copy");
-    paste = new JMenuItem("Paste");
+    cut = new JMenuItem(console.getI18n().getString("cutMenuItemLabel"));
+    copy = new JMenuItem(console.getI18n().getString("copyMenuItemLabel"));
+    paste = new JMenuItem(console.getI18n().getString("pasteMenuItemLabel"));
     
     ActionListener popupListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){

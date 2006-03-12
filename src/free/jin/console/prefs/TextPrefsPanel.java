@@ -31,6 +31,8 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import free.util.swing.ColorChooser;
+import free.jin.I18n;
+import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
@@ -49,6 +51,14 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected final ConsoleManager consoleManager;
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this class.
+   */
+  
+  protected final I18n i18n;
 
 
 
@@ -73,7 +83,6 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   private CategoryPanel currentCategoryPanel;
-
 
 
 
@@ -115,6 +124,7 @@ public class TextPrefsPanel extends PreferencesPanel{
 
   public TextPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
+    this.i18n = I18n.getInstance(getClass(), TextPrefsPanel.class, Jin.getInstance().getLocale());
 
     prefs = Preferences.createBackedUp(Preferences.createNew(), consoleManager.getPrefs());
 
@@ -280,7 +290,7 @@ public class TextPrefsPanel extends PreferencesPanel{
     selectionColorButton = createSelectionColorButton();
     selectedColorButton = createSelectedColorButton();
 
-    defaultSettingsPanel = new CategoryPanel("Default Settings", defaultSettingsChooserPanel, new String[]{""});
+    defaultSettingsPanel = new CategoryPanel(i18n.getString("defaultTextCategoryName"), defaultSettingsChooserPanel, new String[]{""});
     defaultSettingsPanel.setLayout(new BorderLayout(5, 5));
     defaultSettingsPanel.add(defaultSettingsChooserPanel, BorderLayout.CENTER);
     JPanel selectionColorPanel = new JPanel(new GridLayout(1, 2, 15, 5));
@@ -301,6 +311,10 @@ public class TextPrefsPanel extends PreferencesPanel{
 
   private void createSettingsPanelsFromProperties(){
     int categoriesCount = prefs.getInt("preferences.categories.count", 0);
+    
+    // We need this one because the categories (and thus the localization)
+    // are defined in a server specified package
+    I18n consoleManagerI18n = consoleManager.getI18n();
 
     for (int i = 0; i < categoriesCount; i++){
       CategoryPanel categoryPanel;
@@ -312,8 +326,9 @@ public class TextPrefsPanel extends PreferencesPanel{
         categoryPanel = createCustomCategoryPanel(id);
       }
       else{
-        String categoryName = prefs.getString("preferences.categories." + i + ".name");
-        String categoriesString = prefs.getString("preferences.categories."+i+".ids");
+        String categoryNameKey = prefs.getString("preferences.categories." + i + ".nameKey");
+        String categoryName = consoleManagerI18n.getString(categoryNameKey);
+        String categoriesString = prefs.getString("preferences.categories." + i + ".ids");
         StringTokenizer categoriesTokenizer = new StringTokenizer(categoriesString, ";");
 
         String [] categories = new String[categoriesTokenizer.countTokens()];
@@ -354,9 +369,8 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectionColorButton(){
-    Color selectionColor = prefs.getColor("output-selection", UIManager.getColor("textHighlight"));
-    ColorChooser button = new ColorChooser("Selection:", selectionColor);
-    button.setMnemonic('l');
+    ColorChooser button = i18n.createColorChooser("selectionColorChooser");
+    button.setColor(prefs.getColor("output-selection", UIManager.getColor("textHighlight")));
 
     return button;
   }
@@ -369,9 +383,8 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectedColorButton(){
-    Color selectedColor = prefs.getColor("output-selected", UIManager.getColor("textHighlightText"));
-    ColorChooser button = new ColorChooser("Selected Text:", selectedColor);
-    button.setMnemonic('e');
+    ColorChooser button = i18n.createColorChooser("selectedTextColorChooser");
+    button.setColor(prefs.getColor("output-selected", UIManager.getColor("textHighlightText")));
 
     return button;
   }
@@ -390,8 +403,8 @@ public class TextPrefsPanel extends PreferencesPanel{
     JScrollPane scrollPane = new JScrollPane(categoryList);
 
     JPanel listPanel = new JPanel(new BorderLayout(2, 2));
-    JLabel textTypeLabel = new JLabel("Text type", JLabel.CENTER);
-    textTypeLabel.setDisplayedMnemonic('t');
+    JLabel textTypeLabel = i18n.createLabel("textTypeLabel");
+    textTypeLabel.setHorizontalAlignment(JLabel.CENTER);
     textTypeLabel.setLabelFor(categoryList);
     listPanel.add(textTypeLabel, BorderLayout.NORTH);
     listPanel.add(scrollPane, BorderLayout.CENTER);
@@ -554,7 +567,6 @@ public class TextPrefsPanel extends PreferencesPanel{
      */
      
     public CategoryPanel(String categoryName, String [] categories){
- 
       this.categoryName = categoryName;
       this.categories = categories;
     }

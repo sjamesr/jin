@@ -21,24 +21,27 @@
 
 package free.jin.console;
 
-import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
-import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
-import free.workarounds.FixedJTable;
-import free.jin.event.GameListEvent;
-import free.jin.GameListItem;
-import free.jin.Preferences;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.Dimension;
 import java.awt.Point;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableCellRenderer;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.StringTokenizer;
+
+import javax.swing.AbstractButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+
+import free.jin.GameListItem;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.event.GameListEvent;
+import free.workarounds.FixedJTable;
 
 
 /**
@@ -129,6 +132,8 @@ public class GameListTable extends FixedJTable{
    */
 
   protected JPopupMenu createPopup(){
+    I18n i18n = console.getI18n();
+    
     int numSelectedRows = getSelectedRowCount();
     if (numSelectedRows == 0)
       return null;
@@ -138,49 +143,56 @@ public class GameListTable extends FixedJTable{
       return null;
 
     Preferences prefs = console.getPrefs();
-    String prefix = issuedCommandName + "-popup.";
-    int numCommands = prefs.getInt(prefix + "num-commands", 0);
-    if (numCommands == 0)
+    String prefix = "gameListPopup.";
+    int itemCount = prefs.getInt(prefix + "itemCount", 0);
+    if (itemCount == 0)
       return null;
 
     JPopupMenu popup = new JPopupMenu();
-    int actualNumCommands = 0;
-    for (int i=0;i<numCommands;i++){
-      String command = prefs.getString(prefix + "command-" + i);
-
-      if (command.equalsIgnoreCase("separator")){
-        popup.addSeparator();
-        continue;
-      }
-
-      String commandName = prefs.getString(prefix + "command-" + i + "-name");
-      boolean isMultiSupported =
-        prefs.getBool(prefix + "command-" + i + "-multi-select-supported", true);
-      if ((numSelectedRows > 1) && !isMultiSupported)
-        continue;
-
-      JMenuItem menuItem = new JMenuItem(commandName);
-      menuItem.setActionCommand(command);
-      menuItem.addActionListener(new ActionListener(){
-
-        public void actionPerformed(ActionEvent evt){
-          String actionCommand = ((AbstractButton)evt.getSource()).getActionCommand();
-          int [] selectedRows = getSelectedRows();
-          
-          for (int rowIndex=0;rowIndex<selectedRows.length;rowIndex++){
-            GameListItem item = gameListEvent.getItem(selectedRows[rowIndex]);
-            String actualCommand = insertItemProperties(actionCommand, item, '$');
-            console.issueCommand(new Command(actualCommand,0));
-          }
-        }
+    int actualItemCount = 0; // If none support multi selection, we shouldn't display a popup
+    for (int i = 0; i < itemCount; i++){
+      String itemPrefix = prefix + i + ".";
+      String itemType = prefs.getString(itemPrefix + "type", "serverCommand");
+      
+      if ("serverCommand".equals(itemType)){
+        String command = prefs.getString(itemPrefix + "command");
+        String commandNameKey = prefs.getString(itemPrefix + "nameKey");
+        String commandName = i18n.getString(commandNameKey);
         
-      });
+        boolean isMultiSupported =
+          prefs.getBool(itemPrefix + "multiSelectSupported", true);
+        if ((numSelectedRows > 1) && !isMultiSupported)
+          continue;
 
-      actualNumCommands++;
-      popup.add(menuItem);
+        JMenuItem menuItem = new JMenuItem(commandName);
+        menuItem.setActionCommand(command);
+        menuItem.addActionListener(new ActionListener(){
+
+          public void actionPerformed(ActionEvent evt){
+            String actionCommand = ((AbstractButton)evt.getSource()).getActionCommand();
+            int [] selectedRows = getSelectedRows();
+            
+            for (int rowIndex=0;rowIndex<selectedRows.length;rowIndex++){
+              GameListItem item = gameListEvent.getItem(selectedRows[rowIndex]);
+              String actualCommand = insertItemProperties(actionCommand, item, '$');
+              console.issueCommand(new Command(actualCommand,0));
+            }
+          }
+          
+        });
+
+        actualItemCount++;
+        popup.add(menuItem);
+      }
+      else if ("separator".equals(itemType)){
+        popup.addSeparator();
+      }
+      else
+        throw new IllegalArgumentException("Unknown game list popup item type: " + itemType);
+
     }
 
-    if (actualNumCommands==0)
+    if (actualItemCount == 0)
       return null;
 
     return popup;

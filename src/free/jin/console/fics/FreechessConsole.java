@@ -21,8 +21,6 @@
 
 package free.jin.console.fics;
 
-import free.jin.Connection;
-import free.jin.Preferences;
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
@@ -38,12 +36,12 @@ public class FreechessConsole extends Console{
 
 
   /**
-   * Creates a new FreechessConsole with the specified connection and
-   * preferences.
+   * Creates a new <code>FreechessConsole</code> to be used with the specified
+   * <code>FreechessConsoleManager</code>. 
    */
 
-  public FreechessConsole(Connection conn, Preferences prefs){
-    super(conn, prefs);
+  public FreechessConsole(FreechessConsoleManager consoleManager){
+    super(consoleManager);
   }
 
 

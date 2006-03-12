@@ -21,16 +21,22 @@
 
 package free.jin.console;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.lang.reflect.Method;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.swing.*;
 import javax.swing.text.*;
-import java.lang.reflect.*;
+
+import free.jin.I18n;
+import free.jin.Preferences;
 import free.util.GraphicsUtilities;
 import free.util.PlatformUtils;
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.Enumeration;
 import free.workarounds.FixedJTextPane;
 
 
@@ -53,10 +59,9 @@ public class ConsoleTextPane extends FixedJTextPane{
    */
 
   protected final Console console;
-
-
-
-
+  
+  
+  
   /**
    * The default Popup.
    */
@@ -119,12 +124,9 @@ public class ConsoleTextPane extends FixedJTextPane{
 
     enableEvents(MouseEvent.MOUSE_EVENT_MASK | MouseEvent.MOUSE_MOTION_EVENT_MASK);
   }
-
-
-
-
-
-
+  
+  
+  
   /**
    * Re-reads all the plugin properties used by this instance and/or clears any
    * cached values of such properties.
@@ -328,55 +330,59 @@ public class ConsoleTextPane extends FixedJTextPane{
     if ((selection == null) || (selection.length() == 0))
       return null;
 
-    if (defaultPopupMenu == null){
-      int numCommands = console.getPrefs().getInt("output-popup.num-commands", 0);
-      if (numCommands == 0)
-        return null;
-
-      defaultPopupMenu = new JPopupMenu();
-
-      for (int i=0;i<numCommands;i++){
-        String command = console.getPrefs().getString("output-popup.command-" + i);
-
-        if (command.equalsIgnoreCase("separator")){
-          defaultPopupMenu.addSeparator();
-          continue;
-        }
-
-        String commandName = console.getPrefs().getString("output-popup.command-" + i + "-name");
-
-        JMenuItem menuItem = new JMenuItem(commandName);
-        menuItem.setActionCommand(command);
-        menuItem.addActionListener(new ActionListener(){
-
-          public void actionPerformed(ActionEvent evt){
-            String actionCommand = ((AbstractButton)evt.getSource()).getActionCommand();
-            String curSelection = getSelectedText();
-            if (actionCommand.startsWith("$")){
-              executePopupCommand(actionCommand.substring(1), curSelection);
-              return;
-            }
-            String actualCommand = actionCommand;
-            int index;
-            while ((index = actualCommand.indexOf("!@"))!=-1)
-              actualCommand = actualCommand.substring(0,index) + curSelection + actualCommand.substring(index+"!@".length());
-
-            console.issueCommand(new Command(actualCommand,0));
-          }
-          
-        });
-        defaultPopupMenu.add(menuItem);
-      }
-
-      defaultPopupMenu.setSize(defaultPopupMenu.getPreferredSize());
-    }
+    if (defaultPopupMenu == null)
+      defaultPopupMenu = createPopupMenu();
     
     return defaultPopupMenu;
   }
+  
+  
+  
+  /**
+   * Creates the popup menu for this <code>ConsoleTextPane</code>.
+   */
+  
+  protected JPopupMenu createPopupMenu(){
+    Preferences prefs = console.getPrefs();
+    I18n i18n = console.getI18n();
+    
+    String popupPrefix = "consolePopup.";
+    int itemCount = prefs.getInt(popupPrefix + "itemCount", 0);
+    if (itemCount == 0)
+      return null;
 
+    JPopupMenu popupMenu = new JPopupMenu();
 
+    for (int i = 0; i < itemCount; i++){
+      String itemPrefix = popupPrefix + i + ".";
+      
+      String itemType = prefs.getString(itemPrefix + "type", "serverCommand");
+      String labelKey = prefs.getString(itemPrefix + "labelKey", null);
+      String label = labelKey == null ? null : i18n.getString(labelKey);
+      
+      if ("serverCommand".equals(itemType)){
+        String command = prefs.getString(itemPrefix + "command");
+        popupMenu.add(new IssueCommandMenuItem(label, command));
+      }
+      else if ("separator".equals(itemType))
+        popupMenu.addSeparator();
+      else if ("copy".equals(itemType))
+        popupMenu.add(new CopyMenuItem(label));
+      else if ("execute".equals(itemType))
+        popupMenu.add(new ExecuteMenuItem(label));
+      else if ("expurgate".equals(itemType))
+        popupMenu.add(new ExpurgateMenuItem(label));
+      else
+        throw new IllegalStateException("Unknown console popup item type: " + itemType);
+    }  
 
-
+    popupMenu.setSize(popupMenu.getPreferredSize());
+    
+    return popupMenu;
+  }
+  
+  
+  
   /**
    * Returns the start of the word at the specified location.
    */
@@ -478,37 +484,6 @@ public class ConsoleTextPane extends FixedJTextPane{
     return Character.isWhitespace(c);
   }
 
-
-
-
-  /**
-   * Executes a popup command, these are commands that start with '$' in
-   * the properties. The default recognized commands:
-   * <UL>
-   *   <LI> copy - copies the current ConsoleTextPane's selection to the clipboard.
-   *   <LI> execute - executes the currently selected text as a command.
-   *   <LI> url - Treats the currently selected text as a URL and displays the URL
-   *        in a browser.
-   *   <LI> expurgate - Replaces all none-whitespace characters in the current
-   *        selection with asterisks.
-   * </UL>
-   */
-
-  protected void executePopupCommand(String command, String selection){
-    if (command.equalsIgnoreCase("copy")){
-      copy();
-    }
-    else if (command.equalsIgnoreCase("execute")){
-      console.issueCommand(new Command(selection, 0));
-    }
-    else if (command.equalsIgnoreCase("expurgate"))
-      expurgateSelection();
-    else{
-      console.addToOutput("Unknown popup command: "+command, "regular");
-    }
-  }
-
-  
 
 
 
@@ -887,5 +862,151 @@ public class ConsoleTextPane extends FixedJTextPane{
     FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
     return metrics.getHeight();
   }
+  
+  
+  
+  /**
+   * A <code>JMenuItem</code> which, when activated, sends a command to the
+   * server consisting of the current selection in the console appended to the
+   * specified string. Useful for the console popup.
+   */
+  
+  protected class IssueCommandMenuItem extends JMenuItem{
+    
+    
+    
+    /**
+     * The server command to which the selection is appended.
+     */
+    
+    private final String serverCommand;
+    
+    
+    
+    /**
+     * Creates a new <code>IssueCommandMenuItem</code> with the specified
+     * label and server command.
+     */
+    
+    public IssueCommandMenuItem(String label, String serverCommand){
+      super(label);
+      
+      this.serverCommand = serverCommand;
+    }
+    
+    
+    
+    /**
+     * Sends the command to the server.
+     */
+    
+    protected void fireActionPerformed(ActionEvent evt){
+      console.issueCommand(new Command(serverCommand + " " + getSelectedText(), 0));
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * A <code>JMenuItem</code> which, when activated, copies the current console
+   * selection to the clipboard. Useful for the console popup. 
+   */
+  
+  protected class CopyMenuItem extends JMenuItem{
+    
+    
+    
+    /**
+     * Creates a new <code>CopyMenuItem</code> with the specified label.
+     */
+    
+    public CopyMenuItem(String label){
+      super(label);
+    }
+    
+    
+    
+    /**
+     * Copies the currently selected text in the console to the clipboard.
+     */
+    
+    protected void fireActionPerformed(ActionEvent evt){
+      copy();
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * A <code>JMenuItem</code> which sends the current console selection to the
+   * server, as a command. Useful for the console popup.
+   */
+  
+  protected class ExecuteMenuItem extends JMenuItem{
+    
+    
+    
+    /**
+     * Creates a new <code>ExecuteMenuItem</code> with the specified label.
+     */
+    
+    public ExecuteMenuItem(String label){
+      super(label);
+    }
+    
+    
+    
+    /**
+     * Sends the current console selection to the server, as a command.
+     */
+    
+    protected void fireActionPerformed(ActionEvent evt){
+      console.issueCommand(new Command(getSelectedText(), 0));
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * A <code>JMenuItem</code> which expurgates the current selection in the
+   * console. Useful for the console popup.
+   */
+  
+  protected class ExpurgateMenuItem extends JMenuItem{
+    
+    
+    
+    /**
+     * Creates a new <code>ExpurgateMenuItem</code> with the specified label.
+     */
+    
+    public ExpurgateMenuItem(String label){
+      super(label);
+    }
+    
+    
+    
+    /**
+     * Expurgates the current selection.
+     */
+    
+    protected void fireActionPerformed(ActionEvent evt){
+      expurgateSelection();
+    }
+    
+    
+    
+  }
+  
+  
 
 }

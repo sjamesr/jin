@@ -22,16 +22,18 @@
 
 package free.jin.console.prefs;
 
-import free.jin.BadChangesException;
-import free.jin.console.ConsoleManager;
-import free.jin.ui.PreferencesPanel;
-
 import java.awt.BorderLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.console.ConsoleManager;
+import free.jin.ui.PreferencesPanel;
 
 
 
@@ -67,6 +69,8 @@ public class ConsolePrefsPanel extends PreferencesPanel{
     this.textPrefsPanel = createTextPrefsPanel(consoleManager);
     this.behaviourPrefsPanel = createBehaviourPrefsPanel(consoleManager);
     
+    I18n i18n = I18n.getInstance(getClass(), ConsolePrefsPanel.class, Jin.getInstance().getLocale());
+    
     ChangeListener changeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         fireStateChanged();
@@ -80,8 +84,8 @@ public class ConsolePrefsPanel extends PreferencesPanel{
     behaviourPrefsPanel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
     
     JTabbedPane tabs = new JTabbedPane();
-    tabs.addTab("Text Display", null, textPrefsPanel, "Specify preferred text font, size, color");
-    tabs.addTab("Behaviour", null, behaviourPrefsPanel, null);
+    tabs.addTab(i18n.getString("textDisplayTab.text"), null, textPrefsPanel, i18n.getString("textDisplayTab.tooltip"));
+    tabs.addTab(i18n.getString("consoleBehaviourTab.text"), null, behaviourPrefsPanel, i18n.getString("consoleBehaviourTab.tooltip"));
     
     setLayout(new BorderLayout());
     add(tabs, BorderLayout.CENTER);

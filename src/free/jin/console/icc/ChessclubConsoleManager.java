@@ -21,6 +21,8 @@
 
 package free.jin.console.icc;
 
+import java.text.MessageFormat;
+
 import free.jin.console.Console;
 import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
@@ -63,44 +65,15 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String title = evt.getSenderTitle();
     String message = evt.getMessage();
     Object forum = evt.getForum();
-
-    // Tells
-    if (type.equals("tell"))
-      return sender+title+" tells you: "+message;
-    else if (type.equals("say"))
-      return sender+title+" says: "+message;
-    else if (type.equals("ptell"))
-      return sender+title+" (your partner) tells you: "+message;
-    else if (type.equals("qtell"))
-      return parseQTell(evt);
-    else if (type.equals("atell"))
-      return sender+title+" tells you: "+message;
-
-    // Shouts
-    else if (type.equals("shout"))
-      return sender+title+" shouts: "+message;
-    else if (type.equals("ishout"))
-      return "--> "+sender+" "+message;
-    else if (type.equals("sshout"))
-      return sender+title+" s-shouts: "+message;
-    else if (type.equals("announcement"))
-      return "*** ANNOUNCEMENT from "+sender+": "+message+" ***";
     
-    // Channel tells
-    else if (type.equals("channel-tell"))
-      return sender+title+"("+forum+"): "+message;
-    else if (type.equals("channel-atell"))
-      return sender+title+"("+forum+"): "+message;
-    else if (type.equals("channel-qtell"))
+    if ("qtell".equals(type))
+      return parseQTell(evt);
+    else if ("channel-qtell".equals(type))
       return parseChannelQTell(evt);
 
-    // Kibitzes
-    else if (type.equals("kibitz"))
-      return "["+forum+"] "+sender+title+" kibitzes: "+message;
-    else if (type.equals("whisper"))
-      return "["+forum+"] "+sender+title+" whispers: "+message;
-
-    return evt.toString();
+    String pattern = getI18n().getString(type + ".displayPattern");
+    Object [] args = new Object[]{sender, title, String.valueOf(forum), message};
+    return MessageFormat.format(pattern, args);
   }
 
 
@@ -111,7 +84,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
 
   protected Console createConsole(){
-    return new ChessclubConsole(getConn(), getPrefs());
+    return new ChessclubConsole(this);
   }
 
 
@@ -125,18 +98,19 @@ public class ChessclubConsoleManager extends ConsoleManager{
   private String parseQTell(ChatEvent evt){
     String message = evt.getMessage();
     int index;
-    while ((index = message.indexOf("\\n"))!=-1)
-      message = message.substring(0,index)+"\n:"+message.substring(index+2);
-    while ((index = message.indexOf("\\h"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    while ((index = message.indexOf("\\H"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    while ((index = message.indexOf("\\b"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    return ":"+message;
+    while ((index = message.indexOf("\\n")) != -1)
+      message = message.substring(0, index) + "\n:" + message.substring(index + 2);
+    while ((index = message.indexOf("\\h")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\H")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\b")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    return ":" + message;
   }
-
-
+  
+  
+  
   /**
    * Returns a string that should be displayed for the given ChatEvent when the
    * ChatEvent contains a channel qtell.
@@ -146,15 +120,15 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String message = evt.getMessage();
     Object forum = evt.getForum();
     int index;
-    while ((index = message.indexOf("\\n"))!=-1)
-      message = message.substring(0,index)+"\n"+forum+">"+message.substring(index+2);
-    while ((index = message.indexOf("\\h"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    while ((index = message.indexOf("\\H"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    while ((index = message.indexOf("\\b"))!=-1)
-      message = message.substring(0,index)+message.substring(index+2);
-    return forum+">"+message;
+    while ((index = message.indexOf("\\n")) != -1)
+      message = message.substring(0, index) + "\n" + forum + ">" + message.substring(index + 2);
+    while ((index = message.indexOf("\\h")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\H")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\b")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    return forum + ">" + message;
   }
 
 

@@ -21,6 +21,16 @@
 
 package free.jin.console;
 
+import java.awt.*;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Vector;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.*;
+
 import free.jin.Connection;
 import free.jin.GameListConnection;
 import free.jin.console.prefs.ConsolePrefsPanel;
@@ -31,15 +41,6 @@ import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
-
-import java.awt.*;
-import java.net.URL;
-import java.util.Vector;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.*;
 
 
 /**
@@ -161,7 +162,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     console = createConsole();
 
     consoleContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
-    consoleContainer.setTitle("Main Console");
+    consoleContainer.setTitle(getI18n().getString("mainConsole.initialTitle"));
 
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
@@ -187,7 +188,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   protected Console createConsole(){
-    return new Console(getConn(), getPrefs());
+    return new Console(this);
   }
   
   
@@ -398,7 +399,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionAttempted(Connection conn, String hostname, int port){
-    console.addToOutput("Trying to connect to " + hostname + " on port " + port + "...", "info");
+    // We pass a String instead of an Integer for the port because an Integer is translated
+    // according to the locale and then we get something like
+    // "Connecting to chessclub.com on port 5,000"
+    String message = MessageFormat.format(getI18n().getString("tryingToConnectMessage"),
+      new Object[]{hostname, String.valueOf(port)});
+    console.addToOutput(message, "info");
   }
 
 
@@ -408,7 +414,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionEstablished(Connection conn){
-    console.addToOutput("Connected", "info");  
+    console.addToOutput(getI18n().getString("connectedMessage"), "info");  
   }
 
 
@@ -418,8 +424,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void loginSucceeded(Connection conn){
-    consoleContainer.setTitle("Main Console - " + getConn().getUsername() +
-      " on " + getServer().getLongName());
+    String title = MessageFormat.format(getI18n().getString("mainConsole.title"),
+      new Object[]{getConn().getUsername(), getServer().getLongName()});
+    consoleContainer.setTitle(title);
   }
 
 
@@ -429,7 +436,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionLost(Connection conn){
-    console.addToOutput("WARNING: Disconnected", "info");
+    console.addToOutput(getI18n().getString("disconnectedWarning"), "info");
   }
   
   
@@ -490,8 +497,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     }
     
     
-
-    String title = "  "+evt.getListTitle()+".  Displaying items "+evt.getFirstIndex()+"-"+evt.getLastIndex()+" out of "+evt.getItemCount()+"  ";
+    String title = MessageFormat.format(getI18n().getString("gameListTitle"),
+      new Object[]{evt.getListTitle(), new Integer(evt.getFirstIndex()), new Integer(evt.getLastIndex()), new Integer(evt.getItemCount())});
+    title = "  " + title + "  ";
 
     // Otherwise, the table header is not created on time for the layout to take account of it
     // and size the scrollpane properly.
@@ -556,11 +564,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * Returns the string "Main Console".
+   * Returns the name of the plugin.
    */
 
   public String getName(){
-    return "Main Console";
+    return getI18n().getString("pluginName");
   }
 
 

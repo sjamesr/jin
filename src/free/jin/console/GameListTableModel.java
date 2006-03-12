@@ -57,13 +57,17 @@ public class GameListTableModel implements TableModel{
    */
 
   public GameListTableModel(GameListEvent evt){
+    I18n i18n = I18n.getInstance(GameListTableModel.class, Jin.getInstance().getLocale());
     int id = evt.getID();
     int itemCount = evt.getItemCount();
+    
+    String ratedIndicator = i18n.getString("gameListTable.ratedGameIndicator");
+    String unratedIndicator = i18n.getString("gameListTable.unratedGameIndicator");
 
-    if (id==GameListEvent.HISTORY_LIST_EVENT_ID){
+    if (id == GameListEvent.HISTORY_LIST_EVENT_ID){
       tableData = new String[itemCount][12];
 
-      for (int i=0;i<itemCount;i++){
+      for (int i = 0; i < itemCount; i++){
         HistoryListItem item = (HistoryListItem)evt.getItem(i);
         Player player = item.getPlayer();
         tableData[i][0] = String.valueOf(item.getIndex()); // Index
@@ -73,16 +77,29 @@ public class GameListTableModel implements TableModel{
         tableData[i][4] = String.valueOf(player.isWhite() ? item.getBlackRating() : item.getWhiteRating()); // Opponent rating
         tableData[i][5] = player.isWhite() ? item.getBlackName() : item.getWhiteName(); // Opponent nickname.
         tableData[i][6] = getTCString(item.getVariantName(), item.getWhiteTime(), item.getWhiteInc(), item.getBlackTime(), item.getBlackInc());
-        tableData[i][7] = item.isRated() ? "r" : "u"; // rated?
+        tableData[i][7] = item.isRated() ? ratedIndicator : unratedIndicator; // rated?
         tableData[i][8] = item.getRatingCategoryName(); // Rating category name
         tableData[i][9] = item.getECO(); // ECO code
         tableData[i][10] = item.getEndExplanationString(); // end explanation
         tableData[i][11] = item.getDateString()+" "+item.getTimeString(); // Time of the game
       }
 
-      columnNames = new String[]{"#", "Result", "Rating", "Color", "Opp. rating", "Opponent", "Time controls", "Rated", "Category", "ECO", "End", "Date game started"};
+      columnNames = new String[]{
+          i18n.getString("gameListTable.rowIndexColumn"),
+          i18n.getString("gameListTable.resultColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.colorColumn"),
+          i18n.getString("gameListTable.oppRatingColumn"),
+          i18n.getString("gameListTable.oppColumn"),
+          i18n.getString("gameListTable.timeControlsColumn"),
+          i18n.getString("gameListTable.ratedColumn"),
+          i18n.getString("gameListTable.categoryColumn"),
+          i18n.getString("gameListTable.ecoColumn"),
+          i18n.getString("gameListTable.endExplanationColumn"),
+          i18n.getString("gameListTable.gameStartDateColumn")
+      };
     }
-    else if (id==GameListEvent.SEARCH_LIST_EVENT_ID){
+    else if (id == GameListEvent.SEARCH_LIST_EVENT_ID){
       tableData = new String[itemCount][11];
 
       for (int i=0;i<itemCount;i++){
@@ -94,13 +111,25 @@ public class GameListTableModel implements TableModel{
         tableData[i][4] = item.getBlackRating() == -1 ? "?" : String.valueOf(item.getBlackRating()); // Black's rating
         tableData[i][5] = item.getEndExplanationString(); // end explanation
         tableData[i][6] = getTCString(item.getVariantName(), item.getWhiteTime(), item.getWhiteInc(), item.getBlackTime(), item.getBlackInc());
-        tableData[i][7] = item.isRated() ? "r" : "u"; // rated?
+        tableData[i][7] = item.isRated() ? ratedIndicator : unratedIndicator; // rated?
         tableData[i][8] = item.getRatingCategoryName(); // Rating category name
         tableData[i][9] = item.getECO(); // ECO code
         tableData[i][10] = item.getDateString()+" "+item.getTimeString(); // Time of the game
       }
 
-      columnNames = new String[]{"#", "White Player", "Rating", "Black Player", "Rating", "Result", "Time controls", "Rated", "Category", "ECO", "Date game started"};
+      columnNames = new String[]{
+          i18n.getString("gameListTable.rowIndexColumn"),
+          i18n.getString("gameListTable.whitePlayerColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.blackPlayerColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.resultColumn"),
+          i18n.getString("gameListTable.timeControlsColumn"),
+          i18n.getString("gameListTable.ratedColumn"),
+          i18n.getString("gameListTable.categoryColumn"),
+          i18n.getString("gameListTable.ecoColumn"),
+          i18n.getString("gameListTable.gameStartDateColumn")
+      };
     }
     else if (id==GameListEvent.LIBLIST_EVENT_ID){
       tableData = new String[itemCount][12];
@@ -114,35 +143,64 @@ public class GameListTableModel implements TableModel{
         tableData[i][4] = item.getBlackRating() == -1 ? "?" : String.valueOf(item.getBlackRating()); // Black's rating
         tableData[i][5] = item.getEndExplanationString(); // end explanation
         tableData[i][6] = getTCString(item.getVariantName(), item.getWhiteTime(), item.getWhiteInc(), item.getBlackTime(), item.getBlackInc());
-        tableData[i][7] = item.isRated() ? "r" : "u"; // rated?
+        tableData[i][7] = item.isRated() ? ratedIndicator : unratedIndicator; // rated?
         tableData[i][8] = item.getRatingCategoryName(); // Rating category name
         tableData[i][9] = item.getECO(); // ECO code
         tableData[i][10] = item.getDateString()+" "+item.getTimeString(); // Time of the game
         tableData[i][11] = item.getNote(); // Note
       }
 
-      columnNames = new String[]{"#", "White Player", "Rating", "Black Player", "Rating", "Result", "Time controls", "Rated", "Category", "ECO", "Date game started", "Note"};
+      columnNames = new String[]{
+          i18n.getString("gameListTable.rowIndexColumn"),
+          i18n.getString("gameListTable.whitePlayerColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.blackPlayerColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.resultColumn"),
+          i18n.getString("gameListTable.timeControlsColumn"),
+          i18n.getString("gameListTable.ratedColumn"),
+          i18n.getString("gameListTable.categoryColumn"),
+          i18n.getString("gameListTable.ecoColumn"),
+          i18n.getString("gameListTable.gameStartDateColumn"),
+          i18n.getString("gameListTable.noteColumn")
+      };
+
     }
     else if (id==GameListEvent.STORED_LIST_EVENT_ID){
       tableData = new String[itemCount][11];
+      
+      String oppPresentIndicator = i18n.getString("gameListTable.oppPresentIndicator");
+      String oppAbsentIndicator = i18n.getString("gameListTable.oppAbsentIndicator");
 
       for (int i=0;i<itemCount;i++){
         StoredListItem item = (StoredListItem)evt.getItem(i);
         Player player = item.getPlayer();
-        tableData[i][0] = item.isOpponentPresent() ? "Present" : "";
+        tableData[i][0] = item.isOpponentPresent() ? oppPresentIndicator : oppAbsentIndicator;
         tableData[i][1] = String.valueOf(player.isWhite() ? item.getWhiteRating() : item.getBlackRating()); // Player rating.
         tableData[i][2] = player.toString().substring(0,1); // Player color;
         tableData[i][3] = String.valueOf(player.isWhite() ? item.getBlackRating() : item.getWhiteRating()); // Opponent rating
         tableData[i][4] = player.isWhite() ? item.getBlackName() : item.getWhiteName(); // Opponent nickname.
         tableData[i][5] = getTCString(item.getVariantName(), item.getWhiteTime(), item.getWhiteInc(), item.getBlackTime(), item.getBlackInc());
-        tableData[i][6] = item.isRated() ? "r" : "u"; // rated?
+        tableData[i][6] = item.isRated() ? ratedIndicator : unratedIndicator; // rated?
         tableData[i][7] = item.getRatingCategoryName(); // Rating category name
         tableData[i][8] = item.getECO(); // ECO code
         tableData[i][9] = item.getDateString()+" "+item.getTimeString(); // Time of the game
         tableData[i][10] = item.getAdjournmentReason();
       }
 
-      columnNames = new String[]{"Opp. present?", "Rating", "Color", "Opp. rating", "Opponent", "Time controls", "Rated", "Category", "ECO", "Date game started", "Game adjourned"};
+      columnNames = new String[]{
+          i18n.getString("gameListTable.oppPresentColumn"),
+          i18n.getString("gameListTable.ratingColumn"),
+          i18n.getString("gameListTable.colorColumn"),
+          i18n.getString("gameListTable.oppRatingColumn"),
+          i18n.getString("gameListTable.oppColumn"),
+          i18n.getString("gameListTable.timeControlsColumn"),
+          i18n.getString("gameListTable.ratedColumn"),
+          i18n.getString("gameListTable.categoryColumn"),
+          i18n.getString("gameListTable.ecoColumn"),
+          i18n.getString("gameListTable.gameStartDateColumn"),
+          i18n.getString("gameListTable.adjournmentReasonColumn")
+      };
     }
     else 
       throw new IllegalArgumentException("Unknown GameListEvent ID encountered");

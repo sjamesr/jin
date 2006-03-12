@@ -23,6 +23,7 @@ package free.jin.console;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -36,6 +37,7 @@ import javax.swing.event.EventListenerList;
 import javax.swing.text.*;
 
 import free.jin.Connection;
+import free.jin.I18n;
 import free.jin.Preferences;
 import free.util.BrowserControl;
 
@@ -48,6 +50,14 @@ import free.util.BrowserControl;
  */
 
 public class Console extends JPanel implements KeyListener, ContainerListener{
+  
+  
+  
+  /**
+   * The <code>ConsoleManager</code> we're a part of.
+   */
+  
+  private final ConsoleManager consoleManager;
 
 
   /**
@@ -183,13 +193,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
   /**
-   * Creates a new Console with the specified preferences and connection to the
-   * server.
+   * Creates a new <code>Console</code> to be used in the specified <code>ConsoleManager</code>.
    */
 
-  public Console(Connection conn, Preferences prefs){
-    this.conn = conn;
-    this.prefs = prefs;
+  public Console(ConsoleManager consoleManager){
+    this.consoleManager = consoleManager;
+    this.conn = consoleManager.getConn();
+    this.prefs = consoleManager.getPrefs();
 
     this.outputComponent = createOutputComponent();
     configureOutputComponent(outputComponent);
@@ -212,6 +222,17 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   
   
   /**
+   * Returns the <code>I18n</code> for this <code>Console</code> (for the
+   * benefit of its components, like the textfield and textpane).
+   */
+  
+  public I18n getI18n(){
+    return consoleManager.getI18n();
+  }
+  
+  
+  
+  /**
    * An action listener which clears the console.
    */
   
@@ -228,7 +249,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private void createUI(){
-    JButton clearButton = new JButton("Clear Console");
+    JButton clearButton = new JButton(getI18n().getString("clearConsoleButton.text"));
     clearButton.addActionListener(clearingActionListener);
     clearButton.setRequestFocusEnabled(false);
     
@@ -828,7 +849,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         BrowserControl.showDisplayMailerFailedDialog(emailString, this, true);
     }
     else{
-      addToOutput("Unknown special command: \""+command+"\"","system");
+      String message = 
+        MessageFormat.format(getI18n().getString("unknownSpecialCommandMessage"), new Object[]{command});
+      addToOutput(message, "system");
     }
   }
   
@@ -853,7 +876,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       if (conn.isConnected())
         conn.sendCommand(commandString);
       else
-        addToOutput("Unable to issue command - not connected to the server.", "info");
+        addToOutput(getI18n().getString("unconnectedWarningMessage"), "info");
     }
   }
 

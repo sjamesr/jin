@@ -21,13 +21,11 @@
 
 package free.jin.console.icc;
 
-import free.jin.Connection;
-import free.jin.Preferences;
+import javax.swing.text.BadLocationException;
+
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
-
-import javax.swing.text.BadLocationException;
 
 
 /**
@@ -40,11 +38,12 @@ public class ChessclubConsole extends Console{
 
 
   /**
-   * Creates a new Console with the given connection and preferences.
+   * Creates a new <code>ChessclubConsole</code> to be used with the specified
+   * <code>ChessclubConsoleManager</code>. 
    */
 
-  public ChessclubConsole(Connection conn, Preferences prefs){
-    super(conn, prefs);
+  public ChessclubConsole(ChessclubConsoleManager consoleManager){
+    super(consoleManager);
   }
 
 

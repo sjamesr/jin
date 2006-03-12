@@ -30,6 +30,7 @@ import java.util.Vector;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
+import free.jin.I18n;
 import free.jin.console.ConsoleManager;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.TextUtilities;
@@ -94,7 +95,12 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
 
   protected CategoryPanel createCustomCategoryPanel(String id){
     if (id.endsWith("channels-panel")){
-      String categoryName = prefs.getString("preferences.categories." + id + ".name");
+      // We need this one because the categories (and thus the localization)
+      // are defined in a server specified package
+      I18n consoleManagerI18n = consoleManager.getI18n();
+
+      String categoryNameKey = prefs.getString("preferences.categories." + id + ".nameKey");
+      String categoryName = consoleManagerI18n.getString(categoryNameKey);
       String [] categoryIDs = 
         TextUtilities.getTokens(prefs.getString("preferences.categories." + id + ".ids"), ";");
 
@@ -178,7 +184,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
 
       this.setLayout(new BorderLayout(5, 5));
       JPanel chNumberPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-      chNumberPanel.add(new JLabel("Channel number"));
+      chNumberPanel.add(i18n.createLabel("channelNumberLabel"));
       chNumberPanel.add(channelNumberField);
       JPanel chNumberAndSeparatorPanel = new JPanel(new BorderLayout(5, 5));
       chNumberAndSeparatorPanel.add(chNumberPanel, BorderLayout.NORTH);

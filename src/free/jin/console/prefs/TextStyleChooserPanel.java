@@ -21,11 +21,15 @@
 
 package free.jin.console.prefs;
 
-import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Method;
+
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import free.jin.I18n;
+import free.jin.Jin;
 import free.util.swing.ColorChooser;
 import free.util.swing.FontSelectorPanel;
 
@@ -36,6 +40,15 @@ import free.util.swing.FontSelectorPanel;
  */
 
 public class TextStyleChooserPanel extends JPanel{
+  
+  
+  
+  /**
+   * The id of the "antialias" font option.
+   */
+  
+  private static final String ANTIALIAS_OPTION_ID = "antialias";
+
 
 
   /**
@@ -84,18 +97,24 @@ public class TextStyleChooserPanel extends JPanel{
 
   public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor,
       final boolean initAntialiasingValue, boolean allowBackgroundSelection, boolean allowAntialiasingSelection){
+    
+    I18n i18n = I18n.getInstance(getClass(), TextStyleChooserPanel.class, Jin.getInstance().getLocale());
+    
+    String antialiasOptionName = i18n.getString("antialiasOptionName");
+    int antialiasOptionMnemonicIndex = i18n.getInt("antialiasOptionDisplayedMnemonicIndex");
     FontSelectorPanel.BooleanFontOption [] fontOptions = new FontSelectorPanel.BooleanFontOption[]{
       FontSelectorPanel.createBoldFontOption(),
       FontSelectorPanel.createItalicFontOption(),
-      new FontSelectorPanel.BooleanFontOption("Antialias", 'A', initAntialiasingValue)
+      new FontSelectorPanel.BooleanFontOption(
+          ANTIALIAS_OPTION_ID, antialiasOptionName, antialiasOptionMnemonicIndex, initAntialiasingValue)
     };
     int [] fontSizes = new int[]{5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30};
     fontSelector = allowAntialiasingSelection ? new FontSelectorPanel(fontSizes, fontOptions) : new FontSelectorPanel(fontSizes);
-    foregroundChooser = new ColorChooser("Foreground:", initForegroundColor);
-    foregroundChooser.setMnemonic('F');
+    foregroundChooser = i18n.createColorChooser("foregroundColorChooser");
+    foregroundChooser.setColor(initForegroundColor);
     if (allowBackgroundSelection){
-      backgroundChooser = new ColorChooser("Background:", initBackgroundColor);
-      backgroundChooser.setMnemonic('k');
+      backgroundChooser = i18n.createColorChooser("backgroundColorChooser");
+      backgroundChooser.setColor(initBackgroundColor);
     }
     else
       backgroundChooser = null;
@@ -280,7 +299,7 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   public boolean isAntialiasingSelectionEnabled(){
-    return fontSelector.getFontOption("Antialias") != null;
+    return fontSelector.getFontOption(ANTIALIAS_OPTION_ID) != null;
   }
 
 
@@ -294,7 +313,7 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   public boolean isAntialias(){
-    return fontSelector.getFontOptionValue("Antialias");
+    return fontSelector.getFontOptionValue(ANTIALIAS_OPTION_ID);
   }
 
 
@@ -305,7 +324,7 @@ public class TextStyleChooserPanel extends JPanel{
    */
 
   public void setAntialias(boolean antialias){
-    FontSelectorPanel.BooleanFontOption antialiasOption = fontSelector.getFontOption("Antialias");
+    FontSelectorPanel.BooleanFontOption antialiasOption = fontSelector.getFontOption(ANTIALIAS_OPTION_ID);
     if (antialiasOption != null)
       antialiasOption.setValue(antialias);
    ((TextStylePreviewPanel)fontSelector.getPreviewPanel()).setAntialias(antialias);

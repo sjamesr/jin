@@ -7,36 +7,52 @@ game-list-display-style = embedded
 #output-selection = color;000080
 #output-selected = color;ffffff
 
-output-popup.num-commands = integer;16
-output-popup.command-0 = finger !@
-output-popup.command-0-name = finger
-output-popup.command-1 = vars !@
-output-popup.command-1-name = vars
-output-popup.command-2 = ping !@
-output-popup.command-2-name = ping
-output-popup.command-3 = match !@
-output-popup.command-3-name = match
-output-popup.command-4 = assess !@
-output-popup.command-4-name = assess
-output-popup.command-5 = separator
-output-popup.command-6 = observe !@
-output-popup.command-6-name = observe
-output-popup.command-7 = follow !@
-output-popup.command-7-name = follow
-output-popup.command-8 = separator
-output-popup.command-9 = history !@
-output-popup.command-9-name = history
-output-popup.command-10 = liblist !@
-output-popup.command-10-name = liblist
-output-popup.command-11 = stored !@
-output-popup.command-11-name = stored
-output-popup.command-12 = separator
-output-popup.command-13 = $copy
-output-popup.command-13-name = Copy
-output-popup.command-14 = $expurgate
-output-popup.command-14-name = Expurgate
-output-popup.command-15 = $execute
-output-popup.command-15-name = Execute
+consolePopup.itemCount = integer;16
+
+consolePopup.0.command = finger
+consolePopup.0.labelKey = fingerMenuItemLabel
+
+consolePopup.1.command = vars
+consolePopup.1.labelKey = varsMenuItemLabel
+
+consolePopup.2.command = ping
+consolePopup.2.labelKey = pingMenuItemLabel
+
+consolePopup.3.command = match
+consolePopup.3.labelKey = matchMenuItemLabel
+
+consolePopup.4.command = assess
+consolePopup.4.labelKey = assessMenuItemLabel
+
+consolePopup.5.type = separator
+
+consolePopup.6.command = observe
+consolePopup.6.labelKey = observeMenuItemLabel
+
+consolePopup.7.command = follow
+consolePopup.7.labelKey = followMenuItemLabel
+
+consolePopup.8.type = separator
+
+consolePopup.9.command = history
+consolePopup.9.labelKey = historyMenuItemLabel
+
+consolePopup.10.command = stored
+consolePopup.10.labelKey = storedMenuItemLabel
+
+consolePopup.11.command = liblist
+consolePopup.11.labelKey = liblistMenuItemLabel
+
+consolePopup.12.type = separator
+
+consolePopup.13.type = copy
+consolePopup.13.labelKey = copyMenuItemLabel
+
+consolePopup.14.type = expurgate
+consolePopup.14.labelKey = expurgateMenuItemLabel
+
+consolePopup.15.type = execute
+consolePopup.15.labelKey = executeMenuItemLabel
 
 
 output-link.num-patterns = integer;11
@@ -191,73 +207,31 @@ stored-game-list-action = examine #$id$
 liblist-game-list-action = examine #$id$
 search-game-list-action = examine #$id$
 
-history-popup.num-commands = integer;7
-history-popup.command-0 = examine #$id$
-history-popup.command-0-name = Examine game
-history-popup.command-0-multi-select-supported = boolean;false
-history-popup.command-1 = sposition #$id$
-history-popup.command-1-name = View last position
-history-popup.command-1-multi-select-supported = boolean;false
-history-popup.command-2 = smoves #$id$
-history-popup.command-2-name = View move list
-history-popup.command-3 = spgn #$id$
-history-popup.command-3-name = View PGN
-history-popup.command-4 = separator
-history-popup.command-5 = libappend #$id$
-history-popup.command-5-name = Append game(s) to personal library
-history-popup.command-6 = mailstored #$id$
-history-popup.command-6-name = Email me the game(s)
 
-stored-popup.num-commands = integer;7
-stored-popup.command-0 = examine #$id$
-stored-popup.command-0-name = Examine game
-stored-popup.command-0-multi-select-supported = boolean;false
-stored-popup.command-1 = sposition #$id$
-stored-popup.command-1-name = View last position
-stored-popup.command-1-multi-select-supported = boolean;false
-stored-popup.command-2 = smoves #$id$
-stored-popup.command-2-name = View move list
-stored-popup.command-3 = spgn #$id$
-stored-popup.command-3-name = View PGN
-stored-popup.command-4 = separator
-stored-popup.command-5 = libappend #$id$
-stored-popup.command-5-name = Append game(s) to personal library
-stored-popup.command-6 = mailstored #$id$
-stored-popup.command-6-name = Email me the game(s)
+gameListPopup.itemCount = integer;7
 
-liblist-popup.num-commands = integer;7
-liblist-popup.command-0 = examine #$id$
-liblist-popup.command-0-name = Examine game
-liblist-popup.command-0-multi-select-supported = boolean;false
-liblist-popup.command-1 = sposition #$id$
-liblist-popup.command-1-name = View last position
-liblist-popup.command-1-multi-select-supported = boolean;false
-liblist-popup.command-2 = smoves #$id$
-liblist-popup.command-2-name = View move list
-liblist-popup.command-3 = spgn #$id$
-liblist-popup.command-3-name = View PGN
-liblist-popup.command-4 = separator
-liblist-popup.command-5 = libappend #$id$
-liblist-popup.command-5-name = Append game(s) to personal library
-liblist-popup.command-6 = mailstored #$id$
-liblist-popup.command-6-name = Email me the game(s)
+gameListPopup.0.command = examine #$id$
+gameListPopup.0.nameKey = gameListPopup.examineGameItemLabel
+gameListPopup.0.multiSelectSupported = boolean;false
 
-search-popup.num-commands = integer;7
-search-popup.command-0 = examine #$id$
-search-popup.command-0-name = Examine game
-search-popup.command-0-multi-select-supported = boolean;false
-search-popup.command-1 = sposition #$id$
-search-popup.command-1-name = View last position
-search-popup.command-1-multi-select-supported = boolean;false
-search-popup.command-2 = smoves #$id$
-search-popup.command-2-name = View move list
-search-popup.command-3 = spgn #$id$
-search-popup.command-3-name = View PGN
-search-popup.command-4 = separator
-search-popup.command-5 = libappend #$id$
-search-popup.command-5-name = Append game(s) to personal library
-search-popup.command-6 = mailstored #$id$
-search-popup.command-6-name = Email me the game(s)
+gameListPopup.1.command = sposition #$id$
+gameListPopup.1.nameKey = gameListPopup.viewLastPositionItemLabel
+gameListPopup.1.multiSelectSupported = boolean;false
+
+gameListPopup.2.command = smoves #$id$
+gameListPopup.2.nameKey = gameListPopup.viewMoveListItemLabel
+
+gameListPopup.3.command = spgn #$id$
+gameListPopup.3.nameKey = gameListPopup.viewPgnItemLabel
+
+gameListPopup.4.type = separator
+
+gameListPopup.5.command = libappend #$id$
+gameListPopup.5.nameKey = gameListPopup.appendToLibraryItemLabel
+
+gameListPopup.6.command = mailstored #$id$
+gameListPopup.6.nameKey = gameListPopup.emailMeItemLabel
+
 
 # Input properties
 input-background = color;ffffff
@@ -267,50 +241,50 @@ input-foreground = color;000000
 preferences.show = boolean;true
 preferences.categories.count = integer;15
 
-preferences.categories.0.name = Default channel settings
+preferences.categories.0.nameKey = defaultChannelTextCategoryName
 preferences.categories.0.ids = string;channel-tell;channel-atell
 
 preferences.categories.1.custom = boolean;true
 preferences.categories.1.id = channels-panel
 preferences.categories.channels-panel.ids = string;channel-tell;channel-atell
 preferences.categories.channels-panel.channels-count = integer;400
-preferences.categories.channels-panel.name = Channels
+preferences.categories.channels-panel.nameKey = channelsTextCategoryName
 
-preferences.categories.2.name = Personal tells
+preferences.categories.2.nameKey = personalTextCategoryName
 preferences.categories.2.ids = tell
 
-preferences.categories.3.name = Opponent tells
+preferences.categories.3.nameKey = opponentTextCategoryName
 preferences.categories.3.ids = say
 
-preferences.categories.4.name = Bughouse partner tells
+preferences.categories.4.nameKey = bughousePartnerTextCategoryName
 preferences.categories.4.ids = ptell
 
-preferences.categories.5.name = Qtells (Bot tells)
+preferences.categories.5.nameKey = qtellsTextCategoryName
 preferences.categories.5.ids = qtell
 
-preferences.categories.6.name = Shouts
+preferences.categories.6.nameKey = shoutsTextCategoryName
 preferences.categories.6.ids = string;shout;ishout
 
-preferences.categories.7.name = S-Shouts
+preferences.categories.7.nameKey = sshoutsTextCategoryName
 preferences.categories.7.ids = sshout
 
-preferences.categories.8.name = Announcements
+preferences.categories.8.nameKey = announcementsTextCategoryName
 preferences.categories.8.ids = announcement
 
-preferences.categories.9.name = Kibitzes
+preferences.categories.9.nameKey = kibitzesTextCategoryName
 preferences.categories.9.ids = kibitz
 
-preferences.categories.10.name = Whispers
+preferences.categories.10.nameKey = whispersTextCategoryName
 preferences.categories.10.ids = whisper
 
-preferences.categories.11.name = Links
+preferences.categories.11.nameKey = linksTextCategoryName
 preferences.categories.11.ids = link
 
-preferences.categories.12.name = User commands
+preferences.categories.12.nameKey = userCommandsTextCategoryName
 preferences.categories.12.ids = user
 
-preferences.categories.13.name = System information
+preferences.categories.13.nameKey = systemInformationTextCategoryName
 preferences.categories.13.ids = info
 
-preferences.categories.14.name = Special information
+preferences.categories.14.nameKey = specialInformationTextCategoryName
 preferences.categories.14.ids = special
