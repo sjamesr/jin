@@ -155,23 +155,24 @@ public class SeekAction extends JinAction{
      
     public SeekPanel(){
       Preferences prefs = getPrefs();
+      I18n i18n = getI18n();
       
       WildVariant [] variants = getConn().getSupportedVariants();
       
       // Create ui elements
       timeField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 3);
       incField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 3);
-      isRatedBox = new JCheckBox();
+      isRatedBox = i18n.createCheckBox("ratedBox");
       variantChoice = new FixedJComboBox(variants);
       variantChoice.setEditable(false);
-      autoColor = new JRadioButton();
-      whiteColor = new JRadioButton();
-      blackColor = new JRadioButton();
-      limitRatingBox = new JCheckBox();
+      autoColor = i18n.createRadioButton("autoColorRadioButton");
+      whiteColor = i18n.createRadioButton("whiteColorRadioButton");
+      blackColor = i18n.createRadioButton("blackColorRadioButton");
+      limitRatingBox = i18n.createCheckBox("limitRatingCheckBox");
       minRatingField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 4);
       maxRatingField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 4);
-      manualAcceptBox = new JCheckBox();
-      useFormulaBox = new JCheckBox();
+      manualAcceptBox = i18n.createCheckBox("manualAcceptCheckBox");
+      useFormulaBox = i18n.createCheckBox("useFormulaCheckBox");
       
       
       ButtonGroup colorButtonGroup = new ButtonGroup();
@@ -218,14 +219,15 @@ public class SeekAction extends JinAction{
       
       
       // Time controls
-      JLabel timeLabel = new JLabel(i18n.getString("timeLabel"));
-      timeLabel.setDisplayedMnemonicIndex(i18n.getInt("timeLabel.displayedMnemonicIndex"));
+      JLabel timeLabel = i18n.createLabel("timeLabel");
       timeLabel.setLabelFor(timeField);
-      JLabel minutesLabel = new JLabel(i18n.getString("minutesLabel"));
-      JLabel incLabel = new JLabel(i18n.getString("incrementLabel"));
-      incLabel.setDisplayedMnemonicIndex(i18n.getInt("incrementLabel.displayedMnemonicIndex"));
+      
+      JLabel incLabel = i18n.createLabel("incrementLabel");
       incLabel.setLabelFor(incField);
-      JLabel secondsLabel = new JLabel(i18n.getString("secondsLabel"));
+      
+      JLabel secondsLabel = i18n.createLabelNoMnemonic("secondsLabel");
+      JLabel minutesLabel = i18n.createLabelNoMnemonic("minutesLabel");
+      
       timeField.setMaximumSize(timeField.getPreferredSize());
       incField.setMaximumSize(incField.getPreferredSize());
       
@@ -242,14 +244,8 @@ public class SeekAction extends JinAction{
       timeContainer.add(secondsLabel);
       
 
-      // Game ratedness
-      isRatedBox.setText(i18n.getString("ratedBoxLabel"));
-      isRatedBox.setDisplayedMnemonicIndex(i18n.getInt("ratedBoxLabel.displayedMnemonicIndex"));
-      
-      
       // Variant
-      JLabel variantLabel = new JLabel(i18n.getString("variantLabel"));
-      variantLabel.setDisplayedMnemonicIndex(i18n.getInt("variantLabel.displayedMnemonicIndex"));
+      JLabel variantLabel = i18n.createLabel("variantLabel");
       variantLabel.setLabelFor(variantChoice);
       variantChoice.setMaximumSize(variantChoice.getPreferredSize());
       
@@ -262,14 +258,7 @@ public class SeekAction extends JinAction{
       
 
       // Color
-      autoColor.setText(i18n.getString("autoColorChoice"));
-      autoColor.setDisplayedMnemonicIndex(i18n.getInt("autoColorChoice.displayedMnemonicIndex"));
-      whiteColor.setText(i18n.getString("whiteColorChoice"));
-      whiteColor.setDisplayedMnemonicIndex(i18n.getInt("whiteColorChoice.displayedMnemonicIndex"));
-      blackColor.setText(i18n.getString("blackColorChoice"));
-      blackColor.setDisplayedMnemonicIndex(i18n.getInt("blackColorChoice.displayedMnemonicIndex"));
-      
-      JLabel colorLabel = new JLabel(i18n.getString("colorLabel"));
+      JLabel colorLabel = i18n.createLabelNoMnemonic("colorLabel");
       
       JComponent colorContainer = SwingUtils.createHorizontalBox();
       colorContainer.add(Box.createHorizontalStrut(labelPad));
@@ -284,14 +273,9 @@ public class SeekAction extends JinAction{
       
       
       // Limit opponent rating
-      limitRatingBox.setText(i18n.getString("limitRatingLabel"));
-      limitRatingBox.setDisplayedMnemonicIndex(i18n.getInt("limitRatingLabel.displayedMnemonicIndex"));
-      
-      JLabel minLabel = new JLabel(i18n.getString("minRatingLabel"));
-      minLabel.setDisplayedMnemonicIndex(i18n.getInt("minRatingLabel.displayedMnemonicIndex"));
+      JLabel minLabel = i18n.createLabel("minRatingLabel");
       minLabel.setLabelFor(minRatingField);
-      JLabel maxLabel = new JLabel(i18n.getString("maxRatingLabel"));
-      maxLabel.setDisplayedMnemonicIndex(i18n.getInt("maxRatingLabel.displayedMnemonicIndex"));
+      JLabel maxLabel = i18n.createLabel("maxRatingLabel");
       maxLabel.setLabelFor(maxRatingField);
       minRatingField.setMaximumSize(minRatingField.getPreferredSize());
       maxRatingField.setMaximumSize(minRatingField.getPreferredSize());
@@ -318,25 +302,15 @@ public class SeekAction extends JinAction{
       limitRatingContainer.add(minMaxContainer);
       
       
-      // Manual accept
-      manualAcceptBox.setText(i18n.getString("manualAcceptLabel"));
-      manualAcceptBox.setDisplayedMnemonicIndex(i18n.getInt("manualAcceptLabel.displayedMnemonicIndex"));
-      
-      
-      // Use formula
-      useFormulaBox.setText(i18n.getString("useFormulaLabel"));
-      useFormulaBox.setMnemonic(i18n.getInt("useFormulaLabel.displayedMnemonicIndex"));
-      
-
       // Buttons panel
       JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      JButton issueSeekButton = new JButton(i18n.getString("issueSeekButtonText"));
-      JButton cancelButton = new JButton(i18n.getString("cancelButtonText"));
+      JButton issueSeekButton = i18n.createButton("issueSeekButton");
+      JButton cancelButton = i18n.createButton("cancelButton");
       buttonsPanel.add(issueSeekButton);
       buttonsPanel.add(cancelButton);
       
       
-      JButton moreLessButton = new JButton(i18n.getString("moreOptionsButtonText"));
+      JButton moreLessButton = i18n.createButton("moreOptionsButton.text");
       moreLessButton.setActionCommand("more");
       JPanel moreLessPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       moreLessPanel.add(moreLessButton);
@@ -394,14 +368,14 @@ public class SeekAction extends JinAction{
         public void actionPerformed(ActionEvent evt){
           if (evt.getActionCommand().equals("more")){
             JButton moreLessButton = (JButton)evt.getSource();
-            moreLessButton.setText(getI18n().getString("lessOptionsButtonText"));
+            moreLessButton.setText(getI18n().getString("lessOptionsButton.text"));
             moreLessButton.setActionCommand("less");
             advancedPanelHolder.add(advancedPanel, BorderLayout.CENTER);
             SeekPanel.this.resizeContainerToFit();
           }
           else{
             JButton moreLessButton = (JButton)evt.getSource();
-            moreLessButton.setText(getI18n().getString("moreOptionsButtonText"));
+            moreLessButton.setText(getI18n().getString("moreOptionsButton.text"));
             moreLessButton.setActionCommand("more");
             advancedPanelHolder.remove(advancedPanel);
             SeekPanel.this.resizeContainerToFit();

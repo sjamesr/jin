@@ -97,7 +97,7 @@ public class AskQuestionAction extends JinAction{
       setLayout(new BorderLayout(10, 10));
       
       I18n i18n = getI18n();
-      String [] labelText = i18n.getString("instructionsLabel").split("\n");
+      String [] labelText = i18n.getString("instructionsLabel.text").split("\n");
         
       JPanel labelsPanel = new JPanel(new GridLayout(labelText.length, 1));
       for (int i = 0; i < labelText.length; i++)
@@ -105,16 +105,15 @@ public class AskQuestionAction extends JinAction{
       
       
       final JTextField questionField = new FixedJTextField(30);
-      JLabel questionLabel = new JLabel(i18n.getString("questionLabel"));
-      questionLabel.setDisplayedMnemonic('Q');
+      JLabel questionLabel = i18n.createLabel("questionLabel");
       questionLabel.setLabelFor(questionField);
       JPanel textFieldPanel = new JPanel(new BorderLayout(10, 10));
       textFieldPanel.add(questionLabel, BorderLayout.WEST);
       textFieldPanel.add(questionField, BorderLayout.CENTER);
       
       JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      JButton sendButton = new JButton(i18n.getString("sendButtonText"));
-      JButton cancelButton = new JButton(i18n.getString("cancelButtonText"));
+      JButton sendButton = i18n.createButton("sendButton");
+      JButton cancelButton = i18n.createButton("cancelButton");
       buttonsPanel.add(sendButton);
       buttonsPanel.add(cancelButton);
       
