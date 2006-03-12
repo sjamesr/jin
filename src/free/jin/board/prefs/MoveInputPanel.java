@@ -129,8 +129,13 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   public MoveInputPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    dragndrop = createRadioButton("dragndropRadioButton", boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
-    clicknclick = createRadioButton("clicknclickRadioButton", boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
+    I18n i18n = getI18n();
+    
+    dragndrop = i18n.createRadioButton("dragndropRadioButton");
+    clicknclick = i18n.createRadioButton("clicknclickRadioButton");
+    
+    dragndrop.setSelected(boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
+    clicknclick.setSelected(boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
     
     ButtonGroup moveInputGroup = new ButtonGroup();
     moveInputGroup.add(dragndrop);
@@ -145,7 +150,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     dragndrop.addActionListener(moveInputListener);
     clicknclick.addActionListener(moveInputListener);
       
-    autoPromote = createCheckBox("autoPromoteCheckBox", boardManager.isAutoPromote());
+    autoPromote = i18n.createCheckBox("autoPromoteCheckBox");
+    autoPromote.setSelected(boardManager.isAutoPromote());
     autoPromote.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setManualPromote(!autoPromote.isSelected());
@@ -154,7 +160,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
     
-    pieceFollowsCursor = createCheckBox("pieceFollowsCursorCheckBox", boardManager.isPieceFollowsCursor());
+    pieceFollowsCursor = i18n.createCheckBox("pieceFollowsCursorCheckBox");
+    pieceFollowsCursor.setSelected(boardManager.isPieceFollowsCursor());
     pieceFollowsCursor.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
@@ -163,7 +170,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
       
-    highlightMadeMoveSquares = createCheckBox("highlightMadeMoveSquaresCheckBox", boardManager.isHighlightMadeMoveSquares());
+    highlightMadeMoveSquares = i18n.createCheckBox("highlightMadeMoveSquaresCheckBox");
+    highlightMadeMoveSquares.setSelected(boardManager.isHighlightMadeMoveSquares());
     highlightMadeMoveSquares.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         boolean selected = highlightMadeMoveSquares.isSelected();
@@ -175,8 +183,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     
-    madeMoveSquaresHighlightColor = createColorChooser("madeMoveSquaresHighlightColorChooser", 
-        boardManager.getMadeMoveSquaresHighlightColor());
+    madeMoveSquaresHighlightColor = i18n.createColorChooser("madeMoveSquaresHighlightColorChooser");
+    madeMoveSquaresHighlightColor.setColor(boardManager.getMadeMoveSquaresHighlightColor());
     madeMoveSquaresHighlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(
@@ -187,12 +195,13 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     
-    disallowMoveInAdvance = createRadioButton("disallowMoveInAdvanceRadioButton",
-      boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);
-    immediateSendMove = createRadioButton("immediateSendMoveRadioButton",
-      boardManager.getMoveSendingMode() == BoardManager.PREDRAG_MOVE_SENDING_MODE);
-    premove = createRadioButton("premoveRadioButton",
-      boardManager.getMoveSendingMode() == BoardManager.PREMOVE_MOVE_SENDING_MODE);
+    disallowMoveInAdvance = i18n.createRadioButton("disallowMoveInAdvanceRadioButton");
+    immediateSendMove = i18n.createRadioButton("immediateSendMoveRadioButton");
+    premove = i18n.createRadioButton("premoveRadioButton");
+    
+    disallowMoveInAdvance.setSelected(boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);
+    immediateSendMove.setSelected(boardManager.getMoveSendingMode() == BoardManager.PREDRAG_MOVE_SENDING_MODE);
+    premove.setSelected(boardManager.getMoveSendingMode() == BoardManager.PREMOVE_MOVE_SENDING_MODE);
     
     ButtonGroup movingInAdvanceButtonGroup = new ButtonGroup();
     movingInAdvanceButtonGroup.add(disallowMoveInAdvance);

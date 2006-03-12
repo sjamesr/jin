@@ -21,15 +21,18 @@
 
 package free.jin.board.prefs;
 
-import javax.swing.*;
-import free.chess.JBoard;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import free.chess.JBoard;
+import free.jin.BadChangesException;
+import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.jin.BadChangesException;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 
@@ -91,13 +94,22 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
   public SquareCoordinatesPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    int coordsDisplayStyle = boardManager.getCoordsDisplayStyle();
-    none = createRadioButton("noSquareCoordsRadioButton", coordsDisplayStyle == JBoard.NO_COORDS);
-    rim = createRadioButton("rimSquareCoordsRadioButton", coordsDisplayStyle == JBoard.RIM_COORDS);
-    outside = createRadioButton("outsideSquareCoordsRadioButton", coordsDisplayStyle == JBoard.OUTSIDE_COORDS);
-    everySquare = createRadioButton("everySquareCoordsRadioButton", coordsDisplayStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    I18n i18n = getI18n();
     
-    coordsColor = createColorChooser("coordsColorChooser", boardManager.getCoordsDisplayColor());
+    int coordsDisplayStyle = boardManager.getCoordsDisplayStyle();
+    none = i18n.createRadioButton("noSquareCoordsRadioButton");
+    rim = i18n.createRadioButton("rimSquareCoordsRadioButton");
+    outside = i18n.createRadioButton("outsideSquareCoordsRadioButton");
+    everySquare = i18n.createRadioButton("everySquareCoordsRadioButton");
+    
+    none.setSelected(coordsDisplayStyle == JBoard.NO_COORDS);
+    rim.setSelected(coordsDisplayStyle == JBoard.RIM_COORDS);
+    outside.setSelected(coordsDisplayStyle == JBoard.OUTSIDE_COORDS);
+    everySquare.setSelected(coordsDisplayStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    
+    
+    coordsColor = i18n.createColorChooser("coordsColorChooser");
+    coordsColor.setColor(boardManager.getCoordsDisplayColor());
     
     ButtonGroup group = new ButtonGroup();
     group.add(none);

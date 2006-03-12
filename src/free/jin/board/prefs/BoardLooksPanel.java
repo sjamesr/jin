@@ -154,12 +154,19 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     pieceSets = new JList(getPieceSets());
     boardPatterns = new JList(getBoardPatterns());
-    whiteColor = createColorChooser("whiteColorChooser", boardManager.getWhitePieceColor());
-    blackColor = createColorChooser("blackColorChooser", boardManager.getBlackPieceColor());
-    whiteOutline = createColorChooser("whiteOutlineChooser", boardManager.getWhiteOutlineColor());
-    blackOutline = createColorChooser("blackOutlineChooser", boardManager.getBlackOutlineColor());
-    darkSquares = createColorChooser("darkSquaresChooser", boardManager.getDarkSquareColor());
-    lightSquares = createColorChooser("lightSquaresChooser", boardManager.getLightSquareColor());
+    whiteColor = i18n.createColorChooser("whiteColorChooser");
+    blackColor = i18n.createColorChooser("blackColorChooser");
+    whiteOutline = i18n.createColorChooser("whiteOutlineChooser");
+    blackOutline = i18n.createColorChooser("blackOutlineChooser");
+    darkSquares = i18n.createColorChooser("darkSquaresChooser");
+    lightSquares = i18n.createColorChooser("lightSquaresChooser");
+    
+    whiteColor.setColor(boardManager.getWhitePieceColor());
+    blackColor.setColor(boardManager.getBlackPieceColor());
+    whiteOutline.setColor(boardManager.getWhiteOutlineColor());
+    blackOutline.setColor(boardManager.getBlackOutlineColor());
+    darkSquares.setColor(boardManager.getDarkSquareColor());
+    lightSquares.setColor(boardManager.getLightSquareColor());
     
     JComponent piecesPanel = createPiecesUI();
     JComponent boardPanel = createBoardUI();

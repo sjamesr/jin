@@ -115,15 +115,23 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     I18n i18n = getI18n();
     
     int highlightStyle = boardManager.getMoveHighlightingStyle();
-    none = createRadioButton("noMoveHighlightRadioButton", highlightStyle == JBoard.NO_MOVE_HIGHLIGHTING);
-    targetSquare = createRadioButton("targetSquareHighlightRadioButton", highlightStyle == JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
-    bothSquares = createRadioButton("bothSquaresHighlightRadioButton", highlightStyle == JBoard.BOTH_SQUARES_MOVE_HIGHLIGHTING);
-    arrow = createRadioButton("arrowHighlightRadioButton", highlightStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    none = i18n.createRadioButton("noMoveHighlightRadioButton");
+    targetSquare = i18n.createRadioButton("targetSquareHighlightRadioButton");
+    bothSquares = i18n.createRadioButton("bothSquaresHighlightRadioButton");
+    arrow = i18n.createRadioButton("arrowHighlightRadioButton");
     
-    highlightOwnMoves = createCheckBox("highlightOwnMovesCheckBox", boardManager.isHighlightingOwnMoves());
-
-    highlightColor = createColorChooser("moveHighlightColorChooser", boardManager.getMoveHighlightingColor());
-        
+    none.setSelected(highlightStyle == JBoard.NO_MOVE_HIGHLIGHTING);
+    targetSquare.setSelected(highlightStyle == JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
+    bothSquares.setSelected(highlightStyle == JBoard.BOTH_SQUARES_MOVE_HIGHLIGHTING);
+    arrow.setSelected(highlightStyle == JBoard.ARROW_MOVE_HIGHLIGHTING);
+    
+    highlightOwnMoves = i18n.createCheckBox("highlightOwnMovesCheckBox");
+    highlightOwnMoves.setSelected(boardManager.isHighlightingOwnMoves());
+    
+    highlightColor = i18n.createColorChooser("moveHighlightColorChooser");
+    highlightColor.setColor(boardManager.getMoveHighlightingColor());
+    
+    
     ButtonGroup group = new ButtonGroup();
     group.add(none);
     group.add(targetSquare);
