@@ -21,6 +21,8 @@
 
 package free.jin;
 
+import java.text.MessageFormat;
+
 import free.jin.plugin.PluginStartException;
 import free.jin.ui.LoginPanel;
 import free.jin.ui.OptionPanel;
@@ -110,8 +112,11 @@ public class ConnectionManager{
     String serverId = jin.getParameter("login.server");
     if (serverId != null){
       Server server = jin.getServerById(serverId);
-      if (server == null)
-        OptionPanel.error("Login Parameters Error", "Unknown server ID: " + serverId);
+      if (server == null){
+        I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+        OptionPanel.error(i18n.getString("unknownServerParam.title"),
+          MessageFormat.format(i18n.getString("unknownServerParam.message"), new Object[]{serverId}));
+      }
       else
         return server;
     }
@@ -305,8 +310,9 @@ public class ConnectionManager{
    */
   
   void loginFailed(String message){
-    String errorMessage = "Error logging in:\n" + message;
-    OptionPanel.error("Login Error", errorMessage);
+    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    String errorMessage = MessageFormat.format(i18n.getString("loginErrorDialog.message"), new Object[]{message});
+    OptionPanel.error(i18n.getString("loginErrorDialog.title"), errorMessage);
     
     // Reopen the connection UI
     User user = session.getUser();
@@ -339,10 +345,13 @@ public class ConnectionManager{
 
       // Add the user to the known users list
       if (!user.isGuest() && !Jin.getInstance().isKnownUser(user)){
+        I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+        
+        String title = i18n.getString("rememberAccountDialog.title");
+        String message = MessageFormat.format(i18n.getString("rememberAccountDialog.message"), new Object[]{user.getUsername()});
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||
-          OptionPanel.question("Remember Account?", "Would you like Jin to remember the " 
-          + user.getUsername() + " account?", OptionPanel.YES) == OptionPanel.YES;
+          OptionPanel.question(title, message, OptionPanel.YES) == OptionPanel.YES;
           
         if (rememberUser){
           Jin.getInstance().addUser(user);
