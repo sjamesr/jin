@@ -195,11 +195,7 @@ public class I18n{
    */
   
   public JButton createButton(String i18nKey){
-    JButton button = new JButton();
-    
-    button.setText(getString(i18nKey + ".text"));
-    
-    return button;
+    return (JButton)init(new JButton(), i18nKey);
   }
   
   
@@ -211,7 +207,10 @@ public class I18n{
   public ColorChooser createColorChooser(String i18nKey){
     ColorChooser colorChooser = new ColorChooser(getString(i18nKey + ".text"));
     colorChooser.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
-    colorChooser.setToolTipText(getString(i18nKey + ".tooltip"));
+    
+    String tooltipText = getString(i18nKey + ".tooltip");
+    if (!"".equals(tooltipText))
+      colorChooser.setToolTipText(tooltipText);
     
     return colorChooser;
   }
@@ -226,7 +225,10 @@ public class I18n{
   private AbstractButton init(AbstractButton button, String i18nKey){
     button.setText(getString(i18nKey + ".text"));
     button.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
-    button.setToolTipText(getString(i18nKey + ".tooltip"));
+    
+    String tooltipText = getString(i18nKey + ".tooltip");
+    if (!"".equals(tooltipText))
+      button.setToolTipText(tooltipText);
     
     return button;
   }
