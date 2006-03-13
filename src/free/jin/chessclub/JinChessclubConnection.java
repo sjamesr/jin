@@ -47,6 +47,7 @@ import free.jin.chessclub.event.ChessEventEvent;
 import free.jin.chessclub.event.CircleEvent;
 import free.jin.event.*;
 import free.util.Pair;
+import free.util.TextUtilities;
 import free.util.Utilities;
 
 
@@ -426,16 +427,29 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * appropriate instead of sending your own message.
    */
 
-  protected void sendUnsupportedVariantMessage(int variantNumber){
+  protected void warnVariantUnsupported(int variantNumber){
     String variantName = getVariantName(variantNumber);
     if (variantName == null)
       variantName = "w" + variantNumber;
     
-    String message = I18n.getInstance(getClass(), Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
+    String message = I18n.getInstance(JinChessclubConnection.class, Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
     String [] messageLines = message.split("\n");
     
+    Object [] messageFormatArgs = new Object[]{variantName};
     for (int i = 0; i < messageLines.length; i++)
-      processLine(MessageFormat.format(messageLines[i], new Object[]{variantName}));
+      messageLines[i] = MessageFormat.format(messageLines[i], messageFormatArgs);
+    
+    int maxLineLength = 0;
+    for (int i = 0; i < messageLines.length; i++)
+      if (messageLines[i].length() > maxLineLength)
+        maxLineLength = messageLines[i].length();
+    
+    String border = TextUtilities.padStart("", '*', maxLineLength + 4);
+    
+    processLine(border);
+    for (int i = 0; i < messageLines.length; i++)
+      processLine("* " + TextUtilities.padEnd(messageLines[i], ' ', maxLineLength) + " *");
+    processLine(border);
   }
 
 
@@ -1007,7 +1021,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendUnsupportedVariantMessage(variantNumber);
+      warnVariantUnsupported(variantNumber);
       return;
     }
 
@@ -1066,7 +1080,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendUnsupportedVariantMessage(variantNumber);
+      warnVariantUnsupported(variantNumber);
       return;
     }
 
@@ -1127,7 +1141,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     WildVariant variant = getVariant(variantNumber);
     if (variant == null){ // Not a supported variant.
-      sendUnsupportedVariantMessage(variantNumber);
+      warnVariantUnsupported(variantNumber);
       return;
     }
 
