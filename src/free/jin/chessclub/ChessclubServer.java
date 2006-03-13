@@ -42,15 +42,6 @@ public class ChessclubServer extends AbstractServer{
   protected UsernamePolicy createUsernamePolicy(){
     return new UsernamePolicy(){
       
-      private I18n i18n = null;
-      
-      private I18n getI18n(){
-        if (i18n == null)
-          i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
-        
-        return i18n;
-      }
-      
       private boolean isLetter(int c){
         return ((c >= 97) && (c <= 122)) || ((c >= 65) && (c <= 90));
       }
