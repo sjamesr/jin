@@ -249,7 +249,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private void createUI(){
-    JButton clearButton = new JButton(getI18n().getString("clearConsoleButton.text"));
+    JButton clearButton = getI18n().createButton("clearConsoleButton");
     clearButton.addActionListener(clearingActionListener);
     clearButton.setRequestFocusEnabled(false);
     
