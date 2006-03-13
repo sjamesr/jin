@@ -21,6 +21,8 @@
 
 package free.jin.freechess;
 
+import java.text.MessageFormat;
+
 import free.jin.*;
 
 
@@ -47,13 +49,14 @@ public class FreechessServer extends AbstractServer{
       public String invalidityReason(String username){
         int usernameLength = username.length();
         if ((usernameLength < 3) || (usernameLength > 17))
-          return "Usernames must be between 3 and 17 characters long";
+          return getI18n().getString("usernameLengthErrorMessage");
 
         for (int i = 0; i < usernameLength; i++){
           int c = username.charAt(i);
           if (!((c >= 97) && (c <= 122) || // Lowercase characters.
                 (c >= 65) && (c <= 90)))    // Uppercase characters.
-            return "Your username contains at least one illegal character: " + (char)c;
+            return MessageFormat.format(getI18n().getString("usernameIllegalCharacterErrorMessage"),
+                new Object[]{"" + c});
         }
 
         return null;

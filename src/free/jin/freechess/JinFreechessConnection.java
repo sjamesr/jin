@@ -23,6 +23,7 @@ package free.jin.freechess;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -1214,9 +1215,37 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     return false;
   }
+  
+  
+  
+  
+  /**
+   * This method informs the user that he tried to use (observe, play etc.)
+   * a wild variant not supported by Jin. Please use this method when
+   * appropriate instead of sending your own message.
+   */
 
-
-
+  protected void warnVariantUnsupported(String variantName){
+    String message = I18n.getInstance(JinFreechessConnection.class, Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
+    String [] messageLines = message.split("\n");
+    
+    Object [] messageFormatArgs = new Object[]{variantName};
+    for (int i = 0; i < messageLines.length; i++)
+      messageLines[i] = MessageFormat.format(messageLines[i], messageFormatArgs);
+    
+    int maxLineLength = 0;
+    for (int i = 0; i < messageLines.length; i++)
+      if (messageLines[i].length() > maxLineLength)
+        maxLineLength = messageLines[i].length();
+    
+    String border = TextUtilities.padStart("", '*', maxLineLength + 4);
+    
+    processLine(border);
+    for (int i = 0; i < messageLines.length; i++)
+      processLine("* " + TextUtilities.padEnd(messageLines[i], ' ', maxLineLength) + " *");
+    processLine(border);
+  }
+  
 
 
 
@@ -1230,13 +1259,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     String categoryName = gameInfo.getGameCategory();
     WildVariant variant = getVariant(categoryName);
     if (variant == null){
-      String starsPad = TextUtilities.padStart("", '*', categoryName.length()+2);
-      String spacePad = TextUtilities.padStart("", ' ', categoryName.length()+1) + "*";
-      processLine("********************************************************" + starsPad);
-      processLine("* This version of Jin does not support the wild variant " + categoryName + " *");
-      processLine("* and is thus unable to display the game.               " + spacePad);
-      processLine("* Please use the appropriate command to close the game. " + spacePad);
-      processLine("********************************************************" + starsPad);
+      warnVariantUnsupported(categoryName);
       unsupportedGames.addElement(new Integer(gameInfo.getGameNumber()));
       return null;
     }

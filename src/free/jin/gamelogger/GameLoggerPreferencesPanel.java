@@ -21,28 +21,32 @@
 
 package free.jin.gamelogger;
 
-import javax.swing.*;
 import java.awt.*;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.text.JTextComponent;
-import javax.swing.border.EmptyBorder;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Vector;
-import free.workarounds.FixedJTextField;
-import free.jin.Preferences;
-import free.jin.BadChangesException;
-import free.jin.ui.PreferencesPanel;
-import free.util.swing.ExtensionFileFilter;
-import free.util.IOUtilities;
-import free.util.AWTUtilities;
-import free.util.swing.PlainTextDialog;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.JTextComponent;
+
 import bsh.EvalError;
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.ui.PreferencesPanel;
+import free.util.AWTUtilities;
+import free.util.swing.ExtensionFileFilter;
+import free.util.swing.PlainTextDialog;
+import free.workarounds.FixedJTextField;
 
 
 
@@ -192,17 +196,15 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   protected void createUI(){
+    I18n i18n = gameLogger.getI18n();
+    
     int loggingMode = gameLogger.getLoggingMode();
     String allGamesLogFile = gameLogger.getLogFileForAll();
     Vector loggingRules = gameLogger.getLoggingRules();
 
-    logNoneButton = new JRadioButton("Do Not Log Games");
-    logAllButton = new JRadioButton("Log All Games to File:");
-    useRulesButton = new JRadioButton("Specify Logging Rules");
-
-    logNoneButton.setMnemonic('D');
-    logAllButton.setMnemonic('L');
-    useRulesButton.setMnemonic('S');
+    logNoneButton = i18n.createRadioButton("logNoGamesRadioButton");
+    logAllButton = i18n.createRadioButton("logAllGamesRadioButton");
+    useRulesButton = i18n.createRadioButton("ruleBasedGameLoggingRadioButton");
 
     ButtonGroup modeGroup = new ButtonGroup();
     modeGroup.add(logNoneButton);
@@ -250,8 +252,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     allGamesLogFileField = new FixedJTextField(10);
     allGamesLogFileField.setText(allGamesLogFile);
     allGamesLogFileField.getDocument().addDocumentListener(changeFiringDocumentListener);
-    JButton browseAllGamesLogFileButton = new JButton("Browse...");
-    browseAllGamesLogFileButton.setMnemonic('B');
+    JButton browseAllGamesLogFileButton = i18n.createButton("browseLogFileButton");
     browseAllGamesLogFileButton.setDefaultCapable(false);
     browseAllGamesLogFileButton.addActionListener(new PGNFileSelectActionListener(this, allGamesLogFileField));
 
@@ -296,8 +297,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
               ignoreSelectionChange = true;
               loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
               ignoreSelectionChange = false;
-              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(), "Error", 
-                JOptionPane.ERROR_MESSAGE);
+              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(),
+                gameLogger.getI18n().getString("badChangesDialog.title"), JOptionPane.ERROR_MESSAGE);
               if (e.getErrorComponent() != null)
                 e.getErrorComponent().requestFocus();
               return;
@@ -331,13 +332,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     loggingListRulesScrollPane.setPreferredSize(new Dimension(80, 80));
 
 
-    JLabel rulesLabel = new JLabel("Rules");
-    rulesLabel.setDisplayedMnemonic('R');
+    JLabel rulesLabel = i18n.createLabel("gameLoggingRulesLabel");
     rulesLabel.setLabelFor(loggingRulesList);
     rulesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    JButton addRuleButton = new JButton("Add Rule");
-    addRuleButton.setMnemonic('A');
+    JButton addRuleButton = i18n.createButton("addLoggingRuleButton");
     addRuleButton.setDefaultCapable(false);
     addRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -346,14 +345,14 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
           try{
             updateRuleFromUI(selectedIndex);
           } catch (BadChangesException e){
-              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(), "Error", 
-                JOptionPane.ERROR_MESSAGE);
+              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(),
+                  gameLogger.getI18n().getString("badChangesDialog.title"), JOptionPane.ERROR_MESSAGE);
               if (e.getErrorComponent() != null)
                 e.getErrorComponent().requestFocus();
               return;
             }
         }
-        rulesListModel.addElement("New Logging Rule");
+        rulesListModel.addElement(gameLogger.getI18n().getString("initialNewGameLoggingRuleName"));
         loggingRulesList.setSelectedIndex(rulesListModel.size() - 1);
 
         rulenameField.setText("");
@@ -363,16 +362,21 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JButton deleteRuleButton = new JButton("Delete Rule");
-    deleteRuleButton.setMnemonic('t');
+    JButton deleteRuleButton = i18n.createButton("deleteGameLoggingRuleButton");
     deleteRuleButton.setDefaultCapable(false);
     deleteRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex != -1){
+          I18n i18n = gameLogger.getI18n();
           String ruleName = rulesListModel.getElementAt(selectedIndex).toString();
+          
+          String messageFormat = i18n.getString("confirmRuleDeletion.message");
+          String message = MessageFormat.format(messageFormat, new Object[]{ruleName});
+          String title = i18n.getString("confirmRuleDeletion.title");
+            
           int result = JOptionPane.showConfirmDialog(GameLoggerPreferencesPanel.this, 
-            "Are you sure you want to delete the rule \""+ruleName+"\"?", "Confirm rule deletion", JOptionPane.YES_NO_OPTION);
+            message, title, JOptionPane.YES_NO_OPTION);
           if (result == JOptionPane.YES_OPTION){
             rulesListModel.removeElementAt(selectedIndex);
             if (selectedIndex < rulesListModel.size())
@@ -443,7 +447,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         if (selectedItem instanceof String){
           String text = rulenameField.getText();
           if (text.length() == 0)
-            rulesListModel.setElementAt("New Logging Rule", loggingRulesList.getSelectedIndex());
+            rulesListModel.setElementAt(gameLogger.getI18n().getString("initialNewGameLoggingRuleName"), loggingRulesList.getSelectedIndex());
           else
             rulesListModel.setElementAt(text, loggingRulesList.getSelectedIndex());
         }
@@ -458,40 +462,28 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JLabel rulenameLabel = new JLabel("Rule Name:");
-    JLabel filenameLabel = new JLabel("Filename (*.pgn):");
-    JLabel conditionLabel = new JLabel("Condition:");
-
-    rulenameLabel.setDisplayedMnemonic('N');
-    filenameLabel.setDisplayedMnemonic('F');
-    conditionLabel.setDisplayedMnemonic('C');
+    JLabel rulenameLabel = i18n.createLabel("gameLoggingRuleNameLabel");
+    JLabel filenameLabel = i18n.createLabel("gameLoggingFilenameLabel");
+    JLabel conditionLabel = i18n.createLabel("gameLoggingConditionLabel");
 
     rulenameLabel.setLabelFor(rulenameField);
     filenameLabel.setLabelFor(filenameField);
     conditionLabel.setLabelFor(conditionField);
 
-    JButton browseLogFileButton = new JButton("Browse...");
-    browseLogFileButton.setMnemonic('B');
+    JButton browseLogFileButton = i18n.createButton("browseLogFileButton");
     browseLogFileButton.setDefaultCapable(false);
     browseLogFileButton.addActionListener(new PGNFileSelectActionListener(this, filenameField));
 
-    JButton helpConditionButton = new JButton("Help...");
-    helpConditionButton.setMnemonic('H');
+    JButton helpConditionButton = i18n.createButton("conditionHelpButton");
     helpConditionButton.setDefaultCapable(false);
     helpConditionButton.setPreferredSize(browseLogFileButton.getPreferredSize());
     helpConditionButton.addActionListener(new ActionListener(){
-      private String helpText = null;
-
       public void actionPerformed(ActionEvent evt){
-        if (helpText == null)
-          try{
-            helpText = IOUtilities.loadText(GameLoggerPreferencesPanel.class.getResource("condition-help.txt"));
-          } catch (IOException e){
-              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, "Unable to load the helpfile", "Error", JOptionPane.ERROR_MESSAGE);
-              return;
-            }
+        I18n i18n = gameLogger.getI18n();
+        String text = i18n.getString("conditionHelpDialog.text");
+        String title = i18n.getString("conditionHelpDialog.title");
 
-        PlainTextDialog textDialog = new PlainTextDialog(GameLoggerPreferencesPanel.this, "Logging condition help", helpText);
+        PlainTextDialog textDialog = new PlainTextDialog(GameLoggerPreferencesPanel.this, title, text);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
@@ -584,6 +576,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private void updateRuleFromUI(int ruleIndex) throws BadChangesException{
+    I18n i18n = gameLogger.getI18n();
+    
     DefaultListModel rulesModel = (DefaultListModel)loggingRulesList.getModel();
     Object item = rulesModel.getElementAt(ruleIndex);
 
@@ -597,11 +591,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     Component errorComponent = null;
 
     if ((rulename == null) || (rulename.length() == 0)){
-      errorMessage = "You must specify a rule name";
+      errorMessage = i18n.getString("ruleNameUnspecifiedErrorMessage");
       errorComponent = rulenameField;
     }
     else if ((filename == null) || (filename.length() == 0)){
-      errorMessage = "You must specify the name of the file into which the games will be logged";
+      errorMessage = i18n.getString("fileNameUnspecifiedErrorMessage");
       errorComponent = filenameField;
     }
     else if ((ruleString == null) || (ruleString.length() == 0)){
@@ -624,7 +618,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         loggingRulesList.repaint();        
       }
     } catch (EvalError e){
-        throw new BadChangesException("The specified logging condition is not valid", conditionField);
+        throw new BadChangesException(i18n.getString("invalidGameLoggingConditionMessage"), conditionField);
       }
   }
 
@@ -652,7 +646,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
     String allGamesLogFile = allGamesLogFileField.getText();
     if ("all".equals(loggingModeString) && ((allGamesLogFile == null) || (allGamesLogFile.length() == 0)))
-      throw new BadChangesException("You must specify the name of the file into which the games will be logged", 
+      throw new BadChangesException(gameLogger.getI18n().getString("fileNameUnspecifiedErrorMessage"), 
         allGamesLogFileField);
 
     prefs.setString("logging.mode", loggingModeString);
@@ -714,6 +708,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
 
     public void actionPerformed(ActionEvent evt){
+      I18n i18n = I18n.getInstance(GameLoggerPreferencesPanel.class, Jin.getInstance().getLocale());
+      
       File currentFile = new File(textfield.getText());
       File currentDir = null;
       if (currentFile.isFile()){
@@ -731,10 +727,10 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       JFileChooser fileChooser = new JFileChooser(currentDir);
       fileChooser.setMultiSelectionEnabled(false);
       fileChooser.addChoosableFileFilter(
-        new ExtensionFileFilter("Portable Game Notation files", ".pgn", false));
+        new ExtensionFileFilter(i18n.getString("pgnFileChooser.filterName"), ".pgn", false));
       fileChooser.setFileHidingEnabled(true);
       fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-      int result = fileChooser.showDialog(parent, "Use File");
+      int result = fileChooser.showDialog(parent, i18n.getString("pgnFileChooser.name"));
       if (result == JFileChooser.APPROVE_OPTION){
         String path = null;
         try{
