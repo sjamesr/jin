@@ -36,6 +36,14 @@ import free.util.TextUtilities;
  */
 
 public abstract class AbstractServer implements Server{
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this class.
+   */
+  
+  private I18n i18n;
 
 
 
@@ -87,6 +95,19 @@ public abstract class AbstractServer implements Server{
    */
 
   protected abstract UsernamePolicy createUsernamePolicy();
+  
+  
+  
+  /**
+   * Returns the <code>I18n</code> for this server.
+   */
+  
+  public I18n getI18n(){
+    if (i18n == null)
+      i18n = I18n.getInstance(getClass(), AbstractServer.class, Jin.getInstance().getLocale());
+    
+    return i18n; 
+  }
 
 
 
@@ -196,7 +217,7 @@ public abstract class AbstractServer implements Server{
    */
 
   public String getShortName(){
-    return props.getProperty("shortName");
+    return getI18n().getString(props.getProperty("shortNameKey"));
   }
 
 
@@ -207,7 +228,7 @@ public abstract class AbstractServer implements Server{
    */
 
   public String getLongName(){
-    return props.getProperty("longName");
+    return getI18n().getString(props.getProperty("longNameKey"));
   }
 
 
