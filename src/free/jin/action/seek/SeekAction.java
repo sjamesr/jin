@@ -310,7 +310,7 @@ public class SeekAction extends JinAction{
       buttonsPanel.add(cancelButton);
       
       
-      JButton moreLessButton = i18n.createButton("moreOptionsButton.text");
+      JButton moreLessButton = i18n.createButton("moreOptionsButton");
       moreLessButton.setActionCommand("more");
       JPanel moreLessPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       moreLessPanel.add(moreLessButton);
