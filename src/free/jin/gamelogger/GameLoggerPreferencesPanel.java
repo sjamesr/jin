@@ -336,7 +336,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     rulesLabel.setLabelFor(loggingRulesList);
     rulesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    JButton addRuleButton = i18n.createButton("addLoggingRuleButton");
+    JButton addRuleButton = i18n.createButton("addGameLoggingRuleButton");
     addRuleButton.setDefaultCapable(false);
     addRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
