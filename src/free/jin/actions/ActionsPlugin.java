@@ -61,7 +61,7 @@ public class ActionsPlugin extends Plugin{
 
   
   /**
-   * Returns the name of this plugin - "Actions".
+   * Returns the name of this plugin.
    */
   
   public String getName(){
