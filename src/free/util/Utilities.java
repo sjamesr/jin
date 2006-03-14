@@ -281,6 +281,27 @@ public class Utilities{
   public static int hashCode(long val){
     return (int)(val ^ (val >>> 32));
   }
+  
+  
+  
+  /**
+   * Returns the name of the package of the specified class.
+   */
+  
+  public static String getPackageName(Class c){
+    return getPackageName(c.getName());
+  }
+  
+  
+  
+  /**
+   * Returns the name of the package of the class with the specified (full) name.
+   */
+  
+  public static String getPackageName(String className){
+    int lastDotIndex = className.lastIndexOf(".");
+    return lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
+  }
 
 
 }
