@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.*;
 
+import free.util.Utilities;
 import free.util.swing.ColorChooser;
 
 
@@ -100,9 +101,7 @@ public class I18n{
    */
   
   private static ResourceBundle getResourceBundle(Class requestingClass, Locale locale){
-    String className = requestingClass.getName();
-    int lastDotIndex = className.lastIndexOf(".");
-    String packageName = lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
+    String packageName = Utilities.getPackageName(requestingClass);
     String bundleName = "".equals(packageName) ? "localization" : packageName + "." + "localization"; 
     
     return ResourceBundle.getBundle(bundleName, locale, requestingClass.getClassLoader());
