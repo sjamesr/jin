@@ -21,19 +21,24 @@
 
 package free.jin.scripter;
 
-import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.EventObject;
 import java.util.StringTokenizer;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import free.workarounds.FixedJTextArea;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
 import free.jin.ui.PreferencesPanel;
 import free.util.AWTUtilities;
-import free.util.WindowDisposingListener;
 import free.util.Utilities;
-import java.util.EventObject;
+import free.util.WindowDisposingListener;
+import free.workarounds.FixedJTextArea;
 
 
 /**
@@ -41,9 +46,17 @@ import java.util.EventObject;
  */
 
 public class ScripterPreferencesPanel extends PreferencesPanel{
-
-
-
+  
+  
+  
+  /**
+   *  The <code>I18n</code> for this class.
+   */
+  
+  private final I18n i18n;
+  
+  
+  
   /**
    * The Scripter whose preferences we're displaying/modifying.
    */
@@ -66,6 +79,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   public ScripterPreferencesPanel(Scripter scripter){
+    this.i18n = I18n.getInstance(ScripterPreferencesPanel.class, Jin.getInstance().getLocale());
     this.scripter = scripter;
 
     Script [] scripts = scripter.getScripts();
@@ -192,14 +206,13 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setPreferredSize(new Dimension(200, 70));
 
-    JLabel listLabel = new JLabel("Scripts");
-    listLabel.setDisplayedMnemonic('S');
+    JLabel listLabel = i18n.createLabel("scriptsLabel");
     listLabel.setLabelFor(listLabel);
 
-    final JButton add = new JButton("Add Script");
-    final JButton edit = new JButton("Edit Script");
-    final JButton remove = new JButton("Remove Script");
-    final JCheckBox enabled = new JCheckBox("Script Enabled", false);
+    final JButton add = i18n.createButton("addScriptButton");
+    final JButton edit = i18n.createButton("editScriptButton");
+    final JButton remove = i18n.createButton("removeScriptButton");
+    final JCheckBox enabled = i18n.createCheckBox("scriptEnabledCheckBox");
 
     edit.setEnabled(false);
     remove.setEnabled(false);
@@ -269,11 +282,6 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    add.setMnemonic('A');
-    edit.setMnemonic('E');
-    remove.setMnemonic('R');
-    enabled.setMnemonic('n');
-
     add.setDefaultCapable(false);
     edit.setDefaultCapable(false);
     remove.setDefaultCapable(false);
@@ -331,43 +339,8 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
 
   private class ScriptTypeSelectionDialog extends JDialog{
 
-
-    /**
-     * Text explaining the "commands" script type.
-     */
-
-    private static final String COMMANDS_TEXT =
-      "Allows specifying a condition and a list of commands\n"+
-      "which will be sent to the server when the condition is met.\n"+
-      "This is the simplest script type and requires no previous\n"+
-      "knowledge of any programming/scripting languages.";
-
-
-
-    /**
-     * Text explaining the "beanshell" script type.
-     */
-
-    private static final String BEANSHELL_TEXT =
-      "Allows specifying a BeanShell script which will be run\n"+
-      "when a certain event occurs. BeanShell is essentially a Java\n"+
-      "source interpreter with certain scripting features. BeanShell\n"+
-      "scripts are therefore simply small pieces of Java code that\n"+
-      "can be run without compiling. For more information about\n"+
-      "BeanShell see http://www.beanshell.org/. Use this script\n"+
-      "type if you have at least basic knowledge of Java.\n";
       
       
-      
-    /**
-     * An array containing all the possible text for the type explanation text
-     * area.
-     */
-     
-    private final String [] expTexts = new String[]{COMMANDS_TEXT, BEANSHELL_TEXT};
-
-
-
     /**
      * The currently chosen script type.
      */
@@ -393,7 +366,9 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      */
 
     public ScriptTypeSelectionDialog(Component parent){
-      super(AWTUtilities.frameForComponent(parent), "Choose script type", true);
+      super(AWTUtilities.frameForComponent(parent), "", true);
+      
+      setTitle(i18n.getString("scriptTypeSelectionDialog.title"));
 
       setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -416,14 +391,11 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       setContentPane(content);
       content.setBorder(new EmptyBorder(5, 5, 0, 5));
 
-      JRadioButton commands = new JRadioButton("Server Commands");
-      JRadioButton beanshell = new JRadioButton("BeanShell Script (Java)");
+      JRadioButton commands = i18n.createRadioButton("serverCommandsScriptTypeRadioButton");
+      JRadioButton beanshell = i18n.createRadioButton("beanshellScriptTypeRadioButton");
 
       commands.setActionCommand("commands");
       beanshell.setActionCommand("beanshell");
-
-      commands.setMnemonic('S');
-      beanshell.setMnemonic('B');
 
       final ButtonGroup buttonGroup = new ButtonGroup();
       buttonGroup.add(commands);
@@ -439,6 +411,8 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
         private Dimension prefSize = null;
         public Dimension getPreferredSize(){
           if (prefSize == null){
+            String [] expTexts = 
+              new String[]{i18n.getString("scriptExplanation.commands"), i18n.getString("scriptExplanation.beanshell")};
             FontMetrics metrics = this.getFontMetrics(this.getFont());
             int width = 0;
             int height = 0;
@@ -468,11 +442,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
           ButtonModel selectedModel = buttonGroup.getSelection();
           scriptType = selectedModel.getActionCommand();
 
-          String text = null;
-          if ("commands".equals(scriptType))
-            text = COMMANDS_TEXT;
-          else if ("beanshell".equals(scriptType))
-            text = BEANSHELL_TEXT;
+          String text = i18n.getString("scriptExplanation." + scriptType);
 
           typeExplanationTextArea.setText(text);
         }
@@ -481,8 +451,8 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       commands.addActionListener(selectionListener);
       beanshell.addActionListener(selectionListener);
 
-      JButton next = new JButton("Next");
-      JButton cancel = new JButton("Cancel");
+      JButton next = i18n.createButton("scriptTypeSelectionDialog.nextButton");
+      JButton cancel = i18n.createButton("scriptTypeSelectionDialog.cancelButton");
 
       JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       buttonsPanel.add(next);

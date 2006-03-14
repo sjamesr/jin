@@ -44,7 +44,7 @@ public class ChessclubScripter extends Scripter{
    */
 
   public ChessclubScripter(){
-    registerScriptDispatcher("Chat (All types of tells)", new ChatScriptDispatcher());
+    registerScriptDispatcher("chat", new ChatScriptDispatcher());
   }
 
 
@@ -54,7 +54,7 @@ public class ChessclubScripter extends Scripter{
 
   private class ChatScriptDispatcher extends ScriptDispatcher implements ChatListener{
 
-    private final String [] subtypes = new String[]{"Personal Tell", "(Bughouse) Partner Tell", "QTell", "Shout", "Serious Shout", "Announcement", "Channel Tell", "Channel QTell", "Kibitz", "Whisper"};
+    private final String [] subtypes = new String[]{"personalTell", "partnerTell", "qtell", "shout", "sshout", "announcement", "channelTell", "channelQTell", "kibitz", "whisper"};
 
     private final Hashtable chatTypesToSubtypeNames = new Hashtable();
 

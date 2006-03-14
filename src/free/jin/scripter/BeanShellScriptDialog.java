@@ -21,17 +21,20 @@
 
 package free.jin.scripter;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import free.util.TableLayout;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
+
+import javax.swing.*;
+
+import bsh.EvalError;
 import free.util.AWTUtilities;
-import free.util.IOUtilities;
+import free.util.TableLayout;
 import free.util.swing.PlainTextDialog;
 import free.workarounds.FixedJTextArea;
-import bsh.EvalError;
 
 
 /**
@@ -39,16 +42,9 @@ import bsh.EvalError;
  */
 
 class BeanShellScriptDialog extends ScriptDialog{
-
-
-  /**
-   * The text of the beanshell code helpfile. Loaded lazily.
-   */
-
-  private static String codeHelpText = null;
-
-
-
+  
+  
+  
   /**
    * The text area for the code.
    */
@@ -62,8 +58,10 @@ class BeanShellScriptDialog extends ScriptDialog{
    */
 
   public BeanShellScriptDialog(Component parent, Scripter scripter, BeanShellScript templateScript){
-    super(parent, "BeanShell Script", scripter, templateScript);
-
+    super(parent, "", scripter, templateScript);
+    
+    setTitle(i18n.getString("beanshellScriptDialog.title"));
+    
     createUI();
   }
 
@@ -86,30 +84,19 @@ class BeanShellScriptDialog extends ScriptDialog{
     codeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     codeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-    JLabel codeLabel = new JLabel("Code:");
+    JLabel codeLabel = i18n.createLabel("beanshellCodeLabel");
 
-    codeLabel.setDisplayedMnemonic('C');
     codeLabel.setLabelFor(codeArea);
     codeLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-    JButton codeHelp = new JButton("Help...");
-    codeHelp.setMnemonic('l');
+    JButton codeHelp = i18n.createButton("beanshellHelpButton");
     codeHelp.setDefaultCapable(false);
 
     codeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        synchronized(BeanShellScriptDialog.class){
-          if (codeHelpText == null){
-            String resourceLocation = "help/beanshell.txt";
-            try{
-              codeHelpText = IOUtilities.loadText(BeanShellScriptDialog.class.getResource(resourceLocation));
-            } catch (IOException e){
-                JOptionPane.showMessageDialog(BeanShellScriptDialog.this, "Unable to load file: "+resourceLocation, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-              }
-          }
-        }
-        PlainTextDialog textDialog = new PlainTextDialog(BeanShellScriptDialog.this, "BeanShell code help", codeHelpText);
+        String title = i18n.getString("beanshellHelpDialog.title");
+        String codeHelpText = i18n.getString("beanshellHelpDialog.message");
+        PlainTextDialog textDialog = new PlainTextDialog(BeanShellScriptDialog.this, title, codeHelpText);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, BeanShellScriptDialog.this);
         textDialog.setVisible(true);
@@ -143,7 +130,10 @@ class BeanShellScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        JOptionPane.showMessageDialog(this, "Malformed code:\n" + e.getErrorText(), "Malformed Script", JOptionPane.ERROR_MESSAGE);
+        String title = i18n.getString("beanshellMalformedScriptDialog.title");
+        String message = 
+          MessageFormat.format(i18n.getString("beanshellMalformedScriptDialog.message"), new Object[]{e.getErrorText()});
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
         return null;
       }
   }

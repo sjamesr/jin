@@ -21,20 +21,20 @@
 
 package free.jin.scripter;
 
-import free.jin.event.*;
 import java.io.*;
-import java.util.*;
-import free.jin.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
+
+import bsh.EvalError;
 import free.chess.*;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import java.awt.Component;
+import free.jin.*;
+import free.jin.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.ui.PreferencesPanel;
 import free.util.MemoryFile;
 import free.util.Utilities;
-import free.util.swing.UrlDisplayingAction;
-import bsh.EvalError;
 
 
 /**
@@ -51,16 +51,7 @@ public class Scripter extends Plugin{
    * instances supporting those types of events.
    */
 
-  private final Hashtable dispatchers;
-
-
-
-  /**
-   * Our menu.
-   */
-
-  private final JMenu menu;
-
+  private final Hashtable dispatchers = new Hashtable();
 
 
 
@@ -69,16 +60,11 @@ public class Scripter extends Plugin{
    */
 
   public Scripter(){
-    dispatchers = new Hashtable();
-
-    registerScriptDispatcher("Connection", new ConnectionScriptDispatcher());
-    registerScriptDispatcher("Text (Unparsed text)", new PlainTextScriptDispatcher());
-    registerScriptDispatcher("Game", new GameScriptDispatcher());
-    registerScriptDispatcher("Seek", new SeekScriptDispatcher());
-    registerScriptDispatcher("Friends", new FriendsScriptDispatcher());
-//    registerScriptDispatcher("User Invoked", new UserInvokedScriptDispatcher());
-
-    menu = new JMenu("Scripter");
+    registerScriptDispatcher("connection", new ConnectionScriptDispatcher());
+    registerScriptDispatcher("plainText", new PlainTextScriptDispatcher());
+    registerScriptDispatcher("game", new GameScriptDispatcher());
+    registerScriptDispatcher("seek", new SeekScriptDispatcher());
+    registerScriptDispatcher("friends", new FriendsScriptDispatcher());
   }
 
 
@@ -178,12 +164,6 @@ public class Scripter extends Plugin{
    */
 
   public void start(){
-    JMenuItem help = new JMenuItem("Help", 'H');
-    help.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/docs/scripter/"));
-
-    menu.add(help);
-    menu.addSeparator();
-
     loadScripts();
   }
 
@@ -197,18 +177,6 @@ public class Scripter extends Plugin{
   public void saveState(){
     saveScripts();
   }
-
-
-
-  /**
-   * Returns the menu for this plugin.
-   */
-  
-  public JMenu getPluginMenu(){
-    return menu;
-  }
-
-
 
 
 
@@ -228,9 +196,6 @@ public class Scripter extends Plugin{
     if (dispatcher == null)
       throw new IllegalArgumentException(""+script+" is of an unsupported/unknown event type ("+eventType+")");
 
-    if (dispatcher instanceof UserInvokedScriptDispatcher)
-      menu.add(new UserInvokedScriptMenuItem(script));
-
     dispatcher.addScript(script);
   }
 
@@ -246,20 +211,6 @@ public class Scripter extends Plugin{
     ScriptDispatcher dispatcher = getScriptDispatcher(eventType);
     if (dispatcher == null)
       throw new IllegalArgumentException(""+script+" is of an unsupported/unknown event type ("+eventType+")");
-
-    if (dispatcher instanceof UserInvokedScriptDispatcher){
-      int count = menu.getMenuComponentCount();
-      for (int i = 0; i < count; i++){
-        Component comp = menu.getMenuComponent(i);
-        if (comp instanceof UserInvokedScriptMenuItem){
-          UserInvokedScriptMenuItem item = (UserInvokedScriptMenuItem)comp;
-          if (item.getScript() == script){
-            menu.remove(item);
-            break;
-          }
-        }
-      }
-    }
 
     dispatcher.removeScript(script);
   }
@@ -393,14 +344,14 @@ public class Scripter extends Plugin{
 
       String scriptName = props.getProperty("name");
       String scriptType = props.getProperty("type");
-      String eventType = props.getProperty("event-type");
+      String eventType = eventTypeBackwardsCompatibility(props.getProperty("event-type"));
       boolean enabled = "true".equals(props.getProperty("enabled"));
       String eventSubtypesCount = props.getProperty("event-subtype.count");
       String [] eventSubtypes = null;
       if (eventSubtypesCount != null){
         eventSubtypes = new String[Integer.parseInt(eventSubtypesCount)];
         for (int i = 0; i < eventSubtypes.length; i++)
-          eventSubtypes[i] = props.getProperty("event-subtype."+i);
+          eventSubtypes[i] = eventSubtypeBackwardsCompatibility(eventType, props.getProperty("event-subtype." + i));
       }
 
       Script script;
@@ -429,6 +380,120 @@ public class Scripter extends Plugin{
         e.printStackTrace();
         return null;
       }
+  }
+  
+  
+  
+  /**
+   * Maps old event type names to new ones.
+   */
+  
+  private Hashtable oldToNewEventTypes = null;
+  
+  
+  
+  /**
+   * Converts old event type names (which were shown to the user) into the new
+   * ones (which are only used as IDs - the actual names are internationalized).
+   */
+  
+  private String eventTypeBackwardsCompatibility(String eventType){
+    if (oldToNewEventTypes == null){
+      oldToNewEventTypes = new Hashtable();
+      oldToNewEventTypes.put("Chat (All types of tells)", "chat");
+      oldToNewEventTypes.put("Connection", "connection");
+      oldToNewEventTypes.put("Text (Unparsed text)", "plainText");
+      oldToNewEventTypes.put("Game", "game");
+      oldToNewEventTypes.put("Seek", "seek");
+      oldToNewEventTypes.put("Friends", "friends");
+      oldToNewEventTypes.put("User Invoked", "userInvoked");
+    }
+    
+    if (eventType == null)
+      return null;
+    
+    String newEventType = (String)oldToNewEventTypes.get(eventType);
+    
+    return newEventType == null ? eventType : newEventType;
+  }
+  
+  
+  
+  /**
+   * Maps event types (new ones) to a mapping of old event subtypes to new subtypes.
+   */
+  
+  private Hashtable eventTypesToOldToNewEventSubtypes;
+  
+  
+  
+  /**
+   * Converts old event subtype names (which were shown to the user) into new
+   * ones (which are only used as IDs - the actual names are internationalized).
+   */
+  
+  private String eventSubtypeBackwardsCompatibility(String eventType, String eventSubtype){
+    if (eventTypesToOldToNewEventSubtypes == null){
+      eventTypesToOldToNewEventSubtypes = new Hashtable();
+      
+      Hashtable chatOldToNewSubtypes = new Hashtable();
+      chatOldToNewSubtypes.put("Personal Tell", "personalTell");
+      chatOldToNewSubtypes.put("(BugHouse) Partner Tell", "partnerTell");
+      chatOldToNewSubtypes.put("Shout", "shout");
+      chatOldToNewSubtypes.put("T-Shout", "tshout");
+      chatOldToNewSubtypes.put("C-Shout", "cshout");
+      chatOldToNewSubtypes.put("Announcement", "announcement");
+      chatOldToNewSubtypes.put("Channel Tell", "channelTell");
+      chatOldToNewSubtypes.put("Kibitz", "kibitz");
+      chatOldToNewSubtypes.put("Whisper", "whisper");
+      chatOldToNewSubtypes.put("QTell", "qtell");
+      chatOldToNewSubtypes.put("Serious Shout", "sshout");
+      chatOldToNewSubtypes.put("Channel QTell", "channelQTell");
+      eventTypesToOldToNewEventSubtypes.put("chat", chatOldToNewSubtypes);
+      
+      Hashtable connectionOldToNewSubtypes = new Hashtable();
+      connectionOldToNewSubtypes.put("Attempt", "attempt");
+      connectionOldToNewSubtypes.put("Connect", "connect");
+      connectionOldToNewSubtypes.put("Login", "login");
+      connectionOldToNewSubtypes.put("Disconnect", "disconnect");
+      eventTypesToOldToNewEventSubtypes.put("connection", connectionOldToNewSubtypes);
+      
+      Hashtable gameOldToNewSubtypes = new Hashtable();
+      gameOldToNewSubtypes.put("Game Start", "gameStart");
+      gameOldToNewSubtypes.put("Move", "move");
+      gameOldToNewSubtypes.put("Takeback/Backward", "takebackOrBackward");
+      gameOldToNewSubtypes.put("Board Flip", "boardFlip");
+      gameOldToNewSubtypes.put("Illegal Move Attempt", "illegalMoveAttempt");
+      gameOldToNewSubtypes.put("Clock Update", "clockUpdate");
+      gameOldToNewSubtypes.put("Other Position Change", "otherPositionChange");
+      gameOldToNewSubtypes.put("Offers", "offers");
+      gameOldToNewSubtypes.put("Game End", "gameEnd");
+      eventTypesToOldToNewEventSubtypes.put("game", gameOldToNewSubtypes);
+      
+      Hashtable seekOldToNewSubtypes = new Hashtable();
+      seekOldToNewSubtypes.put("Post", "post");
+      seekOldToNewSubtypes.put("Withdraw", "withdraw");
+      eventTypesToOldToNewEventSubtypes.put("seek", seekOldToNewSubtypes);
+      
+      Hashtable friendsOldToNewSubtypes = new Hashtable();
+      friendsOldToNewSubtypes.put("Online", "online");
+      friendsOldToNewSubtypes.put("Connected", "connected");
+      friendsOldToNewSubtypes.put("Disconnected", "disconnected");
+      friendsOldToNewSubtypes.put("Added", "added");
+      friendsOldToNewSubtypes.put("Removed", "removed");
+      eventTypesToOldToNewEventSubtypes.put("friends", friendsOldToNewSubtypes);
+    }
+    
+    if ((eventType == null) || (eventSubtype == null))
+      return null;
+    
+    Hashtable oldToNewSubtype = (Hashtable)eventTypesToOldToNewEventSubtypes.get(eventType);
+    if (oldToNewSubtype == null)
+      return eventSubtype;
+    
+    String newSubtype = (String)oldToNewSubtype.get(eventSubtype);
+    
+    return newSubtype == null ? eventSubtype : newSubtype;
   }
 
 
@@ -497,11 +562,11 @@ public class Scripter extends Plugin{
 
 
   /**
-   * Returns the string "Scripter".
+   * Returns the plugin name.
    */
 
   public String getName(){
-    return "Scripter";
+    return getI18n().getString("pluginName");
   }
 
 
@@ -682,7 +747,7 @@ public class Scripter extends Plugin{
 
   private class ConnectionScriptDispatcher extends ScriptDispatcher implements ConnectionListener{
 
-    private final String [] subtypes = new String[]{"Attempt", "Connect", "Login", "Disconnect"};
+    private final String [] subtypes = new String[]{"attempt", "connect", "login", "disconnect"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
     public boolean isSupportedBy(Connection conn){return true;}
@@ -750,8 +815,8 @@ public class Scripter extends Plugin{
    */
 
   private class GameScriptDispatcher extends ScriptDispatcher implements GameListener{
-
-    private final String [] subtypes = new String[]{"Game Start", "Move", "Takeback/Backward", "Board Flip", "Illegal Move Attempt", "Clock Update", "Other Position Change", "Offers", "Game End"};
+    
+    private final String [] subtypes = new String[]{"gameStart", "move", "takebackOrBackward", "boardFlip", "illegalMoveAttempt", "clockUpdate", "otherPositionChange", "offers", "gameEnd"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
 
@@ -1069,7 +1134,7 @@ public class Scripter extends Plugin{
 
   private class SeekScriptDispatcher extends ScriptDispatcher implements SeekListener{
 
-    private final String [] subtypes = new String[]{"Post", "Withdraw"};
+    private final String [] subtypes = new String[]{"post", "withdraw"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
     public boolean isSupportedBy(Connection conn){return (conn instanceof SeekConnection);}
@@ -1174,7 +1239,7 @@ public class Scripter extends Plugin{
 
   private class FriendsScriptDispatcher extends ScriptDispatcher implements FriendsListener{
 
-    private final String [] subtypes = new String[]{"Online", "Connected", "Disconnected", "Added", "Removed"};
+    private final String [] subtypes = new String[]{"online", "connected", "disconnected", "added", "removed"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
     public boolean isSupportedBy(Connection conn){return (conn instanceof FriendsConnection);}
@@ -1213,31 +1278,7 @@ public class Scripter extends Plugin{
 
 
   }
-
-
-
-
-  /**
-   * A <code>ScriptDispatcher</code> for scripts that are invoked directly by
-   * the user.
-   */
-
-  private class UserInvokedScriptDispatcher extends ScriptDispatcher{
-
-    protected String [] getEventSubtypesImpl(){return null;}
-
-    public boolean isSupportedBy(Connection conn){return true;}
-
-    public void registerForEvent(ListenerManager listenerManager){}
-
-    public void unregisterForEvent(ListenerManager listenerManager){}
-
-    protected Object [][] getAvailableVars(String [] eventSubtypes){
-      return null;
-    }
-
-
-  }
-
-
+  
+  
+  
 }

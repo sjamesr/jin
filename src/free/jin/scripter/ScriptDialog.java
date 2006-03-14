@@ -21,21 +21,24 @@
 
 package free.jin.scripter;
 
-import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.EmptyBorder;
-import java.util.Vector;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.awt.event.ActionListener;
+import java.util.Vector;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+import free.jin.I18n;
+import free.jin.Jin;
 import free.util.AWTUtilities;
-import free.util.swing.SwingUtils;
-import free.workarounds.FixedJTextField;
-import free.workarounds.FixedJComboBox;
+import free.util.NamedObject;
 import free.util.TableLayout;
 import free.util.Utilities;
-import free.util.IOUtilities;
 import free.util.swing.PlainTextDialog;
+import free.util.swing.SwingUtils;
+import free.workarounds.FixedJComboBox;
+import free.workarounds.FixedJTextField;
 
 
 
@@ -44,30 +47,22 @@ import free.util.swing.PlainTextDialog;
  */
 
 abstract class ScriptDialog extends JDialog{
-
-
+  
+  
+  
   /**
-   * The default string we show in the event type choice.
+   * The <code>I18n</code> for this <code>ScriptDialog</code>.
    */
-
-  private static final String SELECT_EVENT_TYPE_STRING = "Select Event Type";
-
-
-
-  /**
-   * The text of the event type helpfile. Loaded lazily.
-   */
-
-  private static String eventTypeHelpText = null;
+  
+  protected final I18n i18n = I18n.getInstance(getClass(), ScriptDialog.class, Jin.getInstance().getLocale());
 
 
 
   /**
-   * The text of the event subtypes helpfiles. Loaded lazily.
+   * The default event type we show in the event type choice.
    */
 
-  private static String eventSubtypesHelpText = null;
-
+  private static final String SELECT_EVENT_TYPE = "selectEventType";
 
 
 
@@ -105,7 +100,7 @@ abstract class ScriptDialog extends JDialog{
 
     if (scripter == null)
       throw new IllegalArgumentException("The specified scripter is null");
-
+    
     this.templateScript = templateScript;
     this.scripter = scripter;
 
@@ -140,18 +135,24 @@ abstract class ScriptDialog extends JDialog{
    */
 
   protected final void createUI(){
+    I18n scripterI18n = scripter.getI18n();
+    
     String defaultScriptName = (templateScript == null ? "" : templateScript.getName());
-    String defaultEventType = (templateScript == null ? SELECT_EVENT_TYPE_STRING : templateScript.getEventType());
+    String defaultEventType = (templateScript == null ? SELECT_EVENT_TYPE : templateScript.getEventType());
     String [] defaultSelectedSubtypes = 
       (templateScript == null ? new String[0] : templateScript.getEventSubtypes());
 
     String [] eventTypes = scripter.getSupportedEventTypes();
-
+    NamedObject [] eventTypeChoiceEntries = new NamedObject[eventTypes.length];
+    for (int i = 0; i < eventTypes.length; i++)
+      eventTypeChoiceEntries[i] = 
+        new NamedObject(eventTypes[i], scripterI18n.getString("eventTypeNames." + eventTypes[i]));
+    
     final JTextField scriptNameField = new FixedJTextField(defaultScriptName);
 
-    final JComboBox eventTypeChoice = new FixedJComboBox(eventTypes);
+    final JComboBox eventTypeChoice = new FixedJComboBox(eventTypeChoiceEntries);
     eventTypeChoice.setEditable(false);
-    eventTypeChoice.addItem(SELECT_EVENT_TYPE_STRING);
+    eventTypeChoice.addItem(new NamedObject(SELECT_EVENT_TYPE, scripterI18n.getString("selectEventTypeString")));
     eventTypeChoice.setSelectedItem(defaultEventType);
 
     final JPanel subtypesPanel = new JPanel(new TableLayout(2));
@@ -168,19 +169,16 @@ abstract class ScriptDialog extends JDialog{
 
     eventTypeChoice.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        String eventType = (String)eventTypeChoice.getSelectedItem();
+        NamedObject selectedItem = (NamedObject)eventTypeChoice.getSelectedItem();
+        String eventType = (String)selectedItem.getTarget();
         String [] selectedSubtypes = (templateScript == null ? new String[0] : templateScript.getEventSubtypes());
         updateSubtypesPanel(subtypesPanel, eventType, selectedSubtypes);
       }
     });
 
-    JLabel scriptNameLabel = new JLabel("Script Name:");
-    JLabel eventTypeLabel = new JLabel("Event Type:");
-    JLabel eventSubtypesLabel = new JLabel("Event Subtypes:");
-
-    scriptNameLabel.setDisplayedMnemonic('N');
-    eventTypeLabel.setDisplayedMnemonic('T');
-    eventSubtypesLabel.setDisplayedMnemonic('S');
+    JLabel scriptNameLabel = i18n.createLabel("scriptNameLabel");
+    JLabel eventTypeLabel = i18n.createLabel("eventTypeLabel");
+    JLabel eventSubtypesLabel = i18n.createLabel("eventSubtypesLabel");
 
     scriptNameLabel.setLabelFor(scriptNameField);
     eventTypeLabel.setLabelFor(eventTypeChoice);
@@ -188,29 +186,18 @@ abstract class ScriptDialog extends JDialog{
 
     eventSubtypesLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-    JButton eventTypeHelp = new JButton("Help...");
-    JButton eventSubtypesHelp = new JButton("Help...");
-
-    eventTypeHelp.setMnemonic('H');
-    eventSubtypesHelp.setMnemonic('e');
+    JButton eventTypeHelp = i18n.createButton("eventTypeHelpButton");
+    JButton eventSubtypesHelp = i18n.createButton("eventSubtypesHelpButton");
 
     eventTypeHelp.setDefaultCapable(false);
     eventSubtypesHelp.setDefaultCapable(false);
 
     eventTypeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        synchronized(ScriptDialog.class){
-          if (eventTypeHelpText == null){
-            String resourceLocation = "help/eventType.txt";
-            try{
-              eventTypeHelpText = IOUtilities.loadText(ScriptDialog.class.getResource(resourceLocation));
-            } catch (IOException e){
-                JOptionPane.showMessageDialog(ScriptDialog.this, "Unable to load file: "+resourceLocation, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-              }
-          }
-        }
-        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, "Event type help", eventTypeHelpText);
+        String title = i18n.getString("eventTypeHelpDialog.title");
+        String message = i18n.getString("eventTypeHelpDialog.message");
+
+        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, ScriptDialog.this);
         textDialog.setVisible(true);
@@ -219,18 +206,9 @@ abstract class ScriptDialog extends JDialog{
 
     eventSubtypesHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        synchronized(ScriptDialog.class){
-          if (eventSubtypesHelpText == null){
-            String resourceLocation = "help/eventSubtypes.txt";
-            try{
-              eventSubtypesHelpText = IOUtilities.loadText(ScriptDialog.class.getResource(resourceLocation));
-            } catch (IOException e){
-                JOptionPane.showMessageDialog(ScriptDialog.this, "Unable to load file: "+resourceLocation, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-              }
-          }
-        }
-        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, "Event subtypes help", eventSubtypesHelpText);
+        String title = i18n.getString("eventSubtypesHelpDialog.title");
+        String message = i18n.getString("eventSubtypesHelpDialog.message");
+        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, ScriptDialog.this);
         textDialog.setVisible(true);
@@ -262,13 +240,14 @@ abstract class ScriptDialog extends JDialog{
     dataPanel.add(Box.createVerticalStrut(10));
     dataPanel.add(scriptTypeSpecificDataPanel);
 
-    JButton okButton = new JButton("OK");
-    JButton cancelButton = new JButton("Cancel");
+    JButton okButton = i18n.createButton("scriptDialogOkButton");
+    JButton cancelButton = i18n.createButton("scriptDialogCancelButton");
 
     okButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String scriptName = scriptNameField.getText();
-        String eventType = (String)eventTypeChoice.getSelectedItem();
+        NamedObject eventTypeSelectedItem = (NamedObject)eventTypeChoice.getSelectedItem();
+        String eventType = (String)eventTypeSelectedItem.getTarget();
 
         Vector selectedSubtypesVector = new Vector();
         Component [] subtypeCheckboxes = subtypesPanel.getComponents();
@@ -284,17 +263,23 @@ abstract class ScriptDialog extends JDialog{
         selectedSubtypesVector.copyInto(selectedSubtypes);
 
         if ((scriptName == null) || (scriptName.length() == 0)){
-          JOptionPane.showMessageDialog(ScriptDialog.this, "You must specify a script name", "Missing Option", JOptionPane.ERROR_MESSAGE);
+          String title = i18n.getString("missingScriptNameDialog.title");
+          String message = i18n.getString("missingScriptNameDialog.message");
+          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
           return;
         }
 
-        if (SELECT_EVENT_TYPE_STRING.equals(eventType)){
-          JOptionPane.showMessageDialog(ScriptDialog.this, "You must specify an event type", "Missing Option", JOptionPane.ERROR_MESSAGE);
+        if (SELECT_EVENT_TYPE.equals(eventType)){
+          String title = i18n.getString("missingEventTypeDialog.title");
+          String message = i18n.getString("missingEventTypeDialog.message");
+          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
           return;
         }
 
         if ((selectedSubtypes.length == 0) && (scripter.getEventSubtypes(eventType) != null)){
-          JOptionPane.showMessageDialog(ScriptDialog.this, "You must select at least one event subtype", "Missing Option", JOptionPane.ERROR_MESSAGE);
+          String title = i18n.getString("missingEventSubtypeDialog.title");
+          String message = i18n.getString("missingEventSubtypeDialog.message");
+          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
           return;
         }
 
@@ -333,12 +318,12 @@ abstract class ScriptDialog extends JDialog{
   private void updateSubtypesPanel(JPanel panel, String eventType, String [] selectedSubtypes){
     panel.removeAll();
 
-    if (!SELECT_EVENT_TYPE_STRING.equals(eventType)){
+    if (!SELECT_EVENT_TYPE.equals(eventType)){
       String [] subtypes = scripter.getEventSubtypes(eventType);
       if (subtypes != null){
         for (int i = 0; i < subtypes.length; i++){
           String subtype = subtypes[i];
-          JCheckBox checkbox = new JCheckBox(subtype);
+          JCheckBox checkbox = new JCheckBox(scripter.getI18n().getString("eventSubtypeNames." + eventType + "." + subtype));
           checkbox.setActionCommand(subtype);
           checkbox.setSelected(Utilities.contains(selectedSubtypes, subtype));
           panel.add(checkbox);
@@ -361,6 +346,7 @@ abstract class ScriptDialog extends JDialog{
 
     return script;
   }
-
-
+  
+  
+  
 }

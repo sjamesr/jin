@@ -21,20 +21,23 @@
 
 package free.jin.scripter;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
-import free.util.TableLayout;
-import free.util.IOUtilities;
-import free.util.swing.PlainTextDialog;
-import free.util.AWTUtilities;
-import free.workarounds.FixedJTextField;
-import free.workarounds.FixedJTextArea;
+
+import javax.swing.*;
+
 import bsh.EvalError;
 import bsh.Interpreter;
+import free.util.AWTUtilities;
+import free.util.TableLayout;
+import free.util.swing.PlainTextDialog;
+import free.workarounds.FixedJTextArea;
+import free.workarounds.FixedJTextField;
 
 
 /**
@@ -42,24 +45,9 @@ import bsh.Interpreter;
  */
 
 class CommandsScriptDialog extends ScriptDialog{
-
-
-  /**
-   * The text of the condition helpfile. Loaded lazily.
-   */
-
-  private static String conditionHelpText = null;
-
-
-
-  /**
-   * The text of the commands helpfile. Loaded lazily.
-   */
-
-  private static String commandsHelpText = null;
-
-
-
+  
+  
+  
   /**
    * The text field for the condition.
    */
@@ -81,7 +69,9 @@ class CommandsScriptDialog extends ScriptDialog{
    */
 
   public CommandsScriptDialog(Component parent, Scripter scripter, CommandScript templateScript){
-    super(parent, "Commands Script", scripter, templateScript);
+    super(parent, "", scripter, templateScript);
+    
+    setTitle("commandsScriptDialog.title");
 
     createUI();
   }
@@ -110,34 +100,22 @@ class CommandsScriptDialog extends ScriptDialog{
     commandsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     commandsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-    JLabel conditionLabel = new JLabel("Condition:");
-    JLabel commandsLabel = new JLabel("Commands:");
-
-    conditionLabel.setDisplayedMnemonic('C');
-    commandsLabel.setDisplayedMnemonic('m');
+    JLabel conditionLabel = i18n.createLabel("commandsConditionLabel");
+    JLabel commandsLabel = i18n.createLabel("commandsCommandsLabel");
 
     conditionLabel.setLabelFor(conditionField);
     commandsLabel.setLabelFor(commandsArea);
 
     commandsLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-    JButton conditionHelp = new JButton("Help...");
-    JButton commandsHelp = new JButton("Help...");
+    JButton conditionHelp = i18n.createButton("commandsConditionHelpButton");
+    JButton commandsHelp = i18n.createButton("commandsCommandsHelpButton");
 
     conditionHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        synchronized(CommandsScriptDialog.class){
-          if (conditionHelpText == null){
-            String resourceLocation = "help/condition.txt";
-            try{
-              conditionHelpText = IOUtilities.loadText(CommandsScriptDialog.class.getResource(resourceLocation));
-            } catch (IOException e){
-                JOptionPane.showMessageDialog(CommandsScriptDialog.this, "Unable to load file: "+resourceLocation, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-              }
-          }
-        }
-        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, "Event type help", conditionHelpText);
+        String title = i18n.getString("commandsConditionHelpDialog.title");
+        String message = i18n.getString("commandsConditionHelpDialog.message");
+        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
         textDialog.setVisible(true);
@@ -146,27 +124,15 @@ class CommandsScriptDialog extends ScriptDialog{
 
     commandsHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        synchronized(CommandsScriptDialog.class){
-          if (commandsHelpText == null){
-            String resourceLocation = "help/commands.txt";
-            try{
-              commandsHelpText = IOUtilities.loadText(CommandsScriptDialog.class.getResource(resourceLocation));
-            } catch (IOException e){
-                JOptionPane.showMessageDialog(CommandsScriptDialog.this, "Unable to load file: "+resourceLocation, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-              }
-          }
-        }
-        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, "Event type help", commandsHelpText);
+        String title = i18n.getString("commandsCommandsHelpDialog.title");
+        String message = i18n.getString("commandsCommandsHelpDialog.message");
+        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
         textDialog.setVisible(true);
       }
     });
 
-
-    conditionHelp.setMnemonic('l');
-    commandsHelp.setMnemonic('p');
 
     conditionHelp.setDefaultCapable(false);
     commandsHelp.setDefaultCapable(false);
@@ -219,7 +185,10 @@ class CommandsScriptDialog extends ScriptDialog{
       if (!(val instanceof Boolean))
         throw new EvalError("Not a boolean expression");
     } catch (EvalError e){
-        int result = JOptionPane.showConfirmDialog(this, "The specified condition seems to be malformed.\nThe error is:\n\"" + format(e.getMessage())+"\"\n\nUse the condition anyway?", "Malformed Script", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+        String title = i18n.getString("commandsMalformedConditionDialog.title");
+        String message = MessageFormat.format(i18n.getString("commandsMalformedConditionDialog.message"),
+          new Object[]{format(e.getMessage())});
+        int result = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
         if (result != JOptionPane.YES_OPTION)
           return null;
       }
@@ -232,7 +201,10 @@ class CommandsScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        JOptionPane.showMessageDialog(this, "Malformed condition or commands:\n" + e.getErrorText(), "Malformed Script", JOptionPane.ERROR_MESSAGE);
+        String title = i18n.getString("commandsMalformedScriptDialog.title");
+        String message = MessageFormat.format(i18n.getString("commandsMalformedScriptDialog.message"),
+          new Object[]{e.getErrorText()});
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
         return null;
       }
   }

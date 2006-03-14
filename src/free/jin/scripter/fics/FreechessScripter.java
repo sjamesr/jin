@@ -44,7 +44,7 @@ public class FreechessScripter extends Scripter{
    */
 
   public FreechessScripter(){
-    registerScriptDispatcher("Chat (All types of tells)", new ChatScriptDispatcher());
+    registerScriptDispatcher("chat", new ChatScriptDispatcher());
   }
 
 
@@ -54,23 +54,23 @@ public class FreechessScripter extends Scripter{
 
   private class ChatScriptDispatcher extends ScriptDispatcher implements ChatListener{
 
-    private final String [] subtypes = new String[]{"Personal Tell", "(BugHouse) Partner Tell", "Shout", "T-Shout", "C-Shout", "Announcement", "Channel Tell", "Kibitz", "Whisper", "QTell"};
+    private final String [] subtypes = new String[]{"personalTell", "partnerTell", "shout", "tshout", "cshout", "announcement", "channelTell", "kibitz", "whisper", "qtell"}; 
 
-    private final Hashtable chatTypesToSubtypeNames = new Hashtable();
+    private final Hashtable chatTypesToSubtypes = new Hashtable();
 
     public ChatScriptDispatcher(){
-      chatTypesToSubtypeNames.put("tell", subtypes[0]);
-      chatTypesToSubtypeNames.put("say", subtypes[0]);
-      chatTypesToSubtypeNames.put("ptell", subtypes[1]);
-      chatTypesToSubtypeNames.put("shout", subtypes[2]);
-      chatTypesToSubtypeNames.put("ishout", subtypes[2]);
-      chatTypesToSubtypeNames.put("tshout", subtypes[3]);
-      chatTypesToSubtypeNames.put("cshout", subtypes[4]);
-      chatTypesToSubtypeNames.put("announcement", subtypes[5]);
-      chatTypesToSubtypeNames.put("channel-tell", subtypes[6]);
-      chatTypesToSubtypeNames.put("kibitz", subtypes[7]);
-      chatTypesToSubtypeNames.put("whisper", subtypes[8]);
-      chatTypesToSubtypeNames.put("qtell", subtypes[9]);
+      chatTypesToSubtypes.put("tell", subtypes[0]);
+      chatTypesToSubtypes.put("say", subtypes[0]);
+      chatTypesToSubtypes.put("ptell", subtypes[1]);
+      chatTypesToSubtypes.put("shout", subtypes[2]);
+      chatTypesToSubtypes.put("ishout", subtypes[2]);
+      chatTypesToSubtypes.put("tshout", subtypes[3]);
+      chatTypesToSubtypes.put("cshout", subtypes[4]);
+      chatTypesToSubtypes.put("announcement", subtypes[5]);
+      chatTypesToSubtypes.put("channel-tell", subtypes[6]);
+      chatTypesToSubtypes.put("kibitz", subtypes[7]);
+      chatTypesToSubtypes.put("whisper", subtypes[8]);
+      chatTypesToSubtypes.put("qtell", subtypes[9]);
     }                                          
 
     protected String [] getEventSubtypesImpl(){return subtypes;}
@@ -100,7 +100,7 @@ public class FreechessScripter extends Scripter{
       Object [][] vars = new Object[varsVector.size()][];
       varsVector.copyInto(vars);
 
-      runScripts(evt, (String)chatTypesToSubtypeNames.get(evt.getType()), vars);
+      runScripts(evt, (String)chatTypesToSubtypes.get(evt.getType()), vars);
     }
 
 
