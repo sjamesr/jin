@@ -22,17 +22,20 @@
 package free.jin;
 
 import java.io.*;
-import java.util.*;
-import free.util.*;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.text.MessageFormat;
+import java.util.*;
+
 import javax.swing.JOptionPane;
-import free.util.zip.ZipClassLoader;
-import free.util.zip.ZipURLStreamHandler;
+
+import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.jin.action.ActionInfo;
+import free.util.*;
+import free.util.zip.ZipClassLoader;
+import free.util.zip.ZipURLStreamHandler;
 
 
 
@@ -74,8 +77,24 @@ public class JinApplication implements JinContext{
    */
   
   private static final boolean dynamicLoad = !"true".equals(System.getProperty("jin.noDynamicLoad"));
+  
+  
+  
+  /**
+   * The locale for this instance of Jin.
+   */
+  
+  private final Locale locale;
 
 
+  
+  /**
+   * The <code>ResourceBundle</code> for this class.
+   */
+  
+  private ResourceBundle resourceBundle = null;
+  
+  
   
   /**
    * The commandline parameters.
@@ -232,6 +251,9 @@ public class JinApplication implements JinContext{
       mainLoader = null;
     }
     
+    // Determine the locale 
+    locale = determineLocale();
+    
     // Load servers
     servers = loadServers();
 
@@ -243,6 +265,16 @@ public class JinApplication implements JinContext{
 
     // Load plugins
     serversToPlugins = loadPlugins();
+  }
+  
+  
+  
+  /**
+   * Returns the locale for this instance of Jin.
+   */
+  
+  public Locale getLocale(){
+    return locale;
   }
   
   
@@ -291,17 +323,25 @@ public class JinApplication implements JinContext{
     try{
       userPrefs.save(userPrefsFile);
     } catch (SecurityException e){
-        showErrorMessage("Saving Preferences Error",
-          "The security manager doesn't allow writing:\n" + userPrefsFile);
+        showPrefsSaveError("securityManagerWriteError", userPrefsFile);
       }
       catch (IOException e){
-        showErrorMessage("Saving Preferences Error",
-          "Unable to save preferences into:\n" + userPrefsFile + "\n" +
-          "Perhaps you don't have permissions to write it?");
+        showPrefsSaveError("ioError", userPrefsFile);
       }
   }
-
-
+  
+  
+  
+  /**
+   * Displays an error message regarding an problem with saving the application-wide user preferences.
+   */
+  
+  private void showPrefsSaveError(String errorI18nKey, File targetFile){
+    showErrorMessage(getResourceBundle().getString("appSavingPrefsErrorDialog.title"),
+        MessageFormat.format(getResourceBundle().getString("appSavingPrefsErrorDialog." + errorI18nKey),
+          new Object[]{targetFile.toString()}));
+  }
+  
 
   
   /**
@@ -355,6 +395,32 @@ public class JinApplication implements JinContext{
     }
   }
 
+  
+  
+  /**
+   * Determines the locale for this instance of Jin.
+   */
+  
+  private Locale determineLocale(){
+    String language, country, variant;
+    
+    if ((language = getParameter("locale.language")) != null){ // Check app params
+      country = getParameter("locale.country");
+      variant = getParameter("locale.variant");
+    }
+    else if ((language = getPrefs().getString("locale.language", null)) != null){ // Check user prefs
+      country = getPrefs().getString("locale.country", "");
+      variant = getPrefs().getString("locale.variant", "");
+    }
+    else{ // default
+      language = "";
+      country = "";
+      variant = "";
+    }
+    
+    return new Locale(language, country == null ? "" : country, variant == null ? "" : variant);
+ }
+  
   
   
   /**
@@ -605,12 +671,11 @@ public class JinApplication implements JinContext{
 
     try{    
       if (!(userDir.isDirectory() || userDir.mkdirs())){
-        showErrorMessage("Saving Account Error", "Unable to create directory:\n" + userDir);
+        showAccountSaveError("unableToCreateDirError", userDir);
         return false;
       }
     } catch (SecurityException e){
-        showErrorMessage("Saving Account Error",
-          "Security manager doesn't allow creating directory:\n" + userDir);
+        showAccountSaveError("securityManagerDirCreateError", userDir);
         return false;
       }
 
@@ -621,16 +686,14 @@ public class JinApplication implements JinContext{
     File propsFile = new File(userDir, "properties");
     try{
       OutputStream out = new FileOutputStream(propsFile);
-      props.save(out, "");
+      props.store(out, "");
       out.close();
     } catch (IOException e){
-        showErrorMessage("Saving Account Error",
-          "Error writing user properties to file :\n" + propsFile);
+        showAccountSaveError("ioErrorStoringProps", propsFile);
         return false;
       }
       catch (SecurityException e){
-        showErrorMessage("Saving Account Error",
-          "Security manager doesn't allow writing to file :\n" + propsFile);
+        showAccountSaveError("securityManagerErrorStoringProps", propsFile);
         return false;
       }
 
@@ -640,13 +703,11 @@ public class JinApplication implements JinContext{
       user.getPrefs().save(out);
       out.close();
     } catch (IOException e){
-        showErrorMessage("Saving Account Error",
-            "Error writing user preferences to file :\n" + prefsFile);
+        showAccountSaveError("ioErrorStoringPrefs", prefsFile);
         return false;
       }
       catch (SecurityException e){
-        showErrorMessage("Saving Account Error",
-            "Security manager doesn't allow writing to file :\n" + prefsFile);
+        showAccountSaveError("securityManagerErrorStoringProps", prefsFile);
         return false;
       }
 
@@ -654,17 +715,27 @@ public class JinApplication implements JinContext{
     try{
       storeUserFiles(user.getFilesMap(), filesFile);
     } catch (IOException e){
-        showErrorMessage("Saving Account Error",
-            "Error writing user files to file :\n" + filesFile);
+        showAccountSaveError("ioErrorStoringUserFiles", filesFile);
         return false;
       }
       catch (SecurityException e){
-        showErrorMessage("Saving Account Error",
-            "Security manager doesn't allow writing to file :\n" + filesFile);
+        showAccountSaveError("securityManagerErrorStoringUserFiles", filesFile);
         return false;
       }
 
     return true;
+  }
+  
+  
+  
+  /**
+   * Displays an error message regarding an problem with saving account preferences.
+   */
+  
+  private void showAccountSaveError(String errorI18nKey, File targetFile){
+    showErrorMessage(getResourceBundle().getString("appSavingAccountErrorDialog.title"),
+        MessageFormat.format(getResourceBundle().getString("appSavingAccountErrorDialog." + errorI18nKey),
+          new Object[]{targetFile.toString()}));
   }
   
   
@@ -1106,10 +1177,7 @@ public class JinApplication implements JinContext{
    */
    
   public String getPasswordSaveWarning(){
-    return "Your password will be stored in your home directory, on your computer,\n" +
-           "as plain text. If there are other people using this computer, they may\n" +
-           "be able to obtain this password.\n" +
-           "Are you sure you want to save your password?";
+    return getResourceBundle().getString("appPasswordSaveWarning");
   }
   
   
@@ -1138,14 +1206,6 @@ public class JinApplication implements JinContext{
   
   
   
- 
-  /* ======================================================================== */
-  /* ============================ Utility methods =========================== */
-  /* ======================================================================== */
-  
-
-  
-  
   /**
    * Displays an error message to the user.
    */
@@ -1153,6 +1213,8 @@ public class JinApplication implements JinContext{
   private void showErrorMessage(String title, String message){
     JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);     
   }
+  
+  
   
   /**
    * Returns the server with the specified id. Returns <code>null</code> if no
@@ -1169,13 +1231,27 @@ public class JinApplication implements JinContext{
   
   
   
+  /**
+   * Returns the <code>ResourceBundle</code> for this class. 
+   */
+  
+  private ResourceBundle getResourceBundle(){
+    if (resourceBundle == null){
+      Class c = JinApplication.class;
+      String packageName = Utilities.getPackageName(c);
+      String bundleName = packageName + "." + "localization"; 
+      
+      resourceBundle = ResourceBundle.getBundle(bundleName, locale, c.getClassLoader());
+    }
+    
+    return resourceBundle;
+  }
   
   
-  /* ======================================================================== */
-  /* ================================== Main ================================ */
-  /* ======================================================================== */
   
-  
+  /**
+   * The main method.
+   */
   
   public static void main(String [] args){
     try{
