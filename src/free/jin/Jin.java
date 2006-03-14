@@ -76,14 +76,6 @@ public class Jin{
   
   
   /**
-   * The locale for this instance of Jin.
-   */
-  
-  private final Locale locale;
-  
-  
-  
-  /**
    * A list of known users (accounts on various servers).
    */
    
@@ -122,9 +114,6 @@ public class Jin{
         throw new IllegalStateException("Unable to load application properties from resources/app.props");
       }
     
-    // Determine locale
-    locale = determineLocale();
-      
     // Get known users (accounts on various servers);
     users = new DefaultListModel();
     User [] usersArr = context.getUsers();
@@ -182,31 +171,6 @@ public class Jin{
   
   
   
-  /**
-   * Determines the locale for this instance of Jin. The locale is determined
-   * by the application properties, but may be overridden by user preferences,
-   * which may in turn be overridden by application parameters.
-   */
-  
-  private Locale determineLocale(){
-    String language, country;
-    
-    if ((language = getParameter("locale.language")) != null) // Check app params
-      country = getParameter("locale.country");
-    else if ((language = getPrefs().getString("locale.language", null)) != null) // Check user prefs
-      country = getPrefs().getString("locale.country"); 
-    else if ((language = getAppProperty("locale.language", null)) != null) // Check app properties
-       country = getAppProperty("locale.country", null);
-    else{ // default
-      language = "";
-      country = "";
-    }
-    
-    return new Locale(language, country == null ? "" : country);
-  }
-  
-  
-
   /**
    * Sets the current look and feel to the one specified in user preferences.
    */
@@ -333,7 +297,7 @@ public class Jin{
    */
   
   public Locale getLocale(){
-    return locale;
+    return context.getLocale();
   }
   
   
@@ -560,8 +524,11 @@ public class Jin{
    */
    
   public void quit(boolean askToConfirm){
+    I18n i18n = I18n.getInstance(Jin.class, getLocale());
+    
     Object result = askToConfirm ? 
-      OptionPanel.confirm("Quit", "Quit Jin?", OptionPanel.OK) : OptionPanel.OK;
+      OptionPanel.confirm(i18n.getString("quitConfirmationDialog.title"),
+        i18n.getString("quitConfirmationDialog.message"), OptionPanel.OK) : OptionPanel.OK;
     
     if (result == OptionPanel.OK){
       connManager.closeSession();
