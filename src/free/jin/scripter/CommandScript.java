@@ -184,7 +184,6 @@ public class CommandScript extends Script{
       for (int i = 0; i < commands.length; i++){
         String line = preprocess(commands[i], vars);
         conn.sendCommand(line);
-        System.out.println("Script sent command: " + line);
       }
 
     } catch (EvalError e){
