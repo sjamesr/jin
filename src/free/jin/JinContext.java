@@ -21,9 +21,11 @@
 
 package free.jin;
 
+import java.util.Locale;
+
+import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.jin.action.ActionInfo;
 
 
 /**
@@ -33,6 +35,14 @@ import free.jin.action.ActionInfo;
  */
 
 public interface JinContext{
+  
+  
+  
+  /**
+   * Returns the locale for this instance of Jin.
+   */
+  
+  Locale getLocale();
 
 
 
