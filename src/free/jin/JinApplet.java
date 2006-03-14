@@ -37,6 +37,7 @@ import free.jin.plugin.PluginInfo;
 import free.util.AWTUtilities;
 import free.util.BrowserControl;
 import free.util.IOUtilities;
+import free.util.Utilities;
 import free.util.audio.AppletContextAudioPlayer;
 
 
@@ -481,8 +482,13 @@ public class JinApplet extends Applet implements JinContext{
    */
   
   private ResourceBundle getResourceBundle(){
-    if (resourceBundle == null)
-      resourceBundle = ResourceBundle.getBundle("localization.properties", getLocale(), JinApplet.class.getClassLoader());
+    if (resourceBundle == null){
+      Class c = JinApplet.class;
+      String packageName = Utilities.getPackageName(c);
+      String bundleName = packageName + "." + "localization"; 
+      
+      resourceBundle = ResourceBundle.getBundle(bundleName, locale, c.getClassLoader());
+    }
     
     return resourceBundle;
   }
