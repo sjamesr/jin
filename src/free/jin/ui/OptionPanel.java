@@ -21,11 +21,16 @@
 
 package free.jin.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
 
-import free.util.Utilities;
+import javax.swing.*;
+
+import free.jin.I18n;
+import free.jin.Jin;
 import free.util.TextUtilities;
+import free.util.Utilities;
 
 
 /**
@@ -42,7 +47,7 @@ public class OptionPanel extends DialogPanel{
    * The constant for displaying an information panel.
    */
 
-  public static final Object INFO = new String("Information");
+  public static final Object INFO = new String("information");
 
 
 
@@ -50,7 +55,7 @@ public class OptionPanel extends DialogPanel{
    * The constant for displaying a warning panel.
    */
 
-  public static final Object WARNING = new String("Warning");
+  public static final Object WARNING = new String("warning");
 
 
 
@@ -58,7 +63,7 @@ public class OptionPanel extends DialogPanel{
    * The constant for displaying a question panel.
    */
 
-  public static final Object QUESTION = new String("Question");
+  public static final Object QUESTION = new String("question");
 
 
 
@@ -66,7 +71,7 @@ public class OptionPanel extends DialogPanel{
    * The constant for displaying an error panel.
    */
 
-  public static final Object ERROR = new String("Error");
+  public static final Object ERROR = new String("error");
 
 
 
@@ -74,7 +79,7 @@ public class OptionPanel extends DialogPanel{
    * The "Yes" option.
    */
 
-  public static final Object YES = new String("Yes");
+  public static final Object YES = new String("yes");
 
 
 
@@ -82,7 +87,7 @@ public class OptionPanel extends DialogPanel{
    * The "No" option.
    */
 
-  public static final Object NO = new String("No");
+  public static final Object NO = new String("no");
 
 
 
@@ -90,7 +95,7 @@ public class OptionPanel extends DialogPanel{
    * The "OK" option.
    */
 
-  public static final Object OK = new String("OK");
+  public static final Object OK = new String("ok");
 
 
 
@@ -98,7 +103,7 @@ public class OptionPanel extends DialogPanel{
    * The "Cancel" option.
    */
 
-  public static final Object CANCEL = new String("Cancel");
+  public static final Object CANCEL = new String("cancel");
 
 
 
@@ -321,6 +326,7 @@ public class OptionPanel extends DialogPanel{
    */
 
   private void createUI(){
+    I18n i18n = I18n.getInstance(OptionPanel.class, Jin.getInstance().getLocale());
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 2));
     buttonPanel.setOpaque(false);
 
@@ -329,7 +335,7 @@ public class OptionPanel extends DialogPanel{
         continue;
 
       Object option = OPTION_ORDER[i];
-      JButton button = new JButton(option.toString());
+      JButton button = new JButton(i18n.getString("optionPanel." + option.toString() + ".text"));
       button.addActionListener(new ClosingListener(option));
       if (option == defaultOption)
         setDefaultButton(button);
@@ -352,7 +358,7 @@ public class OptionPanel extends DialogPanel{
 
   /**
    * Displays this <code>OptionPanel</code> and returns the option chosen by
-   * the user. Note that the return value be {@link #CANCEL} even if you didn't
+   * the user. Note that the return value may be {@link #CANCEL} even if you didn't
    * specify it in the constructor, since that is the value returned when the
    * user cancels the panel without selecting any options.
    */

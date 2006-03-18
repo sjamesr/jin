@@ -21,16 +21,16 @@
 
 package free.jin.ui;
 
-import free.jin.BadChangesException;
-import free.jin.Jin;
-import free.util.PlatformUtils;
-
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.util.PlatformUtils;
 
 
 
@@ -152,13 +152,9 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-    JPanel restartPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-    restartPanel.add(new JLabel("You must restart Jin to apply"));
-    restartPanel.add(new JLabel("the new Look and Feel"));
-    
-    setLayout(new BorderLayout(10, 10));
+    setLayout(new BorderLayout());
     add(scrollPane, BorderLayout.CENTER);
-    add(restartPanel, BorderLayout.SOUTH);
+    add(Box.createHorizontalStrut(150), BorderLayout.SOUTH);
     
     lookAndFeels.addListSelectionListener(new ListSelectionListener(){
       public void valueChanged(ListSelectionEvent evt){
@@ -176,8 +172,10 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
    
   public void applyChanges() throws BadChangesException{
     LnF lnf = (LnF)lookAndFeels.getSelectedValue();
-    if (lnf == null)
-      throw new BadChangesException("No Look and Feel selected", this);
+    if (lnf == null){
+      I18n i18n = I18n.getInstance(LookAndFeelPrefPanel.class, Jin.getInstance().getLocale());
+      throw new BadChangesException(i18n.getString("noLookNFeelSelectedErrorMessage"), this);
+    }
     
     Jin.getInstance().getPrefs().setString("lookAndFeel.classname", lnf.classname);
   }

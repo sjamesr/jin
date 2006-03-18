@@ -21,12 +21,15 @@
 
 package free.jin.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Server;
 import free.util.BrowserControl;
@@ -78,7 +81,7 @@ public class ServerChoicePanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return "Choose Server";
+    return I18n.getInstance(ServerChoicePanel.class, Jin.getInstance().getLocale()).getString("serverChoicePanel.title");
   }
 
 
@@ -88,6 +91,8 @@ public class ServerChoicePanel extends DialogPanel{
    */
 
   private void createUI(){
+    I18n i18n = I18n.getInstance(ServerChoicePanel.class, Jin.getInstance().getLocale());
+    
     final JList list = new JList(serverListModel);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setVisibleRowCount(Math.max(5, Math.min(serverListModel.getSize(), 10)));
@@ -96,14 +101,12 @@ public class ServerChoicePanel extends DialogPanel{
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-    JLabel chooseLabel = new JLabel("Choose a server to connect to");
-    chooseLabel.setDisplayedMnemonic('C');
+    JLabel chooseLabel = i18n.createLabel("chooseServerLabel");
     chooseLabel.setLabelFor(list);
 
-    final JButton okButton = new JButton("OK");
-    JButton cancelButton = new JButton("Cancel");
-    final JButton showWebsiteButton = new JButton("Server's Website");
-    showWebsiteButton.setMnemonic('s');
+    final JButton okButton = i18n.createButton("serverChoicePanel.okButton");
+    JButton cancelButton = i18n.createButton("serverChoicePanel.cancelButton");
+    final JButton showWebsiteButton = i18n.createButton("serverChoicePanel.serverWebsiteButton");
 
     okButton.setEnabled(false);
     showWebsiteButton.setEnabled(false);

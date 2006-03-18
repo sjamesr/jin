@@ -32,6 +32,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.SessionEvent;
@@ -213,8 +214,11 @@ public class SdiUiProvider extends AbstractUiProvider{
 
       this.menubar = new JMenuBar();
       
-      PluginContainersMenu windowsMenu = 
-        new PluginContainersMenu(getExistingPluginUIContainers(), "Windows", 'W');
+      I18n i18n = I18n.getInstance(SdiUiProvider.class, Jin.getInstance().getLocale());
+      
+      PluginContainersMenu windowsMenu = new PluginContainersMenu();
+      windowsMenu.setText(i18n.getString("sdiUiProvider.windowsMenu.text"));
+      windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("sdiUiProvider.windowsMenu.displayedMnemonicIndex"));
       addPluginUIContainerCreationListener(windowsMenu);
       
       ActionsMenu actionsMenu = new ActionsMenu();

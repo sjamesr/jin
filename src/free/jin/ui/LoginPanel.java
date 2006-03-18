@@ -45,6 +45,14 @@ public class LoginPanel extends DialogPanel{
   
   
   /**
+   * The <code>I18n</code> for this login panel.
+   */
+  
+  private final I18n i18n = I18n.getInstance(getClass(), LoginPanel.class, Jin.getInstance().getLocale());
+  
+  
+  
+  /**
    * The list of servers, in the order we put them in the serverBox.
    */
    
@@ -172,12 +180,12 @@ public class LoginPanel extends DialogPanel{
     this.userBox = new FixedJComboBox();
     this.usernameField = new FixedJTextField();
     this.passwordField = new FixedJPasswordField();
-    this.savePasswordCheckBox = new JCheckBox("Save password");
-    this.retrievePasswordButton = new JButton("Retrieve Password"); 
+    this.savePasswordCheckBox = i18n.createCheckBox("savePasswordCheckBox");
+    this.retrievePasswordButton = i18n.createButton("retrievePasswordButton"); 
     this.hostnameBox = new FixedJComboBox();
     this.portsField = new FixedJTextField(7);
-    this.connectButton = new JButton("Connect");
-    this.registerButton = new JButton("Register");
+    this.connectButton = i18n.createButton("connectButton");
+    this.registerButton = i18n.createButton("registerButton");
     
     createUI();
     
@@ -284,7 +292,7 @@ public class LoginPanel extends DialogPanel{
    
   private ComboBoxModel createUserBoxModel(){
     DefaultComboBoxModel model = new DefaultComboBoxModel();
-    model.addElement("<New account>");
+    model.addElement(i18n.getString("accountComboBox.newAccount"));
     
     for (int i = 0; i < users.length; i++)
       model.addElement(users[i].getUsername());
@@ -311,7 +319,7 @@ public class LoginPanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return "Select Login Details";
+    return i18n.getString("loginPanel.title");
   }
 
 
@@ -323,6 +331,19 @@ public class LoginPanel extends DialogPanel{
 
   private void showError(String title, String message){
     OptionPanel.error(this, title, message);
+  }
+  
+  
+  
+  /**
+   * Shows an error regarding telling the user that the ports list he selected is invalid.
+   */
+  
+  private void showIllegalPortsError(){
+    String title = i18n.getString("invalidPortsDialog.title");
+    String message = i18n.getString("invalidPortsDialog.message");
+    
+    showError(title, message);
   }
   
   
@@ -367,8 +388,6 @@ public class LoginPanel extends DialogPanel{
     });
     hostnameBox.setEditable(true);
     
-    savePasswordCheckBox.setMnemonic('S');
-
     connectButton.setDefaultCapable(true);
     setDefaultButton(connectButton);
     connectButton.addActionListener(new ActionListener(){
@@ -378,15 +397,13 @@ public class LoginPanel extends DialogPanel{
         UsernamePolicy policy = server.getUsernamePolicy();
         String invalidityReason = policy.invalidityReason(username);
         if (invalidityReason != null){
-          showError("Bad Username", invalidityReason);
+          showError(i18n.getString("invalidUsernameDialog.title"), invalidityReason);
           return;
         }
 
         int [] ports = parsePorts(portsField.getText());
         if (ports == null){
-          showError("Bad Ports", "The ports text field must contain a\n" +
-                                 "nonempty, space separated, list of ports.\n" +
-                                 "A valid port is a number between 0 and 65535.");
+          showIllegalPortsError();
           return;
         }
 
@@ -410,7 +427,6 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    retrievePasswordButton.setMnemonic('t');
     retrievePasswordButton.setDefaultCapable(false);
     retrievePasswordButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -420,16 +436,13 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    JButton loginAsGuestButton = new JButton("Login as Guest");
-    loginAsGuestButton.setMnemonic('G');
+    JButton loginAsGuestButton = i18n.createButton("loginAsGuestButton");
     loginAsGuestButton.setDefaultCapable(false);
     loginAsGuestButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         int [] ports = parsePorts(portsField.getText());
         if (ports == null){
-          showError("Bad Ports", "The ports text field must contain a\n" +
-                                 "nonempty space separated list of ports.\n" +
-                                 "A valid port is between 0 and 65535.");
+          showIllegalPortsError();
           return;
         }
 
@@ -440,7 +453,6 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    registerButton.setMnemonic('R');
     registerButton.setDefaultCapable(false);
     registerButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -450,7 +462,7 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    JButton cancelButton = new JButton("Cancel");
+    JButton cancelButton = i18n.createButton("loginPanel.cancelButton");
     cancelButton.setDefaultCapable(false);
     cancelButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -464,7 +476,7 @@ public class LoginPanel extends DialogPanel{
           if (savePasswordCheckBox.isSelected()){
             OptionPanel optionPanel =
                 new OptionPanel(LoginPanel.this, 
-                OptionPanel.WARNING, "Save password?",
+                OptionPanel.WARNING, i18n.getString("passwordSaveWarningPanel.title"),
                 new Object[]{OptionPanel.YES, OptionPanel.NO},
                 OptionPanel.YES, Jin.getInstance().getPasswordSaveWarning());
             
@@ -517,13 +529,11 @@ public class LoginPanel extends DialogPanel{
    */
    
   private Component createServerUserPanel(JComboBox serverBox, JComboBox userBox){
-    JLabel serverLabel = new JLabel("Server:");
+    JLabel serverLabel = i18n.createLabel("loginPanel.serverLabel");
     serverLabel.setLabelFor(serverBox);
-    serverLabel.setDisplayedMnemonic('e');
     
-    JLabel userLabel = new JLabel("Account:");
+    JLabel userLabel = i18n.createLabel("loginPanel.accountLabel");
     userLabel.setLabelFor(userBox);
-    userLabel.setDisplayedMnemonic('A');
     
     Box inPanel = Box.createHorizontalBox();
     inPanel.add(Box.createHorizontalStrut(10));
@@ -564,7 +574,7 @@ public class LoginPanel extends DialogPanel{
 
     JPanel outerPanel = new JPanel(new BorderLayout());
     outerPanel.add(hpanel,BorderLayout.CENTER);
-    outerPanel.setBorder(new TitledBorder(" Guests "));
+    outerPanel.setBorder(new TitledBorder(i18n.getString("guestsBorderTitle")));
 
     return outerPanel;
   }
@@ -576,12 +586,7 @@ public class LoginPanel extends DialogPanel{
    */
 
   private Component createAdvancedPanel(JComboBox hostnameBox, JTextField portsField){
-    JPanel hostnameLabelPanel = new JPanel(new GridLayout(3,1));
-    hostnameLabelPanel.add(new JLabel("Server"));
-    hostnameLabelPanel.add(new JLabel("Hostname or"));
-    JLabel hostnameLabel = new JLabel("IP Number");
-    hostnameLabel.setDisplayedMnemonic('I');
-    hostnameLabelPanel.add(hostnameLabel);
+    JLabel hostnameLabel = i18n.createLabel("loginPanel.hostnameLabel");
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
@@ -591,7 +596,7 @@ public class LoginPanel extends DialogPanel{
 
     hostnamePanel.add(hostnameBox);
     hostnamePanel.add(Box.createHorizontalStrut(10));
-    hostnamePanel.add(hostnameLabelPanel);
+    hostnamePanel.add(hostnameLabel);
 
     
     Box portPanel = new Box(BoxLayout.X_AXIS);
@@ -600,8 +605,7 @@ public class LoginPanel extends DialogPanel{
 
     portPanel.add(portsField);
     portPanel.add(Box.createHorizontalStrut(10));
-    JLabel portLabel = new JLabel("Ports");
-    portLabel.setDisplayedMnemonic('o');
+    JLabel portLabel = i18n.createLabel("loginPanel.portsLabel");
     portLabel.setLabelFor(portsField);
     portPanel.add(portLabel);
     portPanel.add(Box.createHorizontalGlue());
@@ -619,7 +623,7 @@ public class LoginPanel extends DialogPanel{
     hpanel.add(Box.createHorizontalStrut(10));
 
     JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(new TitledBorder(" Advanced Options "));
+    outerPanel.setBorder(new TitledBorder(i18n.getString("advancedOptionsBorderTitle")));
     outerPanel.add(hpanel, BorderLayout.CENTER);
 
     return outerPanel;
@@ -639,8 +643,7 @@ public class LoginPanel extends DialogPanel{
     usernameField.setPreferredSize(new Dimension(130, 20));
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
-    JLabel handleLabel = new JLabel("Handle (your login name)");
-    handleLabel.setDisplayedMnemonic('H');
+    JLabel handleLabel = i18n.createLabel("loginPanel.handleLabel");
     handleLabel.setLabelFor(usernameField);
     usernamePanel.add(handleLabel);
     usernamePanel.add(Box.createHorizontalGlue());
@@ -652,8 +655,7 @@ public class LoginPanel extends DialogPanel{
     passwordField.setPreferredSize(new Dimension(130, 20));
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
-    JLabel passwordLabel = new JLabel("Password");
-    passwordLabel.setDisplayedMnemonic('P');
+    JLabel passwordLabel = i18n.createLabel("loginPanel.passwordLabel");
     passwordLabel.setLabelFor(passwordField);
     passwordInputPanel.add(passwordLabel);
     passwordInputPanel.add(Box.createHorizontalGlue());
@@ -707,7 +709,7 @@ public class LoginPanel extends DialogPanel{
 
 
     JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(new TitledBorder(" Members "));
+    outerPanel.setBorder(new TitledBorder(i18n.getString("membersBorderTitle")));
     outerPanel.add(hpanel,BorderLayout.CENTER);
 
     return outerPanel;

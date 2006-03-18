@@ -21,20 +21,21 @@
 
 package free.jin.ui;
 
-import free.jin.plugin.PluginUIContainer;
-import free.jin.plugin.PluginUIEvent;
-import free.jin.plugin.PluginUIListener;
-import free.util.Utilities;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.*;
+
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
+import free.jin.plugin.PluginUIListener;
+import free.util.Utilities;
 
 
 
@@ -42,8 +43,15 @@ import javax.swing.*;
  * A menu which allows the user to manage the various plugin containers.
  */
 
-public class PluginContainersMenu extends JMenu implements PropertyChangeListener,
-    PluginUIListener, ActionListener{
+public class PluginContainersMenu extends JMenu implements PluginUIListener, ActionListener{
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this object.
+   */
+  
+  private final I18n i18n = I18n.getInstance(PluginContainersMenu.class, Jin.getInstance().getLocale());
   
   
   
@@ -102,12 +110,13 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   private int sepIndex = -1;
   
   
+  
   /**
    * Creates a new <code>PluginContainersMenu</code>.
    */
   
-  public PluginContainersMenu(String text, int mnemonic){
-    this(Utilities.EMPTY_ENUM, text, mnemonic);
+  public PluginContainersMenu(){
+    this(Utilities.EMPTY_ENUM);
   }
   
   
@@ -117,12 +126,9 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    * of existing plugin ui containers.
    */
   
-  public PluginContainersMenu(Enumeration existingContainers, String text, int mnemonic){
-    super(text);
-    setMnemonic(mnemonic);
-    
+  public PluginContainersMenu(Enumeration existingContainers){
     while (existingContainers.hasMoreElements())
-      pluginContainerAdded((AbstractPluginUIContainer)existingContainers.nextElement());
+      pluginContainerAdded((PluginUIContainer)existingContainers.nextElement());
   }
   
   
@@ -147,14 +153,28 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   
   
   /**
+   * Syncs the text of the specified "show <plugin container>" check box with the name of that
+   * plugin container.
+   */
+  
+  private void syncShowCheckBoxText(JCheckBoxMenuItem item, PluginUIContainer pc){
+    item.setText(MessageFormat.format(i18n.getString("showPluginContainerCheckBox.text"),
+      new Object[]{pc.getTitle()}));    
+  }
+  
+  
+  
+  /**
    * This method is invoked to notify us that a new plugin container has been
    * created.
    */
   
-  public void pluginContainerAdded(AbstractPluginUIContainer pc){
+  public void pluginContainerAdded(PluginUIContainer pc){
     if (pc.getMode() == UIProvider.HIDEABLE_CONTAINER_MODE){
       JCheckBoxMenuItem item = 
-        new JCheckBoxMenuItem("Show " + pc.getTitle(), pc.isVisible());
+        new JCheckBoxMenuItem();
+      item.setSelected(pc.isVisible());
+      syncShowCheckBoxText(item, pc);
       
       containersToVisCheckBoxes.put(pc, item);
       visCheckBoxesToContainers.put(item, pc);
@@ -175,7 +195,6 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
     item.addActionListener(this);
     
     pc.addPluginUIListener(this);
-    pc.addPropertyChangeListener(this);
   }
   
   
@@ -259,26 +278,6 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   
   
   /**
-   * This method is invoked when a property of one of the current plugin ui
-   * containers changes.
-   */
-  
-  public void propertyChange(PropertyChangeEvent evt){
-    if ("title".equals(evt.getPropertyName())){
-      JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem)containersToVisCheckBoxes.get(evt.getSource());
-      if (checkBox != null)
-        checkBox.setText("Show " + (String)evt.getNewValue());
-      
-      JRadioButtonMenuItem radioButton = (JRadioButtonMenuItem)containersToActiveRadioButtons.get(evt.getSource());
-      radioButton.setText((String)evt.getNewValue());
-    }
-    else if ("disposed".equals(evt.getPropertyName()))
-      pluginContainerRemoved((AbstractPluginUIContainer)evt.getSource());
-  }
-  
-
-  
-  /**
    * This method is invoked when one of the current plugin ui containers is
    * shown.
    */
@@ -333,11 +332,47 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
   
   
   /**
+   * This method is invoked when the plugin ui is disposed.
+   */
+  
+  public void pluginUIDisposed(PluginUIEvent evt){
+    pluginContainerRemoved(evt.getPluginUIContainer());
+  }
+  
+  
+  
+  /**
+   * This method is invoked when the plugin ui title changes.
+   */
+  
+  public void pluginUITitleChanged(PluginUIEvent evt){
+    PluginUIContainer pc = evt.getPluginUIContainer();
+    JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem)containersToVisCheckBoxes.get(pc);
+    if (checkBox != null)
+      syncShowCheckBoxText(checkBox, pc);
+    
+    JRadioButtonMenuItem radioButton = (JRadioButtonMenuItem)containersToActiveRadioButtons.get(pc);
+    radioButton.setText(pc.getTitle());
+  }
+  
+  
+  
+  /**
    * This method is invoked when the user performs a ui closing operation on
    * one of the current plugin ui containers.
    */
 
   public void pluginUIClosing(PluginUIEvent evt){
+    
+  }
+  
+  
+  
+  /**
+   * This method is invoked when the plugin ui icon changes.
+   */
+  
+  public void pluginUIIconChanged(PluginUIEvent evt){
     
   }
   
@@ -370,7 +405,7 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
    * This method is called when a plugin container has been disposed of.
    */
   
-  private void pluginContainerRemoved(AbstractPluginUIContainer pc){
+  private void pluginContainerRemoved(PluginUIContainer pc){
     // remove the visibility controlling menu item
     if (pc.getMode() == UIProvider.HIDEABLE_CONTAINER_MODE){
       JCheckBoxMenuItem item = (JCheckBoxMenuItem)containersToVisCheckBoxes.remove(pc);
@@ -383,7 +418,6 @@ public class PluginContainersMenu extends JMenu implements PropertyChangeListene
     removeActiveRadioButton(item);
     
     pc.removePluginUIListener(this);
-    pc.removePropertyListener(this);
   }
   
   

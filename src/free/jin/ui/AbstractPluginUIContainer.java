@@ -21,6 +21,11 @@
 
 package free.jin.ui;
 
+import java.awt.*;
+
+import javax.swing.JMenu;
+
+import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Session;
 import free.jin.plugin.Plugin;
@@ -28,12 +33,6 @@ import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.plugin.PluginUIListener;
 import free.util.RectDouble;
-
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
-import javax.swing.JMenu;
 
 
 
@@ -78,15 +77,6 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
   
   
   /**
-   * The property change support.
-   */
-  
-  private final PropertyChangeSupport propChangeSupport =
-    new PropertyChangeSupport(this);
-  
-  
-  
-  /**
    * Our title.
    */
   
@@ -123,34 +113,13 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
   
   
   /**
-   * Adds a property change listener. The listener will be notified of changes
-   * of various properties of this plugin ui container, such as title, icon etc.
-   */
-  
-  public void addPropertyChangeListener(PropertyChangeListener listener){
-    propChangeSupport.addPropertyChangeListener(listener);
-  }
-  
-  
-  
-  /**
-   * Removes a property change listener.
-   */
-  
-  public void removePropertyListener(PropertyChangeListener listener){
-    propChangeSupport.removePropertyChangeListener(listener);
-  }
-  
-  
-  
-  /**
    * Disposes of this plugin container.
    */
 
   public final void dispose(){
     disposeImpl();
     
-    propChangeSupport.firePropertyChange("disposed", Boolean.FALSE, Boolean.TRUE);
+    firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DISPOSED));
   }
   
   
@@ -353,8 +322,10 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
     Object result = OptionPanel.OK;
     Session session = Jin.getInstance().getConnManager().getSession();
     if ((session != null) && session.isConnected()){
-      result = OptionPanel.confirm(hintParent, "Close Session?",
-        "Close this window and disconnect?", OptionPanel.OK);
+      I18n i18n = I18n.getInstance(AbstractPluginUIContainer.class, Jin.getInstance().getLocale());
+      String title = i18n.getString("closeSessionDialog.title");
+      String message = i18n.getString("closeSessionDialog.message");
+      result = OptionPanel.confirm(hintParent, title, message, OptionPanel.OK);
     }
 
     if (result == OptionPanel.OK)
@@ -368,10 +339,9 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    */
   
   public final void setTitle(String title){
-    String oldTitle = this.title; 
     setTitleImpl(title);
     this.title = title;
-    propChangeSupport.firePropertyChange("title", oldTitle, title);
+    firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_TITLE_CHANGED));
   }
   
   
@@ -399,10 +369,9 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    */
   
   public final void setIcon(Image icon){
-    Image oldIcon = this.icon;
     setIconImpl(icon);
     this.icon = icon;
-    propChangeSupport.firePropertyChange("icon", oldIcon, icon);
+    firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ICON_CHANGED));
   }
   
   

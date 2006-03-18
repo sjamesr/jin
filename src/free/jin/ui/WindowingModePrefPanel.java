@@ -21,16 +21,18 @@
 
 package free.jin.ui;
 
-import free.jin.BadChangesException;
-import free.jin.Jin;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
+
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
 
 
 /**
@@ -62,9 +64,15 @@ public class WindowingModePrefPanel extends PreferencesPanel{
    */
   
   public WindowingModePrefPanel(){
+    I18n i18n = I18n.getInstance(WindowingModePrefPanel.class, Jin.getInstance().getLocale());
+    
     String pref = Jin.getInstance().getPrefs().getString("uiProvider.classname");
-    mdiMode = new JRadioButton("Multiple Document Interface", MdiUiProvider.class.getName().equals(pref));
-    sdiMode = new JRadioButton("Single Document Interface", SdiUiProvider.class.getName().equals(pref));
+    
+    mdiMode = i18n.createRadioButton("mdiRadioButton");
+    sdiMode = i18n.createRadioButton("sdiRadioButton");
+    
+    mdiMode.setSelected(MdiUiProvider.class.getName().equals(pref));
+    sdiMode.setSelected(SdiUiProvider.class.getName().equals(pref));
     
     ButtonGroup bg = new ButtonGroup();
     bg.add(mdiMode);
@@ -89,23 +97,12 @@ public class WindowingModePrefPanel extends PreferencesPanel{
    */
   
   private void createUi(){
-    mdiMode.setMnemonic('M');
-    sdiMode.setMnemonic('S');
-    
-    mdiMode.setToolTipText("Jin windows are placed inside one outer window");
-    sdiMode.setToolTipText("Jin windows are separate, OS native, windows");
-    
     Container modesPanel = Box.createVerticalBox();
     modesPanel.add(mdiMode);
     modesPanel.add(sdiMode);
     
-    Container restartPane = new JPanel(new GridLayout(2, 1, 5, 5));
-    restartPane.add(new JLabel("You must restart Jin to apply"));
-    restartPane.add(new JLabel("a different windowing mode"));
-
-    setLayout(new BorderLayout(10, 10));
+    setLayout(new BorderLayout());
     add(modesPanel, BorderLayout.CENTER);
-    add(restartPane, BorderLayout.SOUTH);
   }
 
 

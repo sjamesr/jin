@@ -21,10 +21,15 @@
 
 package free.jin.ui;
 
-import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+import free.jin.I18n;
+import free.jin.Jin;
 import free.util.swing.UrlDisplayingAction;
 
 
@@ -33,29 +38,24 @@ import free.util.swing.UrlDisplayingAction;
  */
 
 public class HelpMenu extends JMenu{
-
-
-
+  
+  
+  
   /**
-   * The action listener that forwards all event handling to the private
-   * <code>menuActivated</code> method.
+   * The <code>I18n</code> for this object.
    */
-
-  private final ActionListener menuActionListener = new ActionListener(){
-    public void actionPerformed(ActionEvent evt){
-      menuActivated(evt.getActionCommand());
-    }
-  };
-
-
-
+  
+  private final I18n i18n = I18n.getInstance(HelpMenu.class, Jin.getInstance().getLocale());
+  
+  
+  
   /**
    * Creates a new <code>HelpMenu</code>.
    */
 
   public HelpMenu(){
-    super("Help");
-    setMnemonic('H');
+    setText(i18n.getString("helpMenu.text"));
+    setDisplayedMnemonicIndex(i18n.getInt("helpMenu.displayedMnemonicIndex"));
 
     add(createWebsiteMenuItem());
     add(createCreditsMenuItem());
@@ -67,26 +67,11 @@ public class HelpMenu extends JMenu{
 
 
   /**
-   * Responds to action events on the various menus.
-   */
-
-  private void menuActivated(String actionCommand){
-    if ("credits".equals(actionCommand))
-      new LicensePanel().display();
-    else if ("about".equals(actionCommand))
-      new AboutPanel().display();
-    else
-      throw new IllegalArgumentException("Unknown action command: " + actionCommand);
-  }
-
-
-
-  /**
    * Creates the "Jin Website" menu item.
    */
 
   private JMenuItem createWebsiteMenuItem(){
-    JMenuItem item = new JMenuItem("Jin Website", 'J');
+    JMenuItem item = i18n.createMenuItem("jinWebsiteMenuItem");
     item.addActionListener(new UrlDisplayingAction("http://www.jinchess.com"));
     return item;
   }
@@ -98,9 +83,12 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createCreditsMenuItem(){
-    JMenuItem item = new JMenuItem("Credits and Copyrights...", 'C');
-    item.setActionCommand("credits");
-    item.addActionListener(menuActionListener);
+    JMenuItem item = i18n.createMenuItem("creditsMenuItem");
+    item.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        new LicensePanel().display();
+      }
+    });
     return item;
   }
 
@@ -111,7 +99,7 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createBugReportMenuItem(){
-    JMenuItem item = new JMenuItem("Report a Bug", 'R');
+    JMenuItem item = i18n.createMenuItem("reportBugMenuItem");
     item.addActionListener(new UrlDisplayingAction("https://sourceforge.net/tracker/?group_id=50386&atid=459537"));
     return item;
   }
@@ -123,7 +111,7 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createFeatureRequestMenuItem(){
-    JMenuItem item = new JMenuItem("Suggest a Feature", 'S');
+    JMenuItem item = i18n.createMenuItem("suggestFeatureMenuItem");
     item.addActionListener(new UrlDisplayingAction("https://sourceforge.net/tracker/?group_id=50386&atid=459540"));
     return item;
   }
@@ -135,9 +123,14 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createAboutMenuItem(){
-    JMenuItem item = new JMenuItem("About Jin...", 'A');
-    item.setActionCommand("about");
-    item.addActionListener(menuActionListener);
+    JMenuItem item = new JMenuItem();
+    item.setText(MessageFormat.format(i18n.getString("aboutJinMenuItem.text"), new Object[]{Jin.getInstance().getAppName()}));
+    item.setDisplayedMnemonicIndex(i18n.getInt("aboutJinMenuItem.displayedMnemonicIndex"));
+    item.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        new AboutPanel().display();
+      }
+    });
     return item;
   }
 

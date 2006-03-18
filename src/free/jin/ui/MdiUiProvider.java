@@ -21,6 +21,19 @@
 
 package free.jin.ui;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.Vector;
+
+import javax.swing.*;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+
 import free.jin.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
@@ -34,18 +47,6 @@ import free.util.swing.BackgroundChooser;
 import free.util.swing.InternalFrameSwitcher;
 import free.workarounds.FixedJInternalFrame;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
-import java.io.File;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-
 
 /**
  * An MDI implementation of <code>UIProvider</code> - each
@@ -55,6 +56,14 @@ import javax.swing.event.InternalFrameListener;
  */
 
 public class MdiUiProvider extends AbstractUiProvider{
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this object.
+   */
+  
+  private I18n i18n;
 
 
 
@@ -124,6 +133,7 @@ public class MdiUiProvider extends AbstractUiProvider{
   public void start(){
     super.start();
     
+    i18n = I18n.getInstance(MdiUiProvider.class, Jin.getInstance().getLocale());
     mainFrame = createMainFrame();
     restoreFrameGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.",
         new RectDouble(1d/16, 1d/16, 7d/8, 7d/8));
@@ -134,7 +144,9 @@ public class MdiUiProvider extends AbstractUiProvider{
     mainFrame.setContentPane(desktop);
     mainFrame.setJMenuBar(menubar);
 
-    windowsMenu = new PluginContainersMenu("Windows", 'W');
+    windowsMenu = new PluginContainersMenu();
+    windowsMenu.setText(i18n.getString("mdiUiProvider.windowsMenu.text"));
+    windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("mdiUiProvider.windowsMenu.displayedMnemonicIndex"));
     addPluginUIContainerCreationListener(windowsMenu);
     
     actionsMenu = new ActionsMenu();
@@ -259,8 +271,11 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     Session session = evt.getSession();
     
-    mainFrame.setTitle(session.getUser().getUsername() + " at " 
-      + session.getServer().getShortName() + " - " + Jin.getInstance().getAppName());
+    String mainFrameTitle = i18n.getString("mdiUiProvider.mainFrame.title");
+    String username = session.getUser().getUsername();
+    String serverName = session.getServer().getShortName();
+    String appName = Jin.getInstance().getAppName();
+    mainFrame.setTitle(MessageFormat.format(mainFrameTitle, new Object[]{username, serverName, appName}));
 
     menubar.add(actionsMenu, 1);
     menubar.add(windowsMenu, 3);
@@ -388,17 +403,15 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     public ConnectionMenu(){
-      super("Connection");
-      setMnemonic('C');
+      setText(i18n.getString("connectionMenu.text"));
+      setDisplayedMnemonicIndex(i18n.getInt("connectionMenu.displayedMnemonicIndex"));
 
-      add(newConnection = new JMenuItem("New Connection...", 'N'));
-      // If you use 'c' as the mnemonic here, alt+c won't work for the menu,
-      // see http://developer.java.sun.com/developer/bugParade/bugs/4213634.html
-      add(closeConnection = new JMenuItem("Close Connection", 'l'));
+      add(newConnection = i18n.createMenuItem("newConnectionMenuItem"));
+      add(closeConnection = i18n.createMenuItem("closeConnectionMenuItem"));
       separatorIndex = getItemCount();
 
       addSeparator();
-      add(exit = new JMenuItem("Exit", 'x'));
+      add(exit = i18n.createMenuItem("exitJinMenuItem"));
       
       exit.setAccelerator(
         KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -502,8 +515,9 @@ public class MdiUiProvider extends AbstractUiProvider{
         Object result = OptionPanel.OK;
         Session session = Jin.getInstance().getConnManager().getSession();
         if ((session != null) && session.isConnected()){
-          result = OptionPanel.confirm("Close Session?",
-            "Disconnect from the server and close the session?", OptionPanel.OK);
+          String title = i18n.getString("closeConnectionConfirmationDialog.title");
+          String message = i18n.getString("closeConnectionConfirmationDialog.message");
+          result = OptionPanel.confirm(title, message, OptionPanel.OK);
         }
 
         if (result == OptionPanel.OK)
@@ -533,10 +547,11 @@ public class MdiUiProvider extends AbstractUiProvider{
       // Add them again
       for (int i = 1; i <= recentAccounts.size(); i++){
         User user = (User)recentAccounts.elementAt(i - 1);
-        String label = i + " " + user.getUsername() + " at " + user.getServer().getShortName();
-        JMenuItem menuItem = new JMenuItem(label);
-        if (i <= 8)
-          menuItem.setMnemonic(Character.forDigit(i, 10));
+        String label = MessageFormat.format(i18n.getString("recentAccountMenuItem.text"), 
+          new Object[]{user.getUsername(), user.getServer().getShortName()});
+        JMenuItem menuItem = new JMenuItem(i + " " + label);
+        if (i <= 9)
+          menuItem.setDisplayedMnemonicIndex(0);
         menuItem.addActionListener(this);
 
         insert(menuItem, separatorIndex + i);
@@ -629,7 +644,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
     
     public MdiPrefsMenu(){
-      JMenuItem bgMenuItem = new JMenuItem("Background", 'B');
+      JMenuItem bgMenuItem = i18n.createMenuItem("backgroundPrefsMenuItem");
       add(bgMenuItem);
       
       bgMenuItem.addActionListener(new ActionListener(){

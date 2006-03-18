@@ -26,6 +26,9 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
+import free.jin.I18n;
+import free.jin.Jin;
+
 
 
 /**
@@ -41,9 +44,12 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
    */
   
   public UiPrefsPanel(){
+    I18n i18n = I18n.getInstance(UiPrefsPanel.class, Jin.getInstance().getLocale());
+    
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-    addPanel(new LookAndFeelPrefPanel(), "Look and Feel", "User Interface Look and Feel");
-    addPanel(new WindowingModePrefPanel(), "Windowing Mode", "User Interface Mode");
+    
+    addPanel(new LookAndFeelPrefPanel(), i18n.getString("lookAndFeelPanel.name"), i18n.getString("lookAndFeelPanel.tooltip"));
+    addPanel(new WindowingModePrefPanel(), i18n.getString("windowingModePanel.name"), i18n.getString("windowingModePanel.tooltip"));
   }
   
   

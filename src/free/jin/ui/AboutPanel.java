@@ -21,13 +21,15 @@
 
 package free.jin.ui;
 
-import free.jin.Jin;
-import free.util.IOUtilities;
-
 import java.awt.Font;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
+
+import free.jin.I18n;
+import free.jin.Jin;
+import free.util.IOUtilities;
 
 
 /**
@@ -54,7 +56,9 @@ public class AboutPanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return "About Jin";
+    I18n i18n = I18n.getInstance(AboutPanel.class, Jin.getInstance().getLocale());
+    String appName = Jin.getInstance().getAppName();
+    return MessageFormat.format(i18n.getString("aboutDialog.title"), new Object[]{appName});
   }
 
 
@@ -74,6 +78,8 @@ public class AboutPanel extends DialogPanel{
    */
 
   private void createUI(){
+    I18n i18n = I18n.getInstance(AboutPanel.class, Jin.getInstance().getLocale());
+    
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
     Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo.gif"));
@@ -114,7 +120,7 @@ public class AboutPanel extends DialogPanel{
 
     add(Box.createVerticalStrut(10));
 
-    JButton closeButton = new JButton("OK");
+    JButton closeButton = i18n.createButton("aboutDialog.closeButton");
     closeButton.addActionListener(new ClosingListener(null));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     add(closeButton);

@@ -45,8 +45,9 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
    */
   
   public ActionsMenu(){
-    super("Actions");
-    setMnemonic('A');
+    I18n i18n = I18n.getInstance(ActionsMenu.class, Jin.getInstance().getLocale());
+    setText(i18n.getString("actionsMenu.text"));
+    setDisplayedMnemonicIndex(i18n.getInt("actionsMenu.displayedMnemonicIndex"));
   }
   
   

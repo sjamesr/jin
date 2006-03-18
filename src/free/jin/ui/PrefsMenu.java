@@ -21,6 +21,19 @@
 
 package free.jin.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.MessageFormat;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import free.jin.*;
 import free.jin.plugin.Plugin;
 import free.util.AWTUtilities;
@@ -30,24 +43,23 @@ import free.util.models.Model;
 import free.util.models.ModelUtils;
 import free.util.swing.SwingUtils;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 
 /**
  * The preferences menu.
  */
 
 public class PrefsMenu extends JMenu implements SessionListener{
-
-
-
+  
+  
+  
+  /**
+   * The <code>I18n</code> for this object.
+   */
+  
+  private final I18n i18n = I18n.getInstance(PrefsMenu.class, Jin.getInstance().getLocale());
+  
+  
+  
   /**
    * The "Look and Feel" menu item.
    */
@@ -86,14 +98,14 @@ public class PrefsMenu extends JMenu implements SessionListener{
    */
 
   public PrefsMenu(){
-    super("Preferences");
-    setMnemonic('P');
+    setText(i18n.getString("preferencesMenu.text"));
+    setDisplayedMnemonicIndex(i18n.getInt("preferencesMenu.displayedMnemonicIndex"));
 
-    add(lnfMenu = new JMenuItem("User Interface", 'L'));
+    add(lnfMenu = i18n.createMenuItem("userInterfaceMenuItem"));
     lnfMenu.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this); 
-        JDialog dialog = new PrefsDialog(parentFrame, "User Interface Preferences", 
+        JDialog dialog = new PrefsDialog(parentFrame, i18n.getString("userInterfacePrefsDialog.title"), 
             new UiPrefsPanel());
         AWTUtilities.centerWindow(dialog, parentFrame);
         dialog.setVisible(true);
@@ -193,9 +205,11 @@ public class PrefsMenu extends JMenu implements SessionListener{
           int pluginIndex = Integer.parseInt(evt.getActionCommand());
           Plugin plugin = plugins[pluginIndex];
           
+          String pluginPrefsDialogTitle = MessageFormat.format(i18n.getString("pluginPrefsDialog.title"),
+            new Object[]{plugin.getName()});;
           Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this);
           JDialog dialog = new PrefsDialog(parentFrame, 
-            plugin.getName() + " Preferences", plugin.getPreferencesUI());
+            pluginPrefsDialogTitle, plugin.getPreferencesUI());
           AWTUtilities.centerWindow(dialog, parentFrame);
           dialog.setVisible(true);
         }
@@ -301,9 +315,9 @@ public class PrefsMenu extends JMenu implements SessionListener{
       super(parent, title, true);
 
       this.prefsPanel = prefsPanel;
-      this.applyButton = new JButton("Apply");
-      this.okButton = new JButton("OK");
-      this.cancelButton = new JButton("Cancel");
+      this.applyButton = i18n.createButton("prefsDialog.applyButton");
+      this.okButton = i18n.createButton("prefsDialog.okButton");
+      this.cancelButton = i18n.createButton("prefsDialog.cancelButton");
 
       createUI();
 
@@ -336,7 +350,6 @@ public class PrefsMenu extends JMenu implements SessionListener{
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
       applyButton.setEnabled(false);
-      applyButton.setMnemonic('A');
 
       buttonPanel.add(okButton);
       buttonPanel.add(cancelButton);
@@ -373,7 +386,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error("Error Setting Preference(s)", e.getMessage());
+          OptionPanel.error(i18n.getString("badPrefsChangeDialog.title"), e.getMessage());
           if (e.getErrorComponent() != null)
             e.getErrorComponent().requestFocus();
         }
