@@ -23,7 +23,10 @@ package free.jin.plugin;
 
 import java.awt.Container;
 import java.awt.Image;
+
 import javax.swing.JMenu;
+
+import free.jin.ui.UIProvider;
 
 
 /**
@@ -49,6 +52,15 @@ public interface PluginUIContainer{
    */
   
   String getId();
+  
+  
+  
+  /**
+   * Returns the mode of this container. See {@link UIProvider#createPluginUIContainer(Plugin, String, int)}
+   * for more information regarding the mode.
+   */
+  
+  int getMode();
 
 
 
@@ -65,9 +77,9 @@ public interface PluginUIContainer{
    */
 
   void removePluginUIListener(PluginUIListener listener);
-
-
-
+  
+  
+  
   /**
    * Returns the content pane to which plugins can add their user interface
    * components.
@@ -86,6 +98,14 @@ public interface PluginUIContainer{
   
   
   /**
+   * Returns the title of the container.
+   */
+  
+  String getTitle();
+  
+  
+  
+  /**
    * Adds a menu to this container.
    */
   
@@ -98,6 +118,14 @@ public interface PluginUIContainer{
    */
 
   void setIcon(Image iconImage);
+  
+  
+  
+  /**
+   * Returns the icon of the container.
+   */
+  
+  Image getIcon();
 
 
 

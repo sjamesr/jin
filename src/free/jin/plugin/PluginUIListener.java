@@ -69,6 +69,30 @@ public interface PluginUIListener extends EventListener{
    */
 
   void pluginUIDeactivated(PluginUIEvent evt);
+  
+  
+  
+  /**
+   * This method is invoked when the plugin ui is disposed.
+   */
+  
+  void pluginUIDisposed(PluginUIEvent evt);
+  
+  
+  
+  /**
+   * This method is invoked when the title of the plugin ui changes.
+   */
+  
+  void pluginUITitleChanged(PluginUIEvent evt);
+  
+  
+  
+  /**
+   * This method is invoked when the icon of the plugin ui changes.
+   */
+  
+  void pluginUIIconChanged(PluginUIEvent evt);
 
 
 

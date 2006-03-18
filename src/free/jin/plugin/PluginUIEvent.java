@@ -69,6 +69,30 @@ public class PluginUIEvent extends EventObject{
    */
 
   public static final int PLUGIN_UI_DEACTIVATED = 5;
+  
+  
+  
+  /**
+   * The id for when the plugin ui is disposed.
+   */
+  
+  public static final int PLUGIN_UI_DISPOSED = 6;
+  
+  
+  
+  /**
+   * The id for when the title of the plugin ui changes.
+   */
+  
+  public static final int PLUGIN_UI_TITLE_CHANGED = 7;
+  
+  
+  
+  /**
+   * The id for when the icon of the plugin ui changes.
+   */
+  
+  public static final int PLUGIN_UI_ICON_CHANGED = 8;
 
 
 
@@ -94,6 +118,9 @@ public class PluginUIEvent extends EventObject{
       case PLUGIN_UI_CLOSING:
       case PLUGIN_UI_ACTIVATED:
       case PLUGIN_UI_DEACTIVATED:
+      case PLUGIN_UI_DISPOSED:
+      case PLUGIN_UI_TITLE_CHANGED:
+      case PLUGIN_UI_ICON_CHANGED:
         break;
       default:
         throw new IllegalArgumentException("Bad event id: " + id);
@@ -135,6 +162,9 @@ public class PluginUIEvent extends EventObject{
       case PLUGIN_UI_CLOSING: l.pluginUIClosing(this); break;
       case PLUGIN_UI_ACTIVATED: l.pluginUIActivated(this); break;
       case PLUGIN_UI_DEACTIVATED: l.pluginUIDeactivated(this); break;
+      case PLUGIN_UI_DISPOSED: l.pluginUIDisposed(this); break;
+      case PLUGIN_UI_TITLE_CHANGED: l.pluginUITitleChanged(this); break;
+      case PLUGIN_UI_ICON_CHANGED: l.pluginUIIconChanged(this); break;
     }
   }
 
