@@ -87,7 +87,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * True when the plugin is "on", i.e. sounds are on.
    */
 
-  protected final BooleanModel soundState = new BooleanModel("Enable Sound", false);
+  protected BooleanModel soundState;
 
 
 
@@ -135,7 +135,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   protected void init(){
-    soundState.set(getPrefs().getBool("on", true));
+    soundState = new BooleanModel(getI18n().getString("enableSound"), getPrefs().getBool("on", true));
   }
 
 
@@ -516,7 +516,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public String getName(){
-    return "Sound";
+    return getI18n().getString("pluginName");
   }
 
 
