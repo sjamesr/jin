@@ -1301,6 +1301,10 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void pluginUIShown(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
+  public void pluginUIDisposed(PluginUIEvent evt){}
+  public void pluginUITitleChanged(PluginUIEvent evt){}
+  public void pluginUIIconChanged(PluginUIEvent evt){}
+  
 
 
 
@@ -1415,7 +1419,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public String getName(){
     return getI18n().getString("pluginName");
   }
-  
-  
+
+
   
 }

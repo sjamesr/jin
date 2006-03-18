@@ -160,6 +160,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void pluginUIClosing(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
+  public void pluginUIDisposed(PluginUIEvent evt){}
+  public void pluginUITitleChanged(PluginUIEvent evt){}
+  public void pluginUIIconChanged(PluginUIEvent evt){}
+  
 
 
 
@@ -259,6 +263,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     return getI18n().getString("pluginName");
   }
 
-  
+
 
 }
