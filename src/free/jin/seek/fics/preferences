@@ -10,8 +10,8 @@ seek-image.unrated.human.Chess = unrated_human.gif
 seek-image.rated.computer.Chess = rated_comp.gif
 seek-image.unrated.computer.Chess = unrated_comp.gif
 
-fast-category.name = Lightning
-medium-category.name = Blitz
-slow-category.name = Standard
+fastCategory.nameKey = lightningCategoryName
+moderateCategory.nameKey = blitzCategoryName
+slowCategory.nameKey = standardCategoryName
 
 background.image = background.gif

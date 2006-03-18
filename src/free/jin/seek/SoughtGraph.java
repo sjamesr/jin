@@ -23,18 +23,21 @@ package free.jin.seek;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import javax.swing.JComponent;
 import java.util.Hashtable;
-import free.jin.plugin.Plugin;
-import free.jin.Seek;
+
+import javax.swing.JComponent;
+
+import free.chess.Chess;
+import free.chess.Player;
+import free.chess.WildVariant;
+import free.jin.I18n;
 import free.jin.Preferences;
-import free.jin.seek.event.SeekSelectionListener;
+import free.jin.Seek;
+import free.jin.plugin.Plugin;
 import free.jin.seek.event.SeekSelectionEvent;
+import free.jin.seek.event.SeekSelectionListener;
 import free.util.GraphicsUtilities;
 import free.util.ImageUtilities;
-import free.chess.WildVariant;
-import free.chess.Player;
-import free.chess.Chess;
 
 
 /**
@@ -155,7 +158,30 @@ public class SoughtGraph extends JComponent{
    */
 
   private final Image bgImage;
-
+  
+  
+  
+  /**
+   * The name of the fast games category. 
+   */
+  
+  private final String fastCategoryName;
+  
+  
+  
+  /**
+   * The name of the moderate speed games category.
+   */
+  
+  private final String moderateCategoryName;
+  
+  
+  
+  /**
+   * The name of the slow games category.
+   */
+  
+  private final String slowCategoryName;
 
 
 
@@ -179,6 +205,7 @@ public class SoughtGraph extends JComponent{
     this.plugin = plugin;
 
     Preferences prefs = plugin.getPrefs();
+    I18n i18n = plugin.getI18n();
 
     setOpaque(true);
     setBackground(prefs.getColor("background-color", Color.white));
@@ -193,6 +220,10 @@ public class SoughtGraph extends JComponent{
     }
 
     this.bgImage = bgImage;
+    
+    fastCategoryName = i18n.getString(prefs.getString("fastCategory.nameKey"));
+    moderateCategoryName = i18n.getString(prefs.getString("moderateCategory.nameKey"));
+    slowCategoryName = i18n.getString(prefs.getString("slowCategory.nameKey"));
 
     int [] seekImageSizes = prefs.getIntList("seek-image.sizes");
     int maxSize = 0, minSize = Integer.MAX_VALUE;
@@ -496,31 +527,26 @@ public class SoughtGraph extends JComponent{
     g.setColor(fg);
     Font originalFont = g.getFont();
 
-    Preferences prefs = plugin.getPrefs();
-
-    // The "Bullet", "Blitz" and "Standard" strings.    
-    String bulletString = prefs.getString("fast-category.name");
-    String blitzString = prefs.getString("medium-category.name");
-    String standardString = prefs.getString("slow-category.name");
+    // The speed category names    
     int timeStringHeight = (height-(graphY+graphHeight))/2;
     
     if (timeStringFont == null){
-      int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, bulletString, bulletWidth, timeStringHeight);
-      int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, blitzString, blitzWidth, timeStringHeight);
-      int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, standardString, standardWidth, timeStringHeight);
+      int bulletFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, fastCategoryName, bulletWidth, timeStringHeight);
+      int blitzFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, moderateCategoryName, blitzWidth, timeStringHeight);
+      int standardFontSize = GraphicsUtilities.getMaxFittingFontSize(g, originalFont, slowCategoryName, standardWidth, timeStringHeight);
       int fontSize = Math.min(Math.min(bulletFontSize, blitzFontSize), standardFontSize);
       timeStringFont = new Font(originalFont.getName(), originalFont.getStyle(), fontSize);
       timeStringFontMetrics = g.getFontMetrics(timeStringFont);
     }
     
-    int bulletStringWidth = timeStringFontMetrics.stringWidth(bulletString);
-    int blitzStringWidth = timeStringFontMetrics.stringWidth(blitzString);
-    int standardStringWidth = timeStringFontMetrics.stringWidth(standardString);
+    int bulletStringWidth = timeStringFontMetrics.stringWidth(fastCategoryName);
+    int blitzStringWidth = timeStringFontMetrics.stringWidth(moderateCategoryName);
+    int standardStringWidth = timeStringFontMetrics.stringWidth(slowCategoryName);
     g.setFont(timeStringFont);
     int timeStringY = graphY+graphHeight+timeStringFontMetrics.getMaxAscent()+1;
-    g.drawString(bulletString, graphX+(bulletWidth-bulletStringWidth)/2, timeStringY);
-    g.drawString(blitzString, graphX+bulletWidth+(blitzWidth-blitzStringWidth)/2, timeStringY);
-    g.drawString(standardString, graphX+bulletWidth+blitzWidth+(standardWidth-standardStringWidth)/2, timeStringY);
+    g.drawString(fastCategoryName, graphX+(bulletWidth-bulletStringWidth)/2, timeStringY);
+    g.drawString(moderateCategoryName, graphX+bulletWidth+(blitzWidth-blitzStringWidth)/2, timeStringY);
+    g.drawString(slowCategoryName, graphX+bulletWidth+blitzWidth+(standardWidth-standardStringWidth)/2, timeStringY);
 
     // The "1000", "1500" and "2000" strings.
     String tenString = "1000";
@@ -654,35 +680,6 @@ public class SoughtGraph extends JComponent{
     }
 
     g.drawImage(seekImage, seekBounds.x, seekBounds.y, null);
-
-    /*
-    Color color = StringParser.parseColor(plugin.lookupProperty("color."+seek.getVariant().getName()));
-    Color outlineColor = seek.isSeekerComputer() ? StringParser.parseColor(plugin.getProperty("computer-outline")) : color;
-    String shape = seek.isRated() ? "oval" : "rect";
-
-    int smallWidth = seekBounds.width*2/3;
-    int smallHeight = seekBounds.height*2/3;
-    if ((seekBounds.width-smallWidth)%2!=0)
-      smallWidth++;
-    if ((seekBounds.height-smallHeight)%2!=0)
-      smallHeight++;
-    int xDiff = (seekBounds.width-smallWidth)/2;
-    int yDiff = (seekBounds.height-smallHeight)/2;
-
-
-    if (shape=="oval"){
-      g.setColor(outlineColor);
-      g.fillOval(seekBounds.x, seekBounds.y, seekBounds.width, seekBounds.height);
-      g.setColor(color);
-      g.fillOval(seekBounds.x+xDiff, seekBounds.y+yDiff, smallWidth, smallHeight);
-    }
-    else{
-      g.setColor(outlineColor);
-      g.fillRect(seekBounds.x, seekBounds.y, seekBounds.width, seekBounds.height);
-      g.setColor(color);
-      g.fillRect(seekBounds.x+xDiff, seekBounds.y+yDiff, smallWidth, smallHeight);
-    }
-    */
   }
 
 
@@ -694,6 +691,15 @@ public class SoughtGraph extends JComponent{
 
   protected String getSeekString(Seek seek){
 // <name><titles> <rating> <(provisional)> seeks <time> <inc> [isRated] [wild] [color] [minrating]-[maxrating] [manual] [formula]
+    
+    I18n i18n = plugin.getI18n();
+    String provisional = i18n.getString("provisional");
+    String rated = i18n.getString("rated");
+    String unrated = i18n.getString("unrated");
+    String white = i18n.getString("white");
+    String black = i18n.getString("black");
+    String manualAcceptIndicator = i18n.getString("manualAcceptIndicator");
+    String formulaIndicator = i18n.getString("formulaIndicator");
 
     String name = seek.getSeekerName();
     String title = seek.getSeekerTitle();
@@ -708,26 +714,27 @@ public class SoughtGraph extends JComponent{
     boolean isRatingLimited = seek.isRatingLimited();
     boolean isManualAccept = seek.isManualAccept();
     boolean isFormula = seek.isFormula();
-
-    String seekString = name+title+ratingString+(isProvisional ? " (provisional) " : " ")+time+" "+inc+" "+(isRated ? "rated" : "unrated")+" ";
+    
+    String seekString = name + title + ratingString + (isProvisional ? " (" + provisional+") " : " ") +
+      time + " " + inc + " " + (isRated ? rated : unrated) + " ";
 
     if (!(variant instanceof Chess))
-      seekString = seekString+variant.getName()+" ";
+      seekString = seekString + variant.getName() + " ";
 
     if (color!=null)
-      seekString = seekString+(color.isWhite() ? "white" : "black")+" ";
+      seekString = seekString + (color.isWhite() ? white : black) + " ";
 
     if (isRatingLimited){
       int minRating = seek.getMinRating();
       int maxRating = seek.getMaxRating();
-      seekString = seekString+minRating+"-"+maxRating+" ";
+      seekString = seekString+minRating + "-" + maxRating + " ";
     }
 
     if (isManualAccept)
-      seekString = seekString+"m ";
+      seekString = seekString + manualAcceptIndicator + " ";
 
     if (isFormula)
-      seekString = seekString+"f ";
+      seekString = seekString + formulaIndicator + " ";
 
     return seekString;
   }
