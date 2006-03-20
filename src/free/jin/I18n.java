@@ -190,11 +190,26 @@ public class I18n{
   
   
   /**
-   * Creates a <code>Jbutton</code> using the specified i18n key.
+   * Creates a <code>JButton</code> using the specified i18n key.
    */
   
   public JButton createButton(String i18nKey){
     return (JButton)init(new JButton(), i18nKey);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>JMenuItem</code> using the specified i18n key.
+   */
+  
+  public JMenuItem createMenuItem(String i18nKey){
+    JMenuItem menuItem = new JMenuItem();
+    
+    menuItem.setText(getString(i18nKey + ".text"));
+    menuItem.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
+    
+    return menuItem;
   }
   
   
