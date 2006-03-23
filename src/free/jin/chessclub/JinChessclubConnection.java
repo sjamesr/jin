@@ -23,6 +23,8 @@ package free.jin.chessclub;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.*;
@@ -263,11 +265,33 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected Socket connectImpl(String hostname, int port) throws IOException{
-    // Uncomment the following line to enable timestamping
-    return new free.chessclub.timestamp.TimestampingSocket(hostname, port);
+    Socket result = null;
+    try{
+      Class tsSocketClass = Class.forName("free.chessclub.timestamp.TimestampingSocket");
+      Constructor tsSocketConstructor = tsSocketClass.getConstructor(new Class[]{String.class, int.class});
+      result = (Socket)tsSocketConstructor.newInstance(new Object[]{hostname, new Integer(port)});
+    } catch (ClassNotFoundException e){}
+      catch (SecurityException e){}
+      catch (NoSuchMethodException e){}
+      catch (IllegalArgumentException e){}
+      catch (InstantiationException e){}
+      catch (IllegalAccessException e){}
+      catch (InvocationTargetException e){
+        Throwable targetException = e.getTargetException(); 
+        if (targetException instanceof IOException)
+          throw (IOException)targetException;
+        else if (targetException instanceof RuntimeException)
+          throw (RuntimeException)targetException;
+        else if (targetException instanceof Error)
+          throw (Error)targetException;
+        else
+          e.printStackTrace(); // Shouldn't happen, I think
+      }
     
-    // Uncomment the following line to disable timestamping
-    // return new java.net.Socket(hostname, port);
+    if (result == null)
+      result = new Socket(hostname, port);
+    
+    return result;
   }
 
 
