@@ -22,6 +22,8 @@
 package free.jin.freechess;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -226,12 +228,33 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected Socket connectImpl(String hostname, int port) throws IOException{
-    // Comment this to disable timesealing
-    return new free.freechess.timeseal.TimesealingSocket(hostname, port);
+    Socket result = null;
+    try{
+      Class tsSocketClass = Class.forName("free.freechess.timeseal.TimesealingSocket");
+      Constructor tsSocketConstructor = tsSocketClass.getConstructor(new Class[]{String.class, int.class});
+      result = (Socket)tsSocketConstructor.newInstance(new Object[]{hostname, new Integer(port)});
+    } catch (ClassNotFoundException e){}
+      catch (SecurityException e){}
+      catch (NoSuchMethodException e){}
+      catch (IllegalArgumentException e){}
+      catch (InstantiationException e){}
+      catch (IllegalAccessException e){}
+      catch (InvocationTargetException e){
+        Throwable targetException = e.getTargetException(); 
+        if (targetException instanceof IOException)
+          throw (IOException)targetException;
+        else if (targetException instanceof RuntimeException)
+          throw (RuntimeException)targetException;
+        else if (targetException instanceof Error)
+          throw (Error)targetException;
+        else
+          e.printStackTrace(); // Shouldn't happen, I think
+      }
     
-    // Comment this to enable timesealing
-    // return new Socket(hostname, port);
-  }
+    if (result == null)
+      result = new Socket(hostname, port);
+    
+    return result;  }
 
 
 
