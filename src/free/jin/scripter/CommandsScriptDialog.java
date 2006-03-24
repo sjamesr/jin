@@ -34,9 +34,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import free.jin.I18n;
 import free.jin.ui.OptionPanel;
-import free.util.AWTUtilities;
 import free.util.TableLayout;
-import free.util.swing.PlainTextDialog;
 import free.workarounds.FixedJTextArea;
 import free.workarounds.FixedJTextField;
 
@@ -117,29 +115,14 @@ class CommandsScriptDialog extends ScriptDialog{
     conditionHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
-        
-        String title = i18n.getString("commandsConditionHelpDialog.title");
-        String message = i18n.getString("commandsConditionHelpDialog.message");
-        
-        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
-        textDialog.setVisible(true);
+        i18n.showPlainTextDialog("commandsConditionHelpDialog", CommandsScriptDialog.this);
       }
     });
 
     commandsHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
-        
-        String title = i18n.getString("commandsCommandsHelpDialog.title");
-        String message = i18n.getString("commandsCommandsHelpDialog.message");
-        
-        PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
-        textDialog.setVisible(true);
-      }
+        i18n.showPlainTextDialog("commandsCommandsHelpDialog", CommandsScriptDialog.this);      }
     });
 
 

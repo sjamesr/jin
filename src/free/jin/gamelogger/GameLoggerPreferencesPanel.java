@@ -42,9 +42,7 @@ import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.ui.PreferencesPanel;
-import free.util.AWTUtilities;
 import free.util.swing.ExtensionFileFilter;
-import free.util.swing.PlainTextDialog;
 import free.workarounds.FixedJTextField;
 
 
@@ -478,14 +476,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     helpConditionButton.setPreferredSize(browseLogFileButton.getPreferredSize());
     helpConditionButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        I18n i18n = gameLogger.getI18n();
-        String text = i18n.getString("conditionHelpDialog.text");
-        String title = i18n.getString("conditionHelpDialog.title");
-
-        PlainTextDialog textDialog = new PlainTextDialog(GameLoggerPreferencesPanel.this, title, text);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, getParent());
-        textDialog.setVisible(true);
+        I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
+        i18n.showPlainTextDialog("conditionHelpDialog", GameLoggerPreferencesPanel.this);
       }
     });
 

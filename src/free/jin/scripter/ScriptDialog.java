@@ -34,7 +34,6 @@ import free.util.AWTUtilities;
 import free.util.NamedObject;
 import free.util.TableLayout;
 import free.util.Utilities;
-import free.util.swing.PlainTextDialog;
 import free.util.swing.SwingUtils;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedJTextField;
@@ -188,28 +187,14 @@ abstract class ScriptDialog extends JDialog{
     eventTypeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(ScriptDialog.class);
-        
-        String title = i18n.getString("eventTypeHelpDialog.title");
-        String message = i18n.getString("eventTypeHelpDialog.message");
-
-        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, title, message);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, ScriptDialog.this);
-        textDialog.setVisible(true);
+        i18n.showPlainTextDialog("eventTypeHelpDialog", ScriptDialog.this);
       }
     });
 
     eventSubtypesHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(ScriptDialog.class);
-        
-        String title = i18n.getString("eventSubtypesHelpDialog.title");
-        String message = i18n.getString("eventSubtypesHelpDialog.message");
-        
-        PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, title, message);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, ScriptDialog.this);
-        textDialog.setVisible(true);
+        i18n.showPlainTextDialog("eventSubtypesHelpDialog", ScriptDialog.this);
       }
     });
 

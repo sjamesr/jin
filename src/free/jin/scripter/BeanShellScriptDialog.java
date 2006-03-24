@@ -31,9 +31,7 @@ import javax.swing.*;
 
 import bsh.EvalError;
 import free.jin.I18n;
-import free.util.AWTUtilities;
 import free.util.TableLayout;
-import free.util.swing.PlainTextDialog;
 import free.workarounds.FixedJTextArea;
 
 
@@ -97,14 +95,7 @@ class BeanShellScriptDialog extends ScriptDialog{
     codeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(BeanShellScriptDialog.class);
-        
-        String title = i18n.getString("beanshellHelpDialog.title");
-        String codeHelpText = i18n.getString("beanshellHelpDialog.message");
-        
-        PlainTextDialog textDialog = new PlainTextDialog(BeanShellScriptDialog.this, title, codeHelpText);
-        textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
-        AWTUtilities.centerWindow(textDialog, BeanShellScriptDialog.this);
-        textDialog.setVisible(true);
+        i18n.showPlainTextDialog("beanshellHelpDialog", BeanShellScriptDialog.this);
       }
     });
 
