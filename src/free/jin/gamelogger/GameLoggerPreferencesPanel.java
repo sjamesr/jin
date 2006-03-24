@@ -41,6 +41,7 @@ import bsh.EvalError;
 import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.Preferences;
+import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
 import free.util.swing.ExtensionFileFilter;
 import free.workarounds.FixedJTextField;
@@ -342,8 +343,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
           try{
             updateRuleFromUI(selectedIndex);
           } catch (BadChangesException e){
-              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(),
-                  gameLogger.getI18n().getString("badChangesDialog.title"), JOptionPane.ERROR_MESSAGE);
+              I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
+              OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), GameLoggerPreferencesPanel.this);
               if (e.getErrorComponent() != null)
                 e.getErrorComponent().requestFocus();
               return;
