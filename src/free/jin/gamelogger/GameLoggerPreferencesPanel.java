@@ -26,7 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -295,8 +294,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
               ignoreSelectionChange = true;
               loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
               ignoreSelectionChange = false;
-              JOptionPane.showMessageDialog(GameLoggerPreferencesPanel.this, e.getMessage(),
-                gameLogger.getI18n().getString("badChangesDialog.title"), JOptionPane.ERROR_MESSAGE);
+              
+              I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
+              OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), GameLoggerPreferencesPanel.this);
               if (e.getErrorComponent() != null)
                 e.getErrorComponent().requestFocus();
               return;
@@ -366,16 +366,12 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex != -1){
-          I18n i18n = gameLogger.getI18n();
+          I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
           String ruleName = rulesListModel.getElementAt(selectedIndex).toString();
           
-          String messageFormat = i18n.getString("confirmRuleDeletion.message");
-          String message = MessageFormat.format(messageFormat, new Object[]{ruleName});
-          String title = i18n.getString("confirmRuleDeletion.title");
-            
-          int result = JOptionPane.showConfirmDialog(GameLoggerPreferencesPanel.this, 
-            message, title, JOptionPane.YES_NO_OPTION);
-          if (result == JOptionPane.YES_OPTION){
+          Object result = 
+            i18n.confirm(OptionPanel.OK, "confirmRuleDeletion", GameLoggerPreferencesPanel.this, new Object[]{ruleName});
+          if (result == OptionPanel.OK){
             rulesListModel.removeElementAt(selectedIndex);
             if (selectedIndex < rulesListModel.size())
               loggingRulesList.setSelectedIndex(selectedIndex);
