@@ -21,7 +21,6 @@
 
 package free.jin.board.prefs;
 
-import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.jin.ui.PreferencesPanel;
@@ -52,14 +51,6 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   
   
   /**
-   * The <code>I18n</code> for this preferences panel.
-   */
-  
-  private final I18n i18n;
-  
-  
-  
-  /**
    * Creates a new BoardModifyingPrefsPanel for the specified
    * <code>BoardManager</code> and with the specified preview board.
    */
@@ -67,7 +58,6 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
   public BoardModifyingPrefsPanel(BoardManager boardManager, JinBoard previewBoard){
     this.boardManager = boardManager;
     this.previewBoard = previewBoard;
-    this.i18n = I18n.get(getClass());
   }
   
   
@@ -79,16 +69,6 @@ public abstract class BoardModifyingPrefsPanel extends PreferencesPanel{
    */
    
   public abstract void initPreviewBoard();
-  
-  
-  
-  /**
-   * Returns the <code>I18n</code> for this preferences panel.
-   */
-  
-  public I18n getI18n(){
-    return i18n;
-  }
   
   
   

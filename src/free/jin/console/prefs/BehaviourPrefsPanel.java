@@ -53,14 +53,6 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
   
   
   /**
-   * The <code>I18n</code> for this class.
-   */
-  
-  private final I18n i18n;
-  
-  
-  
-  /**
    * The radio button specifying "embedded" game lists.
    */
   
@@ -100,7 +92,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
   public BehaviourPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
     
-    this.i18n = I18n.get(getClass(), BehaviourPrefsPanel.class);
+    I18n i18n = I18n.get(BehaviourPrefsPanel.class);
     
     if (consoleManager.getConn() instanceof GameListConnection){
       embeddedGameLists = i18n.createRadioButton("embeddedGameListsRadioButton");
@@ -150,6 +142,8 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
   
   private void createUI(){
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    
+    I18n i18n = I18n.get(BehaviourPrefsPanel.class);
 
     if (embeddedGameLists != null){
       ButtonGroup bg = new ButtonGroup();
@@ -160,7 +154,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
       JPanel panel = new PreferredSizedPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
       panel.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createTitledBorder(i18n.getString("gameListsDisplayTitle")),
+        i18n.createTitledBorder("gameListsDisplayPanel"),
         BorderFactory.createEmptyBorder(0, 5, 5, 5)));
           
       embeddedGameLists.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -178,7 +172,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
     JPanel panel = new PreferredSizedPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(i18n.getString("textSelectionTitle")),
+      i18n.createTitledBorder("textSelectionPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     copyOnSelect.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     panel.add(copyOnSelect);

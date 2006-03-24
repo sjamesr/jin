@@ -53,14 +53,6 @@ public class PrefsMenu extends JMenu implements SessionListener{
   
   
   /**
-   * The <code>I18n</code> for this object.
-   */
-  
-  private final I18n i18n = I18n.get(PrefsMenu.class);
-  
-  
-  
-  /**
    * The "Look and Feel" menu item.
    */
    
@@ -98,6 +90,8 @@ public class PrefsMenu extends JMenu implements SessionListener{
    */
 
   public PrefsMenu(){
+    I18n i18n = I18n.get(PrefsMenu.class);
+    
     setText(i18n.getString("preferencesMenu.text"));
     setDisplayedMnemonicIndex(i18n.getInt("preferencesMenu.displayedMnemonicIndex"));
 
@@ -105,8 +99,8 @@ public class PrefsMenu extends JMenu implements SessionListener{
     lnfMenu.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this); 
-        JDialog dialog = new PrefsDialog(parentFrame, i18n.getString("userInterfacePrefsDialog.title"), 
-            new UiPrefsPanel());
+        JDialog dialog = new PrefsDialog(parentFrame, 
+          I18n.get(PrefsMenu.class).getString("userInterfacePrefsDialog.title"), new UiPrefsPanel());
         AWTUtilities.centerWindow(dialog, parentFrame);
         dialog.setVisible(true);
       }
@@ -205,11 +199,12 @@ public class PrefsMenu extends JMenu implements SessionListener{
           int pluginIndex = Integer.parseInt(evt.getActionCommand());
           Plugin plugin = plugins[pluginIndex];
           
-          String pluginPrefsDialogTitle = MessageFormat.format(i18n.getString("pluginPrefsDialog.title"),
-            new Object[]{plugin.getName()});;
+          I18n i18n = I18n.get(PrefsMenu.class);
+          String pluginPrefsDialogTitle = 
+            MessageFormat.format(i18n.getString("pluginPrefsDialog.title"), new Object[]{plugin.getName()});
+          
           Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this);
-          JDialog dialog = new PrefsDialog(parentFrame, 
-            pluginPrefsDialogTitle, plugin.getPreferencesUI());
+          JDialog dialog = new PrefsDialog(parentFrame, pluginPrefsDialogTitle, plugin.getPreferencesUI());
           AWTUtilities.centerWindow(dialog, parentFrame);
           dialog.setVisible(true);
         }
@@ -313,6 +308,8 @@ public class PrefsMenu extends JMenu implements SessionListener{
 
     public PrefsDialog(Frame parent, String title, PreferencesPanel prefsPanel){
       super(parent, title, true);
+      
+      I18n i18n = I18n.get(PrefsMenu.class);
 
       this.prefsPanel = prefsPanel;
       this.applyButton = i18n.createButton("prefsDialog.applyButton");
@@ -386,7 +383,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error(i18n.getString("badPrefsChangeDialog.title"), e.getMessage());
+          OptionPanel.error(I18n.get(PrefsMenu.class).getString("badPrefsChangeDialog.title"), e.getMessage());
           if (e.getErrorComponent() != null)
             e.getErrorComponent().requestFocus();
         }

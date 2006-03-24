@@ -150,7 +150,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
   public BoardLooksPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(BoardLooksPanel.class);
     
     pieceSets = new JList(getPieceSets());
     boardPatterns = new JList(getBoardPatterns());
@@ -249,8 +249,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     JButton downloadExtras = null;
     if (Jin.getInstance().isUserExtensible()){
-      downloadExtras = new JButton(i18n.getString("downloadExtrasButton.text"));
-      downloadExtras.setMnemonic(i18n.getInt("downloadExtrasButton.displayedMnemonicIndex"));
+      downloadExtras = i18n.createButton("downloadExtrasButton");
       downloadExtras.addActionListener(new UrlDisplayingAction("http://www.jinchess.com/extras/"));
     }
     
@@ -383,12 +382,12 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createPiecesUI(){
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(BoardLooksPanel.class);
     
     JComponent piecesPanel = new JPanel();
     piecesPanel.setLayout(new BoxLayout(piecesPanel, BoxLayout.Y_AXIS));
     piecesPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(i18n.getString("piecesTitle")),
+      i18n.createTitledBorder("piecesPanel"),
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
       
@@ -428,12 +427,12 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createBoardUI(){
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(BoardLooksPanel.class);
     
     JComponent boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(i18n.getString("boardTitle")),
+      i18n.createTitledBorder("boardPanel"),
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
     

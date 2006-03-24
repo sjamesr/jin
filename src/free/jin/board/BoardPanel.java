@@ -685,7 +685,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected String createGameLabelText(Game game){
-    I18n i18n = boardManager.getI18n();
+    I18n i18n = I18n.get(BoardPanel.class);
     String gameLabelFormat = i18n.getString("gameLabelFormat");
     
     WildVariant variant = game.getVariant();
@@ -843,7 +843,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected TableModel createMoveListTableModel(Game game){
-    I18n i18n = boardManager.getI18n();
+    I18n i18n = I18n.get(BoardPanel.class);
     return new NonEditableTableModel(new String[]{
           i18n.getString("moveListTable.moveNo"),
           i18n.getString("moveListTable.white"),

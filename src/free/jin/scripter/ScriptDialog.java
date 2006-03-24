@@ -50,14 +50,6 @@ abstract class ScriptDialog extends JDialog{
   
   
   /**
-   * The <code>I18n</code> for this <code>ScriptDialog</code>.
-   */
-  
-  protected final I18n i18n = I18n.get(getClass(), ScriptDialog.class);
-
-
-
-  /**
    * The default event type we show in the event type choice.
    */
 
@@ -174,7 +166,9 @@ abstract class ScriptDialog extends JDialog{
         updateSubtypesPanel(subtypesPanel, eventType, selectedSubtypes);
       }
     });
-
+    
+    I18n i18n = I18n.get(ScriptDialog.class);
+    
     JLabel scriptNameLabel = i18n.createLabel("scriptNameLabel");
     JLabel eventTypeLabel = i18n.createLabel("eventTypeLabel");
     JLabel eventSubtypesLabel = i18n.createLabel("eventSubtypesLabel");
@@ -193,6 +187,8 @@ abstract class ScriptDialog extends JDialog{
 
     eventTypeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        I18n i18n = I18n.get(ScriptDialog.class);
+        
         String title = i18n.getString("eventTypeHelpDialog.title");
         String message = i18n.getString("eventTypeHelpDialog.message");
 
@@ -205,8 +201,11 @@ abstract class ScriptDialog extends JDialog{
 
     eventSubtypesHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        I18n i18n = I18n.get(ScriptDialog.class);
+        
         String title = i18n.getString("eventSubtypesHelpDialog.title");
         String message = i18n.getString("eventSubtypesHelpDialog.message");
+        
         PlainTextDialog textDialog = new PlainTextDialog(ScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, ScriptDialog.this);
@@ -262,23 +261,17 @@ abstract class ScriptDialog extends JDialog{
         selectedSubtypesVector.copyInto(selectedSubtypes);
 
         if ((scriptName == null) || (scriptName.length() == 0)){
-          String title = i18n.getString("missingScriptNameDialog.title");
-          String message = i18n.getString("missingScriptNameDialog.message");
-          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
+          I18n.get(ScriptDialog.class).error("missingScriptNameDialog", ScriptDialog.this);
           return;
         }
 
         if (SELECT_EVENT_TYPE.equals(eventType)){
-          String title = i18n.getString("missingEventTypeDialog.title");
-          String message = i18n.getString("missingEventTypeDialog.message");
-          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
+          I18n.get(ScriptDialog.class).error("missingEventTypeDialog", ScriptDialog.this);
           return;
         }
 
         if ((selectedSubtypes.length == 0) && (scripter.getEventSubtypes(eventType) != null)){
-          String title = i18n.getString("missingEventSubtypeDialog.title");
-          String message = i18n.getString("missingEventSubtypeDialog.message");
-          JOptionPane.showMessageDialog(ScriptDialog.this, message, title, JOptionPane.ERROR_MESSAGE);
+          I18n.get(ScriptDialog.class).error("missingEventSubtypeDialog", ScriptDialog.this);
           return;
         }
 

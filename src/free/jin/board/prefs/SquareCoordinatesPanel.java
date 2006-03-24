@@ -94,7 +94,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
   public SquareCoordinatesPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(SquareCoordinatesPanel.class);
     
     int coordsDisplayStyle = boardManager.getCoordsDisplayStyle();
     none = i18n.createRadioButton("noSquareCoordsRadioButton");
@@ -123,7 +123,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     JPanel contentPanel = new PreferredSizedPanel();
     contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
     contentPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(getI18n().getString("squareCoordsPanelTitle")),
+      i18n.createTitledBorder("squareCoordsPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     none.setAlignmentX(JComponent.LEFT_ALIGNMENT);

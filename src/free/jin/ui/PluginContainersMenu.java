@@ -47,14 +47,6 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Act
   
   
   /**
-   * The <code>I18n</code> for this object.
-   */
-  
-  private final I18n i18n = I18n.get(PluginContainersMenu.class);
-  
-  
-  
-  /**
    * Maps <code>PluginUIContainers</code> to <code>JCheckBoxMenuItems</code>
    * which allow showing/hiding them.
    */
@@ -157,8 +149,8 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Act
    */
   
   private void syncShowCheckBoxText(JCheckBoxMenuItem item, PluginUIContainer pc){
-    item.setText(MessageFormat.format(i18n.getString("showPluginContainerCheckBox.text"),
-      new Object[]{pc.getTitle()}));    
+    String pattern = I18n.get(PluginContainersMenu.class).getString("showPluginContainerCheckBox.text"); 
+    item.setText(MessageFormat.format(pattern, new Object[]{pc.getTitle()}));    
   }
   
   

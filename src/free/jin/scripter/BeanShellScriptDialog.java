@@ -26,11 +26,11 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 
 import javax.swing.*;
 
 import bsh.EvalError;
+import free.jin.I18n;
 import free.util.AWTUtilities;
 import free.util.TableLayout;
 import free.util.swing.PlainTextDialog;
@@ -60,7 +60,7 @@ class BeanShellScriptDialog extends ScriptDialog{
   public BeanShellScriptDialog(Component parent, Scripter scripter, BeanShellScript templateScript){
     super(parent, "", scripter, templateScript);
     
-    setTitle(i18n.getString("beanshellScriptDialog.title"));
+    setTitle(I18n.get(BeanShellScriptDialog.class).getString("beanshellScriptDialog.title"));
     
     createUI();
   }
@@ -72,6 +72,8 @@ class BeanShellScriptDialog extends ScriptDialog{
    */
 
   protected Container createScriptTypeSpecificUI(){
+    I18n i18n = I18n.get(BeanShellScriptDialog.class);
+    
     BeanShellScript templateScript = (BeanShellScript)(this.templateScript);
     String defaultCode = (templateScript == null ? "" : templateScript.getCode());
 
@@ -94,8 +96,11 @@ class BeanShellScriptDialog extends ScriptDialog{
 
     codeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        I18n i18n = I18n.get(BeanShellScriptDialog.class);
+        
         String title = i18n.getString("beanshellHelpDialog.title");
         String codeHelpText = i18n.getString("beanshellHelpDialog.message");
+        
         PlainTextDialog textDialog = new PlainTextDialog(BeanShellScriptDialog.this, title, codeHelpText);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, BeanShellScriptDialog.this);
@@ -130,10 +135,7 @@ class BeanShellScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        String title = i18n.getString("beanshellMalformedScriptDialog.title");
-        String message = 
-          MessageFormat.format(i18n.getString("beanshellMalformedScriptDialog.message"), new Object[]{e.getErrorText()});
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+        I18n.get(BeanShellScriptDialog.class).error("beanshellMalformedScriptDialog", this, new Object[]{e.getErrorText()});
         return null;
       }
   }

@@ -49,14 +49,6 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
   
   
   /**
-   *  The <code>I18n</code> for this class.
-   */
-  
-  private final I18n i18n;
-  
-  
-  
-  /**
    * The Scripter whose preferences we're displaying/modifying.
    */
 
@@ -78,7 +70,6 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   public ScripterPreferencesPanel(Scripter scripter){
-    this.i18n = I18n.get(ScripterPreferencesPanel.class);
     this.scripter = scripter;
 
     Script [] scripts = scripter.getScripts();
@@ -188,6 +179,8 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   protected void createUI(){
+    I18n i18n = I18n.get(ScripterPreferencesPanel.class);
+    
     setLayout(new BorderLayout(10, 5));
 
     final JList list = new JList(scriptsListModel);
@@ -367,7 +360,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     public ScriptTypeSelectionDialog(Component parent){
       super(AWTUtilities.frameForComponent(parent), "", true);
       
-      setTitle(i18n.getString("scriptTypeSelectionDialog.title"));
+      setTitle(I18n.get(ScripterPreferencesPanel.class).getString("scriptTypeSelectionDialog.title"));
 
       setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -386,6 +379,8 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      */
 
     private void createUI(){
+      I18n i18n = I18n.get(ScripterPreferencesPanel.class);
+      
       JPanel content = new JPanel(new BorderLayout(10, 10));
       setContentPane(content);
       content.setBorder(new EmptyBorder(5, 5, 0, 5));
@@ -405,33 +400,40 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       boxesPanel.add(beanshell);
 
       final JTextArea typeExplanationTextArea = new FixedJTextArea(){
+        
         public boolean isFocusTraversable(){return false;}
         
         private Dimension prefSize = null;
+        
         public Dimension getPreferredSize(){
-          if (prefSize == null){
-            String [] expTexts = 
-              new String[]{i18n.getString("scriptExplanation.commands"), i18n.getString("scriptExplanation.beanshell")};
-            FontMetrics metrics = this.getFontMetrics(this.getFont());
-            int width = 0;
-            int height = 0;
-            for (int i = 0; i < expTexts.length; i++){
-              StringTokenizer tokenizer = new StringTokenizer(expTexts[i], "\n");
-              if (tokenizer.countTokens()*metrics.getHeight() > height)
-                height = tokenizer.countTokens()*metrics.getHeight();
-              while (tokenizer.hasMoreTokens()){
-                String line = tokenizer.nextToken();
-                int lineWidth = metrics.stringWidth(line);
-                if (lineWidth > width)
-                  width = lineWidth;
-              }
-            }
-            
-            prefSize = new Dimension(width, height);
-          }
+          if (prefSize == null)
+            prefSize = calculatePreferredSize();
           
           return prefSize;
         }
+        
+        private Dimension calculatePreferredSize(){
+          I18n i18n = I18n.get(ScripterPreferencesPanel.class);
+          String [] expTexts = 
+            new String[]{i18n.getString("scriptExplanation.commands"), i18n.getString("scriptExplanation.beanshell")};
+          FontMetrics metrics = this.getFontMetrics(this.getFont());
+          int width = 0;
+          int height = 0;
+          for (int i = 0; i < expTexts.length; i++){
+            StringTokenizer tokenizer = new StringTokenizer(expTexts[i], "\n");
+            if (tokenizer.countTokens()*metrics.getHeight() > height)
+              height = tokenizer.countTokens()*metrics.getHeight();
+            while (tokenizer.hasMoreTokens()){
+              String line = tokenizer.nextToken();
+              int lineWidth = metrics.stringWidth(line);
+              if (lineWidth > width)
+                width = lineWidth;
+            }
+          }
+          
+          return new Dimension(width, height);
+        }
+        
       };
       typeExplanationTextArea.setEditable(false);
       typeExplanationTextArea.setOpaque(false);
@@ -441,7 +443,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
           ButtonModel selectedModel = buttonGroup.getSelection();
           scriptType = selectedModel.getActionCommand();
 
-          String text = i18n.getString("scriptExplanation." + scriptType);
+          String text = I18n.get(ScripterPreferencesPanel.class).getString("scriptExplanation." + scriptType);
 
           typeExplanationTextArea.setText(text);
         }

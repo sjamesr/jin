@@ -60,14 +60,6 @@ public class MdiUiProvider extends AbstractUiProvider{
   
   
   /**
-   * The <code>I18n</code> for this object.
-   */
-  
-  private I18n i18n;
-
-
-
-  /**
    * The main frame.
    */
 
@@ -133,7 +125,7 @@ public class MdiUiProvider extends AbstractUiProvider{
   public void start(){
     super.start();
     
-    i18n = I18n.get(MdiUiProvider.class);
+    I18n i18n = I18n.get(MdiUiProvider.class);
     mainFrame = createMainFrame();
     restoreFrameGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.",
         new RectDouble(1d/16, 1d/16, 7d/8, 7d/8));
@@ -271,7 +263,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     Session session = evt.getSession();
     
-    String mainFrameTitle = i18n.getString("mdiUiProvider.mainFrame.title");
+    String mainFrameTitle = I18n.get(MdiUiProvider.class).getString("mdiUiProvider.mainFrame.title");
     String username = session.getUser().getUsername();
     String serverName = session.getServer().getShortName();
     String appName = Jin.getInstance().getAppName();
@@ -403,6 +395,8 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     public ConnectionMenu(){
+      I18n i18n = I18n.get(MdiUiProvider.class);
+      
       setText(i18n.getString("connectionMenu.text"));
       setDisplayedMnemonicIndex(i18n.getInt("connectionMenu.displayedMnemonicIndex"));
 
@@ -515,7 +509,7 @@ public class MdiUiProvider extends AbstractUiProvider{
         Object result = OptionPanel.OK;
         Session session = Jin.getInstance().getConnManager().getSession();
         if ((session != null) && session.isConnected())
-          result = i18n.confirm(OptionPanel.OK, "closeConnectionConfirmationDialog");
+          result = I18n.get(MdiUiProvider.class).confirm(OptionPanel.OK, "closeConnectionConfirmationDialog");
 
         if (result == OptionPanel.OK)
           connManager.closeSession();
@@ -542,10 +536,10 @@ public class MdiUiProvider extends AbstractUiProvider{
         remove(separatorIndex + 1);
 
       // Add them again
+      String textPattern = I18n.get(MdiUiProvider.class).getString("recentAccountMenuItem.text");
       for (int i = 1; i <= recentAccounts.size(); i++){
         User user = (User)recentAccounts.elementAt(i - 1);
-        String label = MessageFormat.format(i18n.getString("recentAccountMenuItem.text"), 
-          new Object[]{user.getUsername(), user.getServer().getShortName()});
+        String label = MessageFormat.format(textPattern, new Object[]{user.getUsername(), user.getServer().getShortName()});
         JMenuItem menuItem = new JMenuItem(i + " " + label);
         if (i <= 9)
           menuItem.setDisplayedMnemonicIndex(0);
@@ -641,7 +635,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
     
     public MdiPrefsMenu(){
-      JMenuItem bgMenuItem = i18n.createMenuItem("backgroundPrefsMenuItem");
+      JMenuItem bgMenuItem = I18n.get(MdiUiProvider.class).createMenuItem("backgroundPrefsMenuItem");
       add(bgMenuItem);
       
       bgMenuItem.addActionListener(new ActionListener(){

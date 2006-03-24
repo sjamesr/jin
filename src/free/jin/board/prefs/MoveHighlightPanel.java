@@ -112,7 +112,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
   public MoveHighlightPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(MoveHighlightPanel.class);
     
     int highlightStyle = boardManager.getMoveHighlightingStyle();
     none = i18n.createRadioButton("noMoveHighlightRadioButton");
@@ -144,7 +144,7 @@ public class MoveHighlightPanel extends BoardModifyingPrefsPanel{
     JPanel contentPanel = new PreferredSizedPanel();
     contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
     contentPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(i18n.getString("moveHighlightTitle")),
+      i18n.createTitledBorder("moveHighlightPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     none.setAlignmentX(JComponent.LEFT_ALIGNMENT);

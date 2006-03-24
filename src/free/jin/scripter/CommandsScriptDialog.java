@@ -26,13 +26,14 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import free.jin.I18n;
+import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
 import free.util.TableLayout;
 import free.util.swing.PlainTextDialog;
@@ -83,6 +84,8 @@ class CommandsScriptDialog extends ScriptDialog{
    */
 
   protected Container createScriptTypeSpecificUI(){
+    I18n i18n = I18n.get(CommandsScriptDialog.class);
+    
     CommandScript templateScript = (CommandScript)(this.templateScript);
 
     String defaultCondition = (templateScript == null ? "" : templateScript.getCondition());
@@ -113,8 +116,11 @@ class CommandsScriptDialog extends ScriptDialog{
 
     conditionHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        I18n i18n = I18n.get(CommandsScriptDialog.class);
+        
         String title = i18n.getString("commandsConditionHelpDialog.title");
         String message = i18n.getString("commandsConditionHelpDialog.message");
+        
         PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
@@ -124,8 +130,11 @@ class CommandsScriptDialog extends ScriptDialog{
 
     commandsHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
+        I18n i18n = I18n.get(CommandsScriptDialog.class);
+        
         String title = i18n.getString("commandsCommandsHelpDialog.title");
         String message = i18n.getString("commandsCommandsHelpDialog.message");
+        
         PlainTextDialog textDialog = new PlainTextDialog(CommandsScriptDialog.this, title, message);
         textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
         AWTUtilities.centerWindow(textDialog, CommandsScriptDialog.this);
@@ -185,11 +194,11 @@ class CommandsScriptDialog extends ScriptDialog{
       if (!(val instanceof Boolean))
         throw new EvalError("Not a boolean expression");
     } catch (EvalError e){
-        String title = i18n.getString("commandsMalformedConditionDialog.title");
-        String message = MessageFormat.format(i18n.getString("commandsMalformedConditionDialog.message"),
-          new Object[]{format(e.getMessage())});
-        int result = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-        if (result != JOptionPane.YES_OPTION)
+        I18n i18n = I18n.get(CommandsScriptDialog.class);
+        Object result = 
+          i18n.confirm(OptionPanel.OK, "commandsMalformedConditionDialog", this, new Object[]{format(e.getMessage())});
+        
+        if (result != OptionPanel.OK)
           return null;
       }
 
@@ -201,10 +210,7 @@ class CommandsScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        String title = i18n.getString("commandsMalformedScriptDialog.title");
-        String message = MessageFormat.format(i18n.getString("commandsMalformedScriptDialog.message"),
-          new Object[]{e.getErrorText()});
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+        I18n.get(CommandsScriptDialog.class).error("commandsMalformedScriptDialog", this, new Object[]{e.getErrorText()});
         return null;
       }
   }

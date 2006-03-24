@@ -77,7 +77,7 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     this.boardManager = boardManager;
     this.previewBoard = createPreviewBoard();
     
-    I18n i18n = boardManager.getI18n();
+    I18n i18n = I18n.get(BoardPreferencesPanel.class);
     
     JPanel squarePanel = new JPanel(new SquareLayout());
     squarePanel.add(previewBoard);
@@ -85,8 +85,7 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     previewBoard.setAlignmentY(Component.CENTER_ALIGNMENT);
     previewBoard.setPreferredSize(new Dimension(320, 320));
     
-    JButton resetPosition = new JButton(i18n.getString("resetPositionButton.text"));
-    resetPosition.setDisplayedMnemonicIndex(i18n.getInt("resetPositionButton.displayedMnemonicIndex"));
+    JButton resetPosition = i18n.createButton("resetPositionButton");
     resetPosition.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         initPreviewBoard();
@@ -96,7 +95,7 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     JPanel boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(null,  i18n.getString("testBoardTitle")),
+      i18n.createTitledBorder("testBoardPanel"),
       BorderFactory.createEmptyBorder(5, 5, 5, 5)));
     
     squarePanel.setAlignmentX(Component.CENTER_ALIGNMENT);

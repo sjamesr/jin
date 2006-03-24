@@ -184,7 +184,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
 
       this.setLayout(new BorderLayout(5, 5));
       JPanel chNumberPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-      chNumberPanel.add(i18n.createLabel("channelNumberLabel"));
+      chNumberPanel.add(I18n.get(ChannelTextPrefsPanel.class).createLabel("channelNumberLabel"));
       chNumberPanel.add(channelNumberField);
       JPanel chNumberAndSeparatorPanel = new JPanel(new BorderLayout(5, 5));
       chNumberAndSeparatorPanel.add(chNumberPanel, BorderLayout.NORTH);

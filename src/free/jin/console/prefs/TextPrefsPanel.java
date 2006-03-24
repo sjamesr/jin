@@ -54,14 +54,6 @@ public class TextPrefsPanel extends PreferencesPanel{
   
   
   /**
-   * The <code>I18n</code> for this class.
-   */
-  
-  protected final I18n i18n;
-
-
-
-  /**
    * The preferences we've modified as a result of user actions.
    */
 
@@ -123,7 +115,6 @@ public class TextPrefsPanel extends PreferencesPanel{
 
   public TextPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
-    this.i18n = I18n.get(getClass(), TextPrefsPanel.class);
 
     prefs = Preferences.createBackedUp(Preferences.createNew(), consoleManager.getPrefs());
 
@@ -289,7 +280,9 @@ public class TextPrefsPanel extends PreferencesPanel{
     selectionColorButton = createSelectionColorButton();
     selectedColorButton = createSelectedColorButton();
 
-    defaultSettingsPanel = new CategoryPanel(i18n.getString("defaultTextCategoryName"), defaultSettingsChooserPanel, new String[]{""});
+    defaultSettingsPanel = 
+      new CategoryPanel(I18n.get(TextPrefsPanel.class).getString("defaultTextCategoryName"), 
+        defaultSettingsChooserPanel, new String[]{""});
     defaultSettingsPanel.setLayout(new BorderLayout(5, 5));
     defaultSettingsPanel.add(defaultSettingsChooserPanel, BorderLayout.CENTER);
     JPanel selectionColorPanel = new JPanel(new GridLayout(1, 2, 15, 5));
@@ -368,7 +361,7 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectionColorButton(){
-    ColorChooser button = i18n.createColorChooser("selectionColorChooser");
+    ColorChooser button = I18n.get(TextPrefsPanel.class).createColorChooser("selectionColorChooser");
     button.setColor(prefs.getColor("output-selection", UIManager.getColor("textHighlight")));
 
     return button;
@@ -382,7 +375,7 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected ColorChooser createSelectedColorButton(){
-    ColorChooser button = i18n.createColorChooser("selectedTextColorChooser");
+    ColorChooser button = I18n.get(TextPrefsPanel.class).createColorChooser("selectedTextColorChooser");
     button.setColor(prefs.getColor("output-selected", UIManager.getColor("textHighlightText")));
 
     return button;
@@ -402,7 +395,7 @@ public class TextPrefsPanel extends PreferencesPanel{
     JScrollPane scrollPane = new JScrollPane(categoryList);
 
     JPanel listPanel = new JPanel(new BorderLayout(2, 2));
-    JLabel textTypeLabel = i18n.createLabel("textTypeLabel");
+    JLabel textTypeLabel = I18n.get(TextPrefsPanel.class).createLabel("textTypeLabel");
     textTypeLabel.setHorizontalAlignment(JLabel.CENTER);
     textTypeLabel.setLabelFor(categoryList);
     listPanel.add(textTypeLabel, BorderLayout.NORTH);

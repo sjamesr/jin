@@ -128,7 +128,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   public MoveInputPanel(BoardManager boardManager, JinBoard previewBoard){
     super(boardManager, previewBoard);
     
-    I18n i18n = getI18n();
+    I18n i18n = I18n.get(MoveInputPanel.class);
     
     dragndrop = i18n.createRadioButton("dragndropRadioButton");
     clicknclick = i18n.createRadioButton("clicknclickRadioButton");
@@ -210,7 +210,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       public void actionPerformed(ActionEvent evt){
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
-          I18n i18n = getI18n();
+          I18n i18n = I18n.get(MoveInputPanel.class);
           i18n.error("moveInAdvanceChangeError", MoveInputPanel.this);
             
           disallowMoveInAdvance.setSelected(
@@ -326,7 +326,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new PreferredSizedPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(getI18n().getString("moveInputPanelTitle")),
+      I18n.get(MoveInputPanel.class).createTitledBorder("moveInputPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
         
     dragndrop.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -349,7 +349,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(getI18n().getString("promotionPanelTitle")),
+      I18n.get(MoveInputPanel.class).createTitledBorder("promotionPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     autoPromote.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -370,7 +370,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(getI18n().getString("moveVisualizationPanelTitle")),
+      I18n.get(MoveInputPanel.class).createTitledBorder("moveVisualizationPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
     pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);    
@@ -392,10 +392,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createMovingInAdvanceUI(){
+    I18n i18n = I18n.get(MoveInputPanel.class);
+    
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createTitledBorder(getI18n().getString("movingInAdvancePanelTitle")),
+      i18n.createTitledBorder("movingInAdvancePanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     disallowMoveInAdvance.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -406,7 +408,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(immediateSendMove);
     panel.add(premove);
     panel.add(Box.createVerticalStrut(5));
-    String [] warnings = getI18n().getString("moveInAdvanceChangeWarning").split("\n");
+    String [] warnings = i18n.getString("moveInAdvanceChangeWarning").split("\n");
     for (int i = 0; i < warnings.length; i++)
       panel.add(new JLabel(warnings[i]));
     panel.add(Box.createVerticalGlue());
