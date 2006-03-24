@@ -1,6 +1,7 @@
 package free.jin;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -10,8 +11,10 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
+import free.util.AWTUtilities;
 import free.util.Utilities;
 import free.util.swing.ColorChooser;
+import free.util.swing.PlainTextDialog;
 
 
 
@@ -496,6 +499,22 @@ public class I18n{
   
   public Object question(Object defaultOption, String i18nKey){
     return question(defaultOption, i18nKey, null, null);
+  }
+  
+  
+  
+  /**
+   * Displays text in a <code>PlainTextDialog</code>.
+   */
+  
+  public void showPlainTextDialog(String i18nKey, Component hintParent){
+    String title = getString(i18nKey + ".title");
+    String message = getString(i18nKey + ".message");
+
+    PlainTextDialog textDialog = new PlainTextDialog(hintParent, title, message);
+    textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
+    AWTUtilities.centerWindow(textDialog, hintParent);
+    textDialog.setVisible(true);
   }
   
   
