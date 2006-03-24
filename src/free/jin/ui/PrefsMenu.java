@@ -383,7 +383,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error(I18n.get(PrefsMenu.class).getString("badPrefsChangeDialog.title"), e.getMessage());
+          OptionPanel.error(I18n.get(PrefsMenu.class).getString("badPrefsChangeDialog.title"), e.getMessage(), this);
           if (e.getErrorComponent() != null)
             e.getErrorComponent().requestFocus();
         }
