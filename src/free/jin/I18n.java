@@ -7,6 +7,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
 import free.util.Utilities;
@@ -209,12 +210,29 @@ public class I18n{
    */
   
   public JMenuItem createMenuItem(String i18nKey){
+    return createMenuItem(i18nKey, null);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>JMenuItem</code> using the specified i18n key.
+   * The text of the menu item is treated as a pattern and is formatted via
+   * <code>MessageFormat.format(text, textArgs)</code>.
+   */
+  
+  public JMenuItem createMenuItem(String i18nKey, Object [] textArgs){
     JMenuItem menuItem = new JMenuItem();
     
-    menuItem.setText(getString(i18nKey + ".text"));
+    String text = getString(i18nKey + ".text");
+    if (textArgs != null)
+      text = MessageFormat.format(text, textArgs);
+    
+    menuItem.setText(text);
     menuItem.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
     
     return menuItem;
+    
   }
   
   
@@ -250,6 +268,18 @@ public class I18n{
       button.setToolTipText(tooltipText);
     
     return button;
+  }
+  
+  
+  
+  /**
+   * Creates a titled border with the specified i18n key.
+   */
+  
+  public TitledBorder createTitledBorder(String i18nKey){
+    String title = getString(i18nKey + ".title");
+    
+    return BorderFactory.createTitledBorder(title);
   }
 
 
@@ -291,7 +321,7 @@ public class I18n{
    * message should be displayed. This is optional and may be <code>null</code>.
    */
   
-  public void error(String i18nKey, Object [] messageArgs, Component hintParent){
+  public void error(String i18nKey, Component hintParent, Object [] messageArgs){
     String title = getTitle(i18nKey);
     String message = getMessage(i18nKey, messageArgs);
     
@@ -309,7 +339,7 @@ public class I18n{
    */
   
   public void error(String i18nKey, Component hintParent){
-    error(i18nKey, null, hintParent);
+    error(i18nKey, hintParent, null);
   }
 
 
@@ -323,7 +353,7 @@ public class I18n{
    */
   
   public void error(String i18nKey, Object [] messageArgs){
-    error(i18nKey, messageArgs, null);
+    error(i18nKey, null, messageArgs);
   }
 
 
