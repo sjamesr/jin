@@ -527,8 +527,7 @@ public class Jin{
     I18n i18n = I18n.getInstance(Jin.class, getLocale());
     
     Object result = askToConfirm ? 
-      OptionPanel.confirm(i18n.getString("quitConfirmationDialog.title"),
-        i18n.getString("quitConfirmationDialog.message"), OptionPanel.OK) : OptionPanel.OK;
+      OptionPanel.confirm(OptionPanel.OK, i18n, "quitConfirmationDialog") : OptionPanel.OK;
     
     if (result == OptionPanel.OK){
       connManager.closeSession();

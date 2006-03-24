@@ -397,14 +397,14 @@ public class SeekAction extends JinAction{
           try{
             time = Integer.parseInt(timeField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getI18n().getString("timeError.title"), getI18n().getString("timeError.message"));
+              OptionPanel.error(getI18n(), "timeError");
               return;
             }
             
           try{
             inc = Integer.parseInt(incField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getI18n().getString("incError.title"), getI18n().getString("incError.message"));
+              OptionPanel.error(getI18n(), "incError");
               return;
             }
             
@@ -420,13 +420,13 @@ public class SeekAction extends JinAction{
             try{
               minRating = Integer.parseInt(minRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getI18n().getString("minRatingError.title"), getI18n().getString("minRatingError.message"));
+                OptionPanel.error(getI18n(), "minRatingError");
                 return;
               }
             try{
               maxRating = Integer.parseInt(maxRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getI18n().getString("maxRatingError.title"), getI18n().getString("maxRatingError.message"));
+                OptionPanel.error(getI18n(), "maxRatingError");
                 return;
               }
           }

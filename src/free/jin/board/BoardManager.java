@@ -1248,26 +1248,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     if (boardPanel.isActive()){ // otherwise, the user is just closing a "dead" frame.
       Game game = boardPanel.getGame();
 
-      boolean shouldAsk = false;
-      String question = null;
-      String title = null;
-
-      if (game.getGameType() == Game.MY_GAME){
-        shouldAsk = true;
-        I18n i18n = getI18n();
-        if (game.isPlayed()){
-          question = i18n.getString("resignDialog.question");
-          title = i18n.getString("resignDialog.title");
-        }
-        else{
-          question = i18n.getString("unexamineDialog.question");
-          title = i18n.getString("unexamineDialog.title");
-        }
-      }
-
       Object result = OptionPanel.OK;
-      if (shouldAsk)
-        result = OptionPanel.confirm(boardPanel, title, question, OptionPanel.OK);
+      if (game.getGameType() == Game.MY_GAME)
+        result = OptionPanel.confirm(OptionPanel.OK, getI18n(), game.isPlayed() ? "resignDialog" : "unexamineDialog", boardPanel);
 
       if (result == OptionPanel.OK){
         getConn().quitGame(game);

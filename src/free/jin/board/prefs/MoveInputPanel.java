@@ -212,8 +212,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
           I18n i18n = getI18n();
-          OptionPanel.error(MoveInputPanel.this, i18n.getString("moveInAdvanceChangeError.title"),
-            i18n.getString("moveInAdvanceChangeError.message"));
+          OptionPanel.error(i18n, "moveInAdvanceChangeError", MoveInputPanel.this);
             
           disallowMoveInAdvance.setSelected(
             boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);

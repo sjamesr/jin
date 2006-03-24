@@ -21,8 +21,6 @@
 
 package free.jin;
 
-import java.text.MessageFormat;
-
 import free.jin.plugin.PluginStartException;
 import free.jin.ui.LoginPanel;
 import free.jin.ui.OptionPanel;
@@ -114,8 +112,7 @@ public class ConnectionManager{
       Server server = jin.getServerById(serverId);
       if (server == null){
         I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
-        OptionPanel.error(i18n.getString("unknownServerParam.title"),
-          MessageFormat.format(i18n.getString("unknownServerParam.message"), new Object[]{serverId}));
+        OptionPanel.error(i18n, "unknownServerParam", new Object[]{serverId});
       }
       else
         return server;
@@ -311,8 +308,7 @@ public class ConnectionManager{
   
   void loginFailed(String message){
     I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
-    String errorMessage = MessageFormat.format(i18n.getString("loginErrorDialog.message"), new Object[]{message});
-    OptionPanel.error(i18n.getString("loginErrorDialog.title"), errorMessage);
+    OptionPanel.error(i18n, "loginErrorDialog", new Object[]{message});
     
     // Reopen the connection UI
     User user = session.getUser();
@@ -347,12 +343,10 @@ public class ConnectionManager{
       if (!user.isGuest() && !Jin.getInstance().isKnownUser(user)){
         I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
         
-        String title = i18n.getString("rememberAccountDialog.title");
-        String message = MessageFormat.format(i18n.getString("rememberAccountDialog.message"), new Object[]{user.getUsername()});
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||
-          OptionPanel.question(title, message, OptionPanel.YES) == OptionPanel.YES;
-          
+          OptionPanel.YES == OptionPanel.question(OptionPanel.YES, i18n, "rememberAccountDialog", new Object[]{user.getUsername()});
+         
         if (rememberUser){
           Jin.getInstance().addUser(user);
           saveLastUser(user);

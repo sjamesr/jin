@@ -325,25 +325,11 @@ public class LoginPanel extends DialogPanel{
 
 
   /**
-   * Displays an error panel with the specified title and message. Helper
-   * function.
-   */
-
-  private void showError(String title, String message){
-    OptionPanel.error(this, title, message);
-  }
-  
-  
-  
-  /**
    * Shows an error regarding telling the user that the ports list he selected is invalid.
    */
   
   private void showIllegalPortsError(){
-    String title = i18n.getString("invalidPortsDialog.title");
-    String message = i18n.getString("invalidPortsDialog.message");
-    
-    showError(title, message);
+    OptionPanel.error(i18n, "invalidPortsDialog", this);
   }
   
   
@@ -397,7 +383,7 @@ public class LoginPanel extends DialogPanel{
         UsernamePolicy policy = server.getUsernamePolicy();
         String invalidityReason = policy.invalidityReason(username);
         if (invalidityReason != null){
-          showError(i18n.getString("invalidUsernameDialog.title"), invalidityReason);
+          OptionPanel.error(i18n.getString("invalidUsernameDialog.title"), invalidityReason, LoginPanel.this);
           return;
         }
 
