@@ -329,7 +329,7 @@ public class LoginPanel extends DialogPanel{
    */
   
   private void showIllegalPortsError(){
-    OptionPanel.error(i18n, "invalidPortsDialog", this);
+    i18n.error("invalidPortsDialog", this);
   }
   
   

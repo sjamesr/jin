@@ -24,7 +24,6 @@ package free.jin.ui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-import java.text.MessageFormat;
 
 import javax.swing.*;
 
@@ -208,33 +207,6 @@ public class OptionPanel extends DialogPanel{
   
   
   /**
-   * Obtains the title of the <code>OptionPanel</code> with the specified i18n key.
-   */
-  
-  private static String getTitle(I18n i18n, String i18nKey){
-    return i18n.getString(i18nKey + ".title");
-  }
-
-
-
-  /**
-   * Obtains the message of the <code>OptionPanel</code> with the specified i18n key.
-   * If <code>args</code> is not null, the value of the message is treated as a
-   * pattern and is formatted via <code>MessageFormat.format(message, args)</code>.
-   */
-  
-  private static String getMessage(I18n i18n, String i18nKey, Object [] args){
-    String message = i18n.getString(i18nKey + ".message");
-    
-    if (args != null)
-      message = MessageFormat.format(message, args);
-    
-    return message;
-  }
-  
-  
-  
-  /**
    * <p>Creates and shows an error panel with the specified arguments.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
@@ -257,67 +229,6 @@ public class OptionPanel extends DialogPanel{
   
   
   
-  /**
-   * <p>Creates and shows an error panel.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static void error(I18n i18n, String i18nKey, Object [] messageArgs, Component hintParent){
-    String title = getTitle(i18n, i18nKey);
-    String message = getMessage(i18n, i18nKey, messageArgs);
-    
-    error(title, message, hintParent);
-  }
-  
-  
-  
-  /**
-   * <p>Creates and shows an error panel.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static void error(I18n i18n, String i18nKey, Component hintParent){
-    error(i18n, i18nKey, null, hintParent);
-  }
- 
-
-  
-  /**
-   * <p>Creates and shows an error panel.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   */
-  
-  public static void error(I18n i18n, String i18nKey, Object [] messageArgs){
-    error(i18n, i18nKey, messageArgs, null);
-  }
-  
-  
-  
-  /**
-   * <p>Creates and shows an error panel.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   */
-  
-  public static void error(I18n i18n, String i18nKey){
-    error(i18n, i18nKey, null, null);
-  }
-  
-  
-
   /**
    * <p>Creates, displays a confirmation panel with the specified arguments and
    * returns the result value. Possible result values are {@link #OK} and
@@ -347,71 +258,6 @@ public class OptionPanel extends DialogPanel{
   
   
   /**
-   * <p>Creates, displays a confirmation panel and returns the result value.
-   * Possible result values are {@link #OK} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static Object confirm(Object defaultOption, I18n i18n, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getTitle(i18n, i18nKey);
-    String message = getMessage(i18n, i18nKey, messageArgs);
-    
-    return confirm(defaultOption, title, message, hintParent);
-  }
-  
-
-
-  /**
-   * <p>Creates, displays a confirmation panel and returns the result value.
-   * Possible result values are {@link #OK} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static Object confirm(Object defaultOption, I18n i18n, String i18nKey, Component hintParent){
-    return confirm(defaultOption, i18n, i18nKey, hintParent, null);
-  }
-  
-
-
-  /**
-   * <p>Creates, displays a confirmation panel and returns the result value.
-   * Possible result values are {@link #OK} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   */
-  
-  public static Object confirm(Object defaultOption, I18n i18n, String i18nKey, Object [] messageArgs){
-    return confirm(defaultOption, i18n, i18nKey, null, messageArgs);
-  }
-  
-  
-  
-  /**
-   * <p>Creates, displays a confirmation panel and returns the result value.
-   * Possible result values are {@link #OK} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   */
-  
-  public static Object confirm(Object defaultOption, I18n i18n, String i18nKey){
-    return confirm(defaultOption, i18n, i18nKey, null, null);
-  }
-  
-  
-  
-  /**
    * Creates, displays a yes/no question dialog with the specified arguments and
    * returns the result value. The possible result options are {@link #YES},
    * {@link #NO} and {@link #CANCEL}.
@@ -435,75 +281,6 @@ public class OptionPanel extends DialogPanel{
 
   public static Object question(String title, String message, Object defaultOption){
     return question(defaultOption, title, message, null);
-  }
-  
-  
-  
-  /**
-   * <p>Creates, displays a yes/no question dialog with the specified arguments and
-   * returns the result value. The possible result options are {@link #YES},
-   * {@link #NO} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static Object question(Object defaultOption, I18n i18n, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getTitle(i18n, i18nKey);
-    String message = getMessage(i18n, i18nKey, messageArgs);
-    
-    return question(defaultOption, title, message, hintParent);
-  }
-
-
-
-  /**
-   * <p>Creates, displays a yes/no question dialog with the specified arguments and
-   * returns the result value. The possible result options are {@link #YES},
-   * {@link #NO} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   * <p><code>hintParent</code> specifies the component over which the error
-   * message should be displayed. This is optional and may be <code>null</code>.
-   */
-  
-  public static Object question(Object defaultOption, I18n i18n, String i18nKey, Component hintParent){
-    return question(defaultOption, i18n, i18nKey, hintParent, null);
-  }
-  
-  
-  
-  /**
-   * <p>Creates, displays a yes/no question dialog with the specified arguments and
-   * returns the result value. The possible result options are {@link #YES},
-   * {@link #NO} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key. The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
-   */
-  
-  public static Object question(Object defaultOption, I18n i18n, String i18nKey, Object [] messageArgs){
-    return question(defaultOption, i18n, i18nKey, null, messageArgs);
-  }
-  
-  
-  
-  /**
-   * <p>Creates, displays a yes/no question dialog with the specified arguments and
-   * returns the result value. The possible result options are {@link #YES},
-   * {@link #NO} and {@link #CANCEL}.
-   * <p>The information required to display the panel (such as the title and 
-   * the message) is obtained from the specified <code>I18n</code> object,
-   * using the specified i18n key.
-   */
-  
-  public static Object question(Object defaultOption, I18n i18n, String i18nKey){
-    return question(defaultOption, i18n, i18nKey, null, null);
   }
   
   

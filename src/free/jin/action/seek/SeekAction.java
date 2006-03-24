@@ -39,7 +39,6 @@ import free.jin.UserSeek;
 import free.jin.action.ActionContext;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
-import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
 import free.util.TableLayout;
 import free.util.swing.IntegerStrictPlainDocument;
@@ -397,14 +396,14 @@ public class SeekAction extends JinAction{
           try{
             time = Integer.parseInt(timeField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getI18n(), "timeError");
+              getI18n().error("timeError");
               return;
             }
             
           try{
             inc = Integer.parseInt(incField.getText());
           } catch (NumberFormatException e){
-              OptionPanel.error(getI18n(), "incError");
+              getI18n().error("incError");
               return;
             }
             
@@ -420,13 +419,13 @@ public class SeekAction extends JinAction{
             try{
               minRating = Integer.parseInt(minRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getI18n(), "minRatingError");
+                getI18n().error("minRatingError");
                 return;
               }
             try{
               maxRating = Integer.parseInt(maxRatingField.getText());
             } catch (NumberFormatException e){
-                OptionPanel.error(getI18n(), "maxRatingError");
+                getI18n().error("maxRatingError");
                 return;
               }
           }

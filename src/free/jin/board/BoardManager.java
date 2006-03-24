@@ -1250,7 +1250,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
       Object result = OptionPanel.OK;
       if (game.getGameType() == Game.MY_GAME)
-        result = OptionPanel.confirm(OptionPanel.OK, getI18n(), game.isPlayed() ? "resignDialog" : "unexamineDialog", boardPanel);
+        result = getI18n().confirm(OptionPanel.OK, game.isPlayed() ? "resignDialog" : "unexamineDialog", boardPanel);
 
       if (result == OptionPanel.OK){
         getConn().quitGame(game);

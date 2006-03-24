@@ -112,7 +112,7 @@ public class ConnectionManager{
       Server server = jin.getServerById(serverId);
       if (server == null){
         I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
-        OptionPanel.error(i18n, "unknownServerParam", new Object[]{serverId});
+        i18n.error("unknownServerParam", new Object[]{serverId});
       }
       else
         return server;
@@ -308,7 +308,7 @@ public class ConnectionManager{
   
   void loginFailed(String message){
     I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
-    OptionPanel.error(i18n, "loginErrorDialog", new Object[]{message});
+    i18n.error("loginErrorDialog", new Object[]{message});
     
     // Reopen the connection UI
     User user = session.getUser();
@@ -345,7 +345,7 @@ public class ConnectionManager{
         
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||
-          OptionPanel.YES == OptionPanel.question(OptionPanel.YES, i18n, "rememberAccountDialog", new Object[]{user.getUsername()});
+          OptionPanel.YES == i18n.question(OptionPanel.YES, "rememberAccountDialog", new Object[]{user.getUsername()});
          
         if (rememberUser){
           Jin.getInstance().addUser(user);

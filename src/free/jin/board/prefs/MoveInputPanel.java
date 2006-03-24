@@ -33,7 +33,6 @@ import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
-import free.jin.ui.OptionPanel;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 
@@ -212,7 +211,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
           I18n i18n = getI18n();
-          OptionPanel.error(i18n, "moveInAdvanceChangeError", MoveInputPanel.this);
+          i18n.error("moveInAdvanceChangeError", MoveInputPanel.this);
             
           disallowMoveInAdvance.setSelected(
             boardManager.getMoveSendingMode() == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE);

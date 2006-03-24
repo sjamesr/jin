@@ -515,7 +515,7 @@ public class MdiUiProvider extends AbstractUiProvider{
         Object result = OptionPanel.OK;
         Session session = Jin.getInstance().getConnManager().getSession();
         if ((session != null) && session.isConnected())
-          result = OptionPanel.confirm(OptionPanel.OK, i18n, "closeConnectionConfirmationDialog");
+          result = i18n.confirm(OptionPanel.OK, "closeConnectionConfirmationDialog");
 
         if (result == OptionPanel.OK)
           connManager.closeSession();
