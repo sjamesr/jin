@@ -524,7 +524,7 @@ public class Jin{
    */
    
   public void quit(boolean askToConfirm){
-    I18n i18n = I18n.getInstance(Jin.class, getLocale());
+    I18n i18n = I18n.get(Jin.class);
     
     Object result = askToConfirm ? 
       i18n.confirm(OptionPanel.OK, "quitConfirmationDialog") : OptionPanel.OK;

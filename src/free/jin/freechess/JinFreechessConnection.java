@@ -1249,7 +1249,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected void warnVariantUnsupported(String variantName){
-    String message = I18n.getInstance(JinFreechessConnection.class, Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
+    String message = I18n.get(JinFreechessConnection.class).getString("unsupportedVariantMessage");
     String [] messageLines = message.split("\n");
     
     Object [] messageFormatArgs = new Object[]{variantName};

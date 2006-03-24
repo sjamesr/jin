@@ -48,7 +48,7 @@ public class LoginPanel extends DialogPanel{
    * The <code>I18n</code> for this login panel.
    */
   
-  private final I18n i18n = I18n.getInstance(getClass(), LoginPanel.class, Jin.getInstance().getLocale());
+  private final I18n i18n = I18n.get(getClass(), LoginPanel.class);
   
   
   

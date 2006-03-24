@@ -133,7 +133,7 @@ public class MdiUiProvider extends AbstractUiProvider{
   public void start(){
     super.start();
     
-    i18n = I18n.getInstance(MdiUiProvider.class, Jin.getInstance().getLocale());
+    i18n = I18n.get(MdiUiProvider.class);
     mainFrame = createMainFrame();
     restoreFrameGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.",
         new RectDouble(1d/16, 1d/16, 7d/8, 7d/8));

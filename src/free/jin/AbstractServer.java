@@ -104,7 +104,7 @@ public abstract class AbstractServer implements Server{
   
   public I18n getI18n(){
     if (i18n == null)
-      i18n = I18n.getInstance(getClass(), AbstractServer.class, Jin.getInstance().getLocale());
+      i18n = I18n.get(getClass(), AbstractServer.class);
     
     return i18n; 
   }

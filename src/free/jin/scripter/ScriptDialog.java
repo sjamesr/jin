@@ -30,7 +30,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import free.jin.I18n;
-import free.jin.Jin;
 import free.util.AWTUtilities;
 import free.util.NamedObject;
 import free.util.TableLayout;
@@ -54,7 +53,7 @@ abstract class ScriptDialog extends JDialog{
    * The <code>I18n</code> for this <code>ScriptDialog</code>.
    */
   
-  protected final I18n i18n = I18n.getInstance(getClass(), ScriptDialog.class, Jin.getInstance().getLocale());
+  protected final I18n i18n = I18n.get(getClass(), ScriptDialog.class);
 
 
 

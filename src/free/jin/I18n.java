@@ -72,29 +72,31 @@ public class I18n{
   
   
   /**
-   * Returns an <code>I18n</code> object for the specified class and locale.
+   * Returns an <code>I18n</code> object for the specified class and the current Jin locale.
    */
   
-  public static I18n getInstance(Class requestingClass, Locale locale){
-    return new I18n(requestingClass, locale);
+  public static I18n get(Class requestingClass){
+    return new I18n(requestingClass, Jin.getInstance().getLocale());
   }
   
   
   
   /**
-   * Returns an <code>I18n</code> object for the specified class
-   * and locale and with a parent created for its superclass and the same
+   * Returns an <code>I18n</code> object for the specified class,
+   * current Jin locale and with a parent created for its superclass and the same
    * locale. The parent also has a parent created for the superclass'
    * superclass and so on recursively, until (and including) the specified
    * base class. 
    */
   
-  public static I18n getInstance(Class requestingClass, Class baseClass, Locale locale){
+  public static I18n get(Class requestingClass, Class baseClass){
+    Locale locale = Jin.getInstance().getLocale();
+    
     if (requestingClass.equals(baseClass))
       return new I18n(requestingClass, locale);
     
     return new I18n(requestingClass, locale,
-        getInstance(requestingClass.getSuperclass(), baseClass, locale));
+        get(requestingClass.getSuperclass(), baseClass));
   }
   
   

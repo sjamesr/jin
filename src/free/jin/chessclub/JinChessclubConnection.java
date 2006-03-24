@@ -456,7 +456,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (variantName == null)
       variantName = "w" + variantNumber;
     
-    String message = I18n.getInstance(JinChessclubConnection.class, Jin.getInstance().getLocale()).getString("unsupportedVariantMessage");
+    String message = I18n.get(JinChessclubConnection.class).getString("unsupportedVariantMessage");
     String [] messageLines = message.split("\n");
     
     Object [] messageFormatArgs = new Object[]{variantName};
@@ -2981,7 +2981,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected String getEndExplanationString(int status, int mode, boolean isWhite){
-    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(getClass());
     
     String white = i18n.getString("whitePlayer");
     String black = i18n.getString("blackPlayer");
@@ -3007,7 +3007,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected String getAdjournmentReason(int mode, String actor){
-    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(getClass());
     
     
     try{

@@ -28,7 +28,6 @@ import java.awt.FlowLayout;
 import javax.swing.*;
 
 import free.jin.I18n;
-import free.jin.Jin;
 import free.util.TextUtilities;
 import free.util.Utilities;
 
@@ -328,7 +327,7 @@ public class OptionPanel extends DialogPanel{
    */
 
   private void createUI(){
-    I18n i18n = I18n.getInstance(OptionPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(OptionPanel.class);
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 2));
     buttonPanel.setOpaque(false);
 

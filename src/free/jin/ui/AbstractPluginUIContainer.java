@@ -322,7 +322,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
     Object result = OptionPanel.OK;
     Session session = Jin.getInstance().getConnManager().getSession();
     if ((session != null) && session.isConnected()){
-      I18n i18n = I18n.getInstance(AbstractPluginUIContainer.class, Jin.getInstance().getLocale());
+      I18n i18n = I18n.get(AbstractPluginUIContainer.class);
       result = i18n.confirm(OptionPanel.OK, "closeSessionDialog", hintParent);
     }
 

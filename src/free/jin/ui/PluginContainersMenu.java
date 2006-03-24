@@ -31,7 +31,6 @@ import java.util.Vector;
 import javax.swing.*;
 
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.plugin.PluginUIListener;
@@ -51,7 +50,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Act
    * The <code>I18n</code> for this object.
    */
   
-  private final I18n i18n = I18n.getInstance(PluginContainersMenu.class, Jin.getInstance().getLocale());
+  private final I18n i18n = I18n.get(PluginContainersMenu.class);
   
   
   

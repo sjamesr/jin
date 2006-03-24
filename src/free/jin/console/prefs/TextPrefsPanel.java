@@ -32,7 +32,6 @@ import java.util.StringTokenizer;
 import java.util.Enumeration;
 import free.util.swing.ColorChooser;
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
@@ -124,7 +123,7 @@ public class TextPrefsPanel extends PreferencesPanel{
 
   public TextPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
-    this.i18n = I18n.getInstance(getClass(), TextPrefsPanel.class, Jin.getInstance().getLocale());
+    this.i18n = I18n.get(getClass(), TextPrefsPanel.class);
 
     prefs = Preferences.createBackedUp(Preferences.createNew(), consoleManager.getPrefs());
 

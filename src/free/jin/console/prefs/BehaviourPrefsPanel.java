@@ -29,7 +29,6 @@ import javax.swing.*;
 import free.jin.BadChangesException;
 import free.jin.GameListConnection;
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
 import free.util.swing.PreferredSizedPanel;
@@ -101,7 +100,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
   public BehaviourPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
     
-    this.i18n = I18n.getInstance(getClass(), BehaviourPrefsPanel.class, Jin.getInstance().getLocale());
+    this.i18n = I18n.get(getClass(), BehaviourPrefsPanel.class);
     
     if (consoleManager.getConn() instanceof GameListConnection){
       embeddedGameLists = i18n.createRadioButton("embeddedGameListsRadioButton");

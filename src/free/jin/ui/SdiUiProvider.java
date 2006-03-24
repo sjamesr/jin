@@ -214,7 +214,7 @@ public class SdiUiProvider extends AbstractUiProvider{
 
       this.menubar = new JMenuBar();
       
-      I18n i18n = I18n.getInstance(SdiUiProvider.class, Jin.getInstance().getLocale());
+      I18n i18n = I18n.get(SdiUiProvider.class);
       
       PluginContainersMenu windowsMenu = new PluginContainersMenu();
       windowsMenu.setText(i18n.getString("sdiUiProvider.windowsMenu.text"));

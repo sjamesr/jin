@@ -111,7 +111,7 @@ public class ConnectionManager{
     if (serverId != null){
       Server server = jin.getServerById(serverId);
       if (server == null){
-        I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+        I18n i18n = I18n.get(getClass());
         i18n.error("unknownServerParam", new Object[]{serverId});
       }
       else
@@ -307,7 +307,7 @@ public class ConnectionManager{
    */
   
   void loginFailed(String message){
-    I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(getClass());
     i18n.error("loginErrorDialog", new Object[]{message});
     
     // Reopen the connection UI
@@ -341,7 +341,7 @@ public class ConnectionManager{
 
       // Add the user to the known users list
       if (!user.isGuest() && !Jin.getInstance().isKnownUser(user)){
-        I18n i18n = I18n.getInstance(getClass(), Jin.getInstance().getLocale());
+        I18n i18n = I18n.get(getClass());
         
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||

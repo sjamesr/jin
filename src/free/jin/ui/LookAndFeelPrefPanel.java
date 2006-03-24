@@ -173,7 +173,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
   public void applyChanges() throws BadChangesException{
     LnF lnf = (LnF)lookAndFeels.getSelectedValue();
     if (lnf == null){
-      I18n i18n = I18n.getInstance(LookAndFeelPrefPanel.class, Jin.getInstance().getLocale());
+      I18n i18n = I18n.get(LookAndFeelPrefPanel.class);
       throw new BadChangesException(i18n.getString("noLookNFeelSelectedErrorMessage"), this);
     }
     

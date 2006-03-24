@@ -81,7 +81,7 @@ public class ServerChoicePanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return I18n.getInstance(ServerChoicePanel.class, Jin.getInstance().getLocale()).getString("serverChoicePanel.title");
+    return I18n.get(ServerChoicePanel.class).getString("serverChoicePanel.title");
   }
 
 
@@ -91,7 +91,7 @@ public class ServerChoicePanel extends DialogPanel{
    */
 
   private void createUI(){
-    I18n i18n = I18n.getInstance(ServerChoicePanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(ServerChoicePanel.class);
     
     final JList list = new JList(serverListModel);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

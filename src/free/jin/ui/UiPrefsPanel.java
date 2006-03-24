@@ -27,7 +27,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
 import free.jin.I18n;
-import free.jin.Jin;
 
 
 
@@ -44,7 +43,7 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
    */
   
   public UiPrefsPanel(){
-    I18n i18n = I18n.getInstance(UiPrefsPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(UiPrefsPanel.class);
     
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     

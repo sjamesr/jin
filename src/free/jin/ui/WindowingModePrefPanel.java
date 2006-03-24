@@ -64,7 +64,7 @@ public class WindowingModePrefPanel extends PreferencesPanel{
    */
   
   public WindowingModePrefPanel(){
-    I18n i18n = I18n.getInstance(WindowingModePrefPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(WindowingModePrefPanel.class);
     
     String pref = Jin.getInstance().getPrefs().getString("uiProvider.classname");
     

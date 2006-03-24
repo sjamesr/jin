@@ -31,7 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
 
@@ -69,7 +68,7 @@ public class ConsolePrefsPanel extends PreferencesPanel{
     this.textPrefsPanel = createTextPrefsPanel(consoleManager);
     this.behaviourPrefsPanel = createBehaviourPrefsPanel(consoleManager);
     
-    I18n i18n = I18n.getInstance(getClass(), ConsolePrefsPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(getClass(), ConsolePrefsPanel.class);
     
     ChangeListener changeListener = new ChangeListener(){
       public void stateChanged(ChangeEvent evt){

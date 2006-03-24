@@ -57,7 +57,7 @@ public class GameListTableModel implements TableModel{
    */
 
   public GameListTableModel(GameListEvent evt){
-    I18n i18n = I18n.getInstance(GameListTableModel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(GameListTableModel.class);
     int id = evt.getID();
     int itemCount = evt.getItemCount();
     

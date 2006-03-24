@@ -29,7 +29,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import free.jin.I18n;
-import free.jin.Jin;
 import free.util.swing.ColorChooser;
 import free.util.swing.FontSelectorPanel;
 
@@ -98,7 +97,7 @@ public class TextStyleChooserPanel extends JPanel{
   public TextStyleChooserPanel(Font initialFont, Color initForegroundColor, Color initBackgroundColor,
       final boolean initAntialiasingValue, boolean allowBackgroundSelection, boolean allowAntialiasingSelection){
     
-    I18n i18n = I18n.getInstance(getClass(), TextStyleChooserPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(getClass(), TextStyleChooserPanel.class);
     
     String antialiasOptionName = i18n.getString("antialiasOptionName");
     int antialiasOptionMnemonicIndex = i18n.getInt("antialiasOptionDisplayedMnemonicIndex");

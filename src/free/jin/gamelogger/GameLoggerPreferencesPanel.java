@@ -40,7 +40,6 @@ import javax.swing.text.JTextComponent;
 import bsh.EvalError;
 import free.jin.BadChangesException;
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.ui.PreferencesPanel;
 import free.util.AWTUtilities;
@@ -708,7 +707,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
 
     public void actionPerformed(ActionEvent evt){
-      I18n i18n = I18n.getInstance(GameLoggerPreferencesPanel.class, Jin.getInstance().getLocale());
+      I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
       
       File currentFile = new File(textfield.getText());
       File currentDir = null;

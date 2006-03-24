@@ -45,7 +45,7 @@ public class HelpMenu extends JMenu{
    * The <code>I18n</code> for this object.
    */
   
-  private final I18n i18n = I18n.getInstance(HelpMenu.class, Jin.getInstance().getLocale());
+  private final I18n i18n = I18n.get(HelpMenu.class);
   
   
   

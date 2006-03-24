@@ -33,7 +33,6 @@ import javax.swing.event.ListSelectionListener;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
-import free.jin.Jin;
 import free.jin.ui.PreferencesPanel;
 import free.util.AWTUtilities;
 import free.util.Utilities;
@@ -79,7 +78,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    */
 
   public ScripterPreferencesPanel(Scripter scripter){
-    this.i18n = I18n.getInstance(ScripterPreferencesPanel.class, Jin.getInstance().getLocale());
+    this.i18n = I18n.get(ScripterPreferencesPanel.class);
     this.scripter = scripter;
 
     Script [] scripts = scripter.getScripts();

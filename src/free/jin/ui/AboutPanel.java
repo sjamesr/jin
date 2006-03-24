@@ -56,7 +56,7 @@ public class AboutPanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    I18n i18n = I18n.getInstance(AboutPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(AboutPanel.class);
     String appName = Jin.getInstance().getAppName();
     return MessageFormat.format(i18n.getString("aboutDialog.title"), new Object[]{appName});
   }
@@ -78,7 +78,7 @@ public class AboutPanel extends DialogPanel{
    */
 
   private void createUI(){
-    I18n i18n = I18n.getInstance(AboutPanel.class, Jin.getInstance().getLocale());
+    I18n i18n = I18n.get(AboutPanel.class);
     
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     

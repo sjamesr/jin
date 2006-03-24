@@ -56,7 +56,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
    * The <code>I18n</code> for this object.
    */
   
-  private final I18n i18n = I18n.getInstance(PrefsMenu.class, Jin.getInstance().getLocale());
+  private final I18n i18n = I18n.get(PrefsMenu.class);
   
   
   
