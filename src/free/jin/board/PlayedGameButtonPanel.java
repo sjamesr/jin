@@ -315,7 +315,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   /**
    * Creates a new PlayedGameButtonPanel. It will be used by the given Plugin
    * for the given Game. The given parent Component determines over which component
-   * JOptionPane dialogs will be displayed.
+   * confirmation dialogs will be displayed.
    */
 
   public PlayedGameButtonPanel(Plugin plugin, Game game, Component parentComponent){
