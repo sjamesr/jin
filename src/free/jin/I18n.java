@@ -40,6 +40,14 @@ public class I18n{
   
   
   /**
+   * The name of the class whose information we translate. 
+   */
+  
+  private final String className;
+  
+  
+  
+  /**
    * The parent <code>I18n</code> object, which is consulted if the delegate
    * does not have a translation for the requested key.
    */
@@ -60,6 +68,7 @@ public class I18n{
     } catch (MissingResourceException e){}
     
     this.delegate = delegate;
+    this.className = Utilities.getClassName(requestingClass);
     this.parent = parent;
   }
   
@@ -128,7 +137,7 @@ public class I18n{
         throw new MissingResourceException("Can't find resource for bundle " + getClass().getName() + ", key " + key,
             getClass().getName(), key);
       else
-        return delegate.getString(key);
+        return delegate.getString(className + "." + key);
     } catch (MissingResourceException e){
         if (parent == null)
           throw e;
