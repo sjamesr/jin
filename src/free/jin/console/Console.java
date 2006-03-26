@@ -160,13 +160,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
 
-
   /**
    * A history of people who have told us anything.
    */
 
   private final Vector tellers = new Vector();
-
 
 
 
@@ -179,7 +177,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
 
-
   /**
    * Whether the runnable that is supposed to scroll the scrollpane to the
    * bottom already executed. See {@see #addToOutput(String, String)}
@@ -187,8 +184,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   private boolean didScrollToBottom = true;
-
-
 
 
 
@@ -222,17 +217,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   
   
   /**
-   * Returns the <code>I18n</code> for this <code>Console</code> (for the
-   * benefit of its components, like the textfield and textpane).
-   */
-  
-  public I18n getI18n(){
-    return consoleManager.getI18n();
-  }
-  
-  
-  
-  /**
    * An action listener which clears the console.
    */
   
@@ -249,7 +233,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private void createUI(){
-    JButton clearButton = getI18n().createButton("clearConsoleButton");
+    JButton clearButton = I18n.get(Console.class).createButton("clearConsoleButton");
     clearButton.addActionListener(clearingActionListener);
     clearButton.setRequestFocusEnabled(false);
     
@@ -275,7 +259,16 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   public Preferences getPrefs(){
     return prefs;
   }
-
+  
+  
+  
+  /**
+   * Returns the <code>ConsoleManager</code> a part of which we are.
+   */
+  
+  public ConsoleManager getConsoleManager(){
+    return consoleManager;
+  }
 
 
 
@@ -287,7 +280,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   protected ConsoleTextPane createOutputComponent(){
     return new ConsoleTextPane(this);
   }
-
 
 
 
@@ -850,7 +842,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     }
     else{
       String message = 
-        MessageFormat.format(getI18n().getString("unknownSpecialCommandMessage"), new Object[]{command});
+        MessageFormat.format(I18n.get(Console.class).getString("unknownSpecialCommandMessage"), new Object[]{command});
       addToOutput(message, "system");
     }
   }
@@ -876,10 +868,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       if (conn.isConnected())
         conn.sendCommand(commandString);
       else
-        addToOutput(getI18n().getString("unconnectedWarningMessage"), "info");
+        addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
     }
   }
-
 
 
 
