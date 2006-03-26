@@ -29,6 +29,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
+import free.jin.I18n;
 import free.jin.Preferences;
 import free.workarounds.FixUtils;
 import free.workarounds.FixedJTextField;
@@ -436,9 +437,11 @@ public class ConsoleTextField extends FixedJTextField{
    */
    
   protected JPopupMenu createPopup(){
-    cut = new JMenuItem(console.getI18n().getString("cutMenuItemLabel"));
-    copy = new JMenuItem(console.getI18n().getString("copyMenuItemLabel"));
-    paste = new JMenuItem(console.getI18n().getString("pasteMenuItemLabel"));
+    I18n i18n = I18n.get(ConsoleTextField.class);
+    
+    cut = new JMenuItem(i18n.getString("cutMenuItemLabel"));
+    copy = new JMenuItem(i18n.getString("copyMenuItemLabel"));
+    paste = new JMenuItem(i18n.getString("pasteMenuItemLabel"));
     
     ActionListener popupListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
