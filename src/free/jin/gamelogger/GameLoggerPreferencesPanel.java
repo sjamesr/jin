@@ -193,7 +193,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   protected void createUI(){
-    I18n i18n = gameLogger.getI18n();
+    I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
     
     int loggingMode = gameLogger.getLoggingMode();
     String allGamesLogFile = gameLogger.getLogFileForAll();
@@ -350,7 +350,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
               return;
             }
         }
-        rulesListModel.addElement(gameLogger.getI18n().getString("initialNewGameLoggingRuleName"));
+        rulesListModel.addElement(I18n.get(GameLoggerPreferencesPanel.class).getString("initialNewGameLoggingRuleName"));
         loggingRulesList.setSelectedIndex(rulesListModel.size() - 1);
 
         rulenameField.setText("");
@@ -441,7 +441,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         if (selectedItem instanceof String){
           String text = rulenameField.getText();
           if (text.length() == 0)
-            rulesListModel.setElementAt(gameLogger.getI18n().getString("initialNewGameLoggingRuleName"), loggingRulesList.getSelectedIndex());
+            rulesListModel.setElementAt(I18n.get(GameLoggerPreferencesPanel.class).getString("initialNewGameLoggingRuleName"), loggingRulesList.getSelectedIndex());
           else
             rulesListModel.setElementAt(text, loggingRulesList.getSelectedIndex());
         }
@@ -564,7 +564,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private void updateRuleFromUI(int ruleIndex) throws BadChangesException{
-    I18n i18n = gameLogger.getI18n();
+    I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
     
     DefaultListModel rulesModel = (DefaultListModel)loggingRulesList.getModel();
     Object item = rulesModel.getElementAt(ruleIndex);
@@ -634,7 +634,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
     String allGamesLogFile = allGamesLogFileField.getText();
     if ("all".equals(loggingModeString) && ((allGamesLogFile == null) || (allGamesLogFile.length() == 0)))
-      throw new BadChangesException(gameLogger.getI18n().getString("fileNameUnspecifiedErrorMessage"), 
+      throw new BadChangesException(
+        I18n.get(GameLoggerPreferencesPanel.class).getString("fileNameUnspecifiedErrorMessage"), 
         allGamesLogFileField);
 
     prefs.setString("logging.mode", loggingModeString);
