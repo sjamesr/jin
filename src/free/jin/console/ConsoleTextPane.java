@@ -344,7 +344,10 @@ public class ConsoleTextPane extends FixedJTextPane{
   
   protected JPopupMenu createPopupMenu(){
     Preferences prefs = console.getPrefs();
-    I18n i18n = console.getI18n();
+    
+    // We need this one because the categories (and thus the localization)
+    // are defined in a server specified package
+    I18n consoleManagerI18n = console.getConsoleManager().getI18n();
     
     String popupPrefix = "consolePopup.";
     int itemCount = prefs.getInt(popupPrefix + "itemCount", 0);
@@ -358,7 +361,7 @@ public class ConsoleTextPane extends FixedJTextPane{
       
       String itemType = prefs.getString(itemPrefix + "type", "serverCommand");
       String labelKey = prefs.getString(itemPrefix + "labelKey", null);
-      String label = labelKey == null ? null : i18n.getString(labelKey);
+      String label = labelKey == null ? null : consoleManagerI18n.getString(labelKey);
       
       if ("serverCommand".equals(itemType)){
         String command = prefs.getString(itemPrefix + "command");

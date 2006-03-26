@@ -132,7 +132,7 @@ public class GameListTable extends FixedJTable{
    */
 
   protected JPopupMenu createPopup(){
-    I18n i18n = console.getI18n();
+    I18n consoleManagerI18n = console.getConsoleManager().getI18n();
     
     int numSelectedRows = getSelectedRowCount();
     if (numSelectedRows == 0)
@@ -157,7 +157,7 @@ public class GameListTable extends FixedJTable{
       if ("serverCommand".equals(itemType)){
         String command = prefs.getString(itemPrefix + "command");
         String commandNameKey = prefs.getString(itemPrefix + "nameKey");
-        String commandName = i18n.getString(commandNameKey);
+        String commandName = consoleManagerI18n.getString(commandNameKey);
         
         boolean isMultiSupported =
           prefs.getBool(itemPrefix + "multiSelectSupported", true);
