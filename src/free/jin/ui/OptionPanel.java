@@ -336,7 +336,7 @@ public class OptionPanel extends DialogPanel{
         continue;
 
       Object option = OPTION_ORDER[i];
-      JButton button = new JButton(i18n.getString("optionPanel." + option.toString() + ".text"));
+      JButton button = new JButton(i18n.getString(option.toString() + ".text"));
       button.addActionListener(new ClosingListener(option));
       if (option == defaultOption)
         setDefaultButton(button);

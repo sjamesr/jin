@@ -217,8 +217,8 @@ public class SdiUiProvider extends AbstractUiProvider{
       I18n i18n = I18n.get(SdiUiProvider.class);
       
       PluginContainersMenu windowsMenu = new PluginContainersMenu();
-      windowsMenu.setText(i18n.getString("sdiUiProvider.windowsMenu.text"));
-      windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("sdiUiProvider.windowsMenu.displayedMnemonicIndex"));
+      windowsMenu.setText(i18n.getString("windowsMenu.text"));
+      windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("windowsMenu.displayedMnemonicIndex"));
       addPluginUIContainerCreationListener(windowsMenu);
       
       ActionsMenu actionsMenu = new ActionsMenu();

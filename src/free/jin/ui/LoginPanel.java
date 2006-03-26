@@ -21,19 +21,24 @@
 
 package free.jin.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 import javax.swing.*;
-import java.awt.*;
 
 import free.jin.*;
-import free.util.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.StringTokenizer;
-import javax.swing.border.TitledBorder;
-import free.workarounds.FixedJTextField;
-import free.workarounds.FixedJPasswordField;
+import free.util.BrowserControl;
+import free.util.StringEncoder;
+import free.util.Utilities;
 import free.workarounds.FixedJComboBox;
-import java.util.Vector;
+import free.workarounds.FixedJPasswordField;
+import free.workarounds.FixedJTextField;
 
 
 /**
@@ -319,7 +324,7 @@ public class LoginPanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return i18n.getString("loginPanel.title");
+    return i18n.getString("title");
   }
 
 
@@ -448,7 +453,7 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    JButton cancelButton = i18n.createButton("loginPanel.cancelButton");
+    JButton cancelButton = i18n.createButton("cancelButton");
     cancelButton.setDefaultCapable(false);
     cancelButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
@@ -515,10 +520,10 @@ public class LoginPanel extends DialogPanel{
    */
    
   private Component createServerUserPanel(JComboBox serverBox, JComboBox userBox){
-    JLabel serverLabel = i18n.createLabel("loginPanel.serverLabel");
+    JLabel serverLabel = i18n.createLabel("serverLabel");
     serverLabel.setLabelFor(serverBox);
     
-    JLabel userLabel = i18n.createLabel("loginPanel.accountLabel");
+    JLabel userLabel = i18n.createLabel("accountLabel");
     userLabel.setLabelFor(userBox);
     
     Box inPanel = Box.createHorizontalBox();
@@ -560,7 +565,7 @@ public class LoginPanel extends DialogPanel{
 
     JPanel outerPanel = new JPanel(new BorderLayout());
     outerPanel.add(hpanel,BorderLayout.CENTER);
-    outerPanel.setBorder(new TitledBorder(i18n.getString("guestsBorderTitle")));
+    outerPanel.setBorder(i18n.createTitledBorder("guestsBorder"));
 
     return outerPanel;
   }
@@ -572,7 +577,7 @@ public class LoginPanel extends DialogPanel{
    */
 
   private Component createAdvancedPanel(JComboBox hostnameBox, JTextField portsField){
-    JLabel hostnameLabel = i18n.createLabel("loginPanel.hostnameLabel");
+    JLabel hostnameLabel = i18n.createLabel("hostnameLabel");
 
     Box hostnamePanel = new Box(BoxLayout.X_AXIS);
 
@@ -591,7 +596,7 @@ public class LoginPanel extends DialogPanel{
 
     portPanel.add(portsField);
     portPanel.add(Box.createHorizontalStrut(10));
-    JLabel portLabel = i18n.createLabel("loginPanel.portsLabel");
+    JLabel portLabel = i18n.createLabel("portsLabel");
     portLabel.setLabelFor(portsField);
     portPanel.add(portLabel);
     portPanel.add(Box.createHorizontalGlue());
@@ -609,7 +614,7 @@ public class LoginPanel extends DialogPanel{
     hpanel.add(Box.createHorizontalStrut(10));
 
     JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(new TitledBorder(i18n.getString("advancedOptionsBorderTitle")));
+    outerPanel.setBorder(i18n.createTitledBorder("advancedOptionsBorder"));
     outerPanel.add(hpanel, BorderLayout.CENTER);
 
     return outerPanel;
@@ -629,7 +634,7 @@ public class LoginPanel extends DialogPanel{
     usernameField.setPreferredSize(new Dimension(130, 20));
     usernamePanel.add(usernameField);
     usernamePanel.add(Box.createHorizontalStrut(10));
-    JLabel handleLabel = i18n.createLabel("loginPanel.handleLabel");
+    JLabel handleLabel = i18n.createLabel("handleLabel");
     handleLabel.setLabelFor(usernameField);
     usernamePanel.add(handleLabel);
     usernamePanel.add(Box.createHorizontalGlue());
@@ -641,7 +646,7 @@ public class LoginPanel extends DialogPanel{
     passwordField.setPreferredSize(new Dimension(130, 20));
     passwordInputPanel.add(passwordField);
     passwordInputPanel.add(Box.createHorizontalStrut(10));
-    JLabel passwordLabel = i18n.createLabel("loginPanel.passwordLabel");
+    JLabel passwordLabel = i18n.createLabel("passwordLabel");
     passwordLabel.setLabelFor(passwordField);
     passwordInputPanel.add(passwordLabel);
     passwordInputPanel.add(Box.createHorizontalGlue());
@@ -695,7 +700,7 @@ public class LoginPanel extends DialogPanel{
 
 
     JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(new TitledBorder(i18n.getString("membersBorderTitle")));
+    outerPanel.setBorder(i18n.createTitledBorder("membersBorder"));
     outerPanel.add(hpanel,BorderLayout.CENTER);
 
     return outerPanel;

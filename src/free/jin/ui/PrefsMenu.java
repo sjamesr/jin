@@ -92,8 +92,8 @@ public class PrefsMenu extends JMenu implements SessionListener{
   public PrefsMenu(){
     I18n i18n = I18n.get(PrefsMenu.class);
     
-    setText(i18n.getString("preferencesMenu.text"));
-    setDisplayedMnemonicIndex(i18n.getInt("preferencesMenu.displayedMnemonicIndex"));
+    setText(i18n.getString("text"));
+    setDisplayedMnemonicIndex(i18n.getInt("displayedMnemonicIndex"));
 
     add(lnfMenu = i18n.createMenuItem("userInterfaceMenuItem"));
     lnfMenu.addActionListener(new ActionListener(){

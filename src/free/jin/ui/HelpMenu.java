@@ -47,8 +47,8 @@ public class HelpMenu extends JMenu{
   public HelpMenu(){
     I18n i18n = I18n.get(HelpMenu.class);
     
-    setText(i18n.getString("helpMenu.text"));
-    setDisplayedMnemonicIndex(i18n.getInt("helpMenu.displayedMnemonicIndex"));
+    setText(i18n.getString("text"));
+    setDisplayedMnemonicIndex(i18n.getInt("displayedMnemonicIndex"));
 
     add(createWebsiteMenuItem());
     add(createCreditsMenuItem());

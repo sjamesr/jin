@@ -137,8 +137,8 @@ public class MdiUiProvider extends AbstractUiProvider{
     mainFrame.setJMenuBar(menubar);
 
     windowsMenu = new PluginContainersMenu();
-    windowsMenu.setText(i18n.getString("mdiUiProvider.windowsMenu.text"));
-    windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("mdiUiProvider.windowsMenu.displayedMnemonicIndex"));
+    windowsMenu.setText(i18n.getString("windowsMenu.text"));
+    windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("windowsMenu.displayedMnemonicIndex"));
     addPluginUIContainerCreationListener(windowsMenu);
     
     actionsMenu = new ActionsMenu();
@@ -263,7 +263,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     Session session = evt.getSession();
     
-    String mainFrameTitle = I18n.get(MdiUiProvider.class).getString("mdiUiProvider.mainFrame.title");
+    String mainFrameTitle = I18n.get(MdiUiProvider.class).getString("mainFrame.title");
     String username = session.getUser().getUsername();
     String serverName = session.getServer().getShortName();
     String appName = Jin.getInstance().getAppName();

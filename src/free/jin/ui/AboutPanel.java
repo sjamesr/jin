@@ -58,7 +58,7 @@ public class AboutPanel extends DialogPanel{
   protected String getTitle(){
     I18n i18n = I18n.get(AboutPanel.class);
     String appName = Jin.getInstance().getAppName();
-    return MessageFormat.format(i18n.getString("aboutDialog.title"), new Object[]{appName});
+    return MessageFormat.format(i18n.getString("title"), new Object[]{appName});
   }
 
 
@@ -120,7 +120,7 @@ public class AboutPanel extends DialogPanel{
 
     add(Box.createVerticalStrut(10));
 
-    JButton closeButton = i18n.createButton("aboutDialog.closeButton");
+    JButton closeButton = i18n.createButton("closeButton");
     closeButton.addActionListener(new ClosingListener(null));
     closeButton.setAlignmentX(CENTER_ALIGNMENT);
     add(closeButton);

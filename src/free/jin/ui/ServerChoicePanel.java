@@ -81,7 +81,7 @@ public class ServerChoicePanel extends DialogPanel{
    */
 
   protected String getTitle(){
-    return I18n.get(ServerChoicePanel.class).getString("serverChoicePanel.title");
+    return I18n.get(ServerChoicePanel.class).getString("title");
   }
 
 
@@ -104,9 +104,9 @@ public class ServerChoicePanel extends DialogPanel{
     JLabel chooseLabel = i18n.createLabel("chooseServerLabel");
     chooseLabel.setLabelFor(list);
 
-    final JButton okButton = i18n.createButton("serverChoicePanel.okButton");
-    JButton cancelButton = i18n.createButton("serverChoicePanel.cancelButton");
-    final JButton showWebsiteButton = i18n.createButton("serverChoicePanel.serverWebsiteButton");
+    final JButton okButton = i18n.createButton("okButton");
+    JButton cancelButton = i18n.createButton("cancelButton");
+    final JButton showWebsiteButton = i18n.createButton("serverWebsiteButton");
 
     okButton.setEnabled(false);
     showWebsiteButton.setEnabled(false);
