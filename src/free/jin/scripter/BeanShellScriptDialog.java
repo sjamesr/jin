@@ -58,7 +58,7 @@ class BeanShellScriptDialog extends ScriptDialog{
   public BeanShellScriptDialog(Component parent, Scripter scripter, BeanShellScript templateScript){
     super(parent, "", scripter, templateScript);
     
-    setTitle(I18n.get(BeanShellScriptDialog.class).getString("beanshellScriptDialog.title"));
+    setTitle(I18n.get(BeanShellScriptDialog.class).getString("title"));
     
     createUI();
   }
@@ -84,18 +84,18 @@ class BeanShellScriptDialog extends ScriptDialog{
     codeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     codeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-    JLabel codeLabel = i18n.createLabel("beanshellCodeLabel");
+    JLabel codeLabel = i18n.createLabel("codeLabel");
 
     codeLabel.setLabelFor(codeArea);
     codeLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-    JButton codeHelp = i18n.createButton("beanshellHelpButton");
+    JButton codeHelp = i18n.createButton("helpButton");
     codeHelp.setDefaultCapable(false);
 
     codeHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(BeanShellScriptDialog.class);
-        i18n.showPlainTextDialog("beanshellHelpDialog", BeanShellScriptDialog.this);
+        i18n.showPlainTextDialog("helpDialog", BeanShellScriptDialog.this);
       }
     });
 
@@ -126,7 +126,7 @@ class BeanShellScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        I18n.get(BeanShellScriptDialog.class).error("beanshellMalformedScriptDialog", this, new Object[]{e.getErrorText()});
+        I18n.get(BeanShellScriptDialog.class).error("malformedScriptDialog", this, new Object[]{e.getErrorText()});
         return null;
       }
   }

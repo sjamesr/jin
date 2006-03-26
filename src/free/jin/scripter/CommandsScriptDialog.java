@@ -70,7 +70,7 @@ class CommandsScriptDialog extends ScriptDialog{
   public CommandsScriptDialog(Component parent, Scripter scripter, CommandScript templateScript){
     super(parent, "", scripter, templateScript);
     
-    setTitle("commandsScriptDialog.title");
+    setTitle(I18n.get(CommandsScriptDialog.class).getString("title"));
 
     createUI();
   }
@@ -101,28 +101,28 @@ class CommandsScriptDialog extends ScriptDialog{
     commandsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     commandsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-    JLabel conditionLabel = i18n.createLabel("commandsConditionLabel");
-    JLabel commandsLabel = i18n.createLabel("commandsCommandsLabel");
+    JLabel conditionLabel = i18n.createLabel("conditionLabel");
+    JLabel commandsLabel = i18n.createLabel("commandsLabel");
 
     conditionLabel.setLabelFor(conditionField);
     commandsLabel.setLabelFor(commandsArea);
 
     commandsLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-    JButton conditionHelp = i18n.createButton("commandsConditionHelpButton");
-    JButton commandsHelp = i18n.createButton("commandsCommandsHelpButton");
+    JButton conditionHelp = i18n.createButton("conditionHelpButton");
+    JButton commandsHelp = i18n.createButton("commandsHelpButton");
 
     conditionHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
-        i18n.showPlainTextDialog("commandsConditionHelpDialog", CommandsScriptDialog.this);
+        i18n.showPlainTextDialog("conditionHelpDialog", CommandsScriptDialog.this);
       }
     });
 
     commandsHelp.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
-        i18n.showPlainTextDialog("commandsCommandsHelpDialog", CommandsScriptDialog.this);      }
+        i18n.showPlainTextDialog("commandsHelpDialog", CommandsScriptDialog.this);      }
     });
 
 
@@ -179,7 +179,7 @@ class CommandsScriptDialog extends ScriptDialog{
     } catch (EvalError e){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
         Object result = 
-          i18n.confirm(OptionPanel.OK, "commandsMalformedConditionDialog", this, new Object[]{format(e.getMessage())});
+          i18n.confirm(OptionPanel.OK, "malformedConditionDialog", this, new Object[]{format(e.getMessage())});
         
         if (result != OptionPanel.OK)
           return null;
@@ -193,7 +193,7 @@ class CommandsScriptDialog extends ScriptDialog{
         script.setEnabled(templateScript.isEnabled());
       return script;
     } catch (EvalError e){
-        I18n.get(CommandsScriptDialog.class).error("commandsMalformedScriptDialog", this, new Object[]{e.getErrorText()});
+        I18n.get(CommandsScriptDialog.class).error("malformedScriptDialog", this, new Object[]{e.getErrorText()});
         return null;
       }
   }
