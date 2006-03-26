@@ -21,12 +21,19 @@
 
 package free.jin.board;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import free.jin.Game;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.KeyStroke;
+
 import free.jin.Connection;
+import free.jin.Game;
+import free.jin.I18n;
 import free.jin.plugin.Plugin;
 import free.workarounds.FixedJPanel;
 
@@ -45,7 +52,6 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected final Plugin plugin;
-
 
 
 
@@ -144,7 +150,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createStartGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/start.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText(plugin.getI18n().getString("gameStartButton.tooltip"));
+    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameStartButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt HOME"), WHEN_IN_FOCUSED_WINDOW);    
     button.setDefaultCapable(false);
@@ -163,7 +169,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createEndGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/end.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText(plugin.getI18n().getString("gameEndButton.tooltip"));
+    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameEndButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt END"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
@@ -182,7 +188,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createBackwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/backward.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText(plugin.getI18n().getString("backwardButton.tooltip"));
+    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("backwardButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt LEFT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
@@ -200,7 +206,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   protected JButton createForwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/forward.gif")));
     button.setMargin(new Insets(5,5,5,5));
-    button.setToolTipText(plugin.getI18n().getString("forwardButton.tooltip"));
+    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("forwardButton.tooltip"));
     button.addActionListener(this);
     button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt RIGHT"), WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);

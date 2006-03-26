@@ -462,7 +462,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
    
   private JButton createButton(String i18nKey){
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     JButton button = new JButton(i18n.getString(i18nKey + ".text"));
     button.setDisplayedMnemonicIndex(i18n.getInt(i18nKey + ".displayedMnemonicIndex"));
     button.addActionListener(this);
@@ -484,7 +484,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    */
 
   protected void setDrawState(int state){
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     
     drawButton.setEnabled(state != OFFERED_STATE);
     
@@ -524,7 +524,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (abortButton == null)
       return;
     
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     
     abortButton.setEnabled(state != OFFERED_STATE);    
 
@@ -564,7 +564,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (adjournButton == null)
       return;
     
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     
     adjournButton.setEnabled(state != OFFERED_STATE);    
 
@@ -603,7 +603,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (takeback1Button == null)
       return;
     
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     
     takeback1Button.setEnabled(state != OFFERED_STATE);    
 
@@ -642,7 +642,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     if (takebackNButton == null)
       return;
     
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(PlayedGameButtonPanel.class);
     
     Object [] plyCountArr = new Object[]{new Integer(plyCount)};
     
@@ -688,7 +688,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       case OFFER_STATE: 
         throw new IllegalArgumentException("The resign button may only be in claim state");
       case CLAIM_STATE:{
-        resignButton.setToolTipText(plugin.getI18n().getString("resignButton.tooltip"));
+        resignButton.setToolTipText(I18n.get(PlayedGameButtonPanel.class).getString("resignButton.tooltip"));
         resignButtonPanel.setBorder(new EmptyBorder(
           STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE));
         break;
