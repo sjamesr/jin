@@ -333,12 +333,22 @@ public class JinApplication implements JinContext{
   
   
   /**
+   * A helper method which translates the specified string according to the current locale.
+   */
+  
+  private String translate(String key){
+    return getResourceBundle().getString("JinApplication." + key);
+  }
+  
+  
+  
+  /**
    * Displays an error message regarding an problem with saving the application-wide user preferences.
    */
   
   private void showPrefsSaveError(String errorI18nKey, File targetFile){
-    showErrorMessage(getResourceBundle().getString("appSavingPrefsErrorDialog.title"),
-        MessageFormat.format(getResourceBundle().getString("appSavingPrefsErrorDialog." + errorI18nKey),
+    showErrorMessage(translate("savingPrefsErrorDialog.title"),
+        MessageFormat.format(translate("savingPrefsErrorDialog." + errorI18nKey),
           new Object[]{targetFile.toString()}));
   }
   
@@ -733,8 +743,8 @@ public class JinApplication implements JinContext{
    */
   
   private void showAccountSaveError(String errorI18nKey, File targetFile){
-    showErrorMessage(getResourceBundle().getString("appSavingAccountErrorDialog.title"),
-        MessageFormat.format(getResourceBundle().getString("appSavingAccountErrorDialog." + errorI18nKey),
+    showErrorMessage(translate("savingAccountErrorDialog.title"),
+        MessageFormat.format(translate("savingAccountErrorDialog." + errorI18nKey),
           new Object[]{targetFile.toString()}));
   }
   
@@ -1177,7 +1187,7 @@ public class JinApplication implements JinContext{
    */
    
   public String getPasswordSaveWarning(){
-    return getResourceBundle().getString("appPasswordSaveWarning");
+    return translate("passwordSaveWarning");
   }
   
   
