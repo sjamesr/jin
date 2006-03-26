@@ -302,6 +302,29 @@ public class Utilities{
     int lastDotIndex = className.lastIndexOf(".");
     return lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
   }
-
-
+  
+  
+  
+  /**
+   * Returns the short name (excluding the package name) of the specified class. 
+   */
+  
+  public static String getClassName(Class c){
+    return getClassName(c.getName());
+  }
+  
+  
+  
+  /**
+   * Returns the short name (excluding the package name) of the class with the
+   * specified fully qualified name.
+   */
+  
+  public static String getClassName(String className){
+    int lastDotIndex = className.lastIndexOf(".");
+    return lastDotIndex == -1 ? className : className.substring(lastDotIndex + 1);
+  }
+  
+  
+  
 }
