@@ -126,6 +126,7 @@ abstract class ScriptDialog extends JDialog{
 
   protected final void createUI(){
     I18n scripterI18n = scripter.getI18n();
+    I18n i18n = I18n.get(ScriptDialog.class);
     
     String defaultScriptName = (templateScript == null ? "" : templateScript.getName());
     String defaultEventType = (templateScript == null ? SELECT_EVENT_TYPE : templateScript.getEventType());
@@ -142,7 +143,7 @@ abstract class ScriptDialog extends JDialog{
 
     final JComboBox eventTypeChoice = new FixedJComboBox(eventTypeChoiceEntries);
     eventTypeChoice.setEditable(false);
-    eventTypeChoice.addItem(new NamedObject(SELECT_EVENT_TYPE, scripterI18n.getString("selectEventTypeString")));
+    eventTypeChoice.addItem(new NamedObject(SELECT_EVENT_TYPE, i18n.getString("selectEventTypeString")));
     eventTypeChoice.setSelectedItem(defaultEventType);
 
     final JPanel subtypesPanel = new JPanel(new TableLayout(2));
@@ -165,8 +166,6 @@ abstract class ScriptDialog extends JDialog{
         updateSubtypesPanel(subtypesPanel, eventType, selectedSubtypes);
       }
     });
-    
-    I18n i18n = I18n.get(ScriptDialog.class);
     
     JLabel scriptNameLabel = i18n.createLabel("scriptNameLabel");
     JLabel eventTypeLabel = i18n.createLabel("eventTypeLabel");
@@ -298,9 +297,10 @@ abstract class ScriptDialog extends JDialog{
     if (!SELECT_EVENT_TYPE.equals(eventType)){
       String [] subtypes = scripter.getEventSubtypes(eventType);
       if (subtypes != null){
+        I18n scripterI18n = scripter.getI18n();
         for (int i = 0; i < subtypes.length; i++){
           String subtype = subtypes[i];
-          JCheckBox checkbox = new JCheckBox(scripter.getI18n().getString("eventSubtypeNames." + eventType + "." + subtype));
+          JCheckBox checkbox = new JCheckBox(scripterI18n.getString("eventSubtypeNames." + eventType + "." + subtype));
           checkbox.setActionCommand(subtype);
           checkbox.setSelected(Utilities.contains(selectedSubtypes, subtype));
           panel.add(checkbox);
