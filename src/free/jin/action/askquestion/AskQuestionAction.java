@@ -22,15 +22,13 @@
 package free.jin.action.askquestion;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import free.jin.I18n;
 import free.jin.action.JinAction;
@@ -72,8 +70,9 @@ public class AskQuestionAction extends JinAction{
    * Displays a small dialog which lets the user ask a question.
    */
    
-  public void go(){
-    String question = new QuestionPanel().getQuestion();
+  public void go(Object actor){
+    Component hintParent = (actor instanceof Component) ? SwingUtilities.windowForComponent((Component)actor) : null;
+    String question = new QuestionPanel(hintParent).getQuestion();
     
     if ((question != null) && !"".equals(question.trim()))
       getConn().sendHelpQuestion(question);
@@ -93,7 +92,9 @@ public class AskQuestionAction extends JinAction{
      * Creates a new <code>QuestionPanel</code>.
      */
      
-    public QuestionPanel(){
+    public QuestionPanel(Component hintParent){
+      setHintParent(hintParent);
+      
       setLayout(new BorderLayout(10, 10));
       
       I18n i18n = getI18n();

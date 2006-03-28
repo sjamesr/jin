@@ -158,16 +158,18 @@ public abstract class JinAction implements ActionListener{
    */
    
   public void actionPerformed(ActionEvent evt){
-    go();
+    go(evt.getSource());
   }
   
   
   
   /**
    * Invokes the action.
+   * 
+   * @param actor the object which, in some way, triggered the action. May be <code>null</code>.
    */
   
-  public abstract void go();
+  public abstract void go(Object actor);
   
   
   

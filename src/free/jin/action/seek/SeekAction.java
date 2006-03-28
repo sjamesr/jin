@@ -22,6 +22,7 @@
 package free.jin.action.seek;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -91,8 +92,9 @@ public class SeekAction extends JinAction{
    * issues the seek.
    */
   
-  public void go(){
-    UserSeek seek = new SeekPanel().getSeek();
+  public void go(Object actor){
+    Component hintParent = (actor instanceof Component) ? SwingUtilities.windowForComponent((Component)actor) : null;
+    UserSeek seek = new SeekPanel(hintParent).getSeek();
     
     if (seek != null){
       ((SeekConnection)getConn()).issueSeek(seek);
@@ -152,7 +154,9 @@ public class SeekAction extends JinAction{
      * Creates a new <code>SeekPanel</code>.
      */
      
-    public SeekPanel(){
+    public SeekPanel(Component hintParent){
+      setHintParent(hintParent);
+      
       Preferences prefs = getPrefs();
       I18n i18n = getI18n();
       

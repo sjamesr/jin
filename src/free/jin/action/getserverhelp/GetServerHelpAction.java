@@ -56,7 +56,7 @@ public class GetServerHelpAction extends JinAction{
    * Causes the server specific help to be shown to the user.
    */
    
-  public void go(){
+  public void go(Object actor){
     getConn().showServerHelp();
   }
   

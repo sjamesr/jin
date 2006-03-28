@@ -21,14 +21,17 @@
 
 package free.jin.ui;
 
-import free.jin.*;
-import free.jin.action.JinAction;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+
+import free.jin.*;
+import free.jin.action.JinAction;
 
 
 
@@ -103,7 +106,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     for (int i = 0; i < actions.getSize(); i++){
       JinAction action = (JinAction)actions.getElementAt(i);
       JMenuItem menuItem = new JMenuItem(action.getName());
-      menuItem.addActionListener(action);
+      menuItem.addActionListener(new ActionInvoker(action));
       add(menuItem);
     }
   }
@@ -153,6 +156,49 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
   
   public void contentsChanged(ListDataEvent evt){
     updateActionMenuItems((ListModel)evt.getSource());
+  }
+  
+  
+  
+  /**
+   * The action listener for the menu items, which activates the actions.
+   * We don't use the actions themselves (they implement <code>ActionListener</code>) because we want to pass
+   * the menu and not the menu item as the actor to the action. That we do because the menu items
+   * have the popup window as their toplevel parent (see what the actions do with the actor). 
+   */
+  
+  private class ActionInvoker implements ActionListener{
+    
+    
+    
+    /**
+     * The action to invoke.
+     */
+    
+    private final JinAction action;
+    
+    
+    
+    /**
+     * Creates a new <code>ActionInvoker</code> with the specified <code>JinAction</code> to invoke.
+     */
+    
+    public ActionInvoker(JinAction action){
+      this.action = action;
+    }
+    
+    
+    
+    /**
+     * Invokes the action.
+     */
+    
+    public void actionPerformed(ActionEvent evt){
+      action.go(ActionsMenu.this);
+    }
+    
+    
+    
   }
 
 
