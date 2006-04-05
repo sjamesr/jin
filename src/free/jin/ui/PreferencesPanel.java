@@ -21,11 +21,16 @@
 
 package free.jin.ui;
 
-import free.jin.BadChangesException;
-import free.util.swing.PreferredSizedPanel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import free.jin.BadChangesException;
+import free.util.swing.PreferredSizedPanel;
 
 
 /**
@@ -33,9 +38,50 @@ import javax.swing.event.ChangeListener;
  */
 
 public abstract class PreferencesPanel extends PreferredSizedPanel{
-
-
-
+  
+  
+  
+  /**
+   * An action listener whose sole function is to invoke {@link #fireStateChanged()}.
+   * Useful for <code>PreferencesPanel</code>s with components firing action events
+   * when the user changes a setting.
+   */
+  
+  protected final ActionListener proxyActionListener = new ActionListener(){
+    public void actionPerformed(ActionEvent evt){
+      fireStateChanged();
+    }
+  };
+  
+  
+  
+  /**
+   * A change listener whose sole function is to invoke {@link #fireStateChanged()}.
+   * Useful for <code>PreferencesPanel</code>s with components firing change events
+   * when the user changes a setting.
+   */
+  
+  protected final ChangeListener proxyChangeListener = new ChangeListener(){
+    public void stateChanged(ChangeEvent evt){
+      fireStateChanged();
+    }
+  };
+  
+  
+  
+  /**
+   * A list selection listener whose sole function is to invoke {@link #fireStateChanged()}.
+   * Useful for <code>PreferencesPanel</code>s with lists.
+   */
+  
+  protected final ListSelectionListener proxyListSelectionListener = new ListSelectionListener(){
+    public void valueChanged(ListSelectionEvent evt){
+      fireStateChanged();
+    }
+  };
+  
+  
+  
   /**
    * The sole ChangeEvent we need.
    */
@@ -93,6 +139,7 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
       }
     }
   }
-
-
+  
+  
+  
 }
