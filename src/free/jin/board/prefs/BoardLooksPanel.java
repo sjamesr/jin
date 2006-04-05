@@ -391,8 +391,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
       
-    JLabel pieceSetLabel = new JLabel(i18n.getString("pieceSetLabel"));
-    pieceSetLabel.setDisplayedMnemonicIndex(i18n.getInt("pieceSetLabel.displayedMnemonicIndex"));
+    JLabel pieceSetLabel = i18n.createLabel("pieceSetLabel"); 
     pieceSetLabel.setLabelFor(pieceSets);
     pieceSetLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
@@ -436,8 +435,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
       BorderFactory.createEmptyBorder(0, 10, 10, 10)));
     
     
-    JLabel patternLabel = new JLabel(i18n.getString("boardPatternLabel"));
-    patternLabel.setDisplayedMnemonicIndex(i18n.getInt("boardPatternLabel.displayedMnemonicIndex"));
+    JLabel patternLabel = i18n.createLabel("boardPatternLabel");
     patternLabel.setLabelFor(boardPatterns);
     patternLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
