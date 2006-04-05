@@ -228,8 +228,8 @@ public class SeekAction extends JinAction{
       JLabel incLabel = i18n.createLabel("incrementLabel");
       incLabel.setLabelFor(incField);
       
-      JLabel secondsLabel = i18n.createLabelNoMnemonic("secondsLabel");
-      JLabel minutesLabel = i18n.createLabelNoMnemonic("minutesLabel");
+      JLabel secondsLabel = i18n.createLabel("secondsLabel");
+      JLabel minutesLabel = i18n.createLabel("minutesLabel");
       
       timeField.setMaximumSize(timeField.getPreferredSize());
       incField.setMaximumSize(incField.getPreferredSize());
@@ -261,7 +261,7 @@ public class SeekAction extends JinAction{
       
 
       // Color
-      JLabel colorLabel = i18n.createLabelNoMnemonic("colorLabel");
+      JLabel colorLabel = i18n.createLabel("colorLabel");
       
       JComponent colorContainer = SwingUtils.createHorizontalBox();
       colorContainer.add(Box.createHorizontalStrut(labelPad));
