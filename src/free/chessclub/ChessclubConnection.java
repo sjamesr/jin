@@ -640,7 +640,7 @@ public class ChessclubConnection extends free.util.Connection{
 
     try{
       OutputStream out = getOutputStream();
-      out.write(command.getBytes());
+      out.write(command.getBytes("ISO8859_1"));
       out.write('\n');
       out.flush();
     } catch (IOException e){
