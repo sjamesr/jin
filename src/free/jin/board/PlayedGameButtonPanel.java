@@ -463,8 +463,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    
   private JButton createButton(String i18nKey){
     I18n i18n = I18n.get(PlayedGameButtonPanel.class);
-    JButton button = new JButton(i18n.getString(i18nKey + ".text"));
-    button.setDisplayedMnemonicIndex(i18n.getInt(i18nKey + ".displayedMnemonicIndex"));
+    JButton button = i18n.createButton(i18nKey);
     button.addActionListener(this);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
@@ -688,7 +687,6 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       case OFFER_STATE: 
         throw new IllegalArgumentException("The resign button may only be in claim state");
       case CLAIM_STATE:{
-        resignButton.setToolTipText(I18n.get(PlayedGameButtonPanel.class).getString("resignButton.tooltip"));
         resignButtonPanel.setBorder(new EmptyBorder(
           STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE, STATE_BORDER_SIZE));
         break;
