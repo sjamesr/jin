@@ -54,7 +54,7 @@
 			 or placing things at appropriate locations -->
 	<target name="compile" depends="init">
 		<mkdir dir="${classes.dir}" />
-		<echo message="COMPILER: ${build.compiler}" />
+		<echo message="Compiler: ${build.compiler}" />
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
@@ -183,8 +183,15 @@
 
 		<!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
-			<fileset dir="${source.dir}" excludes="**/*.java **/*.html" />
+			<fileset dir="${source.dir}" excludes="**/*.java **/*.html **/localization*.properties" />
 		</copy>
+		
+		<!-- Convert and copy localization files -->
+		<native2ascii src="${source.dir}"
+		              includes="**/localization*.properties"
+		              dest="${classes.dir}"
+		              encoding="utf8"
+		/>
 		
 		
 		<!-- Call the tasks that do platform specific stuff -->
