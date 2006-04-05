@@ -26,12 +26,10 @@ import java.awt.BorderLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.console.ConsoleManager;
+import free.jin.ui.CompositePreferencesPanel;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -40,24 +38,17 @@ import free.jin.ui.PreferencesPanel;
  * The main preferences panel for the console plugin. 
  */
 
-public class ConsolePrefsPanel extends PreferencesPanel{
-  
-
-  
-  /**
-   * The text preferences panel.
-   */
-  
-  private final PreferencesPanel textPrefsPanel;
+public class ConsolePrefsPanel extends CompositePreferencesPanel{
   
   
   
   /**
-   * The behaviour preferences panel.
+   * The tabbed pane.
    */
   
-  private final PreferencesPanel behaviourPrefsPanel;
+  private final JTabbedPane tabs = new JTabbedPane();
 
+  
 
   
   /**
@@ -65,29 +56,26 @@ public class ConsolePrefsPanel extends PreferencesPanel{
    */
   
   public ConsolePrefsPanel(ConsoleManager consoleManager){
-    this.textPrefsPanel = createTextPrefsPanel(consoleManager);
-    this.behaviourPrefsPanel = createBehaviourPrefsPanel(consoleManager);
-    
     I18n i18n = I18n.get(getClass(), ConsolePrefsPanel.class);
     
-    ChangeListener changeListener = new ChangeListener(){
-      public void stateChanged(ChangeEvent evt){
-        fireStateChanged();
-      }
-    };
-    
-    textPrefsPanel.addChangeListener(changeListener);
-    behaviourPrefsPanel.addChangeListener(changeListener);
-    
-    textPrefsPanel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-    behaviourPrefsPanel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-    
-    JTabbedPane tabs = new JTabbedPane();
-    tabs.addTab(i18n.getString("textDisplayTab.text"), null, textPrefsPanel, i18n.getString("textDisplayTab.tooltip"));
-    tabs.addTab(i18n.getString("consoleBehaviourTab.text"), null, behaviourPrefsPanel, i18n.getString("consoleBehaviourTab.tooltip"));
+    addPanel(createTextPrefsPanel(consoleManager), i18n.getString("textDisplayTab.text"), i18n.getString("textDisplayTab.tooltip"));
+    addPanel(new BehaviourPrefsPanel(consoleManager), i18n.getString("consoleBehaviourTab.text"), i18n.getString("consoleBehaviourTab.tooltip"));
+    if (consoleManager.supportsMultipleEncodings())
+      addPanel(new EncodingPrefsPanel(consoleManager), i18n.getString("encodingTab.text"), i18n.getString("encodingTab.tooltip"));
     
     setLayout(new BorderLayout());
     add(tabs, BorderLayout.CENTER);
+  }
+  
+  
+  
+  /**
+   * Adds the specified panel to a new tab.
+   */
+  
+  protected void addPanelToUi(PreferencesPanel panel, String name, String tooltip){
+    panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+    tabs.addTab(name, null, panel, tooltip);
   }
   
   
@@ -104,21 +92,4 @@ public class ConsolePrefsPanel extends PreferencesPanel{
   
   
   
-  /**
-   * Creates the <code>BehaviourPrefsPanel</code> used in this console prefs.
-   * This method returns a plain <code>BehaviourPrefsPanel</code>, but allows
-   * subclasses to return a subclass of it.
-   */
-  
-  protected BehaviourPrefsPanel createBehaviourPrefsPanel(ConsoleManager cm){
-    return new BehaviourPrefsPanel(cm);
-  }
-
-  
-  
-  public void applyChanges() throws BadChangesException{
-    textPrefsPanel.applyChanges();
-    behaviourPrefsPanel.applyChanges();
-  }
-
 }
