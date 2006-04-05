@@ -63,7 +63,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     String type = evt.getType();
     String sender = evt.getSender();
     String title = evt.getSenderTitle();
-    String message = evt.getMessage();
+    String message = decode(evt.getMessage());
     Object forum = evt.getForum();
     
     if ("qtell".equals(type))
@@ -133,6 +133,14 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
 
 
+  /**
+   * Returns <code>true</code>. 
+   */
+  
+  public boolean supportsMultipleEncodings(){
+    return true;
+  }
+  
 
 
   /**

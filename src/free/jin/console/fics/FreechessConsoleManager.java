@@ -84,7 +84,27 @@ public class FreechessConsoleManager extends ConsoleManager{
     Object [] args = new Object[]{sender, title, rating, String.valueOf(forum), message};
     return MessageFormat.format(pattern, args);
   }
-
+  
+  
+  
+  /**
+   * Returns the FICS encoding, which is 7-bit ASCII.
+   */
+  
+  public String getEncoding(){
+    return "ASCII";
+  }
+  
+  
+  
+  /**
+   * Returns <code>false</code>. 
+   */
+  
+  public boolean supportsMultipleEncodings(){
+    return false;
+  }
+  
 
 
   /**

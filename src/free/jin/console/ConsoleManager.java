@@ -22,7 +22,9 @@
 package free.jin.console;
 
 import java.awt.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Vector;
 
@@ -33,6 +35,7 @@ import javax.swing.table.*;
 
 import free.jin.Connection;
 import free.jin.GameListConnection;
+import free.jin.I18n;
 import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.*;
 import free.jin.plugin.Plugin;
@@ -251,7 +254,78 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   public boolean isCopyOnSelect(){
     return getPrefs().getBool("copyOnSelect", true);
   }
-
+  
+  
+  
+  /**
+   * Returns the encoding with which we decode/encode text received/sent from/to the server.
+   * The default implementation retrieves it from preferences.
+   */
+  
+  public String getEncoding(){
+    return getPrefs().getString("encoding", "utf8");
+  }
+  
+  
+  
+  /**
+   * Sets the encoding with which we decode/encode text received/sent from/to the server.
+   * Throws an exception if multiple encodings are unsupported, otherwise stores the
+   * encoding in preferences.
+   */
+  
+  public void setEncoding(String encoding) throws UnsupportedEncodingException{
+    if (!supportsMultipleEncodings())
+      throw new IllegalStateException("Multiple encodings are unsupported");
+    if (!Charset.isSupported(encoding))
+      throw new UnsupportedEncodingException(encoding);
+    
+    getPrefs().setString("encoding", encoding);
+  }
+  
+  
+  
+  /**
+   * Returns whether this console manager supports more than its default encoding.
+   * The default implementation returns <code>false</code>. 
+   */
+  
+  public boolean supportsMultipleEncodings(){
+    return false;
+  }
+  
+  
+  
+  /**
+   * Encodes a string to be sent to the server.
+   */
+  
+  public String encode(String s){
+    try{
+      return new String(s.getBytes(getEncoding()), "ISO8859_1");
+    } catch (UnsupportedEncodingException e){
+        e.printStackTrace(); // Shouldn't happen - we're using supported encodings
+      }
+    
+    return s;
+  }
+  
+  
+  
+  /**
+   * Decodes a string received from the server.
+   */
+  
+  public String decode(String s){
+    try{
+      return new String(s.getBytes("ISO8859_1"), getEncoding());
+    } catch (UnsupportedEncodingException e){
+        e.printStackTrace(); // Shouldn't happen - we're using supported encodings
+      }
+    
+    return s;
+  }
+  
 
 
   /**
@@ -299,7 +373,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     if ((conn instanceof GameListConnection) && (getGameListsDisplayStyle() != NO_GAME_LISTS))
       ((GameListConnection)conn).getGameListListenerManager().removeGameListListener(this);
-  } 
+  }
 
 
 
@@ -322,7 +396,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       return;
     }
       
-    console.addToOutput(evt.getText(), "plain");
+    console.addToOutput(decode(evt.getText()), "plain");
   }
 
 
@@ -343,6 +417,20 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     String chatMessageType = type + "." + (forum == null ? "" : forum.toString()) + "." + sender;
 
     console.addToOutput(translateChat(evt), chatMessageType);
+  }
+  
+  
+  
+  /**
+   * Sends the specified user-inputted command to the server.
+   */
+  
+  public void sendUserCommand(String command){
+    Connection conn = getConn();
+    if (conn.isConnected())
+      conn.sendCommand(encode(command));
+    else
+      console.addToOutput(I18n.get(ConsoleManager.class).getString("unconnectedWarningMessage"), "info");
   }
   
   

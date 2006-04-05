@@ -36,7 +36,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.*;
 
-import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.util.BrowserControl;
@@ -89,14 +88,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private final ConsoleTextField inputComponent;
-
-
-
-  /**
-   * The connection to the server.
-   */
-
-  private final Connection conn;
 
 
 
@@ -193,7 +184,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   public Console(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
-    this.conn = consoleManager.getConn();
     this.prefs = consoleManager.getPrefs();
 
     this.outputComponent = createOutputComponent();
@@ -713,10 +703,9 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         e.printStackTrace(); // Why the heck is this checked?
       }
   }
-
-
-
-
+  
+  
+  
   /**
    * Actually does the work of adding the given text to the output component's
    * Document.
@@ -725,7 +714,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   protected void addToOutputImpl(String text, String textType) throws BadLocationException{
     StyledDocument document = outputComponent.getStyledDocument();
     int oldTextLength = document.getLength();
-    document.insertString(document.getLength(),text+"\n", attributesForTextType(textType));
+    
+    document.insertString(document.getLength(), text + "\n", attributesForTextType(textType));
 
     AttributeSet urlAttributes = attributesForTextType("link.url");
     AttributeSet emailAttributes = attributesForTextType("link.email");
@@ -864,12 +854,8 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
     if (command.isSpecial())
       executeSpecialCommand(commandString);
-    else{
-      if (conn.isConnected())
-        conn.sendCommand(commandString);
-      else
-        addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
-    }
+    else
+      consoleManager.sendUserCommand(commandString);
   }
 
 
