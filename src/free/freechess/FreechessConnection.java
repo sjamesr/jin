@@ -383,7 +383,7 @@ public class FreechessConnection extends Connection{
 
     try{
       OutputStream out = getOutputStream();
-      out.write(command.getBytes());
+      out.write(command.getBytes("ASCII"));
       out.write('\n');
       out.flush();
     } catch (IOException e){
