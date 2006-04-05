@@ -137,8 +137,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     mainFrame.setJMenuBar(menubar);
 
     windowsMenu = new PluginContainersMenu();
-    windowsMenu.setText(i18n.getString("windowsMenu.text"));
-    windowsMenu.setDisplayedMnemonicIndex(i18n.getInt("windowsMenu.displayedMnemonicIndex"));
+    i18n.initAbstractButton(windowsMenu, "windowsMenu");
     addPluginUIContainerCreationListener(windowsMenu);
     
     actionsMenu = new ActionsMenu();
@@ -397,8 +396,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     public ConnectionMenu(){
       I18n i18n = I18n.get(MdiUiProvider.class);
       
-      setText(i18n.getString("connectionMenu.text"));
-      setDisplayedMnemonicIndex(i18n.getInt("connectionMenu.displayedMnemonicIndex"));
+      i18n.initAbstractButton(this, "connectionMenu");
 
       add(newConnection = i18n.createMenuItem("newConnectionMenuItem"));
       add(closeConnection = i18n.createMenuItem("closeConnectionMenuItem"));
