@@ -58,9 +58,9 @@ public abstract class SolidColorIcon implements Icon{
 
   public SolidColorIcon(Dimension size, Color color){
     if (size == null)
-      throw new IllegalArgumentException("Size is null");
+      throw new IllegalArgumentException("Size is null"); //$NON-NLS-1$
     if (color == null)
-      throw new IllegalArgumentException("Color is null");
+      throw new IllegalArgumentException("Color is null"); //$NON-NLS-1$
 
     this.size = new Dimension(size);
     this.color = color;

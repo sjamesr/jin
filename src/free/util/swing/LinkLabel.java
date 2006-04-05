@@ -68,7 +68,7 @@ public class LinkLabel extends JLabel{
    */
 
   public void setText(String text){
-    super.setText("<html><font color=\"#0000CF\"><u>"+text+"</u></font></html>");
+    super.setText("<html><font color=\"#0000CF\"><u>"+text+"</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
     this.text = text;
   }
 

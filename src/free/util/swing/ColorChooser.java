@@ -33,7 +33,7 @@ import javax.swing.event.ChangeEvent;
  * A component which allows the user to select a color.
  */
 
-public class ColorChooser extends JComponent implements ActionListener{
+public class ColorChooser extends JComponent implements Mnemonicable{
 
 
 
@@ -117,13 +117,11 @@ public class ColorChooser extends JComponent implements ActionListener{
   public ColorChooser(String text, Color initialColor){
     button = new JButton(new SolidColorRectangleIcon(ICON_SIZE, initialColor));
     label = new JLabel(text);
-
+    
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-    if (text != null){
-      add(label);
-      add(Box.createHorizontalStrut(20));
-      add(Box.createHorizontalGlue());
-    }
+    add(label);
+    add(Box.createHorizontalStrut(20));
+    add(Box.createHorizontalGlue());
     add(button);
 
     label.setLabelFor(button);
@@ -131,31 +129,38 @@ public class ColorChooser extends JComponent implements ActionListener{
 
     color = initialColor;
 
-    button.addActionListener(this);
-  }
-
-
-
-  /**
-   * Sets the mnemonic.
-   */
-
-  public void setMnemonic(char mnemonic){
-    label.setDisplayedMnemonic(mnemonic);
-  } 
-
-
-
-  /**
-   * Sets the mnemonic.
-   */
-
-  public void setMnemonic(int mnemonic){
-    label.setDisplayedMnemonic(mnemonic);
+    button.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(ColorChooser.this),
+          Localization.getString("ColorChooser.dialogTitle"), color); //$NON-NLS-1$
+        if (newColor != null)
+          setColor(newColor);
+      }
+    });
   }
   
   
   
+  /**
+   * Sets the text of the label.
+   */
+  
+  public void setText(String text){
+    label.setText(text);
+  }
+  
+  
+  
+  /**
+   * Returns the text of the label.
+   */
+  
+  public String getText(){
+    return label.getText();
+  }
+
+
+
   /**
    * Sets the displayed mnemonic index.
    */
@@ -237,21 +242,7 @@ public class ColorChooser extends JComponent implements ActionListener{
     button.setIcon(new SolidColorRectangleIcon(ICON_SIZE, color));
     fireStateChanged();
   }
-
-
-
-
-  /**
-   * Shows the color chooser.
-   */
-
-  public void actionPerformed(ActionEvent evt){
-    Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(this),
-      "Choose a color", color);
-    if (newColor != null)
-      setColor(newColor);
-  }
   
-
+  
   
 }

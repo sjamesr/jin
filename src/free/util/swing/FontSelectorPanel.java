@@ -41,7 +41,7 @@ public class FontSelectorPanel extends JPanel{
    * The id of the "bold" font option.
    */
   
-  public static final String BOLD_OPTION_ID = "bold";
+  public static final String BOLD_OPTION_ID = "bold"; //$NON-NLS-1$
   
   
   
@@ -49,7 +49,7 @@ public class FontSelectorPanel extends JPanel{
    * The id of the "italic" font option.
    */
   
-  public static final String ITALIC_OPTION_ID = "italic";
+  public static final String ITALIC_OPTION_ID = "italic"; //$NON-NLS-1$
   
   
   
@@ -244,7 +244,7 @@ public class FontSelectorPanel extends JPanel{
 
     previewPanelHolder = new JPanel(new BorderLayout());
     Border outsideBorder = 
-      new TitledBorder(new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED), "Preview");
+      new TitledBorder(new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED), Localization.getString("FontSelectorPanel.preview")); //$NON-NLS-1$
     Border insideBorder = new EmptyBorder(10, 10, 10, 10);
     previewPanelHolder.setBorder(new CompoundBorder(outsideBorder, insideBorder));
 
@@ -302,7 +302,7 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public static BooleanFontOption createBoldFontOption(){
-    return new BooleanFontOption(BOLD_OPTION_ID, "Bold", 0, false);
+    return new BooleanFontOption(BOLD_OPTION_ID, Localization.getString("FontSelectorPanel.bold"), 0, false); //$NON-NLS-1$
   }
 
 
@@ -314,7 +314,7 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public static BooleanFontOption createItalicFontOption(){
-    return new BooleanFontOption(ITALIC_OPTION_ID, "Italic", 0, false);
+    return new BooleanFontOption(ITALIC_OPTION_ID, Localization.getString("FontSelectorPanel.italic"), 0, false); //$NON-NLS-1$
   }
 
 
@@ -331,16 +331,23 @@ public class FontSelectorPanel extends JPanel{
 
     JPanel fontNamePanel = new JPanel(new BorderLayout(2,2));
     JScrollPane fontNamesListScrollPane = new JScrollPane(fontNamesList);
-    JLabel fontNameLabel = new JLabel("Font name", JLabel.CENTER);
-    fontNameLabel.setDisplayedMnemonic('n');
+    
+    JLabel fontNameLabel = new JLabel();
+    SwingUtils.applyLabelSpec(fontNameLabel, Localization.getString("FontSelectorPanel.fontNameLabel.text")); //$NON-NLS-1$
+    fontNameLabel.setHorizontalAlignment(JLabel.CENTER);
+    
     fontNameLabel.setLabelFor(fontNamesList);
     fontNamePanel.add(fontNameLabel, BorderLayout.NORTH);
     fontNamePanel.add(fontNamesListScrollPane, BorderLayout.CENTER);
-
+    
+    
     JPanel fontSizePanel = new JPanel(new BorderLayout(2,2));
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
-    JLabel fontSizeLabel = new JLabel("Font size", JLabel.CENTER);
-    fontSizeLabel.setDisplayedMnemonic('s');
+    
+    JLabel fontSizeLabel = new JLabel();
+    SwingUtils.applyLabelSpec(fontSizeLabel, Localization.getString("FontSelectorPanel.fontSizeLabel.text")); //$NON-NLS-1$
+    fontSizeLabel.setHorizontalAlignment(JLabel.CENTER);
+    
     fontSizeLabel.setLabelFor(fontSizesList);
     fontSizePanel.add(fontSizeLabel, BorderLayout.NORTH);
     fontSizePanel.add(fontSizesListScrollPane, BorderLayout.CENTER);
@@ -537,7 +544,7 @@ public class FontSelectorPanel extends JPanel{
      */
 
     public DefaultPreviewPanel(FontSelectorPanel fontSelectorPanel){
-      super("AaBbYyZz123", JLabel.CENTER);
+      super(Localization.getString("FontSelectorPanel.previewText"), JLabel.CENTER); //$NON-NLS-1$
 
       this.fontSelectorPanel = fontSelectorPanel;
 

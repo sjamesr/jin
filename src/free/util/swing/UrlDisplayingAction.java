@@ -52,7 +52,7 @@ public class UrlDisplayingAction extends AbstractAction{
     super();
 
     if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty");
+      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
 
     this.url = url;
   }
@@ -68,7 +68,7 @@ public class UrlDisplayingAction extends AbstractAction{
     super(name);
 
     if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty");
+      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
 
     this.url = url;
   }
@@ -84,7 +84,7 @@ public class UrlDisplayingAction extends AbstractAction{
     super(name, icon);
 
     if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty");
+      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
 
     this.url = url;
   }

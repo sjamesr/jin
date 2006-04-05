@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2006 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -123,7 +123,7 @@ public class BackgroundChooser extends JDialog{
   public BackgroundChooser(Frame parent, AdvancedJDesktopPane desktop,
       Color defaultColor, File defaultImageFile, int defaultImageLayoutStyle,
       Color color, File imageFile, int imageLayoutStyle){
-    super(parent, "Pick background", true);
+    super(parent, Localization.getString("BackgroundChooser.title"), true); //$NON-NLS-1$
 
     this.desktop = desktop;
     
@@ -160,25 +160,31 @@ public class BackgroundChooser extends JDialog{
     JPanel mainPanel = new JPanel(new GridLayout(allowImageSelection ? 4 : 2, 1, 10, 10));
     mainPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
 
-    JButton pickColor = new JButton("Pick Color");
-    JButton pickImage = new JButton("Pick Image");
-    JButton useDefault = new JButton("Use Default");
-
-    pickColor.setMnemonic('P');
-    pickImage.setMnemonic('I');
-    useDefault.setMnemonic('D');
+    JButton pickColor = new JButton();
+    JButton pickImage = new JButton();
+    JButton useDefault = new JButton();
+    
+    SwingUtils.applyLabelSpec(pickColor, Localization.getString("BackgroundChooser.pickColorButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(pickImage, Localization.getString("BackgroundChooser.pickImageButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(useDefault, Localization.getString("BackgroundChooser.useDefaultsButton.text")); //$NON-NLS-1$
 
     pickColor.setDefaultCapable(false);
     pickImage.setDefaultCapable(false);
     useDefault.setDefaultCapable(false);
 
-    final JRadioButton tileButton = new JRadioButton("Tile", imageLayoutStyle == AdvancedJDesktopPane.TILE);
-    final JRadioButton scaleButton = new JRadioButton("Scale", imageLayoutStyle == AdvancedJDesktopPane.SCALE);
-    final JRadioButton centerButton = new JRadioButton("Center", imageLayoutStyle == AdvancedJDesktopPane.CENTER);
-
-    tileButton.setMnemonic('T');
-    scaleButton.setMnemonic('S');
-    centerButton.setMnemonic('C');
+    final JRadioButton tileButton = new JRadioButton();
+    final JRadioButton scaleButton = new JRadioButton();
+    final JRadioButton centerButton = new JRadioButton();
+    
+    SwingUtils.applyLabelSpec(tileButton, Localization.getString("BackgroundChooser.tileRadioButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(scaleButton, Localization.getString("BackgroundChooser.scaleRadioButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(centerButton, Localization.getString("BackgroundChooser.centerRadioButton.text")); //$NON-NLS-1$
+    
+    switch (imageLayoutStyle){
+      case AdvancedJDesktopPane.TILE: tileButton.setSelected(true); break;
+      case AdvancedJDesktopPane.SCALE: scaleButton.setSelected(true); break;
+      case AdvancedJDesktopPane.CENTER: centerButton.setSelected(true); break;
+    }
 
     ButtonGroup group = new ButtonGroup();
     group.add(tileButton);
@@ -197,7 +203,7 @@ public class BackgroundChooser extends JDialog{
     }
     mainPanel.add(useDefault);
 
-    JButton closeButton = new JButton("Close");
+    JButton closeButton = new JButton(Localization.getString("BackgroundChooser.closeButton.text")); //$NON-NLS-1$
     JPanel closeButtonPanel = new JPanel(new GridLayout(1,1));
     closeButtonPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
     closeButtonPanel.add(closeButton);
@@ -219,7 +225,7 @@ public class BackgroundChooser extends JDialog{
               color = clr;
            
             if (color == null)
-              desktop.setBackground(UIManager.getColor("desktop"));
+              desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
             else
               desktop.setBackground(color);
           }
@@ -228,14 +234,16 @@ public class BackgroundChooser extends JDialog{
         ActionListener cancelListener = new ActionListener(){
           public void actionPerformed(ActionEvent evt){
             if (color == null)
-              desktop.setBackground(UIManager.getColor("desktop"));
+              desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
             else
               desktop.setBackground(color);
           }
         };
 
-        JDialog dialog = JColorChooser.createDialog(BackgroundChooser.this, "Choose background color", true, colorChooser, okListener, cancelListener);
-        dialog.show();
+        JDialog dialog = JColorChooser.createDialog(BackgroundChooser.this,
+          Localization.getString("BackgroundChooser.bgColorChooser.title"), //$NON-NLS-1$
+          true, colorChooser, okListener, cancelListener);
+        dialog.setVisible(true);
       }
 
     });
@@ -270,7 +278,7 @@ public class BackgroundChooser extends JDialog{
           imageLayoutStyle = defaultImageLayoutStyle;
   
           if (color == null)
-            desktop.setBackground(UIManager.getColor("desktop"));
+            desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
           else
             desktop.setBackground(color);
           
@@ -334,7 +342,7 @@ public class BackgroundChooser extends JDialog{
     try{
       SecurityManager securityManager = System.getSecurityManager();
       if (securityManager != null)
-        securityManager.checkRead(System.getProperty("user.home"));
+        securityManager.checkRead(System.getProperty("user.home")); //$NON-NLS-1$
     } catch (SecurityException e){return false;}
     
     return true;
@@ -373,12 +381,13 @@ public class BackgroundChooser extends JDialog{
     JFileChooser fileChooser = new JFileChooser();
 
     String [] supportedImageTypes;
-    if (PlatformUtils.isJavaBetterThan("1.3"))
-      supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg", ".png"};
+    if (PlatformUtils.isJavaBetterThan("1.3")) //$NON-NLS-1$
+      supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg", ".png"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     else
-      supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg"};
+      supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-    fileChooser.setFileFilter(new ExtensionFileFilter("Image files", supportedImageTypes, false));
+    fileChooser.setFileFilter(new ExtensionFileFilter(
+      Localization.getString("BackgroundChooser.fileFilterName"), supportedImageTypes, false)); //$NON-NLS-1$
     fileChooser.setFileHidingEnabled(true);
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fileChooser.setMultiSelectionEnabled(false);

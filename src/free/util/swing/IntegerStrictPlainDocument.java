@@ -94,7 +94,7 @@ public class IntegerStrictPlainDocument extends StrictPlainDocument{
    */
 
   public boolean isChangeAccepted(String oldText, String newText){
-    if ("".equals(newText))
+    if (newText.length() == 0)
       return true;
     try{
       long val = Long.parseLong(newText,getRadix());

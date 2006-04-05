@@ -67,7 +67,7 @@ public class PlainTextDialog extends JDialog{
    */
 
   public PlainTextDialog(Component parent, String title, String text){
-    super(SwingUtils.frameForComponent(parent), title == null ? "" : title, true);
+    super(SwingUtils.frameForComponent(parent), title == null ? "" : title, true); //$NON-NLS-1$
 
     this.title = title;
 
@@ -76,7 +76,7 @@ public class PlainTextDialog extends JDialog{
     SwingUtils.registerEscapeCloser(this);
 
     textArea = new FixedJTextArea(text, 20, 81);
-    closeButton = new JButton("OK");
+    closeButton = new JButton(Localization.getString("PlainTextDialog.closeButton.text")); //$NON-NLS-1$
 
     createUI();
   }
@@ -107,7 +107,7 @@ public class PlainTextDialog extends JDialog{
     if (title != null){
       JLabel titleLabel = new JLabel(title, JLabel.CENTER);
       titleLabel.setAlignmentX(CENTER_ALIGNMENT);
-      titleLabel.setFont(new Font("Serif", Font.PLAIN, 36));
+      titleLabel.setFont(new Font("Serif", Font.PLAIN, 36)); //$NON-NLS-1$
       contentPane.add(titleLabel);
       contentPane.add(Box.createVerticalStrut(10));
     }

@@ -143,9 +143,9 @@ public class ExtensionFileFilter extends FileFilter{
   public String getDescription(){
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < endStrings.length; i++)
-      buf.append("*" + endStrings[i] + ", ");
+      buf.append("*" + endStrings[i] + ", "); //$NON-NLS-1$ //$NON-NLS-2$
     buf.setLength(buf.length() - 2);
-    return name+" ("+buf.toString()+")";
+    return name+" ("+buf.toString()+")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
 

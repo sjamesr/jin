@@ -117,7 +117,7 @@ public class AdvancedJDesktopPane extends JDesktopPane{
       case SCALE:
         break;
       default:
-       throw new IllegalArgumentException("Illegal wallpaper layout style: "+wallpaperLayoutStyle);
+       throw new IllegalArgumentException("Illegal wallpaper layout style: "+wallpaperLayoutStyle); //$NON-NLS-1$
     }
     
     this.wallpaperLayoutStyle = wallpaperLayoutStyle;

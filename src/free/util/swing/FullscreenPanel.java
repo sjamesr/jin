@@ -24,14 +24,10 @@ package free.util.swing;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.swing.*;
 
 import free.util.AWTUtilities;
-import free.util.PlatformUtils;
 import free.util.models.BooleanListener;
 import free.util.models.BooleanModel;
 import free.util.models.ConstBooleanModel;
@@ -40,19 +36,10 @@ import free.workarounds.FixedJPanel;
 
 /**
  * A <code>JPanel</code> which allows its content (always a single component)
- * to be displayed in fullscreen mode. Note: this class only works properly on
- * JDK 1.4 or later.
+ * to be displayed in fullscreen mode.
  */
 
 public class FullscreenPanel extends FixedJPanel{
-
-
-
-  /**
-   * Are we running under JDK 1.4 or later?
-   */
-
-  private static final boolean SUFFICIENT_JAVA_VERSION = PlatformUtils.isJavaBetterThan("1.4");
 
 
 
@@ -119,7 +106,7 @@ public class FullscreenPanel extends FixedJPanel{
    * from fullscreen mode.
    */
    
-  private Object originalFrameState;
+  private int originalFrameState;
   
   
   
@@ -164,7 +151,7 @@ public class FullscreenPanel extends FixedJPanel{
    */
   
   private JPanel createRestorePanel(){
-    JButton restore = new JButton("Restore normal mode");
+    JButton restore = new JButton(Localization.getString("FullscreenPanel.restoreNormalModeButton.text")); //$NON-NLS-1$
     restore.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         getFullscreenModeModel().setOff();
@@ -172,7 +159,7 @@ public class FullscreenPanel extends FixedJPanel{
     });
     restore.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     
-    JLabel label = new JLabel("This panel is in fullscreen mode.");
+    JLabel label = new JLabel(Localization.getString("FullscreenPanel.fullscreenInfoLabel.text")); //$NON-NLS-1$
     label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     
     JPanel panel = new JPanel();
@@ -197,7 +184,7 @@ public class FullscreenPanel extends FixedJPanel{
     if (beingModified)
       super.add(comp, constraints, index);
     else
-      throw new IllegalStateException("You may not add components to FullscreenPanel");
+      throw new IllegalStateException("You may not add components to FullscreenPanel"); //$NON-NLS-1$
   }
 
 
@@ -210,7 +197,7 @@ public class FullscreenPanel extends FixedJPanel{
     if (beingModified)
       super.remove(index);
     else
-      throw new IllegalStateException("You may not remove components from FullscreenPanel");
+      throw new IllegalStateException("You may not remove components from FullscreenPanel"); //$NON-NLS-1$
   }
   
   
@@ -232,11 +219,6 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private void setFullscreen(boolean on){
-    if (!SUFFICIENT_JAVA_VERSION){
-      System.err.println("Ignored request to modify fullscreen mode: only available for JRE 1.4 or later");
-      return;
-    }
-    
     beingModified = true;
     if (on)
       makeFullscreen();
@@ -292,24 +274,10 @@ public class FullscreenPanel extends FixedJPanel{
       return true;
     
     try{
-      Class awtPermissionClass = Class.forName("java.awt.AWTPermission");
-      Constructor awtPermissionCtor = awtPermissionClass.getConstructor(new Class[]{String.class});
-      Object fullscreenExclusivePermission = awtPermissionCtor.newInstance(new Object[]{"fullScreenExclusive"});
-      Class permissionClass = Class.forName("java.security.Permission");
-      Method checkPermissionMethod = SecurityManager.class.getMethod("checkPermission", new Class[]{permissionClass});
-      try{
-        checkPermissionMethod.invoke(sm, new Object[]{fullscreenExclusivePermission});
-      } catch (InvocationTargetException e){
-          if (e.getTargetException() instanceof SecurityException)
-            return false;
-          else
-            e.printStackTrace();
-        }
-    } catch (ClassNotFoundException e){e.printStackTrace();}
-      catch (NoSuchMethodException e){e.printStackTrace();}
-      catch (InstantiationException e){e.printStackTrace();}
-      catch (IllegalAccessException e){e.printStackTrace();}
-      catch (InvocationTargetException e){e.printStackTrace();}
+      sm.checkPermission(new AWTPermission("fullScreenExclusive")); //$NON-NLS-1$
+    } catch (SecurityException e){
+        return false;
+      }
       
     return true;
   }
@@ -322,45 +290,24 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private JFrame setRealFullscreen(){
-    try{
-      originalFrame = SwingUtils.frameForComponent(this);
-      JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle());
-      if (originalFrame != null)
-        frame.setIconImage(originalFrame.getIconImage());        
+    originalFrame = SwingUtils.frameForComponent(this);
+    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); //$NON-NLS-1$
+    if (originalFrame != null)
+      frame.setIconImage(originalFrame.getIconImage());        
 
-      Method setUndecorated = 
-        Frame.class.getMethod("setUndecorated", new Class[]{boolean.class});
-      Method setResizable = 
-        Frame.class.getMethod("setResizable", new Class[]{boolean.class});
+    frame.setUndecorated(true);
+    frame.setResizable(false);
 
-      setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
-      setResizable.invoke(frame, new Object[]{Boolean.FALSE});
+    GraphicsDevice graphicsDevice = SwingUtils.frameForComponent(this).getGraphicsConfiguration().getDevice();
 
-      Class windowClass = Window.class;
-      Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
-      Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
-      Method getGraphicsConfiguration = 
-        windowClass.getMethod("getGraphicsConfiguration", (Class[])null);
-      Method getDevice = graphicsConfigurationClass.getMethod("getDevice", new Class[0]);
-      Method setFullScreenWindow =
-        graphicsDeviceClass.getMethod("setFullScreenWindow", new Class[]{Window.class});
-
-      Object graphicsConfiguration = 
-        getGraphicsConfiguration.invoke(SwingUtils.frameForComponent(this), new Object[0]);
-      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
-      
-      if (originalFrame != null){
-        Method getExtState = Frame.class.getMethod("getExtendedState", new Class[0]);
-        originalFrameState = getExtState.invoke(originalFrame, new Object[0]);
+    if (originalFrame != null){
+      originalFrameState = originalFrame.getExtendedState();
   
-        originalFrame.setVisible(false);
-        setFullScreenWindow.invoke(graphicsDevice, new Object[]{frame});
-      }
+      originalFrame.setVisible(false);
+      graphicsDevice.setFullScreenWindow(frame);
+    }
 
-      return frame;
-    } catch (Exception e){e.printStackTrace();}
-
-    return null;
+    return frame;
   }
 
 
@@ -372,26 +319,18 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private JFrame setFakeFullscreen(){
-    try{
-      originalFrame = SwingUtils.frameForComponent(this);
-      JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle());
+    originalFrame = SwingUtils.frameForComponent(this);
+    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); //$NON-NLS-1$
       
-      Method setUndecorated = 
-        Frame.class.getMethod("setUndecorated", new Class[]{boolean.class});
-      Method setResizable = 
-        Frame.class.getMethod("setResizable", new Class[]{boolean.class});
-  
-      setUndecorated.invoke(frame, new Object[]{Boolean.TRUE});
-      setResizable.invoke(frame, new Object[]{Boolean.FALSE});
+    frame.setUndecorated(true);
+    frame.setResizable(false);
       
-      Rectangle screenBounds = AWTUtilities.getUsableScreenBounds();
-      frame.setBounds(screenBounds);
-      frame.setVisible(true);
-      frame.toFront();
+    Rectangle screenBounds = AWTUtilities.getUsableScreenBounds();
+    frame.setBounds(screenBounds);
+    frame.setVisible(true);
+    frame.toFront();
   
-      return frame;
-    } catch (Exception e){e.printStackTrace();}
-    return null;
+    return frame;
   }
 
 
@@ -423,30 +362,13 @@ public class FullscreenPanel extends FixedJPanel{
    */
 
   private void makeRealNormal(){
-    try{
-      Class windowClass = Window.class;
-      Class graphicsConfigurationClass = Class.forName("java.awt.GraphicsConfiguration");
-      Class graphicsDeviceClass = Class.forName("java.awt.GraphicsDevice");
-      Method getGraphicsConfiguration = 
-        windowClass.getMethod("getGraphicsConfiguration", new Class[0]);
-      Method getDevice = graphicsConfigurationClass.getMethod("getDevice", new Class[0]);
-      Method setFullScreenWindow =
-        graphicsDeviceClass.getMethod("setFullScreenWindow", new Class[]{Window.class});
+    fullscreenFrame.getGraphicsConfiguration().getDevice().setFullScreenWindow(null);
+    fullscreenFrame.dispose();
 
-      Object graphicsConfiguration = getGraphicsConfiguration.invoke(fullscreenFrame, new Object[0]);
-      Object graphicsDevice = getDevice.invoke(graphicsConfiguration, new Object[0]);
-      setFullScreenWindow.invoke(graphicsDevice, new Object[]{null});
-
-      fullscreenFrame.dispose();
-
-      
-      if (originalFrame != null){
-        Method setExtState =
-          Frame.class.getMethod("setExtendedState", new Class[]{int.class});
-        setExtState.invoke(originalFrame, new Object[]{originalFrameState});
-        originalFrame.setVisible(true);
-      }
-    } catch (Exception e){e.printStackTrace();}
+    if (originalFrame != null){
+      originalFrame.setExtendedState(originalFrameState);
+      originalFrame.setVisible(true);
+    }
   }
 
 
