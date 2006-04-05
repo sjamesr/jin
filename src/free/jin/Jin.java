@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2004 Alexander Maryanovsky.
+ * Copyright (C) 2006 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -105,8 +105,11 @@ public class Jin{
    
   private Jin(JinContext context){
     this.context = context;
-
-    // Load application properties    
+    
+    // Initialize the utils lib with the correct locale
+    free.util.swing.Localization.setLocale(getLocale());
+    
+    // Load application properties
     try{
       appProps = IOUtilities.loadProperties(Jin.class.getResourceAsStream("resources/app.props"));
     } catch (IOException e){
