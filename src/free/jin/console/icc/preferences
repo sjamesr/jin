@@ -211,26 +211,26 @@ search-game-list-action = examine #$id$
 gameListPopup.itemCount = integer;7
 
 gameListPopup.0.command = examine #$id$
-gameListPopup.0.nameKey = gameListPopup.examineGameItemLabel
+gameListPopup.0.nameKey = popup.examineGameItemLabel
 gameListPopup.0.multiSelectSupported = boolean;false
 
 gameListPopup.1.command = sposition #$id$
-gameListPopup.1.nameKey = gameListPopup.viewLastPositionItemLabel
+gameListPopup.1.nameKey = popup.viewLastPositionItemLabel
 gameListPopup.1.multiSelectSupported = boolean;false
 
 gameListPopup.2.command = smoves #$id$
-gameListPopup.2.nameKey = gameListPopup.viewMoveListItemLabel
+gameListPopup.2.nameKey = popup.viewMoveListItemLabel
 
 gameListPopup.3.command = spgn #$id$
-gameListPopup.3.nameKey = gameListPopup.viewPgnItemLabel
+gameListPopup.3.nameKey = popup.viewPgnItemLabel
 
 gameListPopup.4.type = separator
 
 gameListPopup.5.command = libappend #$id$
-gameListPopup.5.nameKey = gameListPopup.appendToLibraryItemLabel
+gameListPopup.5.nameKey = popup.appendToLibraryItemLabel
 
 gameListPopup.6.command = mailstored #$id$
-gameListPopup.6.nameKey = gameListPopup.emailMeItemLabel
+gameListPopup.6.nameKey = popup.emailMeItemLabel
 
 
 # Input properties
