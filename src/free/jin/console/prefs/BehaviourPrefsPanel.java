@@ -21,9 +21,6 @@
 
 package free.jin.console.prefs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
 
 import free.jin.BadChangesException;
@@ -40,7 +37,7 @@ import free.util.swing.PreferredSizedPanel;
  * in certain cases.
  */
 
-public class BehaviourPrefsPanel extends PreferencesPanel{
+public final class BehaviourPrefsPanel extends PreferencesPanel{
   
   
   
@@ -107,14 +104,9 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
           throw new IllegalStateException();
       }
       
-      ActionListener gameListsDisplayStyleListener = new ActionListener(){
-        public void actionPerformed(ActionEvent evt){
-          fireStateChanged();
-        }
-      };
-      embeddedGameLists.addActionListener(gameListsDisplayStyleListener);
-      externalGameLists.addActionListener(gameListsDisplayStyleListener);
-      textGameLists.addActionListener(gameListsDisplayStyleListener);
+      embeddedGameLists.addActionListener(proxyActionListener);
+      externalGameLists.addActionListener(proxyActionListener);
+      textGameLists.addActionListener(proxyActionListener);
     }
     else{
       embeddedGameLists = null;
@@ -124,12 +116,7 @@ public class BehaviourPrefsPanel extends PreferencesPanel{
     
     copyOnSelect = i18n.createCheckBox("copyOnSelectCheckBox");
     copyOnSelect.setSelected(consoleManager.isCopyOnSelect());
-    copyOnSelect.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent evt){
-        fireStateChanged();
-      }
-    });
-
+    copyOnSelect.addActionListener(proxyActionListener);
     
     createUI();
   }
