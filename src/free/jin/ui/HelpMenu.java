@@ -45,11 +45,8 @@ public class HelpMenu extends JMenu{
    */
 
   public HelpMenu(){
-    I18n i18n = I18n.get(HelpMenu.class);
+    I18n.get(HelpMenu.class).initAbstractButton(this, "this");
     
-    setText(i18n.getString("text"));
-    setDisplayedMnemonicIndex(i18n.getInt("displayedMnemonicIndex"));
-
     add(createWebsiteMenuItem());
     add(createCreditsMenuItem());
     add(createBugReportMenuItem());
