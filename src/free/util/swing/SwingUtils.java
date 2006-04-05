@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2006 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -111,5 +111,66 @@ public class SwingUtils{
   }
 
 
+
+  /**
+   * Returns the displayed mnemonic index for the specified label specification.
+   * A label specification is a string which possibly includes an ampersand;
+   * the character following the first ampersand is the mnemonic. 
+   */
+  
+  public static int getLabelMnemonicIndex(String labelSpec){
+    return labelSpec.indexOf('&'); 
+  }
+
+
+
+  /**
+   * Returns the text for the specified label specification.
+   * A label specification is a string which possibly includes an ampersand;
+   * the character following the first ampersand is the mnemonic. 
+   */
+  
+  public static String getLabelText(String labelSpec){
+    int ampIndex = labelSpec.indexOf('&');
+    if (ampIndex == -1)
+      return labelSpec;
+    else
+      return labelSpec.substring(0, ampIndex) + labelSpec.substring(ampIndex + 1);
+  }
+  
+  
+  
+  /**
+   * Applies the label specification on the specified button.
+   */
+  
+  public static void applyLabelSpec(AbstractButton button, String labelSpec){
+    button.setText(getLabelText(labelSpec));
+    button.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+  }
+  
+  
+  
+  /**
+   * Applies the label specification on the specified label.
+   */
+  
+  public static void applyLabelSpec(JLabel label, String labelSpec){
+    label.setText(getLabelText(labelSpec));
+    label.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+  }
+  
+  
+  
+  /**
+   * Applies the label specification on the specified mnemonicable component.
+   */
+  
+  public static void applyLabelSpec(Mnemonicable mnemonicable, String labelSpec){
+    mnemonicable.setText(getLabelText(labelSpec));
+    mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+  }
+  
+  
   
 }
