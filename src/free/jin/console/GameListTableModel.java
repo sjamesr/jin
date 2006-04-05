@@ -61,8 +61,8 @@ public class GameListTableModel implements TableModel{
     int id = evt.getID();
     int itemCount = evt.getItemCount();
     
-    String ratedIndicator = i18n.getString("gameListTable.ratedGameIndicator");
-    String unratedIndicator = i18n.getString("gameListTable.unratedGameIndicator");
+    String ratedIndicator = i18n.getString("ratedGameIndicator");
+    String unratedIndicator = i18n.getString("unratedGameIndicator");
 
     if (id == GameListEvent.HISTORY_LIST_EVENT_ID){
       tableData = new String[itemCount][12];
@@ -85,18 +85,18 @@ public class GameListTableModel implements TableModel{
       }
 
       columnNames = new String[]{
-          i18n.getString("gameListTable.rowIndexColumn"),
-          i18n.getString("gameListTable.resultColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.colorColumn"),
-          i18n.getString("gameListTable.oppRatingColumn"),
-          i18n.getString("gameListTable.oppColumn"),
-          i18n.getString("gameListTable.timeControlsColumn"),
-          i18n.getString("gameListTable.ratedColumn"),
-          i18n.getString("gameListTable.categoryColumn"),
-          i18n.getString("gameListTable.ecoColumn"),
-          i18n.getString("gameListTable.endExplanationColumn"),
-          i18n.getString("gameListTable.gameStartDateColumn")
+          i18n.getString("rowIndexColumn"),
+          i18n.getString("resultColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("colorColumn"),
+          i18n.getString("oppRatingColumn"),
+          i18n.getString("oppColumn"),
+          i18n.getString("timeControlsColumn"),
+          i18n.getString("ratedColumn"),
+          i18n.getString("categoryColumn"),
+          i18n.getString("ecoColumn"),
+          i18n.getString("endExplanationColumn"),
+          i18n.getString("gameStartDateColumn")
       };
     }
     else if (id == GameListEvent.SEARCH_LIST_EVENT_ID){
@@ -118,17 +118,17 @@ public class GameListTableModel implements TableModel{
       }
 
       columnNames = new String[]{
-          i18n.getString("gameListTable.rowIndexColumn"),
-          i18n.getString("gameListTable.whitePlayerColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.blackPlayerColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.resultColumn"),
-          i18n.getString("gameListTable.timeControlsColumn"),
-          i18n.getString("gameListTable.ratedColumn"),
-          i18n.getString("gameListTable.categoryColumn"),
-          i18n.getString("gameListTable.ecoColumn"),
-          i18n.getString("gameListTable.gameStartDateColumn")
+          i18n.getString("rowIndexColumn"),
+          i18n.getString("whitePlayerColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("blackPlayerColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("resultColumn"),
+          i18n.getString("timeControlsColumn"),
+          i18n.getString("ratedColumn"),
+          i18n.getString("categoryColumn"),
+          i18n.getString("ecoColumn"),
+          i18n.getString("gameStartDateColumn")
       };
     }
     else if (id==GameListEvent.LIBLIST_EVENT_ID){
@@ -151,26 +151,26 @@ public class GameListTableModel implements TableModel{
       }
 
       columnNames = new String[]{
-          i18n.getString("gameListTable.rowIndexColumn"),
-          i18n.getString("gameListTable.whitePlayerColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.blackPlayerColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.resultColumn"),
-          i18n.getString("gameListTable.timeControlsColumn"),
-          i18n.getString("gameListTable.ratedColumn"),
-          i18n.getString("gameListTable.categoryColumn"),
-          i18n.getString("gameListTable.ecoColumn"),
-          i18n.getString("gameListTable.gameStartDateColumn"),
-          i18n.getString("gameListTable.noteColumn")
+          i18n.getString("rowIndexColumn"),
+          i18n.getString("whitePlayerColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("blackPlayerColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("resultColumn"),
+          i18n.getString("timeControlsColumn"),
+          i18n.getString("ratedColumn"),
+          i18n.getString("categoryColumn"),
+          i18n.getString("ecoColumn"),
+          i18n.getString("gameStartDateColumn"),
+          i18n.getString("noteColumn")
       };
 
     }
     else if (id==GameListEvent.STORED_LIST_EVENT_ID){
       tableData = new String[itemCount][11];
       
-      String oppPresentIndicator = i18n.getString("gameListTable.oppPresentIndicator");
-      String oppAbsentIndicator = i18n.getString("gameListTable.oppAbsentIndicator");
+      String oppPresentIndicator = i18n.getString("oppPresentIndicator");
+      String oppAbsentIndicator = i18n.getString("oppAbsentIndicator");
 
       for (int i=0;i<itemCount;i++){
         StoredListItem item = (StoredListItem)evt.getItem(i);
@@ -189,17 +189,17 @@ public class GameListTableModel implements TableModel{
       }
 
       columnNames = new String[]{
-          i18n.getString("gameListTable.oppPresentColumn"),
-          i18n.getString("gameListTable.ratingColumn"),
-          i18n.getString("gameListTable.colorColumn"),
-          i18n.getString("gameListTable.oppRatingColumn"),
-          i18n.getString("gameListTable.oppColumn"),
-          i18n.getString("gameListTable.timeControlsColumn"),
-          i18n.getString("gameListTable.ratedColumn"),
-          i18n.getString("gameListTable.categoryColumn"),
-          i18n.getString("gameListTable.ecoColumn"),
-          i18n.getString("gameListTable.gameStartDateColumn"),
-          i18n.getString("gameListTable.adjournmentReasonColumn")
+          i18n.getString("oppPresentColumn"),
+          i18n.getString("ratingColumn"),
+          i18n.getString("colorColumn"),
+          i18n.getString("oppRatingColumn"),
+          i18n.getString("oppColumn"),
+          i18n.getString("timeControlsColumn"),
+          i18n.getString("ratedColumn"),
+          i18n.getString("categoryColumn"),
+          i18n.getString("ecoColumn"),
+          i18n.getString("gameStartDateColumn"),
+          i18n.getString("adjournmentReasonColumn")
       };
     }
     else 
