@@ -1,20 +1,43 @@
+/**
+ * Jin - a chess client for internet chess servers.
+ * More information is available at http://www.jinchess.com/.
+ * Copyright (C) 2006 Alexander Maryanovsky.
+ * All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package free.jin;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
+import free.util.Pair;
 import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PlainTextDialog;
+import free.util.swing.SwingUtils;
 
 
 
@@ -32,10 +55,18 @@ public class I18n{
   
   
   /**
-   * The delegate <code>ResourceBundle</code>.
+   * A cache of <code>I18n</code> objects.
    */
   
-  private final ResourceBundle delegate;
+  private static final Map cache = new HashMap(); 
+  
+  
+  
+  /**
+   * Holds the actual translation.
+   */
+  
+  private final Properties props;
   
   
   
@@ -62,12 +93,7 @@ public class I18n{
    */
   
   private I18n(Class requestingClass, Locale locale, I18n parent){
-    ResourceBundle delegate = null;
-    try{
-      delegate = getResourceBundle(requestingClass, locale);
-    } catch (MissingResourceException e){}
-    
-    this.delegate = delegate;
+    this.props = getProperties(requestingClass, locale);
     this.className = Utilities.getClassName(requestingClass);
     this.parent = parent;
   }
@@ -89,7 +115,14 @@ public class I18n{
    */
   
   public static I18n get(Class requestingClass){
-    return new I18n(requestingClass, Jin.getInstance().getLocale());
+    I18n result = (I18n)cache.get(requestingClass);
+    
+    if (result == null){
+      result = new I18n(requestingClass, Jin.getInstance().getLocale());
+      cache.put(requestingClass, result);
+    }
+    
+    return result;
   }
   
   
@@ -103,26 +136,63 @@ public class I18n{
    */
   
   public static I18n get(Class requestingClass, Class baseClass){
-    Locale locale = Jin.getInstance().getLocale();
-    
     if (requestingClass.equals(baseClass))
-      return new I18n(requestingClass, locale);
+      return I18n.get(requestingClass);
     
-    return new I18n(requestingClass, locale,
+    Pair key = new Pair(requestingClass, baseClass);
+    I18n result = (I18n)cache.get(key);
+    
+    if (result == null){
+      result = new I18n(requestingClass, Jin.getInstance().getLocale(),
         get(requestingClass.getSuperclass(), baseClass));
+      cache.put(key, result);
+    }
+    
+    return result;
   }
   
   
   
   /**
-   * Returns the <code>ResourceBundle</code> for the specified class and locale.
+   * Returns the translation <code>Properties</code> for the specified class and locale.
    */
   
-  private static ResourceBundle getResourceBundle(Class requestingClass, Locale locale){
-    String packageName = Utilities.getPackageName(requestingClass);
-    String bundleName = "".equals(packageName) ? "localization" : packageName + "." + "localization"; 
+  private static Properties getProperties(Class c, Locale locale){
+    String propsFilenamePrefix = "localization";
+    String language = locale.getLanguage();
+    String country = locale.getCountry();
+    String variant = locale.getVariant();
     
-    return ResourceBundle.getBundle(bundleName, locale, requestingClass.getClassLoader());
+    Properties props = null;
+    
+    props = loadProps(c, props, propsFilenamePrefix + ".properties");
+    props = loadProps(c, props, propsFilenamePrefix + "_" + language + ".properties");
+    props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + ".properties");
+    props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + "_" + variant + ".properties");
+    
+    return props;
+  }
+  
+  
+  
+  /**
+   * Loads and returns a <code>Properties</code> object from the resource with the specified name.
+   * The specified <code>Properties</code> object is used as the default delegate for the returned one.
+   */
+  
+  private static Properties loadProps(Class c, Properties props, String resourceName){
+    InputStream in = c.getResourceAsStream(resourceName);
+    
+    if (in != null){
+      props = new Properties(props);
+      try{
+        props.load(in);
+      } catch (IOException e){
+          throw new MissingResourceException("IOException while loading " + resourceName, c.getName(), "");
+        }
+    }
+    
+    return props;
   }
   
   
@@ -132,18 +202,28 @@ public class I18n{
    */
   
   public String getString(String key) throws MissingResourceException{
-    try{
-      if (delegate == null)
-        throw new MissingResourceException("Can't find resource for bundle " + getClass().getName() + ", key " + key,
-            getClass().getName(), key);
-      else
-        return delegate.getString(className + "." + key);
-    } catch (MissingResourceException e){
-        if (parent == null)
-          throw e;
-        else
-          return parent.getString(key);
-      }
+    String result = getString(key, null);
+    if (result != null)
+      return result;
+    else
+      throw new MissingResourceException("Missing i18n resource \"" + key + "\" for class " + className, className, key);
+  }
+  
+  
+  
+  /**
+   * Returns the translation for the specified key, or the specified default value if there is no translation.
+   */
+  
+  public String getString(String key, String defaultValue){
+    String result = null;
+    if (props != null)
+      result = props.getProperty(className + "." + key);
+    
+    if (result != null)
+      return result;
+    else
+      return parent == null ? defaultValue : parent.getString(key, defaultValue);
   }
   
   
@@ -159,28 +239,28 @@ public class I18n{
   
   
   /**
+   * Returns the translation for <code>key</code>, parsed as an integer.
+   * If there is no translation <code>key</code>, returns <code>defaultValue</code>.
+   */
+  
+  public int getInt(String key, int defaultValue){
+    String translation = getString(key, null);
+    if (translation != null)
+      return Integer.parseInt(translation);
+    else
+      return defaultValue;
+  }
+  
+  
+  
+  /**
    * Creates a <code>JLabel</code> using the specified i18n key.
    */
   
   public JLabel createLabel(String i18nKey){
     JLabel label = new JLabel();
     
-    label.setText(getString(i18nKey + ".text"));
-    label.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
-    
-    return label;
-  }
-  
-  
-  
-  /**
-   * Creates a <code>JLabel</code> with no mnemonic using the specified i18n key.
-   */
-  
-  public JLabel createLabelNoMnemonic(String i18nKey){
-    JLabel label = new JLabel();
-    
-    label.setText(getString(i18nKey + ".text"));
+    SwingUtils.applyLabelSpec(label, getString(i18nKey + ".text"));    
     
     return label;
   }
@@ -192,7 +272,7 @@ public class I18n{
    */
   
   public JRadioButton createRadioButton(String i18nKey){
-    return (JRadioButton)init(new JRadioButton(), i18nKey);
+    return (JRadioButton)initAbstractButton(new JRadioButton(), i18nKey);
   }
 
   
@@ -202,7 +282,7 @@ public class I18n{
    */
   
   public JCheckBox createCheckBox(String i18nKey){
-    return (JCheckBox)init(new JCheckBox(), i18nKey);
+    return (JCheckBox)initAbstractButton(new JCheckBox(), i18nKey);
   }
   
   
@@ -212,7 +292,7 @@ public class I18n{
    */
   
   public JButton createButton(String i18nKey){
-    return (JButton)init(new JButton(), i18nKey);
+    return (JButton)initAbstractButton(new JButton(), i18nKey);
   }
   
   
@@ -236,12 +316,13 @@ public class I18n{
   public JMenuItem createMenuItem(String i18nKey, Object [] textArgs){
     JMenuItem menuItem = new JMenuItem();
     
-    String text = getString(i18nKey + ".text");
-    if (textArgs != null)
-      text = MessageFormat.format(text, textArgs);
+    String labelSpec = getString(i18nKey + ".text");
     
-    menuItem.setText(text);
-    menuItem.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
+    if (textArgs != null)
+      labelSpec = MessageFormat.format(labelSpec, textArgs);
+    
+    // This doesn't work right if textArgs contains ampersands
+    SwingUtils.applyLabelSpec(menuItem, labelSpec);
     
     return menuItem;
     
@@ -254,12 +335,10 @@ public class I18n{
    */
   
   public ColorChooser createColorChooser(String i18nKey){
-    ColorChooser colorChooser = new ColorChooser(getString(i18nKey + ".text"));
-    colorChooser.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
+    ColorChooser colorChooser = new ColorChooser();
     
-    String tooltipText = getString(i18nKey + ".tooltip");
-    if (!"".equals(tooltipText))
-      colorChooser.setToolTipText(tooltipText);
+    SwingUtils.applyLabelSpec(colorChooser, getString(i18nKey + ".text"));
+    colorChooser.setToolTipText(getString(i18nKey + ".tooltip", null));
     
     return colorChooser;
   }
@@ -269,15 +348,13 @@ public class I18n{
   /**
    * Initializes the specified <code>AbstractButton</code> from the specified
    * i18n key and with the specified initial state.
+   * This method is useful if you have a custom <code>AbstractButton</code>,
+   * and so can't use the <code>create</code> methods.
    */
   
-  private AbstractButton init(AbstractButton button, String i18nKey){
-    button.setText(getString(i18nKey + ".text"));
-    button.setDisplayedMnemonicIndex(getInt(i18nKey + ".displayedMnemonicIndex"));
-    
-    String tooltipText = getString(i18nKey + ".tooltip");
-    if (!"".equals(tooltipText))
-      button.setToolTipText(tooltipText);
+  public AbstractButton initAbstractButton(AbstractButton button, String i18nKey){
+    SwingUtils.applyLabelSpec(button, getString(i18nKey + ".text"));
+    button.setToolTipText(getString(i18nKey + ".tooltip", null));
     
     return button;
   }
@@ -300,7 +377,7 @@ public class I18n{
    * Obtains the title of the <code>OptionPanel</code> with the specified i18n key.
    */
   
-  private String getTitle(String i18nKey){
+  private String getOptionPanelTitle(String i18nKey){
     return getString(i18nKey + ".title");
   }
 
@@ -312,7 +389,7 @@ public class I18n{
    * pattern and is formatted via <code>MessageFormat.format(message, args)</code>.
    */
   
-  private String getMessage(String i18nKey, Object [] args){
+  private String getOptionPanelMessage(String i18nKey, Object [] args){
     String message = getString(i18nKey + ".message");
     
     if (args != null)
@@ -334,8 +411,8 @@ public class I18n{
    */
   
   public void error(String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getTitle(i18nKey);
-    String message = getMessage(i18nKey, messageArgs);
+    String title = getOptionPanelTitle(i18nKey);
+    String message = getOptionPanelMessage(i18nKey, messageArgs);
     
     OptionPanel.error(title, message, hintParent);
   }
@@ -394,8 +471,8 @@ public class I18n{
    */
   
   public Object confirm(Object defaultOption, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getTitle(i18nKey);
-    String message = getMessage(i18nKey, messageArgs);
+    String title = getOptionPanelTitle(i18nKey);
+    String message = getOptionPanelMessage(i18nKey, messageArgs);
     
     return OptionPanel.confirm(defaultOption, title, message, hintParent);
   }
@@ -458,8 +535,8 @@ public class I18n{
    */
   
   public Object question(Object defaultOption, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getTitle(i18nKey);
-    String message = getMessage(i18nKey, messageArgs);
+    String title = getOptionPanelTitle(i18nKey);
+    String message = getOptionPanelMessage(i18nKey, messageArgs);
     
     return OptionPanel.question(defaultOption, title, message, hintParent);
   }
