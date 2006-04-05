@@ -21,12 +21,9 @@
 
 package free.jin.ui;
 
-import free.jin.BadChangesException;
-
 import java.util.Vector;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import free.jin.BadChangesException;
 
 
 /**
@@ -46,25 +43,12 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
   
   
   /**
-   * Listens to changes in underlying panels and reports them to our own
-   * listeners.
-   */
-  
-  private final ChangeListener proxyListener = new ChangeListener(){
-    public void stateChanged(ChangeEvent evt){
-      fireStateChanged();
-    }
-  };
-  
-  
-  
-  /**
    * Adds an underlying preferences panel.
    */
   
   public final void addPanel(PreferencesPanel panel, String panelName, String panelToolTip){
     panels.addElement(panel);
-    panel.addChangeListener(proxyListener);
+    panel.addChangeListener(proxyChangeListener);
     
     addPanelToUi(panel, panelName, panelToolTip);
   }
