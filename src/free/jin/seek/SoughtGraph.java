@@ -692,7 +692,7 @@ public class SoughtGraph extends JComponent{
   protected String getSeekString(Seek seek){
 // <name><titles> <rating> <(provisional)> seeks <time> <inc> [isRated] [wild] [color] [minrating]-[maxrating] [manual] [formula]
     
-    I18n i18n = plugin.getI18n();
+    I18n i18n = I18n.get(SoughtGraph.class);
     String provisional = i18n.getString("provisional");
     String rated = i18n.getString("rated");
     String unrated = i18n.getString("unrated");
