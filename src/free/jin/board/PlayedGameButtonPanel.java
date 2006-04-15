@@ -44,6 +44,7 @@ import free.jin.event.OfferEvent;
 import free.jin.plugin.Plugin;
 import free.jin.ui.OptionPanel;
 import free.util.TableLayout;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 
 
@@ -645,8 +646,9 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     
     Object [] plyCountArr = new Object[]{new Integer(plyCount)};
     
+    String buttonTextPattern = MessageFormat.format(i18n.getString("multipleTakebackButton.textPattern"), plyCountArr);
+    SwingUtils.applyLabelSpec(takebackNButton, buttonTextPattern);
     takebackNButton.setEnabled(state != OFFERED_STATE);
-    takebackNButton.setText(MessageFormat.format(i18n.getString("multipleTakebackButton.textPattern"), plyCountArr));
     takebackNButton.setActionCommand(String.valueOf(plyCount));
     
 
