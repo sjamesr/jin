@@ -646,7 +646,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     
     Object [] plyCountArr = new Object[]{new Integer(plyCount)};
     
-    String buttonTextPattern = MessageFormat.format(i18n.getString("multipleTakebackButton.textPattern"), plyCountArr);
+    String buttonTextPattern = MessageFormat.format(i18n.getString("multipleTakebackButton.text"), plyCountArr);
     SwingUtils.applyLabelSpec(takebackNButton, buttonTextPattern);
     takebackNButton.setEnabled(state != OFFERED_STATE);
     takebackNButton.setActionCommand(String.valueOf(plyCount));
