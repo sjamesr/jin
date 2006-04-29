@@ -144,7 +144,14 @@ abstract class ScriptDialog extends JDialog{
     final JComboBox eventTypeChoice = new FixedJComboBox(eventTypeChoiceEntries);
     eventTypeChoice.setEditable(false);
     eventTypeChoice.addItem(new NamedObject(SELECT_EVENT_TYPE, i18n.getString("selectEventTypeString")));
-    eventTypeChoice.setSelectedItem(defaultEventType);
+    
+    for (int i = 0; i < eventTypeChoice.getItemCount(); i++){
+      NamedObject item = (NamedObject)eventTypeChoice.getItemAt(i);
+      if (item.getTarget().equals(defaultEventType)){
+        eventTypeChoice.setSelectedIndex(i);
+        break;
+      }
+    }
 
     final JPanel subtypesPanel = new JPanel(new TableLayout(2));
     JPanel subtypesHolderPanel = new JPanel(new BorderLayout());
