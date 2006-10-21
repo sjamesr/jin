@@ -223,7 +223,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     if (wallpaper != null)
       desktop.setWallpaper(desktop.getToolkit().getImage(wallpaper));
 
-    desktop.putClientProperty("JDesktopPane.dragMode", "outline");
+    //desktop.putClientProperty("JDesktopPane.dragMode", "outline");
   }
 
 
