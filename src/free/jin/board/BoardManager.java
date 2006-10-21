@@ -279,12 +279,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     setAutoPromote(prefs.getBool("auto-promote", false));
 
-    setMoveInputStyle("click'n'click".equals(prefs.getString("move-input-style", null)) ? 
+    setMoveInputStyle("click'n'click".equals(prefs.getString("move-input-style", "drag'n'drop")) ? 
       JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP);
 
-    setPieceFollowsCursor(prefs.getBool("piece-follows-cursor", false));
+    setPieceFollowsCursor(prefs.getBool("piece-follows-cursor", true));
     
-    setHighlightMadeMoveSquares(prefs.getBool("highlight-made-move-squares", true));
+    setHighlightMadeMoveSquares(prefs.getBool("highlight-made-move-squares", false));
     setMadeMoveSquaresHighlightColor(
       prefs.getColor("highlight-made-move-squares.color", new Color(0x0000ff)));
 
@@ -300,7 +300,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     setHighlightingOwnMoves(prefs.getBool("move-highlight.highlight-own", false));
 
-    setMoveHighlightingColor(prefs.getColor("move-highlight.color", Color.red));
+    setMoveHighlightingColor(prefs.getColor("move-highlight.color", new Color(0x00b2b2)));
 
     String moveSendingModeString = prefs.getString("move-sending-mode", "predrag");
     if ("legal-chess".equals(moveSendingModeString))
@@ -335,8 +335,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setWhiteOutlineColor(prefs.getColor("white-outline-color", Color.black));
     setBlackOutlineColor(prefs.getColor("black-outline-color", Color.white));
 
-    setLightSquareColor(prefs.getColor("light-square-color", Color.cyan));
-    setDarkSquareColor(prefs.getColor("dark-square-color", Color.magenta));
+    setLightSquareColor(prefs.getColor("light-square-color", new Color(0xffcf90)));
+    setDarkSquareColor(prefs.getColor("dark-square-color", new Color(0x8f604f)));
   }
 
 
