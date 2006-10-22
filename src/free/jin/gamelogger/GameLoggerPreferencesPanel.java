@@ -410,6 +410,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
         }
         rulesListModel.addElement(I18n.get(GameLoggerPreferencesPanel.class).getString("initialNewGameLoggingRuleName"));
         loggingRulesList.setSelectedIndex(rulesListModel.size() - 1);
+        loggingRulesList.ensureIndexIsVisible(loggingRulesList.getSelectedIndex());
 
         rulenameField.setText("");
         filenameField.setText("");
@@ -433,6 +434,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
             loggingRulesList.setSelectedIndex(selectedIndex);
           else if (rulesListModel.size() != 0)
             loggingRulesList.setSelectedIndex(selectedIndex - 1);
+          loggingRulesList.ensureIndexIsVisible(loggingRulesList.getSelectedIndex());
         } finally{
           ignoreRulesListSelectionChange = false;
         }
@@ -562,7 +564,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     add(modeButtonsPanel, BorderLayout.NORTH);
     add(useRulesPanel, BorderLayout.CENTER);
     
-    loggingRulesList.setSelectedIndex(-1);
+    int initialSelectedIndex = rulesListModel.getSize() - 1;
+    loggingRulesList.setSelectedIndex(initialSelectedIndex);
+    loggingRulesList.ensureIndexIsVisible(initialSelectedIndex);
 
     syncUI();
   }
