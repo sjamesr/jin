@@ -132,10 +132,41 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private JTextField conditionField;
+  
+  
+  
+  /**
+   * The button for deleting rules.
+   */
+  
+  private JButton deleteRuleButton;
 
 
 
-
+  /**
+   * The panel which holds the UI for the "log all" option.
+   */
+  
+  private JPanel logAllPanel;
+  
+  
+  
+  /**
+   * The panel which holds the UI for the "log via rules" option.
+   */
+  
+  private JPanel useRulesPanel;
+  
+  
+  
+  /**
+   * The panel which holds the UI for setting up a specific rule.
+   */
+  
+  private JPanel rulePropertiesPanel;
+  
+  
+  
   /**
    * This variable is set to <code>true</code> when the values of the rule
    * fields is being changed programmatically because a new rule is selected.
@@ -143,6 +174,16 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private boolean ignoreRuleFieldsDocumentChange = false;
+  
+  
+  
+  /**
+   * This variable is set to <code>true</code> when the selection in the rules
+   * list is being changed programmatically. This is done so that the corresponding
+   * selection listened can act accordingly.
+   */
+  
+  private boolean ignoreRulesListSelectionChange = false;
 
 
 
@@ -153,8 +194,6 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private int rulesListSelectedIndex = -1;
-
-
 
 
 
@@ -184,6 +223,55 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
     createUI();
   }
+  
+  
+  
+  /**
+   * Updates the UI according to the current user selections.
+   */
+  
+  protected void syncUI(){
+    try{
+      ignoreRuleFieldsDocumentChange = true;
+
+      if (logNoneButton.isSelected()){
+        setContainerEnabled(logAllPanel, false);
+        setContainerEnabled(useRulesPanel, false);
+      }
+      else if (logAllButton.isSelected()){
+        setContainerEnabled(logAllPanel, true);
+        setContainerEnabled(useRulesPanel, false);
+      }
+      else if (useRulesButton.isSelected()){
+        setContainerEnabled(logAllPanel, false);
+        setContainerEnabled(useRulesPanel, true);
+      }
+      
+      if (loggingRulesList.getSelectedIndex() == -1){
+        rulenameField.setText("");
+        filenameField.setText("");
+        conditionField.setText("");
+        setContainerEnabled(rulePropertiesPanel, false);
+        deleteRuleButton.setEnabled(false);
+      }
+      else{
+        if (useRulesButton.isSelected()){
+          setContainerEnabled(rulePropertiesPanel, true);
+          deleteRuleButton.setEnabled(true);
+        }
+
+        Object selectedItem = loggingRulesList.getSelectedValue();
+        if (selectedItem instanceof LoggingRule){ // When a new rule is created, this value is merely a String
+          LoggingRule selectedRule = (LoggingRule)selectedItem;
+          rulenameField.setText(selectedRule.getName());
+          filenameField.setText(selectedRule.getFilename());
+          conditionField.setText(selectedRule.getCondition());
+        }
+      }
+    } finally{
+      ignoreRuleFieldsDocumentChange = false;
+    }
+  }
 
 
 
@@ -211,40 +299,26 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     logNoneButton.setActionCommand("none");
     logAllButton.setActionCommand("all");
     useRulesButton.setActionCommand("rules");
-
-    final JPanel logAllPanel = new JPanel();
-    final JPanel useRulesPanel = new JPanel();
+    
+    logAllPanel = new JPanel();
+    useRulesPanel = new JPanel();
 
     ActionListener loggingModeListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        String actionCommand = evt.getActionCommand();
-
-        if ("none".equals(actionCommand)){
-          setContainerEnabled(logAllPanel, false);
-          setContainerEnabled(useRulesPanel, false);
-        }
-        if ("all".equals(actionCommand)){
-          setContainerEnabled(logAllPanel, true);
-          setContainerEnabled(useRulesPanel, false);
-        }
-        else if ("rules".equals(actionCommand)){
-          setContainerEnabled(logAllPanel, false);
-          setContainerEnabled(useRulesPanel, true);
-        }
-
+        syncUI();
         fireStateChanged();
       }
     };
-
-    logNoneButton.addActionListener(loggingModeListener);
-    logAllButton.addActionListener(loggingModeListener);
-    useRulesButton.addActionListener(loggingModeListener);
 
     switch(loggingMode){
       case GameLogger.LOG_NONE:  logNoneButton.setSelected(true); break;
       case GameLogger.LOG_ALL:   logAllButton.setSelected(true); break;
       case GameLogger.USE_RULES: useRulesButton.setSelected(true); break;
     }
+    
+    logNoneButton.addActionListener(loggingModeListener);
+    logAllButton.addActionListener(loggingModeListener);
+    useRulesButton.addActionListener(loggingModeListener);
 
     allGamesLogFileField = new FixedJTextField(10);
     allGamesLogFileField.setText(allGamesLogFile);
@@ -262,9 +336,10 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     JPanel logNoneHelpPanel = new JPanel(new BorderLayout(5, 5));
     logNoneHelpPanel.add(logNoneButton, BorderLayout.WEST);
 
-    JPanel logAllHelpPanel = new JPanel(new BorderLayout());
-    logAllHelpPanel.add(logAllButton, BorderLayout.WEST);
-    logAllHelpPanel.add(logAllPanel, BorderLayout.CENTER);
+    Box logAllHelpPanel = Box.createHorizontalBox();
+    logAllHelpPanel.add(logAllButton);
+    logAllHelpPanel.add(Box.createHorizontalStrut(10));
+    logAllHelpPanel.add(logAllPanel);
 
     JPanel useRulesHelpPanel = new JPanel(new BorderLayout());
     useRulesHelpPanel.add(useRulesButton, BorderLayout.WEST);
@@ -281,19 +356,20 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     loggingRulesList = new JList(rulesListModel);
     loggingRulesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     loggingRulesList.addListSelectionListener(new ListSelectionListener(){
-      private boolean ignoreSelectionChange = false;
       public void valueChanged(ListSelectionEvent evt){
         if (evt.getValueIsAdjusting())
           return;
-        if (ignoreSelectionChange)
+        if (ignoreRulesListSelectionChange){
+          rulesListSelectedIndex = loggingRulesList.getSelectedIndex();
           return;
+        }
         if ((rulesListSelectedIndex != -1) && (rulesListSelectedIndex < rulesListModel.size())){
           try{
             updateRuleFromUI(rulesListSelectedIndex);
           } catch (BadChangesException e){
-              ignoreSelectionChange = true;
+            ignoreRulesListSelectionChange = true;
               loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
-              ignoreSelectionChange = false;
+              ignoreRulesListSelectionChange = false;
               
               I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
               OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), GameLoggerPreferencesPanel.this);
@@ -303,25 +379,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
             }
         }
         rulesListSelectedIndex = loggingRulesList.getSelectedIndex();
-        try{
-          ignoreRuleFieldsDocumentChange = true;
-          if (rulesListSelectedIndex == -1){
-            rulenameField.setText("");
-            filenameField.setText("");
-            conditionField.setText("");
-          }
-          else{  
-            Object selectedItem = loggingRulesList.getSelectedValue();
-            if (selectedItem instanceof LoggingRule){
-              LoggingRule selectedRule = (LoggingRule)selectedItem;
-              rulenameField.setText(selectedRule.getName());
-              filenameField.setText(selectedRule.getFilename());
-              conditionField.setText(selectedRule.getCondition());
-            }
-          }
-        } finally{
-            ignoreRuleFieldsDocumentChange = false;
-          }
+        syncUI();
       }
     });
 
@@ -360,42 +418,27 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JButton deleteRuleButton = i18n.createButton("deleteGameLoggingRuleButton");
+    deleteRuleButton = i18n.createButton("deleteGameLoggingRuleButton");
     deleteRuleButton.setDefaultCapable(false);
     deleteRuleButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
-        if (selectedIndex != -1){
-          I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
-          String ruleName = rulesListModel.getElementAt(selectedIndex).toString();
-          
-          Object result = 
-            i18n.confirm(OptionPanel.OK, "confirmRuleDeletion", GameLoggerPreferencesPanel.this, new Object[]{ruleName});
-          if (result == OptionPanel.OK){
-            rulesListModel.removeElementAt(selectedIndex);
-            if (selectedIndex < rulesListModel.size())
-              loggingRulesList.setSelectedIndex(selectedIndex);
-            else if (rulesListModel.size() != 0)
-              loggingRulesList.setSelectedIndex(selectedIndex - 1);
-            else{
-              // Needed because of a bug in earlier versions of swing which causes ListSelectionEvents
-              // not to be fired for events when no index is selected.
-              try{
-                ignoreRuleFieldsDocumentChange = true;
-                rulenameField.setText("");
-                filenameField.setText("");
-                conditionField.setText("");
-                rulesListSelectedIndex = -1;
-              } finally{
-                  ignoreRuleFieldsDocumentChange = false;
-                }
-            }
-
-            loggingRulesList.setSelectedIndex(-1);
-              
-            fireStateChanged();
-          }
+        if (selectedIndex == -1)
+          return;
+        
+        try{
+          ignoreRulesListSelectionChange = true;
+          rulesListModel.removeElementAt(selectedIndex);
+          if (selectedIndex < rulesListModel.size())
+            loggingRulesList.setSelectedIndex(selectedIndex);
+          else if (rulesListModel.size() != 0)
+            loggingRulesList.setSelectedIndex(selectedIndex - 1);
+        } finally{
+          ignoreRulesListSelectionChange = false;
         }
+        
+        syncUI();  
+        fireStateChanged();
       }
     });
 
@@ -423,9 +466,6 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     rulenameField = new FixedJTextField(10);
     filenameField = new FixedJTextField(10);
     conditionField = new FixedJTextField(20);
-
-    if (rulesListModel.size() != 0)
-      loggingRulesList.setSelectedIndex(0);
 
     rulenameField.getDocument().addDocumentListener(changeFiringDocumentListener);
     filenameField.getDocument().addDocumentListener(changeFiringDocumentListener);
@@ -479,7 +519,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     });
 
 
-    JPanel rulePropertiesPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+    rulePropertiesPanel = new JPanel(new GridLayout(3, 1, 5, 5));
     Box rulenameBox = Box.createHorizontalBox();
     Box filenameBox = Box.createHorizontalBox();
     Box conditionBox = Box.createHorizontalBox();
@@ -519,18 +559,12 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     useRulesPanel.add(rulesListPanel, BorderLayout.CENTER);
     useRulesPanel.add(rulePropertiesPanel, BorderLayout.SOUTH);
     
-
     add(modeButtonsPanel, BorderLayout.NORTH);
     add(useRulesPanel, BorderLayout.CENTER);
+    
+    loggingRulesList.setSelectedIndex(-1);
 
-    if (loggingMode == GameLogger.LOG_ALL)
-      setContainerEnabled(useRulesPanel, false);
-    else if (loggingMode == GameLogger.USE_RULES)
-      setContainerEnabled(logAllPanel, false);
-    else{
-      setContainerEnabled(useRulesPanel, false);
-      setContainerEnabled(logAllPanel, false);
-    }
+    syncUI();
   }
 
 
@@ -546,9 +580,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     Component [] children = container.getComponents();
     for (int i = 0; i < children.length; i++){
       Component child = children[i];
+      
       if (child instanceof JTextComponent)
         ((JTextComponent)child).setEditable(enabled);
       child.setEnabled(enabled);
+      
       if (child instanceof Container)
         setContainerEnabled((Container)child, enabled);
     }
@@ -559,8 +595,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
   /**
    * Updates the currently selected rule from the current rule properties in the
-   * UI. Returns <code>true</code> if the rule was successfully updated or
-   * <code>false</code> if the properties entered by the user were bad.
+   * UI. Throws a <code>BadChangesException</code> if the properties entered by
+   * the user were bad.
    */
 
   private void updateRuleFromUI(int ruleIndex) throws BadChangesException{
