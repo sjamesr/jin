@@ -25,7 +25,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -630,6 +632,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       ruleString = "true";
       conditionField.setText(ruleString);
     }
+    else{
+      errorMessage = checkLogFile(filename);
+      if (errorMessage != null)
+        errorComponent = filenameField;
+    }
 
     if (errorMessage != null)
       throw new BadChangesException(errorMessage, errorComponent);
@@ -641,13 +648,62 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
       else{
         rule.setName(rulename);
-        rule.setFilename(filename);
+        rule.setFilename(interpretLoggingTarget(filename));
         rule.setCondition(ruleString);
         loggingRulesList.repaint();        
       }
     } catch (EvalError e){
         throw new BadChangesException(i18n.getString("invalidGameLoggingConditionMessage"), conditionField);
       }
+  }
+  
+  
+  
+  /**
+   * Interprets the filename selected by the user by returning the filename
+   * to be the actual logging target.
+   */
+  
+  private static String interpretLoggingTarget(String filename){
+    if (new File(filename).isAbsolute())
+      return filename;
+    else
+      return new File(System.getProperty("user.home"), filename).getAbsolutePath();
+  }
+  
+  
+  
+  /**
+   * Checks whether the specified file is good as a target for logging games.
+   * Returns <code>null</code> if so, otherwise, returns an error message. 
+   */
+  
+  private String checkLogFile(String filename){
+    I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
+    
+    File logFile = new File(interpretLoggingTarget(filename));
+    File logDir = logFile.getParentFile();
+    Object [] messageArgs = new Object[]{logFile.getPath(), logDir == null ? null : logDir.getPath()};
+    if (logFile.isDirectory())
+      return i18n.getFormattedString("logFileIsDirectoryErrorMessage", messageArgs);
+    else if (logDir == null)
+      return i18n.getFormattedString("badLogFileErrorMessage", messageArgs);
+    else if (!logDir.exists()){
+      Object result = 
+        i18n.confirm(OptionPanel.OK, "createLogFileDirectoryDialog", this, messageArgs);
+      if ((result == OptionPanel.OK) && !logDir.mkdirs())
+        return i18n.getFormattedString("unableToCreateLogFileDirectory", messageArgs);
+    }
+    
+    // Attempt to create the file.
+    try{
+      OutputStream out = new FileOutputStream(logFile, true);
+      out.close();
+    } catch (IOException e){
+      return i18n.getFormattedString("unableToWriteLogFile", messageArgs);
+    }
+    
+    return null;
   }
 
 
@@ -656,6 +712,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges() throws BadChangesException{
+    I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
     Preferences prefs = gameLogger.getPrefs();
 
     int selectedIndex = loggingRulesList.getSelectedIndex();
@@ -673,14 +730,22 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       throw new IllegalStateException("None of the mode radio buttons are selected");
 
     String allGamesLogFile = allGamesLogFileField.getText();
-    if ("all".equals(loggingModeString) && ((allGamesLogFile == null) || (allGamesLogFile.length() == 0)))
-      throw new BadChangesException(
-        I18n.get(GameLoggerPreferencesPanel.class).getString("fileNameUnspecifiedErrorMessage"), 
-        allGamesLogFileField);
+    if ("all".equals(loggingModeString)){
+      String errMessage = null;
+      
+      if ((allGamesLogFile == null) || (allGamesLogFile.length() == 0))
+        errMessage = i18n.getString("fileNameUnspecifiedErrorMessage");
+      else
+        errMessage = checkLogFile(allGamesLogFile);
+      
+      if (errMessage != null)
+        throw new BadChangesException(errMessage, allGamesLogFileField);
+    }
+    
 
     prefs.setString("logging.mode", loggingModeString);
 
-    prefs.setString("logging.all.filename", allGamesLogFile);
+    prefs.setString("logging.all.filename", interpretLoggingTarget(allGamesLogFile));
 
     DefaultListModel loggingRulesModel = (DefaultListModel)loggingRulesList.getModel();
     int rulesCount = loggingRulesModel.size();
@@ -689,7 +754,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       LoggingRule rule = (LoggingRule)loggingRulesModel.elementAt(i);
       prefs.setString("logging.rule-" + (i + 1) + ".name", rule.getName());
       prefs.setString("logging.rule-" + (i + 1) + ".condition", rule.getCondition());
-      prefs.setString("logging.rule-" + (i + 1) + ".filename", rule.getFilename());
+      prefs.setString("logging.rule-" + (i + 1) + ".filename", interpretLoggingTarget(rule.getFilename()));
     }
 
     gameLogger.refreshFromProperties();
