@@ -26,7 +26,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.text.MessageFormat;
 import java.util.*;
 
 import javax.swing.SwingUtilities;
@@ -456,12 +455,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (variantName == null)
       variantName = "w" + variantNumber;
     
-    String message = I18n.get(JinChessclubConnection.class).getString("unsupportedVariantMessage");
+    String message = 
+      I18n.get(JinChessclubConnection.class).getFormattedString("unsupportedVariantMessage", new Object[]{variantName});
     String [] messageLines = message.split("\n");
-    
-    Object [] messageFormatArgs = new Object[]{variantName};
-    for (int i = 0; i < messageLines.length; i++)
-      messageLines[i] = MessageFormat.format(messageLines[i], messageFormatArgs);
     
     int maxLineLength = 0;
     for (int i = 0; i < messageLines.length; i++)
@@ -2992,8 +2988,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     try{
       String explanationKey = "gameEndExplanation" + "S" + status + "M" + mode;
-      String explanationPattern = i18n.getString(explanationKey);
-      return MessageFormat.format(explanationPattern, new Object[]{winner, loser, result});
+      return i18n.getFormattedString(explanationKey, new Object[]{winner, loser, result});
     } catch (MissingResourceException e){
         return i18n.getString("defaultGameEndExplanation");
       }
@@ -3012,8 +3007,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     try{
       String adjournmentReasonKey = "adjournmentReason" + mode;
-      String adjournmentReasonPattern = i18n.getString(adjournmentReasonKey);
-      return MessageFormat.format(adjournmentReasonPattern, new Object[]{actor});
+      return i18n.getFormattedString(adjournmentReasonKey, new Object[]{actor});
     } catch (MissingResourceException e){
         return "";
       }

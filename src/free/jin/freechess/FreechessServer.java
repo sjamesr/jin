@@ -21,9 +21,10 @@
 
 package free.jin.freechess;
 
-import java.text.MessageFormat;
-
-import free.jin.*;
+import free.jin.AbstractServer;
+import free.jin.Connection;
+import free.jin.ConnectionDetails;
+import free.jin.UsernamePolicy;
 
 
 /**
@@ -55,8 +56,7 @@ public class FreechessServer extends AbstractServer{
           int c = username.charAt(i);
           if (!((c >= 97) && (c <= 122) || // Lowercase characters.
                 (c >= 65) && (c <= 90)))    // Uppercase characters.
-            return MessageFormat.format(getI18n().getString("usernameIllegalCharacterErrorMessage"),
-                new Object[]{"" + c});
+            return getI18n().getFormattedString("usernameIllegalCharacterErrorMessage", new Object[]{"" + c});
         }
 
         return null;

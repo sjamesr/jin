@@ -25,7 +25,6 @@ import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
@@ -490,7 +489,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     // We pass a String instead of an Integer for the port because an Integer is translated
     // according to the locale and then we get something like
     // "Connecting to chessclub.com on port 5,000"
-    String message = MessageFormat.format(getI18n().getString("tryingToConnectMessage"),
+    String message = getI18n().getFormattedString("tryingToConnectMessage",
       new Object[]{hostname, String.valueOf(port)});
     console.addToOutput(message, "info");
   }
@@ -512,7 +511,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void loginSucceeded(Connection conn){
-    String title = MessageFormat.format(getI18n().getString("mainConsole.title"),
+    String title = getI18n().getFormattedString("mainConsole.title",
       new Object[]{getConn().getUsername(), getServer().getLongName()});
     consoleContainer.setTitle(title);
   }
@@ -585,8 +584,13 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     }
     
     
-    String title = MessageFormat.format(getI18n().getString("gameListTitle"),
-      new Object[]{evt.getListTitle(), new Integer(evt.getFirstIndex()), new Integer(evt.getLastIndex()), new Integer(evt.getItemCount())});
+    String title = getI18n().getFormattedString("gameListTitle",
+      new Object[]{
+        evt.getListTitle(),
+        new Integer(evt.getFirstIndex()),
+        new Integer(evt.getLastIndex()),
+        new Integer(evt.getItemCount())
+      });
     title = "  " + title + "  ";
 
     // Otherwise, the table header is not created on time for the layout to take account of it

@@ -22,7 +22,6 @@
 package free.jin.ui;
 
 import java.awt.Font;
-import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
@@ -58,7 +57,7 @@ public class AboutPanel extends DialogPanel{
   protected String getTitle(){
     I18n i18n = I18n.get(AboutPanel.class);
     String appName = Jin.getInstance().getAppName();
-    return MessageFormat.format(i18n.getString("title"), new Object[]{appName});
+    return i18n.getFormattedString("title", new Object[]{appName});
   }
 
 

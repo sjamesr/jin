@@ -27,7 +27,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -262,11 +261,12 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     Session session = evt.getSession();
     
-    String mainFrameTitle = I18n.get(MdiUiProvider.class).getString("mainFrame.title");
     String username = session.getUser().getUsername();
     String serverName = session.getServer().getShortName();
     String appName = Jin.getInstance().getAppName();
-    mainFrame.setTitle(MessageFormat.format(mainFrameTitle, new Object[]{username, serverName, appName}));
+    
+    I18n i18n = I18n.get(MdiUiProvider.class);
+    mainFrame.setTitle(i18n.getFormattedString("mainFrame.title", new Object[]{username, serverName, appName}));
 
     menubar.add(actionsMenu, 1);
     menubar.add(windowsMenu, 3);
@@ -534,10 +534,11 @@ public class MdiUiProvider extends AbstractUiProvider{
         remove(separatorIndex + 1);
 
       // Add them again
-      String textPattern = I18n.get(MdiUiProvider.class).getString("recentAccountMenuItem.text");
+      I18n i18n = I18n.get(MdiUiProvider.class);
       for (int i = 1; i <= recentAccounts.size(); i++){
         User user = (User)recentAccounts.elementAt(i - 1);
-        String label = MessageFormat.format(textPattern, new Object[]{user.getUsername(), user.getServer().getShortName()});
+        String label = i18n.getFormattedString("recentAccountMenuItem.text",
+            new Object[]{user.getUsername(), user.getServer().getShortName()});
         JMenuItem menuItem = new JMenuItem(i + " " + label);
         if (i <= 9)
           menuItem.setDisplayedMnemonicIndex(0);

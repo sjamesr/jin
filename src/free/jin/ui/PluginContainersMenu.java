@@ -23,7 +23,6 @@ package free.jin.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -149,8 +148,8 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Act
    */
   
   private void syncShowCheckBoxText(JCheckBoxMenuItem item, PluginUIContainer pc){
-    String pattern = I18n.get(PluginContainersMenu.class).getString("showPluginContainerCheckBox.text"); 
-    item.setText(MessageFormat.format(pattern, new Object[]{pc.getTitle()}));    
+    I18n i18n = I18n.get(PluginContainersMenu.class);
+    item.setText(i18n.getFormattedString("showPluginContainerCheckBox.text", new Object[]{pc.getTitle()}));    
   }
   
   

@@ -30,7 +30,6 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -1182,23 +1181,22 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
   
   protected String getBoardTitle(BoardPanel boardPanel){
-    I18n i18n = getI18n();
-    String titleFormat;
     Game game = boardPanel.getGame();
+    I18n i18n = getI18n();
+    Object [] titleArgs = new Object[]{game};
+
     if (boardPanel.isActive()){
       if (game.getGameType() == Game.MY_GAME){
         if (game.isPlayed())
-          titleFormat = i18n.getString("playingBoardTitle");
+          return i18n.getFormattedString("playingBoardTitle", titleArgs);
         else
-          titleFormat = i18n.getString("examiningBoardTitle");
+          return i18n.getFormattedString("examiningBoardTitle", titleArgs);
       }
       else
-        titleFormat = i18n.getString("observingBoardTitle");
+        return i18n.getFormattedString("observingBoardTitle", titleArgs);
     }
     else
-      titleFormat = i18n.getString("inactiveBoardTitle");
-    
-    return MessageFormat.format(titleFormat, new Object[]{game}); 
+      return i18n.getFormattedString("inactiveBoardTitle", titleArgs);
   }
   
   

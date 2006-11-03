@@ -23,7 +23,6 @@ package free.jin.console;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -832,7 +831,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     }
     else{
       String message = 
-        MessageFormat.format(I18n.get(Console.class).getString("unknownSpecialCommandMessage"), new Object[]{command});
+        I18n.get(Console.class).getFormattedString("unknownSpecialCommandMessage", new Object[]{command});
       addToOutput(message, "system");
     }
   }

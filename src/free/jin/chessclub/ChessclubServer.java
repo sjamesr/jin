@@ -21,9 +21,10 @@
 
 package free.jin.chessclub;
 
-import java.text.MessageFormat;
-
-import free.jin.*;
+import free.jin.AbstractServer;
+import free.jin.Connection;
+import free.jin.ConnectionDetails;
+import free.jin.UsernamePolicy;
 
 
 /**
@@ -79,8 +80,7 @@ public class ChessclubServer extends AbstractServer{
 
           int val = c;
           if (!(isLetter(val) || isDigit(val) || (c == '-')))
-            return MessageFormat.format(getI18n().getString("usernameIllegalCharacterErrorMessage"),
-              new Object[]{"" + c});
+            return getI18n().getFormattedString("usernameIllegalCharacterErrorMessage", new Object[]{"" + c});
         }
 
         return null;

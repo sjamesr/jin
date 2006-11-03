@@ -24,7 +24,6 @@ package free.jin.board;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -646,7 +645,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     
     Object [] plyCountArr = new Object[]{new Integer(plyCount)};
     
-    String buttonTextPattern = MessageFormat.format(i18n.getString("multipleTakebackButton.text"), plyCountArr);
+    String buttonTextPattern = i18n.getFormattedString("multipleTakebackButton.text", plyCountArr);
     SwingUtils.applyLabelSpec(takebackNButton, buttonTextPattern);
     takebackNButton.setEnabled(state != OFFERED_STATE);
     takebackNButton.setActionCommand(String.valueOf(plyCount));
@@ -658,17 +657,17 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
         break;
       }
       case OFFER_STATE:{
-        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.offerTooltip"), plyCountArr));
+        takebackNButton.setToolTipText(i18n.getFormattedString("multipleTakebackButton.offerTooltip", plyCountArr));
         takebackNButtonPanel.setBorder(OFFER_STATE_BORDER);
         break;
       }
       case CLAIM_STATE:{
-        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.claimTooltip"), plyCountArr));
+        takebackNButton.setToolTipText(i18n.getFormattedString("multipleTakebackButton.claimTooltip", plyCountArr));
         takebackNButtonPanel.setBorder(CLAIM_STATE_BORDER);
         break;
       }
       case ACCEPT_STATE:{
-        takebackNButton.setToolTipText(MessageFormat.format(i18n.getString("multipleTakebackButton.claimTooltip"), plyCountArr));
+        takebackNButton.setToolTipText(i18n.getFormattedString("multipleTakebackButton.claimTooltip", plyCountArr));
         takebackNButtonPanel.setBorder(ACCEPT_STATE_BORDER);
         break;
       }

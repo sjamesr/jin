@@ -27,7 +27,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.MessageFormat;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -200,7 +199,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
           
           I18n i18n = I18n.get(PrefsMenu.class);
           String pluginPrefsDialogTitle = 
-            MessageFormat.format(i18n.getString("pluginPrefsDialog.title"), new Object[]{plugin.getName()});
+            i18n.getFormattedString("pluginPrefsDialog.title", new Object[]{plugin.getName()});
           
           Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this);
           JDialog dialog = new PrefsDialog(parentFrame, pluginPrefsDialogTitle, plugin.getPreferencesUI());

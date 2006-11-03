@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -685,14 +684,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected String createGameLabelText(Game game){
-    I18n i18n = I18n.get(BoardPanel.class);
-    String gameLabelFormat = i18n.getString("gameLabelFormat");
-    
     WildVariant variant = game.getVariant();
     String category = variant.equals(Chess.getInstance()) ?
       game.getRatingCategoryString() : variant.getName();
     
-    return MessageFormat.format(gameLabelFormat, new Object[]{
+    I18n i18n = I18n.get(BoardPanel.class);
+    return i18n.getFormattedString("gameLabelFormat", new Object[]{
         game.isRated() ? i18n.getString("rated") : i18n.getString("unrated"),
         game.getTCString(),
         category

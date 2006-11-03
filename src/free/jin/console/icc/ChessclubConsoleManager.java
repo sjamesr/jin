@@ -21,8 +21,6 @@
 
 package free.jin.console.icc;
 
-import java.text.MessageFormat;
-
 import free.jin.console.Console;
 import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
@@ -71,9 +69,8 @@ public class ChessclubConsoleManager extends ConsoleManager{
     else if ("channel-qtell".equals(type))
       return parseChannelQTell(evt);
 
-    String pattern = getI18n().getString(type + ".displayPattern");
     Object [] args = new Object[]{sender, title, String.valueOf(forum), message};
-    return MessageFormat.format(pattern, args);
+    return getI18n().getFormattedString(type + ".displayPattern", args);
   }
 
 

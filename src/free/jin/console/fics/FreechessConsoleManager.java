@@ -21,8 +21,6 @@
 
 package free.jin.console.fics;
 
-import java.text.MessageFormat;
-
 import free.jin.console.Console;
 import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
@@ -80,9 +78,8 @@ public class FreechessConsoleManager extends ConsoleManager{
     String message = evt.getMessage();
     Object forum = evt.getForum();
     
-    String pattern = getI18n().getString(type + ".displayPattern");
     Object [] args = new Object[]{sender, title, rating, String.valueOf(forum), message};
-    return MessageFormat.format(pattern, args);
+    return getI18n().getFormattedString(type + ".displayPattern", args);
   }
   
   

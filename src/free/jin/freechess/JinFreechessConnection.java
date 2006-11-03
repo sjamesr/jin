@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -1249,12 +1248,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected void warnVariantUnsupported(String variantName){
-    String message = I18n.get(JinFreechessConnection.class).getString("unsupportedVariantMessage");
-    String [] messageLines = message.split("\n");
-    
     Object [] messageFormatArgs = new Object[]{variantName};
-    for (int i = 0; i < messageLines.length; i++)
-      messageLines[i] = MessageFormat.format(messageLines[i], messageFormatArgs);
+    String message = 
+      I18n.get(JinFreechessConnection.class).getFormattedString("unsupportedVariantMessage", messageFormatArgs);
+    String [] messageLines = message.split("\n");
     
     int maxLineLength = 0;
     for (int i = 0; i < messageLines.length; i++)
