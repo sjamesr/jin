@@ -229,6 +229,18 @@ public class I18n{
   
   
   /**
+   * Returns the string obtained by treating the translation for the specified
+   * key as a pattern and inserting <code>args</code> into the appropriate
+   * locations into it.
+   */
+  
+  public String getFormattedString(String key, Object [] args) throws MissingResourceException{
+    return formatMessage(getString(key), args);
+  }
+  
+  
+  
+  /**
    * Returns the translation for the specified key, parsed as an integer.
    */
   
@@ -249,6 +261,18 @@ public class I18n{
       return Integer.parseInt(translation);
     else
       return defaultValue;
+  }
+  
+  
+  
+  /**
+   * Formats the message by inserting the specified message arguments into the
+   * appropriate locations and returns the result. If <code>messageArgs</code>
+   * is <code>null</code> the specified message is returned as-is.
+   */
+  
+  private static String formatMessage(String message, Object [] messageArgs){
+    return messageArgs == null ? message : MessageFormat.format(message, messageArgs);
   }
   
   
@@ -309,8 +333,9 @@ public class I18n{
   
   /**
    * Creates a <code>JMenuItem</code> using the specified i18n key.
-   * The text of the menu item is treated as a pattern and is formatted via
-   * <code>MessageFormat.format(text, textArgs)</code>.
+   * The text of the menu item is treated as a pattern and
+   * <code>textArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    */
   
   public JMenuItem createMenuItem(String i18nKey, Object [] textArgs){
@@ -318,8 +343,7 @@ public class I18n{
     
     String labelSpec = getString(i18nKey + ".text");
     
-    if (textArgs != null)
-      labelSpec = MessageFormat.format(labelSpec, textArgs);
+    labelSpec = formatMessage(labelSpec, textArgs);
     
     // This doesn't work right if textArgs contains ampersands
     SwingUtils.applyLabelSpec(menuItem, labelSpec);
@@ -385,15 +409,15 @@ public class I18n{
 
   /**
    * Obtains the message of the <code>OptionPanel</code> with the specified i18n key.
-   * If <code>args</code> is not null, the value of the message is treated as a
-   * pattern and is formatted via <code>MessageFormat.format(message, args)</code>.
+   * The message string is treated as a pattern and <code>args</code>, if not
+   * <code>null</code> are inserted at the appropriate locations.
    */
   
   private String getOptionPanelMessage(String i18nKey, Object [] args){
     String message = getString(i18nKey + ".message");
     
     if (args != null)
-      message = MessageFormat.format(message, args);
+      message = formatMessage(message, args);
     
     return message;
   }
@@ -404,8 +428,8 @@ public class I18n{
    * <p>Creates and shows an error panel.
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key. The panel's message
-   * is treated as a pattern and is formatted via
-   * <code>MessageFormat.format(message, messageArgs)</code>.
+   * is treated as a pattern and <code>messageArgs</code>, if not
+   * <code>null</code> are inserted at the appropriate locations.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
@@ -438,7 +462,8 @@ public class I18n{
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
    * The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
+   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    */
   
   public void error(String i18nKey, Object [] messageArgs){
@@ -465,7 +490,8 @@ public class I18n{
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
    * The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
+   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
@@ -500,7 +526,8 @@ public class I18n{
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
    * The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
+   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    */
   
   public Object confirm(Object defaultOption, String i18nKey, Object [] messageArgs){
@@ -529,7 +556,8 @@ public class I18n{
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
    * The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
+   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
@@ -566,7 +594,8 @@ public class I18n{
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
    * The panel's message is treated as a pattern
-   * and is formatted via <code>MessageFormat.format(message, messageArgs)</code>.
+   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
    */
   
   public Object question(Object defaultOption, String i18nKey, Object [] messageArgs){
