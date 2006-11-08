@@ -7,16 +7,10 @@
    IMPORTANT: The result should not say something about "gcj" or "kaffe". If
    it does, what you have is an incomplete Java implementation which cannot
    run Jin. You will need to install a good version.
-2. If you don't, Install Java from 
-   * Linux - Download the latest Java version from
-       http://www.java.com/en/download/manual.jsp
-
-   * FreeBSD - Download the latest Java version from
-       http://www.freebsd.org/java/
-
-   * Solaris - Usually Java comes preinstalled, but if it isn't, you can get one
-       from http://www.java.com/en/download/manual.jsp
-
+2. If you don't, Install Java from:
+   * Linux - http://www.java.com/en/download/manual.jsp
+   * FreeBSD - http://www.freebsd.org/java/
+   * Solaris - http://www.java.com/en/download/manual.jsp
    * For other systems, I can only suggest a websearch for a 1.4 compatible JVM.
 
 
