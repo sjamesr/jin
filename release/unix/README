@@ -44,7 +44,10 @@
    variable. Setting it properly allows Jin to open URLs when you click them in
    your preferred browser. You can set this variable in the "jin" script.
 
-5. If you encounter any bugs, want to ask for a certain feature or ask any 
+5. If you run Jin using a shortcut in your favorite desktop environment, Jin
+   comes with a nice icon (icon.png in the main directory) for you to use.
+
+6. If you encounter any bugs, want to ask for a certain feature or ask any 
    general question about Jin, see the sourceforge project page at
    https://sourceforge.net/projects/jin/ or email me directly at
    msasha@engineer.com.
