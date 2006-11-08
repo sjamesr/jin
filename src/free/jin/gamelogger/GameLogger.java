@@ -438,7 +438,8 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    */
 
   protected boolean canLog(Game game){
-    return game.getVariant() instanceof Chess;
+    return (game.getGameType() == Game.MY_GAME) && 
+           (game.getVariant() instanceof Chess);
   }
 
 
@@ -599,7 +600,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
 
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
-    if (canLog(game) && (game.getGameType() == Game.MY_GAME) && game.isPlayed())
+    if (canLog(game) && game.isPlayed())
       log(game);
     gamesToGameInfo.remove(game);
   }
@@ -613,8 +614,10 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   
   public void propertyChange(PropertyChangeEvent evt){
     Game game = (Game)evt.getSource();
-    if (evt.getPropertyName().equals("played") && !game.isPlayed()) // The game ended and became examined
-      log(game);
+    if (canLog(game)){
+      if (evt.getPropertyName().equals("played") && !game.isPlayed()) // The game ended and became examined
+        log(game);
+    }
   }
 
   
