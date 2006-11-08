@@ -21,6 +21,9 @@
 
 package free.jin.scripter;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,11 +144,24 @@ public class CommandScript extends Script{
 
 
   /**
-   * Preprocesses the specified beanshell expression, replacing any variable
+   * Preprocesses the specified server command, replacing any variable
    * names with their values.
    */
 
   private String preprocess(String code, Object [][] vars){
+    // Sort by length and replace longer strings first.
+    // Without this, something like $gameType will get recognized as ($game)Type
+    Collections.sort(Arrays.asList(vars), new Comparator(){
+      public int compare(Object v1, Object v2){
+        Object [] var1 = (Object [])v1;
+        Object [] var2 = (Object [])v2;
+        String varName1 = (String)var1[0];
+        String varName2 = (String)var2[0];
+        
+        return varName2.length() - varName1.length();
+      }
+    });
+    
     for (int i = 0; i < vars.length; i++){
       Object var [] = vars[i];
       String varName = (String)var[0];
