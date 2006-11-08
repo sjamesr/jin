@@ -3,27 +3,21 @@
 ************************************
 
 1. Check whether you already hava Java installed by typing "java -version" at
-   the commandline.
+   the commandline. The Java version should be 1.4 or greater.
    IMPORTANT: The result should not say something about "gcj" or "kaffe". If
    it does, what you have is an incomplete Java implementation which cannot
    run Jin. You will need to install a good version.
-2. If you don't, Install one of the following Java Runtime Environments:
-   * Linux - Download and install one of the following 
-     * IBM's 1.4 - 
-       http://www-106.ibm.com/developerworks/java/jdk/linux140/?dwzone=java.
-     * Blackdown: http://www.blackdown.org/java-linux.html
-     * Sun's 1.4 - http://java.sun.com/j2se/1.4/download.html
-     * You can also try Sun's 1.5-beta release, which has many improvements
-       (including UI responsiveness), and is reasonably stable in my
-       experience. You can find it on http://java.sun.com.
+2. If you don't, Install Java from 
+   * Linux - Download the latest Java version from
+       http://www.java.com/en/download/manual.jsp
 
    * FreeBSD - Download the latest Java version from
        http://www.freebsd.org/java/
 
    * Solaris - Usually Java comes preinstalled, but if it isn't, you can get one
-       from http://java.sun.com/j2se/1.4/download.html.
+       from http://www.java.com/en/download/manual.jsp
 
-   * For other systems, I suggest a websearch for a 1.4 compatible JVM.
+   * For other systems, I can only suggest a websearch for a 1.4 compatible JVM.
 
 
 ***********************************
@@ -33,36 +27,26 @@
 1. Extract the tar.gz file you downloaded into some directory (if you got this
    file from the tar.gz file, then you're done :-)).
 
-3. Make sure that the "java" binary is in your PATH. If you have one of the
+2. Make sure that the "java" binary is in your PATH. If you have one of the
    latest versions of Java installed, that will usually already be the case.
    Type "java -version" in a shell to see whether it works and to find the
    version of Java you have.
    If you don't have it in your PATH and don't know how to add it, ask on a
    newsgroup, #linuxnewbies on IRC, channel 212 on ICC or channel 85 on FICS.
 
-4. Change to the jin directory (this will usually be in the format
-   jin-<version> (jin-2.11 for example) and run Jin with "./jin". You can also
+3. Change to the jin directory (this will usually be in the format
+   jin-<version> (jin-2.14 for example) and run Jin with "./jin". You can also
    create a symlink to the jin script in your ~/bin directory. If the jin script
    doesn't work for you for some reason, you can also run Jin with
    "java -jar jin.jar" from Jin's directory (the last part is important).
 
-5. See http://www.jinchess.com/faq for information on setting your BROWSER
+4. See http://www.jinchess.com/faq for information on setting your BROWSER
    variable. Setting it properly allows Jin to open URLs when you click them in
    your preferred browser. You can set this variable in the "jin" script.
 
-6. If you encounter any bugs, want to ask for a certain feature or ask any 
+5. If you encounter any bugs, want to ask for a certain feature or ask any 
    general question about Jin, see the sourceforge project page at
    https://sourceforge.net/projects/jin/ or email me directly at
    msasha@engineer.com.
 
-7. Enjoy! (or Profit!!!) :-)
-
-
-*****************************
-*********** Notes ***********
-*****************************
-
-* Almost all desktop useable operating systems have Java 1.2 or later for them,
-  so this readme file will now assume you have that. If nevertheless you want
-  to run Jin under Java 1.1, please contact me for instructions at
-  msasha@engineer.com.
+6. Enjoy! (or Profit!!!) :-)
