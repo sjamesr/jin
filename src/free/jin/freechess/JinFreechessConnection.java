@@ -1416,13 +1416,34 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       // (isNew == true) because FICS never sends the entire move history
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
-    if ((unechoedGameMoves != null) && (unechoedGameMoves.size() != 0)){ // Looks like it's our move.
+    if ((unechoedGameMoves != null) && (unechoedGameMoves.size() != 0)){ // Might be our move.
       Move madeMove = (Move)unechoedGameMoves.elementAt(0);
-      if (moveToString(game, move).equals(moveToString(game, madeMove))) // Same move.
+      if (isSameMove(game, move, madeMove))
         unechoedGameMoves.removeElementAt(0); 
     }
 
     gameData.addMove(move);
+  }
+  
+  
+  
+  /**
+   * Returns whether <code>echoedMove</code> (sent to us by the server)
+   * is the same move as <code>sentMove</code> (a move we sent to the server).
+   */
+  
+  private static boolean isSameMove(Game game, Move echoedMove, Move sentMove){
+    try{
+      String echoedMoveString = moveToString(game, echoedMove);
+      String sentMoveString = moveToString(game, sentMove);
+      return echoedMoveString.equals(sentMoveString);
+    } catch (IllegalArgumentException e){
+      // An exception shouldn't be thrown for sentMove (since moveToString was
+      // already called on it when it was sent to the server). Thus if it is
+      // thrown, it's for echoedMove, in which case it's certainly not the
+      // same move.
+      return false;
+    }
   }
 
 
@@ -2243,9 +2264,11 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
   /**
    * Converts the given move into a string we can send to the server.
+   * Throws an <code>IllegalArgumentException</code> if the move is not of a
+   * type that we know how to send to the server.
    */
 
-  private static String moveToString(Game game, Move move){
+  private static String moveToString(Game game, Move move) throws IllegalArgumentException{
     WildVariant variant = game.getVariant();
     if (move instanceof ChessMove){
       ChessMove cmove = (ChessMove)move;
