@@ -135,7 +135,7 @@ public class Kriegspiel implements WildVariant{
       return new KriegspielMove(pos, endSquare, stringRepresentation);
     } 
     else{
-      return new ChessMove(pos, startSquare, endSquare, (ChessPiece)promotionTarget, stringRepresentation);
+      return Chess.getInstance().createChessMove(pos, startSquare, endSquare, (ChessPiece)promotionTarget, stringRepresentation);
     }
   }
 
@@ -221,7 +221,7 @@ public class Kriegspiel implements WildVariant{
       modifier.setCurrentPlayer(pos.getCurrentPlayer().getOpponent());
     }
     else{ // Completely visible
-      ChesslikeGenericVariant.makeChessMove((ChessMove)move, pos, modifier);
+      Chess.getInstance().makeChessMove((ChessMove)move, pos, modifier);
     }
   }
 
