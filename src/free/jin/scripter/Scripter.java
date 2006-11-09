@@ -835,7 +835,7 @@ public class Scripter extends Plugin{
      */
 
     private Vector createVarsVector(GameEvent evt){
-      Vector vars = new Vector(25);
+      Vector vars = new Vector(29);
 
       Game game = evt.getGame();
 
@@ -866,6 +866,10 @@ public class Scripter extends Plugin{
       vars.addElement(new Object[]{"blackRating", new Integer(game.getBlackRating())});
       vars.addElement(new Object[]{"whiteTitle", game.getWhiteTitles()});
       vars.addElement(new Object[]{"blackTitle", game.getBlackTitles()});
+      vars.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
+      vars.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
 
       if (userPlayer != null){
         if (userPlayer.isWhite()){
@@ -895,11 +899,6 @@ public class Scripter extends Plugin{
 
         vars.addElement(new Object[]{"userPlayer", game.getUserPlayer().toString().toLowerCase()});
       }
-
-      vars.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
-      vars.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
-      vars.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
-      vars.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
 
       return vars;
     }
@@ -1051,7 +1050,7 @@ public class Scripter extends Plugin{
     }
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
-      Vector varsVector = new Vector(25);
+      Vector varsVector = new Vector(29);
       Game game = new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
         5*60*1000, 2000, 1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER);
 
@@ -1081,13 +1080,16 @@ public class Scripter extends Plugin{
       varsVector.addElement(new Object[]{"blackRating", new Integer(game.getBlackRating())});
       varsVector.addElement(new Object[]{"whiteTitle", game.getWhiteTitles()});
       varsVector.addElement(new Object[]{"blackTitle", game.getBlackTitles()});
+      varsVector.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
+      varsVector.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
 
       Move move = new ChessMove(Square.parseSquare("e2"), Square.parseSquare("e4"),
         Player.WHITE_PLAYER, false, false, false, null, 4, null, "e4");
 
       if (Utilities.contains(eventSubtypes, subtypes[1])){
         varsVector.addElement(new Object[]{"move", move});
-        varsVector.addElement(new Object[]{"isNewMove", Boolean.TRUE});
       }
 
       if (Utilities.contains(eventSubtypes, subtypes[6]))
