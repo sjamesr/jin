@@ -464,7 +464,31 @@ public class ChesslikeGenericVariant implements WildVariant{
       Piece promotionTarget, String moveSAN){
 
     checkPosition(pos);
-
+    
+    return createChessMove(pos, startingSquare, endingSquare, promotionTarget, moveSAN);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>ChessMove</code> from the specified parameters as
+   * documented in {@link #createMove(Position, Square, Square, Piece, String)}
+   * This method is here solely for the benefit of <code>WildVariant</code>
+   * implementations which need to create normal chess moves but don't want
+   * to reimplement this method. Note that because this method is not static,
+   * to actually use it, you still need to obtain an instance of
+   * <code>Chess</code> via <code>Chess.getInstance()</code>.
+   * Unlike the {@link #createMove(Position, Square, Square, Piece, String)}
+   * method, this method does not enforce the wild variant of the position
+   * by calling {@link #checkPosition(Position)}.
+   */
+  
+  public ChessMove createChessMove(Position pos, Square startingSquare,
+      Square endingSquare, Piece promotionTarget, String moveSAN){
+    // This method is not static because it calls non-static methods (isEnPassant and such).
+    // It's still possible to use it in a static-like manner with:
+    // Chess.getInstance().createChessMove(...)
+    
     if ((promotionTarget != null) && !(promotionTarget instanceof ChessPiece))
       throw new IllegalArgumentException("Wrong promotion target type: "+promotionTarget.getClass());
 
@@ -484,6 +508,7 @@ public class ChesslikeGenericVariant implements WildVariant{
 
     return new ChessMove(startingSquare, endingSquare, movingPlayer, isEnPassant, isShortCastling, 
       isLongCastling, capturedPiece, doublePawnPushFile, promotionChessTarget, moveSAN);
+
   }
 
 
@@ -583,10 +608,20 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Makes the given ChessMove on the given Position using the given position
    * modifier. This method is here solely for the benefit of WildVariant
    * implementations which sometimes need to make a regular ChessMove on a
-   * position and don't want to reimplement this method.
+   * position and don't want to reimplement this method. Note that because this
+   * method is not static, to actually use it, you still need to obtain an
+   * instance of <code>Chess</code> via <code>Chess.getInstance()</code>.
+   * Unlike the {@link #makeMove(Move, Position, Position.Modifier)}
+   * method, this method does not enforce the wild variant of the position
+   * by calling {@link #checkPosition(Position)}.
    */
 
-  public static void makeChessMove(ChessMove cmove, Position pos, Position.Modifier modifier){
+  public void makeChessMove(ChessMove cmove, Position pos, Position.Modifier modifier){
+    // This method is not static in solidarity with the createChessMove method
+    // which has trouble being static due to using non-static methods (isEnPassant and such).
+    // It's still possible to use it in a static-like manner with:
+    // Chess.getInstance().makeChessMove(...)
+    
     Square startingSquare = cmove.getStartingSquare();
     Square endingSquare = cmove.getEndingSquare();
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
