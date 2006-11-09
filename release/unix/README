@@ -25,8 +25,8 @@
    latest versions of Java installed, that will usually already be the case.
    Type "java -version" in a shell to see whether it works and to find the
    version of Java you have.
-   If you don't have it in your PATH and don't know how to add it, ask on a
-   newsgroup, #linuxnewbies on IRC, channel 212 on ICC or channel 85 on FICS.
+   If you don't have it in your PATH and don't know how to add it, ask in
+   channel 212 on ICC, channel 85 on FICS, a newsgroup or #linuxnewbies on IRC.
 
 3. Change to the jin directory (this will usually be in the format
    jin-<version> (jin-2.14 for example) and run Jin with "./jin". You can also
@@ -34,9 +34,9 @@
    doesn't work for you for some reason, you can also run Jin with
    "java -jar jin.jar" from Jin's directory (the last part is important).
 
-4. See http://www.jinchess.com/faq for information on setting your BROWSER
-   variable. Setting it properly allows Jin to open URLs when you click them in
-   your preferred browser. You can set this variable in the "jin" script.
+4. See http://www.jinchess.com/wiki/index.php/Users:BrowserLinux for information
+   on setting your BROWSER variable. Setting it properly allows Jin to open URLs
+   when you click them in your preferred browser.
 
 5. If you run Jin using a shortcut in your favorite desktop environment, Jin
    comes with a nice icon (icon.png in the main directory) for you to use.
