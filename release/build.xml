@@ -61,7 +61,6 @@
 		
 		<antcall target="rebuild">
 			<param name="release.platform" value="unix" />
-			<param name="build.target" value="1.3" />
 		</antcall>
 		
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/tmp" />
@@ -71,7 +70,7 @@
 		<copy todir="${unix-files-dir}">
 			<fileset dir="${build.dir}" excludes="lnfs/jgoodies-windows.jar" />
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
-			<fileset dir="unix" includes="README" />
+			<fileset dir="unix" includes="README icon.png" />
 		</copy>
 		
 		<property name="unix-tar" value="${release.unix.dir}/jin-${release.version}-unix.tar" />
