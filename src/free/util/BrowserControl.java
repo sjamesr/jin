@@ -39,13 +39,12 @@ import java.util.StringTokenizer;
  * <UL>
  *   <LI> Windows - The default browser will be opened via
  *        <code>rundll32 url.dll,FileProtocolHandler url</code>
- *   <LI> Linux - The browser specified by the BROWSER environment variable
- *        will be used. Use <code>%s</code> in its value to specify where the
- *        URL will be inserted. If $BROWSER is not specified, mozilla is used.
  *   <LI> Mac OS X - The <code>open</code> command is used to open the url in
  *        the default browser.
  *   <LI> Classic MacOS - Netscape is used.
- *   <LI> Unix - Mozilla is used.
+ *   <LI> All other platforms - The command specified by the BROWSER environment
+ *        variable is executed, with <code>%s</code> in it replaced by the URL.
+ *        If $BROWSER is not specified, mozilla is tried.
  * </UL>
  */
 
@@ -102,7 +101,7 @@ public class BrowserControl{
         String [] commandLine = new String[]{"netscape", url}; 
         Runtime.getRuntime().exec(commandLine); 
       }
-      else if (PlatformUtils.isLinux()){
+      else{
         synchronized(BrowserControl.class){
           if (environment == null){
             environment = new Properties();
@@ -139,9 +138,6 @@ public class BrowserControl{
           commandline = browser+" "+url;
         Runtime.getRuntime().exec(commandline);
       }
-      else{
-        return tryMozilla(url);
-      } 
     } catch (IOException e){
         return false;
       }
