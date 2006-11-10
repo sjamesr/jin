@@ -21,6 +21,8 @@
 
 package free.jin;
 
+import java.util.List;
+
 import free.jin.plugin.PluginStartException;
 import free.jin.ui.LoginPanel;
 import free.jin.ui.OptionPanel;
@@ -143,6 +145,7 @@ public class ConnectionManager{
    * <ol>
    *   <li> Application parameters.
    *   <li> Last logged in user.
+   *   <li> Sole known user for the server.
    * </ol>
    * Returns <code>null</code> if all the above methods fail.
    */
@@ -167,6 +170,11 @@ public class ConnectionManager{
     User lastUser = getLastUser();
     if ((lastUser != null) && (lastUser.getServer() == server))
       return lastUser;
+    
+    // Only one known user on the server
+    List serverUsers = jin.getUsers(server);
+    if (serverUsers.size() == 1)
+      return (User)serverUsers.get(0);
     
     return null;
   }
