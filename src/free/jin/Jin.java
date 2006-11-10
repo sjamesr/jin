@@ -22,6 +22,8 @@
 package free.jin;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -454,6 +456,22 @@ public class Jin{
         return servers[i];
 
     return null;
+  }
+  
+  
+  
+  /**
+   * Returns a list of the users on the specified server.
+   */
+  
+  public List getUsers(Server server){
+    List serverUsers = new LinkedList();
+    for (int i = 0; i < users.getSize(); i++){
+      User user = (User)users.getElementAt(i);
+      if (user.getServer() == server)
+        serverUsers.add(user);
+    }
+    return serverUsers;
   }
   
   
