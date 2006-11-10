@@ -34,7 +34,7 @@
    doesn't work for you for some reason, you can also run Jin with
    "java -jar jin.jar" from Jin's directory (the last part is important).
 
-4. See http://www.jinchess.com/wiki/index.php/Users:BrowserLinux for information
+4. See http://www.jinchess.com/wiki/index.php/Browser_(Unix) for information
    on setting your BROWSER variable. Setting it properly allows Jin to open URLs
    when you click them in your preferred browser.
 
