@@ -438,6 +438,8 @@ public class JinBoard extends JBoard implements PaintHook{
       circles.removeElementAt(i);
       fireCircleRemoved(circle);
     }
+    
+    repaint();
   }
 
 
