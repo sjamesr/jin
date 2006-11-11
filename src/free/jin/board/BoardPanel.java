@@ -369,7 +369,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         (PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2"))||
         ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))){
       fullscreenButton.setEnabled(false);
-      fullscreenButton.setToolTipText(boardManager.getI18n().getString("fullscreenUnavailableMessage"));
+      fullscreenButton.setToolTipText(I18n.get(BoardPanel.class).getString("fullscreenUnavailableMessage"));
     }
     else{
       KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
