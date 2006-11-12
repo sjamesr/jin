@@ -455,6 +455,16 @@ public class IOUtilities{
     in.close();
     urlCache.put(url, data);
   }
+  
+  
+  
+  /**
+   * Returns whether the specified URL is cached.
+   */
+  
+  public static boolean isURLCached(URL url){
+    return urlCache.containsKey(url);
+  }
 
 
   
