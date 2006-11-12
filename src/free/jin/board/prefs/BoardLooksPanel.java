@@ -24,6 +24,10 @@ package free.jin.board.prefs;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -38,7 +42,6 @@ import free.chess.PiecePainter;
 import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.Jin;
-import free.jin.Resource;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPattern;
 import free.jin.board.JinBoard;
@@ -290,25 +293,16 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private PieceSet [] getPieceSets(){
-    Resource [] resources = boardManager.getResources("pieces");
-    PieceSet [] pieceSets = new PieceSet[resources.length];
+    Map resources = boardManager.getResources("pieces");
+    PieceSet [] pieceSets = (PieceSet [])resources.values().toArray(new PieceSet[0]);
     
-    for (int i = 0; i < resources.length; i++)
-      pieceSets[i] = (PieceSet)resources[i];
-    
-    // Bubble sort by name
-    for (int i = 0; i < resources.length; i++){
-      for (int j = 0; j < resources.length - (i + 1); j++){
-        String name1 = pieceSets[j].getName();
-        String name2 = pieceSets[j+1].getName();
-        
-        if (name1.compareTo(name2) > 0){
-          PieceSet tmp = pieceSets[j];
-          pieceSets[j] = pieceSets[j+1];
-          pieceSets[j+1] = tmp;
-        }
+    Collections.sort(Arrays.asList(pieceSets), new Comparator(){
+      public int compare(Object arg1, Object arg2){
+        PieceSet set1 = (PieceSet)arg1;
+        PieceSet set2 = (PieceSet)arg2;
+        return set1.getName().compareTo(set2.getName());
       }
-    }
+    });
     
     return pieceSets;
   }
@@ -320,25 +314,16 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    */
    
   private BoardPattern [] getBoardPatterns(){
-    Resource [] resources = boardManager.getResources("boards");
-    BoardPattern [] boardPatterns = new BoardPattern[resources.length];
+    Map resources = boardManager.getResources("boards");
+    BoardPattern [] boardPatterns = (BoardPattern [])resources.values().toArray(new BoardPattern[0]);
     
-    for (int i = 0; i < resources.length; i++)
-      boardPatterns[i] = (BoardPattern)resources[i];
-    
-    // Bubble sort by name
-    for (int i = 0; i < resources.length; i++){
-      for (int j = 0; j < resources.length - (i + 1); j++){
-        String name1 = boardPatterns[j].getName();
-        String name2 = boardPatterns[j+1].getName();
-        
-        if (name1.compareTo(name2) > 0){
-          BoardPattern tmp = boardPatterns[j];
-          boardPatterns[j] = boardPatterns[j+1];
-          boardPatterns[j+1] = tmp;
-        }
+    Collections.sort(Arrays.asList(boardPatterns), new Comparator(){
+      public int compare(Object arg1, Object arg2){
+        BoardPattern pat1 = (BoardPattern)arg1;
+        BoardPattern pat2 = (BoardPattern)arg2;
+        return pat1.getName().compareTo(pat2.getName());
       }
-    }
+    });
     
     return boardPatterns;
   }
