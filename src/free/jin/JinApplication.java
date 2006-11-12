@@ -1047,14 +1047,20 @@ public class JinApplication implements JinContext{
   
   /**
    * Returns all the resources for the specified resource type. Resources are
-   * assumed to be zip or jar files and are looked up in three directories:
-   * <code>JIN_DIR/resources/resType</code>,
-   * <code>JIN_DIR/resources/resType/serverId</code> and
-   * <code>prefsDir/resources/resType</code>.
+   * assumed to be zip files and are looked up in three directories (in
+   * that order):
+   * <ol>
+   *   <li><code>JIN_DIR/resources/resType</code>
+   *   <li><code>JIN_DIR/resources/resType/serverId</code>
+   *   <li><code>prefsDir/resources/resType</code>
+   * </ol>
+   * with resources loaded later overriding earlier ones.
+   * 
+   * See {@link JinContext#getResources(String, Plugin)} for more information.
    */
    
-  public Resource [] getResources(String resType, Plugin plugin){
-    Vector resources = new Vector();
+  public Map getResources(String resType, Plugin plugin){
+    Map resourceMap = new HashMap();
     
     String serverId = plugin.getServer().getId();
     
@@ -1062,38 +1068,36 @@ public class JinApplication implements JinContext{
     File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
     File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), resType), serverId);
                             
-    loadResources(userResDir, resources, plugin);
-    loadResources(jinResDir, resources, plugin);
-    loadResources(jinServerResDir, resources, plugin);
+    loadResources(jinResDir, resourceMap, plugin);
+    loadResources(jinServerResDir, resourceMap, plugin);
+    loadResources(userResDir, resourceMap, plugin);
      
-    Resource [] resArr = new Resource[resources.size()];
-    resources.copyInto(resArr);
-    
-    return resArr;
+    return resourceMap;
   }
    
    
    
   /**
    * Loads resources from the specified directory, adding them to the
-   * specified <code>Vector</code>. Helper method for <code>getResources</code>.
+   * specified map. Helper method for <code>getResources</code>.
    */
    
-  private void loadResources(File dir, Vector v, Plugin plugin){
+  private void loadResources(File dir, Map resourceMap, Plugin plugin){
     if (!dir.exists() || !dir.isDirectory())
       return;
     
-    String [] filenames = dir.list(new ExtensionFilenameFilter(new String[]{".jar", ".zip"}));
+    String [] filenames = dir.list(new ExtensionFilenameFilter(".zip"));
     if (filenames == null)
       return;
     
     for (int i = 0; i < filenames.length; i++){
-      File resourceFile = new File(dir, filenames[i]);
+      String filename = filenames[i];
+      File resourceFile = new File(dir, filename);
       try{
         Resource resource = loadResource(resourceFile, plugin);
         
         if (resource != null)
-          v.addElement(resource);
+          resourceMap.put(resource.getId(), resource);
       } catch (IOException e){
           System.out.println("Failed to load resource from " + resourceFile);
           e.printStackTrace();
@@ -1115,9 +1119,9 @@ public class JinApplication implements JinContext{
     File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), type), serverId);
     
     File [] files = new File[]{
-      new File(userResDir, id + ".jar"), new File(userResDir, id + ".zip"),
-      new File(jinServerResDir, id + ".jar"), new File(jinServerResDir, id + ".zip"),
-      new File(jinResDir, id + ".jar"), new File(jinResDir, id + ".zip")
+      new File(userResDir, id + ".zip"),
+      new File(jinServerResDir, id + ".zip"),
+      new File(jinResDir, id + ".zip")
     };
       
    

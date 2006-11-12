@@ -391,29 +391,27 @@ public class JinApplet extends Applet implements JinContext{
   
   /**
    * Returns all the resources of the specified type.
+   * See {@link JinContext#getResources(String, Plugin)} for more information.
    */
 
-  public Resource [] getResources(String resourceType, Plugin plugin){
+  public Map getResources(String resourceType, Plugin plugin){
     String resourcesArg = getParameter("resources." + resourceType);
     if (resourcesArg == null)
-      return new Resource[0];
+      return Collections.emptyMap();
     
     StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
-    Vector resources = new Vector(resourceNames.countTokens());
+    Map resourceMap = new HashMap(resourceNames.countTokens());
     while (resourceNames.hasMoreTokens()){
       try{
         URL resourceURL = new URL(getCodeBase(), "resources/" + resourceType + "/" 
           + resourceNames.nextToken() + "/");
-        Resource res = loadResource(resourceURL, plugin);
-        if (res != null)
-          resources.addElement(res);
+        Resource resource = loadResource(resourceURL, plugin);
+        if (resource != null)
+          resourceMap.put(resource.getId(), resource);
       } catch (IOException e){e.printStackTrace();}
     }
     
-    Resource [] resArr = new Resource[resources.size()];
-    resources.copyInto(resArr);
-    
-    return resArr;
+    return resourceMap;
   }
   
   
@@ -454,7 +452,8 @@ public class JinApplet extends Applet implements JinContext{
    
   private Resource loadResource(URL url, Plugin plugin) throws IOException{
     URL defURL = new URL(url, "definition");
-    IOUtilities.cacheURL(defURL);
+    if (!IOUtilities.isURLCached(defURL))
+      IOUtilities.cacheURL(defURL);
     
     Properties def = IOUtilities.loadProperties(defURL);
     String classname = def.getProperty("classname");

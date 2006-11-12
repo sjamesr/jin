@@ -22,6 +22,7 @@
 package free.jin;
 
 import java.util.Locale;
+import java.util.Map;
 
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
@@ -66,7 +67,8 @@ public interface JinContext{
   
   /**
    * Loads and returns the resources of the specified type for the specified
-   * plugin. Resources are typically used when there is a need to allow the user
+   * plugin. The returned map is from resource IDs to <code>Resource</code>s.
+   * Resources are typically used when there is a need to allow the user
    * (or some other 3rd party) to add his own customizations to Jin
    * (or a plugin). For example, this mechanism is used for loading piece sets
    * and boards by the board manager plugin. A <code>JinContext</code>
@@ -75,7 +77,7 @@ public interface JinContext{
    * adding/deleting files from those directories.
    */
    
-  Resource [] getResources(String resourceType, Plugin plugin);
+  Map getResources(String resourceType, Plugin plugin);
   
   
   
