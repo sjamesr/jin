@@ -21,7 +21,12 @@
  
 package free.jin.board.icc;
  
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Polygon;
+
+import free.chess.PiecePainter;
 import free.chess.VectorPiecePainter;
 
 
@@ -32,7 +37,7 @@ import free.chess.VectorPiecePainter;
  * *not* use them for any other purpose, commercial or otherwise.
  */
 
-public class BlitzinVectorPiecePainter extends VectorPiecePainter{
+public final class BlitzinVectorPiecePainter extends VectorPiecePainter{
 
 
 
@@ -44,7 +49,6 @@ public class BlitzinVectorPiecePainter extends VectorPiecePainter{
   public BlitzinVectorPiecePainter(){
     super();
   }
-
 
 
 
@@ -66,9 +70,6 @@ public class BlitzinVectorPiecePainter extends VectorPiecePainter{
 
 
 
-
-
-
   /**
    * Creates a new BlitzinVectorPiecePainter which will produce
    * white and black pieces with the given colors and the given
@@ -87,7 +88,16 @@ public class BlitzinVectorPiecePainter extends VectorPiecePainter{
 
 
 
-
+  /**
+   * Returns a new <code>BlitzinVectorPiecePainter</code>.
+   */
+  
+  public PiecePainter freshInstance(){
+    return new BlitzinVectorPiecePainter();
+  }
+  
+  
+  
   /**
    * Returns 36x36.
    */
@@ -95,7 +105,6 @@ public class BlitzinVectorPiecePainter extends VectorPiecePainter{
   public Dimension getPreferredPieceSize(){
     return new Dimension(36,36);
   }
-
 
 
 

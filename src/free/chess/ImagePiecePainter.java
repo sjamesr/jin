@@ -35,10 +35,10 @@ import free.util.IOUtilities;
 
 
 /**
- * An implementation of PiecePainter which paints images.
+ * An implementation of <code>PiecePainter</code> which paints images.
  */
 
-public class ImagePiecePainter implements ResourcePiecePainter{
+public final class ImagePiecePainter implements ResourcePiecePainter{
 
 
   
@@ -130,6 +130,17 @@ public class ImagePiecePainter implements ResourcePiecePainter{
   
   
   /**
+   * Since <code>ImagePiecePainter</code>s are immutable, simply returns
+   * <code>this</code>.
+   */
+  
+  public PiecePainter freshInstance(){
+    return this;
+  }
+  
+  
+  
+  /**
    * Loads the piece images from the specified URL. The structure at the
    * specified url is described below.
    * A properties file named "definition" must be located at the base URL.
@@ -152,6 +163,9 @@ public class ImagePiecePainter implements ResourcePiecePainter{
    */
    
   public void load(URL url) throws IOException{
+    if (pieceImages != null)
+      throw new IllegalStateException("This ImagePiecePainter has already been loaded");
+    
     URL defURL = new URL(url, "definition");
     Properties def = IOUtilities.loadProperties(defURL);
     if (def == null)

@@ -22,11 +22,13 @@
 package free.chess;
 
 import java.awt.*;
-import java.net.URL;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
-import free.util.ImageUtilities;
+
 import free.util.IOUtilities;
+import free.util.ImageUtilities;
 
 
 /**
@@ -34,9 +36,10 @@ import free.util.IOUtilities;
  * light squares and one for dark) to draw the board.
  */
 
-public class ImageBoardPainter implements ResourceBoardPainter{
-
-
+public final class ImageBoardPainter implements ResourceBoardPainter{
+  
+  
+  
   /**
    * The image of the entire board. This may be null if we're using two square
    * images.
@@ -151,6 +154,17 @@ public class ImageBoardPainter implements ResourceBoardPainter{
     this.isScaled = isScaled;
     this.boardImage = null;
   }
+  
+  
+  
+  /**
+   * Since <code>ImageBoardPainter</code>s are immutable, simply returns
+   * <code>this</code>.
+   */
+  
+  public BoardPainter freshInstance(){
+    return this;
+  }
 
 
 
@@ -185,6 +199,9 @@ public class ImageBoardPainter implements ResourceBoardPainter{
    */
    
   public void load(URL url) throws IOException{
+    if ((boardImage != null) || (lightImage != null))
+      throw new IllegalStateException("This ImageBoardPainter has already been loaded");
+    
     URL defURL = new URL(url, "definition");
 
     Properties def = IOUtilities.loadProperties(defURL);
@@ -263,7 +280,41 @@ public class ImageBoardPainter implements ResourceBoardPainter{
   public boolean isScaled(){
     return isScaled;
   }
-
+  
+  
+  
+  /**
+   * Preloads the images.
+   */
+  
+  private void preloadImages(){
+    if (boardImage == null){
+      if ((lightImage instanceof BufferedImage) && (darkImage instanceof BufferedImage))
+        return;
+      
+      ImageUtilities.preload(new Image[]{lightImage, darkImage}, new int[2]); 
+      
+      BufferedImage bufferedLightImage = 
+        new BufferedImage(lightImage.getWidth(null), lightImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+      bufferedLightImage.getGraphics().drawImage(lightImage, 0, 0, null);
+      lightImage = bufferedLightImage;
+      
+      BufferedImage bufferedDarkImage = 
+        new BufferedImage(darkImage.getWidth(null), darkImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+      bufferedDarkImage.getGraphics().drawImage(darkImage, 0, 0, null);      
+      darkImage = bufferedDarkImage;
+    }
+    else{
+      if (boardImage instanceof BufferedImage)
+        return;
+      
+      ImageUtilities.preload(boardImage);
+      BufferedImage bufferedImage = 
+        new BufferedImage(boardImage.getWidth(null), boardImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+      bufferedImage.getGraphics().drawImage(boardImage, 0, 0, null);
+      boardImage = bufferedImage;
+    }
+  }
 
 
 
@@ -279,9 +330,6 @@ public class ImageBoardPainter implements ResourceBoardPainter{
       if (isScaled){
         scaledLight = lightImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
         scaledDark = darkImage.getScaledInstance(width/8, height/8, Image.SCALE_SMOOTH);
-        
-        ImageUtilities.preload(scaledLight);
-        ImageUtilities.preload(scaledDark);
       }
     }
     else{
@@ -289,29 +337,11 @@ public class ImageBoardPainter implements ResourceBoardPainter{
         return;
 
       scaled = boardImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-      ImageUtilities.preload(scaled);
     } 
   }
   
   
   
-  /**
-   * Causes the images used by the ImageBoardPainter to start loading.
-   */
-   
-  public void loadResources(){
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    
-    if (boardImage == null){
-      toolkit.prepareImage(lightImage, -1, -1, null);
-      toolkit.prepareImage(darkImage, -1, -1, null);
-    }
-    else
-      toolkit.prepareImage(boardImage, -1, -1, null);
-  }
-
-
-
   /**
    * Paints the board at the given location on the given Graphics scaled to
    * the given size.
@@ -319,12 +349,7 @@ public class ImageBoardPainter implements ResourceBoardPainter{
 
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     // Preload if necessary
-    if (boardImage == null){
-      ImageUtilities.preload(lightImage); 
-      ImageUtilities.preload(darkImage); 
-    }
-    else
-      ImageUtilities.preload(boardImage);
+    preloadImages();
     
     scaleImages(width, height);
 

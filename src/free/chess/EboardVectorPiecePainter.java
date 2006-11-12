@@ -42,7 +42,7 @@ import java.awt.*;
  * website</A>
  */
 
-public class EboardVectorPiecePainter extends VectorPiecePainter{
+public final class EboardVectorPiecePainter extends VectorPiecePainter{
 
 
 
@@ -93,6 +93,16 @@ public class EboardVectorPiecePainter extends VectorPiecePainter{
   public EboardVectorPiecePainter(Color whiteColor, Color blackColor,
                                   Color whiteOutline, Color blackOutline){
     super(whiteColor, blackColor, whiteOutline, blackOutline);
+  }
+  
+  
+  
+  /**
+   * Returns a copy of this <code>EboardVectorPiecePainter</code>.
+   */
+  
+  public PiecePainter freshInstance(){
+    return new EboardVectorPiecePainter();
   }
 
 
