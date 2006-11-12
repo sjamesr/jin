@@ -21,17 +21,52 @@
 
 package free.chess;
 
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+
 
 /**
  * The default PiecePainter implementation used in JBoard.
  * This PiecePainter supports the pieces in all wild variants defined in the
  * free.chess package and all its subpackages. This class currently uses
- * free.chess.art.EboardVectorPiecePainter to paint the pieces, but this is
- * an implementation detail which you should not rely on. The artwork belongs
- * solely to the author(s) of eboard. For additional information see
+ * <code>free.chess.EboardVectorPiecePainter</code> to paint the pieces, but
+ * this is an implementation detail which you should not rely on. The artwork
+ * belongs solely to the author(s) of eboard. For additional information see
  * <A HREF="http://eboard.sourceforge.net/">the eboard website</A>
  */
 
-public class DefaultPiecePainter extends free.chess.EboardVectorPiecePainter{
+public class DefaultPiecePainter implements PiecePainter{
+  
+  
+  
+  /**
+   * The delegate.
+   */
+  
+  private PiecePainter delegate = new EboardVectorPiecePainter();
+  
+  
+  
+  /**
+   * Since <code>DefaultPiecePainter</code> is immutable, simply returns
+   * </code>this</code>.
+   */
+  
+  public PiecePainter freshInstance(){
+    return this;
+  }
+  
+  
+  
+  /**
+   * Paints the piece.
+   */
 
+  public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect, boolean shaded){
+    delegate.paintPiece(piece, g, component, rect, shaded);
+  }
+  
+  
+  
 }

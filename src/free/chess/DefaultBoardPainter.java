@@ -21,22 +21,45 @@
 
 package free.chess;
 
-import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
 
 
 /**
- * The default BoardPainter implementation used by JBoard.
+ * The default <code>BoardPainter implementation used by <code>JBoard</code>.
  */
 
-public class DefaultBoardPainter extends PlainBoardPainter{
-
+public class DefaultBoardPainter implements BoardPainter{
+  
+  
   
   /**
-   * Creates a new DefaultBoardPainter.
+   * The delegate.
    */
-
-  public DefaultBoardPainter(){
-    super(new Color(255,207,144),new Color(143,96,79));
+  
+  private final BoardPainter delegate = new PlainBoardPainter();
+  
+  
+  
+  /**
+   * Since <code>DefaultBoardPainter</code> is immutable, simply returns
+   * </code>this</code>.
+   */
+  
+  public BoardPainter freshInstance(){
+    return new DefaultBoardPainter();
   }
-
+  
+  
+  
+  /**
+   * Paints the board.
+   */
+  
+  public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
+    delegate.paintBoard(g, component, x, y, width, height);
+  }
+  
+  
+  
 }
