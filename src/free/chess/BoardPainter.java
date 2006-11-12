@@ -34,23 +34,22 @@ public interface BoardPainter{
 
 
   /**
-   * Forces the board painter to load any resources it requires to draw the
-   * board. It's up to the implementation whether the resources should be loaded
-   * in the current thread (preferably, only if they are small and guaranteed
-   * not to block for a long time), or in a background thread.
-   */
-  
-  void loadResources();
-  
-   
-  
-  /**
    * Paints the board at the given location on the given Graphics scaled to
    * the given size. The <code>component</code> argument may be null.
    */
 
   void paintBoard(Graphics g, Component component, int x, int y, int width, int height);
 
+  
+  
+  /**
+   * Returns a new <code>BoardPainter</code> of the same class as this one.
+   * Implementations which are immutable may return this instance itself instead
+   * of an actual copy.
+   */
+  
+  BoardPainter freshInstance();
+  
   
   
 }

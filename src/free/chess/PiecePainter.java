@@ -27,7 +27,8 @@ import java.awt.Rectangle;
 
 
 /**
- * An interface for classes that paint the pieces on JBoard.
+ * An interface for classes that paint the pieces (normally on a
+ * <code>JBoard</code>).
  */
 
 public interface PiecePainter{
@@ -43,7 +44,17 @@ public interface PiecePainter{
    */
 
   void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect, boolean shaded);
-
+  
+  
+  
+  /**
+   * Returns a new <code>PiecePainter</code> of the same class as this one.
+   * Implementations which are immutable may return this instance itself instead
+   * of an actual copy.
+   */
+  
+  PiecePainter freshInstance();
+  
   
   
 }
