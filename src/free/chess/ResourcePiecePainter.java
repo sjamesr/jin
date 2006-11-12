@@ -39,6 +39,8 @@ public interface ResourcePiecePainter extends PiecePainter{
   
   /**
    * Loads this <code>ResourcePiecePainter</code> from the specified URL.
+   * This method should be called immediately after creating the painter
+   * and may only be called once.
    */
    
   public void load(URL url) throws IOException;
