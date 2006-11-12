@@ -22,10 +22,7 @@
 package free.jin;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -40,6 +37,7 @@ import free.jin.ui.OptionPanel;
 import free.jin.ui.SdiUiProvider;
 import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
+import free.util.Pair;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
 
@@ -74,6 +72,17 @@ public class Jin{
    */
 
   private final Properties appProps;
+  
+  
+  
+  /**
+   * Cache of loaded resources. Maps a pair of (resourceType, plugin) to a
+   * pair whose first value is a map from resourceId to the resource and whose
+   * second value is a Boolean specifying whether the map consists of all the
+   * resources of that type for that plugin (it may also be partially loaded).
+   */
+  
+  private final Map resourceCache = new HashMap();
   
   
   
@@ -341,7 +350,8 @@ public class Jin{
   
   /**
    * Loads and returns the resources of the specified type for the specified
-   * plugin. Resources are typically used when there is a need to allow the user
+   * plugin. The returned map is from resource IDs to <code>Resource</code>s.
+   * Resources are typically used when there is a need to allow the user
    * (or some other 3rd party) to add his own customizations to Jin
    * (or a plugin). For example, this mechanism is used for loading piece sets
    * and boards by the board manager plugin. A <code>JinContext</code>
@@ -350,8 +360,20 @@ public class Jin{
    * adding/deleting files from those directories.
    */
    
-  public Resource [] getResources(String resourceType, Plugin plugin){
-    return (Resource [])context.getResources(resourceType, plugin).clone();
+  public Map getResources(String resourceType, Plugin plugin){
+    Pair key = new Pair(resourceType, plugin);
+    Pair value = (Pair)resourceCache.get(key);
+    Map resourceMap;
+    if ((value == null) || !((Boolean)value.getSecond()).booleanValue()){
+      resourceMap = context.getResources(resourceType, plugin);
+      if (resourceMap == null)
+        return null;
+      resourceCache.put(key, new Pair(resourceMap, Boolean.TRUE));
+    }
+    else
+      resourceMap = (Map)value.getFirst();
+    
+    return Collections.unmodifiableMap(resourceMap);
   }
   
   
@@ -361,7 +383,24 @@ public class Jin{
    */
   
   public Resource getResource(String resourceType, String id, Plugin plugin){
-    return context.getResource(resourceType, id, plugin);
+    Pair key = new Pair(resourceType, plugin);
+    Pair value = (Pair)resourceCache.get(key);
+    Resource resource;
+    
+    if ((value == null) || ((resource = (Resource)((Map)value.getFirst()).get(id)) == null))
+      resource = context.getResource(resourceType, id, plugin);
+    
+    if (value == null){
+      Map resourceMap = new HashMap();
+      resourceMap.put(id, resource);
+      resourceCache.put(key, new Pair(resourceMap, Boolean.FALSE));
+    }
+    else{
+      Map resourceMap = (Map)value.getFirst();
+      resourceMap.put(id, resource);
+    }
+    
+    return resource;
   }
   
   
