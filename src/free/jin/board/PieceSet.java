@@ -211,11 +211,11 @@ public class PieceSet implements Resource{
   
   
   /**
-   * Returns the piece painter of this piece set.
+   * Returns a piece painter of this piece set.
    */
   
   public PiecePainter getPiecePainter(){
-    return piecePainter;
+    return piecePainter.freshInstance();
   }
   
   

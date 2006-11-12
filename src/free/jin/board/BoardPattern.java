@@ -211,11 +211,11 @@ public class BoardPattern implements Resource{
   
   
   /**
-   * Returns the board painter of this piece set.
+   * Returns a board painter of this piece set.
    */
   
   public BoardPainter getBoardPainter(){
-    return boardPainter;
+    return boardPainter.freshInstance();
   }
 
   
