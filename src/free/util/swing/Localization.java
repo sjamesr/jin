@@ -43,10 +43,10 @@ public class Localization{
   
   
   /**
-   * The resource bundle.
+   * The resource bundle, initialized by <code>setLocale</code>, or lazily.
    */
 
-  private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+  private static ResourceBundle resourceBundle = null;
   
   
   
@@ -65,7 +65,11 @@ public class Localization{
    * Returns the localization for the following key.
    */
 
-  public static String getString(String key){
+  public static synchronized String getString(String key){
+    // Lazily initialize
+    if (resourceBundle == null)
+      resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+    
     return resourceBundle.getString(key);
   }
   
