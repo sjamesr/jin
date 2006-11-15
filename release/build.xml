@@ -220,22 +220,15 @@
     
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.applet.dir}" />
-
-		<antcall target="rebuild">
-			<param name="release.name" value="Jin Applet" />
-			<param name="release.platform" value="applet" />
-			<param name="build.compress" value="yes" />
-			<param name="build.manifest" value="release/applet/manifest.txt" />
-		</antcall>
-
+		
 		<antcall target="create-applet-archive">
 			<param name="server.name" value="icc" />
 			<param name="server.file" value="chessclub.jar" />
 			<param name="libs" value="icc/timestamping.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
+			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
-			<param name="pieces" value="icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 xboard" />
 		</antcall>
 
 		<antcall target="create-applet-archive">
@@ -244,8 +237,8 @@
 			<param name="libs" value="fics/timesealing.jar seek.jar board.jar sound.jar console.jar" />
 			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
 			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
+			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard fics/eboard" />
 			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
-			<param name="pieces" value="fics/eboard xboard" />
 		</antcall>
 	</target>
   
@@ -254,8 +247,17 @@
 	<!-- Helper target for building an applet release. Builds a release for
 	     the server specified by the server.name property -->
 	<target name="create-applet-archive">
+		
+		<antcall target="rebuild">
+			<param name="release.name" value="Jin Applet" />
+			<param name="release.platform" value="applet" />
+			<param name="build.compress" value="yes" />
+			<param name="build.manifest" value="release/applet/manifest.txt" />
+			<param name="applet.pieces" value="${pieces}" />
+			<param name="applet.boards" value="${boards}" />
+		</antcall>
   
-	<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
+		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
 			<fileset dir="${build.dir}" includes="util.jar chess.jar jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>

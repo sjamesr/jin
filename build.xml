@@ -37,6 +37,8 @@
 		<property file="${source.dir}/free/jin/resources/app.props" prefix="jin" />
 		<property name="release.name" value="Jin" />
 		<property name="release.version" value="${date}" />
+		<property name="applet.pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3 fics/eboard" />
+		<property name="applet.boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
 	</target>
 
 
@@ -506,6 +508,10 @@
 		
 		<copy todir="${build.dir}">
 			<fileset file="resources/os-specific/applet/**" excludes="**.java"/>
+			<filterset>
+				<filter token="PIECES" value="${applet.pieces}" />
+				<filter token="BOARDS" value="${applet.boards}" />
+			</filterset>
 		</copy>
 		
  		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
