@@ -30,8 +30,8 @@
 	<PARAM NAME="actions.2.classname" VALUE="free.jin.action.seek.SeekAction">
 
 	
-	<PARAM NAME="resources.boards" VALUE="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark">
-	<PARAM NAME="resources.pieces" VALUE="fics/eboard xboard">
+	<PARAM NAME="resources.boards" VALUE="@BOARDS@">
+	<PARAM NAME="resources.pieces" VALUE="@PIECES@">
 	
 </APPLET>
 
