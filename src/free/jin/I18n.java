@@ -166,9 +166,13 @@ public class I18n{
     Properties props = null;
     
     props = loadProps(c, props, propsFilenamePrefix + ".properties");
-    props = loadProps(c, props, propsFilenamePrefix + "_" + language + ".properties");
-    props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + ".properties");
-    props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + "_" + variant + ".properties");
+    
+    if ((language != null) && !"".equals(language))
+      props = loadProps(c, props, propsFilenamePrefix + "_" + language + ".properties");
+    if ((country != null) && !"".equals(country))
+      props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + ".properties");
+    if ((variant != null) && !"".equals(variant))
+      props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + "_" + variant + ".properties");
     
     return props;
   }
