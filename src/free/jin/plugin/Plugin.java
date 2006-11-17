@@ -21,6 +21,8 @@
 
 package free.jin.plugin;
 
+import java.util.Map;
+
 import javax.swing.ListModel;
 
 import free.jin.*;
@@ -126,7 +128,7 @@ public abstract class Plugin{
    * <code>JinContext.getResources</code> for more information.
    */
    
-  public Resource [] getResources(String resourceType){
+  public Map getResources(String resourceType){
     return Jin.getInstance().getResources(resourceType, this); 
   }
   
