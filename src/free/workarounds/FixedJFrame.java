@@ -17,6 +17,15 @@ import javax.swing.JFrame;
 public class FixedJFrame extends JFrame{
   
   
+  
+  /**
+   * The bounds the frame should have, for bug 4424690.
+   */
+  
+  private volatile Rectangle expectedBounds = null;
+  
+  
+  
   /**
    * Creates a new <code>FixedJFrame</code> per the contract of the respective
    * <code>JFrame</code> constructor.
@@ -41,6 +50,16 @@ public class FixedJFrame extends JFrame{
   
   // <4424690>
   
+  /**
+   * Remembers a user-driven change to the bounds during a call to
+   * <code>show()</code>.
+   */
+  
+  public void reshape(int x, int y, int width, int height){
+    super.reshape(x, y, width, height);
+    expectedBounds = new Rectangle(x, y, width, height);
+  }
+  
   
   
   /**
@@ -53,12 +72,11 @@ public class FixedJFrame extends JFrame{
       return;
     }
     
-    Rectangle bounds = getBounds();
+    expectedBounds = getBounds();
     
     super.show();
     
-    if (!bounds.equals(getBounds()))
-      setBounds(bounds);
+    setBounds(expectedBounds);
   }
   
 
