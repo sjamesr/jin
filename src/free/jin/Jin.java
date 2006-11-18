@@ -122,7 +122,7 @@ public class Jin{
     
     // Load application properties
     try{
-      appProps = IOUtilities.loadProperties(Jin.class.getResourceAsStream("resources/app.props"));
+      appProps = IOUtilities.loadPropertiesAndClose(Jin.class.getResourceAsStream("resources/app.props"));
     } catch (IOException e){
         e.printStackTrace();
         throw new IllegalStateException("Unable to load application properties from resources/app.props");

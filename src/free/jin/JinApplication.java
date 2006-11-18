@@ -473,7 +473,7 @@ public class JinApplication implements JinContext{
     InputStream serverDefIn = loader.getResourceAsStream("definition");
     if (serverDefIn == null)
       throw new FileNotFoundException("Unable to find server definition file in " + jar);
-    Properties serverDef = IOUtilities.loadProperties(serverDefIn);
+    Properties serverDef = IOUtilities.loadPropertiesAndClose(serverDefIn);
 
     String classname = serverDef.getProperty("classname");
     if (classname == null)
@@ -871,7 +871,7 @@ public class JinApplication implements JinContext{
       System.err.println(jar + " does not contain an action definition file");
       return null;
     }
-    Properties actionDef = IOUtilities.loadProperties(actionDefIn);
+    Properties actionDef = IOUtilities.loadPropertiesAndClose(actionDefIn);
 
     String classname = actionDef.getProperty("classname");
     if (classname == null){
@@ -1000,7 +1000,7 @@ public class JinApplication implements JinContext{
       System.err.println(jar + " does not contain a plugin definition file");
       return null;
     }
-    Properties pluginDef = IOUtilities.loadProperties(pluginDefIn);
+    Properties pluginDef = IOUtilities.loadPropertiesAndClose(pluginDefIn);
 
     String classname = pluginDef.getProperty("classname");
     if (classname == null){
@@ -1146,7 +1146,7 @@ public class JinApplication implements JinContext{
    
   private Resource loadResource(File file, Plugin plugin) throws IOException{
     ZipClassLoader cl = new ZipClassLoader(file); 
-    Properties def = IOUtilities.loadProperties(cl.getResourceAsStream("definition"));
+    Properties def = IOUtilities.loadPropertiesAndClose(cl.getResourceAsStream("definition"));
     if (def == null)
       return null;
     String classname = def.getProperty("classname");
