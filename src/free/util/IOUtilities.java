@@ -404,10 +404,21 @@ public class IOUtilities{
    */
 
   public static Properties loadProperties(InputStream in) throws IOException{
+    return loadProperties(in, new Properties());
+  }
+  
+  
+  
+  /**
+   * Loads properties from the specified <code>InputStream</code> into the
+   * specified <code>Properties</code> object. Returns the passed
+   * <code>Properties</code> object/
+   */
+  
+  public static Properties loadProperties(InputStream in, Properties props) throws IOException{
     if (in == null)
       return null;
     
-    Properties props = new Properties();
     try{
       props.load(in);
     } finally {
@@ -433,12 +444,28 @@ public class IOUtilities{
   /**
    * Creates and returns a new <code>java.util.Properties</code> object loaded
    * from the specified <code>URL</code>.
+   * <code>allowCache</code> specifies whether the data may be retrieved from
+   * the cache instead of being actually retrieved.
    */
 
-  public static Properties loadProperties(URL url) throws IOException{
-    byte [] cached = (byte [])urlCache.get(url);
+  public static Properties loadProperties(URL url, boolean allowCache) throws IOException{
+    return loadProperties(url, allowCache, new Properties());
+  }
+  
+  
+  
+  /**
+   * Loads properties from the specified <code>URL</code> into the specified
+   * </code>Properties</code> object. Returns the passed
+   * <code>Properties</code> object.
+   * <code>allowCache</code> specifies whether the data may be retrieved from
+   * the cache instead of being actually retrieved.
+   */
+  
+  public static Properties loadProperties(URL url, boolean allowCache, Properties props) throws IOException{
+    byte [] cached = allowCache ? (byte [])urlCache.get(url) : null;
     InputStream in = cached == null ? url.openStream() : new ByteArrayInputStream(cached);
-    return loadProperties(in);
+    return loadProperties(in, props);
   }
   
   
