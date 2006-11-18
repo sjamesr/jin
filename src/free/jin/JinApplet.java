@@ -455,7 +455,7 @@ public class JinApplet extends Applet implements JinContext{
     if (!IOUtilities.isURLCached(defURL))
       IOUtilities.cacheURL(defURL);
     
-    Properties def = IOUtilities.loadProperties(defURL);
+    Properties def = IOUtilities.loadProperties(defURL, true);
     String classname = def.getProperty("classname");
     if (classname == null)
       return null;

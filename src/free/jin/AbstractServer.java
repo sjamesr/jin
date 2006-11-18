@@ -78,7 +78,7 @@ public abstract class AbstractServer implements Server{
 
   protected AbstractServer(){
     try{
-      props = IOUtilities.loadProperties(getClass().getResource("properties"));
+      props = IOUtilities.loadProperties(getClass().getResource("properties"), true);
     } catch (IOException e){
         throw new IllegalStateException("No properties file found");
       }

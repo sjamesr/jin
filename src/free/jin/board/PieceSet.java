@@ -105,7 +105,7 @@ public class PieceSet implements Resource{
    */
    
   public boolean load(URL url, Plugin plugin) throws IOException{
-    Properties definition = IOUtilities.loadProperties(new URL(url, "definition"));
+    Properties definition = IOUtilities.loadProperties(new URL(url, "definition"), true);
     
     String minJavaVer = definition.getProperty("minJavaVersion");
     if ((minJavaVer != null) && !PlatformUtils.isJavaBetterThan(minJavaVer))

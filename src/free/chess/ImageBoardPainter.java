@@ -204,7 +204,7 @@ public final class ImageBoardPainter implements ResourceBoardPainter{
     
     URL defURL = new URL(url, "definition");
 
-    Properties def = IOUtilities.loadProperties(defURL);
+    Properties def = IOUtilities.loadProperties(defURL, true);
     if (def == null)
       def = new Properties();
 

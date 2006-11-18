@@ -167,7 +167,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
       throw new IllegalStateException("This ImagePiecePainter has already been loaded");
     
     URL defURL = new URL(url, "definition");
-    Properties def = IOUtilities.loadProperties(defURL);
+    Properties def = IOUtilities.loadProperties(defURL, true);
     if (def == null)
       throw new IOException("Unable to load " + defURL);
     
