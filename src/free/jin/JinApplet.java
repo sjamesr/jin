@@ -30,6 +30,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
@@ -395,21 +397,30 @@ public class JinApplet extends Applet implements JinContext{
    */
 
   public Map getResources(String resourceType, Plugin plugin){
-    String resourcesArg = getParameter("resources." + resourceType);
-    if (resourcesArg == null)
-      return Collections.emptyMap();
+    Map resourceMap = new HashMap();
     
-    StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
-    Map resourceMap = new HashMap(resourceNames.countTokens());
-    while (resourceNames.hasMoreTokens()){
-      try{
-        URL resourceURL = new URL(getCodeBase(), "resources/" + resourceType + "/" 
-          + resourceNames.nextToken() + "/");
+    try{
+      URL codeBase = getCodeBase();
+      URL definitionsFileURL = new URL(codeBase, "resources/" + resourceType + "/definitions.zip");
+      if (!IOUtilities.isURLCached(definitionsFileURL))
+        IOUtilities.cacheURL(definitionsFileURL);
+      ZipInputStream zip = new ZipInputStream(IOUtilities.inputStreamForURL(definitionsFileURL));
+      ZipEntry entry;
+      while ((entry = zip.getNextEntry()) != null){
+        String entryName = entry.getName();
+        if (!entryName.endsWith("definition") || entry.isDirectory())
+          continue;
+        String resourcePath = entryName.substring(0, entryName.length() - "/definition".length());
+        byte [] data = IOUtilities.readToEnd(zip);
+        URL resourceURL = new URL(codeBase, "resources/" + resourceType + "/" + resourcePath + "/");
+        IOUtilities.cacheData(new URL(resourceURL, "definition"), data);
         Resource resource = loadResource(resourceURL, plugin);
         if (resource != null)
           resourceMap.put(resource.getId(), resource);
-      } catch (IOException e){e.printStackTrace();}
-    }
+      }
+    } catch (IOException e){
+        e.printStackTrace();
+      }
     
     return resourceMap;
   }
@@ -423,23 +434,12 @@ public class JinApplet extends Applet implements JinContext{
    
   public Resource getResource(String type, String id, Plugin plugin){
     try{
-      String resourcesArg = getParameter("resources." + type);
-      if (resourcesArg == null)
+      URL resourceURL = new URL(getCodeBase(), "resources/" + type + "/" + id + "/");
+      return loadResource(resourceURL, plugin);
+    } catch (IOException e){
+        e.printStackTrace();
         return null;
-      
-      StringTokenizer resourceNames = new StringTokenizer(resourcesArg, " ");
-      while (resourceNames.hasMoreTokens()){
-        String resource = resourceNames.nextToken();
-        int slashIndex = resource.indexOf("/");
-        String resourceId = slashIndex == -1 ? resource : resource.substring(slashIndex + 1);
-        if (id.equals(resourceId)){
-          URL resourceURL = new URL(getCodeBase(), "resources/" + type + "/" + resource + "/");
-          return loadResource(resourceURL, plugin);
-        }
       }
-    } catch (IOException e){e.printStackTrace();}
-    
-    return null;
   }
   
   

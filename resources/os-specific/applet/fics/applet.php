@@ -28,10 +28,6 @@
 	<PARAM NAME="actions.0.classname" VALUE="free.jin.action.getserverhelp.GetServerHelpAction">
 	<PARAM NAME="actions.1.classname" VALUE="free.jin.action.askquestion.AskQuestionAction">
 	<PARAM NAME="actions.2.classname" VALUE="free.jin.action.seek.SeekAction">
-
-	
-	<PARAM NAME="resources.boards" VALUE="@BOARDS@">
-	<PARAM NAME="resources.pieces" VALUE="@PIECES@">
 	
 </APPLET>
 

@@ -253,8 +253,6 @@
 			<param name="release.platform" value="applet" />
 			<param name="build.compress" value="yes" />
 			<param name="build.manifest" value="release/applet/manifest.txt" />
-			<param name="applet.pieces" value="${pieces}" />
-			<param name="applet.boards" value="${boards}" />
 		</antcall>
   
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
@@ -282,13 +280,15 @@
 		</copy>
 		
 		
-		<foreach list="${boards}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
+		<antcall target="build-applet-resource-type" inheritall="yes">
 			<param name="resource.type" value="boards" />
-		</foreach>
+			<param name="resource.names" value="${boards}" />
+		</antcall>
     
-		<foreach list="${pieces}" target="copy-applet-resources" param="resource.name" delimiter=" " inheritall="yes">
+		<antcall target="build-applet-resource-type" inheritall="yes">
 			<param name="resource.type" value="pieces" />
-		</foreach>
+			<param name="resource.names" value="${pieces}" />
+		</antcall>
     
 		<property name="tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}.tar" />
 		<property name="gz" value="${tar}.gz" />
@@ -301,14 +301,29 @@
 		<delete file="${tar}" />
 		<property name="applet-${server.name}-archive" value="${gz}" />
 	</target>
-  
-  
-	<!-- A helper target for copying a specified list of resources -->
-	<target name="copy-applet-resources">
-		<mkdir dir="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
-    	<unzip src="${build.dir}/resources/${resource.type}/${resource.name}.zip"
-    	       dest="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
+	
+	<!-- A helper target for building a single resource type for the applet -->
+	<target name="build-applet-resource-type">
+		<foreach list="${resource.names}"
+		         target="copy-applet-resources"
+		         param="resource.path"
+		         delimiter=" "
+		         inheritall="yes"
+		/>
+		<zip destfile="${dir-to-tar}/resources/${resource.type}/definitions.zip"
+		     basedir="${dir-to-tar}/resources/${resource.type}"
+		     includes="*/definition"
+		/>
 	</target>
+	
+	<!-- A helper target for copying a specified list of resources for the applet -->
+	<target name="copy-applet-resources">
+		<basename file="${resource.path}" property="resource.name"/>
+		<mkdir dir="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
+		<unzip src="${build.dir}/resources/${resource.type}/${resource.path}.zip"
+    	           dest="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
+	</target>
+	
 	
 	
 	<!-- Source. Resulting files are ${src-archive} and ${src-archive-no-extras} -->
