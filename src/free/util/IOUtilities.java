@@ -237,8 +237,8 @@ public class IOUtilities{
 
   /**
    * Reads from the given InputStream until its end and returns a byte array
-   * of the contents. Note that this method doesn't close the given InputStream,
-   * that is left to the user.
+   * of the contents. The input stream is not <code>close</code>d by this
+   * method.
    */
 
   public static byte [] readToEnd(InputStream in) throws IOException{
@@ -399,10 +399,9 @@ public class IOUtilities{
 
   /**
    * Creates and returns a new <code>java.util.Properties</code> object loaded
-   * from the specified <code>InputStream</code>. <strong>Important:</strong>
-   * this method closes the specified input stream after reading from it.
+   * from the specified <code>InputStream</code>.
    */
-
+  
   public static Properties loadProperties(InputStream in) throws IOException{
     return loadProperties(in, new Properties());
   }
@@ -412,31 +411,58 @@ public class IOUtilities{
   /**
    * Loads properties from the specified <code>InputStream</code> into the
    * specified <code>Properties</code> object. Returns the passed
-   * <code>Properties</code> object/
+   * <code>Properties</code> object.
    */
   
   public static Properties loadProperties(InputStream in, Properties props) throws IOException{
     if (in == null)
       return null;
     
-    try{
-      props.load(in);
-    } finally {
-        in.close();
-      }
+    props.load(in);
+    
     return props;
   }
-
-
-
+  
+  
+  
+  
+  /**
+   * Similar to the {@link #loadProperties(InputStream)} method, but closes
+   * the specified <code>InputStream</code> at the end of its operation.
+   */
+  
+  public static Properties loadPropertiesAndClose(InputStream in) throws IOException{
+    return loadPropertiesAndClose(in, new Properties());
+  }
+  
+  
+  
+  /**
+   * Similar to the {@link #loadProperties(InputStream, Properties)} method,
+   * but closes the specified <code>InputStream</code> at the end of its
+   * operation.
+   */
+  
+  public static Properties loadPropertiesAndClose(InputStream in, Properties props) throws IOException{
+    try{
+      return loadProperties(in, props);
+    } finally{
+        try{
+          in.close();
+        } catch (IOException e){}
+      }
+  }
+  
+  
+  
+  
   /**
    * Creates and returns a new <code>java.util.Properties</code> object loaded
    * from the specified <code>File</code>.
    */
 
   public static Properties loadProperties(File file) throws IOException{
-    InputStream in = new FileInputStream(file);
-    return loadProperties(in);
+    return loadPropertiesAndClose(new FileInputStream(file));
   }
 
 
@@ -463,9 +489,8 @@ public class IOUtilities{
    */
   
   public static Properties loadProperties(URL url, boolean allowCache, Properties props) throws IOException{
-    byte [] cached = allowCache ? (byte [])urlCache.get(url) : null;
-    InputStream in = cached == null ? url.openStream() : new ByteArrayInputStream(cached);
-    return loadProperties(in, props);
+    InputStream in = allowCache ? inputStreamForURL(url) : url.openStream();
+    return loadPropertiesAndClose(in, props);
   }
   
   
@@ -473,13 +498,27 @@ public class IOUtilities{
   /**
    * Loads and caches the contents of the specified URL. Calls to any of the
    * methods that load from URLs in this class will use the cached data. Calling
-   * this method with an already cached URL will cause it to be loaded again.
+   * this method with an already cached URL will cause it to be loaded again. If
+   * an <code>IOException</code> occurs while loading the data, the cache
+   * remains unchanged.
    */
    
   public static void cacheURL(URL url) throws IOException{
     InputStream in = url.openStream(); 
     byte [] data = readToEnd(in);
     in.close();
+    cacheData(url, data);
+  }
+  
+  
+  
+  /**
+   * Forces the data mapped to the specified URL to be the specified data.
+   * This method is useful when one part of an application wants to generate
+   * or specify data for another part.
+   */
+  
+  public static void cacheData(URL url, byte [] data){
     urlCache.put(url, data);
   }
   
@@ -492,7 +531,20 @@ public class IOUtilities{
   public static boolean isURLCached(URL url){
     return urlCache.containsKey(url);
   }
-
-
+  
+  
+  
+  /**
+   * Returns an <code>InpuStream</code> for reading the data at the specified
+   * URL. If the URL is cached, a <code>ByteArrayInpuStream</code> with the
+   * cached data is returned.
+   */
+  
+  public static InputStream inputStreamForURL(URL url) throws IOException{
+    byte [] cached = (byte [])urlCache.get(url);
+    return cached == null ? url.openStream() : new ByteArrayInputStream(cached);
+  }
+  
+  
   
 }
