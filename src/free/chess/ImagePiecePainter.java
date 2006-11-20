@@ -22,16 +22,16 @@
 package free.chess;
 
 import java.awt.*;
-import java.awt.image.*;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.RGBImageFilter;
 import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+
+import free.util.IOUtilities;
 import free.util.ImageUtilities;
 import free.util.TextUtilities;
-import free.util.IOUtilities;
 
 
 /**
@@ -43,6 +43,14 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
 
   
   /**
+   * The painter we delegate to while loading images.
+   */
+  
+  private static final PiecePainter whileLoadingDelegate = new DefaultPiecePainter();
+  
+  
+  
+  /**
    * The ImageFilter we use to create shaded images.
    */
 
@@ -51,11 +59,21 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
 
 
   /**
+   * True if piece images are to be loaded asynchronously, and in the meanwhile,
+   * the delegate should be used.
+   */
+  
+  private static volatile boolean asyncImageLoad = false;
+  
+  
+  
+  /**
    * An array whose indices specify the size of the images and whose values
-   * are Hashtables mapping Pieces to Images.
+   * are maps mapping <code>Piece</code>s to either <code>Image</code>s or
+   * <code>URL</code>s, if the image isn't loaded yet.
    */
 
-  private Hashtable [] pieceImages;
+  private Map [] pieceImages;
 
 
 
@@ -63,7 +81,16 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
    * Same as pieceImages only for shaded images.
    */
 
-  private Hashtable [] shadedPieceImages;
+  private Map [] shadedPieceImages;
+  
+  
+  
+  /**
+   * Maps the square sizes for which images are currently being loaded to the
+   * <code>ImageDataReceiver</code>s waiting on the data.
+   */
+  
+  private final Map imageDataReceivers = new HashMap(2);
 
 
   
@@ -79,18 +106,19 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
   
 
   /**
-   * Creates a new ImagePiecePainter with the specified piece images.
-   * The given Hashtable should map Integer objects specifying the size of the
-   * piece images to Hashtables which in turn map Piece objects to piece Images.
+   * Creates a new <code>ImagePiecePainter</code> with the specified piece
+   * images. The given <code>Map</code> should map <code>Integer</code>s
+   * specifying the size of the piece images to <code>Maps</code>s which in
+   * turn map <code>Piece</code>s to piece <code>Image</code>s.
    */
 
-  public ImagePiecePainter(Hashtable pieceImages){
+  public ImagePiecePainter(Map pieceImages){
 
     // Find the largest size
     int maxSize = 0;
-    Enumeration sizes = pieceImages.keys();
-    while (sizes.hasMoreElements()){
-      int size = ((Integer)sizes.nextElement()).intValue();
+    Iterator sizes = pieceImages.keySet().iterator();
+    while (sizes.hasNext()){
+      int size = ((Integer)sizes.next()).intValue();
       if (size <= 0)
         throw new IllegalArgumentException("Image sizes must be positive");
 
@@ -101,23 +129,23 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
     if (maxSize == 0)
       throw new IllegalArgumentException("No sizes in the hashtable");
 
-    this.pieceImages = new Hashtable[maxSize + 1];
-    this.shadedPieceImages = new Hashtable[maxSize + 1];
+    this.pieceImages = new Map[maxSize + 1];
+    this.shadedPieceImages = new Map[maxSize + 1];
 
     // Fill the array
-    sizes = pieceImages.keys();
-    while (sizes.hasMoreElements()){
-      Integer size = (Integer)sizes.nextElement();
+    sizes = pieceImages.keySet().iterator();
+    while (sizes.hasNext()){
+      Integer size = (Integer)sizes.next();
       int sizeInt = size.intValue();
 
-      Hashtable images = (Hashtable)pieceImages.get(size);
+      Map images = (Map)pieceImages.get(size);
       int imagesCount = images.size();
-      this.pieceImages[sizeInt] = new Hashtable(imagesCount);
-      this.shadedPieceImages[sizeInt] = new Hashtable(imagesCount);
+      this.pieceImages[sizeInt] = new HashMap(imagesCount);
+      this.shadedPieceImages[sizeInt] = new HashMap(imagesCount);
 
-      Enumeration pieces = images.keys();
-      while (pieces.hasMoreElements()){
-        Object key = pieces.nextElement();
+      Iterator pieces = images.keySet().iterator();
+      while (pieces.hasNext()){
+        Object key = pieces.next();
         Image image = (Image)images.get(key);
         Image shadedImage = shadeImage(image);
 
@@ -125,6 +153,27 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
         this.shadedPieceImages[sizeInt].put(key, shadedImage);
       }
     }
+  }
+  
+  
+  
+  /**
+   * Sets whether piece images are to be loaded asynchronously and a simpler
+   * piece painter delegate used while they load.
+   */
+  
+  public static void setAsyncImageLoad(boolean asyncImageLoad){
+    ImagePiecePainter.asyncImageLoad = asyncImageLoad;
+  }
+  
+  
+  
+  /**
+   * Creates a shaded version of the specified image.
+   */
+  
+  private static Image shadeImage(Image image){
+    return Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(image.getSource(), SHADING_FILTER));
   }
   
   
@@ -162,11 +211,11 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
    * must have the correct size.
    */
    
-  public void load(URL url) throws IOException{
+  public void load(URL baseUrl) throws IOException{
     if (pieceImages != null)
       throw new IllegalStateException("This ImagePiecePainter has already been loaded");
     
-    URL defURL = new URL(url, "definition");
+    URL defURL = new URL(baseUrl, "definition");
     Properties def = IOUtilities.loadProperties(defURL, true);
     if (def == null)
       throw new IOException("Unable to load " + defURL);
@@ -174,27 +223,31 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
     String ext = def.getProperty("ext", "gif");
     int [] sizes = TextUtilities.parseIntList(def.getProperty("size.list"), " ");
     
-    this.pieceImages = new Hashtable[sizes[sizes.length - 1] + 1];
-    this.shadedPieceImages = new Hashtable[sizes[sizes.length - 1] + 1];
+    this.pieceImages = new HashMap[sizes[sizes.length - 1] + 1];
+    this.shadedPieceImages = new HashMap[sizes[sizes.length - 1] + 1];
     
-    Piece [] pieces = new Piece[]{ChessPiece.WHITE_KING, ChessPiece.BLACK_KING,
-      ChessPiece.WHITE_QUEEN, ChessPiece.BLACK_QUEEN, ChessPiece.WHITE_ROOK,
-      ChessPiece.BLACK_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.BLACK_BISHOP,
-      ChessPiece.WHITE_KNIGHT, ChessPiece.BLACK_KNIGHT, ChessPiece.WHITE_PAWN,
-      ChessPiece.BLACK_PAWN};
+    Piece [] pieces = new Piece[]{
+        ChessPiece.WHITE_KING, ChessPiece.BLACK_KING,
+        ChessPiece.WHITE_QUEEN, ChessPiece.BLACK_QUEEN,
+        ChessPiece.WHITE_ROOK, ChessPiece.BLACK_ROOK,
+        ChessPiece.WHITE_BISHOP, ChessPiece.BLACK_BISHOP,
+        ChessPiece.WHITE_KNIGHT, ChessPiece.BLACK_KNIGHT,
+        ChessPiece.WHITE_PAWN, ChessPiece.BLACK_PAWN};
       
     String [] pieceNames = 
       new String[]{"wk", "bk", "wq", "bq", "wr", "br", "wb", "bb", "wn", "bn", "wp", "bp"};
     
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
     for (int i = 0; i < sizes.length; i++){
       int size = sizes[i];
       
-      Hashtable normal = new Hashtable(15);
-      Hashtable shaded = new Hashtable(15);
+      Map normal = new HashMap(15);
+      Map shaded = new HashMap(15);
 
-      for (int j = 0; j < pieces.length; j++)
-        addImage(toolkit, url, pieces[j], size, pieceNames[j], ext, normal, shaded); 
+      for (int j = 0; j < pieces.length; j++){
+        URL imageUrl = new URL(baseUrl, size + "/" + pieceNames[j] + "." + ext);
+        normal.put(pieces[j], imageUrl);
+        shaded.put(pieces[j], imageUrl);
+      }
 
       this.pieceImages[size] = normal;
       this.shadedPieceImages[size] = shaded;
@@ -204,61 +257,77 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
   
   
   /**
-   * Loads and maps the specified image and its shaded version in the specified
-   * hashtables.
+   * Returns the size of provided images which is the best fit for the
+   * specified square size.
    */
-   
-   private void addImage(Toolkit toolkit, URL url, Piece piece, int size,
-      String name, String ext, Hashtable normal, Hashtable shaded) throws MalformedURLException{
-        
-    Image normalImage = toolkit.getImage(new URL(url, size + "/" + name + "." + ext));
-    Image shadedImage = shadeImage(normalImage);
-    normal.put(piece, normalImage);
-    shaded.put(piece, shadedImage);
-   }
-
-
-
-
-  /**
-   * Returns a shaded version of the specified image.
-   */
-
-  protected Image shadeImage(Image image){
-    Image shadedImage = Toolkit.getDefaultToolkit().createImage(
-      new FilteredImageSource(image.getSource(), SHADING_FILTER));
-    return shadedImage;
-  }
-
-
-
-
-  /**
-   * Returns the Image by which the given Piece is represented at the given
-   * size.
-   */
-
-  protected Image getPieceImage(int size, Piece piece, boolean shaded){
-    Hashtable [] images = shaded ? shadedPieceImages : pieceImages;
-
-    if (size <= 0)
+  
+  protected int bestFitImageSize(int squareSize){
+    if (squareSize <= 0)
       throw new IllegalArgumentException("Image size must be positive");
 
-    if (size >= images.length)
-      return (Image)(images[images.length-1].get(piece));
+    if (squareSize >= pieceImages.length)
+      return pieceImages.length - 1;
 
-    if (images[size] != null)
-      return (Image)(images[size].get(piece));
+    if (pieceImages[squareSize] != null)
+      return squareSize;
 
-    for (int i = size; i > 0; i--)
-      if (images[i] != null)
-        return (Image)(images[i].get(piece));
+    for (int i = squareSize; i > 0; i--)
+      if (pieceImages[i] != null)
+        return i;
 
-    for (int i = size+1; i < images.length; i++)
-      if (images[i] != null)
-        return (Image)(images[i].get(piece));
+    for (int i = squareSize+1; i < pieceImages.length; i++)
+      if (pieceImages[i] != null)
+        return i;
 
     throw new Error("This can't happen");
+  }
+  
+  
+  
+  /**
+   * If already loaded, returns the piece images at the specified size.
+   * Otherwise, starts loading them (in a background thread), and once done,
+   * repaints the specified component. In the meanwhile, returning
+   * <code>null</code>. 
+   */
+  
+  protected synchronized Map loadPieces(int squareSize, boolean shaded, Component target){
+    int imageSize = bestFitImageSize(squareSize);
+    ImageDataReceiver receiver = (ImageDataReceiver)imageDataReceivers.get(new Integer(imageSize));
+    if (receiver != null){ // We're already loading the images
+      receiver.addComponentToRepaint(target);
+      return null;
+    }
+    
+    
+    Map images = (shaded ? shadedPieceImages : pieceImages)[imageSize];
+    if (images.values().iterator().next() instanceof Image) // Already loaded
+      return images;
+    else{
+      Set entrySet = images.entrySet();
+      Piece [] pieces = new Piece[entrySet.size()];
+      URL [] urls = new URL[entrySet.size()];
+      Iterator entries = entrySet.iterator();
+      for (int i = 0; i < pieces.length; i++){
+        Map.Entry entry = (Map.Entry)entries.next();
+        pieces[i] = (Piece)entry.getKey();
+        urls[i] = (URL)entry.getValue();
+      }
+      
+      Map normalImages = pieceImages[imageSize];
+      Map shadedImages = shadedPieceImages[imageSize];
+      receiver = new ImageDataReceiver(target, imageSize, normalImages, shadedImages);
+      imageDataReceivers.put(new Integer(imageSize), receiver);
+      
+      if (asyncImageLoad){
+        IOUtilities.loadAsynchronously(urls, pieces, receiver, true);
+        return null;
+      }
+      else{
+        IOUtilities.loadSynchronously(urls, pieces, receiver, true);
+        return shaded ? shadedImages : normalImages;
+      }
+    }
   }
 
 
@@ -278,12 +347,17 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
     int height = rect.height;
 
     int size = width > height ? height : width;
-    Image pieceImage = getPieceImage(size, piece, shaded);
     
-    ImageUtilities.preload(pieceImage);
+    Map pieces = loadPieces(size, shaded, component);
+    if (pieces == null){
+      whileLoadingDelegate.paintPiece(piece, g, component, rect, shaded);
+      return;
+    }
     
+    Image pieceImage = (Image)pieces.get(piece);
     int pieceWidth = pieceImage.getWidth(null);
     int pieceHeight = pieceImage.getHeight(null);
+    
     g.drawImage(pieceImage, x + (width - pieceWidth)/2, y + (height - pieceHeight)/2, component);
   }
 
@@ -310,7 +384,116 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
     }
 
   }
-
-
+  
+  
+  
+  /**
+   * The receiver of loaded image data. Responsible for creating and correctly
+   * mapping the piece images.
+   */
+  
+  private class ImageDataReceiver implements IOUtilities.DataReceiver{
+    
+    
+    
+    /**
+     * The map of pieces to normal images.
+     */
+    
+    private final Map normalImages;
+    
+    
+    
+    /**
+     * The map of pieces to shaded images.
+     */
+    
+    private final Map shadedImages;
+    
+    
+    
+    /**
+     * The size of the images we're loading. 
+     */
+    
+    private final int imageSize;
+    
+    
+    
+    /**
+     * The components to repaint when the loading is done.
+     */
+    
+    private final Set componentsToRepaint = new HashSet(2);
+    
+    
+    
+    /**
+     * Creates a new <code>ImageDataReceiver</code> with the specified maps to
+     * fill and component to repaint when loading is done.
+     */
+    
+    public ImageDataReceiver(Component componentToRepaint, int imageSize, Map normalImages, Map shadedImages){
+      this.normalImages = normalImages;
+      this.shadedImages = shadedImages;
+      this.imageSize = imageSize;
+      componentsToRepaint.add(componentToRepaint);
+    }
+    
+    
+    
+    /**
+     * Adds a component to the set of components to repaint once all the images
+     * are loaded.
+     */
+    
+    public void addComponentToRepaint(Component component){
+      componentsToRepaint.add(component);
+    }
+    
+    
+    
+    /**
+     * Called when the image data has been loaded. Creates and maps the piece
+     * images.
+     */
+    
+    public void dataRead(URL [] urls, Object id, byte [][] data, IOException[] exceptions){
+      // If there are any exceptions, we simply quit - this will cause
+      // the painter to keep using the delegate to paint pieces.
+      for (int i = 0; i < exceptions.length; i++)
+        if (exceptions[i] != null)
+          return;
+      
+      synchronized(ImagePiecePainter.this){
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Piece [] pieces = (Piece[])id;
+        for (int i = 0; i < data.length; i++){
+          Image normalImage = toolkit.createImage(data[i]);
+          Image shadedImage = shadeImage(normalImage);
+          
+          ImageUtilities.preload(normalImage);
+          ImageUtilities.preload(shadedImage);
+          
+          normalImages.put(pieces[i], normalImage);
+          shadedImages.put(pieces[i], shadedImage);
+        }
+        
+        imageDataReceivers.remove(new Integer(imageSize));
+        
+        for (Iterator i = componentsToRepaint.iterator(); i.hasNext();)
+          ((Component)i.next()).repaint();
+      }
+      
+      
+      
+    }
+    
+    
+    
+    
+  }
+  
+  
   
 }
