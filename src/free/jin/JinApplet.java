@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2004 Alexander Maryanovsky.
+ * Copyright (C) 2006 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -33,7 +33,9 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import free.chess.BoardImageBoardPainter;
 import free.chess.ImagePiecePainter;
+import free.chess.SquareImagesBoardPainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -139,9 +141,8 @@ public class JinApplet extends Applet implements JinContext{
    
   public void init(){
     try{
-      BrowserControl.setAppletContext(getAppletContext());
-      AppletContextAudioPlayer.setAppletContext(getAppletContext());
-      ImagePiecePainter.setAsyncImageLoad(true);
+      // Configure the libraries the applet depends on
+      configureLibraries();
       
       // Determine the locale
       locale = determineLocale();
@@ -240,6 +241,19 @@ public class JinApplet extends Applet implements JinContext{
     Jin.getInstance().start();
   }
   
+  
+  
+  /**
+   * Configures various libraries the applet uses.
+   */
+  
+  private void configureLibraries(){
+    BrowserControl.setAppletContext(getAppletContext());
+    AppletContextAudioPlayer.setAppletContext(getAppletContext());
+    ImagePiecePainter.setAsyncImageLoad(true);
+    BoardImageBoardPainter.setAsyncImageLoad(true);
+    SquareImagesBoardPainter.setAsyncImageLoad(true);
+  }
   
   
   /**
