@@ -23,7 +23,7 @@ package free.util;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.image.*;
+import java.awt.image.ImageObserver;
 
 
 /**
@@ -160,9 +160,19 @@ public class ImageUtilities{
     
     return results;
   }
-
-
-
+  
+  
+  
+  /**
+   * Returns whether the specified image is already fully loaded.
+   */
+  
+  public static boolean isLoaded(Image image){
+    return (Toolkit.getDefaultToolkit().checkImage(image, -1, -1, null) & ImageObserver.ALLBITS) != 0;
+  }
+  
+  
+  
   /**
    * This class is an implementation of ImageObserver which notifies a given
    * lock when loading of the Image is done. This can be used to wait until a
