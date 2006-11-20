@@ -159,7 +159,8 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
   
   /**
    * Sets whether piece images are to be loaded asynchronously and a simpler
-   * piece painter delegate used while they load.
+   * piece painter delegate used while they load. Asynchronous loading is off
+   * by default.
    */
   
   public static void setAsyncImageLoad(boolean asyncImageLoad){
@@ -286,24 +287,23 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
   
   /**
    * If already loaded, returns the piece images at the specified size.
-   * Otherwise, starts loading them (in a background thread), and once done,
-   * repaints the specified component. In the meanwhile, returning
-   * <code>null</code>. 
+   * Otherwise, starts loading them (if async loading is enabled, in a
+   * background thread, in the meanwhile, returning <code>null</code>),
+   * and once done, repaints the specified component.
    */
   
   protected synchronized Map loadPieces(int squareSize, boolean shaded, Component target){
     int imageSize = bestFitImageSize(squareSize);
-    ImageDataReceiver receiver = (ImageDataReceiver)imageDataReceivers.get(new Integer(imageSize));
-    if (receiver != null){ // We're already loading the images
-      receiver.addComponentToRepaint(target);
-      return null;
-    }
-    
-    
     Map images = (shaded ? shadedPieceImages : pieceImages)[imageSize];
     if (images.values().iterator().next() instanceof Image) // Already loaded
       return images;
     else{
+      ImageDataReceiver receiver = (ImageDataReceiver)imageDataReceivers.get(new Integer(imageSize));
+      if (receiver != null){ // We're already loading the images
+        receiver.addComponentToRepaint(target);
+        return null;
+      }
+      
       Set entrySet = images.entrySet();
       Piece [] pieces = new Piece[entrySet.size()];
       URL [] urls = new URL[entrySet.size()];
@@ -316,7 +316,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
       
       Map normalImages = pieceImages[imageSize];
       Map shadedImages = shadedPieceImages[imageSize];
-      receiver = new ImageDataReceiver(target, imageSize, normalImages, shadedImages);
+      receiver = new ImageDataReceiver(asyncImageLoad ? target : null, imageSize, normalImages, shadedImages);
       imageDataReceivers.put(new Integer(imageSize), receiver);
       
       if (asyncImageLoad){
@@ -481,8 +481,11 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
         
         imageDataReceivers.remove(new Integer(imageSize));
         
-        for (Iterator i = componentsToRepaint.iterator(); i.hasNext();)
-          ((Component)i.next()).repaint();
+        for (Iterator i = componentsToRepaint.iterator(); i.hasNext();){
+          Component component = (Component)i.next();
+          if (component != null)
+            component.repaint();
+        }
       }
       
       
