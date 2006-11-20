@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import free.chess.ImagePiecePainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -250,6 +251,8 @@ public class JinApplication implements JinContext{
       libsLoader = null;
       mainLoader = null;
     }
+    
+    ImagePiecePainter.setAsyncImageLoad(false);
     
     // Determine the locale 
     locale = determineLocale();

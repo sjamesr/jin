@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import free.chess.ImagePiecePainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -140,6 +141,7 @@ public class JinApplet extends Applet implements JinContext{
     try{
       BrowserControl.setAppletContext(getAppletContext());
       AppletContextAudioPlayer.setAppletContext(getAppletContext());
+      ImagePiecePainter.setAsyncImageLoad(true);
       
       // Determine the locale
       locale = determineLocale();
@@ -404,7 +406,7 @@ public class JinApplet extends Applet implements JinContext{
       URL definitionsFileURL = new URL(codeBase, "resources/" + resourceType + "/definitions.zip");
       if (!IOUtilities.isURLCached(definitionsFileURL))
         IOUtilities.cacheURL(definitionsFileURL);
-      ZipInputStream zip = new ZipInputStream(IOUtilities.inputStreamForURL(definitionsFileURL));
+      ZipInputStream zip = new ZipInputStream(IOUtilities.inputStreamForURL(definitionsFileURL, true));
       ZipEntry entry;
       while ((entry = zip.getNextEntry()) != null){
         String entryName = entry.getName();
