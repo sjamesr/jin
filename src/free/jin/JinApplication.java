@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2004 Alexander Maryanovsky.
+ * Copyright (C) 2006 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -30,7 +30,6 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import free.chess.ImagePiecePainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -251,8 +250,6 @@ public class JinApplication implements JinContext{
       libsLoader = null;
       mainLoader = null;
     }
-    
-    ImagePiecePainter.setAsyncImageLoad(false);
     
     // Determine the locale 
     locale = determineLocale();
