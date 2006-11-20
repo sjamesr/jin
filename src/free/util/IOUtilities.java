@@ -22,10 +22,10 @@
 package free.util;
 
 import java.io.*;
-import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Properties;
+import java.net.URL;
 import java.util.Hashtable;
+import java.util.Properties;
 
 
 /**
@@ -276,6 +276,23 @@ public class IOUtilities{
 
     return buf.toByteArray();
   }
+  
+  
+  
+  /**
+   * Loads and returns data from the specified URL.
+   */
+  
+  public static byte [] load(URL url, boolean allowCache) throws IOException{
+    InputStream in = inputStreamForURL(url, allowCache);
+    try{
+      return readToEnd(in);
+    } finally{
+        try{
+          in.close();
+        } catch (IOException e){}
+      }
+  }
 
 
 
@@ -300,12 +317,8 @@ public class IOUtilities{
    * while accessing it.
    */
 
-  public static String loadText(URL url) throws IOException{
-    byte [] cached = (byte [])urlCache.get(url);
-    InputStream in = cached == null ? url.openStream() : new ByteArrayInputStream(cached);
-    String text = loadText(in);
-    in.close();
-    return text;
+  public static String loadText(URL url, boolean allowCache) throws IOException{
+    return new String(load(url, allowCache));
   }
 
 
@@ -489,8 +502,7 @@ public class IOUtilities{
    */
   
   public static Properties loadProperties(URL url, boolean allowCache, Properties props) throws IOException{
-    InputStream in = allowCache ? inputStreamForURL(url) : url.openStream();
-    return loadPropertiesAndClose(in, props);
+    return loadPropertiesAndClose(inputStreamForURL(url, allowCache), props);
   }
   
   
@@ -504,10 +516,7 @@ public class IOUtilities{
    */
    
   public static void cacheURL(URL url) throws IOException{
-    InputStream in = url.openStream(); 
-    byte [] data = readToEnd(in);
-    in.close();
-    cacheData(url, data);
+    cacheData(url, load(url, false));
   }
   
   
@@ -536,13 +545,169 @@ public class IOUtilities{
   
   /**
    * Returns an <code>InpuStream</code> for reading the data at the specified
-   * URL. If the URL is cached, a <code>ByteArrayInpuStream</code> with the
-   * cached data is returned.
+   * URL. If <code>allowCache</code> is <code>true</code>, and the URL is cached,
+   * a <code>ByteArrayInpuStream</code> with the cached data is returned.
    */
   
-  public static InputStream inputStreamForURL(URL url) throws IOException{
-    byte [] cached = (byte [])urlCache.get(url);
+  public static InputStream inputStreamForURL(URL url, boolean allowCache) throws IOException{
+    byte [] cached = null;
+    if (allowCache)
+      cached = (byte [])urlCache.get(url);
     return cached == null ? url.openStream() : new ByteArrayInputStream(cached);
+  }
+  
+  
+  
+  /**
+   * Loads data from the specified URLs asynchronously in a background thread.
+   * Once all the data is loaded, it is passed to the specified
+   * <code>DataReceiver</code>. <code>id</code> is a convenience allowing the
+   * receiver to identify the data - it is merely passed back to the receiver.
+   */
+  
+  public static void loadAsynchronously(URL [] urls, Object id, DataReceiver receiver, boolean allowCache){
+    Thread asyncReader = 
+      new Thread(new UrlDataReader((URL[])urls.clone(), id, receiver, allowCache),
+      "AsyncThread-" + (++UrlDataReader.threadCount));
+    asyncReader.setDaemon(true);
+    asyncReader.start();
+  }
+  
+  
+  
+  /**
+   * Similar to <code>loadAsynchronously</code>, but returns only when all the
+   * data has been loaded and passed off to the receiver.
+   */
+  
+  public static void loadSynchronously(URL [] urls, Object id, DataReceiver receiver, boolean allowCache){
+    new UrlDataReader((URL[])urls.clone(), id, receiver, allowCache).run();
+  }
+  
+  
+  
+  /**
+   * The callback interface for asynchronous reading of data.
+   */
+  
+  public static interface DataReceiver{
+    
+    
+    
+    /**
+     * Gets called when all the data is loaded.
+     * The <code>IOException</code> array holds the exceptions thrown while
+     * loading. The indices in all the arrays correspond.
+     */
+    
+    void dataRead(URL [] urls, Object id, byte [][] data, IOException [] exceptions);
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * Reads data from URLs.
+   */
+  
+  private static class UrlDataReader implements Runnable{
+    
+    
+    
+    /**
+     * The number of <code>Threads</code> running <code>UrlDataReader</code>s
+     * already created.
+     */
+    
+    public static int threadCount = 0;
+    
+    
+    
+    /**
+     * The URLs to load data from. 
+     */
+    
+    private final URL [] urls;
+    
+    
+    
+    /**
+     * The identifier of this download.
+     */
+    
+    private final Object id;
+    
+    
+    
+    /**
+     * The callback <code>DataReceiver</code>.
+     */
+    
+    private final DataReceiver receiver;
+    
+    
+    
+    /**
+     * Whether it is allowed for the data to be retrieved from cache.
+     */
+    
+    private final boolean allowCache;
+    
+    
+    
+    /**
+     * The data.
+     */
+    
+    private final byte [][] data;
+    
+    
+    
+    /**
+     * The <code>IOExceptions</code> thrown while loading the data.
+     */
+    
+    private final IOException [] exceptions;
+    
+    
+    
+    /**
+     * Creates a new <code>UrlDataReader</code> with the specified id, to load
+     * data from the specified URLs and report back to the specified
+     * <code>DataReceiver</code>.
+     */
+    
+    public UrlDataReader(URL [] urls, Object id, DataReceiver receiver, boolean allowCache){
+      this.urls = urls;
+      this.id = id;
+      this.receiver = receiver;
+      this.allowCache = allowCache;
+      this.data = new byte[urls.length][];
+      this.exceptions = new IOException[urls.length];
+    }
+    
+    
+    
+    /**
+     * Reads the data and reports back to the receiver.
+     */
+    
+    public void run(){
+      for (int i = 0; i < urls.length; i++){
+        try{
+          data[i] = load(urls[i], allowCache);
+        } catch (IOException e){
+            exceptions[i] = e;
+          }
+      }
+      
+      receiver.dataRead(urls, id, data, exceptions);
+    }
+    
+    
+    
   }
   
   
