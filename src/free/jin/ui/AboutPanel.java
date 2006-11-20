@@ -94,7 +94,7 @@ public class AboutPanel extends DialogPanel{
 
     String copyright; 
     try{
-      copyright = IOUtilities.loadText(Jin.class.getResource("legal/copyright.txt"));
+      copyright = IOUtilities.loadText(Jin.class.getResourceAsStream("legal/copyright.txt"));
     } catch (java.io.IOException e){
         add(new JLabel("Unable to load copyright file"));
         return;
