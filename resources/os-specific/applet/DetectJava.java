@@ -25,14 +25,19 @@ import java.net.MalformedURLException;
 
 
 /**
- * A small applet which redirects to a different page (specified in applet
- * parameters based on the version of Java in which it is run. The parameter
- * <code>old_java_url</code> specifies the URL to redirect to if Java 1.1 is
- * running the applet and the parameter <code>new_java_url</code> specifies the
- * URL for later versions of Java.
+ * A small applet which redirects to a different page based on the version of
+ * Java in which it is run. The applet takes 3 parameters:
+ * <ul>
+ *   <li>minRequiredJavaVersion - the minimum required version of Java.
+ *   <li>goodJavaURL - the URL to redirect to if the version of Java is equal to
+ *       or higher than minRequiredJavaVersion.
+ *   <li>badJavaURL - The URL to redirect to the if the version of Java is lower
+ *       than minRequiredJavaVersion.
+ * </ul>
  */
  
 public class DetectJava extends Applet{
+  
   
   
   
@@ -42,9 +47,10 @@ public class DetectJava extends Applet{
    */
    
   public void start(){
+    String minRequiredJavaVersion = getParameter("minRequiredJavaVersion");
     String javaVersion = System.getProperty("java.version");
-    String url = (javaVersion.compareTo("1.2") < 0) ?  
-      getParameter("old_java_url") : getParameter("new_java_url");
+    String url = (javaVersion.compareTo(minRequiredJavaVersion) < 0) ?  
+      getParameter("badJavaURL") : getParameter("goodJavaURL");
     
     try{
       getAppletContext().showDocument(new URL(getDocumentBase(), url));
@@ -52,5 +58,7 @@ public class DetectJava extends Applet{
         e.printStackTrace();
       }
   }
+  
+  
    
 }
