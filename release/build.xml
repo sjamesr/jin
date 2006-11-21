@@ -258,9 +258,7 @@
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="util.jar chess.jar jin.jar index.php prefs.php detect_java.php DetectJava.class servers/${server.file}"	/>
-		</copy>
-		<copy todir="${dir-to-tar}">
+			<fileset dir="${build.dir}" includes="*.jar *.php DetectJava.class servers/${server.file}" />
 			<fileset dir="${build.dir}/${server.name}" />
 		</copy>
 		
