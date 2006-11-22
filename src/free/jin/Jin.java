@@ -117,9 +117,6 @@ public class Jin{
   private Jin(JinContext context){
     this.context = context;
     
-    // Initialize the utils lib with the correct locale
-    free.util.swing.Localization.setLocale(getLocale());
-    
     // Load application properties
     try{
       appProps = IOUtilities.loadPropertiesAndClose(Jin.class.getResourceAsStream("resources/app.props"));
