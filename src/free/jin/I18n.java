@@ -23,16 +23,18 @@ package free.jin;
 
 import java.awt.Component;
 import java.awt.Font;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
+import free.util.Localization;
 import free.util.Pair;
 import free.util.Utilities;
 import free.util.swing.ColorChooser;
@@ -66,7 +68,7 @@ public class I18n{
    * Holds the actual translation.
    */
   
-  private final Properties props;
+  private final Localization localization;
   
   
   
@@ -93,7 +95,7 @@ public class I18n{
    */
   
   private I18n(Class requestingClass, Locale locale, I18n parent){
-    this.props = getProperties(requestingClass, locale);
+    this.localization = Localization.load(requestingClass, locale);
     this.className = Utilities.getClassName(requestingClass);
     this.parent = parent;
   }
@@ -154,54 +156,6 @@ public class I18n{
   
   
   /**
-   * Returns the translation <code>Properties</code> for the specified class and locale.
-   */
-  
-  private static Properties getProperties(Class c, Locale locale){
-    String propsFilenamePrefix = "localization";
-    String language = locale.getLanguage();
-    String country = locale.getCountry();
-    String variant = locale.getVariant();
-    
-    Properties props = null;
-    
-    props = loadProps(c, props, propsFilenamePrefix + ".properties");
-    
-    if ((language != null) && !"".equals(language))
-      props = loadProps(c, props, propsFilenamePrefix + "_" + language + ".properties");
-    if ((country != null) && !"".equals(country))
-      props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + ".properties");
-    if ((variant != null) && !"".equals(variant))
-      props = loadProps(c, props, propsFilenamePrefix + "_" + language + "_" + country + "_" + variant + ".properties");
-    
-    return props;
-  }
-  
-  
-  
-  /**
-   * Loads and returns a <code>Properties</code> object from the resource with the specified name.
-   * The specified <code>Properties</code> object is used as the default delegate for the returned one.
-   */
-  
-  private static Properties loadProps(Class c, Properties props, String resourceName){
-    InputStream in = c.getResourceAsStream(resourceName);
-    
-    if (in != null){
-      props = new Properties(props);
-      try{
-        props.load(in);
-      } catch (IOException e){
-          throw new MissingResourceException("IOException while loading " + resourceName, c.getName(), "");
-        }
-    }
-    
-    return props;
-  }
-  
-  
-  
-  /**
    * Returns the translation for the specified key.
    */
   
@@ -221,8 +175,8 @@ public class I18n{
   
   public String getString(String key, String defaultValue){
     String result = null;
-    if (props != null)
-      result = props.getProperty(className + "." + key);
+    if (localization != null)
+      result = localization.getString(key);
     
     if (result != null)
       return result;
