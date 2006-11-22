@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import free.util.AWTUtilities;
+import free.util.Localization;
 import free.util.models.BooleanListener;
 import free.util.models.BooleanModel;
 import free.util.models.ConstBooleanModel;
@@ -151,7 +152,8 @@ public class FullscreenPanel extends FixedJPanel{
    */
   
   private JPanel createRestorePanel(){
-    JButton restore = new JButton(Localization.getString("FullscreenPanel.restoreNormalModeButton.text")); //$NON-NLS-1$
+    Localization l10n = LocalizationService.getForClass(FullscreenPanel.class);
+    JButton restore = new JButton(l10n.getString("restoreNormalModeButton.text")); //$NON-NLS-1$
     restore.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         getFullscreenModeModel().setOff();
@@ -159,7 +161,7 @@ public class FullscreenPanel extends FixedJPanel{
     });
     restore.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     
-    JLabel label = new JLabel(Localization.getString("FullscreenPanel.fullscreenInfoLabel.text")); //$NON-NLS-1$
+    JLabel label = new JLabel(l10n.getString("fullscreenInfoLabel.text")); //$NON-NLS-1$
     label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
     
     JPanel panel = new JPanel();

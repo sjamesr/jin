@@ -21,16 +21,19 @@
 
 package free.util.swing;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
+
 import free.util.AWTUtilities;
+import free.util.Localization;
 import free.util.PlatformUtils;
 
 
@@ -42,9 +45,17 @@ import free.util.PlatformUtils;
  */
 
 public class BackgroundChooser extends JDialog{
-
-
-
+  
+  
+  
+  /**
+   * The localization for this class, loaded lazily.
+   */
+  
+  private static Localization l10n;
+  
+  
+  
   /**
    * The AdvancedJDesktopPane we're working with.
    */
@@ -123,7 +134,7 @@ public class BackgroundChooser extends JDialog{
   public BackgroundChooser(Frame parent, AdvancedJDesktopPane desktop,
       Color defaultColor, File defaultImageFile, int defaultImageLayoutStyle,
       Color color, File imageFile, int imageLayoutStyle){
-    super(parent, Localization.getString("BackgroundChooser.title"), true); //$NON-NLS-1$
+    super(parent, getL10n().getString("title"), true); //$NON-NLS-1$
 
     this.desktop = desktop;
     
@@ -141,8 +152,18 @@ public class BackgroundChooser extends JDialog{
 
     SwingUtils.registerEscapeCloser(this);
   }
-
-
+  
+  
+  
+  /**
+   * Returns the localization for this class.
+   */
+  
+  private static synchronized Localization getL10n(){
+    if (l10n == null)
+      l10n = LocalizationService.getForClass(BackgroundChooser.class);
+    return l10n;
+  }
 
 
 
@@ -164,9 +185,9 @@ public class BackgroundChooser extends JDialog{
     JButton pickImage = new JButton();
     JButton useDefault = new JButton();
     
-    SwingUtils.applyLabelSpec(pickColor, Localization.getString("BackgroundChooser.pickColorButton.text")); //$NON-NLS-1$
-    SwingUtils.applyLabelSpec(pickImage, Localization.getString("BackgroundChooser.pickImageButton.text")); //$NON-NLS-1$
-    SwingUtils.applyLabelSpec(useDefault, Localization.getString("BackgroundChooser.useDefaultsButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(pickColor, getL10n().getString("pickColorButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(pickImage, getL10n().getString("pickImageButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(useDefault, getL10n().getString("useDefaultsButton.text")); //$NON-NLS-1$
 
     pickColor.setDefaultCapable(false);
     pickImage.setDefaultCapable(false);
@@ -176,9 +197,9 @@ public class BackgroundChooser extends JDialog{
     final JRadioButton scaleButton = new JRadioButton();
     final JRadioButton centerButton = new JRadioButton();
     
-    SwingUtils.applyLabelSpec(tileButton, Localization.getString("BackgroundChooser.tileRadioButton.text")); //$NON-NLS-1$
-    SwingUtils.applyLabelSpec(scaleButton, Localization.getString("BackgroundChooser.scaleRadioButton.text")); //$NON-NLS-1$
-    SwingUtils.applyLabelSpec(centerButton, Localization.getString("BackgroundChooser.centerRadioButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(tileButton, getL10n().getString("tileRadioButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(scaleButton, getL10n().getString("scaleRadioButton.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(centerButton, getL10n().getString("centerRadioButton.text")); //$NON-NLS-1$
     
     switch (imageLayoutStyle){
       case AdvancedJDesktopPane.TILE: tileButton.setSelected(true); break;
@@ -203,7 +224,7 @@ public class BackgroundChooser extends JDialog{
     }
     mainPanel.add(useDefault);
 
-    JButton closeButton = new JButton(Localization.getString("BackgroundChooser.closeButton.text")); //$NON-NLS-1$
+    JButton closeButton = new JButton(getL10n().getString("closeButton.text")); //$NON-NLS-1$
     JPanel closeButtonPanel = new JPanel(new GridLayout(1,1));
     closeButtonPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
     closeButtonPanel.add(closeButton);
@@ -241,7 +262,7 @@ public class BackgroundChooser extends JDialog{
         };
 
         JDialog dialog = JColorChooser.createDialog(BackgroundChooser.this,
-          Localization.getString("BackgroundChooser.bgColorChooser.title"), //$NON-NLS-1$
+            getL10n().getString("bgColorChooser.title"), //$NON-NLS-1$
           true, colorChooser, okListener, cancelListener);
         dialog.setVisible(true);
       }
@@ -387,7 +408,7 @@ public class BackgroundChooser extends JDialog{
       supportedImageTypes = new String[]{".gif", ".jpg", ".jpeg"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     fileChooser.setFileFilter(new ExtensionFileFilter(
-      Localization.getString("BackgroundChooser.fileFilterName"), supportedImageTypes, false)); //$NON-NLS-1$
+        getL10n().getString("fileFilterName"), supportedImageTypes, false)); //$NON-NLS-1$
     fileChooser.setFileHidingEnabled(true);
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fileChooser.setMultiSelectionEnabled(false);

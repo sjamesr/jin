@@ -27,6 +27,7 @@ import javax.swing.event.*;
 import javax.swing.border.*;
 import java.util.Hashtable;
 import free.util.AWTUtilities;
+import free.util.Localization;
 
 
 /**
@@ -34,6 +35,14 @@ import free.util.AWTUtilities;
  */
 
 public class FontSelectorPanel extends JPanel{
+  
+  
+  
+  /**
+   * The localization for this class.
+   */
+  
+  private static Localization l10n;
 
 
   
@@ -244,7 +253,8 @@ public class FontSelectorPanel extends JPanel{
 
     previewPanelHolder = new JPanel(new BorderLayout());
     Border outsideBorder = 
-      new TitledBorder(new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED), Localization.getString("FontSelectorPanel.preview")); //$NON-NLS-1$
+      new TitledBorder(new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED),
+          getL10n().getString("preview")); //$NON-NLS-1$
     Border insideBorder = new EmptyBorder(10, 10, 10, 10);
     previewPanelHolder.setBorder(new CompoundBorder(outsideBorder, insideBorder));
 
@@ -266,6 +276,18 @@ public class FontSelectorPanel extends JPanel{
 
 
 
+  /**
+   * Returns the localization for this class.
+   */
+  
+  private static synchronized Localization getL10n(){
+    if (l10n == null)
+      l10n = LocalizationService.getForClass(FontSelectorPanel.class);
+    return l10n;
+  }
+  
+  
+  
   /**
    * Returns the <code>BooleanFontOption</code> with the specified id, or
    * <code>null</code> if no such <code>BooleanFontOption</code> exists.
@@ -302,7 +324,7 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public static BooleanFontOption createBoldFontOption(){
-    return new BooleanFontOption(BOLD_OPTION_ID, Localization.getString("FontSelectorPanel.bold"), 0, false); //$NON-NLS-1$
+    return new BooleanFontOption(BOLD_OPTION_ID, getL10n().getString("bold"), 0, false); //$NON-NLS-1$
   }
 
 
@@ -314,7 +336,7 @@ public class FontSelectorPanel extends JPanel{
    */
 
   public static BooleanFontOption createItalicFontOption(){
-    return new BooleanFontOption(ITALIC_OPTION_ID, Localization.getString("FontSelectorPanel.italic"), 0, false); //$NON-NLS-1$
+    return new BooleanFontOption(ITALIC_OPTION_ID, getL10n().getString("italic"), 0, false); //$NON-NLS-1$
   }
 
 
@@ -333,7 +355,7 @@ public class FontSelectorPanel extends JPanel{
     JScrollPane fontNamesListScrollPane = new JScrollPane(fontNamesList);
     
     JLabel fontNameLabel = new JLabel();
-    SwingUtils.applyLabelSpec(fontNameLabel, Localization.getString("FontSelectorPanel.fontNameLabel.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(fontNameLabel, getL10n().getString("fontNameLabel.text")); //$NON-NLS-1$
     fontNameLabel.setHorizontalAlignment(JLabel.CENTER);
     
     fontNameLabel.setLabelFor(fontNamesList);
@@ -345,7 +367,7 @@ public class FontSelectorPanel extends JPanel{
     JScrollPane fontSizesListScrollPane = new JScrollPane(fontSizesList);
     
     JLabel fontSizeLabel = new JLabel();
-    SwingUtils.applyLabelSpec(fontSizeLabel, Localization.getString("FontSelectorPanel.fontSizeLabel.text")); //$NON-NLS-1$
+    SwingUtils.applyLabelSpec(fontSizeLabel, getL10n().getString("fontSizeLabel.text")); //$NON-NLS-1$
     fontSizeLabel.setHorizontalAlignment(JLabel.CENTER);
     
     fontSizeLabel.setLabelFor(fontSizesList);
@@ -544,7 +566,7 @@ public class FontSelectorPanel extends JPanel{
      */
 
     public DefaultPreviewPanel(FontSelectorPanel fontSelectorPanel){
-      super(Localization.getString("FontSelectorPanel.previewText"), JLabel.CENTER); //$NON-NLS-1$
+      super(getL10n().getString("previewText"), JLabel.CENTER); //$NON-NLS-1$
 
       this.fontSelectorPanel = fontSelectorPanel;
 

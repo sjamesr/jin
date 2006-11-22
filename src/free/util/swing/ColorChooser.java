@@ -132,7 +132,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(ColorChooser.this),
-          Localization.getString("ColorChooser.dialogTitle"), color); //$NON-NLS-1$
+            LocalizationService.getForClass(ColorChooser.class).getString("dialogTitle"), color); //$NON-NLS-1$
         if (newColor != null)
           setColor(newColor);
       }

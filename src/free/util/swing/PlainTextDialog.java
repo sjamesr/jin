@@ -21,9 +21,13 @@
 
 package free.util.swing;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Font;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import free.util.Localization;
 import free.util.WindowDisposingListener;
 import free.workarounds.FixedJTextArea;
   
@@ -76,7 +80,9 @@ public class PlainTextDialog extends JDialog{
     SwingUtils.registerEscapeCloser(this);
 
     textArea = new FixedJTextArea(text, 20, 81);
-    closeButton = new JButton(Localization.getString("PlainTextDialog.closeButton.text")); //$NON-NLS-1$
+    
+    Localization l10n = LocalizationService.getForClass(PlainTextDialog.class);
+    closeButton = new JButton(l10n.getString("closeButton.text")); //$NON-NLS-1$
 
     createUI();
   }
