@@ -39,10 +39,7 @@ import free.chess.SquareImagesBoardPainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.util.AWTUtilities;
-import free.util.BrowserControl;
-import free.util.IOUtilities;
-import free.util.Utilities;
+import free.util.*;
 import free.util.audio.AppletContextAudioPlayer;
 
 
@@ -63,10 +60,10 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * The <code>ResourceBundle</code> for this class.
+   * The <code>Localization</code> for this class.
    */
   
-  private ResourceBundle resourceBundle = null;
+  private Localization l10n;
   
   
   
@@ -141,11 +138,14 @@ public class JinApplet extends Applet implements JinContext{
    
   public void init(){
     try{
+      // Determine the locale
+      locale = determineLocale();
+      
       // Configure the libraries the applet depends on
       configureLibraries();
       
-      // Determine the locale
-      locale = determineLocale();
+      // Load localization
+      l10n = Localization.load(JinApplet.class);
       
       // Load the server we'll be connecting to
       server = loadServer();
@@ -244,19 +244,6 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
-   * Configures various libraries the applet uses.
-   */
-  
-  private void configureLibraries(){
-    BrowserControl.setAppletContext(getAppletContext());
-    AppletContextAudioPlayer.setAppletContext(getAppletContext());
-    ImagePiecePainter.setAsyncImageLoad(true);
-    BoardImageBoardPainter.setAsyncImageLoad(true);
-    SquareImagesBoardPainter.setAsyncImageLoad(true);
-  }
-  
-  
-  /**
    * Determines the locale for this instance of Jin.
    */
   
@@ -270,6 +257,21 @@ public class JinApplet extends Applet implements JinContext{
     variant = variant == null ? "" : variant;
     
     return new Locale(language, country, variant);
+  }
+  
+  
+  
+  /**
+   * Configures various libraries the applet uses.
+   */
+  
+  private void configureLibraries(){
+    Localization.setAppLocale(locale);
+    BrowserControl.setAppletContext(getAppletContext());
+    AppletContextAudioPlayer.setAppletContext(getAppletContext());
+    ImagePiecePainter.setAsyncImageLoad(true);
+    BoardImageBoardPainter.setAsyncImageLoad(true);
+    SquareImagesBoardPainter.setAsyncImageLoad(true);
   }
   
   
@@ -488,34 +490,6 @@ public class JinApplet extends Applet implements JinContext{
     } catch (ClassNotFoundException e){e.printStackTrace(); return null;}
       catch (InstantiationException e){e.printStackTrace(); return null;}
       catch (IllegalAccessException e){e.printStackTrace(); return null;}
-  }
-  
-  
-  
-  /**
-   * Returns the <code>ResourceBundle</code> for this class. 
-   */
-  
-  private ResourceBundle getResourceBundle(){
-    if (resourceBundle == null){
-      Class c = JinApplet.class;
-      String packageName = Utilities.getPackageName(c);
-      String bundleName = packageName + "." + "localization"; 
-      
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale, c.getClassLoader());
-    }
-    
-    return resourceBundle;
-  }
-  
-  
-  
-  /**
-   * A helper method which translates the specified string according to the current locale.
-   */
-  
-  private String translate(String key){
-    return getResourceBundle().getString("JinApplet." + key);
   }
   
   
@@ -766,7 +740,7 @@ public class JinApplet extends Applet implements JinContext{
       if (isSecure)
         return null;
       else
-        return translate("passwordSaveWarning");
+        return l10n.getString("passwordSaveWarning");
     } catch (MalformedURLException e){
         e.printStackTrace();
         return "Error: Your password will not be stored due to a configuration problem.";
@@ -794,7 +768,7 @@ public class JinApplet extends Applet implements JinContext{
     
     setLayout(new BorderLayout());
     
-    add(new Label(translate("errorLabel.text")), BorderLayout.NORTH);
+    add(new Label(l10n.getString("errorLabel.text")), BorderLayout.NORTH);
     
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     t.printStackTrace(new PrintStream(buf));
@@ -923,16 +897,16 @@ public class JinApplet extends Applet implements JinContext{
     private void createUI(){
       this.setLayout(new BorderLayout(15, 15));
       this.add(BorderLayout.NORTH,
-        new Label(translate("instructionsLabel.text")));
+        new Label(l10n.getString("instructionsLabel.text")));
       
       Panel userInfoPanel = new Panel(new BorderLayout());
       Panel labelsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       Panel textFieldsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       
-      labelsPanel.add(new Label(translate("usernameLabel.text")));
+      labelsPanel.add(new Label(l10n.getString("usernameLabel.text")));
       textFieldsPanel.add(usernameField);
             
-      labelsPanel.add(new Label(translate("passwordLabel.text")));
+      labelsPanel.add(new Label(l10n.getString("passwordLabel.text")));
       textFieldsPanel.add(passwordField);
       
       userInfoPanel.add(BorderLayout.WEST, labelsPanel);
@@ -947,8 +921,8 @@ public class JinApplet extends Applet implements JinContext{
       
       statusAndButtonsPanel.add(statusLabel);
       
-      loginButton = new Button(translate("loginButton.text"));
-      guestButton = new Button(translate("loginAsGuestButton.text"));
+      loginButton = new Button(l10n.getString("loginButton.text"));
+      guestButton = new Button(l10n.getString("loginAsGuestButton.text"));
       
       Panel buttonsPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
       buttonsPanel.add(loginButton);
@@ -963,11 +937,11 @@ public class JinApplet extends Applet implements JinContext{
           String password = passwordField.getText();
           
           if ((username == null) || "".equals(username)){
-            setStatus(translate("usernameUnspecifiedError"), Color.red);
+            setStatus(l10n.getString("usernameUnspecifiedError"), Color.red);
             usernameField.requestFocus();
           }
           else if ((password == null) || "".equals(password)){
-            setStatus(translate("passwordUnspecifiedError"), Color.red);
+            setStatus(l10n.getString("passwordUnspecifiedError"), Color.red);
             passwordField.requestFocus();
           }
           else{
@@ -985,11 +959,11 @@ public class JinApplet extends Applet implements JinContext{
       
       guestButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          setStatus(translate("startingJinStatus"), Color.black);
+          setStatus(l10n.getString("startingJinStatus"), Color.black);
           loginButton.setEnabled(false);
           guestButton.setEnabled(false);
           startAsGuest();
-          setStatus(translate("stayOnPageStatus"), Color.black);
+          setStatus(l10n.getString("stayOnPageStatus"), Color.black);
         }
       });
     }
@@ -1041,7 +1015,7 @@ public class JinApplet extends Applet implements JinContext{
         String username = usernameField.getText();
         String password = passwordField.getText();
         
-        setStatus(translate("connectingStatus"), Color.black);
+        setStatus(l10n.getString("connectingStatus"), Color.black);
         
         URL loadPrefsUrl = getPrefsDownloadUrl();
         URLConnection conn = loadPrefsUrl.openConnection();
@@ -1055,7 +1029,7 @@ public class JinApplet extends Applet implements JinContext{
         
         conn.connect();
         
-        setStatus(translate("authenticatingStatus"), Color.black);
+        setStatus(l10n.getString("authenticatingStatus"), Color.black);
         
         InputStream in = new BufferedInputStream(conn.getInputStream());
         DataInputStream dataIn = new DataInputStream(in);
@@ -1068,7 +1042,7 @@ public class JinApplet extends Applet implements JinContext{
         String returnCode = dataIn.readLine();
         
         if ("OK".equals(returnCode)){
-          setStatus(translate("retrievingPreferencesStatus"), Color.black);
+          setStatus(l10n.getString("retrievingPreferencesStatus"), Color.black);
           
           // Read application preferences
           int appPrefsLength = dataIn.readInt();
@@ -1098,11 +1072,11 @@ public class JinApplet extends Applet implements JinContext{
           return;
         }
 
-        setStatus(translate("startingJinStatus"), Color.black);
+        setStatus(l10n.getString("startingJinStatus"), Color.black);
         
         start(prefs, guest, users, username, password);
         
-        setStatus(translate("stayOnPageStatus"), Color.black);
+        setStatus(l10n.getString("stayOnPageStatus"), Color.black);
       } catch (IOException e){
           e.printStackTrace();
           createErrorUI(e);
@@ -1154,13 +1128,13 @@ public class JinApplet extends Applet implements JinContext{
     public SettingsUploadDialog(Frame parent){
       super(parent, "", true);
       
-      setTitle(translate("prefsUploadDialog.title"));
+      setTitle(l10n.getString("prefsUploadDialog.title"));
      
       this.setLayout(new GridLayout(2, 1));
       
-      this.add(new Label(translate("prefsUploadDialog.message")));
+      this.add(new Label(l10n.getString("prefsUploadDialog.message")));
       
-      Button button = new Button(translate("prefsUploadDialog.cancelButton.text"));
+      Button button = new Button(l10n.getString("prefsUploadDialog.cancelButton.text"));
       Panel buttonPanel = new Panel(new FlowLayout());
       buttonPanel.add(button);
       this.add(buttonPanel);
@@ -1200,7 +1174,7 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     public SettingsUploadErrorDialog(Frame parent, String errorMessage){
-      super(parent, translate("prefsUploadErrorDialog.title"), true);
+      super(parent, l10n.getString("prefsUploadErrorDialog.title"), true);
       
       createUI(errorMessage);
     }
@@ -1214,14 +1188,14 @@ public class JinApplet extends Applet implements JinContext{
     private void createUI(String errorMessage){
       this.setLayout(new BorderLayout(5, 5));
       
-      this.add(BorderLayout.NORTH, new Label(translate("prefsUploadErrorDialog.message")));
+      this.add(BorderLayout.NORTH, new Label(l10n.getString("prefsUploadErrorDialog.message")));
       
       TextArea errorArea = new TextArea(errorMessage, 3, 40);
       
       errorArea.setEditable(false);
       this.add(BorderLayout.CENTER, errorArea);
       
-      Button closeButton = new Button(translate("prefsUploadErrorDialog.closeButton.text"));
+      Button closeButton = new Button(l10n.getString("prefsUploadErrorDialog.closeButton.text"));
       Panel buttonPanel = new Panel(new FlowLayout());
       buttonPanel.add(closeButton);
       this.add(BorderLayout.SOUTH, buttonPanel);
@@ -1277,7 +1251,7 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     public PasswordDialog(Frame parent, String errorMessage, String username){
-      super(parent, translate("passwordPrefsUploadErrorDialog.title"), true);
+      super(parent, l10n.getString("passwordPrefsUploadErrorDialog.title"), true);
       
       usernameField = new TextField(username);
       passwordField = new TextField();
@@ -1295,7 +1269,7 @@ public class JinApplet extends Applet implements JinContext{
     private void createUI(String errorMessage){
       this.setLayout(new BorderLayout(5, 5));
       
-      this.add(BorderLayout.NORTH, new Label(translate("passwordPrefsUploadErrorDialog.message")));
+      this.add(BorderLayout.NORTH, new Label(l10n.getString("passwordPrefsUploadErrorDialog.message")));
       
       Panel centerPanel = new Panel(new BorderLayout(5, 5));
       
@@ -1307,10 +1281,10 @@ public class JinApplet extends Applet implements JinContext{
       Panel labelsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       Panel textFieldsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       
-      labelsPanel.add(new Label(translate("usernameLabel.text")));
+      labelsPanel.add(new Label(l10n.getString("usernameLabel.text")));
       textFieldsPanel.add(usernameField);
             
-      labelsPanel.add(new Label(translate("passwordLabel.text")));
+      labelsPanel.add(new Label(l10n.getString("passwordLabel.text")));
       textFieldsPanel.add(passwordField);
       
       userInfoPanel.add(BorderLayout.WEST, labelsPanel);
@@ -1319,8 +1293,8 @@ public class JinApplet extends Applet implements JinContext{
       this.add(BorderLayout.CENTER, centerPanel);
       
       
-      Button retryButton = new Button(translate("passwordPrefsUploadErrorDialog.retryButton.text"));
-      Button closeButton = new Button(translate("passwordPrefsUploadErrorDialog.closeButton.text"));
+      Button retryButton = new Button(l10n.getString("passwordPrefsUploadErrorDialog.retryButton.text"));
+      Button closeButton = new Button(l10n.getString("passwordPrefsUploadErrorDialog.closeButton.text"));
       
       Panel buttonPanel = new Panel(new FlowLayout());
       buttonPanel.add(retryButton);

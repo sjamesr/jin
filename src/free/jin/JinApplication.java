@@ -89,10 +89,10 @@ public class JinApplication implements JinContext{
 
   
   /**
-   * The <code>ResourceBundle</code> for this class.
+   * The <code>Localization</code> for this class.
    */
   
-  private ResourceBundle resourceBundle = null;
+  private Localization l10n = null;
   
   
   
@@ -254,6 +254,11 @@ public class JinApplication implements JinContext{
     // Determine the locale 
     locale = determineLocale();
     
+    configureLibraries();
+    
+    // Load localization
+    l10n = Localization.load(JinApplication.class, locale);
+    
     // Load servers
     servers = loadServers();
 
@@ -333,22 +338,12 @@ public class JinApplication implements JinContext{
   
   
   /**
-   * A helper method which translates the specified string according to the current locale.
-   */
-  
-  private String translate(String key){
-    return getResourceBundle().getString("JinApplication." + key);
-  }
-  
-  
-  
-  /**
    * Displays an error message regarding an problem with saving the application-wide user preferences.
    */
   
   private void showPrefsSaveError(String errorI18nKey, File targetFile){
-    showErrorMessage(translate("savingPrefsErrorDialog.title"),
-        MessageFormat.format(translate("savingPrefsErrorDialog." + errorI18nKey),
+    showErrorMessage(l10n.getString("savingPrefsErrorDialog.title"),
+        MessageFormat.format(l10n.getString("savingPrefsErrorDialog." + errorI18nKey),
           new Object[]{targetFile.toString()}));
   }
   
@@ -429,7 +424,17 @@ public class JinApplication implements JinContext{
     }
     
     return new Locale(language, country == null ? "" : country, variant == null ? "" : variant);
- }
+  }
+  
+  
+  
+  /**
+   * Configures various libraries the application uses.
+   */
+  
+  private void configureLibraries(){
+    Localization.setAppLocale(locale);
+  }
   
   
   
@@ -743,8 +748,8 @@ public class JinApplication implements JinContext{
    */
   
   private void showAccountSaveError(String errorI18nKey, File targetFile){
-    showErrorMessage(translate("savingAccountErrorDialog.title"),
-        MessageFormat.format(translate("savingAccountErrorDialog." + errorI18nKey),
+    showErrorMessage(l10n.getString("savingAccountErrorDialog.title"),
+        MessageFormat.format(l10n.getString("savingAccountErrorDialog." + errorI18nKey),
           new Object[]{targetFile.toString()}));
   }
   
@@ -1191,7 +1196,7 @@ public class JinApplication implements JinContext{
    */
    
   public String getPasswordSaveWarning(){
-    return translate("passwordSaveWarning");
+    return l10n.getString("passwordSaveWarning");
   }
   
   
@@ -1241,24 +1246,6 @@ public class JinApplication implements JinContext{
         return servers[i];
 
     return null;
-  }
-  
-  
-  
-  /**
-   * Returns the <code>ResourceBundle</code> for this class. 
-   */
-  
-  private ResourceBundle getResourceBundle(){
-    if (resourceBundle == null){
-      Class c = JinApplication.class;
-      String packageName = Utilities.getPackageName(c);
-      String bundleName = packageName + "." + "localization"; 
-      
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale, c.getClassLoader());
-    }
-    
-    return resourceBundle;
   }
   
   
