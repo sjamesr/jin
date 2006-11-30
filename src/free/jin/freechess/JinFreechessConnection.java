@@ -2182,7 +2182,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     
     Player color = seek.getColor();
     
-    String seekCommand = "seek " + seek.getTime() + " " + seek.getInc() + " " +
+    String seekCommand = "$seek " + seek.getTime() + " " + seek.getInc() + " " +
       (seek.isRated() ? "rated" : "unrated") + " " +
       (color == null ? "" : color.isWhite() ? "white " : "black ") +
       wildName + " " +
@@ -2501,7 +2501,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void showServerHelp(){
-    sendCommand("help");
+    sendCommand("$help");
   }
   
   
@@ -2511,7 +2511,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void sendHelpQuestion(String question){
-    sendCommand("tell 1 [" + Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() + "] "+ question);    
+    sendCommand("$tell 1 [" + Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() + "] "+ question);    
   }
 
 
