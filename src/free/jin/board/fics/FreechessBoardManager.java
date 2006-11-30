@@ -28,6 +28,7 @@ import free.jin.board.BoardPanel;
 import free.jin.freechess.JinFreechessConnection;
 import free.jin.Game;
 import free.jin.Connection;
+import free.jin.Preferences;
 import free.jin.event.GameStartEvent;
 import free.jin.event.GameEndEvent;
 import free.jin.freechess.FreechessListenerManager;
@@ -215,6 +216,23 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
       setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
     }
       // Punish the bastard ;-)
+  }
+  
+  
+  
+  /**
+   * Sets the initial value of autoflag to 1. This is really the server's job,
+   * but since FICS refuses to do the reasonable thing, we must.
+   */
+  
+  public void loginSucceeded(Connection conn){
+    super.loginSucceeded(conn);
+    
+    Preferences prefs = getPrefs();
+    if (prefs.getBool("setDefaultAutoflagValue", true)){
+      conn.sendCommand("$set autoflag 1");
+      prefs.setBool("setDefaultAutoflagValue", false);
+    }
   }
 
 
