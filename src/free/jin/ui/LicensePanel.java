@@ -248,28 +248,22 @@ public class LicensePanel extends DialogPanel{
     add(new JSeparator());
     add(Box.createVerticalStrut(10));
 
-    try{
-      // Throws ClassNotFoundException if not found
-      Class.forName("bsh.EvalError"); 
-      
-      JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-      beanshellPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-      LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
-      beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
-      beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
-      beanshellPanel.add(beanshellWebsiteLabel);
-      beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-      LinkLabel beanshellLicenseLabel = new LinkLabel("LGPL and Sun licenses");
-      beanshellLicenseLabel.addActionListener(beanshellActionListener);
-      beanshellPanel.add(beanshellLicenseLabel);
-      beanshellPanel.add(new JLabel("<html>.</html>"));
-      add(beanshellPanel);
-      add(Box.createVerticalStrut(5));
-    } catch (ClassNotFoundException e){}
-
+    JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    beanshellPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
+    LinkLabel beanshellWebsiteLabel = new LinkLabel("BeanShell embeddable script interpreter");
+    beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
+    beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
+    beanshellPanel.add(beanshellWebsiteLabel);
+    beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel beanshellLicenseLabel = new LinkLabel("LGPL and Sun licenses");
+    beanshellLicenseLabel.addActionListener(beanshellActionListener);
+    beanshellPanel.add(beanshellLicenseLabel);
+    beanshellPanel.add(new JLabel("<html>.</html>"));
+    add(beanshellPanel);
+    add(Box.createVerticalStrut(5));
    
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    xboardPanel.add(new JLabel("<html>Jin contains a piece set from&nbsp</html>"));
+    xboardPanel.add(new JLabel("<html>Jin includes a piece set from&nbsp</html>"));
     LinkLabel xboardWebsiteLabel = new LinkLabel("xboard/winboard");
     xboardWebsiteLabel.setToolTipText("http://www.tim-mann.org/xboard.html");
     xboardWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.tim-mann.org/xboard.html"));
