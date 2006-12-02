@@ -21,18 +21,23 @@
 
 package free.jin.board.icc;
 
-import free.jin.event.*;
-import free.jin.board.*;
 import java.awt.Color;
+
 import free.jin.Game;
-import free.jin.chessclub.event.ChessclubGameListener;
-import free.jin.chessclub.event.ArrowEvent;
-import free.jin.chessclub.event.CircleEvent;
+import free.jin.board.*;
 import free.jin.board.event.ArrowCircleListener;
+import free.jin.chessclub.event.ArrowEvent;
+import free.jin.chessclub.event.ChessclubGameListener;
+import free.jin.chessclub.event.CircleEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
 
 
 /**
- * Extends BoardPanel to provide chessclub.com specific functionalities.
+ * Extends <code>BoardPanel</code> to provide chessclub.com specific
+ * functionaly.
  */
 
 public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameListener,
@@ -61,9 +66,9 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
 
 
 
-
   /**
-   * Overrides createBoard(Game game) to return an instance of ChessclubJBoard.
+   * Overrides <code>createBoard(Game)</code> to return an instance of
+   * <code>ChessclubJBoard</code>.
    */
 
   protected JinBoard createBoard(Game game){
@@ -72,14 +77,13 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
 
 
 
-
   /**
-   * Override configureBoard(Game, JinBoard) to add ourselves as an
-   * ArrowCircleListener to the board.
+   * Overrides <code>configureBoard(Game, JinBoard)</code> to add ourselves as
+   * an <code>ArrowCircleListener</code> to the board.
    */
 
-  protected void initBoard(Game game, JinBoard board){
-    super.initBoard(game, board);
+  protected void configureBoardFromGame(Game game, JinBoard board){
+    super.configureBoardFromGame(game, board);
 
     if ((game.getGameType() == Game.MY_GAME) && !game.isPlayed()){
       board.addArrowCircleListener(this);
@@ -88,12 +92,12 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
     else
       board.setArrowCircleEnabled(false);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Overrides moveMade(MoveMadeEvent) to clear the board of any arrows/circles.
+   * Overrides <code>moveMade(MoveMadeEvent)</code> to clear the board of any
+   * arrows/circles.
    */
 
   public void moveMade(MoveMadeEvent evt){
