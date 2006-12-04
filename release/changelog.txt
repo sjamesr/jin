@@ -1,3 +1,47 @@
+2.14
+
+* Fixed a bug which would reset the board to the initial position when a game
+  played by the user became examined.
+* The "GameEnd" sound was not being played when a game played by the user
+  became examined.
+* Most of the piece sets are now much better looking - they sport a border and
+  a translucent shadow.
+* Removed the Cases piece set (the black rook is broken at some sizes) and
+  added the Utrecht piece set.
+* Worked around a Java bug which caused Jin windows to be restored to a
+  slightly smaller size than the saved size under Linux/KDE (and maybe other
+  window managers). It's still isn't perfect, but better than nothing.
+* Fixed a problem with resizing Jin's windows in MDI mode. The problem was
+  specific to Java 1.4.
+* Fixed the game logger not saving a game if the user has examine=1.
+  See bug 1327781 for more information.
+* Got rid of the jregex library - now using java.util.regex.
+* Due to the above, Jin will now run only on Java 1.4 or later.
+* Jin is now almost fully internationalized. See
+  http://www.jinchess.com/wiki/index.php/Localization for instructions on
+  localizing (translating) Jin.
+* Added support for selecting the charset/encoding used for chat in the console.
+  This allows chatting in languages other than English on ICC.
+* In an effort to make Jin prettier (and slower), did the following:
+  - The default piece set is now "Alpha".
+  - The default board on FICS is now Pale Wood (on ICC still Light Wood).
+  - The default move display mode is to show pieces while they're being dragged.
+  - In MDI mode, the windows will now show their contents while dragging and
+    resizing, instead of showing the outline only.
+* Added new, useful variables like "win" and "userWhite" for the logging
+  condition in the Game Logger.
+* Unix releases now come with a nice icon (icon.png) to use with a desktop
+  shortcut.
+* Fixed a bug causing premoves not to work in Kriegspiel games (and make the
+  board stuck).
+* In JinApplet, piece and board images will now load asynchronously. While they
+  are being loaded, the plain color board and eboard piece set will be
+  displayed.
+* FICS: Jin will now set autoflag to 1 (on login) the first time it is used
+  with some account.
+
+
+
 2.13.1
 
 * ICC: Fixed a bug which caused text ending with a bell to not be displayed
@@ -36,6 +80,7 @@
   resign confirmation dialog or promotion piece selection dialogs were
   displayed. Fullscreen board mode, however, is no longer available under Java
   versions earlier than 1.4.
+
 
 
 2.13
@@ -94,7 +139,6 @@
 
 
 
-
 2.12.1
 
 * Fixed a bug in the main console preferences dialog which prevented users from
@@ -131,8 +175,8 @@
 * The "Moving in Advance" section on the move input panel for board preferences
   will no longer be disabled during games (this was broken anyway). Instead, it
   will give an error if you try to modify its settings while playing a game.
-  
-  
+
+
 
 2.12
 
@@ -251,6 +295,7 @@
   when it was maximized.
 
 
+
 2.1
 
 * Worked around the server timeseal problem where premoved moves would take more
@@ -258,6 +303,7 @@
 * The internal windows will now defend themselves against users doing 
   stupid/hostile things to them, such as making them larger than the main window
   or moving them out of the screen.
+
 
 
 2.07rc4
@@ -274,6 +320,7 @@
   noticing the bug and assisting with testing the fix.
  
 
+
 2.07rc3:
 
 * Fixed a bug causing the seek graph plugin to fail starting the next time if
@@ -284,6 +331,7 @@
   be displayed when a move is made.
 * Choosing a new move highlighting color for the board didn't properly 
   change/save it.
+
 
 
 2.07rc2:
@@ -298,6 +346,7 @@
   bug that caused slow XORed drawing in JDK 1.4.2. If you're bothered by this
   problem, download the latest Java version from
   http://java.sun.com/j2se/downloads.html
+
 
 
 2.07rc1:
@@ -359,6 +408,7 @@
   over a link.
 
 
+
 2.07b2:
 
 * Fixed a bug where flipping the board would only make the board itself flip,
@@ -404,6 +454,7 @@
   Windows 98. At least now Jin doesn't itself contribute to the delay.
 * Fixed a bug which would sometime make the board disabled during an examined
   game (it wouldn't allow making any moves).
+
 
 
 2.07b:
@@ -473,6 +524,7 @@
 * Guest's preferences are now saved as well.
 
 
+
 2.06b:
 
 * Fixed a bug where unused boards didn't change the board or piece style when
@@ -536,7 +588,8 @@
   it clear that for played games, clicking "yes" resigns the game).
 * Jin now supports FICS - the Free Internet Chess Server 
   at http://www.freechess.org.
-			  
+
+
 
 2.05b:
 
@@ -620,6 +673,8 @@
   JinFrame.processFocusEvent(FocusEvent) this might have caused many problems,
   including the console locking bug.
 
+
+
 2.04b:
 
 * If there was more than one "clickable" item in a single message (tell, channel
@@ -700,6 +755,7 @@
   to determine which mailer to run when you click an email address in Jin.
 
 
+
 2.03_1b:
 
 * Email addresses are now also links, which under Windows open the default
@@ -711,6 +767,7 @@
   details on the bug.
 * Fixed a bug where if someone "mexamined" a Jin user, Jin would not recognize 
   that the user is now in examine mode. 
+
 
 
 2.03b:
@@ -747,6 +804,7 @@
   the screen if you right-clicked at the bottom of the console when the console
   was scrolled up at least the size of the popup.
 * Implemented game lists embedded in the text console.
+
 
 
 2.02b:
