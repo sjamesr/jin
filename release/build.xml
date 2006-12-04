@@ -338,7 +338,10 @@
 		<mkdir dir="${src-archive-dir}" />
 		<mkdir dir="${src-archive-files}" />		
 		<copy todir="${src-archive-files}">
-			<fileset dir="${jin.dir}" includes="src/** resources/** build.xml manifest.txt" />
+			<fileset dir="${jin.dir}"
+			         includes="src/** resources/** build.xml manifest.txt"
+			         excludes="src/**/maya/**"
+			/>
 			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
 			<fileset dir="src" includes="COMPILING" />
 		</copy>
@@ -359,7 +362,7 @@
 	</target>
 
 	
-	<!-- Builds a release compiled with Excelsior JET 4.1 -->
+	<!-- Builds a release compiled with Excelsior JET 4.5 -->
 	<target name="jet" depends="init" description="Builds a release compiled with Excelsior JET">
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
 		
@@ -402,15 +405,18 @@
 			<fileset dir="${tmpdir}" includes="**/*.jar" excludes="resources/** lnfs/**" />
 		</foreach>
 
+		<!--
 		<property name="dir-to-inst" value="${release.jet.dir}/jin-${release.version}" />
 		<mkdir dir="${dir-to-inst}" />
 		
-		<exec executable="${jet.home}/bin/jpiib" dir="${tmpdir}" failonerror="yes">
-			<arg line="${basedir}/${jin.releasespec} -imagedir ${basedir}/${dir-to-inst}" />
+		<exec executable="${jet.home}/bin/xpack" dir="${tmpdir}" failonerror="yes">
+			<arg line="${basedir}/${jin.releasespec} -target ${basedir}/${dir-to-inst}" />
 			<env key="PATH" value="${jet.home}/bin" />
 			<env key="LD_LIBRARY_PATH" value="${jet.home}/lib/x86/shared" />
 		</exec>
-		<!-- jpiib rewrites the spec file, saving the old one as .bak -->
+		-->
+		<!-- xpack rewrites the spec file, saving the old one as .bak -->
+		<!--
 		<move file="${jin.releasespec}.bak" tofile="${jin.releasespec}" preservelastmodified="true" />
 		<delete dir="${tmpdir}" />
 		
@@ -421,6 +427,7 @@
 		<antcall target="jet-package-${os}" />
 		
 		<delete dir="${dir-to-inst}" />
+		-->
 	</target>
 	
 	
