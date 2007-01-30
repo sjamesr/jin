@@ -305,7 +305,7 @@ public class SoughtGraph extends JComponent{
 
     int direction = 0;
     int spiralLength = 1;
-    infiniteLoop: while(true){
+    while(true){
       for (int i=0;i<2;i++){
         for (int j=0;j<spiralLength;j++){
           switch(direction){
