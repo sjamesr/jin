@@ -229,10 +229,10 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     // We always want input component to have focus
     inputComponent.setNextFocusableComponent(inputComponent);
     
-    JPanel bottomPanel = new JPanel(new BorderLayout());
+    JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
     bottomPanel.add(clearButton, BorderLayout.EAST);
-
+    bottomPanel.setBorder(BorderFactory.createEmptyBorder(4, 5, 4, 18));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
