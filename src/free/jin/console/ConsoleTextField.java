@@ -22,7 +22,11 @@
 package free.jin.console;
 
 import java.awt.Font;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
@@ -31,6 +35,7 @@ import javax.swing.KeyStroke;
 
 import free.jin.I18n;
 import free.jin.Preferences;
+import free.util.PlatformUtils;
 import free.workarounds.FixUtils;
 import free.workarounds.FixedJTextField;
 
@@ -144,9 +149,12 @@ public class ConsoleTextField extends FixedJTextField{
       unregisterKeyboardAction(tellNextTellerKeyStroke);
 
     Preferences prefs = console.getPrefs();
-
-    String tellLastTellerKeyStrokeString = prefs.getString("tell-last-teller-keystroke", null);
-    String tellNextTellerKeyStrokeString = prefs.getString("tell-next-teller-keystroke", null);
+    
+    String platformSuffix = "." + PlatformUtils.getOSName();
+    String tellLastTellerKeyStrokeString =
+      (String)prefs.lookup("tell-last-teller-keystroke" + platformSuffix, null);
+    String tellNextTellerKeyStrokeString = 
+      (String)prefs.getString("tell-next-teller-keystroke" + platformSuffix, null);
 
     if (tellLastTellerKeyStrokeString != null){
       tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
