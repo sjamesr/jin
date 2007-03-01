@@ -111,7 +111,6 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     
     addPanel(createBoardLooksPanel(), i18n.getString("boardLooksPanel.title"), i18n.getString("boardLooksPanel.tooltip"));
     addPanel(createMoveInputPanel(), i18n.getString("moveInputPanel.title"), i18n.getString("moveInputPanel.tooltip"));
-    addPanel(createMoveHighlightingPanel(), i18n.getString("moveHighlightPanel.title"), i18n.getString("moveHighlightPanel.tooltip"));
     addPanel(createSquareCoordsPanel(), i18n.getString("coordsPanel.title"), i18n.getString("coordsPanel.tooltip"));
     
     initPreviewBoard();
@@ -168,16 +167,6 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
    
   protected BoardModifyingPrefsPanel createMoveInputPanel(){
     return new MoveInputPanel(boardManager, previewBoard);
-  }
-
-
-
-  /**
-   * Creates the "Move Highlighting" panel.
-   */
-   
-  protected BoardModifyingPrefsPanel createMoveHighlightingPanel(){
-    return new MoveHighlightPanel(boardManager, previewBoard);
   }
 
 
