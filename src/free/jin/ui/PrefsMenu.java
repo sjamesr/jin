@@ -28,14 +28,26 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import free.jin.*;
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Session;
+import free.jin.SessionEvent;
+import free.jin.SessionListener;
 import free.jin.plugin.Plugin;
 import free.util.AWTUtilities;
+import free.util.PlatformUtils;
 import free.util.WindowDisposingListener;
 import free.util.models.BooleanModel;
 import free.util.models.Model;
@@ -350,6 +362,10 @@ public class PrefsMenu extends JMenu implements SessionListener{
       buttonPanel.add(cancelButton);
       buttonPanel.add(applyButton);
       bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+      
+      // To prevent overlapping the window resize handle
+      if (PlatformUtils.isMacOSX())
+        bottomPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
       content.add(bottomPanel, BorderLayout.SOUTH);
       this.getRootPane().setDefaultButton(okButton);
