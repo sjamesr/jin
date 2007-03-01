@@ -1,6 +1,9 @@
 tell-last-teller-keystroke = F9
 tell-next-teller-keystroke = shift F9
 
+tell-last-teller-keystroke.macosx = F8
+tell-next-teller-keystroke.macosx = shift F8
+
 game-list-display-style = embedded
 
 # Output properties
