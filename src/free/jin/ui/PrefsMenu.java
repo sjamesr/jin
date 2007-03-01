@@ -202,7 +202,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
       if (!plugin.hasPreferencesUI())
         continue;
 
-      JMenuItem menuItem = new JMenuItem(plugins[i].getName());
+      JMenuItem menuItem = new JMenuItem(plugins[i].getName() + "...");
       menuItem.setActionCommand(String.valueOf(i));
       menuItem.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
