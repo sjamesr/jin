@@ -44,36 +44,28 @@ public class FixedJComboBox extends JComboBox{
 
   public FixedJComboBox(){
     super();
-    fixBugs();
   }
 
 
   public FixedJComboBox(ComboBoxModel model){
     super(model);
-    fixBugs();
   }
 
 
   public FixedJComboBox(Object [] items){
     super(items);
-    fixBugs();
   }
 
 
   public FixedJComboBox(Vector items){
     super(items);
-    fixBugs();
   }
 
 
 
 
-  /**
-   * Fixes various bugs that can be fixed in the constructor. This method is
-   * called from all the constructors.
-   */
-
-  protected void fixBugs(){
+  public void addNotify(){
+    super.addNotify();
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4269430.html //
 
