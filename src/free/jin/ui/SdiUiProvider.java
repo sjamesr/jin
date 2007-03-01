@@ -308,6 +308,28 @@ public class SdiUiProvider extends AbstractUiProvider{
     
     
     /**
+     * Sets the resizable state of this plugin container's frame.
+     */
+    
+    public void setResizable(boolean resizable){
+      frame.setResizable(resizable);
+    }
+    
+    
+    
+    /**
+     * Returns whether the frame of this plugin container is currently
+     * resizable.
+     */
+    
+    public boolean isResizable(){
+      return frame.isResizable();
+    }
+
+    
+    
+    
+    /**
      * Returns the content pane of the frame.
      */
   
