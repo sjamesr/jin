@@ -161,7 +161,24 @@ public interface PluginUIContainer{
    */
 
   boolean isActive();
-
+  
+  
+  
+  /**
+   * Sets whether this container should be resizable by the user.
+   * Note that, depending on the implementation, this setting may be meaningless
+   * and thus ignored.
+   */
+  
+  void setResizable(boolean resizable);
+  
+  
+  
+  /**
+   * Returns whether this container is currently resizable by the user.
+   */
+  
+  boolean isResizable();
 
   
   /**
