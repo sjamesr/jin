@@ -99,6 +99,7 @@ public class ActionsPlugin extends Plugin{
   private PluginUIContainer createButtonContainer(){
     PluginUIContainer container = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
     container.setTitle(getI18n().getString("buttonPanelTitle"));
+    container.setResizable(false);
     
     return container;
   }
