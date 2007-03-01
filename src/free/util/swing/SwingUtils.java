@@ -21,12 +21,24 @@
 
 package free.util.swing;
 
-import java.awt.Frame;
 import java.awt.Component;
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
+import java.awt.Frame;
 import java.awt.Window;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
+
+import free.util.PlatformUtils;
 import free.util.WindowDisposingListener;
 
 
@@ -146,7 +158,9 @@ public class SwingUtils{
   
   public static void applyLabelSpec(AbstractButton button, String labelSpec){
     button.setText(getLabelText(labelSpec));
-    button.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    
+    if (!PlatformUtils.isMacOS())
+      button.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
   }
   
   
@@ -157,7 +171,9 @@ public class SwingUtils{
   
   public static void applyLabelSpec(JLabel label, String labelSpec){
     label.setText(getLabelText(labelSpec));
-    label.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    
+    if (!PlatformUtils.isMacOS())
+      label.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
   }
   
   
@@ -168,7 +184,9 @@ public class SwingUtils{
   
   public static void applyLabelSpec(Mnemonicable mnemonicable, String labelSpec){
     mnemonicable.setText(getLabelText(labelSpec));
-    mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    
+    if (!PlatformUtils.isMacOS())
+      mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
   }
   
   
