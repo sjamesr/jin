@@ -128,5 +128,33 @@ public class PlatformUtils{
   }
   
   
+  
+  /**
+   * Returns the name of the OS we're running on, out of the specified list:
+   * <ul>
+   *   <li>windows
+   *   <li>linux
+   *   <li>macosx
+   *   <li>solaris
+   * </ul>
+   * 
+   * Returns <code>null</code> if we're running on an OS which is not in the
+   * above list.
+   */
+  
+  public static String getOSName(){
+    if (isWindows() || isOldWindows())
+      return "windows";
+    else if (isLinux())
+      return "linux";
+    else if (isMacOSX())
+      return "macosx";
+    else if (isSolaris())
+      return "solaris";
+    else
+      return null;
+  }
+  
+  
    
 }
