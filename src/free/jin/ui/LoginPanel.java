@@ -603,6 +603,7 @@ public class LoginPanel extends DialogPanel{
    
     
     Box vpanel = new Box(BoxLayout.Y_AXIS);
+    vpanel.add(Box.createVerticalStrut(10));
     vpanel.add(hostnamePanel);
     vpanel.add(Box.createVerticalStrut(10));
     vpanel.add(portPanel);
