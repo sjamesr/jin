@@ -633,10 +633,20 @@ public class ConsoleTextPane extends FixedJTextPane{
         int y = evt.getY();
         int width = popup.getWidth();
         int height = popup.getHeight();
-        if (clickPointOnRootPane.x + width > rootPaneSize.width)
-          x = x - width;
-        if (clickPointOnRootPane.y + height > rootPaneSize.height)
-          y = y - height;
+        
+        // The extra 1 pixel works around a bug where a mouse release event is
+        // dispatched immediately (on the mouse release corresponding to the
+        // mouse press which activated the popup) on the popup, activating an
+        // item which wasn't really selected.
+        if (clickPointOnRootPane.x + width + 1 > rootPaneSize.width)
+          x = x - width - 1;
+        else
+          x += 1;
+        
+        if (clickPointOnRootPane.y + height - 5 > rootPaneSize.height)
+          y = y - height + 5;
+        else
+          y -= 5;
         
         popup.setSelected(null);
         popup.show(this,x,y);
