@@ -137,7 +137,12 @@ public class ColorChooser extends JComponent implements Mnemonicable{
 
     label.setLabelFor(button);
     button.setDefaultCapable(false);
-    button.setMargin(new Insets(5, 5, 5, 5));
+    
+    if (SwingUtils.isMacLnF())
+      button.setMargin(new Insets(5, 5, 5, 5));
+    else
+      button.setMargin(new Insets(3, 3, 3, 3));
+    
 
     color = initialColor;
 

@@ -37,6 +37,7 @@ import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.plugin.Plugin;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 
 
@@ -141,26 +142,38 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     forwardButton = createForwardButton(plugin, game);
     endButton = createEndGameButton(plugin, game);
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Creates a button with the specified parameters.
+   */
+  
+  protected JButton createButton(String iconPath, String tooltipKey, KeyStroke shortcut){
+    JButton button = new JButton(new ImageIcon(getClass().getResource(iconPath)));
+    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString(tooltipKey));
+    button.addActionListener(this);
+    button.registerKeyboardAction(this, shortcut, WHEN_IN_FOCUSED_WINDOW); 
+    button.setDefaultCapable(false);
+    button.setRequestFocusEnabled(false);
+    
+    if (SwingUtils.isMacLnF())
+      button.setMargin(new Insets(11, 9, 9, 9));
+    else
+      button.setMargin(new Insets(5, 5, 5, 5));
+    
+    return button;
+  }
+  
+  
+  
   /**
    * Creates the button which makes the game go its start.
    */
 
   protected JButton createStartGameButton(Plugin plugin, Game game){
-    JButton button = new JButton(new ImageIcon(getClass().getResource("images/start.gif")));
-    button.setMargin(new Insets(2, 2, 2, 2));
-    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameStartButton.tooltip"));
-    button.addActionListener(this);
-    button.registerKeyboardAction(this, 
-        KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        WHEN_IN_FOCUSED_WINDOW);    
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
+    return createButton("images/start.gif", "gameStartButton.tooltip", 
+        KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
 
@@ -171,17 +184,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createEndGameButton(Plugin plugin, Game game){
-    JButton button = new JButton(new ImageIcon(getClass().getResource("images/end.gif")));
-    button.setMargin(new Insets(2, 2, 2, 2));
-    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameEndButton.tooltip"));
-    button.addActionListener(this);
-    button.registerKeyboardAction(this,
-        KeyStroke.getKeyStroke(KeyEvent.VK_END, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        WHEN_IN_FOCUSED_WINDOW);
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
+    return createButton("images/end.gif", "gameEndButton.tooltip",
+        KeyStroke.getKeyStroke(KeyEvent.VK_END, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
 
@@ -192,17 +196,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createBackwardButton(Plugin plugin, Game game){
-    JButton button = new JButton(new ImageIcon(getClass().getResource("images/backward.gif")));
-    button.setMargin(new Insets(2, 2, 2, 2));
-    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("backwardButton.tooltip"));
-    button.addActionListener(this);
-    button.registerKeyboardAction(this,
-        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        WHEN_IN_FOCUSED_WINDOW);
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
+    return createButton("images/backward.gif", "backwardButton.tooltip",
+        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
 
@@ -212,17 +207,8 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createForwardButton(Plugin plugin, Game game){
-    JButton button = new JButton(new ImageIcon(getClass().getResource("images/forward.gif")));
-    button.setMargin(new Insets(2, 2, 2, 2));
-    button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("forwardButton.tooltip"));
-    button.addActionListener(this);
-    button.registerKeyboardAction(this,
-        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        WHEN_IN_FOCUSED_WINDOW);
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-
-    return button;
+    return createButton("images/forward.gif", "forwardButton.tooltip",
+        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
 
