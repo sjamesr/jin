@@ -1,0 +1,27 @@
+#!/bin/bash
+
+sourcedir=$1
+volumename=$2
+targetfile=$3
+
+# Create an initial disk image (32 megs)
+hdiutil create -size 32m -fs HFS+ -volname "$volumename" $targetfile
+ 
+# Mount the disk image
+hdiutil attach $targetfile
+
+# Copy files into disk image
+cp -r $sourcedir /Volumes/$volumename/
+ 
+# Obtain device information
+DEVS=$(hdiutil attach $targetfile | cut -f 1)
+DEV=$(echo $DEVS | cut -f 1 -d ' ')
+ 
+# Unmount the disk image
+hdiutil detach $DEV
+ 
+# Convert the disk image to read-only
+tmpfile=${targetfile}.dmg
+hdiutil convert $targetfile -format UDZO -o $tmpfile
+mv -f $tmpfile $targetfile
+
