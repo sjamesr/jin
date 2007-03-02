@@ -1374,7 +1374,11 @@ public class JBoard extends JComponent{
    * given <code>Graphics</code> object using the specified color.
    */
 
-  protected void drawArrow(Graphics2D g, Square from, Square to, float arrowSize, Color color){
+  protected void drawArrow(Graphics graphics, Square from, Square to,
+      float arrowSize, Color color){
+    
+    Graphics2D g = (Graphics2D)graphics;
+    
     Rectangle fromRect = squareToRect(from, null);
     Rectangle toRect = squareToRect(to, null);
 
@@ -1428,8 +1432,9 @@ public class JBoard extends JComponent{
    * specifies the width of the outline.
    */
 
-  protected void drawSquare(Graphics2D g, Square circleSquare, int size, Color color){
-
+  protected void drawSquare(Graphics graphics, Square circleSquare, int size, Color color){
+    Graphics2D g = (Graphics2D)graphics;
+    
     Rectangle rect = squareToRect(circleSquare, null);
 
     g.translate(rect.x, rect.y);
