@@ -47,6 +47,7 @@ import free.util.Utilities;
 import free.util.models.ModelUtils;
 import free.util.swing.FullscreenPanel;
 import free.util.swing.NonEditableTableModel;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 
@@ -753,11 +754,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
 
   protected JToggleButton createFullscreenButton(){
+    I18n i18n = I18n.get(BoardPanel.class);
     JToggleButton button = new JToggleButton();
     button.setIcon(new ImageIcon(BoardPanel.class.getResource("images/fullscreen.gif")));
     button.setRequestFocusEnabled(false);
-    button.setMargin(new Insets(2, 2, 2, 2));
-    button.setToolTipText("Toggle fullscreen mode");
+    button.setToolTipText(i18n.getString("fullscreenButton.tooltip"));
+    
+    if (SwingUtils.isMacLnF()){
+      button.putClientProperty("JButton.buttonType", "toolbar");
+      button.setMargin(new Insets(3, 3, 3, 3));
+    }
+    else{
+      button.setMargin(new Insets(2, 2, 2, 2));
+    }
     
     ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 
