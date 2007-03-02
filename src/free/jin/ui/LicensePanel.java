@@ -68,6 +68,15 @@ public class LicensePanel extends DialogPanel{
    */
 
   private String lgplText = null;
+  
+  
+  
+  /**
+   * The text of the Creative Commons Attribution-ShareAlike 2.5 license, loaded
+   * lazily.
+   */
+  
+  private String ccsa25Text = null;
 
 
 
@@ -183,6 +192,25 @@ public class LicensePanel extends DialogPanel{
         textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
         AWTUtilities.centerWindow(textDialog, getParent());
         textDialog.setVisible(true);
+      }
+    };
+    
+    
+    ActionListener ccsa25ActionListener = new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        if (ccsa25Text == null){
+          try{
+            ccsa25Text = IOUtilities.loadText(Jin.class.getResource("legal/cc-sa-2.5.txt"), true);
+          } catch (IOException e){
+              e.printStackTrace();
+              return;
+            }
+          
+          PlainTextDialog textDialog = new PlainTextDialog(LicensePanel.this, "Creative Commons Attribution-ShareAlike 2.5 License", ccsa25Text);
+          textDialog.setTextAreaFont(LICENSE_TEXT_FONT);
+          AWTUtilities.centerWindow(textDialog, getParent());
+          textDialog.setVisible(true);
+        }
       }
     };
 
@@ -379,6 +407,21 @@ public class LicensePanel extends DialogPanel{
       add(Box.createVerticalStrut(5));
     } catch (ClassNotFoundException e){}
     
+    JPanel tangoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    tangoPanel.add(new JLabel("<html>Jin uses icons from the&nbsp</html>"));
+    LinkLabel tangoWebsiteLabel = new LinkLabel("Tango Desktop Project");
+    tangoWebsiteLabel.setToolTipText("http://tango.freedesktop.org/");
+    tangoWebsiteLabel.addActionListener(
+      new UrlDisplayingAction("http://tango.freedesktop.org/"));
+    tangoPanel.add(tangoWebsiteLabel);
+    tangoPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel tangoLicenseLabel = new LinkLabel("Creative Commons Attribution-ShareAlike 2.5 License");
+    tangoLicenseLabel.addActionListener(ccsa25ActionListener);
+    tangoPanel.add(tangoLicenseLabel);
+    tangoPanel.add(new JLabel("<html>.</html>"));
+    add(tangoPanel);
+    add(Box.createVerticalStrut(5));
+    
     JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     denisDesLauriersPanel.add(new JLabel("<html>The Jin logo was designed by&nbsp</html>"));
     LinkLabel denisDesLauriersWebsiteLabel = new LinkLabel("Denis DesLauriers");
@@ -393,7 +436,6 @@ public class LicensePanel extends DialogPanel{
     denisDesLauriersPanel.add(new JLabel("<html>.</html>"));
     add(denisDesLauriersPanel);
     
-
     add(Box.createVerticalStrut(30));
 
     JButton okButton = new JButton("OK");
