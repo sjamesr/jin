@@ -24,8 +24,10 @@ package free.jin.board;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -149,10 +151,12 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
 
   protected JButton createStartGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/start.gif")));
-    button.setMargin(new Insets(5,5,5,5));
+    button.setMargin(new Insets(2, 2, 2, 2));
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameStartButton.tooltip"));
     button.addActionListener(this);
-    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt HOME"), WHEN_IN_FOCUSED_WINDOW);    
+    button.registerKeyboardAction(this, 
+        KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        WHEN_IN_FOCUSED_WINDOW);    
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -168,10 +172,12 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
 
   protected JButton createEndGameButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/end.gif")));
-    button.setMargin(new Insets(5,5,5,5));
+    button.setMargin(new Insets(2, 2, 2, 2));
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("gameEndButton.tooltip"));
     button.addActionListener(this);
-    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt END"), WHEN_IN_FOCUSED_WINDOW);
+    button.registerKeyboardAction(this,
+        KeyStroke.getKeyStroke(KeyEvent.VK_END, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -187,10 +193,12 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
 
   protected JButton createBackwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/backward.gif")));
-    button.setMargin(new Insets(5,5,5,5));
+    button.setMargin(new Insets(2, 2, 2, 2));
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("backwardButton.tooltip"));
     button.addActionListener(this);
-    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt LEFT"), WHEN_IN_FOCUSED_WINDOW);
+    button.registerKeyboardAction(this,
+        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
@@ -205,10 +213,12 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
 
   protected JButton createForwardButton(Plugin plugin, Game game){
     JButton button = new JButton(new ImageIcon(getClass().getResource("images/forward.gif")));
-    button.setMargin(new Insets(5,5,5,5));
+    button.setMargin(new Insets(2, 2, 2, 2));
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString("forwardButton.tooltip"));
     button.addActionListener(this);
-    button.registerKeyboardAction(this, KeyStroke.getKeyStroke("alt RIGHT"), WHEN_IN_FOCUSED_WINDOW);
+    button.registerKeyboardAction(this,
+        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+        WHEN_IN_FOCUSED_WINDOW);
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
 
