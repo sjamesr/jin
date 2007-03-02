@@ -21,16 +21,27 @@
 
 package free.jin.ui;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Enumeration;
 
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -230,6 +241,16 @@ public class SdiUiProvider extends AbstractUiProvider{
       frame.setJMenuBar(menubar);
       
       setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
+      
+      JRootPane rootPane = frame.getRootPane();
+      ActionListener closer = new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          close();
+        }
+      };
+      KeyStroke closeKeyStroke = 
+        KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()); 
+      rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
     
     
@@ -463,6 +484,27 @@ public class SdiUiProvider extends AbstractUiProvider{
       restoreFrameGeometry(prefs, frame, prefix, defaultBounds);
     }
     
+    
+    
+    /**
+     * Closes this window according to the plugin container mode.
+     */
+    
+    private void close(){
+      switch (getMode()){
+        case HIDEABLE_CONTAINER_MODE:
+        case CLOSEABLE_CONTAINER_MODE:
+          setVisible(false);
+          break;
+        case ESSENTIAL_CONTAINER_MODE:
+          closeSession(frame);
+          break;
+        case SELF_MANAGED_CONTAINER_MODE:
+          firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_CLOSING));
+          break;
+      }
+    }
+    
 
     
     /**
@@ -476,18 +518,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DEACTIVATED));
     }
     public void windowClosing(WindowEvent e){
-      switch (getMode()){
-        case HIDEABLE_CONTAINER_MODE:
-        case CLOSEABLE_CONTAINER_MODE:
-          setVisible(false);
-          break;
-        case ESSENTIAL_CONTAINER_MODE:
-          closeSession(frame);
-          break;
-        case SELF_MANAGED_CONTAINER_MODE:
-          firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_CLOSING));
-          break;
-      }
+      close();
     }
 
     public void windowClosed(WindowEvent e){}
