@@ -23,7 +23,7 @@
           <key>apple.laf.useScreenMenuBar</key><string>false</string>
           <key>apple.awt.fakefullscreen</key><string>false</string>
           <key>apple.awt.brushMetalLook</key><string>false</string>
-          <key>apple.awt.antialiasing</key><string>on</string
+          <key>apple.awt.antialiasing</key><string>on</string>
         </dict>
       <key>WorkingDirectory</key><string>$JAVAROOT</string>
     </dict>
