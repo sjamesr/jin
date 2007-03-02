@@ -756,7 +756,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     JToggleButton button = new JToggleButton();
     button.setIcon(new ImageIcon(BoardPanel.class.getResource("images/fullscreen.gif")));
     button.setRequestFocusEnabled(false);
-    button.setMargin(new Insets(0, 0, 0, 0));
+    button.setMargin(new Insets(2, 2, 2, 2));
     button.setToolTipText("Toggle fullscreen mode");
     
     ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
