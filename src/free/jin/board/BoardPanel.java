@@ -364,16 +364,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     add(fullscreenPanel, BorderLayout.CENTER);
 
     // Fullscreen mode locks up the application under OS X (older versions of Java).
-    // Fullscreen mode is broken under Java 1.5.0, see
+    // Fullscreen mode is broken under Java 1.5.0 when used as an Applet, see
     // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5085648
     if (!PlatformUtils.isJavaBetterThan("1.4") ||
-        (PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2"))||
+        (PlatformUtils.isMacOSX() && !PlatformUtils.isJavaBetterThan("1.4.2")) ||
         ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))){
       fullscreenButton.setEnabled(false);
       fullscreenButton.setToolTipText(I18n.get(BoardPanel.class).getString("fullscreenUnavailableMessage"));
     }
     else{
-      KeyStroke fullscreenKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_MASK);
+      KeyStroke fullscreenKeyStroke = 
+        KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
       contentPanel.registerKeyboardAction(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
           fullscreenPanel.getFullscreenModeModel().flip();
