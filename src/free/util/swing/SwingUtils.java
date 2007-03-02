@@ -37,8 +37,8 @@ import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
-import free.util.PlatformUtils;
 import free.util.WindowDisposingListener;
 
 
@@ -159,7 +159,7 @@ public class SwingUtils{
   public static void applyLabelSpec(AbstractButton button, String labelSpec){
     button.setText(getLabelText(labelSpec));
     
-    if (!PlatformUtils.isMacOS())
+    if (!isMacLnF())
       button.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
   }
   
@@ -172,7 +172,7 @@ public class SwingUtils{
   public static void applyLabelSpec(JLabel label, String labelSpec){
     label.setText(getLabelText(labelSpec));
     
-    if (!PlatformUtils.isMacOS())
+    if (!isMacLnF())
       label.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
   }
   
@@ -185,8 +185,49 @@ public class SwingUtils{
   public static void applyLabelSpec(Mnemonicable mnemonicable, String labelSpec){
     mnemonicable.setText(getLabelText(labelSpec));
     
-    if (!PlatformUtils.isMacOS())
+    if (!isMacLnF())
       mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+  }
+  
+  
+  
+  /**
+   * Returns whether we're currently running the Mac OS X Look&Feel.
+   */
+  
+  public static boolean isMacLnF(){
+    String id = UIManager.getLookAndFeel().getID(); 
+    return id.equals("Mac") || id.equals("Aqua");
+  }
+  
+  
+  
+  /**
+   * Returns whether we're currently running the Metal Look&Feel.
+   */
+  
+  public static boolean isMetalLnF(){
+    return UIManager.getLookAndFeel().getID().equals("Metal");
+  }
+  
+  
+  
+  /**
+   * Returns whether we're currently running the Motif Look&Feel.
+   */
+  
+  public static boolean isMotiflLnF(){
+    return UIManager.getLookAndFeel().getID().equals("Motif");
+  }
+  
+  
+  
+  /**
+   * Returns whether we're currently running the Windows Look&Feel.
+   */
+  
+  public static boolean isWindowsLnF(){
+    return UIManager.getLookAndFeel().getID().equals("Windows");
   }
   
   
