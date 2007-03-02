@@ -21,17 +21,29 @@
 
 package free.chess;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.AWTEvent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
+import java.util.Vector;
+
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.util.Vector;
+
+import free.chess.event.MoveProgressEvent;
+import free.chess.event.MoveProgressListener;
 import free.util.PaintHook;
 import free.util.Utilities;
-import free.chess.event.MoveProgressListener;
-import free.chess.event.MoveProgressEvent;
 
 
 /**
@@ -1099,7 +1111,7 @@ public class JBoard extends JComponent{
     // The documentation of JComponent#paintComponent(Graphics) says we
     // shouldn't make permanent changes to the Graphics object, but we want to
     // clip it.
-    Graphics g = graphics.create();
+    Graphics2D g = (Graphics2D)graphics.create();
     
     g.setColor(getBackground());
     g.fillRect(0, 0, getWidth(), getHeight());
@@ -1362,50 +1374,50 @@ public class JBoard extends JComponent{
    * given <code>Graphics</code> object using the specified color.
    */
 
-  protected void drawArrow(Graphics g, Square from, Square to, int arrowSize, Color color){
-    g.setColor(color);
-
+  protected void drawArrow(Graphics2D g, Square from, Square to, float arrowSize, Color color){
     Rectangle fromRect = squareToRect(from, null);
     Rectangle toRect = squareToRect(to, null);
 
-    int fromX = fromRect.x + fromRect.width/2;
-    int fromY = fromRect.y + fromRect.height/2;
-    int toX = toRect.x + toRect.width/2;
-    int toY = toRect.y + toRect.height/2;
+    float fromX = fromRect.x + fromRect.width/2;
+    float fromY = fromRect.y + fromRect.height/2;
+    float toX = toRect.x + toRect.width/2;
+    float toY = toRect.y + toRect.height/2;
 
     double angle = Math.atan2(toY - fromY, toX - fromX);
     double sin = Math.sin(angle);
     double cos = Math.cos(angle);
     
+    float cosXarrowSize = (float)(cos*arrowSize);
+    float sinXarrowSize = (float)(sin*arrowSize);
+    float cosXhalfArrowSize = cosXarrowSize/2.0f;
+    float sinXhalfArrowSize = sinXarrowSize/2.0f;
+    
     toX -= (int)(cos*toRect.width/2);
     toY -= (int)(sin*toRect.height/2);
-
-    int [] xpoints = new int[4];
-    int [] ypoints = new int[4];
-
-    // The arrow "stick"
-    xpoints[0] = (int)(fromX+sin*arrowSize/2);
-    ypoints[0] = (int)(fromY-cos*arrowSize/2);
-    xpoints[1] = (int)(fromX-sin*arrowSize/2);
-    ypoints[1] = (int)(fromY+cos*arrowSize/2);
-    xpoints[2] = (int)(toX-sin*arrowSize/2);
-    ypoints[2] = (int)(toY+cos*arrowSize/2);
-    xpoints[3] = (int)(toX+sin*arrowSize/2);
-    ypoints[3] = (int)(toY-cos*arrowSize/2);
-
-    g.fillPolygon(xpoints, ypoints, 4);
-
-    // The arrow "point"
-    xpoints[0] = (int)(toX+cos*arrowSize);
-    ypoints[0] = (int)(toY+sin*arrowSize);
-    xpoints[1] = (int)(toX+Math.cos(angle-Math.PI*3/4)*arrowSize*3);
-    ypoints[1] = (int)(toY+Math.sin(angle-Math.PI*3/4)*arrowSize*3);
-    xpoints[2] = (int)(toX-cos*arrowSize);
-    ypoints[2] = (int)(toY-sin*arrowSize);
-    xpoints[3] = (int)(toX+Math.cos(angle+Math.PI*3/4)*arrowSize*3);
-    ypoints[3] = (int)(toY+Math.sin(angle+Math.PI*3/4)*arrowSize*3);
-
-    g.fillPolygon(xpoints, ypoints, 4);
+    
+    GeneralPath path = new GeneralPath();
+    
+    path.moveTo(fromX + sinXhalfArrowSize, fromY - cosXhalfArrowSize);
+    path.lineTo(fromX + cosXhalfArrowSize*0.6f, fromY + sinXhalfArrowSize*0.6f);
+    path.lineTo(fromX - sinXhalfArrowSize, fromY + cosXhalfArrowSize);
+    path.lineTo(
+        toX - cosXarrowSize*1.2f - sinXhalfArrowSize, 
+        toY - sinXarrowSize*1.2f + cosXhalfArrowSize);
+    path.lineTo(
+        (float)(toX + Math.cos(angle + Math.PI*3/4) * arrowSize*3),
+        (float)(toY + Math.sin(angle + Math.PI*3/4) * arrowSize*3));
+    path.lineTo(toX + cosXarrowSize, toY + sinXarrowSize);
+    path.lineTo(
+        (float)(toX + Math.cos(angle - Math.PI*3/4) * arrowSize*3),
+        (float)(toY + Math.sin(angle - Math.PI*3/4) * arrowSize*3));
+    path.lineTo(
+        toX - cosXarrowSize*1.2f + sinXhalfArrowSize, 
+        toY - sinXarrowSize*1.2f - cosXhalfArrowSize);
+    
+    path.closePath();
+    
+    g.setColor(color);
+    g.fill(path);
   }
 
 
@@ -1416,22 +1428,25 @@ public class JBoard extends JComponent{
    * specifies the width of the outline.
    */
 
-  protected void drawSquare(Graphics g, Square circleSquare, int size, Color color){
-    g.setColor(color);
+  protected void drawSquare(Graphics2D g, Square circleSquare, int size, Color color){
 
     Rectangle rect = squareToRect(circleSquare, null);
 
     g.translate(rect.x, rect.y);
+    
+    float halfSize = size/2.0f;
+    
+    GeneralPath path = new GeneralPath();
+    path.moveTo(halfSize - 0.5f, halfSize - 0.5f);
+    path.lineTo(rect.width - halfSize - 0.5f, halfSize - 0.5f);
+    path.lineTo(rect.width - halfSize - 0.5f, rect.height - halfSize - 0.5f);
+    path.lineTo(halfSize - 0.5f, rect.height - halfSize - 0.5f);
+    path.closePath();
 
-    g.fillRect(size, 0, rect.width - size*2, size);
-    g.fillRect(rect.width - size, size, size, rect.height - size*2);
-    g.fillRect(size, rect.height - size, rect.width - size*2, size);
-    g.fillRect(0, size, size, rect.height - size*2);
-
-    g.fillArc(0, 0, size*2, size*2, 90, 90);
-    g.fillArc(rect.width - size*2, 0, size*2, size*2, 0, 90);
-    g.fillArc(rect.width - size*2, rect.height - size*2, size*2, size*2, 270, 90);
-    g.fillArc(0, rect.height - size*2, size*2, size*2, 180, 90);
+    g.setColor(color);
+    g.setStroke(new BasicStroke(size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    
+    g.draw(path);
 
     g.translate(-rect.x, -rect.y);
   }
