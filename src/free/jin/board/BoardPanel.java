@@ -21,33 +21,80 @@
 
 package free.jin.board;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import free.chess.*;
+import free.chess.AbstractChessClock;
+import free.chess.Chess;
+import free.chess.ChessMove;
+import free.chess.JChessClock;
+import free.chess.Move;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.WildVariant;
 import free.chess.event.MoveEvent;
 import free.chess.event.MoveListener;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
-import free.jin.event.*;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
 import free.util.PlatformUtils;
 import free.util.SquareLayout;
 import free.util.Utilities;
 import free.util.models.ModelUtils;
 import free.util.swing.FullscreenPanel;
 import free.util.swing.NonEditableTableModel;
-import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 
@@ -757,17 +804,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   protected JToggleButton createFullscreenButton(){
     I18n i18n = I18n.get(BoardPanel.class);
     JToggleButton button = new JToggleButton();
-    button.setIcon(new ImageIcon(BoardPanel.class.getResource("images/fullscreen.gif")));
     button.setRequestFocusEnabled(false);
     button.setToolTipText(i18n.getString("fullscreenButton.tooltip"));
     
-    if (SwingUtils.isMacLnF()){
-      button.putClientProperty("JButton.buttonType", "toolbar");
-      button.setMargin(new Insets(3, 3, 3, 3));
-    }
-    else{
-      button.setMargin(new Insets(2, 2, 2, 2));
-    }
+    button.setBorderPainted(false);
+    button.setContentAreaFilled(false);
+    button.setMargin(new Insets(0, 0, 0, 0));
+    
+    Class loader = BoardPanel.class;
+    button.setIcon(new ImageIcon(loader.getResource("images/view-fullscreen.png")));
+    button.setRolloverIcon(new ImageIcon(loader.getResource("images/view-fullscreen-rollover.png")));
+    button.setPressedIcon(new ImageIcon(loader.getResource("images/view-fullscreen-pressed.png")));
     
     ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 

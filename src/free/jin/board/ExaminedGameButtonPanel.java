@@ -37,7 +37,6 @@ import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.plugin.Plugin;
-import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 
 
@@ -149,18 +148,22 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * Creates a button with the specified parameters.
    */
   
-  protected JButton createButton(String iconPath, String tooltipKey, KeyStroke shortcut){
-    JButton button = new JButton(new ImageIcon(getClass().getResource(iconPath)));
+  protected JButton createButton(String iconName, String tooltipKey, KeyStroke shortcut){
+    JButton button = new JButton();
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString(tooltipKey));
     button.addActionListener(this);
     button.registerKeyboardAction(this, shortcut, WHEN_IN_FOCUSED_WINDOW); 
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
     
-    if (SwingUtils.isMacLnF())
-      button.setMargin(new Insets(11, 9, 9, 9));
-    else
-      button.setMargin(new Insets(5, 5, 5, 5));
+    button.setBorderPainted(false);
+    button.setContentAreaFilled(false);
+    button.setMargin(new Insets(0, 0, 0, 0));
+    
+    Class loader = ExaminedGameButtonPanel.class;
+    button.setIcon(new ImageIcon(loader.getResource("images/" + iconName + ".png")));
+    button.setRolloverIcon(new ImageIcon(loader.getResource("images/" + iconName + "-rollover.png")));
+    button.setPressedIcon(new ImageIcon(loader.getResource("images/" + iconName + "-pressed.png")));
     
     return button;
   }
@@ -172,7 +175,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createStartGameButton(Plugin plugin, Game game){
-    return createButton("images/start.gif", "gameStartButton.tooltip", 
+    return createButton("go-first", "gameStartButton.tooltip", 
         KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
@@ -184,7 +187,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createEndGameButton(Plugin plugin, Game game){
-    return createButton("images/end.gif", "gameEndButton.tooltip",
+    return createButton("go-last", "gameEndButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_END, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
@@ -196,7 +199,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createBackwardButton(Plugin plugin, Game game){
-    return createButton("images/backward.gif", "backwardButton.tooltip",
+    return createButton("go-previous", "backwardButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
@@ -207,7 +210,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    */
 
   protected JButton createForwardButton(Plugin plugin, Game game){
-    return createButton("images/forward.gif", "forwardButton.tooltip",
+    return createButton("go-next", "forwardButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   }
 
