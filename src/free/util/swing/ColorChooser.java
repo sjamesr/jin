@@ -57,7 +57,15 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * The icon's size.
    */
 
-  private static final Dimension ICON_SIZE = new Dimension(30, 20);
+  private static final Dimension ICON_SIZE = new Dimension(25, 10);
+  
+  
+  
+  /**
+   * The color of the icon's border.
+   */
+  
+  private static final Color ICON_BORDER_COLOR = Color.GRAY;
 
 
 
@@ -115,8 +123,11 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    */
 
   public ColorChooser(String text, Color initialColor){
-    button = new JButton(new SolidColorRectangleIcon(ICON_SIZE, initialColor));
-    label = new JLabel(text);
+    label = new JLabel();
+    button = new JButton();
+    
+    setText(text);
+    setColor(initialColor);
     
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     add(label);
@@ -126,6 +137,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
 
     label.setLabelFor(button);
     button.setDefaultCapable(false);
+    button.setMargin(new Insets(5, 5, 5, 5));
 
     color = initialColor;
 
@@ -239,7 +251,10 @@ public class ColorChooser extends JComponent implements Mnemonicable{
 
   public void setColor(Color color){
     this.color = color;
-    button.setIcon(new SolidColorRectangleIcon(ICON_SIZE, color));
+    
+    Icon colorIcon = new SolidColorRectangleIcon(ICON_SIZE, color);
+    button.setIcon(new BorderIcon(colorIcon, ICON_BORDER_COLOR));
+    
     fireStateChanged();
   }
   
