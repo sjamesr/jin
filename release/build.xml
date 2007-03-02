@@ -8,8 +8,7 @@
 
   1. To build a Windows installer, this buildfile uses the NSIS installer compiler from
      http://nsis.sourceforge.net/.
-  2. OS X releases require a Unix-like machine with dd, bash and hfsutils
-     (http://www.mars.org/home/rob/proj/hfs).
+  2. Mac OS X releases can only be built on Mac OS X.
   3. Building an applet or JET release requires some tasks from the ant-contrib project
      which you can get from http://sourceforge.net/projects/ant-contrib/.
   4. Building a JET release requires Excelsior JET 4.1.
@@ -180,30 +179,27 @@
 		</copy>
 		<mkdir dir="${app-dir}/Contents/MacOS" />
 		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
+		<chmod file="${app-dir}/Contents/MacOS/JavaApplicationStub" perm="a+x" />
 		
+		<property name="osx-install" value="${release.osx.dir}/jin-${release.version}.dmg" />
 		<antcall target="osx-package">
-			<param name="release.name" value="jin-${release.version}-osx" />
+			<param name="targetfile" value="${osx-install}" />
 		</antcall>
 		
 		<delete dir="${app-dir}" />
-		<property name="osx-install" value="jin-${release.version}-osx.dmg" />
 	</target>
 	
 	
-	<!-- Helper target for the osx target. Builds a .dmg.gz file from the Jin.app directory -->
+	<!-- 
+		Helper target for the osx target. Builds a .dmg.gz file from the Jin.app directory 
+		This is unlikely to work except for under Mac OS X
+	-->
 	<target name="osx-package">
-		<property name="dmg-filename" value="${release.name}.dmg" />
-		<exec executable="dd" dir="${release.osx.dir}" failonerror="yes">
-			<arg line="if=/dev/zero of=${dmg-filename} bs=1M count=30" />
+		<property name="mkdmg" value="${basedir}/osx/mkdmg" />
+		<chmod file="${mkdmg}" perm="u+x" />
+		<exec executable="${basedir}/osx/mkdmg" failonerror="yes">
+			<arg line="${app-dir} Jin-${release.version} ${targetfile}" />
 		</exec>
-		<exec executable="hformat" dir="${release.osx.dir}" failonerror="yes">
-			<arg line="-l Jin-${release.version} ${dmg-filename}" />
-		</exec>
-		<exec executable="${basedir}/osx/hcp" dir="${release.osx.dir}" failonerror="yes">
-			<arg line="${app-dir.name}" />
-		</exec>
-		<gzip src="${release.osx.dir}/${dmg-filename}" zipfile="${release.osx.dir}/${dmg-filename}.gz" />
-		<delete file="${release.osx.dir}/${dmg-filename}" />
 	</target>
 	
 	
