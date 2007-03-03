@@ -283,7 +283,7 @@ public class LicensePanel extends DialogPanel{
     beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
     beanshellPanel.add(beanshellWebsiteLabel);
     beanshellPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
-    LinkLabel beanshellLicenseLabel = new LinkLabel("LGPL and Sun licenses");
+    LinkLabel beanshellLicenseLabel = new LinkLabel("GNU Lesser General Public License");
     beanshellLicenseLabel.addActionListener(beanshellActionListener);
     beanshellPanel.add(beanshellLicenseLabel);
     beanshellPanel.add(new JLabel("<html>.</html>"));
@@ -327,7 +327,21 @@ public class LicensePanel extends DialogPanel{
     blitzinPanel.add(new JLabel("<html>, used with permission.</html>"));
     add(blitzinPanel);
     add(Box.createVerticalStrut(5));
-
+    
+    JPanel maurizioMongePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    maurizioMongePanel.add(new JLabel("<html>Jin includes piece sets created by&nbsp</html>"));
+    LinkLabel maurizioMongeWebsiteLabel = new LinkLabel("Maurizio Monge");
+    maurizioMongeWebsiteLabel.setToolTipText("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces");
+    maurizioMongeWebsiteLabel.addActionListener(new UrlDisplayingAction("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces"));
+    maurizioMongePanel.add(maurizioMongeWebsiteLabel);
+    maurizioMongePanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel maurizioMongeLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    maurizioMongeLicenseLabel.addActionListener(lgplActionListener);
+    maurizioMongePanel.add(maurizioMongeLicenseLabel);
+    maurizioMongePanel.add(new JLabel("<html>.</html>"));
+    add(maurizioMongePanel);
+    add(Box.createVerticalStrut(5));
+    
     try{
       // Throws ClassNotFoundException if not found
       Class.forName("com.incors.plaf.kunststoff.KunststoffLookAndFeel");
