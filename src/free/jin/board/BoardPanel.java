@@ -27,7 +27,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -95,6 +94,7 @@ import free.util.Utilities;
 import free.util.models.ModelUtils;
 import free.util.swing.FullscreenPanel;
 import free.util.swing.NonEditableTableModel;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 
@@ -807,14 +807,12 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     button.setRequestFocusEnabled(false);
     button.setToolTipText(i18n.getString("fullscreenButton.tooltip"));
     
-    button.setBorderPainted(false);
-    button.setContentAreaFilled(false);
-    button.setMargin(new Insets(0, 0, 0, 0));
-    
     Class loader = BoardPanel.class;
-    button.setIcon(new ImageIcon(loader.getResource("images/view-fullscreen.png")));
-    button.setRolloverIcon(new ImageIcon(loader.getResource("images/view-fullscreen-rollover.png")));
-    button.setPressedIcon(new ImageIcon(loader.getResource("images/view-fullscreen-pressed.png")));
+    SwingUtils.makeIconButton(button,
+        new ImageIcon(loader.getResource("images/view-fullscreen.png")),
+        new ImageIcon(loader.getResource("images/view-fullscreen-rollover.png")),
+        new ImageIcon(loader.getResource("images/view-fullscreen-pressed.png"))
+    );
     
     ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 

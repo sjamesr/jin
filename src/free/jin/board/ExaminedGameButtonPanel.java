@@ -23,7 +23,6 @@ package free.jin.board;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +36,7 @@ import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.plugin.Plugin;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 
 
@@ -156,14 +156,12 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
     
-    button.setBorderPainted(false);
-    button.setContentAreaFilled(false);
-    button.setMargin(new Insets(0, 0, 0, 0));
-    
     Class loader = ExaminedGameButtonPanel.class;
-    button.setIcon(new ImageIcon(loader.getResource("images/" + iconName + ".png")));
-    button.setRolloverIcon(new ImageIcon(loader.getResource("images/" + iconName + "-rollover.png")));
-    button.setPressedIcon(new ImageIcon(loader.getResource("images/" + iconName + "-pressed.png")));
+    SwingUtils.makeIconButton(button,
+        new ImageIcon(loader.getResource("images/" + iconName + ".png")),
+        new ImageIcon(loader.getResource("images/" + iconName + "-rollover.png")),
+        new ImageIcon(loader.getResource("images/" + iconName + "-pressed.png"))
+    );
     
     return button;
   }
