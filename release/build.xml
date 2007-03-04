@@ -107,8 +107,8 @@
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
-		<property name="win-install" value="${release.win.dir}/jin-${release.version}-win.exe" />
-		<property name="win-archive" value="${release.win.dir}/jin-${release.version}-win.zip" />
+		<property name="win-install" value="${release.win.dir}/jin-${release.version}-windows.exe" />
+		<property name="win-archive" value="${release.win.dir}/jin-${release.version}-windows.zip" />
 
 		<!-- Build the release -->
 		<mkdir dir="${dir-to-inst}" />
@@ -181,7 +181,7 @@
 		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
 		<chmod file="${app-dir}/Contents/MacOS/JavaApplicationStub" perm="a+x" />
 		
-		<property name="osx-install" value="${release.osx.dir}/jin-${release.version}.dmg" />
+		<property name="osx-install" value="${release.osx.dir}/jin-${release.version}-macosx.dmg" />
 		<antcall target="osx-package">
 			<param name="targetfile" value="${osx-install}" />
 		</antcall>
@@ -346,7 +346,7 @@
 			<entry key="app.version" value="${release.version}" />
 		</propertyfile>
 		
-		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-src.tar" />
+		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-source.tar" />
 		<property name="src-archive" value="${src-tar}.gz" />
 		<tar destfile="${src-tar}">
 			<tarfileset dir="${src-archive-dir}" />
