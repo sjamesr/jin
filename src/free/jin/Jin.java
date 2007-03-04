@@ -189,10 +189,8 @@ public class Jin{
   private void restoreLookAndFeel(){
     String defaultLnf = UIManager.getSystemLookAndFeelClassName();
 
-    // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
-    // Remove this when Sun fixes it.
-    if ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5") && 
-        ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf)))
+    // GTK Look and Feel still sucks. Remove this when it doesn't.
+    if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf))
       defaultLnf = UIManager.getCrossPlatformLookAndFeelClassName();
     
     String lfClassName = getPrefs().getString("lookAndFeel.classname", null);
