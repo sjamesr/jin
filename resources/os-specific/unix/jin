@@ -4,17 +4,14 @@
 JAVA_CMD=java
 
 # Check if GCJ
-readlink -f $JAVA_CMD | grep -i -q "gij\|gcj"
+$JAVA_CMD -version 2>&1 | grep -i -q "gcj\|gnu\|gij"
 if [ $? -eq 0 ]
 then
-	$JAVA_CMD -version 2>&1 | grep -i -q "gcj\|gnu\|gij"
-	if [ $? -eq 0 ]
-	then
-		echo "You seem to be running GNU's Java implementation, which is"
-		echo "incomplete. To run Jin, standard Java is required. You can obtain"
-		echo "it at http://www.java.com"
-		exit
-	fi
+	echo "You seem to be running GNU's Java implementation, which is incomplete."
+	echo "Jin requires Sun's Java (or a fully compatible version) 1.4 or later."
+	echo "If you can't install it with your distribution's package manager, you"
+	echo "can obtain and install it manually from http://www.java.com"
+	exit
 fi
 
 # Follow links
