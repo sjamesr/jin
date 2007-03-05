@@ -32,6 +32,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
@@ -43,6 +44,7 @@ import javax.swing.event.ChangeListener;
 import free.chess.event.MoveProgressEvent;
 import free.chess.event.MoveProgressListener;
 import free.util.PaintHook;
+import free.util.PlatformUtils;
 import free.util.Utilities;
 
 
@@ -1442,14 +1444,18 @@ public class JBoard extends JComponent{
     float halfSize = size/2.0f;
     
     GeneralPath path = new GeneralPath();
-    path.moveTo(halfSize - 0.5f, halfSize - 0.5f);
-    path.lineTo(rect.width - halfSize - 0.5f, halfSize - 0.5f);
-    path.lineTo(rect.width - halfSize - 0.5f, rect.height - halfSize - 0.5f);
-    path.lineTo(halfSize - 0.5f, rect.height - halfSize - 0.5f);
+    path.moveTo(halfSize, halfSize);
+    path.lineTo(rect.width - halfSize, halfSize);
+    path.lineTo(rect.width - halfSize, rect.height - halfSize);
+    path.lineTo(halfSize, rect.height - halfSize);
     path.closePath();
+    
+    // Mac OS X draws it differently from other platforms for some reason
+    if (PlatformUtils.isMacOSX())
+      path.transform(AffineTransform.getTranslateInstance(-0.5, -0.5));
 
     g.setColor(color);
-    g.setStroke(new BasicStroke(size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g.setStroke(new BasicStroke(size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
     
     g.draw(path);
 
