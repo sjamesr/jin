@@ -24,8 +24,8 @@
   pretty icons taken from the Tango Desktop Project at
   http://tango.freedesktop.org/
 * Unix/Linux: The default Look and Feel is now Metal, since GTK is still awful.
-* Mac OS X: Jin is now distributed as a compressed .dmg file (instead of a .dmg
-  file inside of a .tar.gz).
+* Mac OS X: Jin is now distributed as a compressed .dmg file (instead of a
+  .dmg.gz).
 
 
 
