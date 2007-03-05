@@ -21,23 +21,59 @@
 
 package free.jin.console;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.OverlayLayout;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import javax.swing.text.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.util.BrowserControl;
+import free.util.PlatformUtils;
 
 
 /**
@@ -232,7 +268,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
     bottomPanel.add(clearButton, BorderLayout.EAST);
-    bottomPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 2, 18));
+    
+    if (PlatformUtils.isMacOSX())
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 2, 18));
+    else
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 2, 5));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
