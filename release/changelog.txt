@@ -1,3 +1,34 @@
+2.14.1
+
+* Added a "Crampled Paper" board pattern.
+* Added new piece sets from Maurizio Monge
+  (http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces).
+* Mac OS X: You can now quickly respond to the last person who sent you a tell
+  by hitting the F8 key in the console. Previously, this didn't work on Mac OS X
+  because the default key used for this (F9) is taken by Expose.
+* The "Actions" window is no longer resizable.
+* A bunch of minor UI adjustments to make Jin look better under Mac OS X (and,
+  hopefully, not worse on other platforms).
+* Merged the "Move highlight" and "Move input" board preferences panels into one
+  panel - "Moves".
+* Command-W on Mac OS X and Alt-W on other platforms will now close Jin windows
+  in SDI mode.
+* Mac OS X: Some graphics were drawn badly, such as vector pieces, square
+  highlight and arrow. All pretty (and antialiased) now.
+* Mac OS X: The keyboard shortcuts for moving through an examined game are now
+  Command-Left (one ply backward), Command-Right (one ply forward),
+  Command-Home (beginning of game) and Command-End (end of game).
+* Mac OS X: The keyboard shortcut for entering board fullscreen mode is now
+  Command-Enter.
+* Replaced ugly board icons (game previous/next/start/end and fullscreen) with
+  pretty icons taken from the Tango Desktop Project at
+  http://tango.freedesktop.org/
+* Unix/Linux: The default Look and Feel is now Metal, since GTK is still awful.
+* Mac OS X: Jin is now distributed as a compressed .dmg file (instead of a .dmg
+  file inside of a .tar.gz).
+
+
+
 2.14
 
 * Fixed a bug which would reset the board to the initial position when a game
