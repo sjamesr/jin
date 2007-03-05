@@ -30,11 +30,32 @@ import java.awt.event.ActionListener;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
 
-import free.jin.*;
+import free.jin.ConnectionDetails;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Server;
+import free.jin.User;
+import free.jin.UsernamePolicy;
 import free.util.BrowserControl;
 import free.util.StringEncoder;
+import free.util.TableLayout;
 import free.util.Utilities;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedJPasswordField;
@@ -233,6 +254,9 @@ public class LoginPanel extends DialogPanel{
       savePasswordCheckBox.setSelected(connDetails.isSavePassword());
     }
     
+    usernameField.setColumns(10);
+    passwordField.setColumns(10);
+    
     hostnameBox.setModel(new DefaultComboBoxModel(server.getHosts()));
     hostnameBox.setSelectedItem(connDetails == null ? server.getDefaultHost() : connDetails.getHost());
     
@@ -377,6 +401,8 @@ public class LoginPanel extends DialogPanel{
           setData(getServer(), users[userBox.getSelectedIndex() - 1].getPreferredConnDetails());
       }
     });
+    
+    hostnameBox.setFont(UIManager.getFont("TextField.font"));
     hostnameBox.setEditable(true);
     
     connectButton.setDefaultCapable(true);
@@ -551,23 +577,16 @@ public class LoginPanel extends DialogPanel{
    */
 
   private Component createGuestPanel(JButton loginAsGuestButton, JButton registerButton){
-    Box vpanel = new Box(BoxLayout.Y_AXIS);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(loginAsGuestButton);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(registerButton);
-    vpanel.add(Box.createVerticalStrut(10));
+    JPanel panel = new JPanel(new TableLayout(1, 10, 10));
+    
+    panel.add(loginAsGuestButton);
+    panel.add(registerButton);
 
-    Box hpanel = new Box(BoxLayout.X_AXIS);
-    hpanel.add(Box.createHorizontalStrut(10));
-    hpanel.add(vpanel);
-    hpanel.add(Box.createHorizontalStrut(10));
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        i18n.createTitledBorder("guestsBorder"),
+        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-    JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.add(hpanel,BorderLayout.CENTER);
-    outerPanel.setBorder(i18n.createTitledBorder("guestsBorder"));
-
-    return outerPanel;
+    return panel;
   }
 
 
@@ -578,47 +597,26 @@ public class LoginPanel extends DialogPanel{
 
   private Component createAdvancedPanel(JComboBox hostnameBox, JTextField portsField){
     JLabel hostnameLabel = i18n.createLabel("hostnameLabel");
-
-    Box hostnamePanel = new Box(BoxLayout.X_AXIS);
-
-    hostnameBox.setFont(UIManager.getFont("TextField.font"));
-    hostnameBox.setEditable(true);
     hostnameLabel.setLabelFor(hostnameBox);
-
-    hostnamePanel.add(hostnameBox);
-    hostnamePanel.add(Box.createHorizontalStrut(10));
-    hostnamePanel.add(hostnameLabel);
-
     
-    Box portPanel = new Box(BoxLayout.X_AXIS);
-
-    portsField.setMaximumSize(portsField.getPreferredSize());
-
-    portPanel.add(portsField);
-    portPanel.add(Box.createHorizontalStrut(10));
     JLabel portLabel = i18n.createLabel("portsLabel");
     portLabel.setLabelFor(portsField);
-    portPanel.add(portLabel);
-    portPanel.add(Box.createHorizontalGlue());
-   
+
+    JPanel panel = new JPanel(new TableLayout(2, 10, 10));
+
+    panel.add(hostnameBox);
+    panel.add(hostnameLabel);
+    panel.add(portsField);
+    panel.add(portLabel);
     
-    Box vpanel = new Box(BoxLayout.Y_AXIS);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(hostnamePanel);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(portPanel);
-    vpanel.add(Box.createVerticalStrut(10));
+    portsField.setMaximumSize(
+        new Dimension(Integer.MAX_VALUE, portsField.getPreferredSize().height));
+    
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        i18n.createTitledBorder("advancedOptionsBorder"),
+        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-    Box hpanel = new Box(BoxLayout.X_AXIS);
-    hpanel.add(Box.createHorizontalStrut(10));
-    hpanel.add(vpanel);
-    hpanel.add(Box.createHorizontalStrut(10));
-
-    JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(i18n.createTitledBorder("advancedOptionsBorder"));
-    outerPanel.add(hpanel, BorderLayout.CENTER);
-
-    return outerPanel;
+    return panel;
   }
 
 
@@ -629,38 +627,27 @@ public class LoginPanel extends DialogPanel{
 
   private Component createMembersPanel(JTextField usernameField, JPasswordField passwordField,
     JCheckBox savePasswordCheckBox, JButton retrievePasswordButton, JButton connectButton){
-
-    Box usernamePanel = new Box(BoxLayout.X_AXIS);
-
-    usernameField.setPreferredSize(new Dimension(130, 20));
-    usernamePanel.add(usernameField);
-    usernamePanel.add(Box.createHorizontalStrut(10));
-    JLabel handleLabel = i18n.createLabel("handleLabel");
-    handleLabel.setLabelFor(usernameField);
-    usernamePanel.add(handleLabel);
-    usernamePanel.add(Box.createHorizontalGlue());
-    usernamePanel.add(Box.createHorizontalStrut(10));
-
-
-    Box passwordInputPanel = new Box(BoxLayout.X_AXIS);
-
-    passwordField.setPreferredSize(new Dimension(130, 20));
-    passwordInputPanel.add(passwordField);
-    passwordInputPanel.add(Box.createHorizontalStrut(10));
+    
+    JLabel usernameLabel = i18n.createLabel("handleLabel");
+    usernameLabel.setLabelFor(usernameField);
+    
     JLabel passwordLabel = i18n.createLabel("passwordLabel");
     passwordLabel.setLabelFor(passwordField);
-    passwordInputPanel.add(passwordLabel);
-    passwordInputPanel.add(Box.createHorizontalGlue());
-    passwordInputPanel.add(Box.createHorizontalStrut(10));
+    
+    JPanel credentialsPanel = new JPanel(new TableLayout(2, 10, 7));
+    credentialsPanel.add(usernameField);
+    credentialsPanel.add(usernameLabel);
+    credentialsPanel.add(passwordField);
+    credentialsPanel.add(passwordLabel);
 
-    int fieldsWidth = Math.max(usernameField.getPreferredSize().width, passwordField.getPreferredSize().width);
-    usernameField.setMaximumSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
-    passwordField.setMaximumSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
-    usernameField.setPreferredSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
-    passwordField.setPreferredSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
+//    int fieldsWidth = Math.max(usernameField.getPreferredSize().width, passwordField.getPreferredSize().width);
+//    usernameField.setMaximumSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
+//    passwordField.setMaximumSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
+//    usernameField.setPreferredSize(new Dimension(fieldsWidth, usernameField.getPreferredSize().height));
+//    passwordField.setPreferredSize(new Dimension(fieldsWidth, passwordField.getPreferredSize().height));
 
-    usernameField.setColumns(0); // Otherwise setPreferredSize is ignored and it will still
-    passwordField.setColumns(0); // use the amount of columns to calculate preferred size.
+//    usernameField.setColumns(0); // Otherwise setPreferredSize is ignored and it will still
+//    passwordField.setColumns(0); // use the amount of columns to calculate preferred size.
 
     Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
     
@@ -683,28 +670,19 @@ public class LoginPanel extends DialogPanel{
     decisionPanel.add(connectButton);
     decisionPanel.add(Box.createHorizontalGlue());
 
-    Box vpanel = new Box(BoxLayout.Y_AXIS);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(usernamePanel);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(passwordInputPanel);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(passwordOptionsPanel);
-    vpanel.add(Box.createVerticalStrut(10));
-    vpanel.add(decisionPanel);
-    vpanel.add(Box.createVerticalStrut(10));
+    Box panel = new Box(BoxLayout.Y_AXIS);
+    panel.add(credentialsPanel);
+    panel.add(Box.createVerticalStrut(10));
+    panel.add(passwordOptionsPanel);
+    panel.add(Box.createVerticalStrut(10));
+    panel.add(decisionPanel);
+    panel.add(Box.createVerticalStrut(10));
+    
+    panel.setBorder(BorderFactory.createCompoundBorder(
+        i18n.createTitledBorder("membersBorder"),
+        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-    Box hpanel = new Box(BoxLayout.X_AXIS);
-    hpanel.add(Box.createHorizontalStrut(10));
-    hpanel.add(vpanel);
-    hpanel.add(Box.createHorizontalGlue());
-
-
-    JPanel outerPanel = new JPanel(new BorderLayout());
-    outerPanel.setBorder(i18n.createTitledBorder("membersBorder"));
-    outerPanel.add(hpanel,BorderLayout.CENTER);
-
-    return outerPanel;
+    return panel;
   }
 
 
