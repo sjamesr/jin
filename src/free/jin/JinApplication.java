@@ -1260,7 +1260,8 @@ public class JinApplication implements JinContext{
       
       osxMenubarFix();
       
-      File prefsDir = new File(System.getProperty("user.home"), ".jin");
+      String appName = Jin.getAppName(); 
+      File prefsDir = new File(System.getProperty("user.home"), "." + appName.toLowerCase());
       createPreferencesDir(prefsDir);
       
       // Redirect output and error streams to a MultiOutputStream which
