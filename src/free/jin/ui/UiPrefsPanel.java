@@ -78,7 +78,7 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
     super.applyChanges();
     
     Object result = I18n.get(UiPrefsPanel.class).question(OptionPanel.YES, "restartJinDialog", this,
-      new Object[]{Jin.getInstance().getAppName()});
+      new Object[]{Jin.getAppName()});
     
     if (result == OptionPanel.YES)
       Jin.getInstance().quit(false);

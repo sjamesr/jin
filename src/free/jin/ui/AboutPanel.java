@@ -56,7 +56,7 @@ public class AboutPanel extends DialogPanel{
 
   protected String getTitle(){
     I18n i18n = I18n.get(AboutPanel.class);
-    String appName = Jin.getInstance().getAppName();
+    String appName = Jin.getAppName();
     return i18n.getFormattedString("title", new Object[]{appName});
   }
 
@@ -82,8 +82,8 @@ public class AboutPanel extends DialogPanel{
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
     Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo.gif"));
-    JLabel jinLabel = new JLabel(Jin.getInstance().getAppName() + " " 
-      + Jin.getInstance().getAppVersion(), jinIcon, JLabel.CENTER);
+    JLabel jinLabel = new JLabel(Jin.getAppName() + " " 
+      + Jin.getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
     jinLabel.setAlignmentX(CENTER_ALIGNMENT);
 

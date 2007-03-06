@@ -182,7 +182,7 @@ public class MdiUiProvider extends AbstractUiProvider{
   private JFrame createMainFrame(){
     JFrame frame = new JFrame();
     
-    frame.setTitle(Jin.getInstance().getAppName());
+    frame.setTitle(Jin.getAppName());
     frame.setIconImage(frame.getToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
@@ -263,7 +263,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     String username = session.getUser().getUsername();
     String serverName = session.getServer().getShortName();
-    String appName = Jin.getInstance().getAppName();
+    String appName = Jin.getAppName();
     
     I18n i18n = I18n.get(MdiUiProvider.class);
     mainFrame.setTitle(i18n.getFormattedString("mainFrame.title", new Object[]{username, serverName, appName}));
@@ -281,7 +281,7 @@ public class MdiUiProvider extends AbstractUiProvider{
   public void sessionClosed(SessionEvent evt){
     super.sessionClosed(evt);
     
-    mainFrame.setTitle(Jin.getInstance().getAppName());
+    mainFrame.setTitle(Jin.getAppName());
     
     menubar.remove(actionsMenu);
     menubar.remove(windowsMenu);

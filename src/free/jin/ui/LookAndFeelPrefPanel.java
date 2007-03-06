@@ -120,11 +120,11 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
       return;
     extraLnFsInstalled = true;
     
-    int extraLooksCount = Integer.parseInt(Jin.getInstance().getAppProperty("lf.extra.count", "0"));
+    int extraLooksCount = Integer.parseInt(Jin.getAppProperty("lf.extra.count", "0"));
     for (int i = 0; i < extraLooksCount; i++){
-      String name = Jin.getInstance().getAppProperty("lf.extra." + i + ".name", null);
-      String className = Jin.getInstance().getAppProperty("lf.extra." + i + ".class", null);
-      String minRequiredJavaVer = Jin.getInstance().getAppProperty("lf.extra." + i + ".minRequiredJava", "0");
+      String name = Jin.getAppProperty("lf.extra." + i + ".name", null);
+      String className = Jin.getAppProperty("lf.extra." + i + ".class", null);
+      String minRequiredJavaVer = Jin.getAppProperty("lf.extra." + i + ".minRequiredJava", "0");
       if (PlatformUtils.isJavaBetterThan(minRequiredJavaVer)){
         try{
           Class.forName(className);

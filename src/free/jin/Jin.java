@@ -55,6 +55,32 @@ public class Jin{
   
   
   /**
+   * Application (Jin) properties.
+   */
+
+  private final static Preferences appProps;
+  
+  
+  
+  /**
+   * Loads and returns the application properties.
+   */
+  
+  static{
+    try{
+      InputStream propsIn = Jin.class.getResourceAsStream("resources/app.props");
+      appProps = Preferences.load(propsIn);
+      propsIn.close();
+    } catch (IOException e){
+        e.printStackTrace();
+        throw new IllegalStateException("Unable to load application properties from resources/app.props");
+      }
+  }
+
+  
+  
+  
+  /**
    * The sole Jin instance.
    */
    
@@ -67,14 +93,6 @@ public class Jin{
    */
    
   private final JinContext context;
-  
-  
-  
-  /**
-   * Application (Jin) properties.
-   */
-
-  private final Preferences appProps;
   
   
   
@@ -119,16 +137,6 @@ public class Jin{
    
   private Jin(JinContext context){
     this.context = context;
-    
-    // Load application properties
-    try{
-      InputStream propsIn = Jin.class.getResourceAsStream("resources/app.props");
-      appProps = Preferences.load(propsIn);
-      propsIn.close();
-    } catch (IOException e){
-        e.printStackTrace();
-        throw new IllegalStateException("Unable to load application properties from resources/app.props");
-      }
     
     // Get known users (accounts on various servers);
     users = new DefaultListModel();
@@ -255,8 +263,8 @@ public class Jin{
    * Returns the application name.
    */
 
-  public String getAppName(){
-    return appProps.getString("app.name");
+  public static String getAppName(){
+    return getAppProperty("app.name", null);
   }
 
 
@@ -265,8 +273,8 @@ public class Jin{
    * Returns the application version.
    */
 
-  public String getAppVersion(){
-    return appProps.getString("app.version");
+  public static String getAppVersion(){
+    return getAppProperty("app.version", null);
   }
   
   
@@ -276,7 +284,7 @@ public class Jin{
    * the specified default value if none exists.
    */
   
-  public String getAppProperty(String propName, String defaultValue){
+  public static String getAppProperty(String propName, String defaultValue){
     return appProps.getString(propName, defaultValue);
   }
   

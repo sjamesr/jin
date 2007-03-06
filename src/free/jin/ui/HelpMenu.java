@@ -113,7 +113,7 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createAboutMenuItem(){
-    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("aboutJinMenuItem", new Object[]{Jin.getInstance().getAppName()});
+    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("aboutJinMenuItem", new Object[]{Jin.getAppName()});
     item.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         new AboutPanel().display();

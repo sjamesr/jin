@@ -78,7 +78,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public JinChessclubConnection(String username, String password){
     super(username, password, System.out);
 
-    setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
+    setInterface(Jin.getAppName() + " " + Jin.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
       ", " + System.getProperty("os.name") + " " + getSafeOSVersion() + ")");
   }

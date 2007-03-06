@@ -74,7 +74,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public JinFreechessConnection(String requestedUsername, String password){
     super(requestedUsername, password, System.out);
 
-    setInterface(Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() +
+    setInterface(Jin.getAppName() + " " + Jin.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
       ", " + System.getProperty("os.name") + " " + getSafeOSVersion() + ")");
 
@@ -2511,7 +2511,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void sendHelpQuestion(String question){
-    sendCommand("$tell 1 [" + Jin.getInstance().getAppName() + " " + Jin.getInstance().getAppVersion() + "] "+ question);    
+    sendCommand("$tell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question);    
   }
 
 
