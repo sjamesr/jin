@@ -3,6 +3,12 @@
 app.name=
 app.version=
 
+uiProvider.classname=free.jin.ui.MdiUiProvider
+uiProvider.classname.macosx=free.jin.ui.SdiUiProvider
+
+# This doesn't specify which extra look and feels are actually used - it just
+# tells Jin their names and main classes. They are actually used if they can be
+# found (via a class lookup).
 lf.extra.count=7
 
 lf.extra.0.name=Kunststoff
