@@ -1,6 +1,7 @@
-#Wed Jul 21 15:02:58 IDT 2004
-app.name=Jin
-app.version=2.13.1dev
+
+# These properties are set by the buildfile.
+app.name=
+app.version=
 
 lf.extra.count=7
 
