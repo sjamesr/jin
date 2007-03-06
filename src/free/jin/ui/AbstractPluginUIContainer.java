@@ -21,9 +21,11 @@
 
 package free.jin.ui;
 
-import java.awt.*;
-
-import javax.swing.JMenu;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Image;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -90,14 +92,6 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
   
   private Image icon;
   
-
-
-  /**
-   * The index of the first menu belonging to the plugin itself. 
-   */
-  
-  private int pluginMenuIndex = 0;
-
 
 
   /**
@@ -177,44 +171,6 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
   
   public final int getMode(){
     return mode;
-  }
-  
-  
-  
-  /**
-   * Inserts a menu at the specified index.
-   */
-  
-  protected abstract void insertMenu(JMenu menu, int index);
-  
-  
-  
-  /**
-   * Returns the amount of menus in this plugin ui container.
-   */
-  
-  protected abstract int getMenuCount();
-
-  
-  
-  /**
-   * Adds a plugin menu. 
-   */
-  
-  public void addMenu(JMenu menu){
-    insertMenu(menu, getMenuCount());
-  }
-  
-  
-  
-  /**
-   * Adds a "global" (not specific to the plugin) menu. The menu is inserted
-   * right after the currently last "global" menu and before any plugin menus.
-   */
-  
-  public void addGlobalMenu(JMenu menu){
-    insertMenu(menu, pluginMenuIndex);
-    pluginMenuIndex++;
   }
   
   

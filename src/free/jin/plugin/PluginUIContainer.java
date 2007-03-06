@@ -24,8 +24,6 @@ package free.jin.plugin;
 import java.awt.Container;
 import java.awt.Image;
 
-import javax.swing.JMenu;
-
 import free.jin.ui.UIProvider;
 
 
@@ -102,14 +100,6 @@ public interface PluginUIContainer{
    */
   
   String getTitle();
-  
-  
-  
-  /**
-   * Adds a menu to this container.
-   */
-  
-  void addMenu(JMenu menu);
   
   
   

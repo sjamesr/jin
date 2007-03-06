@@ -726,31 +726,6 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     
     /**
-     * Inserts a menu at the specified index.
-     */
-    
-    protected void insertMenu(JMenu menu, int index){
-      JMenuBar menubar = frame.getJMenuBar();
-      if (menubar == null)
-        frame.setJMenuBar(menubar = new JMenuBar());
-      
-      menubar.add(menu, index);
-    }
-    
-    
-    
-    /**
-     * Returns the amount of menus added.
-     */
-    
-    protected int getMenuCount(){
-      JMenuBar menubar = frame.getJMenuBar();
-      return (menubar == null) ? 0 : menubar.getMenuCount(); 
-    }
-    
-    
-    
-    /**
      * Either brings the frame to front and makes it selected or moves it to
      * back and selects a different frame.
      */

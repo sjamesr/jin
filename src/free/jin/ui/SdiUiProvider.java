@@ -38,7 +38,6 @@ import java.util.Enumeration;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
@@ -262,41 +261,6 @@ public class SdiUiProvider extends AbstractUiProvider{
     public void disposeImpl(){
       setVisible(false);
       frame.dispose();
-    }
-    
-    
-    
-    /**
-     * Adds a plugin menu. 
-     */
-    
-    public void addMenu(JMenu menu){
-      insertMenu(menu, getMenuCount() - 1); // Insert before the help menu
-    }
-    
-    
-    
-    /**
-     * Inserts a menu at the specified index.
-     */
-    
-    protected void insertMenu(JMenu menu, int index){
-      JMenuBar menubar = frame.getJMenuBar();
-      if (menubar == null)
-        frame.setJMenuBar(menubar = new JMenuBar());
-      
-      menubar.add(menu, index);
-    }
-    
-    
-    
-    /**
-     * Returns the amount of menus added.
-     */
-    
-    protected int getMenuCount(){
-      JMenuBar menubar = frame.getJMenuBar();
-      return (menubar == null) ? 0 : menubar.getMenuCount(); 
     }
     
     
