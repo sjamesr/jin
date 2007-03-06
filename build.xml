@@ -34,9 +34,14 @@
 		<property name="resources.dir" value="${build.dir}/resources" />	
 		<property name="lnfs.dir" value="${build.dir}/lnfs" />
 		
-		<property file="${source.dir}/free/jin/resources/app.props" prefix="jin" />
 		<property name="release.name" value="Jin" />
 		<property name="release.version" value="${date}" />
+		
+		<!-- 
+			Allowing this to be specified by the user (of the buildfile) lets them
+			create customized versions of Jin.
+		-->
+		<property name="app.props.file" value="${source.dir}/free/jin/resources/app.props"/>
 	</target>
 
 
@@ -201,7 +206,9 @@
 		<antcall target="doAppletStuff" />
 
 		
-		<!-- Set application name and version -->
+		<!-- Set Jin properties -->
+		<echo message="copying ${app.props.file} to ${classes.dir}/free/jin/resources/app.props"/>
+		<copy file="${app.props.file}" tofile="${classes.dir}/free/jin/resources/app.props"/>
 		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
 			<entry key="app.name" value="${release.name}" />
 			<entry key="app.version" value="${release.version}" />
