@@ -22,7 +22,13 @@
 package free.jin;
 
 import java.io.IOException;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -32,11 +38,8 @@ import javax.swing.UIManager;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.jin.ui.MdiUiProvider;
 import free.jin.ui.OptionPanel;
-import free.jin.ui.SdiUiProvider;
 import free.jin.ui.UIProvider;
-import free.util.IOUtilities;
 import free.util.Pair;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
@@ -71,7 +74,7 @@ public class Jin{
    * Application (Jin) properties.
    */
 
-  private final Properties appProps;
+  private final Preferences appProps;
   
   
   
@@ -119,7 +122,9 @@ public class Jin{
     
     // Load application properties
     try{
-      appProps = IOUtilities.loadPropertiesAndClose(Jin.class.getResourceAsStream("resources/app.props"));
+      InputStream propsIn = Jin.class.getResourceAsStream("resources/app.props");
+      appProps = Preferences.load(propsIn);
+      propsIn.close();
     } catch (IOException e){
         e.printStackTrace();
         throw new IllegalStateException("Unable to load application properties from resources/app.props");
@@ -231,12 +236,10 @@ public class Jin{
    */
   
   private UIProvider createUiProvider(){
-    String uiProviderClassname = PlatformUtils.isMacOS() ? 
-        SdiUiProvider.class.getName() : MdiUiProvider.class.getName();
-    uiProviderClassname = getPrefs().getString("uiProvider.classname", uiProviderClassname);
-    
-    // ui provider selection UI needs to know this, if we're using the default one
-    getPrefs().setString("uiProvider.classname", uiProviderClassname);
+    String defaultUiProviderClassname = 
+      (String)appProps.lookup("uiProvider.classname." + PlatformUtils.getOSName());
+    String uiProviderClassname = 
+      getPrefs().getString("uiProvider.classname", defaultUiProviderClassname);
     
     try{
       return (UIProvider)Class.forName(uiProviderClassname).newInstance();
@@ -253,7 +256,7 @@ public class Jin{
    */
 
   public String getAppName(){
-    return appProps.getProperty("app.name");
+    return appProps.getString("app.name");
   }
 
 
@@ -263,7 +266,7 @@ public class Jin{
    */
 
   public String getAppVersion(){
-    return appProps.getProperty("app.version");
+    return appProps.getString("app.version");
   }
   
   
@@ -274,7 +277,7 @@ public class Jin{
    */
   
   public String getAppProperty(String propName, String defaultValue){
-    return appProps.getProperty(propName, defaultValue);
+    return appProps.getString(propName, defaultValue);
   }
   
   
