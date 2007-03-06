@@ -66,7 +66,7 @@ public class WindowingModePrefPanel extends PreferencesPanel{
   public WindowingModePrefPanel(){
     I18n i18n = I18n.get(WindowingModePrefPanel.class);
     
-    String pref = Jin.getInstance().getPrefs().getString("uiProvider.classname");
+    String pref = Jin.getInstance().getUIProvider().getClass().getName();
     
     mdiMode = i18n.createRadioButton("mdiRadioButton");
     sdiMode = i18n.createRadioButton("sdiRadioButton");
