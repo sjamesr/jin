@@ -33,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -426,7 +425,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         public void actionPerformed(ActionEvent evt){
           fullscreenPanel.getFullscreenModeModel().flip();
         }
-      }, fullscreenKeyStroke, WHEN_FOCUSED);
+      }, fullscreenKeyStroke, WHEN_IN_FOCUSED_WINDOW);
     }
   }
   
@@ -644,21 +643,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       }
     };
 
-    // We have no choice but to use WHEN_FOCUSED and to give the focus to the
-    // content panel when it is pressed because WHEN_IN_FOCUSED_WINDOW doesn't
-    // work in MS VM.
     contentPanel.registerKeyboardAction(escapeListener,
-      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_FOCUSED);
+      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     contentPanel.registerKeyboardAction(escapeListener, 
-      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_FOCUSED);
+      KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-    board.addMouseListener(new MouseAdapter(){
-      public void mousePressed(MouseEvent evt){
-        if (!contentPanel.hasFocus())
-          contentPanel.requestFocus();
-      }
-    });
-    
     if (!isUserTurn() && (moveSendingMode == BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE))
       board.setEditable(false);
   }
