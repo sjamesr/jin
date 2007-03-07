@@ -165,6 +165,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   protected void handleLoginSucceeded(){
+    super.handleLoginSucceeded();
+    
     sendCommand("set-quietly wrap 0");
 
     // Hack, currently, the server has a bug which causes it not to send us
@@ -174,8 +176,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       setDGOnAgain(Datagram.DG_TOURNEY);
 
     listenerManager.fireLoginSucceeded(this);
-    
-    super.handleLoginSucceeded();
   }
   
   
@@ -1992,7 +1992,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
 
-
+  /**
+   * Starts a new, empty, examination game.
+   */
+  
+  public void examineNewGame(){
+    sendCommand("examine");
+  }
+  
+  
+  
   /**
    * Depending on the type of the game, issues either "unobserve <gameNumber>",
    * "unexamine" or "resign" command.
