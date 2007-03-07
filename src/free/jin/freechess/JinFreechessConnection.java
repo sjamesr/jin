@@ -2208,6 +2208,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
 
   /**
+   * Starts a new, empty, examination game.
+   */
+  
+  public void examineNewGame(){
+    sendCommand("$examine");
+  }
+  
+  
+  
+  /**
    * Quits the specified game.
    */
 
