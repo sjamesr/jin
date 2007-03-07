@@ -248,7 +248,7 @@
 			<param name="release.name" value="Jin Applet" />
 			<param name="release.platform" value="applet" />
 			<param name="build.compress" value="yes" />
-			<param name="build.manifest" value="release/applet/manifest.txt" />
+			<param name="manifest.classpath.lf" value="" />
 		</antcall>
   
 		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
