@@ -200,7 +200,15 @@ public interface Connection{
   WildVariant [] getSupportedVariants();
 
 
-
+  
+  /**
+   * Starts a new, empty, examination game.
+   */
+  
+  void examineNewGame();
+  
+  
+  
   /**
    * Quits the given game. Whatever relation I had to this game is closed, this
    * may mean, unobserving, resigning, unexamining or any other operation
