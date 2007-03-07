@@ -480,8 +480,6 @@ public abstract class Connection{
   
   /**
    * Invoked when the server acknowledges that we are logged in. The default implementation does nothing.
-   * 
-   * @param username The username the server assigned us.
    */
   
   protected void handleLoginSucceeded(){
