@@ -645,8 +645,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * Returns the string <code>"console"</code>. The scripter plugin has this
-   * hardcoded.
+   * Returns the string <code>"console"</code>.
    */
 
   public String getId(){
