@@ -29,13 +29,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
 import free.util.Localization;
 import free.util.Pair;
+import free.util.PlatformUtils;
 import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PlainTextDialog;
@@ -285,6 +292,19 @@ public class I18n{
   
   public JMenuItem createMenuItem(String i18nKey){
     return createMenuItem(i18nKey, null);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>JMenuItem</code> using the specified i18n key and appends
+   * an ellipsis to its text.
+   */
+  
+  public JMenuItem createMenuItemWithEllipsis(String i18nKey){
+    JMenuItem item = createMenuItem(i18nKey);
+    item.setText(item.getText() + PlatformUtils.getEllipsis());
+    return item;
   }
   
   
