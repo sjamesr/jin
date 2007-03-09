@@ -156,5 +156,20 @@ public class PlatformUtils{
   }
   
   
+  
+  
+  /**
+   * Returns the string that should be used for an ellipsis. This is needed
+   * because not all systems support displaying the real ellipsis character. 
+   */
+  
+  public static String getEllipsis(){
+    if (isMacOS())
+      return "…";
+    else
+      return "...";
+  }
+  
+  
    
 }
