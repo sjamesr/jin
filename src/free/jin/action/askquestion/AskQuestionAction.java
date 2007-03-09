@@ -28,11 +28,16 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import free.jin.I18n;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
+import free.util.PlatformUtils;
 import free.workarounds.FixedJTextField;
 
 
@@ -60,7 +65,7 @@ public class AskQuestionAction extends JinAction{
    */
    
   public String getName(){
-    return getI18n().getString("actionName");
+    return getI18n().getString("actionName") + PlatformUtils.getEllipsis();
   }
   
   

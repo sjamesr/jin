@@ -29,7 +29,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -41,6 +52,7 @@ import free.jin.action.ActionContext;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
 import free.util.AWTUtilities;
+import free.util.PlatformUtils;
 import free.util.TableLayout;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.swing.SwingUtils;
@@ -71,7 +83,7 @@ public class SeekAction extends JinAction{
    */
    
   public String getName(){
-    return getI18n().getString("actionName"); 
+    return getI18n().getString("actionName") + PlatformUtils.getEllipsis(); 
   }
   
   
