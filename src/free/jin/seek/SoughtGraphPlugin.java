@@ -25,13 +25,19 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.net.URL;
+import java.util.Iterator;
 
 import free.jin.Connection;
+import free.jin.Seek;
 import free.jin.SeekConnection;
 import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
 import free.jin.event.SeekListener;
-import free.jin.plugin.*;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginContext;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
+import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
@@ -66,7 +72,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   /**
    * Sets the plugin context - return <code>false</code> if the connection is
-   * not an instance of <code>SeekJinConnection</code>.
+   * not an instance of <code>SeekConnection</code>.
    */
 
   public boolean setContext(PluginContext context){
@@ -139,6 +145,12 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public void pluginUIShown(PluginUIEvent evt){
     SeekConnection conn = (SeekConnection)getConn();
+    
+    for (Iterator i = conn.getSeeks().iterator(); i.hasNext();){
+      Seek seek = (Seek)i.next();
+      soughtGraph.addSeek(seek);
+    }
+    
     conn.getSeekListenerManager().addSeekListener(this);
   }
 
