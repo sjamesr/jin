@@ -70,8 +70,6 @@ public class FreechessListenerManager extends BasicListenerManager{
 
     if (listenerList.getListenerCount(SeekListener.class) == 1)
       source.setIvarState(Ivar.SEEKINFO, true);
-    else
-      source.notFirstListenerAdded(listener);
   }
 
 
@@ -85,11 +83,8 @@ public class FreechessListenerManager extends BasicListenerManager{
   public void removeSeekListener(SeekListener listener){
     super.removeSeekListener(listener);
 
-    if (listenerList.getListenerCount(SeekListener.class) == 0){
+    if (listenerList.getListenerCount(SeekListener.class) == 0)
       source.setIvarState(Ivar.SEEKINFO, false);
-
-      source.lastSeekListenerRemoved();
-    }
   }
   
   
