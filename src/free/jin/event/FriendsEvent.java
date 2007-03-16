@@ -22,6 +22,7 @@
 package free.jin.event;
 
 import free.jin.FriendsConnection;
+import free.jin.ServerUser;
 
 
 /**
@@ -89,22 +90,22 @@ public class FriendsEvent extends JinEvent{
 
 
   /**
-   * The name of the "friend.
+   * The "friend".
    */
 
-  private final String friendName;
+  private final ServerUser friend;
 
 
 
 
   /**
-   * Creates a new FriendsEvent with the given source FriendsConnection event
-   * id and friend name.
+   * Creates a new <code>FriendsEvent</code> with the specified source
+   * <code>FriendsConnection</code> event id and friend.
    */
 
-  public FriendsEvent(FriendsConnection source, int id, String friendName){
+  public FriendsEvent(FriendsConnection source, int id, ServerUser friend){
     super(source);
-
+    
     switch (id){
       case FRIEND_CONNECTED:
       case FRIEND_DISCONNECTED:
@@ -115,9 +116,12 @@ public class FriendsEvent extends JinEvent{
       default:
         throw new IllegalArgumentException("Unknown FriendsEvent id: "+id);
     }
+    
+    if (friend == null)
+      throw new IllegalArgumentException("friend may not be null");
 
     this.id = id;
-    this.friendName = friendName;
+    this.friend = friend;
   }
 
 
@@ -135,13 +139,14 @@ public class FriendsEvent extends JinEvent{
 
 
   /**
-   * Returns the name of the friend.
+   * Returns the friend.
    */
 
-  public String getFriendName(){
-    return friendName;
+  public ServerUser getFriend(){
+    return friend;
   }
-
-
+  
+  
+  
 }
 
