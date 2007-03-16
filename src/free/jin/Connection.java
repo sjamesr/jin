@@ -198,6 +198,17 @@ public interface Connection{
    */
    
   WildVariant [] getSupportedVariants();
+  
+  
+  
+  /**
+   * Returns a <code>ServerUser</code> object corresponding to the specified
+   * user name/handle/nickname. All code related to this certain connection
+   * which requires a <code>ServerUser</code> may only be given an instance
+   * returned by this method.
+   */
+  
+  ServerUser userForName(String name);
 
 
   
