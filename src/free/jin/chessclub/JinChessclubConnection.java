@@ -2584,8 +2584,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the current set of friends.
    */
   
-  public Set getFriends(){
-    return new HashSet(friends);
+  public Collection getFriends(){
+    return Collections.unmodifiableCollection(friends);
   }
   
   
@@ -2594,8 +2594,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the set of currently online friends.
    */
   
-  public Set getOnlineFriends(){
-    return new HashSet(onlineFriends);
+  public Collection getOnlineFriends(){
+    return Collections.unmodifiableCollection(onlineFriends);
   }
   
   
