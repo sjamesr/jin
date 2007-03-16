@@ -25,24 +25,63 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessMove;
+import free.chess.ChessPiece;
+import free.chess.ChesslikeGenericVariant;
+import free.chess.Move;
+import free.chess.Piece;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.Square;
+import free.chess.WildVariant;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
 import free.chessclub.ChessclubConnection;
-import free.freechess.*;
-import free.jin.*;
-import free.jin.event.*;
+import free.freechess.DeltaBoardStruct;
+import free.freechess.FreechessConnection;
+import free.freechess.GameInfoStruct;
+import free.freechess.Ivar;
+import free.freechess.SeekInfoStruct;
+import free.freechess.Style12Struct;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.PGNConnection;
+import free.jin.Seek;
+import free.jin.SeekConnection;
+import free.jin.ServerUser;
+import free.jin.UserSeek;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ChatEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PlainTextEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.SeekEvent;
+import free.jin.event.SeekListenerManager;
+import free.jin.event.TakebackEvent;
 import free.jin.freechess.event.IvarStateChangeEvent;
 import free.util.Pair;
 import free.util.TextUtilities;
@@ -274,6 +313,9 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   protected boolean processIvarStateChanged(Ivar ivar, boolean state){
+    if (ivar == Ivar.SEEKINFO)
+      seekInfoChanged(state);
+    
     IvarStateChangeEvent evt = new IvarStateChangeEvent(this, ivar, state);
     
     listenerManager.fireIvarStateChangeEvent(evt);
@@ -1337,7 +1379,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     // no choice but to remove *all* seeks during a game. The seeks are restored
     // when a game ends by setting seekinfo to 1 again.
     if (gameType == Game.MY_GAME)
-      removeAllSeeks(); 
+      clearSeeks(); 
 
     return gameData;
   }
@@ -1643,6 +1685,17 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public SeekListenerManager getSeekListenerManager(){
     return getFreechessListenerManager();
   }
+  
+  
+  
+  /**
+   * Invoked when seekinfo ivar's state changes. 
+   */
+  
+  protected void seekInfoChanged(boolean isOn){
+    if (!isOn)
+      clearSeeks();
+  }
 
 
 
@@ -1751,71 +1804,80 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processSeeksCleared(){
-    removeAllSeeks();
+    clearSeeks();
     return true;
   }
-
-
-
-
+  
+  
+  
   /**
-   * Removes all the seeks and notifies the listeners.
+   * Removes all currently known seeks, notifying any interested listeners.
    */
-
-  private void removeAllSeeks(){
-    int seeksCount = seeks.size();
-    if (seeksCount != 0){
-      Object [] seeksIndices = new Object[seeksCount];
-
-      // Copy all the keys into a temporary array
-      Enumeration seekIDsEnum = seeks.keys();
-      for (int i = 0; i < seeksCount; i++)
-        seeksIndices[i] = seekIDsEnum.nextElement();
-
-      // Remove all the seeks one by one, notifying any interested listeners.
-      for (int i = 0; i < seeksCount; i++){
-        Object seekIndex = seeksIndices[i];
-        Seek seek = (Seek)seeks.get(seekIndex);
-        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
-        seeks.remove(seekIndex);
-      }
+  
+  private void clearSeeks(){
+    Set seekIndices = seeks.keySet();
+    for (Iterator i = seekIndices.iterator(); i.hasNext();){
+      Integer seekIndex = (Integer)i.next();
+      Seek seek = (Seek)seeks.get(seekIndex);
+      
+      i.remove();
+      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
     }
   }
-
-
-
-
+  
+  
+  
   /**
-   * This method is called by our FreechessJinListenerManager when a new
-   * SeekListener is added and we already had registered listeners (meaning that
-   * iv_seekinfo was already on, so we need to notify the new listeners of all
-   * existing seeks as well).
+   * Returns the current set of seeks.
+   */
+  
+  public Collection getSeeks(){
+    return Collections.unmodifiableCollection(seeks.values());
+  }
+  
+  
+  
+  /**
+   * Accepts the given seek. Note that the given seek must be an instance generated
+   * by this SeekJinConnection and it must be in the current sought list.
    */
 
-  void notFirstListenerAdded(SeekListener listener){
-    Enumeration seeksEnum = seeks.elements();
-    while (seeksEnum.hasMoreElements()){
-      Seek seek = (Seek)seeksEnum.nextElement();
-      SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
-      listener.seekAdded(evt);
-    }
+  public void acceptSeek(Seek seek){
+    if (!seeks.contains(seek))
+      throw new IllegalArgumentException("The specified seek is not on the seek list");
+
+    sendCommand("$play "+seek.getID());
   }
-
-
-
-
+  
+  
+  
   /**
-   * This method is called by our ChessclubJinListenerManager when the last
-   * SeekListener is removed.
+   * Issues the specified seek.
    */
-
-  void lastSeekListenerRemoved(){
-    seeks.clear();
+   
+  public void issueSeek(UserSeek seek){
+    WildVariant variant = seek.getVariant();
+    String wildName = getWildName(variant);
+    if (wildName == null)
+      throw new IllegalArgumentException("Unsupported variant: " + variant);
+    
+    Player color = seek.getColor();
+    
+    String seekCommand = "$seek " + seek.getTime() + " " + seek.getInc() + " " +
+      (seek.isRated() ? "rated" : "unrated") + " " +
+      (color == null ? "" : color.isWhite() ? "white " : "black ") +
+      wildName + " " +
+      (seek.isManualAccept() ? "manual " : "") +
+      (seek.isFormula() ? "formula " : "") +
+      (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
+      (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " ";
+      
+    sendCommand(seekCommand);
   }
 
-
-
-
+  
+  
+  
   /**
    * Maps offer indices to the <code>InternalGameData</code> objects
    * representing the games in which the offer was made.
@@ -2155,53 +2217,22 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
 
 
-
-  /**
-   * Accepts the given seek. Note that the given seek must be an instance generated
-   * by this SeekJinConnection and it must be in the current sought list.
-   */
-
-  public void acceptSeek(Seek seek){
-    if (!seeks.contains(seek))
-      throw new IllegalArgumentException("The specified seek is not on the seek list");
-
-    sendCommand("$play "+seek.getID());
-  }
-  
-  
-  
-  /**
-   * Issues the specified seek.
-   */
-   
-  public void issueSeek(UserSeek seek){
-    WildVariant variant = seek.getVariant();
-    String wildName = getWildName(variant);
-    if (wildName == null)
-      throw new IllegalArgumentException("Unsupported variant: " + variant);
-    
-    Player color = seek.getColor();
-    
-    String seekCommand = "$seek " + seek.getTime() + " " + seek.getInc() + " " +
-      (seek.isRated() ? "rated" : "unrated") + " " +
-      (color == null ? "" : color.isWhite() ? "white " : "black ") +
-      wildName + " " +
-      (seek.isManualAccept() ? "manual " : "") +
-      (seek.isFormula() ? "formula " : "") +
-      (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
-      (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " ";
-      
-    sendCommand(seekCommand);
-  }
-
-
-
   /**
    * Sends the "exit" command to the server.
    */
 
   public void exit(){
     sendCommand("$quit");
+  }
+  
+  
+  
+  /**
+   * Returns a <code>FreechessUser</code> with the specified name.
+   */
+  
+  public ServerUser userForName(String name){
+    return FreechessUser.get(name);
   }
 
 
