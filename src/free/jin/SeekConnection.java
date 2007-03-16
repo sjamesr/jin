@@ -22,8 +22,9 @@
 package free.jin;
 
 
+import java.util.Collection;
+
 import free.jin.event.SeekListenerManager;
-import free.jin.Seek;
 
 
 /**
@@ -41,6 +42,17 @@ public interface SeekConnection extends Connection{
    */
 
   SeekListenerManager getSeekListenerManager();
+  
+  
+  
+  /**
+   * Returns the currently known collection of seeks. Note, that the seeks are
+   * guaranteed to be retrieved only if at least one seek listener is
+   * registered.
+   */
+  
+  Collection getSeeks();
+  
 
 
   /**
