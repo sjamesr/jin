@@ -1255,23 +1255,23 @@ public class Scripter extends Plugin{
     }
 
     public void friendOnline(FriendsEvent evt){
-      runScripts(evt, subtypes[0], new Object[][]{{"name", evt.getFriendName()}});
+      runScripts(evt, subtypes[0], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
     public void friendConnected(FriendsEvent evt){
-      runScripts(evt, subtypes[1], new Object[][]{{"name", evt.getFriendName()}});
+      runScripts(evt, subtypes[1], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
     public void friendDisconnected(FriendsEvent evt){
-      runScripts(evt, subtypes[2], new Object[][]{{"name", evt.getFriendName()}});
+      runScripts(evt, subtypes[2], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
     public void friendAdded(FriendsEvent evt){
-      runScripts(evt, subtypes[3], new Object[][]{{"name", evt.getFriendName()}});
+      runScripts(evt, subtypes[3], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
     public void friendRemoved(FriendsEvent evt){
-      runScripts(evt, subtypes[4], new Object[][]{{"name", evt.getFriendName()}});
+      runScripts(evt, subtypes[4], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
