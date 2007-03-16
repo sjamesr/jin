@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -26,11 +26,26 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.MissingResourceException;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.swing.SwingUtilities;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessMove;
+import free.chess.ChesslikeGenericVariant;
+import free.chess.Move;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.Square;
+import free.chess.WildVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
@@ -42,11 +57,44 @@ import free.chessclub.ChessclubConstants;
 import free.chessclub.level2.Datagram;
 import free.chessclub.level2.DatagramEvent;
 import free.chessclub.level2.DatagramListener;
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.FriendsConnection;
+import free.jin.Game;
+import free.jin.GameListConnection;
+import free.jin.GameListItem;
+import free.jin.HistoryListItem;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.LibListItem;
+import free.jin.PGNConnection;
+import free.jin.SearchListItem;
+import free.jin.Seek;
+import free.jin.SeekConnection;
+import free.jin.ServerUser;
+import free.jin.StoredListItem;
+import free.jin.UserSeek;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
 import free.jin.chessclub.event.CircleEvent;
-import free.jin.event.*;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ChatEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.FriendsEvent;
+import free.jin.event.FriendsListenerManager;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameEvent;
+import free.jin.event.GameListEvent;
+import free.jin.event.GameListListenerManager;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PlainTextEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.SeekEvent;
+import free.jin.event.SeekListenerManager;
+import free.jin.event.TakebackEvent;
 import free.util.Pair;
 import free.util.TextUtilities;
 import free.util.Utilities;
@@ -59,7 +107,7 @@ import free.util.Utilities;
  */
 
 public class JinChessclubConnection extends ChessclubConnection implements DatagramListener,
-    Connection, SeekConnection, GameListConnection, PGNConnection{
+    Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection{
 
 
 
@@ -77,6 +125,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   public JinChessclubConnection(String username, String password){
     super(username, password, System.out);
+    
+    // Needed to know when to clear certain data structures
+    addDatagramListener(this, Datagram.DG_SET2);
 
     setInterface(Jin.getAppName() + " " + Jin.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
@@ -481,6 +532,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void exit(){
     quit();
   }
+  
+  
+  
+  /**
+   * Returns a <code>ChessclubUser</code> with the specified name.
+   */
+  
+  public ServerUser userForName(String name){
+    return ChessclubUser.get(name);
+  }
 
 
 
@@ -504,6 +565,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void datagramReceived(DatagramEvent evt){
     Datagram dg = evt.getDatagram();
     switch (dg.getId()){
+      // Datagram turned on/off
+      case Datagram.DG_SET2: processSet2DG(dg); break;
+      
       // Chat related
       case Datagram.DG_PERSONAL_TELL: processPersonalTellDG(dg); break; 
       case Datagram.DG_PERSONAL_QTELL: processPersonalQTellDG(dg); break;
@@ -545,8 +609,40 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       case Datagram.DG_TOURNEY: processTourneyDG(dg); break;
       case Datagram.DG_REMOVE_TOURNEY: processRemoveTourneyDG(dg); break;
       
+      // Friends related
+      case Datagram.DG_NOTIFY_ARRIVED: processNotifyArrivedDG(dg); break;
+      case Datagram.DG_NOTIFY_LEFT: processNotifyLeftDG(dg); break;
+      case Datagram.DG_MY_NOTIFY_LIST: processMyNotifyListDG(dg); break;
+      
       default:
         throw new IllegalStateException("Unhandled datagram received: " + dg);
+    }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_SET2.
+   */
+  
+  private void processSet2DG(Datagram dg){
+    processSet2(dg.getInteger(0), dg.getBoolean(1));
+  }
+  
+  
+  
+  /**
+   * Invoked when the specified datagram is turned on or off.
+   */
+  
+  protected void processSet2(int datagramType, boolean isOn){
+    
+    // The datagram that marks the end of the change is determined by the order
+    // in which the listener is unregistered in ChessclubListenerManager
+    switch(datagramType){
+      case Datagram.DG_SEEK_REMOVED: seekDatagramsStateChanged(isOn); break;
+      case Datagram.DG_UNCIRCLE: gameDatagramsStateChanged(isOn); break;
+      case Datagram.DG_MY_NOTIFY_LIST: friendsDatagramsStateChanged(isOn); break;
     }
   }
 
@@ -740,14 +836,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
   /**
-   * This method is called by ChessclubJinListenerManager when the last
-   * GameListener is removed.
+   * Invoked when the state of game-related datagrams changes. 
    */
 
-  void lastGameListenerRemoved(){
-    // Why do we clear this? What if another listener registers?
-//    gameNumbersToGameInfo.clear();
-//    nonStartedGames.clear();
+  private void gameDatagramsStateChanged(boolean isOn){
+    if (!isOn){
+      gameNumbersToGameInfo.clear();
+      nonStartedGames.clear();
+    }
   }
 
 
@@ -2321,7 +2417,208 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     sendCommand("tell 1 * " + question);    
   }
   
+  
+  
+  /**
+   * The set (of <code>ChessclubUser</code>s) of friends.
+   */
+  
+  private final Set friends = new HashSet();
+  
+  
+  
+  /**
+   * The set (of <code>ChessclubUser</code>s) of friends who are online.
+   */
+  
+  private final Set onlineFriends = new HashSet();
+  
+  
+  
+  
+  /**
+   * Invoked when the state of friend-related datagrams changes.
+   */
+  
+  protected void friendsDatagramsStateChanged(boolean isOn){
+    if (!isOn)
+      clearFriends();
+  }
+  
+  
+  
+  /**
+   * Removes all friends and notifies interested listeners.
+   */
+  
+  private void clearFriends(){
+    for (Iterator i = friends.iterator(); i.hasNext();){
+      ServerUser user = (ServerUser)i.next();
+      i.remove();
+      listenerManager.fireFriendsEvent(
+          new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
+    }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_NOTIFY_ARRIVED.
+   */
+  
+  private void processNotifyArrivedDG(Datagram dg){
+    processNotifyArrived(dg.getString(0));
+  }
+  
+  
+  
+  /**
+   * Invoked when the specified user on our notify list arrives.
+   */
+  
+  protected void processNotifyArrived(String username){
+    ChessclubUser user = ChessclubUser.get(username);
+    
+    if (onlineFriends.add(user)){
+      listenerManager.fireFriendsEvent(
+          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user));
+    }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_NOTIFY_LEFT.
+   */
+  
+  private void processNotifyLeftDG(Datagram dg){
+    processNotifyLeft(dg.getString(0));
+  }
+  
+  
+  
+  /**
+   * Invoked when the specified user on our notify list leaves.
+   */
+  
+  protected void processNotifyLeft(String username){
+    ChessclubUser user = ChessclubUser.get(username);
+    
+    if (onlineFriends.remove(user)){
+      listenerManager.fireFriendsEvent(
+          new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user));
+    }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_MY_NOTIFY_LIST.
+   */
+  
+  private void processMyNotifyListDG(Datagram dg){
+    processMyNotifyList(dg.getString(0), dg.getBoolean(1));
+  }
+  
+  
+  
+  /**
+   * Invoked when a person is added or removed from the notify list.
+   */
+  
+  protected void processMyNotifyList(String username, boolean isAdded){
+    ChessclubUser user = ChessclubUser.get(username);
+    
+    if (isAdded){
+      if (friends.add(user)){
+        listenerManager.fireFriendsEvent(
+            new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, user));
+      
+        // Needed to find out whether the new friend is online, per formats.txt
+        setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
+      }
+    }
+    else{
+      if (friends.remove(user)){
+        listenerManager.fireFriendsEvent(
+            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
+        
+        onlineFriends.remove(user);
+      }
+    }
+  }
+  
+  
+  
+  /**
+   * Returns our listener manager, as a <code>FriendsListenerManager</code>.
+   */
+  
+  public FriendsListenerManager getFriendsListenerManager(){
+    return listenerManager;
+  }
+  
+  
+  
+  /**
+   * Adds the specified user to the list of friends.
+   */
 
+  public void addFriend(ServerUser user){
+    sendCommand("+notify " + user.getName());
+  }
+  
+  
+  
+  /**
+   * Removes the specified user from the list of friends.
+   */
+  
+  public void removeFriend(ServerUser user){
+    sendCommand("-notify " + user.getName());
+  }
+  
+  
+  
+  /**
+   * Returns the current set of friends.
+   */
+  
+  public Set getFriends(){
+    return new HashSet(friends);
+  }
+  
+  
+  
+  /**
+   * Returns the set of currently online friends.
+   */
+  
+  public Set getOnlineFriends(){
+    return new HashSet(onlineFriends);
+  }
+  
+  
+  
+  /**
+   * Returns whether the specified user is a friend.
+   */
+  
+  public boolean isFriend(ServerUser user){
+    return friends.contains(user);
+  }
+  
+  
+  
+  /**
+   * Returns whether the specified user is a friend and is online.
+   */
+  
+  public boolean isFriendOnline(ServerUser user){
+    return onlineFriends.contains(user);
+  }
+  
+  
 
   /**
    * A container for various game information, such as the Game object, the current
@@ -2636,32 +2933,29 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
   /**
-   * This method is called by our ChessclubJinListenerManager when a new
-   * SeekListener is added and we already had registered listeners (meaning that
-   * DG_SEEK was already on, so we need to notify the new listeners of all
-   * existing seeks as well).
+   * Invoked when the state of the seek related datagram changes.
    */
 
-  void notFirstListenerAdded(SeekListener listener){
-    Enumeration seeksEnum = seeks.elements();
-    while (seeksEnum.hasMoreElements()){
-      Seek seek = (Seek)seeksEnum.nextElement();
-      SeekEvent evt = new SeekEvent(this, SeekEvent.SEEK_ADDED, seek);
-      listener.seekAdded(evt);
-    }
+  protected void seekDatagramsStateChanged(boolean isOn){
+    if (!isOn)
+      clearSeeks();
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * This method is called by our ChessclubJinListenerManager when the last
-   * SeekListener is removed.
+   * Removes all currently known seeks, notifying any interested listeners.
    */
-
-  void lastSeekListenerRemoved(){
-    seeks.clear();
+  
+  private void clearSeeks(){
+    Set seekIndices = seeks.keySet();
+    for (Iterator i = seekIndices.iterator(); i.hasNext();){
+      Integer seekIndex = (Integer)i.next();
+      Seek seek = (Seek)seeks.get(seekIndex);
+      
+      i.remove();
+      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+    }
   }
   
   
@@ -2724,7 +3018,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     Seek seek = new Seek(String.valueOf(index), name, title, rating, isProvisional, isRegistered, isSeekerRated, isComputer, variant,
       ratingCategoryString, time*60*1000, inc*1000, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
-
+    
     seeks.put(new Integer(index), seek);
 
     listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
@@ -2739,8 +3033,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   private void processSeekRemovedDG(Datagram dg){
     processSeekRemoved(dg.getInteger(0), dg.getInteger(1));
   }
-
-
+  
+  
+  
   /**
    * Fires the appropriate SeekEvent indicating a seek was removed.
    */
@@ -2753,10 +3048,19 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));    
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Returns the current set of seeks.
+   */
+  
+  public Collection getSeeks(){
+    return Collections.unmodifiableCollection(seeks.values());
+  }
+  
+  
+  
   /**
    * Accepts the given seek. Note that the given seek must be an instance generated
    * by this SeekJinConnection and it must be in the current sought list.
@@ -3298,6 +3602,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void execRunnable(Runnable runnable){
     SwingUtilities.invokeLater(runnable);
   }
-
-
+  
+  
+  
 }
