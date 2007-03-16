@@ -23,7 +23,6 @@ package free.jin.board;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,7 +31,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
-import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.plugin.Plugin;
@@ -45,7 +43,7 @@ import free.workarounds.FixedJPanel;
  * Game.MY_GAME.
  */
 
-public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListener{
+public final class ExaminedGameButtonPanel extends FixedJPanel{
 
 
 
@@ -53,7 +51,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The Plugin we're being used by.
    */
 
-  protected final Plugin plugin;
+  private final Plugin plugin;
 
 
 
@@ -61,7 +59,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The Game for which this ExaminedGameButtonPanel is used.
    */
 
-  protected final Game game;
+  private final Game game;
 
 
 
@@ -69,7 +67,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The button which makes the game jump to its beginning.
    */
 
-  protected JButton startButton;
+  private final JButton startButton;
   
 
 
@@ -78,7 +76,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The button which makes the game go one ply backward.
    */
 
-  protected JButton backwardButton;
+  private final JButton backwardButton;
 
 
 
@@ -87,7 +85,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The button which makes the game go one ply forward.
    */
 
-  protected JButton forwardButton;
+  private final JButton forwardButton;
 
 
 
@@ -96,63 +94,39 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * The button which makes the game jump to its end.
    */
 
-  protected JButton endButton;
-
-
+  private final JButton endButton;
 
 
 
   /**
-   * Creates a new ExaminedGameButtonPanel. It will be used by the given Plugin
-   * for the given Game.
+   * Creates a new <code>ExaminedGameButtonPanel</code>. It will be used by the
+   * given <code>Plugin</code> for the given <code>Game</code>.
    */
 
   public ExaminedGameButtonPanel(Plugin plugin, Game game){
     this.plugin = plugin;
     this.game = game;
-
-    init(plugin, game);
+    
+    startButton = createStartGameButton();
+    backwardButton = createBackwardButton();
+    forwardButton = createForwardButton();
+    endButton = createEndGameButton();
+    
+    createUI();
   }
 
 
 
 
-  /**
-   * Initializes this ExaminedGameButtonPanel. This method calls delegates to
-   * {@link #createComponents(Plugin, Game)} and
-   * {@link #addComponents(Plugin, Game)}
-   */
-
-  protected void init(Plugin plugin, Game game){
-    createComponents(plugin, game);
-    addComponents(plugin, game);
-  }
-
-
-
-
-  /**
-   * Creates all the components of this ExaminedGameButtonPanel.
-   */
-
-  protected void createComponents(Plugin plugin, Game game){
-    startButton = createStartGameButton(plugin, game);
-    backwardButton = createBackwardButton(plugin, game);
-    forwardButton = createForwardButton(plugin, game);
-    endButton = createEndGameButton(plugin, game);
-  }
-  
-  
-  
   /**
    * Creates a button with the specified parameters.
    */
   
-  protected JButton createButton(String iconName, String tooltipKey, KeyStroke shortcut){
+  private JButton createButton(String iconName, String tooltipKey, KeyStroke shortcut, ActionListener listener){
     JButton button = new JButton();
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString(tooltipKey));
-    button.addActionListener(this);
-    button.registerKeyboardAction(this, shortcut, WHEN_IN_FOCUSED_WINDOW); 
+    button.addActionListener(listener);
+    button.registerKeyboardAction(listener, shortcut, WHEN_IN_FOCUSED_WINDOW); 
     button.setDefaultCapable(false);
     button.setRequestFocusEnabled(false);
     
@@ -169,12 +143,31 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   
   
   /**
+   * Returns the keyboard modifier used in the keyboard shortcuts for our
+   * buttons. 
+   */
+  
+  private static int getButtonKeyModifier(){
+    if (SwingUtils.isMacLnF())
+      return KeyEvent.CTRL_DOWN_MASK;
+    else
+      return KeyEvent.ALT_DOWN_MASK;
+  }
+  
+  
+  
+  /**
    * Creates the button which makes the game go its start.
    */
 
-  protected JButton createStartGameButton(Plugin plugin, Game game){
+  private JButton createStartGameButton(){
     return createButton("go-first", "gameStartButton.tooltip", 
-        KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        KeyStroke.getKeyStroke(KeyEvent.VK_HOME, getButtonKeyModifier()),
+        new ActionListener(){
+          public void actionPerformed(ActionEvent evt){
+            plugin.getConn().goToBeginning(game);
+          }
+        });
   }
 
 
@@ -184,9 +177,14 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * Creates the button which makes the game go its end.
    */
 
-  protected JButton createEndGameButton(Plugin plugin, Game game){
+  private JButton createEndGameButton(){
     return createButton("go-last", "gameEndButton.tooltip",
-        KeyStroke.getKeyStroke(KeyEvent.VK_END, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        KeyStroke.getKeyStroke(KeyEvent.VK_END, getButtonKeyModifier()),
+        new ActionListener(){
+          public void actionPerformed(ActionEvent evt){
+            plugin.getConn().goToEnd(game);
+          }
+        });
   }
 
 
@@ -196,9 +194,14 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * Creates the button which makes the game go one ply backward.
    */
 
-  protected JButton createBackwardButton(Plugin plugin, Game game){
+  private JButton createBackwardButton(){
     return createButton("go-previous", "backwardButton.tooltip",
-        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, getButtonKeyModifier()),
+        new ActionListener(){
+          public void actionPerformed(ActionEvent arg0){
+            plugin.getConn().goBackward(game, 1);
+          }
+        });
   }
 
 
@@ -207,51 +210,30 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
    * Creates the button which makes the game go one ply forward.
    */
 
-  protected JButton createForwardButton(Plugin plugin, Game game){
+  private JButton createForwardButton(){
     return createButton("go-next", "forwardButton.tooltip",
-        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, getButtonKeyModifier()),
+        new ActionListener(){
+          public void actionPerformed(ActionEvent arg0){
+            plugin.getConn().goForward(game, 1);
+          }
+        });
   }
 
 
 
 
   /**
-   * Adds all the components to this ExaminedGameButtonPanel.
+   * Creates the UI of this <code>ExaminedGameButtonPanel</code>.
    */
 
-  protected void addComponents(Plugin plugin, Game game){
+  private void createUI(){
     setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
     
     add(startButton);
     add(backwardButton);
     add(forwardButton);
     add(endButton);
-  }
-
-
-
-
-  /**
-   * ActionListener implementation. Executes the appropriate command depending
-   * on the button that was pressed.
-   */
-
-  public void actionPerformed(ActionEvent evt){
-    Object source = evt.getSource();
-
-    Connection conn = plugin.getConn();
-    if (source==startButton){
-      conn.goToBeginning(game);
-    }
-    else if (source==endButton){
-      conn.goToEnd(game);
-    }
-    else if (source==forwardButton){
-      conn.goForward(game, 1);
-    }
-    else if (source==backwardButton){
-      conn.goBackward(game, 1);
-    }
   }
 
 
@@ -263,6 +245,7 @@ public class ExaminedGameButtonPanel extends FixedJPanel implements ActionListen
   public Dimension getMaximumSize(){
     return getPreferredSize();
   }
-
-
+  
+  
+  
 }
