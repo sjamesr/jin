@@ -22,10 +22,19 @@
 package free.jin.chessclub; // Not in free.jin.chessclub.event because we need
                             // to call package friendly methods in JinChessclubConnection
 
-import free.jin.chessclub.event.*;
-import free.jin.event.*;
 import free.chessclub.level2.Datagram;
+import free.jin.chessclub.event.ArrowEvent;
+import free.jin.chessclub.event.ChessEventEvent;
+import free.jin.chessclub.event.ChessEventListener;
+import free.jin.chessclub.event.ChessclubGameListener;
+import free.jin.chessclub.event.CircleEvent;
 import free.jin.event.BasicListenerManager;
+import free.jin.event.ChatListener;
+import free.jin.event.FriendsListener;
+import free.jin.event.GameEvent;
+import free.jin.event.GameListListener;
+import free.jin.event.GameListener;
+import free.jin.event.SeekListener;
 
 
 /**
@@ -134,6 +143,9 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.addDatagramListener(source, Datagram.DG_ARROW);
       source.addDatagramListener(source, Datagram.DG_UNARROW);
       source.addDatagramListener(source, Datagram.DG_CIRCLE);
+      
+      // Do not add listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.gameDatagramsStateChanged).
       source.addDatagramListener(source, Datagram.DG_UNCIRCLE);
       source.setStyle(13);
     }
@@ -173,9 +185,12 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.removeDatagramListener(source, Datagram.DG_ARROW);
       source.removeDatagramListener(source, Datagram.DG_UNARROW);
       source.removeDatagramListener(source, Datagram.DG_CIRCLE);
+      
+      // Do not remove listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.gameDatagramsStateChanged).
       source.removeDatagramListener(source, Datagram.DG_UNCIRCLE);
+      
       source.setStyle(1);
-      source.lastGameListenerRemoved();
     }
   }
 
@@ -251,10 +266,11 @@ public class ChessclubListenerManager extends BasicListenerManager{
 
     if (listenerList.getListenerCount(SeekListener.class) == 1){
       source.addDatagramListener(source, Datagram.DG_SEEK);
+      
+      // Do not add listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.seekDatagramsStateChanged).
       source.addDatagramListener(source, Datagram.DG_SEEK_REMOVED);
     }
-    else
-      source.notFirstListenerAdded(listener);
   }
 
 
@@ -270,9 +286,10 @@ public class ChessclubListenerManager extends BasicListenerManager{
 
     if (listenerList.getListenerCount(SeekListener.class) == 0){
       source.removeDatagramListener(source, Datagram.DG_SEEK);
+      
+      // Do not remove listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.seekDatagramsStateChanged).
       source.removeDatagramListener(source, Datagram.DG_SEEK_REMOVED);
-
-      source.lastSeekListenerRemoved();
     }
   }
 
@@ -369,7 +386,49 @@ public class ChessclubListenerManager extends BasicListenerManager{
       }
     }
   }
+  
+  
+  
+  /**
+   * Adds the specified <code>FriendsListener</code> to the list of listeners
+   * receiving notifications about friends.
+   */
 
+  public void addFriendsListener(FriendsListener listener){
+    super.addFriendsListener(listener);
 
+    if (listenerList.getListenerCount(FriendsListener.class) == 1){
+//    source.addDatagramListener(source, Datagram.DG_NOTIFY_STATE);
+      source.addDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
+      source.addDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
+      
+      // Do not add listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
+      source.addDatagramListener(source, Datagram.DG_MY_NOTIFY_LIST);
+    }
+  }
+  
+  
+  
+  /**
+   * Removes the specified <code>FriendsListener</code> from the list of
+   * listeners receiving notifications about friends.
+   */
+  
+  public void removeFriendsListener(FriendsListener listener){
+    super.removeFriendsListener(listener);
 
+    if (listenerList.getListenerCount(FriendsListener.class)==0){
+//    source.removeDatagramListener(source, Datagram.DG_NOTIFY_STATE);      
+      source.removeDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
+      source.removeDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
+      
+      // Do not remove listeners after this one - it marks the end of the
+      // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
+      source.removeDatagramListener(source, Datagram.DG_MY_NOTIFY_LIST);
+    }
+  }
+  
+  
+  
 }
