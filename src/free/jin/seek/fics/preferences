@@ -1,14 +1,14 @@
 
 seek-image.sizes = intlist;5 7 9 11 13 15
 seek-image.directory = images
-seek-image.rated.human= rated_human_wild.gif
-seek-image.unrated.human= unrated_human_wild.gif
-seek-image.rated.computer= rated_comp_wild.gif
-seek-image.unrated.computer= unrated_comp_wild.gif
-seek-image.rated.human.Chess = rated_human.gif
-seek-image.unrated.human.Chess = unrated_human.gif
-seek-image.rated.computer.Chess = rated_comp.gif
-seek-image.unrated.computer.Chess = unrated_comp.gif
+seek-image.rated.human= rated_human_wild.png
+seek-image.unrated.human= unrated_human_wild.png
+seek-image.rated.computer= rated_comp_wild.png
+seek-image.unrated.computer= unrated_comp_wild.png
+seek-image.rated.human.Chess = rated_human.png
+seek-image.unrated.human.Chess = unrated_human.png
+seek-image.rated.computer.Chess = rated_comp.png
+seek-image.unrated.computer.Chess = unrated_comp.png
 
 fastCategory.nameKey = lightningCategoryName
 moderateCategory.nameKey = blitzCategoryName
