@@ -22,6 +22,7 @@
 package free.chess;
 
 import java.awt.*;
+
 import free.util.TextUtilities;
 import free.util.GraphicsUtilities;
 
@@ -40,7 +41,7 @@ public class JChessClock extends AbstractChessClock{
    * The active background color.
    */
 
-  private Color activeBG = Color.blue;
+  private Color activeBG = new Color(30, 100, 230);
 
 
 
@@ -55,7 +56,7 @@ public class JChessClock extends AbstractChessClock{
 
 
   /**
-   * The inactive background color. Defaults to the paren't background.
+   * The inactive background color. Defaults to the parent's background.
    */
 
   private Color inactiveBG = null;
