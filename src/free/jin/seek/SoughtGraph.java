@@ -625,15 +625,15 @@ public class SoughtGraph extends JComponent{
       index = size;
 
     if (index == -1){
-      for (int i = size; i > 0; i--)
+      for (int i = size+1; i < seekImageCache.length; i++)
         if (seekImageCache[i] != null){
           index = i;
           break;
         }
     }
-
+    
     if (index == -1){
-      for (int i = size+1; i < seekImageCache.length; i++)
+      for (int i = size; i > 0; i--)
         if (seekImageCache[i] != null){
           index = i;
           break;
