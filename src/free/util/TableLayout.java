@@ -30,11 +30,16 @@ import java.util.Vector;
  * Unlike <code>GridLayout</code>, the sizes of the rows and columns
  * are dynamic, although properly aligned. The cell sizes are determined
  * according to the preferred sizes of the components and each component is
- * sized to either its maximum size or the cell size. Components are positioned
- * within their cells according to their X and Y alignments.
+ * sized to either its preferred size or the cell size. Components are
+ * positioned within their cells according to their X and Y alignments. Any
+ * extra space given to the laid out container is handled depending on the
+ * alignment of that container, e.g. a container aligned to the left will have
+ * all its extra space on the right.
  * When a new component is added, it is placed in the first empty cell, in
  * lexigraphic order. A new row is created if necessary.
- * To create an empty cell, simply add blank component.
+ * To create an empty cell, simply add a blank component. To force a row or a
+ * column to be at least a certain size, add a component with the desired size
+ * (<code>Box.createRigidArea()</code> for example).
  */
 
 public class TableLayout implements LayoutManager2{
@@ -266,20 +271,27 @@ public class TableLayout implements LayoutManager2{
                       prefParentSize.height - yGap*(columnCount - 1) - parentInsets.top - parentInsets.bottom);
 
       // Layout the components.
-      int y = parentInsets.top;
+      int y = parentInsets.top +
+          Math.max(0, (int)(parent.getAlignmentY() * (layoutSize.height - prefLayoutSize.height)));
+      
       for (int i = 0; i < rowCount; i++){
-        int x = parentInsets.left;
-        int cellHeight = (rowHeights[i]*layoutSize.height)/prefLayoutSize.height;
+        int x = parentInsets.left + 
+            Math.max(0, (int)(parent.getAlignmentX() * (layoutSize.width - prefLayoutSize.width)));
+        
+        int cellHeight = (int)(rowHeights[i] * 
+            Math.min(1, ((double)layoutSize.height)/prefLayoutSize.height));
+        
         Component [] row = (Component [])rows.elementAt(i);
         for (int j = 0; j < row.length; j++){
-          int cellWidth = (columnWidths[j]*layoutSize.width)/prefLayoutSize.width;
+          int cellWidth = (int)(columnWidths[j] * 
+              Math.min(1, ((double)layoutSize.width)/prefLayoutSize.width));
           Component component = row[j];
 
           // Can only happen on the last line when all the remaining components are null as well
           if (component == null)
             break;
 
-          Dimension maxSize = component.getMaximumSize();
+          Dimension maxSize = component.getPreferredSize();
 
           int compWidth = Math.min(maxSize.width, cellWidth);
           int compHeight = Math.min(maxSize.height, cellHeight);
