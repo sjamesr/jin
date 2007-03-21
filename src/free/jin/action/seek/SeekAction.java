@@ -23,24 +23,22 @@ package free.jin.action.seek;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -51,7 +49,7 @@ import free.jin.UserSeek;
 import free.jin.action.ActionContext;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
-import free.util.AWTUtilities;
+import free.util.NamedObject;
 import free.util.PlatformUtils;
 import free.util.TableLayout;
 import free.util.swing.IntegerStrictPlainDocument;
@@ -105,7 +103,8 @@ public class SeekAction extends JinAction{
    */
   
   public void go(Object actor){
-    Component hintParent = (actor instanceof Component) ? SwingUtilities.windowForComponent((Component)actor) : null;
+    Component hintParent = (actor instanceof Component) ?
+        SwingUtilities.windowForComponent((Component)actor) : null;
     UserSeek seek = new SeekPanel(hintParent).getSeek();
     
     if (seek != null){
@@ -154,7 +153,8 @@ public class SeekAction extends JinAction{
     private final JTextField incField;
     private final JCheckBox isRatedBox;
     private final JComboBox variantChoice;
-    private final JRadioButton autoColor, whiteColor, blackColor;
+    private final JCheckBox isColorManualBox;
+    private final JComboBox pieceColorChoice;
     private final JCheckBox limitRatingBox;
     private final JTextField minRatingField, maxRatingField;
     private final JCheckBox manualAcceptBox;
@@ -174,27 +174,27 @@ public class SeekAction extends JinAction{
       
       WildVariant [] variants = getConn().getSupportedVariants();
       
+      Object whitePiecesSelection = new NamedObject(Player.WHITE_PLAYER,
+          i18n.getString("pieceColorChoice.white"));
+      Object blackPiecesSelection = new NamedObject(Player.BLACK_PLAYER,
+          i18n.getString("pieceColorChoice.black"));
+      Object [] pieceColorSelections = 
+        new Object[]{whitePiecesSelection, blackPiecesSelection};
+      
       // Create ui elements
       timeField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 3);
       incField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 3);
       isRatedBox = i18n.createCheckBox("ratedBox");
       variantChoice = new FixedJComboBox(variants);
       variantChoice.setEditable(false);
-      autoColor = i18n.createRadioButton("autoColorRadioButton");
-      whiteColor = i18n.createRadioButton("whiteColorRadioButton");
-      blackColor = i18n.createRadioButton("blackColorRadioButton");
+      isColorManualBox = i18n.createCheckBox("manualColorBox");
+      pieceColorChoice = new FixedJComboBox(pieceColorSelections);
       limitRatingBox = i18n.createCheckBox("limitRatingCheckBox");
       minRatingField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 4);
       maxRatingField = new FixedJTextField(new IntegerStrictPlainDocument(0, 9999), "", 4);
       manualAcceptBox = i18n.createCheckBox("manualAcceptCheckBox");
       useFormulaBox = i18n.createCheckBox("useFormulaCheckBox");
       
-      
-      ButtonGroup colorButtonGroup = new ButtonGroup();
-      colorButtonGroup.add(autoColor);
-      colorButtonGroup.add(whiteColor);
-      colorButtonGroup.add(blackColor);
-     
       
       String color = prefs.getString("color", "auto");
       
@@ -203,9 +203,12 @@ public class SeekAction extends JinAction{
       incField.setText(String.valueOf(prefs.getInt("inc", 0)));
       isRatedBox.setSelected(prefs.getBool("isRated", true));
       variantChoice.setSelectedIndex(findVariantIndex(variants, prefs.getString("variant", "Chess")));
-      autoColor.setSelected("auto".equals(color));
-      whiteColor.setSelected("white".equals(color));
-      blackColor.setSelected("black".equals(color));
+      if ("auto".equals(color))
+        isColorManualBox.setSelected(false);
+      else if ("white".equals(color))
+        pieceColorChoice.setSelectedItem(whitePiecesSelection);
+      else if ("black".equals(color))
+        pieceColorChoice.setSelectedItem(blackPiecesSelection);
       limitRatingBox.setSelected(prefs.getBool("limitRating", false));
       minRatingField.setText(String.valueOf(prefs.getInt("minRating", 0)));
       maxRatingField.setText(String.valueOf(prefs.getInt("maxRating", 9999)));
@@ -230,156 +233,157 @@ public class SeekAction extends JinAction{
     private void createUI(){
       I18n i18n = getI18n();
       
-      final int labelPad = 4; // To align labels with checkboxes
-      
+      int xGap = 4; // The standard horizontal gap
+      int yGap = 6; // The standard verical gap
       
       // Time controls
+      JPanel timeControlsPanel = new JPanel(new TableLayout(3, xGap, yGap));
+      
       JLabel timeLabel = i18n.createLabel("timeLabel");
       timeLabel.setLabelFor(timeField);
+      timeLabel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
       
       JLabel incLabel = i18n.createLabel("incrementLabel");
       incLabel.setLabelFor(incField);
+      incLabel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
       
       JLabel secondsLabel = i18n.createLabel("secondsLabel");
+      secondsLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      
       JLabel minutesLabel = i18n.createLabel("minutesLabel");
+      minutesLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
       
       timeField.setMaximumSize(timeField.getPreferredSize());
       incField.setMaximumSize(incField.getPreferredSize());
       
-      JComponent timeContainer = new JPanel(new TableLayout(5, labelPad, 2));
-      timeContainer.add(Box.createHorizontalStrut(0));
-      timeContainer.add(timeLabel);
-      timeContainer.add(Box.createHorizontalStrut(10));
-      timeContainer.add(timeField);
-      timeContainer.add(minutesLabel);
-      timeContainer.add(Box.createHorizontalStrut(0));
-      timeContainer.add(incLabel);
-      timeContainer.add(Box.createHorizontalStrut(10));
-      timeContainer.add(incField);
-      timeContainer.add(secondsLabel);
+      // First row
+      timeControlsPanel.add(timeLabel);
+      timeControlsPanel.add(timeField);
+      timeControlsPanel.add(minutesLabel);
       
-
-      // Variant
-      JLabel variantLabel = i18n.createLabel("variantLabel");
-      variantLabel.setLabelFor(variantChoice);
-      variantChoice.setMaximumSize(variantChoice.getPreferredSize());
+      // Second row
+      timeControlsPanel.add(incLabel);
+      timeControlsPanel.add(incField);
+      timeControlsPanel.add(secondsLabel);
       
-      JComponent variantContainer = SwingUtils.createHorizontalBox();
-      variantContainer.add(Box.createHorizontalStrut(labelPad));
-      variantContainer.add(variantLabel);
-      variantContainer.add(Box.createHorizontalStrut(10));
-      variantContainer.add(variantChoice);
-      variantContainer.add(Box.createHorizontalGlue());
       
-
+      // Ratedness and variant
+      JPanel gameTypePanel = new JPanel(new TableLayout(2, xGap, yGap));
+      isRatedBox.setAlignmentY(JComponent.TOP_ALIGNMENT);
+      variantChoice.setAlignmentY(JComponent.TOP_ALIGNMENT);
+      gameTypePanel.add(isRatedBox);
+      gameTypePanel.add(variantChoice);
+      
+      
       // Color
-      JLabel colorLabel = i18n.createLabel("colorLabel");
-      
-      JComponent colorContainer = SwingUtils.createHorizontalBox();
-      colorContainer.add(Box.createHorizontalStrut(labelPad));
-      colorContainer.add(colorLabel);
-      colorContainer.add(Box.createHorizontalStrut(15));
-      colorContainer.add(autoColor);
-      colorContainer.add(Box.createHorizontalStrut(10));
-      colorContainer.add(whiteColor);
-      colorContainer.add(Box.createHorizontalStrut(10));
-      colorContainer.add(blackColor);
-      colorContainer.add(Box.createHorizontalGlue());
+      JPanel colorPanel = new JPanel(new TableLayout(2, xGap, yGap));
+      isColorManualBox.setAlignmentY(JComponent.TOP_ALIGNMENT);
+      pieceColorChoice.setAlignmentY(JComponent.TOP_ALIGNMENT);
+      colorPanel.add(isColorManualBox);
+      colorPanel.add(pieceColorChoice);
       
       
       // Limit opponent rating
+      Font normalFont = UIManager.getFont("Label.font");
+      int minMaxLabelsFontSize = normalFont.getSize() - 4;
+      Font minMaxLabelsFont = 
+        normalFont.deriveFont((float)minMaxLabelsFontSize);
+      
       JLabel minLabel = i18n.createLabel("minRatingLabel");
+      minLabel.setFont(minMaxLabelsFont);
       minLabel.setLabelFor(minRatingField);
+      minLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      
       JLabel maxLabel = i18n.createLabel("maxRatingLabel");
       maxLabel.setLabelFor(maxRatingField);
+      maxLabel.setFont(minMaxLabelsFont);
+      maxLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      
       minRatingField.setMaximumSize(minRatingField.getPreferredSize());
       maxRatingField.setMaximumSize(minRatingField.getPreferredSize());
+
       
-      JComponent limitRatingBoxContainer = SwingUtils.createHorizontalBox();
-      limitRatingBoxContainer.add(limitRatingBox);
-      limitRatingBoxContainer.add(Box.createHorizontalGlue());
-      
-      final JComponent minMaxContainer = SwingUtils.createHorizontalBox();
-      minMaxContainer.add(Box.createHorizontalStrut(40));
-      minMaxContainer.add(minLabel);
-      minMaxContainer.add(Box.createHorizontalStrut(10));
-      minMaxContainer.add(minRatingField);
-      minMaxContainer.add(Box.createHorizontalStrut(20));
-      minMaxContainer.add(maxLabel);
-      minMaxContainer.add(Box.createHorizontalStrut(10));
-      minMaxContainer.add(maxRatingField);
-      minMaxContainer.add(Box.createHorizontalGlue());
-      
-      
-      JComponent limitRatingContainer = SwingUtils.createVerticalBox();
-      limitRatingContainer.add(limitRatingBoxContainer);
-      limitRatingContainer.add(Box.createVerticalStrut(3));
-      limitRatingContainer.add(minMaxContainer);
+      JPanel oppRatingLimitPanel = new JPanel(new TableLayout(4, xGap, 1));
+      oppRatingLimitPanel.add(limitRatingBox);
+      oppRatingLimitPanel.add(minRatingField);
+      oppRatingLimitPanel.add(new JLabel("-"));
+      oppRatingLimitPanel.add(maxRatingField);
+      oppRatingLimitPanel.add(new JPanel());
+      oppRatingLimitPanel.add(minLabel);
+      oppRatingLimitPanel.add(new JPanel());
+      oppRatingLimitPanel.add(maxLabel);
       
       
       // Buttons panel
-      JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      JButton issueSeekButton = i18n.createButton("issueSeekButton");
-      JButton cancelButton = i18n.createButton("cancelButton");
-      
-      setDefaultButton(issueSeekButton);
-      cancelButton.setDefaultCapable(false);
-      
-      buttonsPanel.add(issueSeekButton);
-      buttonsPanel.add(cancelButton);
-      
+      JPanel buttonsPanel = new JPanel(new TableLayout(2, xGap, yGap));
+      buttonsPanel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
       
       JButton moreLessButton = i18n.createButton("moreOptionsButton");
       moreLessButton.setDefaultCapable(false);
       moreLessButton.setActionCommand("more");
-      JPanel moreLessPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      moreLessPanel.add(moreLessButton);
       
-      final JComponent advancedPanelHolder = new JPanel(new BorderLayout());
+      JButton issueSeekButton = i18n.createButton("issueSeekButton");
+      setDefaultButton(issueSeekButton);
       
+      buttonsPanel.add(moreLessButton);
+      buttonsPanel.add(issueSeekButton);
+      
+      
+      // Holds the panel displayed when "More Options" is clicked
+      final JPanel advancedPanelHolder = new JPanel(new BorderLayout());
       
       
       // Layout the subcontainers in the main container
-      setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-      timeContainer.setAlignmentX(LEFT_ALIGNMENT);
-      add(timeContainer);
-      add(Box.createVerticalStrut(2));
-      isRatedBox.setAlignmentX(LEFT_ALIGNMENT);
-      add(isRatedBox);
-      advancedPanelHolder.setAlignmentX(LEFT_ALIGNMENT);
-      add(advancedPanelHolder);
-      add(Box.createVerticalStrut(5));
-      moreLessPanel.setAlignmentX(LEFT_ALIGNMENT);
-      add(moreLessPanel);
+      setLayout(new TableLayout(1, xGap, yGap));
+      setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      timeControlsPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      advancedPanelHolder.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      buttonsPanel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
       
-      add(Box.createVerticalStrut(10));
-      buttonsPanel.setAlignmentX(LEFT_ALIGNMENT);
+      add(timeControlsPanel);
+      add(Box.createVerticalStrut(yGap/2));
+      add(advancedPanelHolder);
       add(buttonsPanel);
       
       
       // Advanced options panel
-      final JComponent advancedPanel = SwingUtils.createVerticalBox();
-      advancedPanel.add(Box.createVerticalStrut(4));
-      variantContainer.setAlignmentX(LEFT_ALIGNMENT);
-      advancedPanel.add(variantContainer);
-      advancedPanel.add(Box.createVerticalStrut(4));
-      colorContainer.setAlignmentX(LEFT_ALIGNMENT);
-      advancedPanel.add(colorContainer);
-      advancedPanel.add(Box.createVerticalStrut(2));
-      limitRatingContainer.setAlignmentX(LEFT_ALIGNMENT);
-      advancedPanel.add(limitRatingContainer);
-      advancedPanel.add(Box.createVerticalStrut(2));
-      manualAcceptBox.setAlignmentX(LEFT_ALIGNMENT);
+      final JPanel advancedPanel = SwingUtils.createVerticalBox();
+      
+      gameTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      colorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      oppRatingLimitPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      manualAcceptBox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      useFormulaBox.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      
+      advancedPanel.add(gameTypePanel);
+      advancedPanel.add(Box.createVerticalStrut(yGap));
+      advancedPanel.add(colorPanel);
+      advancedPanel.add(Box.createVerticalStrut(yGap));
+      advancedPanel.add(oppRatingLimitPanel);
+      advancedPanel.add(Box.createVerticalStrut(yGap - minMaxLabelsFontSize - 1));
       advancedPanel.add(manualAcceptBox);
-      advancedPanel.add(Box.createVerticalStrut(2));
-      useFormulaBox.setAlignmentX(LEFT_ALIGNMENT);
+      advancedPanel.add(Box.createVerticalStrut(yGap));
       advancedPanel.add(useFormulaBox);
       
       
-      AWTUtilities.setContainerEnabled(minMaxContainer, limitRatingBox.isSelected());
+      boolean isColorManual = isColorManualBox.isSelected();
+      pieceColorChoice.setEnabled(isColorManual);
+      isColorManualBox.addItemListener(new ItemListener(){
+        public void itemStateChanged(ItemEvent evt){
+          boolean isColorManual = isColorManualBox.isSelected();
+          pieceColorChoice.setEnabled(isColorManual);
+        }
+      });
+      
+      
+      boolean isRatingLimited = limitRatingBox.isSelected();
+      minRatingField.setEnabled(isRatingLimited);
+      maxRatingField.setEnabled(isRatingLimited);
       limitRatingBox.addItemListener(new ItemListener(){
         public void itemStateChanged(ItemEvent evt){
-          AWTUtilities.setContainerEnabled(minMaxContainer, limitRatingBox.isSelected());
+            boolean isRatingLimited = limitRatingBox.isSelected();
+            minRatingField.setEnabled(isRatingLimited);
+            maxRatingField.setEnabled(isRatingLimited);
         }
       });
       
@@ -404,32 +408,40 @@ public class SeekAction extends JinAction{
       });
       
       
-      cancelButton.addActionListener(new ClosingListener(null));
       issueSeekButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          int time, inc;
-          
+          // Time
+          int time;
           try{
             time = Integer.parseInt(timeField.getText());
           } catch (NumberFormatException e){
               getI18n().error("timeError");
               return;
             }
-            
+          
+          // Increment
+          int inc;
           try{
             inc = Integer.parseInt(incField.getText());
           } catch (NumberFormatException e){
               getI18n().error("incError");
               return;
             }
-            
+          
+          // Ratedness
           boolean isRated = isRatedBox.isSelected();
           
+          // Variant
           WildVariant variant = (WildVariant)variantChoice.getSelectedItem();
           
-          Player color = autoColor.isSelected() ? null :
-            whiteColor.isSelected() ? Player.WHITE_PLAYER : Player.BLACK_PLAYER;
-            
+          // Color
+          NamedObject pieceColorSelection = 
+            (NamedObject)pieceColorChoice.getSelectedItem(); 
+          Player color = (Player)pieceColorSelection.getTarget();
+          if (!isColorManualBox.isSelected())
+            color = null;
+          
+          // Opponent rating range
           int minRating, maxRating;
           if (limitRatingBox.isSelected()){
             try{
