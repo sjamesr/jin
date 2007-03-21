@@ -649,34 +649,23 @@ public class LoginPanel extends DialogPanel{
 //    usernameField.setColumns(0); // Otherwise setPreferredSize is ignored and it will still
 //    passwordField.setColumns(0); // use the amount of columns to calculate preferred size.
 
-    Box passwordOptionsPanel = new Box(BoxLayout.X_AXIS);
+    JPanel passwordOptionsPanel = new JPanel(new TableLayout(2, 10, 0));
     
-    boolean addSavePasswordCB = savePasswordCheckBox != null;
-    boolean addRetrievePassButton = retrievePasswordButton != null; 
-
-    if (addSavePasswordCB)
+    if (savePasswordCheckBox != null)
       passwordOptionsPanel.add(savePasswordCheckBox);
     
-    if (addRetrievePassButton){
-      if (addSavePasswordCB)
-        passwordOptionsPanel.add(Box.createHorizontalStrut(10));
+    if (retrievePasswordButton != null)
       passwordOptionsPanel.add(retrievePasswordButton);
-    }
-    passwordOptionsPanel.add(Box.createHorizontalGlue());
 
 
-    Box decisionPanel = new Box(BoxLayout.X_AXIS);
-    
-    decisionPanel.add(connectButton);
-    decisionPanel.add(Box.createHorizontalGlue());
-
-    Box panel = new Box(BoxLayout.Y_AXIS);
+    JPanel panel = new JPanel(new TableLayout(1, 0, 10));
+    panel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    credentialsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    passwordOptionsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    connectButton.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     panel.add(credentialsPanel);
-    panel.add(Box.createVerticalStrut(10));
     panel.add(passwordOptionsPanel);
-    panel.add(Box.createVerticalStrut(10));
-    panel.add(decisionPanel);
-    panel.add(Box.createVerticalStrut(10));
+    panel.add(connectButton);
     
     panel.setBorder(BorderFactory.createCompoundBorder(
         i18n.createTitledBorder("membersBorder"),
