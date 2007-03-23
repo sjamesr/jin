@@ -1754,11 +1754,14 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
         boolean isRatingLimited = ((seekInfo.getOpponentMinRating() > 0) || (seekInfo.getOpponentMaxRating() < 9999));
 
-        Seek seek = new Seek(seekID, seekInfo.getSeekerHandle(), titlesBuf.toString(), seekInfo.getSeekerRating(),
-          isProvisional, isRegistered, isSeekerRated, isComputer, variant, seekInfo.getMatchType(),
-          seekInfo.getMatchTime()*60*1000, seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
-          isRatingLimited, seekInfo.getOpponentMinRating(), seekInfo.getOpponentMaxRating(),
-          !seekInfo.isAutomaticAccept(), seekInfo.isFormulaUsed());
+        Seek seek = new Seek(seekID, userForName(seekInfo.getSeekerHandle()),
+            titlesBuf.toString(), seekInfo.getSeekerRating(), isProvisional,
+            isRegistered, isSeekerRated, isComputer, variant,
+            seekInfo.getMatchType(), seekInfo.getMatchTime()*60*1000,
+            seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
+            isRatingLimited, seekInfo.getOpponentMinRating(),
+            seekInfo.getOpponentMaxRating(), !seekInfo.isAutomaticAccept(),
+            seekInfo.isFormulaUsed());
 
         Integer seekIndex = new Integer(seekInfo.getSeekIndex());
 
@@ -2223,6 +2226,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
   public void exit(){
     sendCommand("$quit");
+  }
+  
+  
+  
+  /**
+   * Returns the user with which we are logged in.
+   */
+  
+  public ServerUser getUser(){
+    return userForName(getUsername());
   }
   
   

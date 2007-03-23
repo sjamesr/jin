@@ -536,6 +536,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Returns the user with which we are logged in.
+   */
+  
+  public ServerUser getUser(){
+    return userForName(getUsername());
+  }
+  
+  
+  
+  /**
    * Returns a <code>ChessclubUser</code> with the specified name.
    */
   
@@ -3016,8 +3026,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     String title = displayableTitle(titles);
 
-    Seek seek = new Seek(String.valueOf(index), name, title, rating, isProvisional, isRegistered, isSeekerRated, isComputer, variant,
-      ratingCategoryString, time*60*1000, inc*1000, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
+    Seek seek = new Seek(String.valueOf(index), userForName(name), title,
+        rating, isProvisional, isRegistered, isSeekerRated, isComputer, variant,
+        ratingCategoryString, time*60*1000, inc*1000, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
     
     seeks.put(new Integer(index), seek);
 
