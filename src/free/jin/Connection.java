@@ -165,11 +165,11 @@ public interface Connection{
 
 
   /**
-   * Returns the username of the account. This method should only be called after
-   * connect() returns.
+   * Returns the user with which we are logged in. This method should only be
+   * called after connect() returns.
    */
 
-  String getUsername();
+  ServerUser getUser();
 
 
 
