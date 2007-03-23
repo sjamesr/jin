@@ -285,7 +285,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void seekSelected(SeekSelectionEvent evt){
-    ((SeekConnection)getConn()).acceptSeek(evt.getSeek());
+    Seek seek = evt.getSeek();
+    SeekConnection conn = (SeekConnection)getConn();
+    
+    // Is it our own seek?
+    if (seek.getSeeker().equals(getConn().getUser()))
+      conn.withdraw(seek);
+    else
+      conn.accept(seek);
   }
   
   
