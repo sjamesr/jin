@@ -22,14 +22,21 @@
 package free.jin.seek;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.net.URL;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
 import free.jin.Connection;
+import free.jin.I18n;
+import free.jin.Preferences;
 import free.jin.Seek;
 import free.jin.SeekConnection;
+import free.jin.action.JinAction;
 import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
 import free.jin.event.SeekListener;
@@ -41,6 +48,8 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
+import free.util.PlatformUtils;
+import free.util.TableLayout;
 
 
 /**
@@ -51,22 +60,30 @@ import free.jin.ui.UIProvider;
 
 public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelectionListener,
     PluginUIListener, ConnectionListener{
+  
+  
+  
+  /**
+   * The panel for issuing seeks.
+   */
+  
+  private IssueSeekPanel issueSeekPanel;
+  
+  
+  
+  /**
+   * The seek graph.
+   */
+
+  private SoughtGraph soughtGraph;
 
 
 
   /**
-   * The SoughtGraph.
+   * The container of our UI.
    */
 
-  protected SoughtGraph soughtGraph;
-
-
-
-  /**
-   * The container of the sought graph.
-   */
-
-  protected PluginUIContainer soughtGraphContainer;
+  private PluginUIContainer uiContainer;
 
 
 
@@ -89,8 +106,9 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void start(){
-    initSoughtGraph();
+    createUI();
     registerListeners();
+    exportSeekAction();
   }
 
 
@@ -101,43 +119,57 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public void stop(){
     unregisterListeners();
+    issueSeekPanel.saveSeekOptions();
   }
 
 
 
   /**
-   * Initializes the sought graph.
+   * Creates the UI.
    */
 
-  protected void initSoughtGraph(){
-    soughtGraphContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
-    soughtGraphContainer.setTitle(getI18n().getString("graphContainerTitle"));
+  protected void createUI(){
+    I18n i18n = getI18n();
+    
+    int xGap = 10;
+    int yGap = 10;
+    
+    uiContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
+    uiContainer.setTitle(i18n.getString("uiContainerTitle"));
 
     URL iconImageURL = SoughtGraphPlugin.class.getResource("icon.gif");
     if (iconImageURL!= null)
-      soughtGraphContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+      uiContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
 
-    soughtGraphContainer.addPluginUIListener(this);
+    uiContainer.addPluginUIListener(this);
 
-
-    soughtGraph = createSoughtGraph();
-
-    Container content = soughtGraphContainer.getContentPane();
-    content.setLayout(new BorderLayout());
-    content.add(soughtGraph, BorderLayout.CENTER);
+    issueSeekPanel = new IssueSeekPanel(this, 
+        Preferences.createWrapped(getPrefs(), "issueSeekPanel"));
+    soughtGraph = new SoughtGraph(this);
+    
+    
+    JPanel issueSeekPanelWrapper = new JPanel(new TableLayout(1, xGap, yGap));
+    issueSeekPanelWrapper.setAlignmentY(JComponent.TOP_ALIGNMENT);
+    issueSeekPanelWrapper.add(i18n.createLabel("issueSeekLabel"));
+    issueSeekPanelWrapper.add(issueSeekPanel);
+    
+    JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap));
+    soughtGraphWrapper.add(i18n.createLabel("soughtGraphLabel"), BorderLayout.PAGE_START);
+    soughtGraphWrapper.add(soughtGraph, BorderLayout.CENTER);
+    soughtGraph.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+    
+    
+    JPanel content = new JPanel(new BorderLayout(xGap, yGap));
+    content.add(issueSeekPanelWrapper, BorderLayout.LINE_START);
+    content.add(soughtGraphWrapper, BorderLayout.CENTER);
+    content.setBorder(BorderFactory.createEmptyBorder(yGap, xGap, yGap, xGap));
+    
+    uiContainer.getContentPane().setLayout(new BorderLayout());
+    uiContainer.getContentPane().add(content, BorderLayout.CENTER);
+    
   }
-
-
-
-  /**
-   * Creates and returns the sought graph.
-   */
-
-  protected SoughtGraph createSoughtGraph(){
-    return new SoughtGraph(this);
-  }
-
-
+  
+  
 
   /**
    * Gets called when the seek graph container is made visible.
@@ -166,9 +198,9 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     SeekConnection conn = (SeekConnection)getConn();
     conn.getSeekListenerManager().removeSeekListener(this);
   }
-
-
-
+  
+  
+  
   public void pluginUIClosing(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
@@ -202,6 +234,27 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     soughtGraph.removeSeekSelectionListener(this);
     conn.getSeekListenerManager().removeSeekListener(this); // Just in case.
     getConn().getListenerManager().removeConnectionListener(this);
+  }
+  
+  
+  
+  /**
+   * Exports an action which displays our UI.
+   */
+  
+  private void exportSeekAction(){
+    exportAction(new JinAction(){
+      public String getId(){
+        return "seek";
+      }
+      public String getName(){
+        return SoughtGraphPlugin.this.getI18n().getString("seekActionName") + 
+          PlatformUtils.getEllipsis();
+      }
+      public void go(Object actor){
+        uiContainer.setActive(true);
+      }
+    });
   }
 
 
