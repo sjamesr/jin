@@ -31,6 +31,8 @@ import java.awt.GridLayout;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 
 /**
@@ -87,7 +89,19 @@ public class ActionsPlugin extends Plugin{
   public void start(){
     buttonContainer = createButtonContainer();
     
-    addActionButtons();
+    updateActionButtons();
+    
+    getActions().addListDataListener(new ListDataListener(){
+      public void contentsChanged(ListDataEvent e){
+        updateActionButtons();
+      }
+      public void intervalAdded(ListDataEvent e){
+        updateActionButtons();
+      }
+      public void intervalRemoved(ListDataEvent e){
+        updateActionButtons();
+      }
+    });
   }
   
   
@@ -110,7 +124,7 @@ public class ActionsPlugin extends Plugin{
    * Adds the action buttons into the button container. 
    */
    
-  private void addActionButtons(){
+  private void updateActionButtons(){
     ListModel actions = getActions();
     
     JComponent content = new JPanel(new GridLayout(actions.getSize(), 1, 5, 5));
@@ -123,6 +137,7 @@ public class ActionsPlugin extends Plugin{
     
     content.setBorder(new EmptyBorder(10, 10, 10, 10));
     
+    buttonContainer.getContentPane().removeAll();
     buttonContainer.getContentPane().setLayout(new BorderLayout());
     buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
   }
