@@ -215,24 +215,16 @@ public class SoughtGraph extends JComponent{
     Preferences prefs = plugin.getPrefs();
     I18n i18n = plugin.getI18n();
 
-    setBackground(prefs.getColor("background-color", Color.white));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
 
-    String bgImageFilename = prefs.getString("background.image", null);
-    Image bgImage = bgImageFilename == null ? null :
-      getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
-    if (bgImage != null){
-      if (ImageUtilities.preload(bgImage) != ImageUtilities.COMPLETE)
-        bgImage = null;
-    }
+    this.bgImage = getToolkit().getImage(SoughtGraph.class.getResource("background.gif"));
+    ImageUtilities.preload(bgImage);
 
-    this.bgImage = bgImage;
-    
     fastCategoryName = i18n.getString(prefs.getString("fastCategory.nameKey"));
     moderateCategoryName = i18n.getString(prefs.getString("moderateCategory.nameKey"));
     slowCategoryName = i18n.getString(prefs.getString("slowCategory.nameKey"));
 
-    int [] seekImageSizes = prefs.getIntList("seek-image.sizes");
+    int [] seekImageSizes = new int[]{5, 7, 9, 11, 13, 15};
     int maxSize = 0, minSize = Integer.MAX_VALUE;
     for (int i = 0; i < seekImageSizes.length; i++){
       if (seekImageSizes[i] > maxSize)
@@ -652,22 +644,22 @@ public class SoughtGraph extends JComponent{
       throw new IllegalStateException("Couldn't find suitable seek images");
 
     Hashtable sizeImages = seekImageCache[index];
-
-    String playerType = seek.isSeekerComputer() ? "computer" : "human";
+    
+    boolean isMySeek = seek.getSeeker().equals(plugin.getConn().getUser());
+    String playerType = seek.isSeekerComputer() ? "comp" : "human";
     String ratedString = seek.isRated() ? "rated" : "unrated";
-    String imageKey = "seek-image."+ratedString+"."+playerType+"."+seek.getVariant();
+    boolean isWild = !seek.getVariant().equals(Chess.getInstance());
+    
+    String imageName = (isMySeek ? "own" : 
+        ratedString + "_" + playerType + (isWild ? "_wild" : "")) + ".png";
 
-    Image image = (Image)sizeImages.get(imageKey);
+    Image image = (Image)sizeImages.get(imageName);
     if (image == null){
-      String imageName = (String)plugin.getPrefs().lookup(imageKey);
-      if (imageName == null)
-        return null;
-
       String imageFile = "images/"+index+"/"+imageName;
       image = getToolkit().getImage(SoughtGraph.class.getResource(imageFile));
       if (ImageUtilities.preload(image) != ImageUtilities.COMPLETE)
         return null;
-      sizeImages.put(imageKey, image);
+      sizeImages.put(imageName, image);
     }
 
     return image;
