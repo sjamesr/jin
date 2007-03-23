@@ -1845,7 +1845,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * by this SeekJinConnection and it must be in the current sought list.
    */
 
-  public void acceptSeek(Seek seek){
+  public void accept(Seek seek){
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
@@ -1855,10 +1855,23 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   
   /**
+   * Withdraws the specified seek, issued by the user.
+   */
+  
+  public void withdraw(Seek seek){
+    if (!seeks.contains(seek))
+      throw new IllegalArgumentException("The specified seek is not on the seek list");
+    
+    sendCommand("unseek " + seek.getID());
+  }
+  
+  
+  
+  /**
    * Issues the specified seek.
    */
    
-  public void issueSeek(UserSeek seek){
+  public void issue(UserSeek seek){
     WildVariant variant = seek.getVariant();
     String wildName = getWildName(variant);
     if (wildName == null)
