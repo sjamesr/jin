@@ -409,8 +409,7 @@ public class IssueSeekPanel extends JPanel{
     issueSeekButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         SeekConnection conn = (SeekConnection)plugin.getConn();
-        System.out.println(getSeek());
-        conn.issueSeek(getSeek());
+        conn.issue(getSeek());
       }
     });
   }
