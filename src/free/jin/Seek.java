@@ -38,7 +38,7 @@ public class Seek extends Struct{
    * Creates a new Seek with the given properties.
    *
    * @param seekID A string identifying the game for the user.
-   * @param seeker The handle of the player who issued the seek.
+   * @param seeker The player who issued the seek.
    * @param seekerTitle The title of the player who issued the seek.
    * @param rating The rating of the player who issued the seek.
    * @param isProvisional Is the rating of the player who issued the seek provisional?
@@ -68,13 +68,13 @@ public class Seek extends Struct{
    * player's formula.
    */
 
-  public Seek(String seekID, String seeker, String seekerTitle, int rating, boolean isProvisional,
+  public Seek(String seekID, ServerUser seeker, String seekerTitle, int rating, boolean isProvisional,
       boolean isRegistered, boolean isSeekerRated, boolean isComputer, WildVariant variant,
       String ratingCategoryString, int time, int inc, boolean isRated, Player color, boolean isRatingLimited,
       int minRating, int maxRating, boolean isManualAccept, boolean isFormula){
 
     setStringProperty("SeekID", seekID);
-    setStringProperty("Seeker", seeker);
+    setProperty("Seeker", seeker);
     setStringProperty("SeekerTitle", seekerTitle);
     setIntegerProperty("SeekerRating", rating);
     setBooleanProperty("IsProvisional", isProvisional);
@@ -106,6 +106,16 @@ public class Seek extends Struct{
   public String getID(){
     return getStringProperty("SeekID");
   }
+  
+  
+  
+  /**
+   * Returns the player who issued the seek.
+   */
+  
+  public ServerUser getSeeker(){
+    return (ServerUser)getProperty("Seeker");
+  }
 
 
 
@@ -115,7 +125,7 @@ public class Seek extends Struct{
    */
 
   public String getSeekerName(){
-    return getStringProperty("Seeker");
+    return getSeeker().getName();
   }
 
 
