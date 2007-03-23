@@ -1202,8 +1202,9 @@ public class Scripter extends Plugin{
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       Vector varsVector = new Vector(25);
       
-      Seek seek = new Seek("64", "AlexTheGreat", "C", 1800, false, true, true, true, Chess.getInstance(),
-        "Blitz", 5*60*1000, 2000, true, null, true, 1700, 1900, false, false);
+      Seek seek = new Seek("64", getConn().userForName("AlexTheGreat"), "C",
+          1800, false, true, true, true, Chess.getInstance(), "Blitz",
+          5*60*1000, 2000, true, null, true, 1700, 1900, false, false);
 
       varsVector.addElement(new Object[]{"seek", seek});
       varsVector.addElement(new Object[]{"name", seek.getSeekerName()});
