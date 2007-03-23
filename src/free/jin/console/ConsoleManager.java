@@ -512,7 +512,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   public void loginSucceeded(Connection conn){
     String title = getI18n().getFormattedString("mainConsole.title",
-      new Object[]{getConn().getUsername(), getServer().getLongName()});
+      new Object[]{getConn().getUser().getName(), getServer().getLongName()});
     consoleContainer.setTitle(title);
   }
 
