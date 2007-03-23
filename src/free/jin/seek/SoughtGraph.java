@@ -115,6 +115,14 @@ public class SoughtGraph extends JComponent{
    */
   
   private final int minSeekImageSize;
+  
+  
+  
+  /**
+   * The size of the largest seek image.
+   */
+  
+  private final int maxSeekImageSize;
 
 
 
@@ -207,7 +215,6 @@ public class SoughtGraph extends JComponent{
     Preferences prefs = plugin.getPrefs();
     I18n i18n = plugin.getI18n();
 
-    setOpaque(true);
     setBackground(prefs.getColor("background-color", Color.white));
     setFont(new Font("SansSerif", Font.PLAIN, 10));
 
@@ -235,6 +242,7 @@ public class SoughtGraph extends JComponent{
     }
     
     minSeekImageSize = minSize;
+    maxSeekImageSize = maxSize;
 
     seekImageCache = new Hashtable[maxSize+1];
     for (int i = 0; i < seekImageSizes.length; i++)
@@ -891,6 +899,28 @@ public class SoughtGraph extends JComponent{
     int width = (int)(minSeekImageSize * (BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS) / GRAPH_WIDTH_PERCENTAGE);
     int height = (int)(minSeekImageSize * RATING_SLOTS / GRAPH_HEIGHT_PERCENTAGE);
     return new Dimension(width, height);
+  }
+  
+  
+  
+  /**
+   * Returns the preferred size of the sought graph.
+   */
+  
+  public Dimension getPreferredSize(){
+    int width = (int)(maxSeekImageSize * (BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS) / GRAPH_WIDTH_PERCENTAGE);
+    int height = (int)(maxSeekImageSize * RATING_SLOTS / GRAPH_HEIGHT_PERCENTAGE);
+    return new Dimension(width, height);
+  }
+  
+  
+  
+  /**
+   * Returns the maximum size of the sought graph.
+   */
+  
+  public Dimension getMaximumSize(){
+    return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
   }
   
   
