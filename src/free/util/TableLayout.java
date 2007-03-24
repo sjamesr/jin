@@ -30,7 +30,7 @@ import java.util.Vector;
  * Unlike <code>GridLayout</code>, the sizes of the rows and columns
  * are dynamic, although properly aligned. The cell sizes are determined
  * according to the preferred sizes of the components and each component is
- * sized to either its preferred size or the cell size. Components are
+ * sized to either its maximum size or the cell size. Components are
  * positioned within their cells according to their X and Y alignments. Any
  * extra space given to the laid out container is handled depending on the
  * alignment of that container, e.g. a container aligned to the left will have
@@ -291,7 +291,7 @@ public class TableLayout implements LayoutManager2{
           if (component == null)
             break;
 
-          Dimension maxSize = component.getPreferredSize();
+          Dimension maxSize = component.getMaximumSize();
 
           int compWidth = Math.min(maxSize.width, cellWidth);
           int compHeight = Math.min(maxSize.height, cellHeight);
