@@ -250,7 +250,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
   
   private void addBooleanPref(BooleanModel model){
     JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(model.getName(), model.get());
-    ModelUtils.link(model, menuItem.getModel());
+    ModelUtils.linkSelected(model, menuItem.getModel());
     add(menuItem);
   }
 
