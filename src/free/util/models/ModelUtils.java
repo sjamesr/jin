@@ -36,18 +36,18 @@ public class ModelUtils{
   
   
   /**
-   * Links between the specified <code>BooleanModel</code> and
-   * <code>ButtonModel</code>. That is, when one changes, the other one is
-   * changed to match its state (for the button, its selected state is used).
+   * Links between the specified <code>BooleanModel</code> and the selected
+   * state of the specified <code>ButtonModel</code>. That is, when one changes,
+   * the other one is changed to match its state.
    * Note that the two models' state must match initially.
    */
   
-  public static void link(final BooleanModel booleanModel, final ButtonModel buttonModel){
+  public static void linkSelected(final BooleanModel booleanModel, final ButtonModel buttonModel){
     if (booleanModel.get() != buttonModel.isSelected())
       throw new IllegalStateException("Mismatching model states");
     
     booleanModel.addListener(new BooleanListener(){
-      public void modelChanged(ConstBooleanModel model){
+      public void modelChanged(UnmodifiableBooleanModel model){
         buttonModel.setSelected(model.isOn());
       }
     });
@@ -58,7 +58,7 @@ public class ModelUtils{
       }
     });
   }
-
+  
   
   
 }
