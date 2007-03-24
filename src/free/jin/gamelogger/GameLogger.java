@@ -21,10 +21,12 @@
 
 package free.jin.gamelogger;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -33,18 +35,39 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+
 import bsh.EvalError;
 import bsh.Interpreter;
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessMove;
+import free.chess.Move;
+import free.chess.Player;
+import free.chess.Position;
 import free.jin.Connection;
 import free.jin.Game;
+import free.jin.I18n;
 import free.jin.PGNConnection;
 import free.jin.Preferences;
-import free.jin.event.*;
+import free.jin.action.JinAction;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
+import free.util.PlatformUtils;
+import free.util.swing.ExtensionFileFilter;
 
 
 
@@ -94,10 +117,17 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    */
 
   private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
-
-
-
-
+  
+  
+  
+  /**
+   * An action which allows the user to custom-save his last (saveable) game. 
+   */
+  
+  private final SaveGameAction saveGameAction = new SaveGameAction();
+  
+  
+  
   /**
    * Maps Game objects to GameInfo objects.
    */
@@ -199,6 +229,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   public void start(){
     registerListeners();
     loadLoggingConditions();
+    exportAction(saveGameAction);
   }
 
 
@@ -280,10 +311,9 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
         }
     }
   }
-
-
-
-
+  
+  
+  
   /**
    * Rereads all the user/plugin preferences. This method should be called when
    * the user changes his preferences.
@@ -448,23 +478,25 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Logs the specified game to all the files it should be logged into.
    */
   
-  private void log(Game game){
+  private void gameEnded(Game game){
+    GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
+    saveGameAction.setLastGame(game, gameInfo);
+    
     String [] filenames = getFilesToLogInto(game);
     if (filenames != null){
       for (int i = 0; i < filenames.length; i++)
-        log(game, filenames[i]);
+        log(game, gameInfo, filenames[i]);
     }
   }
   
   
-    
+  
   /**
-   * Logs the specified game into the specified file.
+   * Logs the specified game, with the specified game info into the specified
+   * file.
    */
-
-  private void log(Game game, String filename){
-    GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
-
+  
+  private void log(Game game, GameInfo gameInfo, String filename){
     try{
       String resultString;
       switch (game.getResult()){
@@ -601,7 +633,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
     if (canLog(game) && game.isPlayed())
-      log(game);
+      gameEnded(game);
     gamesToGameInfo.remove(game);
   }
   
@@ -616,7 +648,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     Game game = (Game)evt.getSource();
     if (canLog(game)){
       if (evt.getPropertyName().equals("played") && !game.isPlayed()) // The game ended and became examined
-        log(game);
+        gameEnded(game);
     }
   }
 
@@ -727,8 +759,9 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    */
 
   private static class GameInfo{
-
-
+    
+    
+    
     /**
      * The initial position.
      */
@@ -763,7 +796,131 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
       movelist = new Vector();
       gameStartDate = new Date();
     }
-
+    
+    
+    
   }
+  
+  
+  
+  /**
+   * A <code>JinAction</code> which lets the user save the last saveable game.
+   */
+  
+  private class SaveGameAction extends JinAction{
+    
+    
+    
+    /**
+     * The last saveable game, <code>null</code> if none.
+     */
+    
+    private Game lastGame = null;
+    
+    
+    
+    /**
+     * The <code>GameInfo</code> of the last saveable game, <code>null</code> if
+     * none.
+     */
+    
+    private GameInfo lastGameInfo = null;
+    
+    
+    
+    /**
+     * Creates a new <code>SaveGameAction</code>.
+     */
+    
+    public SaveGameAction(){
+      // We're disabled at first, since there's no game to save
+      enabledModel.setOff();
+    }
+    
+    
+    
+    /**
+     * Returns the string <code>saveGame</code>.
+     */
 
+    public String getId(){
+      return "saveGame";
+    }
+    
+    
+    
+    /**
+     * Returns the name of the action.
+     */
+    
+    public String getName(){
+      return I18n.get(SaveGameAction.class).getString("actionName") +
+          PlatformUtils.getEllipsis();
+    }
+    
+    
+    
+    /**
+     * Sets the last saveable game and its info. 
+     */
+    
+    public void setLastGame(Game game, GameInfo gameInfo){
+      lastGame = game;
+      lastGameInfo = gameInfo;
+      
+      enabledModel.setOn();
+    }
+    
+    
+    
+    /**
+     * Lets the user select a file and then logs the game into it.
+     */
+    
+    public void go(Object actor){
+      Component hintParent = (actor instanceof Component) ?
+          SwingUtilities.windowForComponent((Component)actor) : null;
+      
+      I18n i18n = I18n.get(SaveGameAction.class);
+      Preferences prefs = getPrefs();
+      
+      JFileChooser fileChooser = new JFileChooser();
+      
+      String defaultFile = prefs.getString("defaultFile", null);
+      if (defaultFile != null)
+        fileChooser.setSelectedFile(new File(defaultFile));
+      
+      fileChooser.setMultiSelectionEnabled(false);
+      fileChooser.addChoosableFileFilter(
+        new ExtensionFileFilter(i18n.getString("fileChooser.filterName"), ".pgn", false));
+      fileChooser.setFileHidingEnabled(true);
+      fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      int result = fileChooser.showDialog(hintParent, i18n.getString("fileChooser.approveButtonText"));
+      if (result != JFileChooser.APPROVE_OPTION)
+        return;
+      
+      File file = fileChooser.getSelectedFile();
+      String path = null;
+      try{
+        path = file.getCanonicalPath();
+      } catch (IOException e){
+        e.printStackTrace(); // Shouldn't happen
+      }
+      if (path == null)
+        path = file.getAbsolutePath();
+
+      if ((!file.exists()) && (path.lastIndexOf('.') == -1))
+        path = path + ".pgn";
+
+      log(lastGame, lastGameInfo, path);
+      
+      prefs.setString("defaultFile", path);
+    }
+    
+    
+    
+  }
+  
+  
+  
 }
