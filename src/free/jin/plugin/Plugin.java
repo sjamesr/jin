@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.swing.ListModel;
 
 import free.jin.*;
+import free.jin.action.ActionContext;
 import free.jin.action.JinAction;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
@@ -279,6 +280,10 @@ public abstract class Plugin{
    */
    
   public void exportAction(JinAction action){
+    String actionId = action.getId();
+    Preferences actionPrefs = Preferences.createWrapped(getPrefs(), actionId + ".");
+    action.setContext(new ActionContext(getConn(), getUser(), actionPrefs));
+    
     context.addAction(action);
   }
    
