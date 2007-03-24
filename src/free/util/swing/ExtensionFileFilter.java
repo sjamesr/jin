@@ -22,17 +22,20 @@
 package free.util.swing;
 
 import java.io.File;
+import java.io.FilenameFilter;
+
 import javax.swing.filechooser.FileFilter;
 
 
 /**
- * An implementation of the <code>javax.swing.filechooser.FileFilter</code>
+ * An implementation of <code>javax.swing.filechooser.FileFilter</code>
  * which accepts files whose name ends with a certain string. This makes it
- * useful for accepting files with a certain extension.
+ * useful for accepting files with a certain extension. For convenience, it also
+ * implements FilenameFilter.
  */
 
 
-public class ExtensionFileFilter extends FileFilter{
+public class ExtensionFileFilter extends FileFilter implements FilenameFilter{
 
 
 
@@ -110,7 +113,7 @@ public class ExtensionFileFilter extends FileFilter{
 
   /**
    * Tests whether the specified file passes the filter. Returns true if the
-   * file's name ends with one of the string specified in the constructor.
+   * file's name ends with one of the strings specified in the constructor.
    */
 
   public boolean accept(File file){
@@ -132,10 +135,20 @@ public class ExtensionFileFilter extends FileFilter{
 
     return false;
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Tests whether the specified file passes the filer. Returns whether the
+   * file's name ends with one of the strings specified in the constructor.
+   */
+  
+  public boolean accept(File dir, String name){
+    return accept(new File(dir, name));
+  }
+  
+  
+  
   /**
    * Returns a description of this FileFilter.
    */
@@ -147,6 +160,7 @@ public class ExtensionFileFilter extends FileFilter{
     buf.setLength(buf.length() - 2);
     return name+" ("+buf.toString()+")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
-
-
+  
+  
+  
 }
