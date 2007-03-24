@@ -31,7 +31,7 @@ import free.util.AWTUtilities;
 import free.util.Localization;
 import free.util.models.BooleanListener;
 import free.util.models.BooleanModel;
-import free.util.models.ConstBooleanModel;
+import free.util.models.UnmodifiableBooleanModel;
 import free.workarounds.FixedJPanel;
 
 
@@ -137,7 +137,7 @@ public class FullscreenPanel extends FixedJPanel{
     
     fullscreenModeModel = new BooleanModel(false);
     fullscreenModeModel.addListener(new BooleanListener(){
-      public void modelChanged(ConstBooleanModel model){
+      public void modelChanged(UnmodifiableBooleanModel model){
         setFullscreen(model.isOn());
       }
     });

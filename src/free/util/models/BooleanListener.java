@@ -36,7 +36,7 @@ public interface BooleanListener extends EventListener{
    * Invoked when a <code>BooleanModel</code> changes its state.
    */
   
-  void modelChanged(ConstBooleanModel model);
+  void modelChanged(UnmodifiableBooleanModel model);
 
   
   

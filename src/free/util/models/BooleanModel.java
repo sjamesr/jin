@@ -28,7 +28,7 @@ package free.util.models;
  * <strong>Note:</strong> This model is not thread-safe. 
  */
 
-public class BooleanModel extends Model implements ConstBooleanModel{
+public class BooleanModel extends Model implements UnmodifiableBooleanModel{
   
   
   
