@@ -803,7 +803,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         new ImageIcon(loader.getResource("images/view-fullscreen-pressed.png"))
     );
     
-    ModelUtils.link(fullscreenPanel.getFullscreenModeModel(), button.getModel());
+    ModelUtils.linkSelected(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 
     return button;
   }
