@@ -144,7 +144,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     uiContainer.addPluginUIListener(this);
 
     issueSeekPanel = new IssueSeekPanel(this, 
-        Preferences.createWrapped(getPrefs(), "issueSeekPanel"));
+        Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
     soughtGraph = new SoughtGraph(this);
     
     
