@@ -30,7 +30,8 @@ import free.jin.ui.UIProvider;
 /**
  * A container for the user interface components of a plugin. This can be
  * implemented in different ways - via an internal frame, a single tab in a
- * tabbed pane, or a toplevel window.
+ * tabbed pane, or a toplevel window. Note that some implementations may not
+ * support some of concepts.
  */
 
 public interface PluginUIContainer{
@@ -156,8 +157,6 @@ public interface PluginUIContainer{
   
   /**
    * Sets whether this container should be resizable by the user.
-   * Note that, depending on the implementation, this setting may be meaningless
-   * and thus ignored.
    */
   
   void setResizable(boolean resizable);
@@ -169,6 +168,14 @@ public interface PluginUIContainer{
    */
   
   boolean isResizable();
+  
+  
+  
+  /**
+   * Sets the size of this container to its preferred size.
+   */
+  
+  void sizeToFit();
 
   
   /**
