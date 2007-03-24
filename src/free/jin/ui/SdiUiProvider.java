@@ -250,6 +250,8 @@ public class SdiUiProvider extends AbstractUiProvider{
       KeyStroke closeKeyStroke = 
         KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()); 
       rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+      
+      loadState();
     }
     
     
@@ -259,6 +261,8 @@ public class SdiUiProvider extends AbstractUiProvider{
      */
 
     public void disposeImpl(){
+      saveState();
+      
       setVisible(false);
       frame.dispose();
     }
@@ -311,6 +315,21 @@ public class SdiUiProvider extends AbstractUiProvider{
       return frame.isResizable();
     }
 
+    
+    
+    /**
+     * Resizes the frame to its preferred size.
+     */
+    
+    public void sizeToFit(){
+      boolean isResizable = frame.isResizable();
+      
+      if (!isResizable)
+        frame.setResizable(true);
+      frame.setSize(frame.getPreferredSize());
+      if (!isResizable)
+        frame.setResizable(false);
+    }
     
     
     
@@ -376,8 +395,6 @@ public class SdiUiProvider extends AbstractUiProvider{
      */
   
     private void show(){
-      loadState();
-      
       frame.setVisible(true);
 
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_SHOWN));
@@ -390,7 +407,6 @@ public class SdiUiProvider extends AbstractUiProvider{
      */
   
     private void hide(){
-      saveState();
       frame.setVisible(false);
   
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_HIDDEN));
