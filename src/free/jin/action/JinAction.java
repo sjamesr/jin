@@ -24,7 +24,13 @@ package free.jin.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.Server;
+import free.jin.User;
+import free.util.models.BooleanModel;
+import free.util.models.UnmodifiableBooleanModel;
 
 
 /**
@@ -55,6 +61,14 @@ public abstract class JinAction implements ActionListener{
    */
   
   private Preferences prefs;
+  
+  
+  
+  /**
+   * The <code>BooleanModel</code> reflecting the action's enabled status.
+   */
+  
+  protected final BooleanModel enabledModel = new BooleanModel(true);
   
   
   
@@ -159,6 +173,27 @@ public abstract class JinAction implements ActionListener{
    
   public void actionPerformed(ActionEvent evt){
     go(evt.getSource());
+  }
+  
+  
+  
+  /**
+   * Returns whether the action is currently enabled.
+   */
+  
+  public boolean isEnabled(){
+    return enabledModel.isOn();
+  }
+  
+  
+  
+  /**
+   * Returns the <code>UnmodifiableBooleanModel</code> reflecting whether this action
+   * is enabled. 
+   */
+  
+  public UnmodifiableBooleanModel getEnabledModel(){
+    return enabledModel;
   }
   
   
