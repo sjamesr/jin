@@ -21,18 +21,26 @@
 
 package free.jin.actions;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.ListModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import free.jin.action.JinAction;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.ui.UIProvider;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import free.util.models.BooleanListener;
+import free.util.models.UnmodifiableBooleanModel;
 
 
 /**
@@ -130,9 +138,7 @@ public class ActionsPlugin extends Plugin{
     JComponent content = new JPanel(new GridLayout(actions.getSize(), 1, 5, 5));
     for (int i = 0; i < actions.getSize(); i++){
       JinAction action = (JinAction)actions.getElementAt(i);
-      JButton button = new JButton(action.getName());
-      button.addActionListener(action);
-      content.add(button);
+      content.add(new ActionButton(action, new JButton()).getButton());
     }
     
     content.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -140,6 +146,105 @@ public class ActionsPlugin extends Plugin{
     buttonContainer.getContentPane().removeAll();
     buttonContainer.getContentPane().setLayout(new BorderLayout());
     buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
+    buttonContainer.sizeToFit();
+  }
+  
+  
+  
+  /**
+   * A wrapper of an <code>AbstractButton</code> which makes the button
+   * represent and activate <code>JinAction</code>.
+   */
+  
+  private static class ActionButton implements BooleanListener{
+    
+    
+    
+    /**
+     * The action we represent.
+     */
+    
+    private final JinAction action;
+    
+    
+    
+    /**
+     * The button we wrap.
+     */
+    
+    private final AbstractButton button;
+    
+    
+    
+    /**
+     * Creates a new <code>ActionButton</code> to represent the specified
+     * action using the specified button.
+     */
+    
+    public ActionButton(JinAction action, AbstractButton button){
+      this.action = action;
+      this.button = button;
+      
+      button.addHierarchyListener(new HierarchyListener(){
+        public void hierarchyChanged(HierarchyEvent e){
+          if ((e.getChangeFlags() & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0){
+            if (ActionButton.this.button.isDisplayable())
+              madeDisplayable();
+            else
+              madeUndisplayable();
+          }
+        }
+      });
+    }
+    
+    
+    
+    /**
+     * Returns the button.
+     */
+    
+    public AbstractButton getButton(){
+      return button;
+    }
+    
+    
+    
+    /**
+     * Invoked when the button is made displayable.
+     */
+    
+    private void madeDisplayable(){
+      button.setText(action.getName());
+      
+      button.setEnabled(action.isEnabled());
+      action.getEnabledModel().addListener(this);
+      
+      button.addActionListener(action);
+    }
+    
+    
+    
+    /**
+     * Invoked when the button is made undisplayable.
+     */
+    
+    private void madeUndisplayable(){
+      action.getEnabledModel().removeListener(this);
+      button.removeActionListener(action);
+    }
+    
+    
+    
+    /**
+     * Sets the button's enabled state to match the action's enabled state.
+     */
+    
+    public void modelChanged(UnmodifiableBooleanModel model){
+      button.setEnabled(model.isOn());
+    }
+
+    
+    
   }
   
   
