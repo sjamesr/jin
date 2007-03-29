@@ -257,7 +257,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
   public void setColor(Color color){
     this.color = color;
     
-    Icon colorIcon = new SolidColorRectangleIcon(ICON_SIZE, color);
+    Icon colorIcon = new RectangleIcon(ICON_SIZE, color);
     button.setIcon(new BorderIcon(colorIcon, ICON_BORDER_COLOR));
     
     fireStateChanged();
