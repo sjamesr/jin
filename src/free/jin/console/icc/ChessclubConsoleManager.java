@@ -22,6 +22,7 @@
 package free.jin.console.icc;
 
 import free.jin.console.Console;
+import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
@@ -36,21 +37,16 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
 
   /**
-   * Overrides <code>chatMessageReceived(ChatEvent)</code> to notify the
-   * <code>Console</code> when tells are received.
+   * Returns whether the specified chat event is a personal tell. 
    */
-
-  public void chatMessageReceived(ChatEvent evt){
-    super.chatMessageReceived(evt);
-    
-    if (isPaused())
-      return;
-
+  
+  protected boolean isPersonalTell(ChatEvent evt){
     String type = evt.getType();
-    if (type.equals("tell") || type.equals("say") || type.equals("atell") || type.equals("ptell"))
-      console.tellReceived(evt.getSender());
+    return type.equals("tell") || type.equals("say") || type.equals("atell") ||
+        type.equals("ptell");
   }
-
+  
+  
   
   /**
    * Returns the string that should be displayed according to the given
@@ -77,11 +73,11 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
 
   /**
-   * Creates a ChessclubConsole.
+   * Creates a <code>ChessclubConsole</code> with the specified designation.
    */
 
-  protected Console createConsole(){
-    return new ChessclubConsole(this);
+  protected Console createConsole(ConsoleDesignation designation){
+    return new ChessclubConsole(this, designation);
   }
 
 
