@@ -401,13 +401,9 @@
 			<param name="action.id" value="askquestion" />
 		</antcall>
 		
-		<!-- Seek action -->
-		<antcall target="buildAction">
-			<param name="action.id" value="seek" />
-		</antcall>
 		
-    
-    
+    	
+		
 		<!-- Resources -->
 		<mkdir dir="${resources.dir}" />
 		
@@ -416,7 +412,7 @@
 			<fileset dir="${res.dir}" includes="pieces/**/*.jar pieces/**/*.zip" />
 			<fileset dir="${res.dir}" includes="boards/**/.jar boards/**/*.zip" />
 		</copy>
-
+		
 	</target>
   
   
