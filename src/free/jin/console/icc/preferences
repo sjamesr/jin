@@ -4,7 +4,10 @@ tell-next-teller-keystroke = shift F9
 tell-last-teller-keystroke.macosx = F8
 tell-next-teller-keystroke.macosx = shift F8
 
-game-list-display-style = embedded
+
+# Consoles definition
+consoles.count = integer;1
+consoles.0.type = system
 
 # Output properties
 #output-selection = color;000080
