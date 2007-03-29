@@ -24,6 +24,7 @@ package free.jin.console.icc;
 import javax.swing.text.BadLocationException;
 
 import free.jin.console.Console;
+import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleTextField;
 import free.jin.console.ConsoleTextPane;
 
@@ -38,16 +39,16 @@ public class ChessclubConsole extends Console{
 
 
   /**
-   * Creates a new <code>ChessclubConsole</code> to be used with the specified
-   * <code>ChessclubConsoleManager</code>. 
+   * Creates a new <code>ChessclubConsole</code> with the specified designation,
+   * to be used with the specified <code>ChessclubConsoleManager</code>. 
    */
 
-  public ChessclubConsole(ChessclubConsoleManager consoleManager){
-    super(consoleManager);
+  public ChessclubConsole(ChessclubConsoleManager consoleManager, ConsoleDesignation designation){
+    super(consoleManager, designation);
   }
-
-
-
+  
+  
+  
   /**
    * Creates the <code>ConsoleTextField</code> in which the user can input
    * commands to be sent to the server. Overrides
