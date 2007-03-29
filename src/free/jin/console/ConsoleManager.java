@@ -21,22 +21,29 @@
 
 package free.jin.console;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Toolkit;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.*;
+import javax.swing.JComponent;
+import javax.swing.JTabbedPane;
 
 import free.jin.Connection;
-import free.jin.GameListConnection;
 import free.jin.I18n;
+import free.jin.Preferences;
 import free.jin.console.prefs.ConsolePrefsPanel;
-import free.jin.event.*;
+import free.jin.event.ChatEvent;
+import free.jin.event.ChatListener;
+import free.jin.event.ConnectionListener;
+import free.jin.event.ListenerManager;
+import free.jin.event.PlainTextEvent;
+import free.jin.event.PlainTextListener;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
@@ -50,7 +57,7 @@ import free.jin.ui.UIProvider;
  * opening, positioning and closing the various consoles used by the user.
  */
 
-public class ConsoleManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListListener{
+public class ConsoleManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener{
   
   
   
@@ -79,29 +86,29 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
   
   /**
-   * The main console.
+   * The consoles.
    */
 
-  protected Console console;
+  private final List consoles = new ArrayList();
 
 
 
   /**
-   * The container in which the console sits.
+   * Our main container.
    */
 
-  protected PluginUIContainer consoleContainer;
-
-
-
+  private PluginUIContainer uiContainer;
+  
+  
+  
   /**
-   * The current game lists display style.
+   * The tabbed pane in which the consoles sit.
    */
+  
+  private JTabbedPane consolesTabbedPane;
 
-  private int gameListsDisplayStyle;
-  
-  
-  
+
+
   /**
    * Are we currently paused?
    */
@@ -123,8 +130,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void start(){
-    initState();
-    openConsole();
+    createUI();
+    createConsoles();
+    uiContainer.setVisible(true);
     registerConnListeners();
   }
 
@@ -141,96 +149,130 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * Sets all the variables representing the current settings from the parameters.
+   * Creates the consoles we'll be displaying. 
    */
-
-  protected void initState(){
-    String gameListsDisplayStyleString = getPrefs().getString("game-list-display-style", "embedded");
-    if ("embedded".equals(gameListsDisplayStyleString))
-      setGameListsDisplayStyle(EMBEDDED_GAME_LISTS);
-    else if ("framed".equals(gameListsDisplayStyleString))
-      setGameListsDisplayStyle(EXTERNAL_GAME_LISTS);
-    else if ("none".equals(gameListsDisplayStyleString))
-      setGameListsDisplayStyle(NO_GAME_LISTS);
+  
+  private void createConsoles(){
+    int consoleCount = getPrefs().getInt("consoles.count");
+    for (int i = 0; i < consoleCount; i++){
+      ConsoleDesignation designation = 
+        loadConsoleDesignation("consoles." + i + ".");
+      addConsole(designation);
+    }
   }
+  
+  
+  
+  /**
+   * Creates a <code>ConsoleDesignation</code> from preferences, using the
+   * specified prefix.
+   */
+  
+  private ConsoleDesignation loadConsoleDesignation(String prefsPrefix){
+    Preferences prefs = getPrefs();
+    I18n i18n = getI18n();
+
+    String type = prefs.getString(prefsPrefix + "type");
+    if ("system".equals(type))
+      return new SystemConsoleDesignation();
+    else if ("chat".equals(type)){
+      String name = prefs.getString(prefsPrefix + "name", null);
+      if (name == null)
+        name = i18n.getString(prefs.getString(prefsPrefix + "nameKey"));
+      
+      ChatConsoleDesignation designation =
+          new ChatConsoleDesignation(name, false);
+      
+      int acceptedCount = prefs.getInt(prefsPrefix + "accepted.count");
+      for (int j = 0; j < acceptedCount; j++){
+        String acceptedPrefix = prefsPrefix + "accepted." + j + ".";
+        String chatType = prefs.getString(acceptedPrefix + "chatType", null);
+        Object forum = prefs.get(acceptedPrefix + "forum", null);
+        String sender = prefs.getString(acceptedPrefix + "sender", null);
+        
+        designation.addAccepted(chatType, forum, sender);
+      }
+      
+      return designation;
+    }
+//    else if ("text".equals(type)){
+//
+//    }
+//    else if ("union".equals(type)){
+//      
+//    }
+    else
+      throw new IllegalArgumentException("Unrecognized designation type: " + type);
+  }
+  
 
 
 
   /**
-   * Creates and opens the console.
+   * Creates and displays the plugin's UI.
    */
 
-  private void openConsole(){
-    console = createConsole();
+  private void createUI(){
+    I18n i18n = getI18n();
 
-    consoleContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
-    consoleContainer.setTitle(getI18n().getString("mainConsole.initialTitle"));
+    uiContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
+    uiContainer.setTitle(i18n.getString("mainConsole.initialTitle"));
 
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
-      consoleContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+      uiContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
     
-    Container content = consoleContainer.getContentPane();
+    consolesTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+    
+    Container content = uiContainer.getContentPane();
     content.setLayout(new BorderLayout());
-    content.add(console, BorderLayout.CENTER);
+    content.add(consolesTabbedPane, BorderLayout.CENTER);
     
-    consoleContainer.addPluginUIListener(new PluginUIAdapter(){
+    uiContainer.addPluginUIListener(new PluginUIAdapter(){
       public void pluginUIActivated(PluginUIEvent evt){
-        console.requestDefaultFocus();
+        JComponent selected = (JComponent)consolesTabbedPane.getSelectedComponent();
+        if (selected != null)
+          selected.requestDefaultFocus();
       }
     });
-
-    consoleContainer.setVisible(true);
-  }
-
-
-
-  /**
-   * Creates the Console for this ConsoleManager.
-   */
-
-  protected Console createConsole(){
-    return new Console(this);
   }
   
   
   
   /**
-   * Sets the current game lists display style to the specified value. Possible
-   * values are <code>EMBEDDED_GAME_LISTS</code>,
-   * <code>EXTERNAL_GAME_LISTS</code> and <code>NO_GAME_LISTS</code>. 
+   * Adds a console with the specified designation.
    */
   
-  public void setGameListsDisplayStyle(int style){
-    switch (style){
-      case EMBEDDED_GAME_LISTS:
-      case EXTERNAL_GAME_LISTS:
-      case NO_GAME_LISTS:
-        break;
-      default:
-        throw new IllegalArgumentException("Bad game lists display style value: " + style);
-    }
-
-    if (getConn() instanceof GameListConnection){
-      GameListListenerManager listenerManager = ((GameListConnection)getConn()).getGameListListenerManager();
+  public void addConsole(ConsoleDesignation designation){
+    Console console = createConsole(designation);
+    consoles.add(console);
+    consolesTabbedPane.addTab(designation.getName(), console); 
+  }
   
-      if (style == NO_GAME_LISTS)
-        listenerManager.removeGameListListener(ConsoleManager.this);
-      else if (gameListsDisplayStyle == NO_GAME_LISTS)
-        listenerManager.addGameListListener(ConsoleManager.this);
-    }
+  
+  
+  /**
+   * Removes the specified console.
+   */
+  
+  public void removeConsole(Console console){
+    int index = consoles.indexOf(console);
+    if (index == -1)
+      throw new IllegalArgumentException("Unknown console: " + console);
     
-    this.gameListsDisplayStyle = style;
+    consoles.remove(index);
+    consolesTabbedPane.removeTabAt(index);
   }
   
   
   
   /**
-   * Returns the current game lists display style.
+   * Creates a single <code>Console</code> for this <code>ConsoleManager</code>.
+   * @param designation TODO
    */
-  
-  public int getGameListsDisplayStyle(){
-    return gameListsDisplayStyle;
+
+  protected Console createConsole(ConsoleDesignation designation){
+    return new Console(this, designation);
   }
   
   
@@ -328,17 +370,19 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * Rereads the plugin/user properties and changes the assosiated console
-   * manager's settings accordingly. This method should be called when the user
-   * changes the preferences.
+   * Rereads the plugin/user properties and changes settings accordingly.
+   * This method should be called when the user changes the preferences.
    */
 
   public void refreshFromProperties(){
-    console.refreshFromProperties();
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.refreshFromProperties();
+    }
   }
-
-
-
+  
+  
+  
   /**
    * Registers all the necessary listeners to JinConnection events.
    */
@@ -350,9 +394,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     listenerManager.addPlainTextListener(this);
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
-
-    if ((conn instanceof GameListConnection) && (getGameListsDisplayStyle() != NO_GAME_LISTS))
-      ((GameListConnection)conn).getGameListListenerManager().addGameListListener(this);
   }
 
 
@@ -369,24 +410,25 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     listenerManager.removePlainTextListener(this);
     listenerManager.removeChatListener(this);
     listenerManager.removeConnectionListener(this);
-
-    if ((conn instanceof GameListConnection) && (getGameListsDisplayStyle() != NO_GAME_LISTS))
-      ((GameListConnection)conn).getGameListListenerManager().removeGameListListener(this);
   }
 
 
 
   /**
-   * Adds the specified line of text to the console.
+   * Adds the specified line of text to all the consoles.
    */
 
   public void addSpecialLine(String line){
-    console.addToOutput(line, "special");
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.addToOutput(line, "special");
+    }
   }
-
-
+  
+  
+  
   /**
-   * Listens to plain text and adds it to the console.
+   * Listens to plain text events and adds them to the consoles.
    */
 
   public void plainTextReceived(PlainTextEvent evt){
@@ -394,12 +436,29 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       pausedEventsQueue.addElement(evt);
       return;
     }
-      
-    console.addToOutput(decode(evt.getText()), "plain");
+    
+    String decoded = decode(evt.getText());
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      if (console.getDesignation().accept(evt))
+        console.addToOutput(decoded, "plain");
+    }
   }
-
-
-
+  
+  
+  
+  /**
+   * Returns whether the specified chat event is a personal tell. This method
+   * is meant to be overridden by server-specific implementations. The default
+   * implementation always returns false.
+   */
+  
+  protected boolean isPersonalTell(ChatEvent evt){
+    return false;
+  }
+  
+  
+  
   /**
    * Listens to ChatEvents and adds appropriate text to the console.
    */
@@ -414,17 +473,28 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     Object forum = evt.getForum();
     String sender = evt.getSender();
     String chatMessageType = type + "." + (forum == null ? "" : forum.toString()) + "." + sender;
-
-    console.addToOutput(translateChat(evt), chatMessageType);
+    String translated = translateChat(evt);
+    
+    boolean isPersonalTell = isPersonalTell(evt);
+    
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      if (console.getDesignation().accept(evt)){
+        console.addToOutput(translated, chatMessageType);
+        if (isPersonalTell)
+          console.personalTellReceived(sender);
+      }
+    }
   }
   
   
   
   /**
-   * Sends the specified user-inputted command to the server.
+   * Sends the specified user-inputted command to the server on behalf of the
+   * specified console.
    */
   
-  public void sendUserCommand(String command){
+  public void sendUserCommand(String command, Console console){
     Connection conn = getConn();
     if (conn.isConnected())
       conn.sendCommand(encode(command));
@@ -491,7 +561,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     // "Connecting to chessclub.com on port 5,000"
     String message = getI18n().getFormattedString("tryingToConnectMessage",
       new Object[]{hostname, String.valueOf(port)});
-    console.addToOutput(message, "info");
+    
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.addToOutput(message, "info");
+    }
   }
 
 
@@ -501,7 +575,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionEstablished(Connection conn){
-    console.addToOutput(getI18n().getString("connectedMessage"), "info");  
+    String message = getI18n().getString("connectedMessage");
+    
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.addToOutput(message, "info");
+    }
   }
 
 
@@ -513,7 +592,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   public void loginSucceeded(Connection conn){
     String title = getI18n().getFormattedString("mainConsole.title",
       new Object[]{getConn().getUser().getName(), getServer().getLongName()});
-    consoleContainer.setTitle(title);
+    uiContainer.setTitle(title);
   }
 
 
@@ -523,7 +602,12 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void connectionLost(Connection conn){
-    console.addToOutput(getI18n().getString("disconnectedWarning"), "info");
+    String message = getI18n().getString("disconnectedWarning");
+    
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.addToOutput(message, "info");
+    }
   }
   
   
@@ -535,111 +619,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
 
   /**
-   * Creates a table to display a game list item for the given GameListEvent.
-   */
-
-  protected JTable createGameListTable(GameListEvent evt){
-    return new GameListTable(console, evt);
-  }
-
-  
-
-
-  /**
-   * Gets called when a game list arrives from the server.
-   * Adds a JTable displaying the list to the console.
-   */
-
-  public void gameListArrived(GameListEvent evt){
-    final JTable table = createGameListTable(evt);
-    JTableHeader header = table.getTableHeader();
-    Dimension originalPrefSize = header.getPreferredSize();
-    // This abomination is needed because Metal L&F has a too small preferred label height on 1.1
-    header.setPreferredSize(new Dimension(originalPrefSize.width, Math.max(originalPrefSize.height, 18)));
-
-    JScrollPane scrollPane = new JScrollPane(table);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-    // The following block sets the preferred sizes of the columns to the maximum
-    // preferred width of the cells in that column.
-    TableColumnModel columnModel = table.getColumnModel();
-    TableModel model = table.getModel();
-    for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++){
-      TableColumn column = columnModel.getColumn(columnIndex);
-      Component headerRendererComponent = column.getHeaderRenderer().getTableCellRendererComponent(table, column.getHeaderValue(), false, false, 0, columnIndex);
-      int maxWidth = headerRendererComponent.getPreferredSize().width;
-      for (int rowIndex=0;rowIndex<model.getRowCount();rowIndex++){
-        TableCellRenderer cellRenderer = table.getCellRenderer(rowIndex, columnIndex);
-        Object value = model.getValueAt(rowIndex, columnIndex);
-        Component rendererComponent = cellRenderer.getTableCellRendererComponent(table, value, false, false, rowIndex, columnIndex);
-        int cellWidth = rendererComponent.getPreferredSize().width;
-        if (cellWidth>maxWidth)
-          maxWidth = cellWidth;
-      }
-      if (maxWidth>150) // This is probably the "note" column, which is very wide but we don't want it to take all the space
-        column.setPreferredWidth(50);
-      else
-        column.setPreferredWidth(maxWidth);
-    }
-    
-    
-    String title = getI18n().getFormattedString("gameListTitle",
-      new Object[]{
-        evt.getListTitle(),
-        new Integer(evt.getFirstIndex()),
-        new Integer(evt.getLastIndex()),
-        new Integer(evt.getItemCount())
-      });
-    title = "  " + title + "  ";
-
-    // Otherwise, the table header is not created on time for the layout to take account of it
-    // and size the scrollpane properly.
-    // See bug https://sourceforge.net/tracker/index.php?func=detail&aid=602496&group_id=50386&atid=459537
-    scrollPane.setColumnHeaderView(table.getTableHeader());
-
-    if (getGameListsDisplayStyle() == EMBEDDED_GAME_LISTS){
-      scrollPane.setBorder(new TitledBorder(title));
-      int maxHeight = (console.getOutputArea().height - 40) * 2/3;
-      if (scrollPane.getPreferredSize().height > maxHeight)
-        scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width, maxHeight));
-
-      // This is stupid, but fixes the bug in the embedded case case described at
-      // https://sourceforge.net/tracker/index.php?func=detail&aid=602496&group_id=50386&atid=459537 for JDK1.4
-      scrollPane.setPreferredSize(scrollPane.getPreferredSize());
-
-      console.addToOutput(scrollPane);
-    }
-    else{
-      PluginUIContainer container = createContainer(null, UIProvider.CLOSEABLE_CONTAINER_MODE);
-      container.setTitle(title);
-
-      Container content = container.getContentPane();
-      content.setLayout(new BorderLayout());
-      content.add(scrollPane, BorderLayout.CENTER);
-
-      container.setVisible(true);
-    }
-  }
-
-
-
-  /**
    * Saves the current state into the user file.
    */
 
   public void saveState(){
-    if (getConn() instanceof GameListConnection){
-      String displayStyleString;
-      switch (getGameListsDisplayStyle()){
-        case EMBEDDED_GAME_LISTS: displayStyleString = "embedded"; break;
-        case EXTERNAL_GAME_LISTS: displayStyleString = "framed"; break;
-        case NO_GAME_LISTS: displayStyleString = "none"; break;
-        default:
-          throw new IllegalStateException("Bad gameListsDisplayStyle value");
-      }
-      getPrefs().setString("game-list-display-style", displayStyleString);
-    }
+    
   }
 
 
