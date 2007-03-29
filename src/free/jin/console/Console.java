@@ -31,7 +31,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.FocusEvent;
@@ -44,9 +43,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -73,7 +73,7 @@ import javax.swing.text.StyledDocument;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.util.BrowserControl;
-import free.util.PlatformUtils;
+import free.util.swing.MultiButton;
 
 
 /**
@@ -92,8 +92,17 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private final ConsoleManager consoleManager;
+  
+  
+  
+  /**
+   * This console's designation.
+   */
+  
+  private final ConsoleDesignation designation;
+  
 
-
+  
   /**
    * The listener list.
    */
@@ -210,15 +219,45 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
 
   private boolean didScrollToBottom = true;
+  
+  
+  
+  /**
+   * An action which clears the console.
+   */
+  
+  private final Action clearingAction = 
+    new AbstractAction(I18n.get(Console.class).getString("clearAction.name")){
+      public void actionPerformed(ActionEvent e){
+        clear();
+      }
+  };
+  
+  
+  
+  /**
+   * An action which closes the console.
+   */
+  
+  private final Action closeAction =
+    new AbstractAction(I18n.get(Console.class).getString("closeAction.name")){
+      public void actionPerformed(ActionEvent e){
+        consoleManager.removeConsole(Console.this);
+      }
+  };
+    
 
 
 
   /**
-   * Creates a new <code>Console</code> to be used in the specified <code>ConsoleManager</code>.
+   * Creates a new <code>Console</code> with the specified designation, to be
+   * used in the specified <code>ConsoleManager</code>.
    */
 
-  public Console(ConsoleManager consoleManager){
+  public Console(ConsoleManager consoleManager, ConsoleDesignation designation){
     this.consoleManager = consoleManager;
+    this.designation = designation;
+    
     this.prefs = consoleManager.getPrefs();
 
     this.outputComponent = createOutputComponent();
@@ -226,7 +265,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     this.outputScrollPane = createOutputScrollPane(outputComponent);
     this.inputComponent = createInputComponent();
     
-    registerKeyboardAction(clearingActionListener, 
+    registerKeyboardAction(clearingAction, 
         KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
         WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
@@ -236,20 +275,22 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     inputComponent.addKeyListener(this);
     outputComponent.addContainerListener(this);
     
+    setFocusable(false);
+    
+    closeAction.setEnabled(designation.isConsoleTemporary());
+    
     init();
   }
   
   
   
   /**
-   * An action listener which clears the console.
+   * Returns this console's designation.
    */
   
-  private final ActionListener clearingActionListener = new ActionListener(){
-    public void actionPerformed(ActionEvent evt){
-      clear();
-    }
-  };
+  public ConsoleDesignation getDesignation(){
+    return designation;
+  }
   
   
   
@@ -258,21 +299,16 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    */
   
   private void createUI(){
-    JButton clearButton = I18n.get(Console.class).createButton("clearConsoleButton");
-    clearButton.addActionListener(clearingActionListener);
-    clearButton.setRequestFocusEnabled(false);
+    JComponent actionsComponent = createActionsComponent();
     
     // We always want input component to have focus
     inputComponent.setNextFocusableComponent(inputComponent);
     
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
-    bottomPanel.add(clearButton, BorderLayout.EAST);
+    bottomPanel.add(actionsComponent, BorderLayout.EAST);
     
-    if (PlatformUtils.isMacOSX())
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 2, 18));
-    else
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 2, 5));
+    bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
@@ -298,9 +334,26 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   public ConsoleManager getConsoleManager(){
     return consoleManager;
   }
-
-
-
+  
+  
+  
+  /**
+   * Creates the component which allows the user to perform certain actions on
+   * the console (such as close, clear...).
+   */
+  
+  protected JComponent createActionsComponent(){
+    MultiButton button = new MultiButton();
+    
+    button.add(clearingAction);
+    button.add(closeAction);
+    
+    return button;
+  }
+  
+  
+  
+  
   /**
    * Creates the <code>ConsoleTextPane</code> to which the server's textual
    * output goes.
@@ -894,7 +947,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     if (command.isSpecial())
       executeSpecialCommand(commandString);
     else
-      consoleManager.sendUserCommand(commandString);
+      consoleManager.sendUserCommand(commandString, this);
   }
 
 
@@ -914,10 +967,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   /**
    * Gets called when a tell by the given player is received. This method saves
-   * the name of the teller so it can be later retrieved when F9 is hit.
+   * the name of the teller so it can be later retrieved when the keyboard
+   * shortcut to reply is activated.
    */
 
-  public void tellReceived(String teller){
+  public void personalTellReceived(String teller){
     tellers.removeElement(teller);
     tellers.insertElementAt(teller, 0);
     if (tellers.size() > getTellerRingSize())
