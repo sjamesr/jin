@@ -201,7 +201,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
     
     // This makes the insets of the frame known, which is important for 
     // determining its real preferred size
-    if ((container instanceof Frame) && (container.getPeer() == null))
+    if ((container instanceof Frame) && !container.isDisplayable())
       ((Frame)container).pack();
 
     Dimension prefSize = container.getPreferredSize();
