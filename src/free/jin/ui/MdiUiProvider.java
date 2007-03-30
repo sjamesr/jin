@@ -710,8 +710,6 @@ public class MdiUiProvider extends AbstractUiProvider{
       frame.setVisible(false); // internal frames are initially visible in 1.1
       
       setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
-      
-      loadState();
     }
     
     
@@ -721,8 +719,6 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     public void disposeImpl(){
-      saveState();
-      
       setVisible(false);
       frame.dispose();
     }
@@ -871,6 +867,8 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     private void show(){
+      loadState();
+      
       desktop.add(frame);
       frame.setVisible(true);
       
@@ -884,6 +882,8 @@ public class MdiUiProvider extends AbstractUiProvider{
      */
 
     private void hide(){
+      saveState();
+      
       if (frame.isSelected())
         frameSwitcher.selectPrevious();
       
