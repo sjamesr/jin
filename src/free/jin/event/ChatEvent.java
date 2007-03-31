@@ -21,8 +21,8 @@
 
 package free.jin.event;
 
-import free.jin.event.JinEvent;
 import free.jin.Connection;
+import free.jin.ServerUser;
 
 
 /**
@@ -109,10 +109,10 @@ public class ChatEvent extends JinEvent{
 
 
   /**
-   * The name/handle of the player who sent the message.
+   * The player who sent the message.
    */
+  private final ServerUser sender;
 
-  private final String sender;
 
 
 
@@ -159,10 +159,10 @@ public class ChatEvent extends JinEvent{
    * If your chat type belongs to a category which does not exist yet, contact
    * the person responsible for the code and ask him to add a new category. In
    * the meanwhile (or if you are happy with it), use
-   * <code>UNCATEGORIZED_CHAT</code>
+   * <code>OTHER_CHAT_CATEGORY</code>
    */
 
-  public ChatEvent(Connection conn, String type, int category, String sender, String senderTitle,
+  public ChatEvent(Connection conn, String type, int category, ServerUser sender, String senderTitle,
       int senderRating, String message, Object forum){
     super(conn);
 
@@ -216,10 +216,10 @@ public class ChatEvent extends JinEvent{
 
 
   /**
-   * Returns the name/handle of the player who sent the message.
+   * Returns the player who sent the message.
    */
 
-  public String getSender(){
+  public ServerUser getSender(){
     return sender;
   }
 
