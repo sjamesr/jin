@@ -34,7 +34,23 @@ import java.util.regex.PatternSyntaxException;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.Preferences;
-import free.jin.event.*;
+import free.jin.ServerUser;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ChatEvent;
+import free.jin.event.ChatListener;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.ConnectionListener;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PlainTextEvent;
+import free.jin.event.PlainTextListener;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
 import free.jin.plugin.Plugin;
 import free.util.audio.AudioClip;
 import free.util.models.BooleanModel;
@@ -302,8 +318,10 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
     String type = evt.getType();
     Object forum = evt.getForum();
-    String sender = evt.getSender();
-    String chatMessageType = type+"."+(forum == null ? "" : forum.toString())+"."+sender;
+    ServerUser sender = evt.getSender();
+    String chatMessageType = type + "." + 
+        (forum == null ? "" : forum.toString()) + "." + 
+        (sender == null ? "" : sender.getName());
     
     Enumeration patterns = chatPatternsToFilenames.keys();
     while (patterns.hasMoreElements()){
