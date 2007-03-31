@@ -23,16 +23,12 @@ package free.jin.console;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -71,8 +67,12 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import free.jin.I18n;
+import free.jin.Jin;
 import free.jin.Preferences;
+import free.jin.ServerUser;
+import free.jin.ui.SdiUiProvider;
 import free.util.BrowserControl;
+import free.util.PlatformUtils;
 import free.util.swing.MultiButton;
 
 
@@ -83,7 +83,7 @@ import free.util.swing.MultiButton;
  * free.jin.console.ConsoleManager.
  */
 
-public class Console extends JPanel implements KeyListener, ContainerListener{
+public class Console extends JPanel implements KeyListener{
   
   
   
@@ -273,7 +273,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
-    outputComponent.addContainerListener(this);
     
     setFocusable(false);
     
@@ -301,18 +300,29 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
   private void createUI(){
     JComponent actionsComponent = createActionsComponent();
     
-    // We always want input component to have focus
-    inputComponent.setNextFocusableComponent(inputComponent);
-    
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
     bottomPanel.add(actionsComponent, BorderLayout.EAST);
     
-    bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+    // Hack to make room for the window resize handle
+    if (PlatformUtils.isMacOSX() && (Jin.getInstance().getUIProvider() instanceof SdiUiProvider))
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0 , 2, 18));
+    else
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
     add(bottomPanel, BorderLayout.SOUTH);
+  }
+  
+  
+  
+  /**
+   * Transfers the focus to the input component.
+   */
+  
+  public void obtainFocus(){
+    inputComponent.requestFocusInWindow();
   }
 
 
@@ -376,7 +386,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
       public void focusGained(FocusEvent evt){
         super.focusGained(evt);
         if (!dragging)
-          requestDefaultFocus();
+          obtainFocus();
       }
       public void focusLost(FocusEvent e){
         this.setVisible(false);
@@ -411,7 +421,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
         if (isCopyOnSelect()){
           SwingUtilities.invokeLater(new Runnable(){
             public void run(){
-              requestDefaultFocus();
+              obtainFocus();
             }
           });
         }
@@ -541,10 +551,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     scrollPane.setViewport(viewport);
 
     viewport.putClientProperty("EnableWindowBlit", Boolean.TRUE);
+    
+    scrollPane.setBorder(null);
 
     return scrollPane;
   }
-
 
 
 
@@ -557,20 +568,6 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
     ConsoleTextField textField = new ConsoleTextField(this);
     return textField;
   }
-
-
-
-
-  
-  /**
-   * Assigns the default focus to input component.
-   */
-
-  public boolean requestDefaultFocus(){
-    inputComponent.requestFocus();
-    return true;
-  }
-
 
 
 
@@ -682,8 +679,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   protected final boolean prepareAdding(){
     // Seriously hack the scrolling to make sure if we're at the bottom, we stay there,
-    // and if not, we stay there too :-) If you figure out what (and why) I'm doing, drop me an email,
-    // and we'll hire you as a Java programmer.
+    // and if not, we stay there too :-)
     numAddToOutputCalls++;
     outputScrollPane.getViewport().putClientProperty("EnableWindowBlit", Boolean.FALSE); // Adding a lot of text is slow with blitting
     BoundedRangeModel verticalScroll = outputScrollPane.getVerticalScrollBar().getModel();
@@ -738,7 +734,7 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
     if (scrollToBottom && didScrollToBottom){
       // This may be false if the frame containing us (for example), is iconified
-      if (getPeer() != null){
+      if (isDisplayable()){
         didScrollToBottom = false;
         SwingUtilities.invokeLater(new BottomScroller(numAddToOutputCalls));
       }
@@ -967,13 +963,13 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
   /**
    * Gets called when a tell by the given player is received. This method saves
-   * the name of the teller so it can be later retrieved when the keyboard
+   * the name of the sender so it can be later retrieved when the keyboard
    * shortcut to reply is activated.
    */
 
-  public void personalTellReceived(String teller){
-    tellers.removeElement(teller);
-    tellers.insertElementAt(teller, 0);
+  public void personalTellReceived(ServerUser sender){
+    tellers.removeElement(sender);
+    tellers.insertElementAt(sender, 0);
     if (tellers.size() > getTellerRingSize())
       tellers.removeElementAt(tellers.size() - 1);
   }
@@ -999,11 +995,11 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
    * the method but I didn't think getColocutor() was much better :-)
    */
 
-  public String getTeller(int n){
+  public ServerUser getTeller(int n){
     if ((n < 0) || (n >= tellers.size()))
       return null;
 
-    return (String)tellers.elementAt(n);
+    return (ServerUser)tellers.elementAt(n);
   }
 
 
@@ -1141,81 +1137,5 @@ public class Console extends JPanel implements KeyListener, ContainerListener{
 
 
 
-
-  /**
-   * Listens to components being added to the output component and its descendents
-   * and registers as the key and container listener for all of them, because
-   * we need to transfer the focus to the input field.
-   */
-   
-  public void componentAdded(ContainerEvent evt){
-    Container container = evt.getContainer();
-    Component child = evt.getChild();
-
-    if (SwingUtilities.isDescendingFrom(container,outputComponent)) // Check just in case.
-      registerAsListenerToHierarchy(child);
-  }
-
-
-
-
-  /**
-   * Listens to components being removed from the output component and its
-   * descendents and unregisters as the key listener.
-   */
-  
-  public void componentRemoved(ContainerEvent evt){
-    Container container = evt.getContainer();
-    Component child = evt.getChild();
-
-    if (SwingUtilities.isDescendingFrom(container,outputComponent)) // Check just in case.
-      unregisterAsListenerToHierarchy(child);
-  }
-
-
-
-
-  /**
-   * Recursively registers <code>this</code> as the key listener with the given
-   * component and of its descendants (recursively) if they are focus
-   * traversable. If they are Containers, also registers as their
-   * ContainerListener.
-   */
-
-  private void registerAsListenerToHierarchy(Component component){
-    if (component.isFocusTraversable())
-      component.addKeyListener(this);
-
-    if (component instanceof Container){
-      Container container = (Container)component;
-      container.addContainerListener(this);
-      int numChildren = container.getComponentCount();
-      for (int i=0; i<numChildren; i++)
-        registerAsListenerToHierarchy(container.getComponent(i));        
-    }
-  }
-
-
-
-  
-  /**
-   * Does the opposite of <code>registerAsListenerToHierarchy(Component)</code>,
-   * unregistering <code>this</code> as the key or container listener from the
-   * given component and any of its children.
-   */
-
-  private void unregisterAsListenerToHierarchy(Component component){
-    if (component.isFocusTraversable())
-      component.removeKeyListener(this);
-
-    if (component instanceof Container){
-      Container container = (Container)component;
-      container.removeContainerListener(this);
-      int numChildren = container.getComponentCount();
-      for (int i=0; i<numChildren; i++)
-        unregisterAsListenerToHierarchy(container.getComponent(i));        
-    }
-  }
-  
 
 }
