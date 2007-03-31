@@ -22,7 +22,6 @@
 package free.jin.ui;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Image;
@@ -35,10 +34,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Enumeration;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 
@@ -221,6 +222,10 @@ public class SdiUiProvider extends AbstractUiProvider{
       
       frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       frame.addWindowListener(this);
+      
+      JPanel contentPane = new JPanel();
+      contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      frame.setContentPane(contentPane);
 
       this.menubar = new JMenuBar();
       
@@ -333,8 +338,8 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Returns the content pane of the frame.
      */
   
-    public Container getContentPane(){
-      return frame.getContentPane();
+    public JComponent getContentPane(){
+      return (JComponent)frame.getContentPane();
     }
   
   

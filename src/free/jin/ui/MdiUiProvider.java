@@ -706,6 +706,10 @@ public class MdiUiProvider extends AbstractUiProvider{
       frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
       frame.addVetoableChangeListener(this);
       frame.addInternalFrameListener(this);
+      
+      JPanel contentPane = new JPanel();
+      contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      frame.setContentPane(contentPane);
 
       frame.setVisible(false); // internal frames are initially visible in 1.1
       
@@ -799,8 +803,8 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Returns the content pane of the frame.
      */
 
-    public Container getContentPane(){
-      return frame.getContentPane();
+    public JComponent getContentPane(){
+      return (JComponent)frame.getContentPane();
     }
 
 
