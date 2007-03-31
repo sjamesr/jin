@@ -21,6 +21,7 @@
 
 package free.jin.console.fics;
 
+import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
@@ -64,13 +65,13 @@ public class FreechessConsoleManager extends ConsoleManager{
 
   protected String translateChat(ChatEvent evt){
     String type = evt.getType();
-    String sender = evt.getSender();
+    ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
     String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
     String message = evt.getMessage();
     Object forum = evt.getForum();
     
-    Object [] args = new Object[]{sender, title, rating, String.valueOf(forum), message};
+    Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
     return getI18n().getFormattedString(type + ".displayPattern", args);
   }
   

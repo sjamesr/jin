@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
@@ -55,7 +56,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
   protected String translateChat(ChatEvent evt){
     String type = evt.getType();
-    String sender = evt.getSender();
+    ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
     String message = decode(evt.getMessage());
     Object forum = evt.getForum();
@@ -65,7 +66,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
     else if ("channel-qtell".equals(type))
       return parseChannelQTell(evt);
 
-    Object [] args = new Object[]{sender, title, String.valueOf(forum), message};
+    Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
     return getI18n().getFormattedString(type + ".displayPattern", args);
   }
 
