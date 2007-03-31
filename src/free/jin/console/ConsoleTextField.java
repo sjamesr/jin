@@ -35,6 +35,7 @@ import javax.swing.KeyStroke;
 
 import free.jin.I18n;
 import free.jin.Preferences;
+import free.jin.ServerUser;
 import free.util.PlatformUtils;
 import free.workarounds.FixUtils;
 import free.workarounds.FixedJTextField;
@@ -337,7 +338,7 @@ public class ConsoleTextField extends FixedJTextField{
    * The default implementation does nothing.
    */
 
-  protected void setTellPersonState(String playerName){}
+  protected void setTellPersonState(ServerUser playerName){}
 
 
 
@@ -356,7 +357,7 @@ public class ConsoleTextField extends FixedJTextField{
       if ((tellerIndex == console.getTellerCount()) || (tellerIndex == traversedTellerCount))
         tellerIndex = 0;
 
-      String teller = console.getTeller(tellerIndex);
+      ServerUser teller = console.getTeller(tellerIndex);
       if (teller != null)
         setTellPersonState(teller);
     }
@@ -379,7 +380,7 @@ public class ConsoleTextField extends FixedJTextField{
       if (tellerIndex < 0)
         tellerIndex = Math.min(traversedTellerCount, console.getTellerCount()) - 1;
 
-      String teller = console.getTeller(tellerIndex);
+      ServerUser teller = console.getTeller(tellerIndex);
       if (teller != null)
         setTellPersonState(teller);
     }
