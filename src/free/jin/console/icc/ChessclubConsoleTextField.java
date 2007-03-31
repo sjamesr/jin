@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.ServerUser;
 import free.jin.console.ConsoleTextField;
 
 
@@ -46,13 +47,13 @@ public class ChessclubConsoleTextField extends ConsoleTextField{
 
   
   /**
-   * Sets the textfield to be ready to send a tell to the given player.
-   * Sets the text in the textfield to <code>"tell "+playerName+"! "</code> and
-   * puts the caret at the end of the text.
+   * Sets the textfield to be ready to send a tell to the given user.
+   * Sets the text in the textfield to <code>"tell " + playerName + "! "</code>
+   * and puts the caret at the end of the text.
    */
 
-  protected void setTellPersonState(String playerName){
-    String text = "tell "+playerName+"! ";
+  protected void setTellPersonState(ServerUser user){
+    String text = "tell " + user.getName() + "! ";
     setText(text);
     setCaretPosition(text.length());
   }
