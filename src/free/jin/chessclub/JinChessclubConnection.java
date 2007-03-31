@@ -674,7 +674,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processPersonalTell(String playername, String titles, String message, int tellType){
+  protected void processPersonalTell(String playerName, String titles, String message, int tellType){
     String tellTypeString;
     switch (tellType){
       case ChessclubConstants.REGULAR_TELL: tellTypeString = "tell"; break;
@@ -689,7 +689,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-      playername, title, -1, message, null);
+        userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -713,7 +713,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processPersonalQTell(String name, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-      name, displayableTitle(titles), -1, message, null));
+        userForName(name), displayableTitle(titles), -1, message, null));
   }
 
 
@@ -747,8 +747,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = (shoutType == ChessclubConstants.ANNOUNCEMENT_SHOUT) ? 
-      new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, playerName, title, -1, message, null):
-      new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, playerName, title, -1, message, null);
+      new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, userForName(playerName), title, -1, message, null):
+      new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -782,7 +782,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, 
-      playerName, title, -1, message, new Integer(channel));
+      userForName(playerName), title, -1, message, new Integer(channel));
       
     listenerManager.fireChatEvent(evt);
   }
@@ -807,7 +807,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processChannelQTell(int channel, String name, String titles, String message){
     ChatEvent evt = new ChatEvent(this, "channel-qtell", ChatEvent.ROOM_CHAT_CATEGORY,
-      name, displayableTitle(titles), -1, message, new Integer(channel));
+        userForName(name), displayableTitle(titles), -1, message, new Integer(channel));
 
     listenerManager.fireChatEvent(evt);
   }
@@ -836,7 +836,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
-      playerName, title, -1, message, new Integer(gameNumber));
+        userForName(playerName), title, -1, message, new Integer(gameNumber));
     listenerManager.fireChatEvent(evt);
   }
 
