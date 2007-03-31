@@ -162,7 +162,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     JPanel content = new JPanel(new BorderLayout(xGap, yGap));
     content.add(issueSeekPanelWrapper, BorderLayout.LINE_START);
     content.add(soughtGraphWrapper, BorderLayout.CENTER);
-    content.setBorder(BorderFactory.createEmptyBorder(yGap, xGap, yGap, xGap));
     
     uiContainer.getContentPane().setLayout(new BorderLayout());
     uiContainer.getContentPane().add(content, BorderLayout.CENTER);
