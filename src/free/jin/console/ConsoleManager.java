@@ -24,19 +24,22 @@ package free.jin.console;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Preferences;
+import free.jin.ServerUser;
 import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.ChatEvent;
 import free.jin.event.ChatListener;
@@ -153,11 +156,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
   
   private void createConsoles(){
-    int consoleCount = getPrefs().getInt("consoles.count");
+    int consoleCount = getPrefs().getInt("consoles.count", 0);
     for (int i = 0; i < consoleCount; i++){
       ConsoleDesignation designation = 
         loadConsoleDesignation("consoles." + i + ".");
-      addConsole(designation);
+      addConsole(designation, false);
     }
   }
   
@@ -188,7 +191,9 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
         String acceptedPrefix = prefsPrefix + "accepted." + j + ".";
         String chatType = prefs.getString(acceptedPrefix + "chatType", null);
         Object forum = prefs.get(acceptedPrefix + "forum", null);
-        String sender = prefs.getString(acceptedPrefix + "sender", null);
+        String senderName = prefs.getString(acceptedPrefix + "sender", null);
+        ServerUser sender = senderName == null ? 
+            null : getConn().userForName(senderName);
         
         designation.addAccepted(chatType, forum, sender);
       }
@@ -217,6 +222,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     uiContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
     uiContainer.setTitle(i18n.getString("mainConsole.initialTitle"));
+    uiContainer.getContentPane().setBorder(null); // We don't want it
 
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
@@ -226,13 +232,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     
     Container content = uiContainer.getContentPane();
     content.setLayout(new BorderLayout());
-    content.add(consolesTabbedPane, BorderLayout.CENTER);
     
     uiContainer.addPluginUIListener(new PluginUIAdapter(){
       public void pluginUIActivated(PluginUIEvent evt){
-        JComponent selected = (JComponent)consolesTabbedPane.getSelectedComponent();
-        if (selected != null)
-          selected.requestDefaultFocus();
+        obtainFocus();
       }
     });
   }
@@ -240,13 +243,95 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
   
   
   /**
-   * Adds a console with the specified designation.
+   * Transfers the focus to the currently visible console.
    */
   
-  public void addConsole(ConsoleDesignation designation){
+  private void obtainFocus(){
+    Console console;
+    if (consoles.size() == 1)
+      console = (Console)consoles.get(0);
+    else
+      console = (Console)consolesTabbedPane.getSelectedComponent();
+    
+    if (console != null)
+      console.obtainFocus();
+  }
+  
+  
+  
+  /**
+   * Adds a console with the specified designation, possibly making it the
+   * active console.
+   */
+  
+  public void addConsole(ConsoleDesignation designation, boolean makeActive){
     Console console = createConsole(designation);
     consoles.add(console);
-    consolesTabbedPane.addTab(designation.getName(), console); 
+    
+    if (consoles.size() == 1)
+      setSingleConsoleMode();
+    else if (consoles.size() == 2)
+      setMultiConsoleMode();
+    else
+      consolesTabbedPane.addTab(designation.getName(), console);
+      
+    console.addComponentListener(new ComponentAdapter(){
+      public void componentShown(ComponentEvent e){
+        Console console = (Console)e.getSource();
+        console.obtainFocus();
+      }
+    });
+    
+    if (makeActive){
+      if (consoles.size() > 1)
+        consolesTabbedPane.setSelectedIndex(consolesTabbedPane.getComponentCount() - 1);
+      if (uiContainer != null)
+        uiContainer.setActive(true);
+    }
+  }
+  
+  
+  
+  /**
+   * Puts us into single console mode.
+   */
+  
+  private void setSingleConsoleMode(){
+    Container contentPane = uiContainer.getContentPane();
+    contentPane.removeAll();
+    contentPane.add((Console)consoles.get(0));
+  }
+  
+  
+  
+  /**
+   * Puts us into multi console mode.
+   */
+  
+  private void setMultiConsoleMode(){
+    Container contentPane = uiContainer.getContentPane();
+    
+    consolesTabbedPane.removeAll();
+    for (Iterator i = consoles.iterator(); i.hasNext();){
+      Console console = (Console)i.next();
+      consolesTabbedPane.addTab(console.getDesignation().getName(), console);
+    }
+    
+    contentPane.removeAll();
+    contentPane.add(consolesTabbedPane);
+  }
+  
+  
+  
+  
+  
+  /**
+   * Adds a temporary console for chatting with the specified user, possibly
+   * making it the active console.
+   */
+  
+  public void addPersonalChatConsole(ServerUser user, boolean makeActive){
+    addConsole(new PersonalChatConsoleDesignation(user, true), makeActive);
   }
   
   
@@ -261,7 +346,11 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       throw new IllegalArgumentException("Unknown console: " + console);
     
     consoles.remove(index);
-    consolesTabbedPane.removeTabAt(index);
+    
+    if (consoles.size() == 1)
+      setSingleConsoleMode();
+    else
+      consolesTabbedPane.removeTabAt(index);
   }
   
   
@@ -471,8 +560,10 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
     
     String type = evt.getType();
     Object forum = evt.getForum();
-    String sender = evt.getSender();
-    String chatMessageType = type + "." + (forum == null ? "" : forum.toString()) + "." + sender;
+    ServerUser sender = evt.getSender();
+    String chatMessageType = type + "." + 
+        (forum == null ? "" : forum.toString()) + "." + 
+        (sender == null ? "" : sender.getName());
     String translated = translateChat(evt);
     
     boolean isPersonalTell = isPersonalTell(evt);
