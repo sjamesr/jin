@@ -147,9 +147,6 @@ public class Jin{
     // Restore the look and feel
     restoreLookAndFeel();
     
-    // Apply Swing fixes
-    fixSwing();
-
     // Create the UI manager
     uiProvider = createUiProvider();
 
@@ -224,20 +221,6 @@ public class Jin{
   }
   
 
-  
-  /**
-   * Applies various swing fixes.
-   */
-   
-  private static void fixSwing(){
-    try{
-      Class.forName("free.workarounds.SwingFix");
-    } catch (ClassNotFoundException e){
-        e.printStackTrace();
-      }
-  }
-  
-  
   
   /**
    * Creates the UIProvider based on user preferences.
