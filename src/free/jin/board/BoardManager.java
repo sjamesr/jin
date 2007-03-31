@@ -1028,6 +1028,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     URL iconImageURL = BoardManager.class.getResource("board.gif");
     if (iconImageURL!= null)
       boardContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+    
+    boardContainer.getContentPane().setBorder(null); // We don't want it
 
     boardContainer.addPluginUIListener(this);
 
