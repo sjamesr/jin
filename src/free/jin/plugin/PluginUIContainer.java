@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2003 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,8 +21,9 @@
 
 package free.jin.plugin;
 
-import java.awt.Container;
 import java.awt.Image;
+
+import javax.swing.JComponent;
 
 import free.jin.ui.UIProvider;
 
@@ -84,7 +85,7 @@ public interface PluginUIContainer{
    * components.
    */
 
-  Container getContentPane();
+  JComponent getContentPane();
 
 
 
