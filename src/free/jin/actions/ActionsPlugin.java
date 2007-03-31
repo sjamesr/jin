@@ -37,7 +37,9 @@ import javax.swing.event.ListDataListener;
 
 import free.jin.action.JinAction;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.UIProvider;
 import free.util.models.BooleanListener;
 import free.util.models.UnmodifiableBooleanModel;
@@ -96,6 +98,11 @@ public class ActionsPlugin extends Plugin{
    
   public void start(){
     buttonContainer = createButtonContainer();
+    buttonContainer.addPluginUIListener(new PluginUIAdapter(){
+      public void pluginUIShown(PluginUIEvent evt){
+        buttonContainer.sizeToFit();
+      }
+    });
     
     updateActionButtons();
     
@@ -146,7 +153,9 @@ public class ActionsPlugin extends Plugin{
     buttonContainer.getContentPane().removeAll();
     buttonContainer.getContentPane().setLayout(new BorderLayout());
     buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
-    buttonContainer.sizeToFit();
+    
+    if (buttonContainer.isVisible())
+      buttonContainer.sizeToFit();
   }
   
   
