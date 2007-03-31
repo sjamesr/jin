@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 
@@ -47,7 +48,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * accepts all chat events coming from <code>AlexTheGreat</code>.
    */
   
-  public void addAccepted(String type, Object forum, String sender){
+  public void addAccepted(String type, Object forum, ServerUser sender){
     acceptedChatTypes.add(new ChatType(type, forum, sender));
   }
   
@@ -104,7 +105,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
      * The sender; <code>null</code> stands for "any sender".
      */
     
-    private final String sender;
+    private final ServerUser sender;
     
     
     
@@ -115,7 +116,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
      * be accepted.
      */
     
-    public ChatType(String type, Object forum, String sender){
+    public ChatType(String type, Object forum, ServerUser sender){
       this.type = type;
       this.forum = forum;
       this.sender = sender;
