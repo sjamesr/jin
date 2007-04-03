@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -222,7 +222,6 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     uiContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
     uiContainer.setTitle(i18n.getString("mainConsole.initialTitle"));
-    uiContainer.getContentPane().setBorder(null); // We don't want it
 
     URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
     if (iconImageURL != null)
