@@ -163,6 +163,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     content.add(issueSeekPanelWrapper, BorderLayout.LINE_START);
     content.add(soughtGraphWrapper, BorderLayout.CENTER);
     
+    content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    
     uiContainer.getContentPane().setLayout(new BorderLayout());
     uiContainer.getContentPane().add(content, BorderLayout.CENTER);
     
