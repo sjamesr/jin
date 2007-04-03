@@ -34,7 +34,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Enumeration;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -223,9 +222,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       frame.addWindowListener(this);
       
-      JPanel contentPane = new JPanel();
-      contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-      frame.setContentPane(contentPane);
+      frame.setContentPane(new JPanel());
 
       this.menubar = new JMenuBar();
       

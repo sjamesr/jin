@@ -707,9 +707,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       frame.addVetoableChangeListener(this);
       frame.addInternalFrameListener(this);
       
-      JPanel contentPane = new JPanel();
-      contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-      frame.setContentPane(contentPane);
+      frame.setContentPane(new JPanel());
 
       frame.setVisible(false); // internal frames are initially visible in 1.1
       
