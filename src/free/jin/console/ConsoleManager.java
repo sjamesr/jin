@@ -44,6 +44,7 @@ import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.ChatEvent;
 import free.jin.event.ChatListener;
 import free.jin.event.ConnectionListener;
+import free.jin.event.JinEvent;
 import free.jin.event.ListenerManager;
 import free.jin.event.PlainTextEvent;
 import free.jin.event.PlainTextListener;
@@ -58,9 +59,12 @@ import free.jin.ui.UIProvider;
 /**
  * A Plugin which implements the consoles functionality. It's responsible for
  * opening, positioning and closing the various consoles used by the user.
+ * The class is abstract because some of the functionality is delegated to
+ * server-specific classes.
  */
 
-public class ConsoleManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener{
+public abstract class ConsoleManager extends Plugin implements PlainTextListener,
+    ChatListener, ConnectionListener{
   
   
   
@@ -177,7 +181,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
 
     String type = prefs.getString(prefsPrefix + "type");
     if ("system".equals(type))
-      return new SystemConsoleDesignation();
+      return createSystemConsoleDesignation();
     else if ("chat".equals(type)){
       String name = prefs.getString(prefsPrefix + "name", null);
       if (name == null)
@@ -210,9 +214,17 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
       throw new IllegalArgumentException("Unrecognized designation type: " + type);
   }
   
-
-
-
+  
+  
+  /**
+   * Creates the "system" console designation. This method is meant to be
+   * implemented by a server-specific console manager.
+   */
+  
+  protected abstract ConsoleDesignation createSystemConsoleDesignation();
+  
+  
+  
   /**
    * Creates and displays the plugin's UI.
    */
@@ -520,29 +532,7 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void plainTextReceived(PlainTextEvent evt){
-    if (isPaused()){
-      pausedEventsQueue.addElement(evt);
-      return;
-    }
-    
-    String decoded = decode(evt.getText());
-    for (int i = 0; i < consoles.size(); i++){
-      Console console = (Console)consoles.get(i);
-      if (console.getDesignation().accept(evt))
-        console.addToOutput(decoded, "plain");
-    }
-  }
-  
-  
-  
-  /**
-   * Returns whether the specified chat event is a personal tell. This method
-   * is meant to be overridden by server-specific implementations. The default
-   * implementation always returns false.
-   */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    return false;
+    eventForConsoleReceived(evt);
   }
   
   
@@ -552,28 +542,24 @@ public class ConsoleManager extends Plugin implements PlainTextListener, ChatLis
    */
 
   public void chatMessageReceived(ChatEvent evt){
+    eventForConsoleReceived(evt);
+  }
+  
+  
+  
+  /**
+   * Invoked when an event which may be displayed in a console occurs.
+   */
+  
+  protected void eventForConsoleReceived(JinEvent evt){
     if (isPaused()){
       pausedEventsQueue.addElement(evt);
       return;
     }
     
-    String type = evt.getType();
-    Object forum = evt.getForum();
-    ServerUser sender = evt.getSender();
-    String chatMessageType = type + "." + 
-        (forum == null ? "" : forum.toString()) + "." + 
-        (sender == null ? "" : sender.getName());
-    String translated = translateChat(evt);
-    
-    boolean isPersonalTell = isPersonalTell(evt);
-    
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
-      if (console.getDesignation().accept(evt)){
-        console.addToOutput(translated, chatMessageType);
-        if (isPersonalTell)
-          console.personalTellReceived(sender);
-      }
+      console.getDesignation().receive(evt, getEncoding(), console);
     }
   }
   
