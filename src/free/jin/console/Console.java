@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002, 2003 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -70,6 +70,9 @@ import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.ServerUser;
+import free.jin.event.ChatEvent;
+import free.jin.event.JinEvent;
+import free.jin.event.PlainTextEvent;
 import free.jin.ui.SdiUiProvider;
 import free.util.BrowserControl;
 import free.util.PlatformUtils;
@@ -776,10 +779,11 @@ public class Console extends JPanel implements KeyListener{
 
 
   /**
-   * Adds the given text of the given text type to the output.
-   *
-   * @param text The text to add, '\n' excluded.
-   * @param textType The type of the text, "kibitz" for example.
+   * Adds the specified text of the specified type to the console. The event
+   * type is a string which is used to look up (in the preferences) the
+   * properties (font, color etc.) of the text when displayed in the console.
+   * 
+   * @see #textTypeForEvent(JinEvent)
    */
 
   public void addToOutput(String text, String textType){
@@ -790,6 +794,40 @@ public class Console extends JPanel implements KeyListener{
     } catch (BadLocationException e){
         e.printStackTrace(); // Why the heck is this checked?
       }
+  }
+  
+  
+  
+  /**
+   * Returns the text type which should be used when adding text for the
+   * specified event to the console. The returned text type is a recommendation 
+   * - if there is a good reason to use a different type, you may do so.
+   * For <code>PlainTextEvent</code>, the method returns the string "plain".
+   * For <code>ChatEvent</code>s, it returns the concatenation of the chat type,
+   * chat forum and sender name, separated by dots (using an empty string if
+   * one of the properties is missing).
+   * Other events are unsupported.
+   */
+  
+  public String textTypeForEvent(JinEvent evt){
+    if (evt == null)
+      throw new NullPointerException();
+    
+    if (evt instanceof PlainTextEvent)
+      return "plain";
+    else if (evt instanceof ChatEvent){
+      ChatEvent chatEvent = (ChatEvent)evt;
+      
+      String type = chatEvent.getType();
+      Object forum = chatEvent.getForum();
+      ServerUser sender = chatEvent.getSender();
+  
+      return type + "." + 
+        (forum == null ? "" : forum.toString()) + "." + 
+        (sender == null ? "" : sender.getName());
+    }
+    else
+      throw new IllegalArgumentException("Unsupported event: " + evt);
   }
   
   
