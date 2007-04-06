@@ -21,6 +21,7 @@
 
 package free.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
 
@@ -243,7 +244,32 @@ public class TextUtilities{
   
     return buf.toString();
   }
-
-
-
+  
+  
+  
+  /**
+   * Converts the specified string between encodings. If one of the encodings
+   * is unsupported, an <code>IllegalArgumentException</code> is thrown (as
+   * opposed to an <code>UnsupportedEncodingException</code>.
+   */
+  
+  public static String convert(String s, String fromEncoding, String toEncoding)
+      throws IllegalArgumentException{
+    
+    byte [] rawBytes;
+    try{
+      rawBytes = s.getBytes(fromEncoding);
+    } catch (UnsupportedEncodingException e){
+      throw new IllegalArgumentException("Unsupported encoding: " + fromEncoding);
+      }
+    
+    try{
+      return new String(rawBytes, toEncoding);
+    } catch (UnsupportedEncodingException e){
+        throw new IllegalArgumentException("Unsupported encoding: " + toEncoding);
+      }
+  }
+  
+  
+  
 }
