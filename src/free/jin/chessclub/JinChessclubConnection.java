@@ -108,9 +108,19 @@ import free.util.Utilities;
 
 public class JinChessclubConnection extends ChessclubConnection implements DatagramListener,
     Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection{
-
-
-
+  
+  
+  
+  /**
+   * The encoding with which plain text and chat messages are encoded.
+   * See the constructor of <code>ChatEvent</code> and
+   * <code>PlainTextEvent</code> for details.
+   */
+  
+  private static final String TEXT_ENCODING = "ISO-8859-1";
+  
+  
+  
   /**
    * Our listener manager.
    */
@@ -560,7 +570,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected void processLine(String line){
-    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
+    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line, TEXT_ENCODING));
   }
   
   
@@ -689,7 +699,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-        userForName(playerName), title, -1, message, null);
+        userForName(playerName), title, -1, message, TEXT_ENCODING, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -713,7 +723,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processPersonalQTell(String name, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-        userForName(name), displayableTitle(titles), -1, message, null));
+        userForName(name), displayableTitle(titles), -1, message, TEXT_ENCODING, null));
   }
 
 
@@ -747,8 +757,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = (shoutType == ChessclubConstants.ANNOUNCEMENT_SHOUT) ? 
-      new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, userForName(playerName), title, -1, message, null):
-      new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, userForName(playerName), title, -1, message, null);
+      new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, 
+          userForName(playerName), title, -1, message, TEXT_ENCODING, null):
+      new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY,
+          userForName(playerName), title, -1, message, TEXT_ENCODING, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -782,7 +794,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, 
-      userForName(playerName), title, -1, message, new Integer(channel));
+      userForName(playerName), title, -1, message, TEXT_ENCODING, new Integer(channel));
       
     listenerManager.fireChatEvent(evt);
   }
@@ -807,7 +819,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processChannelQTell(int channel, String name, String titles, String message){
     ChatEvent evt = new ChatEvent(this, "channel-qtell", ChatEvent.ROOM_CHAT_CATEGORY,
-        userForName(name), displayableTitle(titles), -1, message, new Integer(channel));
+        userForName(name), displayableTitle(titles), -1, message, TEXT_ENCODING, new Integer(channel));
 
     listenerManager.fireChatEvent(evt);
   }
@@ -836,7 +848,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
-        userForName(playerName), title, -1, message, new Integer(gameNumber));
+        userForName(playerName), title, -1, message, TEXT_ENCODING, new Integer(gameNumber));
     listenerManager.fireChatEvent(evt);
   }
 
