@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,11 +21,9 @@
 
 package free.jin.console.icc;
 
-import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
-import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -34,45 +32,19 @@ import free.jin.ui.PreferencesPanel;
  */
 
 public class ChessclubConsoleManager extends ConsoleManager{
-
-
-
-  /**
-   * Returns whether the specified chat event is a personal tell. 
-   */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    String type = evt.getType();
-    return type.equals("tell") || type.equals("say") || type.equals("atell") ||
-        type.equals("ptell");
-  }
   
   
   
   /**
-   * Returns the string that should be displayed according to the given
-   * ChatEvent.
+   * Returns an ICC-specific system console designation.
    */
-
-  protected String translateChat(ChatEvent evt){
-    String type = evt.getType();
-    ServerUser sender = evt.getSender();
-    String title = evt.getSenderTitle();
-    String message = decode(evt.getMessage());
-    Object forum = evt.getForum();
-    
-    if ("qtell".equals(type))
-      return parseQTell(evt);
-    else if ("channel-qtell".equals(type))
-      return parseChannelQTell(evt);
-
-    Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
-    return getI18n().getFormattedString(type + ".displayPattern", args);
+  
+  protected ConsoleDesignation createSystemConsoleDesignation(){
+    return new ChessclubSystemConsoleDesignation();
   }
-
-
-
-
+  
+  
+  
   /**
    * Creates a <code>ChessclubConsole</code> with the specified designation.
    */
@@ -80,53 +52,9 @@ public class ChessclubConsoleManager extends ConsoleManager{
   protected Console createConsole(ConsoleDesignation designation){
     return new ChessclubConsole(this, designation);
   }
-
-
-
-
-  /**
-   * Returns a string that should be displayed for the given ChatEvent when the
-   * ChatEvent contains a qtell.
-   */
-
-  private String parseQTell(ChatEvent evt){
-    String message = evt.getMessage();
-    int index;
-    while ((index = message.indexOf("\\n")) != -1)
-      message = message.substring(0, index) + "\n:" + message.substring(index + 2);
-    while ((index = message.indexOf("\\h")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\H")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\b")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    return ":" + message;
-  }
   
   
   
-  /**
-   * Returns a string that should be displayed for the given ChatEvent when the
-   * ChatEvent contains a channel qtell.
-   */
-
-  private String parseChannelQTell(ChatEvent evt){
-    String message = evt.getMessage();
-    Object forum = evt.getForum();
-    int index;
-    while ((index = message.indexOf("\\n")) != -1)
-      message = message.substring(0, index) + "\n" + forum + ">" + message.substring(index + 2);
-    while ((index = message.indexOf("\\h")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\H")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\b")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    return forum + ">" + message;
-  }
-
-
-
   /**
    * Returns <code>true</code>. 
    */
@@ -145,6 +73,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
   public PreferencesPanel getPreferencesUI(){
     return new ChessclubConsolePrefsPanel(this);
   }
-
-
+  
+  
+  
 }
