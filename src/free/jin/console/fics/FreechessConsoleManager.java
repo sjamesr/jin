@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002, 2003 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,11 +21,9 @@
 
 package free.jin.console.fics;
 
-import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
-import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -34,6 +32,16 @@ import free.jin.ui.PreferencesPanel;
  */
 
 public class FreechessConsoleManager extends ConsoleManager{
+  
+  
+  
+  /**
+   * Returns a FICS-specific system console designation.
+   */
+  
+  protected ConsoleDesignation createSystemConsoleDesignation(){
+    return new FreechessSystemConsoleDesignation();
+  }
 
 
 
@@ -48,41 +56,11 @@ public class FreechessConsoleManager extends ConsoleManager{
   
   
   /**
-   * Returns whether the specified chat event is a personal tell. 
-   */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    String type = evt.getType();
-    return type.equals("tell") || type.equals("say") || type.equals("ptell");
-  }
-  
-  
-  
-  /**
-   * Returns the string that should be displayed according to the given
-   * ChatEvent.
-   */
-
-  protected String translateChat(ChatEvent evt){
-    String type = evt.getType();
-    ServerUser sender = evt.getSender();
-    String title = evt.getSenderTitle();
-    String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
-    String message = evt.getMessage();
-    Object forum = evt.getForum();
-    
-    Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
-    return getI18n().getFormattedString(type + ".displayPattern", args);
-  }
-  
-  
-  
-  /**
    * Returns the FICS encoding, which is 7-bit ASCII.
    */
   
   public String getEncoding(){
-    return "ASCII";
+    return "US-ASCII";
   }
   
   
@@ -104,6 +82,7 @@ public class FreechessConsoleManager extends ConsoleManager{
   public PreferencesPanel getPreferencesUI(){
     return new FreechessConsolePrefsPanel(this);
   }
-
-
+  
+  
+  
 }
