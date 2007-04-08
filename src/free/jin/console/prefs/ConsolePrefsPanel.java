@@ -60,7 +60,7 @@ public class ConsolePrefsPanel extends CompositePreferencesPanel{
     
     addPanel(createTextPrefsPanel(consoleManager), i18n.getString("textDisplayTab.text"), i18n.getString("textDisplayTab.tooltip"));
     addPanel(new BehaviourPrefsPanel(consoleManager), i18n.getString("consoleBehaviourTab.text"), i18n.getString("consoleBehaviourTab.tooltip"));
-    if (consoleManager.supportsMultipleEncodings())
+    if (consoleManager.getConn().getTextEncoding() != null)
       addPanel(new EncodingPrefsPanel(consoleManager), i18n.getString("encodingTab.text"), i18n.getString("encodingTab.tooltip"));
     
     setLayout(new BorderLayout());
