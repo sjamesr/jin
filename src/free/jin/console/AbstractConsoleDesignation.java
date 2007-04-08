@@ -21,7 +21,9 @@
 
 package free.jin.console;
 
+import free.jin.Connection;
 import free.jin.event.JinEvent;
+import free.util.TextUtilities;
 
 
 
@@ -43,6 +45,15 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * The encoding used to encode/decode certain messages sent to/received from
+   * the server.
+   */
+  
+  private String encoding;
+  
+  
+  
+  /**
    * Whether the console is temporary.
    */
   
@@ -52,11 +63,13 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   /**
    * Creates a new <code>AbstractConsoleDesignation</code> with the specified
-   * name and temporary status.
+   * name, encoding and temporary status.
    */
   
-  public AbstractConsoleDesignation(String name, boolean isConsoleTemporary){
+  public AbstractConsoleDesignation(String name, String encoding,
+      boolean isConsoleTemporary){
     this.name = name;
+    this.encoding = encoding;
     this.isConsoleTemporary = isConsoleTemporary;
   }
   
@@ -68,6 +81,56 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
 
   public String getName(){
     return name;
+  }
+  
+  
+  
+  /**
+   * Encodes the specified string for sending to the server, according to the
+   * connection's encoding and the encoding of this console designation.
+   */
+  
+  protected final String encode(String s, Connection conn){
+    return convert(s, encoding, conn.getTextEncoding());
+  }
+  
+  
+  
+  /**
+   * Decodes the specified message received from the server according to the
+   * connection's encoding and the encoding of this console designation.
+   */
+  
+  protected final String decode(String s, Connection conn){
+    return convert(s, conn.getTextEncoding(), encoding);
+  }
+  
+  
+  
+  /**
+   * Converts the specified string from the between the specified encodings.
+   * If either of the encodings is <code>null</code>, no conversion is
+   * performed.
+   */
+  
+  private static String convert(String s, String fromEncoding, String toEncoding){
+    if ((fromEncoding == null) || (toEncoding == null))
+      return s;
+    else
+      return TextUtilities.convert(s, fromEncoding, toEncoding);
+  }
+  
+  
+  
+  /**
+   * Sets the encoding. This method is a temporary measure - the encoding should
+   * be a final field when the preferences UI allows it to be adjusted per
+   * console. Modifying the encoding should change the designation of the
+   * console to a new one. 
+   */
+  
+  void setEncoding(String encoding){
+    this.encoding = encoding;
   }
   
   
@@ -87,9 +150,9 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * it and, if accepted, sending it to the console.
    */
   
-  public void receive(JinEvent evt, String encoding, Console console){
+  public void receive(JinEvent evt, Console console){
     if (accept(evt))
-      append(evt, encoding, console);
+      append(evt, console);
   }
   
   
@@ -105,12 +168,10 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   /**
    * Appends the specified event to the console, causing it to be displayed
-   * there in some manner. <code>encoding</code> specifies the encoding into
-   * which text originating from the server should be converted before being
-   * displayed (may be <code>null</code> if no conversion is necessary).
+   * there in some manner. 
    */
   
-  protected abstract void append(JinEvent evt, String encoding, Console console);
+  protected abstract void append(JinEvent evt, Console console);
   
   
   
