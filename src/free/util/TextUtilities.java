@@ -21,6 +21,8 @@
 
 package free.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
@@ -31,8 +33,8 @@ import java.util.StringTokenizer;
 
 public class TextUtilities{
   
-
-
+  
+  
   /**
    * Pads the beginning of the given String with the given character until it's
    * <code>length</code> characters long. If the given String's size is already
@@ -248,13 +250,42 @@ public class TextUtilities{
   
   
   /**
-   * Converts the specified string between encodings. If one of the encodings
+   * The name of the system's default charset, lazily initialized.
+   */
+  
+  private static String defaultCharsetName = null;
+  
+  
+  
+  /**
+   * Returns the name of the system's default charset. This method is useful
+   * under 1.4, because <code>Charset.defaultCharset()</code> is only available
+   * since 1.5.
+   */
+  
+  public static String getDefaultCharsetName(){
+    if (defaultCharsetName == null)
+      defaultCharsetName = 
+        new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding();
+    
+    return defaultCharsetName;
+  }
+  
+  
+  
+  /**
+   * Converts the specified string between encodings. If either of the
+   * encodings is <code>null</code>, no conversion is made. If both the
+   * encodings are not <code>null</code> and one of the encodings
    * is unsupported, an <code>IllegalArgumentException</code> is thrown (as
-   * opposed to an <code>UnsupportedEncodingException</code>.
+   * opposed to an <code>UnsupportedEncodingException</code>. 
    */
   
   public static String convert(String s, String fromEncoding, String toEncoding)
       throws IllegalArgumentException{
+    
+    if ((fromEncoding == null) || (toEncoding == null))
+      return s;
     
     byte [] rawBytes;
     try{
