@@ -100,7 +100,8 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     
-    encodingsList.setSelectedValue(Charset.forName(consoleManager.getEncoding()), true);
+    if (consoleManager.getEncoding() != null)
+      encodingsList.setSelectedValue(Charset.forName(consoleManager.getEncoding()), true);
     
     panel.add(scroller);
     
