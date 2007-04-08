@@ -170,6 +170,21 @@ public interface Connection{
    */
 
   ServerUser getUser();
+  
+  
+  
+  /**
+   * Returns the encoding in which this connection communicates text, such as
+   * commands, plain text, chat events etc. Returns <code>null</code> if the
+   * connection supports Unicode fully or does not even support 8-bit
+   * characters.
+   * The point of this method is that some servers do not support Unicode, but
+   * do support, for example, 8-bits per character, which allows users to
+   * communicate in a language other than English, by using the same 8-bit
+   * encoding on both sides. 
+   */
+  
+  String getTextEncoding();
 
 
 
@@ -209,6 +224,14 @@ public interface Connection{
    */
   
   ServerUser userForName(String name);
+  
+  
+  
+  /**
+   * Sends the specified personal tell to the specified user.
+   */
+  
+  void sendPersonalTell(ServerUser user, String message);
 
 
   
