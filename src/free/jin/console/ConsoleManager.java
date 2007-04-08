@@ -54,6 +54,7 @@ import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
+import free.util.TextUtilities;
 
 
 /**
@@ -188,7 +189,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
         name = i18n.getString(prefs.getString(prefsPrefix + "nameKey"));
       
       ChatConsoleDesignation designation =
-          new ChatConsoleDesignation(name, false);
+          new ChatConsoleDesignation(name, getEncoding(), false);
       
       int acceptedCount = prefs.getInt(prefsPrefix + "accepted.count");
       for (int j = 0; j < acceptedCount; j++){
@@ -342,7 +343,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   public void addPersonalChatConsole(ServerUser user, boolean makeActive){
-    addConsole(new PersonalChatConsoleDesignation(user, true), makeActive);
+    addConsole(new PersonalChatConsoleDesignation(user, getEncoding(), true),
+        makeActive);
   }
   
   
@@ -399,76 +401,41 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
-   * Returns the encoding with which we decode/encode text received/sent from/to the server.
-   * The default implementation retrieves it from preferences.
+   * Returns the encoding with which we decode/encode text received/sent
+   * from/to the server; <code>null</code> if none.
    */
   
   public String getEncoding(){
-    return getPrefs().getString("encoding", "utf8");
+    return getPrefs().getString("encoding", TextUtilities.getDefaultCharsetName());
   }
   
   
   
   /**
-   * Sets the encoding with which we decode/encode text received/sent from/to the server.
-   * Throws an exception if multiple encodings are unsupported, otherwise stores the
-   * encoding in preferences.
+   * Sets the encoding with which we decode/encode text received/sent from/to
+   * the server. This is only relevant if the connections text encoding is
+   * non-null. See {@link free.jin.Connection#getTextEncoding()} for more
+   * information.
    */
   
   public void setEncoding(String encoding) throws UnsupportedEncodingException{
-    if (!supportsMultipleEncodings())
-      throw new IllegalStateException("Multiple encodings are unsupported");
     if (!Charset.isSupported(encoding))
       throw new UnsupportedEncodingException(encoding);
     
     getPrefs().setString("encoding", encoding);
-  }
-  
-  
-  
-  /**
-   * Returns whether this console manager supports more than its default encoding.
-   * The default implementation returns <code>false</code>. 
-   */
-  
-  public boolean supportsMultipleEncodings(){
-    return false;
-  }
-  
-  
-  
-  /**
-   * Encodes a string to be sent to the server.
-   */
-  
-  public String encode(String s){
-    try{
-      return new String(s.getBytes(getEncoding()), "ISO8859_1");
-    } catch (UnsupportedEncodingException e){
-        e.printStackTrace(); // Shouldn't happen - we're using supported encodings
-      }
     
-    return s;
+    // Hack - the encoding should be on a per-console basis, and changing it
+    // should replace the designation of the console, not update it
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      ConsoleDesignation designation = console.getDesignation();
+      if (designation instanceof AbstractConsoleDesignation)
+        ((AbstractConsoleDesignation)designation).setEncoding(encoding);
+    }
   }
   
   
   
-  /**
-   * Decodes a string received from the server.
-   */
-  
-  public String decode(String s){
-    try{
-      return new String(s.getBytes("ISO8859_1"), getEncoding());
-    } catch (UnsupportedEncodingException e){
-        e.printStackTrace(); // Shouldn't happen - we're using supported encodings
-      }
-    
-    return s;
-  }
-  
-
-
   /**
    * Rereads the plugin/user properties and changes settings accordingly.
    * This method should be called when the user changes the preferences.
@@ -559,23 +526,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
-      console.getDesignation().receive(evt, getEncoding(), console);
+      console.getDesignation().receive(evt, console);
     }
-  }
-  
-  
-  
-  /**
-   * Sends the specified user-inputted command to the server on behalf of the
-   * specified console.
-   */
-  
-  public void sendUserCommand(String command, Console console){
-    Connection conn = getConn();
-    if (conn.isConnected())
-      conn.sendCommand(encode(command));
-    else
-      console.addToOutput(I18n.get(ConsoleManager.class).getString("unconnectedWarningMessage"), "info");
   }
   
   
