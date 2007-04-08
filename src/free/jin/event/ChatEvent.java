@@ -21,11 +21,8 @@
 
 package free.jin.event;
 
-import java.nio.charset.Charset;
-
 import free.jin.Connection;
 import free.jin.ServerUser;
-import free.util.TextUtilities;
 
 
 /**
@@ -145,18 +142,6 @@ public class ChatEvent extends JinEvent{
   
   
   /**
-   * The encoding of the message, that is, encoding such that a call to
-   * <code>message.getBytes(messageEncoding)</code> returns the message's raw
-   * bytes. A value of <code>null</code> indicates that the message should not
-   * be re-encoded because it is either already in Unicode or the server only
-   * supports 7-bit ASCII (thus re-encoding will not help). 
-   */
-  
-  private final String messageEncoding;
-  
-  
-  
-  /**
    * The forum on which the message was sent. Only applies to
    * messages that aren't one-on-one or go to everyone. For kibitzes
    * and whispers this is an Integer specifying the game number for example,
@@ -169,20 +154,16 @@ public class ChatEvent extends JinEvent{
 
   /**
    * Creates a new ChatEvent with the given type, category, sender, sender
-   * titles, sender rating (-1 if unknown), message, message encoding and forum.
+   * titles, sender rating (-1 if unknown), message and forum.
    * Note that the list of possible chat categories is not final (and will never
    * be such). If your chat type belongs to a category which does not exist yet,
    * contact the person responsible for the code and ask him to add a new
    * category. In the meanwhile (or if you are happy with it), use
    * <code>OTHER_CHAT_CATEGORY</code>
-   * A value of <code>null</code> for the message encoding indicates that the
-   * message should not be re-encoded because it is either already in Unicode
-   * or the server only supports 7-bit ASCII (thus re-encoding will not help).
    */
 
   public ChatEvent(Connection conn, String type, int category, ServerUser sender,
-      String senderTitle, int senderRating, String message,
-      String messageEncoding, Object forum){
+      String senderTitle, int senderRating, String message, Object forum){
     super(conn);
 
     if (type == null)
@@ -200,16 +181,12 @@ public class ChatEvent extends JinEvent{
         throw new IllegalArgumentException("Unknown chat category value: " + category);
     }
     
-    if ((messageEncoding != null) && !Charset.isSupported(messageEncoding))
-      throw new IllegalArgumentException("Unsupported encoding: " + messageEncoding);
-
     this.type = type;
     this.category = category;
     this.sender = sender;
     this.senderTitle = senderTitle;
     this.senderRating = senderRating;
     this.message = message;
-    this.messageEncoding = messageEncoding;
     this.forum = forum;
   }
 
@@ -274,27 +251,6 @@ public class ChatEvent extends JinEvent{
 
   public String getMessage(){
     return message;
-  }
-  
-  
-  
-  /**
-   * Returns the message, encoded using the specified encoding.
-   * This is useful because some servers don't support Unicode, but some do
-   * support 8-bit characters, which allows some non English text to be sent, as
-   * long as the sender and the receiver agree on the encoding.
-   * For servers like these, this method encodes the raw bytes of the message
-   * into a string via </code>new String(rawBytes, encoding)</code> and returns
-   * the result. For servers which support Unicode or do not support even 8-bit
-   * characters (only 7-bit ASCII), this method returns the same value as
-   * <code>getMessage()</code>.
-   */
-  
-  public String getMessage(String encoding){
-    if (messageEncoding == null)
-      return message;
-    else
-      return TextUtilities.convert(message, messageEncoding, encoding);
   }
   
   
