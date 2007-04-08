@@ -40,7 +40,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createSystemConsoleDesignation(){
-    return new ChessclubSystemConsoleDesignation();
+    return new ChessclubSystemConsoleDesignation(getEncoding());
   }
   
   
@@ -55,16 +55,6 @@ public class ChessclubConsoleManager extends ConsoleManager{
   
   
   
-  /**
-   * Returns <code>true</code>. 
-   */
-  
-  public boolean supportsMultipleEncodings(){
-    return true;
-  }
-  
-
-
   /**
    * Return a <code>PreferencesPanel</code> for changing the console
    * manager's settings.
