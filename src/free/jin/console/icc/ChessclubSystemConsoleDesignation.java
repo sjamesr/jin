@@ -37,6 +37,17 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   /**
+   * Creates a new <code>ChessclubSystemConsoleDesignation</code> with the
+   * specified encoding.
+   */
+  
+  public ChessclubSystemConsoleDesignation(String encoding){
+    super(encoding);
+  }
+  
+  
+  
+  /**
    * Returns whether the specified chat event is a personal tell. 
    */
   
@@ -53,11 +64,11 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
    * chat event.
    */
 
-  protected String textForChat(ChatEvent evt, String encoding){
+  protected String textForChat(ChatEvent evt){
     String type = evt.getType();
     ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
-    String message = evt.getMessage(encoding);
+    String message = decode(evt.getMessage(), evt.getConnection());
     Object forum = evt.getForum();
     
     if ("qtell".equals(type))

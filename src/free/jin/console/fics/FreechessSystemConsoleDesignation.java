@@ -37,6 +37,17 @@ public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   /**
+   * Creates a new <code>FreechessSystemConsoleDesignation</code> with the
+   * specified encoding.
+   */
+  
+  public FreechessSystemConsoleDesignation(String encoding){
+    super(encoding);
+  }
+  
+  
+  
+  /**
    * Returns whether the specified chat event is a personal tell. 
    */
   
@@ -52,19 +63,20 @@ public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
    * chat event.
    */
 
-  protected String textForChat(ChatEvent evt, String encoding){
+  protected String textForChat(ChatEvent evt){
     String type = evt.getType();
     ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
     String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
-    String message = evt.getMessage(encoding);
+    String message = decode(evt.getMessage(), evt.getConnection());
     Object forum = evt.getForum();
     
     Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
     
     I18n i18n = I18n.get(FreechessSystemConsoleDesignation.class);
     return i18n.getFormattedString(type + ".displayPattern", args);
-
   }
-
+  
+  
+  
 }
