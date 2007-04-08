@@ -40,7 +40,7 @@ public class FreechessConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createSystemConsoleDesignation(){
-    return new FreechessSystemConsoleDesignation();
+    return new FreechessSystemConsoleDesignation(getEncoding());
   }
 
 
@@ -55,26 +55,6 @@ public class FreechessConsoleManager extends ConsoleManager{
   
   
   
-  /**
-   * Returns the FICS encoding, which is 7-bit ASCII.
-   */
-  
-  public String getEncoding(){
-    return "US-ASCII";
-  }
-  
-  
-  
-  /**
-   * Returns <code>false</code>. 
-   */
-  
-  public boolean supportsMultipleEncodings(){
-    return false;
-  }
-  
-
-
   /**
    * Return a PreferencesPanel for changing the console manager's settings.
    */
