@@ -68,6 +68,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Preferences;
@@ -1000,7 +1001,7 @@ public class Console extends JPanel implements KeyListener{
     else{
       String message = 
         I18n.get(Console.class).getFormattedString("unknownSpecialCommandMessage", new Object[]{command});
-      addToOutput(message, "system");
+      addToOutput(message, "info");
     }
   }
 
@@ -1015,11 +1016,16 @@ public class Console extends JPanel implements KeyListener{
 
     if (!command.isBlanked())
       addToOutput(commandString, "user");
-
+    
     if (command.isSpecial())
       executeSpecialCommand(commandString);
-    else
-      getSelectedCommandType().executeCommand(commandString, consoleManager.getConn());
+    else{
+      Connection conn = consoleManager.getConn();
+      if (!conn.isConnected())
+        addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
+      else
+        getSelectedCommandType().executeCommand(commandString, consoleManager.getConn());
+    }
   }
 
 
