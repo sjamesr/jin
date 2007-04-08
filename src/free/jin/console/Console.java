@@ -43,7 +43,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -127,6 +129,15 @@ public class Console extends JPanel implements KeyListener{
    */
 
   private final JScrollPane outputScrollPane;
+  
+  
+  
+  /**
+   * The command type component, which is either a JLabel (if there's only one
+   * command type) or a JComboBox (if there are multiple command types).
+   */
+  
+  private final JComponent commandTypeComponent;
 
 
 
@@ -266,6 +277,7 @@ public class Console extends JPanel implements KeyListener{
     this.outputComponent = createOutputComponent();
     configureOutputComponent(outputComponent);
     this.outputScrollPane = createOutputScrollPane(outputComponent);
+    this.commandTypeComponent = createCommandTypeComponent();
     this.inputComponent = createInputComponent();
     
     registerKeyboardAction(clearingAction, 
@@ -303,15 +315,20 @@ public class Console extends JPanel implements KeyListener{
   private void createUI(){
     JComponent actionsComponent = createActionsComponent();
     
+    JPanel commandTypePanel = new JPanel(new BorderLayout());
+    commandTypePanel.add(commandTypeComponent, BorderLayout.LINE_START);
+    commandTypePanel.add(new JLabel(":"), BorderLayout.LINE_END);
+    
     JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
+    bottomPanel.add(commandTypePanel, BorderLayout.LINE_START);
     bottomPanel.add(inputComponent, BorderLayout.CENTER);
-    bottomPanel.add(actionsComponent, BorderLayout.EAST);
+    bottomPanel.add(actionsComponent, BorderLayout.LINE_END);
     
     // Hack to make room for the window resize handle
     if (PlatformUtils.isMacOSX() && (Jin.getInstance().getUIProvider() instanceof SdiUiProvider))
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0 , 2, 18));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5 , 2, 18));
     else
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 0));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
@@ -559,9 +576,46 @@ public class Console extends JPanel implements KeyListener{
 
     return scrollPane;
   }
-
-
-
+  
+  
+  
+  /**
+   * Creates the command type component, which is either a JLabel (if there is
+   * only one command type in our console designation) or a JComboBox (if there
+   * are multiple command types).
+   */
+  
+  private JComponent createCommandTypeComponent(){
+    ConsoleDesignation.CommandType [] commandTypes =
+      designation.getCommandTypes();
+    
+    if (commandTypes.length == 1)
+      return new JLabel(commandTypes[0].toString());
+    else{
+      JComboBox box = new JComboBox(commandTypes);
+      box.setEditable(false);
+      box.setFocusable(false);
+      return box;
+    }
+  }
+  
+  
+  
+  /**
+   * Returns the currently selected command type.
+   */
+  
+  private ConsoleDesignation.CommandType getSelectedCommandType(){
+    if (commandTypeComponent instanceof JLabel)
+      return designation.getCommandTypes()[0];
+    else{
+      JComboBox box = (JComboBox)commandTypeComponent;
+      return (ConsoleDesignation.CommandType)box.getSelectedItem();
+    }
+  }
+  
+  
+  
   /**
    * Creates the JTextField in which the user can input commands to be sent to
    * the server.
@@ -913,19 +967,6 @@ public class Console extends JPanel implements KeyListener{
 
 
 
-
-
-  /**
-   * Returns the size of the output area.
-   */
-
-  public Dimension getOutputArea(){
-    return outputScrollPane.getViewport().getSize();
-  }
-
-
-
-
   /**
    * Executes a special command. The following commands are recognized by this
    * method:
@@ -962,26 +1003,23 @@ public class Console extends JPanel implements KeyListener{
       addToOutput(message, "system");
     }
   }
+
   
-
-
-
   
   /**
    * Executes the given command.
    */
 
-  public void issueCommand(Command command){
+  void issueCommand(Command command){
     String commandString = command.getCommandString();
 
-    if (!command.isBlanked()){
+    if (!command.isBlanked())
       addToOutput(commandString, "user");
-    } 
 
     if (command.isSpecial())
       executeSpecialCommand(commandString);
     else
-      consoleManager.sendUserCommand(commandString, this);
+      getSelectedCommandType().executeCommand(commandString, consoleManager.getConn());
   }
 
 
