@@ -49,12 +49,43 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Creates a new <code>ChatConsoleDesignation</code> with the specified name
-   * and temporary status.
+   * The list of command types we can execute.
    */
   
-  public ChatConsoleDesignation(String name, boolean isConsoleTemporary){
-    super(name, isConsoleTemporary);
+  private final List commandTypes = new LinkedList();
+  
+  
+  
+  /**
+   * Creates a new <code>ChatConsoleDesignation</code> with the specified name,
+   * encoding, and temporary status.
+   */
+  
+  public ChatConsoleDesignation(String name, String encoding, 
+      boolean isConsoleTemporary){
+    super(name, encoding, isConsoleTemporary);
+  }
+  
+  
+  
+  /**
+   * Adds the specified <code>CommandType</code> to the list of of command types
+   * this <code>ChatConsoleDesignation</code> is able to issue.
+   */
+  
+  public void addCommandType(CommandType commandType){
+    commandTypes.add(commandType);
+  }
+  
+  
+  
+  /**
+   * Returns the list of command types this <code>ChatConsoleDesignation</code>
+   * is able to issue.
+   */
+  
+  public CommandType [] getCommandTypes(){
+    return (CommandType [])commandTypes.toArray(new CommandType[0]);
   }
   
   
@@ -100,7 +131,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * Appends the text for the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt, String encoding, Console console){
+  protected void append(JinEvent evt, Console console){
     // We already know it's a ChatEvent because it passed accept(JinEvent)
     ChatEvent chatEvent = (ChatEvent)evt;
     
@@ -108,7 +139,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
     String senderTitle = chatEvent.getSenderTitle();
     int senderRating = chatEvent.getSenderRating();
     Object forum = chatEvent.getForum();
-    String message = chatEvent.getMessage(encoding);
+    String message = decode(chatEvent.getMessage(), evt.getConnection());
     
     String text = 
       senderName +
