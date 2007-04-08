@@ -31,7 +31,7 @@ import javax.swing.border.EmptyBorder;
 
 import free.jin.I18n;
 import free.util.AWTUtilities;
-import free.util.NamedObject;
+import free.util.NamedWrapper;
 import free.util.TableLayout;
 import free.util.Utilities;
 import free.util.swing.SwingUtils;
@@ -134,19 +134,19 @@ abstract class ScriptDialog extends JDialog{
       (templateScript == null ? new String[0] : templateScript.getEventSubtypes());
 
     String [] eventTypes = scripter.getSupportedEventTypes();
-    NamedObject [] eventTypeChoiceEntries = new NamedObject[eventTypes.length];
+    NamedWrapper [] eventTypeChoiceEntries = new NamedWrapper[eventTypes.length];
     for (int i = 0; i < eventTypes.length; i++)
       eventTypeChoiceEntries[i] = 
-        new NamedObject(eventTypes[i], scripterI18n.getString("eventTypeNames." + eventTypes[i]));
+        new NamedWrapper(eventTypes[i], scripterI18n.getString("eventTypeNames." + eventTypes[i]));
     
     final JTextField scriptNameField = new FixedJTextField(defaultScriptName);
 
     final JComboBox eventTypeChoice = new FixedJComboBox(eventTypeChoiceEntries);
     eventTypeChoice.setEditable(false);
-    eventTypeChoice.addItem(new NamedObject(SELECT_EVENT_TYPE, i18n.getString("selectEventTypeString")));
+    eventTypeChoice.addItem(new NamedWrapper(SELECT_EVENT_TYPE, i18n.getString("selectEventTypeString")));
     
     for (int i = 0; i < eventTypeChoice.getItemCount(); i++){
-      NamedObject item = (NamedObject)eventTypeChoice.getItemAt(i);
+      NamedWrapper item = (NamedWrapper)eventTypeChoice.getItemAt(i);
       if (item.getTarget().equals(defaultEventType)){
         eventTypeChoice.setSelectedIndex(i);
         break;
@@ -167,7 +167,7 @@ abstract class ScriptDialog extends JDialog{
 
     eventTypeChoice.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        NamedObject selectedItem = (NamedObject)eventTypeChoice.getSelectedItem();
+        NamedWrapper selectedItem = (NamedWrapper)eventTypeChoice.getSelectedItem();
         String eventType = (String)selectedItem.getTarget();
         String [] selectedSubtypes = (templateScript == null ? new String[0] : templateScript.getEventSubtypes());
         updateSubtypesPanel(subtypesPanel, eventType, selectedSubtypes);
@@ -235,7 +235,7 @@ abstract class ScriptDialog extends JDialog{
     okButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         String scriptName = scriptNameField.getText();
-        NamedObject eventTypeSelectedItem = (NamedObject)eventTypeChoice.getSelectedItem();
+        NamedWrapper eventTypeSelectedItem = (NamedWrapper)eventTypeChoice.getSelectedItem();
         String eventType = (String)eventTypeSelectedItem.getTarget();
 
         Vector selectedSubtypesVector = new Vector();

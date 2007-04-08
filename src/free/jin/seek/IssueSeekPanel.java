@@ -48,7 +48,7 @@ import free.jin.Preferences;
 import free.jin.SeekConnection;
 import free.jin.UserSeek;
 import free.jin.plugin.Plugin;
-import free.util.NamedObject;
+import free.util.NamedWrapper;
 import free.util.TableLayout;
 import free.util.swing.IntegerStrictPlainDocument;
 import free.util.swing.SwingUtils;
@@ -118,9 +118,9 @@ public class IssueSeekPanel extends JPanel{
     
     WildVariant [] variants = plugin.getConn().getSupportedVariants();
     
-    Object whitePiecesSelection = new NamedObject(Player.WHITE_PLAYER,
+    Object whitePiecesSelection = new NamedWrapper(Player.WHITE_PLAYER,
         i18n.getString("pieceColorChoice.white"));
-    Object blackPiecesSelection = new NamedObject(Player.BLACK_PLAYER,
+    Object blackPiecesSelection = new NamedWrapper(Player.BLACK_PLAYER,
         i18n.getString("pieceColorChoice.black"));
     Object [] pieceColorSelections = 
       new Object[]{whitePiecesSelection, blackPiecesSelection};
@@ -521,8 +521,8 @@ public class IssueSeekPanel extends JPanel{
     WildVariant variant = (WildVariant)variantChoice.getSelectedItem();
     
     // Color
-    NamedObject pieceColorSelection = 
-      (NamedObject)pieceColorChoice.getSelectedItem(); 
+    NamedWrapper pieceColorSelection = 
+      (NamedWrapper)pieceColorChoice.getSelectedItem(); 
     Player color = (Player)pieceColorSelection.getTarget();
     if (!isColorManualBox.isSelected())
       color = null;
