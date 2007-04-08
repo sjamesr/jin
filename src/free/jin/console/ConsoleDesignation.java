@@ -21,7 +21,9 @@
 
 package free.jin.console;
 
+import free.jin.Connection;
 import free.jin.event.JinEvent;
+import free.util.Named;
 
 
 
@@ -44,12 +46,19 @@ public interface ConsoleDesignation{
   
   /**
    * Receives the specified <code>JinEvent</code>, possibly displaying it in
-   * some manner in the specified console. Before displaying any text obtained
-   * from the event, it should be encoded in the specified encoding (
-   * <code>null</code> if shouldn't).
+   * some manner in the specified console.
    */
   
-  void receive(JinEvent evt, String encoding, Console console);
+  void receive(JinEvent evt, Console console);
+  
+  
+  
+  /**
+   * Returns the list of command types this console designation is able to
+   * issue.
+   */
+  
+  CommandType [] getCommandTypes();
   
   
   
@@ -58,6 +67,36 @@ public interface ConsoleDesignation{
    */
   
   boolean isConsoleTemporary();
+  
+  
+  
+  /**
+   * Defines a certain type of command which can be issued by the user.
+   */
+  
+  public static abstract class CommandType extends Named{
+    
+    
+    
+    /**
+     * Creates a new <code>CommandType</code> with the specified name.
+     */
+    
+    public CommandType(String name){
+      super(name);
+    }
+    
+    
+    
+    /**
+     * Executes the command specified by the text typed by the user.
+     */
+    
+    public abstract void executeCommand(String userText, Connection connection);
+    
+    
+    
+  }
   
   
   
