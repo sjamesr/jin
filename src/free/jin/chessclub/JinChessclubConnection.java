@@ -112,16 +112,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
-   * The encoding with which plain text and chat messages are encoded.
-   * See the constructor of <code>ChatEvent</code> and
-   * <code>PlainTextEvent</code> for details.
-   */
-  
-  private static final String TEXT_ENCODING = "ISO-8859-1";
-  
-  
-  
-  /**
    * Our listener manager.
    */
 
@@ -159,10 +149,19 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     return osVersion;
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Returns the encoding of the text for ICC, which is "ISO-8859-1".
+   */
+  
+  public String getTextEncoding(){
+    return "ISO-8859-1";
+  }
+  
+  
+  
   /**
    * Returns the listener manager as its actual type for use by ICC specific
    * code.
@@ -570,7 +569,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected void processLine(String line){
-    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line, TEXT_ENCODING));
+    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
   }
   
   
@@ -665,9 +664,18 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       case Datagram.DG_MY_NOTIFY_LIST: friendsDatagramsStateChanged(isOn); break;
     }
   }
-
-
-
+  
+  
+  
+  /**
+   * Sends a personal tell to the specified user.
+   */
+  
+  public void sendPersonalTell(ServerUser user, String message){
+    sendCommand("xtell " + user.getName() + "! " + message);
+  }
+  
+  
   
   /**
    * Processes a DG_PERSONAL_TELL.
@@ -699,7 +707,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-        userForName(playerName), title, -1, message, TEXT_ENCODING, null);
+        userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -723,7 +731,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processPersonalQTell(String name, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
-        userForName(name), displayableTitle(titles), -1, message, TEXT_ENCODING, null));
+        userForName(name), displayableTitle(titles), -1, message, null));
   }
 
 
@@ -758,9 +766,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     ChatEvent evt = (shoutType == ChessclubConstants.ANNOUNCEMENT_SHOUT) ? 
       new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, 
-          userForName(playerName), title, -1, message, TEXT_ENCODING, null):
+          userForName(playerName), title, -1, message, null):
       new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY,
-          userForName(playerName), title, -1, message, TEXT_ENCODING, null);
+          userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
   }
@@ -794,7 +802,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, 
-      userForName(playerName), title, -1, message, TEXT_ENCODING, new Integer(channel));
+      userForName(playerName), title, -1, message, new Integer(channel));
       
     listenerManager.fireChatEvent(evt);
   }
@@ -819,7 +827,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
   protected void processChannelQTell(int channel, String name, String titles, String message){
     ChatEvent evt = new ChatEvent(this, "channel-qtell", ChatEvent.ROOM_CHAT_CATEGORY,
-        userForName(name), displayableTitle(titles), -1, message, TEXT_ENCODING, new Integer(channel));
+        userForName(name), displayableTitle(titles), -1, message, new Integer(channel));
 
     listenerManager.fireChatEvent(evt);
   }
@@ -848,7 +856,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
-        userForName(playerName), title, -1, message, TEXT_ENCODING, new Integer(gameNumber));
+        userForName(playerName), title, -1, message, new Integer(gameNumber));
     listenerManager.fireChatEvent(evt);
   }
 
