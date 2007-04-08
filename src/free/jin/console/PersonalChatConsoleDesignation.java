@@ -21,6 +21,8 @@
 
 package free.jin.console;
 
+import free.jin.Connection;
+import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
@@ -44,15 +46,37 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Creates a new <code>PersonalChatConsoleDesignation</code> with the
-   * specified conversation partner.
+   * Our sole command type.
    */
   
-  public PersonalChatConsoleDesignation(ServerUser conversationPartner, boolean isConsoleTemporary){
-    super(conversationPartner.getName(), isConsoleTemporary);
+  private final CommandType sendPersonalTell;
+
+  
+  
+  /**
+   * Creates a new <code>PersonalChatConsoleDesignation</code> with the
+   * specified conversation partner, encoding, and temporary status.
+   */
+  
+  public PersonalChatConsoleDesignation(ServerUser conversationPartner, 
+      String encoding, boolean isConsoleTemporary){
+    super(conversationPartner.getName(), encoding, isConsoleTemporary);
     
     this.conversationPartner = conversationPartner;
+    this.sendPersonalTell = new SendPersonalTell();
   }
+  
+  
+  
+  /**
+   * Returns our sole command type - sending a personal tell to our conversation
+   * partner.
+   */
+  
+  public CommandType [] getCommandTypes(){
+    return new CommandType[]{sendPersonalTell};
+  }
+
   
   
   
@@ -75,13 +99,13 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * Appends the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt, String encoding, Console console){
+  protected void append(JinEvent evt, Console console){
     // We already know it's a ChatEvent because it passed accept(JinEvent)
     ChatEvent chatEvent = (ChatEvent)evt;
     
     String senderName = chatEvent.getSender().getName();
     String senderTitle = chatEvent.getSenderTitle();
-    String message = chatEvent.getMessage(encoding);
+    String message = decode(chatEvent.getMessage(), chatEvent.getConnection());
     
     String text =
       senderName +
@@ -90,6 +114,41 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
       message;
     
     console.addToOutput(text, console.textTypeForEvent(evt));
+  }
+  
+  
+  
+  /**
+   * A command type which sends a personal tell to our conversation partner.
+   */
+  
+  private class SendPersonalTell extends CommandType{
+    
+    
+    
+    /**
+     * Creates a new <code>SendPersonalTell</code> with the specified
+     * conversation parner.
+     */
+    
+    public SendPersonalTell(){
+      super(I18n.get(SendPersonalTell.class).getFormattedString("name", 
+          new Object[]{conversationPartner.getName()}));
+    }
+    
+    
+    
+    /**
+     * Sends the specified personal tell to our conversation partner. 
+     */
+    
+    public void executeCommand(String message, Connection connection){
+      connection.sendPersonalTell(conversationPartner, 
+          encode(message, connection));
+    }
+    
+    
+    
   }
   
   

@@ -21,6 +21,7 @@
 
 package free.jin.console;
 
+import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
@@ -38,11 +39,32 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
-   * Creates a new <code>SystemConsoleDesignation</code>.
+   * Our sole command type.
    */
   
-  public SystemConsoleDesignation(){
-    super(I18n.get(SystemConsoleDesignation.class).getString("name"), false);
+  private final CommandType commandIssuing = new IssueCommand(); 
+  
+  
+  
+  /**
+   * Creates a new <code>SystemConsoleDesignation</code> with the specified
+   * encoding.
+   */
+  
+  public SystemConsoleDesignation(String encoding){
+    super(I18n.get(SystemConsoleDesignation.class).getString("name"), encoding,
+        false);
+  }
+  
+  
+  
+  /**
+   * Returns our sole command type - sending user-typed commands as-is to the
+   * server.
+   */
+  
+  public CommandType [] getCommandTypes(){
+    return new CommandType[]{commandIssuing};
   }
   
   
@@ -61,11 +83,11 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Appends the specified event to the console.
    */
   
-  protected void append(JinEvent evt, String encoding, Console console){
+  protected void append(JinEvent evt, Console console){
     if (evt instanceof PlainTextEvent)
-      appendPlainText((PlainTextEvent)evt, encoding, console);
+      appendPlainText((PlainTextEvent)evt, console);
     else if (evt instanceof ChatEvent)
-      appendChat((ChatEvent)evt, encoding, console);
+      appendChat((ChatEvent)evt, console);
   }
   
   
@@ -74,8 +96,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Appends the text of the specified plain text event to the console.
    */
   
-  private void appendPlainText(PlainTextEvent evt, String encoding, Console console){
-    console.addToOutput(evt.getText(encoding), "plain");
+  private void appendPlainText(PlainTextEvent evt, Console console){
+    console.addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
   }
   
   
@@ -86,8 +108,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * @see #textForChat(ChatEvent, String)
    */
   
-  private void appendChat(ChatEvent evt, String encoding, Console console){
-    console.addToOutput(textForChat(evt, encoding), console.textTypeForEvent(evt));
+  private void appendChat(ChatEvent evt, Console console){
+    console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
     if (isPersonalTell(evt))
       console.personalTellReceived(evt.getSender());
   }
@@ -99,7 +121,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * chat event.
    */
   
-  protected abstract String textForChat(ChatEvent evt, String encoding);
+  protected abstract String textForChat(ChatEvent evt);
   
   
   
@@ -108,6 +130,39 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    */
   
   protected abstract boolean isPersonalTell(ChatEvent evt);
+  
+  
+  
+  /**
+   * A command type which sends the command typed by the user as-is to the
+   * server.
+   */
+  
+  private class IssueCommand extends CommandType{
+    
+    
+    
+    /**
+     * Creates a new <code>IssueCommand</code>.
+     */
+    
+    public IssueCommand(){
+      super(I18n.get(IssueCommand.class).getString("name"));
+    }
+    
+    
+    
+    /**
+     * Issues the specified command.
+     */
+    
+    public void executeCommand(String command, Connection connection){
+      connection.sendCommand(encode(command, connection));
+    }
+    
+    
+    
+  }
   
   
   
