@@ -22,6 +22,7 @@
 package free.jin.gamelogger;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
@@ -36,7 +37,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -66,8 +66,8 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
-import free.util.PlatformUtils;
 import free.util.swing.ExtensionFileFilter;
+import free.util.swing.SwingUtils;
 
 
 
@@ -833,8 +833,10 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      */
     
     public SaveGameAction(){
+      super(true);
+      
       // We're disabled at first, since there's no game to save
-      enabledModel.setOff();
+      setEnabled(false);
     }
     
     
@@ -850,17 +852,6 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     
     
     /**
-     * Returns the name of the action.
-     */
-    
-    public String getName(){
-      return I18n.get(SaveGameAction.class).getString("actionName") +
-          PlatformUtils.getEllipsis();
-    }
-    
-    
-    
-    /**
      * Sets the last saveable game and its info. 
      */
     
@@ -868,7 +859,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
       lastGame = game;
       lastGameInfo = gameInfo;
       
-      enabledModel.setOn();
+      setEnabled(true);
     }
     
     
@@ -877,9 +868,9 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      * Lets the user select a file and then logs the game into it.
      */
     
-    public void go(Object actor){
-      Component hintParent = (actor instanceof Component) ?
-          SwingUtilities.windowForComponent((Component)actor) : null;
+    public void actionPerformed(ActionEvent evt){
+      Component hintParent = (evt.getSource() instanceof Component) ?
+          SwingUtils.frameForComponent((Component)evt.getSource()) : null;
       
       I18n i18n = I18n.get(SaveGameAction.class);
       Preferences prefs = getPrefs();

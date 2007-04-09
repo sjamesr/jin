@@ -21,6 +21,8 @@
 
 package free.jin.action.getserverhelp;
 
+import java.awt.event.ActionEvent;
+
 import free.jin.action.JinAction;
 
 
@@ -29,7 +31,7 @@ import free.jin.action.JinAction;
  */
 
 public class GetServerHelpAction extends JinAction{
-   
+  
   
   
   /**
@@ -43,20 +45,10 @@ public class GetServerHelpAction extends JinAction{
   
   
   /**
-   * Returns the name of the action.
-   */
-   
-  public String getName(){
-    return getI18n().getString("actionName"); 
-  }
-  
-  
-  
-  /**
    * Causes the server specific help to be shown to the user.
    */
    
-  public void go(Object actor){
+  public void actionPerformed(ActionEvent evt){
     getConn().showServerHelp();
   }
   

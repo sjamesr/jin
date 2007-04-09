@@ -327,9 +327,9 @@ public class Console extends JPanel implements KeyListener{
     
     // Hack to make room for the window resize handle
     if (PlatformUtils.isMacOSX() && (Jin.getInstance().getUIProvider() instanceof SdiUiProvider))
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5 , 2, 18));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5 ,2, 18));
     else
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 0));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);

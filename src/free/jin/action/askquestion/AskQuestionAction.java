@@ -32,12 +32,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 import free.jin.I18n;
 import free.jin.action.JinAction;
 import free.jin.ui.DialogPanel;
-import free.util.PlatformUtils;
+import free.util.swing.SwingUtils;
 import free.workarounds.FixedJTextField;
 
 
@@ -47,6 +46,16 @@ import free.workarounds.FixedJTextField;
  */
 
 public class AskQuestionAction extends JinAction{
+  
+  
+  
+  /**
+   * Creates a new <code>AskQuestionAction</code>.
+   */
+  
+  public AskQuestionAction(){
+    super(true);
+  }
   
   
   
@@ -61,22 +70,12 @@ public class AskQuestionAction extends JinAction{
   
   
   /**
-   * Returns the name of the action.
-   */
-   
-  public String getName(){
-    return getI18n().getString("actionName") + PlatformUtils.getEllipsis();
-  }
-  
-  
-  
-  
-  /**
    * Displays a small dialog which lets the user ask a question.
    */
    
-  public void go(Object actor){
-    Component hintParent = (actor instanceof Component) ? SwingUtilities.windowForComponent((Component)actor) : null;
+  public void actionPerformed(ActionEvent evt){
+    Component hintParent = (evt.getSource() instanceof Component) ?
+        SwingUtils.frameForComponent((Component)evt.getSource()) : null;
     String question = new QuestionPanel(hintParent).getQuestion();
     
     if ((question != null) && !"".equals(question.trim()))

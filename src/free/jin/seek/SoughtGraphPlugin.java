@@ -24,6 +24,7 @@ package free.jin.seek;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -48,7 +49,6 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
-import free.util.PlatformUtils;
 import free.util.TableLayout;
 
 
@@ -244,15 +244,11 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
   
   private void exportSeekAction(){
-    exportAction(new JinAction(){
+    exportAction(new JinAction(SoughtGraphPlugin.this.getI18n().getString("seekActionName"), true){
       public String getId(){
         return "seek";
       }
-      public String getName(){
-        return SoughtGraphPlugin.this.getI18n().getString("seekActionName") + 
-          PlatformUtils.getEllipsis();
-      }
-      public void go(Object actor){
+      public void actionPerformed(ActionEvent evt){
         uiContainer.setActive(true);
       }
     });

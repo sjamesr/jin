@@ -21,16 +21,15 @@
 
 package free.jin.action;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.Server;
 import free.jin.User;
-import free.util.models.BooleanModel;
-import free.util.models.UnmodifiableBooleanModel;
+import free.util.PlatformUtils;
 
 
 /**
@@ -38,12 +37,10 @@ import free.util.models.UnmodifiableBooleanModel;
  * encapsulate a single action. An action can be created in two ways - either
  * it is created by the Jin framework as a standalone action or it can be
  * created and exported by a plugin. Subclasses which implement standalone
- * actions must have a no-arg constructor. For convenience,
- * <code>JinAction</code> implements <code>ActionListener</code> which simply
- * runs the action.
+ * actions must have a no-arg constructor.
  */
  
-public abstract class JinAction implements ActionListener{
+public abstract class JinAction extends AbstractAction{
   
   
   
@@ -65,18 +62,55 @@ public abstract class JinAction implements ActionListener{
   
   
   /**
-   * The <code>BooleanModel</code> reflecting the action's enabled status.
-   */
-  
-  protected final BooleanModel enabledModel = new BooleanModel(true);
-  
-  
-  
-  /**
    * The <code>I18n</code> for this action.
    */
   
   private I18n i18n;
+  
+  
+  
+  /**
+   * Creates a new <code>JinAction</code> with the specified name, possibly
+   * appending an ellipsis to it.
+   */
+  
+  public JinAction(String name, boolean appendEllipsis){
+    setName(name, appendEllipsis);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>JinAction</code> with a name retrieved from its
+   * I18n with the <code>actionName</code> key, possibly appending an ellipsis
+   * to it.
+   */
+  
+  public JinAction(boolean appendEllipsis){
+    setName(getI18n().getString("actionName"), appendEllipsis);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>JinAction</code> with a name retrieved from its
+   * I18n with the <code>actionName</code> key.
+   */
+  
+  public JinAction(){
+    this(false);
+  }
+  
+  
+  
+  /**
+   * Sets the name of this action, potentially appending an ellipsis to it.
+   */
+  
+  private void setName(String name, boolean appendEllipsis){
+    putValue(Action.NAME, 
+        name + (appendEllipsis ? PlatformUtils.getEllipsis() : ""));
+  }
   
   
 
@@ -144,7 +178,9 @@ public abstract class JinAction implements ActionListener{
     if (prefs == null){
       Preferences actionPrefs = context.getPreferences();
       Preferences userPrefs = getUser().getPrefs();
-      prefs = Preferences.createBackedUp(Preferences.createWrapped(userPrefs, "action." + getId() + "."), actionPrefs);
+      prefs = Preferences.createBackedUp(
+          Preferences.createWrapped(userPrefs, "action." + getId() + "."),
+          actionPrefs);
     }
 
     return prefs;
@@ -162,57 +198,6 @@ public abstract class JinAction implements ActionListener{
     
     return i18n;
   }
-  
-  
-  
-  
-  /**
-   * <code>ActionListener</code> implementation. Simply forwards the call to the
-   * <code>go</code> method.
-   */
-   
-  public void actionPerformed(ActionEvent evt){
-    go(evt.getSource());
-  }
-  
-  
-  
-  /**
-   * Returns whether the action is currently enabled.
-   */
-  
-  public boolean isEnabled(){
-    return enabledModel.isOn();
-  }
-  
-  
-  
-  /**
-   * Returns the <code>UnmodifiableBooleanModel</code> reflecting whether this action
-   * is enabled. 
-   */
-  
-  public UnmodifiableBooleanModel getEnabledModel(){
-    return enabledModel;
-  }
-  
-  
-  
-  /**
-   * Invokes the action.
-   * 
-   * @param actor the object which, in some way, triggered the action. May be <code>null</code>.
-   */
-  
-  public abstract void go(Object actor);
-  
-  
-  
-  /**
-   * Returns the action's name. This may be displayed to the user.
-   */
-   
-  public abstract String getName();
   
   
   
