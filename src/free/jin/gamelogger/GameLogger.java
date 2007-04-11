@@ -846,7 +846,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      */
 
     public String getId(){
-      return "saveGame";
+      return "savegame";
     }
     
     
