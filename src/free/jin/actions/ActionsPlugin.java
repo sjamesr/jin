@@ -23,11 +23,13 @@ package free.jin.actions;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -38,6 +40,7 @@ import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.UIProvider;
+import free.util.swing.SwingUtils;
 
 
 /**
@@ -140,7 +143,16 @@ public class ActionsPlugin extends Plugin{
     JComponent content = new JPanel(new GridLayout(actions.getSize(), 1, 5, 5));
     for (int i = 0; i < actions.getSize(); i++){
       JinAction action = (JinAction)actions.getElementAt(i);
-      content.add(new JButton(action));
+      
+      JButton button = new JButton(action);
+      Image iconImage = (Image)action.getValue(JinAction.ICON_IMAGE);
+      if (iconImage != null){
+        SwingUtils.makeIconButton(button, iconImage);
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setVerticalTextPosition(SwingConstants.BOTTOM);
+      }
+      
+      content.add(button);
     }
     
     content.setBorder(new EmptyBorder(10, 10, 10, 10));
