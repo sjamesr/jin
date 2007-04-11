@@ -23,6 +23,7 @@ package free.util.swing;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionListener;
@@ -30,7 +31,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -127,17 +128,14 @@ public class SwingUtils{
   
   
   /**
-   * Makes an icon button from the specified button by setting its icon to the
-   * specified one, setting it not to draw its border or fill its content area
-   * and setting its margins to 0.
+   * Configures the specified button to be an icon button.
    */
   
-  public static void makeIconButton(AbstractButton button, 
-      Icon icon, Icon rolloverIcon, Icon pressedIcon){
-    
-    button.setIcon(icon);
-    button.setRolloverIcon(rolloverIcon);
-    button.setPressedIcon(pressedIcon);
+  public static void makeIconButton(AbstractButton button, Image image){
+    button.setIcon(new ImageIcon(image));
+    button.setRolloverIcon(new ImageIcon(IconImageFilters.getRollover(image)));
+    button.setPressedIcon(new ImageIcon(IconImageFilters.getPressed(image)));
+    button.setDisabledIcon(new ImageIcon(IconImageFilters.getDisabled(image)));
     
     button.setBorderPainted(false);
     button.setContentAreaFilled(false);
