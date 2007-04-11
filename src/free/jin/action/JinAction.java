@@ -21,6 +21,10 @@
 
 package free.jin.action;
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.net.URL;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
@@ -33,7 +37,7 @@ import free.util.PlatformUtils;
 
 
 /**
- * The base class for jin actions. Jin actions are miniature plugins, which
+ * The base class for Jin actions. Jin actions are miniature plugins, which
  * encapsulate a single action. An action can be created in two ways - either
  * it is created by the Jin framework as a standalone action or it can be
  * created and exported by a plugin. Subclasses which implement standalone
@@ -41,6 +45,14 @@ import free.util.PlatformUtils;
  */
  
 public abstract class JinAction extends AbstractAction{
+  
+  
+  
+  /**
+   * The key for this action's icon image.
+   */
+  
+  public static final String ICON_IMAGE = "iconImage";
   
   
   
@@ -70,31 +82,40 @@ public abstract class JinAction extends AbstractAction{
   
   
   /**
-   * Creates a new <code>JinAction</code> with the specified name, possibly
-   * appending an ellipsis to it.
+   * Creates a new <code>JinAction</code> with the specified name (possibly
+   * appending an ellipsis to it) and icon image.
    */
   
-  public JinAction(String name, boolean appendEllipsis){
-    setName(name, appendEllipsis);
+  public JinAction(String name, Image iconImage){
+    putValue(Action.NAME, name);
+    putValue(ICON_IMAGE, iconImage);
   }
   
   
   
   /**
    * Creates a new <code>JinAction</code> with a name retrieved from its
-   * I18n with the <code>actionName</code> key, possibly appending an ellipsis
-   * to it.
+   * I18n with the <code>actionName</code> key (possibly appending an ellipsis
+   * to it) and an icon image loaded from a resource named 
+   * <code>getId() + ".png"</code> (if such a resource exists).
    */
   
   public JinAction(boolean appendEllipsis){
-    setName(getI18n().getString("actionName"), appendEllipsis);
+    String name = getI18n().getString("actionName") + 
+      (appendEllipsis ? PlatformUtils.getEllipsis() : "");
+    putValue(Action.NAME, name);
+    
+    URL iconURL = getClass().getResource(getId() + ".png");
+    if (iconURL != null)
+      putValue(ICON_IMAGE, Toolkit.getDefaultToolkit().getImage(iconURL));
   }
   
   
   
   /**
    * Creates a new <code>JinAction</code> with a name retrieved from its
-   * I18n with the <code>actionName</code> key.
+   * I18n with the <code>actionName</code> key and an <code>ImageIcon</code>
+   * loaded from a resource named <code>getId() + ".png"</code>. 
    */
   
   public JinAction(){
@@ -103,17 +124,6 @@ public abstract class JinAction extends AbstractAction{
   
   
   
-  /**
-   * Sets the name of this action, potentially appending an ellipsis to it.
-   */
-  
-  private void setName(String name, boolean appendEllipsis){
-    putValue(Action.NAME, 
-        name + (appendEllipsis ? PlatformUtils.getEllipsis() : ""));
-  }
-  
-  
-
   /**
    * Sets the action's context. Returns whether the context is supported.
    */
