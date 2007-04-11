@@ -330,7 +330,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      */
     
     public FindGameAction(){
-      super(true);
+      super(false);
     }
     
     
