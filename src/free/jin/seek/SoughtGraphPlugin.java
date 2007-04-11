@@ -108,7 +108,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void start(){
     createUI();
     registerListeners();
-    exportSeekAction();
+    exportAction(new FindGameAction());
   }
 
 
@@ -240,23 +240,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   /**
-   * Exports an action which displays our UI.
-   */
-  
-  private void exportSeekAction(){
-    exportAction(new JinAction(SoughtGraphPlugin.this.getI18n().getString("seekActionName"), true){
-      public String getId(){
-        return "seek";
-      }
-      public void actionPerformed(ActionEvent evt){
-        uiContainer.setActive(true);
-      }
-    });
-  }
-
-
-
-  /**
    * SeekListener implementation. Gets called when a seek is added.
    */
 
@@ -330,6 +313,48 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public String getName(){
     return getI18n().getString("pluginName");
+  }
+  
+  
+  
+  /**
+   * An action which displays/hides our UI.
+   */
+  
+  private class FindGameAction extends JinAction{
+    
+    
+    
+    /**
+     * Creates a new <code>FindGameAction</code>.
+     */
+    
+    public FindGameAction(){
+      super(true);
+    }
+    
+    
+    
+    /**
+     * Returns the id of this action.
+     */
+      
+    public String getId(){
+      return "findgame";
+    }
+    
+    
+    
+    /**
+     * Displays or hides the UI.
+     */
+    
+    public void actionPerformed(ActionEvent evt){
+      uiContainer.setActive(true);
+    }
+    
+    
+    
   }
 
 
