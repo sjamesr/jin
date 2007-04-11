@@ -23,11 +23,12 @@ package free.jin.board;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
@@ -131,11 +132,10 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     button.setRequestFocusEnabled(false);
     
     Class loader = ExaminedGameButtonPanel.class;
-    SwingUtils.makeIconButton(button,
-        new ImageIcon(loader.getResource("images/" + iconName + ".png")),
-        new ImageIcon(loader.getResource("images/" + iconName + "-rollover.png")),
-        new ImageIcon(loader.getResource("images/" + iconName + "-pressed.png"))
-    );
+    Image image = Toolkit.getDefaultToolkit().getImage(
+        loader.getResource("images/" + iconName + ".png"));
+
+    SwingUtils.makeIconButton(button, image);
     
     return button;
   }

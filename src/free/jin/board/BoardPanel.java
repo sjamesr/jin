@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +43,6 @@ import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -797,11 +797,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     button.setToolTipText(i18n.getString("fullscreenButton.tooltip"));
     
     Class loader = BoardPanel.class;
-    SwingUtils.makeIconButton(button,
-        new ImageIcon(loader.getResource("images/view-fullscreen.png")),
-        new ImageIcon(loader.getResource("images/view-fullscreen-rollover.png")),
-        new ImageIcon(loader.getResource("images/view-fullscreen-pressed.png"))
-    );
+    Image image = Toolkit.getDefaultToolkit().getImage(
+        loader.getResource("images/view-fullscreen.png"));
+    SwingUtils.makeIconButton(button, image);
     
     ModelUtils.linkSelected(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 
