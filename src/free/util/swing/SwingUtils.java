@@ -43,6 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import free.util.WindowDisposingListener;
+import free.util.imagefilters.IconImageFilters;
 
 
 /**
