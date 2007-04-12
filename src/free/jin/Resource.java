@@ -47,14 +47,6 @@ public interface Resource{
   
   
   /**
-   * Returns the type of the resource.
-   */
-   
-  String getType();
-  
-  
-  
-  /**
    * Returns the id of the resource. Between all resources with the same type,
    * the id should be unique.
    */
