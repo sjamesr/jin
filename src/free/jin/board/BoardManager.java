@@ -25,24 +25,50 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
-import free.chess.*;
+import free.chess.BoardPainter;
+import free.chess.ColoredBoardPainter;
+import free.chess.ColoredPiecePainter;
+import free.chess.JBoard;
+import free.chess.PiecePainter;
+import free.chess.Player;
+import free.chess.Position;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.Preferences;
+import free.jin.action.JinAction;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
-import free.jin.event.*;
-import free.jin.plugin.*;
+import free.jin.event.BoardFlipEvent;
+import free.jin.event.ClockAdjustmentEvent;
+import free.jin.event.ConnectionListener;
+import free.jin.event.GameEndEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.IllegalMoveEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.MoveMadeEvent;
+import free.jin.event.OfferEvent;
+import free.jin.event.PositionChangedEvent;
+import free.jin.event.TakebackEvent;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginStartException;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
+import free.jin.plugin.PluginUIListener;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
@@ -168,6 +194,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     initPreferences();
     registerConnListeners();
     preload();
+    exportAction(new ChangeBoardAction());
+    exportAction(new ChangePieceSetAction());
   }
 
 
@@ -1399,6 +1427,115 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public String getName(){
     return getI18n().getString("pluginName");
   }
+  
+  
+  
+  /**
+   * An action which changes the board pattern.
+   */
+  
+  private class ChangeBoardAction extends JinAction{
+    
+    
+    
+    /**
+     * Creates a new <code>ChangeBoardAction</code>.
+     */
+    
+    public ChangeBoardAction(){
+      super(false);
+    }
+    
+    
+    
+    /**
+     * Returns the id of this action - "changeboard".
+     */
+    
+    public String getId(){
+      return "changeboard";
+    }
+    
+    
+    
+    /**
+     * Changes the board pattern to the next one.
+     */
+    
+    public void actionPerformed(ActionEvent evt){
+      int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1; 
+      
+      List boardPatterns = new ArrayList(getResources("boards").values());
+      Collections.sort(boardPatterns);
+      
+      int currentIndex = Collections.binarySearch(boardPatterns, getBoardPattern());
+      int newIndex;
+      if (currentIndex < 0)
+        newIndex = 0;
+      else
+        newIndex = (currentIndex + offset) % boardPatterns.size();
+      
+      setBoardPattern((BoardPattern)boardPatterns.get(newIndex));
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * An action which changes the piece set.
+   */
+  
+  private class ChangePieceSetAction extends JinAction{
+    
+    
+    
+    /**
+     * Creates a new <code>ChangePieceSetAction</code>.
+     */
+    
+    public ChangePieceSetAction(){
+      super(false);
+    }
+    
+    
+    
+    /**
+     * Returns the id of this action - "changepieces".
+     */
+    
+    public String getId(){
+      return "changepieces";
+    }
+    
+    
+    
+    /**
+     * Changes the piece set to the next one.
+     */
+    
+    public void actionPerformed(ActionEvent evt){
+      int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1; 
+      
+      List pieceSets = new ArrayList(getResources("pieces").values());
+      Collections.sort(pieceSets);
+      
+      int currentIndex = Collections.binarySearch(pieceSets, getPieceSet());
+      int newIndex;
+      if (currentIndex < 0)
+        newIndex = 0;
+      else
+        newIndex = (currentIndex + offset) % pieceSets.size();
+      
+      setPieceSet((PieceSet)pieceSets.get(newIndex));
+    }
+    
+    
+    
+  }
+
 
 
   
