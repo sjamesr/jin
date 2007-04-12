@@ -14,7 +14,7 @@
    id="svg5816"
    sodipodi:version="0.32"
    inkscape:version="0.45"
-   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/misc/icons/actions"
+   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/src/free/jin/action/askquestion"
    sodipodi:docname="askquestion.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/Users/sasha/Development/Projects/Jin/misc/icons/actions/askquestion.png"
@@ -177,10 +177,10 @@
      borderopacity="1"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313708"
-     inkscape:cx="30.3196"
-     inkscape:cy="24.406742"
-     inkscape:current-layer="layer1"
+     inkscape:zoom="22.627416"
+     inkscape:cx="19.960772"
+     inkscape:cy="17.335674"
+     inkscape:current-layer="layer7"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
@@ -247,9 +247,10 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     id="layer7"
+     inkscape:label="Question"
+     style="display:inline">
     <g
        transform="matrix(1.0175545e-2,0,0,1.3981279e-2,20.615582,13.834389)"
        id="g6707"
@@ -278,10 +279,28 @@
        style="color:#000000;fill:url(#linearGradient29443);fill-opacity:1;fill-rule:nonzero;stroke:#787878;stroke-width:1.005;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
        sodipodi:nodetypes="cccccccccccc" />
     <path
-       style="color:#000000;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible;stroke-dasharray:none"
+       style="color:#000000;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
        d="M 18,3.5 C 18.5,3.5 18.5,3.5 18.5,4 L 18.5,14 C 18.5,14.5 18.5,14.5 18,14.5 L 9,14.5 C 8.495279,15.176309 7.7651651,16.279029 6.8093593,16.712738 C 7.1898547,16.085671 7.050511,15.776952 7,14.5 L 4,14.5 C 3.5,14.5 3.5,14.5 3.5,14 L 3.5,4 C 3.5,3.5 3.5,3.5 4,3.5 L 18,3.5 z "
        id="path29449"
        sodipodi:nodetypes="cccccccccccc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2216"
+       style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;fill:#2e3436;font-family:Sans"
+       transform="matrix(0.6999343,0,0,0.67,0.7930879,0.3442973)"><flowRegion
+         id="flowRegion2218"><rect
+           id="rect2220"
+           width="21.9375"
+           height="15.9375"
+           x="4.125"
+           y="5"
+           style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;fill:#2e3436;font-family:Sans" /></flowRegion><flowPara
+         id="flowPara2222">?</flowPara></flowRoot>  </g>
+  <g
+     id="layer1"
+     inkscape:label="Answer"
+     inkscape:groupmode="layer"
+     style="display:inline">
     <g
        id="g6865"
        transform="matrix(1.0175545e-2,0,0,1.3981279e-2,29.828082,24.554389)">
@@ -335,17 +354,5 @@
            x="20.0625"
            y="20.0625"
            style="font-size:16px;font-weight:bold;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#2e3436;font-family:Sans" /></flowRegion><flowPara
-         id="flowPara2214">!</flowPara></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot2216"
-       style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;fill:#2e3436;font-family:Sans"
-       transform="matrix(0.6999343,0,0,0.67,0.7930879,0.3442973)"><flowRegion
-         id="flowRegion2218"><rect
-           id="rect2220"
-           width="21.9375"
-           height="15.9375"
-           x="4.125"
-           y="5"
-           style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;fill:#2e3436;font-family:Sans" /></flowRegion><flowPara
-         id="flowPara2222">?</flowPara></flowRoot>  </g>
+         id="flowPara2214">!</flowPara></flowRoot>  </g>
 </svg>
