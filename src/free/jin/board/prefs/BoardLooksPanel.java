@@ -26,10 +26,18 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -48,6 +56,7 @@ import free.jin.board.JinBoard;
 import free.jin.board.PieceSet;
 import free.util.AWTUtilities;
 import free.util.TableLayout;
+import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.swing.UrlDisplayingAction;
@@ -296,13 +305,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     Map resources = boardManager.getResources("pieces");
     PieceSet [] pieceSets = (PieceSet [])resources.values().toArray(new PieceSet[0]);
     
-    Collections.sort(Arrays.asList(pieceSets), new Comparator(){
-      public int compare(Object arg1, Object arg2){
-        PieceSet set1 = (PieceSet)arg1;
-        PieceSet set2 = (PieceSet)arg2;
-        return set1.getName().compareTo(set2.getName());
-      }
-    });
+    Collections.sort(Arrays.asList(pieceSets), Utilities.NAME_COMPARATOR);
     
     return pieceSets;
   }
@@ -317,13 +320,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     Map resources = boardManager.getResources("boards");
     BoardPattern [] boardPatterns = (BoardPattern [])resources.values().toArray(new BoardPattern[0]);
     
-    Collections.sort(Arrays.asList(boardPatterns), new Comparator(){
-      public int compare(Object arg1, Object arg2){
-        BoardPattern pat1 = (BoardPattern)arg1;
-        BoardPattern pat2 = (BoardPattern)arg2;
-        return pat1.getName().compareTo(pat2.getName());
-      }
-    });
+    Collections.sort(Arrays.asList(boardPatterns), Utilities.NAME_COMPARATOR);
     
     return boardPatterns;
   }
