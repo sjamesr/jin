@@ -40,7 +40,7 @@ import free.util.URLClassLoader;
  * A piece set resource.
  */
 
-public class PieceSet implements Resource{
+public final class PieceSet implements Resource, Comparable{
   
   
   
@@ -162,17 +162,6 @@ public class PieceSet implements Resource{
   
   
   /**
-   * Returns the string <code>pieces</code>.
-   */
-   
-  public String getType(){
-    return "pieces";
-  }
-  
-  
-  
-  
-  /**
    * Returns the name of this piece set.
    */
    
@@ -240,7 +229,7 @@ public class PieceSet implements Resource{
     
     PieceSet pieceSet = (PieceSet)o;
     
-    return getType().equals(pieceSet.getType()) && getId().equals(pieceSet.getId());
+    return getId().equals(pieceSet.getId());
   }
   
   
@@ -250,9 +239,25 @@ public class PieceSet implements Resource{
    */
    
   public int hashCode(){
-    return getId().hashCode() ^ getType().hashCode();
+    return getId().hashCode();
   }
-
+  
+  
+  
+  /**
+   * Compares this <code>PieceSet</code> to the specified one, alphabetically,
+   * by ID.
+   */
+  
+  
+  public int compareTo(Object o){
+    if (!(o instanceof PieceSet))
+      throw new ClassCastException(o.getClass().getName());
+    
+    PieceSet pieceSet = (PieceSet)o;
+    return getId().compareTo(pieceSet.getId());
+  }
+  
   
   
 }

@@ -41,7 +41,7 @@ import java.util.Properties;
  * A board pattern resource.
  */
  
-public class BoardPattern implements Resource{
+public final class BoardPattern implements Resource, Comparable{
   
   
   
@@ -163,16 +163,6 @@ public class BoardPattern implements Resource{
   
   
   /**
-   * Returns the string <code>boards</code>.
-   */
-   
-  public String getType(){
-    return "boards";
-  }
-  
-  
-  
-  /**
    * Returns the name of this board pattern.
    */
    
@@ -240,7 +230,7 @@ public class BoardPattern implements Resource{
     
     BoardPattern boardPattern = (BoardPattern)o;
     
-    return getType().equals(boardPattern.getType()) && getId().equals(boardPattern.getId());
+    return getId().equals(boardPattern.getId());
   }
   
   
@@ -250,7 +240,23 @@ public class BoardPattern implements Resource{
    */
    
   public int hashCode(){
-    return getId().hashCode() ^ getType().hashCode();
+    return getId().hashCode();
+  }
+  
+  
+  
+  /**
+   * Compares this <code>BoardPattern</code> to the specified one, alphabetically,
+   * by ID.
+   */
+  
+  
+  public int compareTo(Object o){
+    if (!(o instanceof BoardPattern))
+      throw new ClassCastException(o.getClass().getName());
+    
+    BoardPattern boardPattern = (BoardPattern)o;
+    return getId().compareTo(boardPattern.getId());
   }
   
   
