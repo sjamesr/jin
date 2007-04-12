@@ -10,7 +10,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    sodipodi:docname="savegame.svg"
-   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/misc/icons/actions"
+   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/src/free/jin/gamelogger"
    inkscape:version="0.45"
    sodipodi:version="0.32"
    id="svg2913"
@@ -461,10 +461,10 @@
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      showgrid="true"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer6"
      inkscape:cy="14.396587"
      inkscape:cx="20.764285"
-     inkscape:zoom="11.313709"
+     inkscape:zoom="22.627418"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1"
@@ -535,9 +535,10 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="pix"
-     id="layer2"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Move Sheet"
+     style="display:inline">
     <g
        style="display:inline"
        transform="matrix(1.0527305e-2,0,0,1.043379e-2,20.488361,21.361181)"
@@ -601,7 +602,7 @@
        rx="0"
        ry="0" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 6.5,6.5 C 10,6.5 10,6.5 10,6.5"
        id="path4208"
        sodipodi:nodetypes="cc" />
@@ -609,9 +610,9 @@
        sodipodi:nodetypes="cc"
        id="path4467"
        d="M 6.5,8.5 C 10,8.5 10,8.5 10,8.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 6.5,10.5 C 10,10.5 10,10.5 10,10.5"
        id="path4469"
        sodipodi:nodetypes="cc" />
@@ -619,9 +620,9 @@
        sodipodi:nodetypes="cc"
        id="path4471"
        d="M 6.5,12.5 C 10,12.5 10,12.5 10,12.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 6.5,14.5 C 10,14.5 10,14.5 10,14.5"
        id="path4473"
        sodipodi:nodetypes="cc" />
@@ -629,9 +630,9 @@
        sodipodi:nodetypes="cc"
        id="path4475"
        d="M 6.5,16.5 C 10,16.5 10,16.5 10,16.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 6.5,18.5 C 10,18.5 10,18.5 10,18.5"
        id="path4477"
        sodipodi:nodetypes="cc" />
@@ -639,9 +640,9 @@
        sodipodi:nodetypes="cc"
        id="path4479"
        d="M 13,18.5 C 16.5,18.5 16.5,18.5 16.5,18.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 13,16.5 C 16.5,16.5 16.5,16.5 16.5,16.5"
        id="path4481"
        sodipodi:nodetypes="cc" />
@@ -649,9 +650,9 @@
        sodipodi:nodetypes="cc"
        id="path4483"
        d="M 13,14.5 C 16.5,14.5 16.5,14.5 16.5,14.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 13,12.5 C 16.5,12.5 16.5,12.5 16.5,12.5"
        id="path4485"
        sodipodi:nodetypes="cc" />
@@ -659,9 +660,9 @@
        sodipodi:nodetypes="cc"
        id="path4487"
        d="M 13,10.5 C 16.5,10.5 16.5,10.5 16.5,10.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="M 13,8.5 C 16.5,8.5 16.5,8.5 16.5,8.5"
        id="path4489"
        sodipodi:nodetypes="cc" />
@@ -669,7 +670,13 @@
        sodipodi:nodetypes="cc"
        id="path4491"
        d="M 13,6.5 C 16.5,6.5 16.5,6.5 16.5,6.5"
-       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;fill-rule:evenodd;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline" />
+  </g>
+  <g
+     inkscape:label="Disk"
+     id="layer2"
+     inkscape:groupmode="layer"
+     style="display:inline">
     <g
        transform="matrix(1.0890066e-2,0,0,8.9393232e-3,29.241791,28.070938)"
        id="g3408"
@@ -811,7 +818,8 @@
   <g
      inkscape:groupmode="layer"
      id="layer1"
-     inkscape:label="down">
+     inkscape:label="Arrow"
+     style="display:inline">
     <path
        sodipodi:type="arc"
        style="opacity:0.14117647;color:#000000;fill:url(#radialGradient3589);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.12151313;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4.4000001;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible"

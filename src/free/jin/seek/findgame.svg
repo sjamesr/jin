@@ -14,7 +14,7 @@
    id="svg2108"
    sodipodi:version="0.32"
    inkscape:version="0.45"
-   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/misc/icons/actions"
+   sodipodi:docbase="/Users/sasha/Development/Projects/Jin/src/free/jin/seek"
    sodipodi:docname="findgame.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
@@ -265,8 +265,8 @@
      inkscape:pageshadow="2"
      inkscape:zoom="16"
      inkscape:cx="17.716822"
-     inkscape:cy="13.86274"
-     inkscape:current-layer="layer2"
+     inkscape:cy="15.647963"
+     inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
@@ -324,9 +324,9 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     inkscape:label="cipek"
      inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Person"
      style="display:inline">
     <path
        style="opacity:1;color:#000000;fill:url(#linearGradient2253);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible"
@@ -412,6 +412,12 @@
        id="path4364"
        d="M 22.697315,21.438346 C 23.522253,21.04909 23.90625,20.096791 23.90625,20.096791 C 23.263639,17.387992 21.24223,15.512101 21.24223,15.512101 C 21.24223,15.512101 22.893507,19.761644 22.697315,21.438346 z "
        style="opacity:0.22784807;color:#000000;fill:url(#linearGradient2269);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible" />
+  </g>
+  <g
+     id="layer1"
+     inkscape:label="Board"
+     inkscape:groupmode="layer"
+     style="display:inline">
     <g
        transform="matrix(1.0890066e-2,0,0,8.9393232e-3,25.630232,28.070938)"
        id="g3408"
@@ -470,9 +476,4 @@
        d="M 22,23 C 16,23 16,25.5 9,25 L 10.8125,21 C 10.8125,21 21.1875,21.03125 21.1875,21.03125 L 22,23 z "
        style="opacity:0.49431817;color:#000000;fill:url(#radialGradient4495);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99401367;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4.4000001;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible" />
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="dalsi cipek"
-     style="display:inline" />
 </svg>
