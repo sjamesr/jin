@@ -350,7 +350,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      */
     
     public void actionPerformed(ActionEvent evt){
-      uiContainer.setActive(true);
+      if (uiContainer.isVisible())
+        uiContainer.setVisible(false);
+      else
+        uiContainer.setActive(true);
     }
     
     
