@@ -21,8 +21,9 @@
 
 package free.util;
 
-import java.util.Hashtable;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
 
@@ -116,7 +117,35 @@ public class Utilities{
   };
   
   
-
+  
+  /**
+   * A <code>Comparator</code> which compares objects based on the strings
+   * returned by their <code>toString</code> methods, alphabetically.
+   * Note: this comparator may impose orderings that are inconsistent with
+   * equals, depending on the actual class of the objects. 
+   */
+  
+  public static final Comparator NAME_COMPARATOR = new Comparator(){
+    
+    
+    
+    /**
+     * Compares the specified objects, according to
+     * {@link Comparator#compare(Object, Object)}'s contract.
+     */
+    
+    public int compare(Object o1, Object o2){
+      if ((o1 == null) || (o2 == null))
+        throw new NullPointerException();
+      
+      return o1.toString().compareTo(o2.toString());
+    }
+    
+    
+  };
+  
+  
+  
   /**
    * Returns <code>true</code> if the two specified objects are the same.
    * Returns <code>false</code> otherwise. To be considered the same, the two
