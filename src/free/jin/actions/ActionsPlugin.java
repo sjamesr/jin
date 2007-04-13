@@ -22,7 +22,6 @@
 package free.jin.actions;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 
 import javax.swing.JButton;
@@ -40,6 +39,7 @@ import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.UIProvider;
+import free.util.TableLayout;
 import free.util.swing.SwingUtils;
 
 
@@ -140,11 +140,13 @@ public class ActionsPlugin extends Plugin{
   private void updateActionButtons(){
     ListModel actions = getActions();
     
-    JComponent content = new JPanel(new GridLayout(actions.getSize(), 1, 5, 5));
+    JComponent content = new JPanel(new TableLayout(1, 20, 20));
     for (int i = 0; i < actions.getSize(); i++){
       JinAction action = (JinAction)actions.getElementAt(i);
       
       JButton button = new JButton(action);
+      button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      
       Image iconImage = (Image)action.getValue(JinAction.ICON_IMAGE);
       if (iconImage != null){
         SwingUtils.makeIconButton(button, iconImage);
@@ -156,6 +158,7 @@ public class ActionsPlugin extends Plugin{
     }
     
     content.setBorder(new EmptyBorder(10, 10, 10, 10));
+    content.setAlignmentY(JComponent.TOP_ALIGNMENT);
     
     buttonContainer.getContentPane().removeAll();
     buttonContainer.getContentPane().setLayout(new BorderLayout());
