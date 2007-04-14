@@ -126,11 +126,12 @@ public class User{
 
 
   /**
-   * Returns the preferences of this account.
+   * Returns the preferences of this account, backed up by the application's
+   * customizing preferences.
    */
 
   public Preferences getPrefs(){
-    return prefs;
+    return Preferences.createBackedUp(prefs, Jin.getInstance().getCustomizingPrefs());
   }
 
 
