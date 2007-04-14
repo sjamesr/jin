@@ -296,6 +296,19 @@ public class Jin{
   
   
   /**
+   * Returns the application's customizing preferences. These are used as
+   * default preferences for each user. They allow 3rd parties to customize Jin
+   * to their liking. May return <code>null</code>.
+   */
+  
+  public Preferences getCustomizingPrefs(){
+    return context.getCustomizingPrefs();
+  }
+  
+  
+  
+  
+  /**
    * Returns the locale for this instance of Jin.
    */
   

@@ -121,6 +121,14 @@ public class JinApplication implements JinContext{
   
   
   /**
+   * Customizing preferences.
+   */
+  
+  private final Preferences customizingPrefs;
+  
+  
+  
+  /**
    * Our class loader. Initially it has no delegates - they are added as the
    * various jars for plugins, server definitions etc. are loaded. The structure
    * of the classloader is:
@@ -239,6 +247,9 @@ public class JinApplication implements JinContext{
     // Load user preferences
     userPrefs = loadUserPrefs();
     
+    // Load customizing preferences
+    customizingPrefs = loadCustomizingPrefs();
+    
     
     if (dynamicLoad){
       // Create our own special classloader. The delegate classloaders will be
@@ -314,6 +325,35 @@ public class JinApplication implements JinContext{
 
   public Preferences getPrefs(){
     return userPrefs;
+  }
+  
+  
+  
+  /**
+   * Loads and returns the application's customizing preferences.
+   */
+  
+  public Preferences loadCustomizingPrefs(){
+    File file = new File(JIN_DIR, "custom.properties");
+    
+    try{
+      if (file.exists() && file.isFile())
+        return Preferences.load(file);
+    } catch (IOException e){
+        e.printStackTrace();
+      }
+    
+    return null;
+  }
+  
+  
+  
+  /**
+   * Returns the application's customizing preferences.
+   */
+  
+  public Preferences getCustomizingPrefs(){
+    return customizingPrefs;
   }
   
   

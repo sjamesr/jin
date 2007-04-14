@@ -410,6 +410,17 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
+   * Returns the application's customizing preferences.
+   */
+  
+  public Preferences getCustomizingPrefs(){
+    // TODO: Implement me
+    return null;
+  }
+  
+  
+  
+  /**
    * Returns all the resources of the specified type.
    * See {@link JinContext#getResources(String, Plugin)} for more information.
    */

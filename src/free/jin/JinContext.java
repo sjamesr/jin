@@ -64,6 +64,17 @@ public interface JinContext{
   
   
   
+  /**
+   * Returns the context's customizing preferences, which are used as the
+   * default preferences for each <code>User</code>. This allows 3rd parties to
+   * customize Jin to their liking. May return <code>null</code> to indicate
+   * that no customizing preferences are specified.
+   */
+  
+  Preferences getCustomizingPrefs();
+  
+  
+  
   
   /**
    * Loads and returns the resources of the specified type for the specified
