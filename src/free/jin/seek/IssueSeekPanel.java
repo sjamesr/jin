@@ -163,7 +163,7 @@ public class IssueSeekPanel extends JPanel{
       pieceColorChoice.setSelectedItem(blackPiecesSelection);
     limitRatingBox.setSelected(prefs.getBool("limitRating", false));
     minRatingField.setText(minRating == Integer.MIN_VALUE ? "" : String.valueOf(minRating));
-    maxRatingField.setText(minRating == Integer.MAX_VALUE ? "" : String.valueOf(maxRating));
+    maxRatingField.setText(maxRating == Integer.MAX_VALUE ? "" : String.valueOf(maxRating));
     manualAcceptBox.setSelected(prefs.getBool("manualAccept", false));
     useFormulaBox.setSelected(prefs.getBool("useFormula", true));
     
