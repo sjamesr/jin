@@ -392,15 +392,12 @@
 		
 
 		<!-- Get Server Help action -->
+		<!--
 		<antcall target="buildAction">
 			<param name="action.id" value="getserverhelp" />
 		</antcall>
+		-->
  		
-		<!-- Ask a Question action -->
-		<antcall target="buildAction">
-			<param name="action.id" value="askquestion" />
-		</antcall>
-		
 		
     	
 		
