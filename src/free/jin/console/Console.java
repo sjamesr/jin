@@ -29,6 +29,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -55,6 +56,7 @@ import javax.swing.KeyStroke;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -292,7 +294,7 @@ public class Console extends JPanel implements KeyListener{
     
     setFocusable(false);
     
-    closeAction.setEnabled(designation.isConsoleTemporary());
+    closeAction.setEnabled(designation.isConsoleCloseable());
     
     init();
   }
@@ -344,6 +346,24 @@ public class Console extends JPanel implements KeyListener{
   
   public void obtainFocus(){
     inputComponent.requestFocusInWindow();
+  }
+  
+  
+  
+  /**
+   * Flashes the input field, attracting attention to it.
+   */
+  
+  public void flashInputField(){
+    inputComponent.setBackground(Color.red);
+    
+    Timer timer = new Timer(300, new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        inputComponent.setBackground(null);
+      }
+    });
+    timer.setRepeats(false);
+    timer.start();
   }
 
 
