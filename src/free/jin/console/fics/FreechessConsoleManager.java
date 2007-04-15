@@ -42,6 +42,16 @@ public class FreechessConsoleManager extends ConsoleManager{
   protected ConsoleDesignation createSystemConsoleDesignation(){
     return new FreechessSystemConsoleDesignation(getEncoding());
   }
+  
+  
+  
+  /**
+   * Returns a FICS-specific help console designation.
+   */
+  
+  protected ConsoleDesignation createHelpConsoleDesignation(){
+    return new FreechessHelpConsoleDesignation(getEncoding());
+  }
 
 
 

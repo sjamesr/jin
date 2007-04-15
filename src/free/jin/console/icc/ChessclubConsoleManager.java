@@ -46,6 +46,16 @@ public class ChessclubConsoleManager extends ConsoleManager{
   
   
   /**
+   * Returns an ICC-specific help console designation.
+   */
+  
+  protected ConsoleDesignation createHelpConsoleDesignation(){
+    return new ChessclubHelpConsoleDesignation(getEncoding());
+  }
+  
+  
+  
+  /**
    * Creates a <code>ChessclubConsole</code> with the specified designation.
    */
 
