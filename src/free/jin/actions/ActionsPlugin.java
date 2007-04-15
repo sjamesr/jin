@@ -152,6 +152,7 @@ public class ActionsPlugin extends Plugin{
         SwingUtils.makeIconButton(button, iconImage);
         button.setHorizontalTextPosition(SwingConstants.CENTER);
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
+        button.setFocusable(false);
       }
       
       content.add(button);
