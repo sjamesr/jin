@@ -54,23 +54,22 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
-   * Whether the console is temporary.
+   * Whether the console is closeable.
    */
   
-  private final boolean isConsoleTemporary;
+  private final boolean isConsoleCloseable;
   
   
   
   /**
    * Creates a new <code>AbstractConsoleDesignation</code> with the specified
-   * name, encoding and temporary status.
+   * name, encoding and closeable status.
    */
   
-  public AbstractConsoleDesignation(String name, String encoding,
-      boolean isConsoleTemporary){
+  public AbstractConsoleDesignation(String name, String encoding, boolean isConsoleCloseable){
     this.name = name;
     this.encoding = encoding;
-    this.isConsoleTemporary = isConsoleTemporary;
+    this.isConsoleCloseable = isConsoleCloseable;
   }
   
   
@@ -136,11 +135,11 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
-   * Returns whether the console is temporary.
+   * Returns whether the console is closeable.
    */
   
-  public boolean isConsoleTemporary(){
-    return isConsoleTemporary;
+  public boolean isConsoleCloseable(){
+    return isConsoleCloseable;
   }
   
   

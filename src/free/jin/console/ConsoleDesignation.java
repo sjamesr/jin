@@ -63,10 +63,10 @@ public interface ConsoleDesignation{
   
   
   /**
-   * Returns whether the console is temporary.
+   * Returns whether the console is closeable.
    */
   
-  boolean isConsoleTemporary();
+  boolean isConsoleCloseable();
   
   
   

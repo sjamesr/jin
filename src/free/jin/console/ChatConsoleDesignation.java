@@ -58,12 +58,12 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   /**
    * Creates a new <code>ChatConsoleDesignation</code> with the specified name,
-   * encoding, and temporary status.
+   * encoding, and closeable status.
    */
   
   public ChatConsoleDesignation(String name, String encoding, 
-      boolean isConsoleTemporary){
-    super(name, encoding, isConsoleTemporary);
+      boolean isConsoleCloseable){
+    super(name, encoding, isConsoleCloseable);
   }
   
   

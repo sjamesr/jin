@@ -55,12 +55,12 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   /**
    * Creates a new <code>PersonalChatConsoleDesignation</code> with the
-   * specified conversation partner, encoding, and temporary status.
+   * specified conversation partner, encoding, and closeable status.
    */
   
   public PersonalChatConsoleDesignation(ServerUser conversationPartner, 
-      String encoding, boolean isConsoleTemporary){
-    super(conversationPartner.getName(), encoding, isConsoleTemporary);
+      String encoding, boolean isConsoleCloseable){
+    super(conversationPartner.getName(), encoding, isConsoleCloseable);
     
     this.conversationPartner = conversationPartner;
     this.sendPersonalTell = new SendPersonalTell();
