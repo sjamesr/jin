@@ -243,12 +243,12 @@ public class Console extends JPanel implements KeyListener{
    * An action which clears the console.
    */
   
-  private final Action clearingAction = 
+  private final Action clearAction = 
     new AbstractAction(I18n.get(Console.class).getString("clearAction.name")){
       public void actionPerformed(ActionEvent e){
         clear();
       }
-  };
+    };
   
   
   
@@ -283,7 +283,7 @@ public class Console extends JPanel implements KeyListener{
     this.commandTypeComponent = createCommandTypeComponent();
     this.inputComponent = createInputComponent();
     
-    registerKeyboardAction(clearingAction, 
+    registerKeyboardAction(clearAction, 
         KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
         WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
@@ -396,7 +396,8 @@ public class Console extends JPanel implements KeyListener{
   protected JComponent createActionsComponent(){
     MultiButton button = new MultiButton();
     
-    button.add(clearingAction);
+    button.add(inputComponent.getSendAction());
+    button.add(clearAction);
     button.add(closeAction);
     
     return button;
