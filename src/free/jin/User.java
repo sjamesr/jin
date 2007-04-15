@@ -131,7 +131,11 @@ public class User{
    */
 
   public Preferences getPrefs(){
-    return Preferences.createBackedUp(prefs, Jin.getInstance().getCustomizingPrefs());
+    Preferences customizingPrefs = Jin.getInstance().getCustomizingPrefs();
+    if (customizingPrefs == null)
+      return prefs;
+    else
+      return Preferences.createBackedUp(prefs, customizingPrefs);
   }
 
 
