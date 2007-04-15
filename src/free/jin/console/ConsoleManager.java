@@ -24,6 +24,7 @@ package free.jin.console;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.UnsupportedEncodingException;
@@ -40,6 +41,7 @@ import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.ServerUser;
+import free.jin.action.JinAction;
 import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.ChatEvent;
 import free.jin.event.ChatListener;
@@ -98,9 +100,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
 
   private final List consoles = new ArrayList();
-
-
-
+  
+  
+  
   /**
    * Our main container.
    */
@@ -130,9 +132,17 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
    
   private final Vector pausedEventsQueue = new Vector();
-
-
-
+  
+  
+  
+  /**
+   * The help console designation, if any.
+   */
+  
+  private ConsoleDesignation helpConsoleDesignation;
+  
+  
+  
   /**
    * Starts this plugin.
    */
@@ -142,6 +152,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     createConsoles();
     uiContainer.setVisible(true);
     registerConnListeners();
+    exportAction(new AskHelpQuestionAction());
   }
 
 
@@ -183,6 +194,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     String type = prefs.getString(prefsPrefix + "type");
     if ("system".equals(type))
       return createSystemConsoleDesignation();
+    else if ("help".equals(type)){
+      helpConsoleDesignation = createHelpConsoleDesignation();
+      return helpConsoleDesignation;
+    }
     else if ("chat".equals(type)){
       String name = prefs.getString(prefsPrefix + "name", null);
       if (name == null)
@@ -205,12 +220,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       
       return designation;
     }
-//    else if ("text".equals(type)){
-//
-//    }
-//    else if ("union".equals(type)){
-//      
-//    }
     else
       throw new IllegalArgumentException("Unrecognized designation type: " + type);
   }
@@ -218,11 +227,20 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
-   * Creates the "system" console designation. This method is meant to be
+   * Creates the system console designation. This method is meant to be
    * implemented by a server-specific console manager.
    */
   
   protected abstract ConsoleDesignation createSystemConsoleDesignation();
+  
+  
+  
+  /**
+   * Creates the help console designation. This method is meant to be
+   * implemented by a server-specific console manager.
+   */
+  
+  protected abstract ConsoleDesignation createHelpConsoleDesignation();
   
   
   
@@ -294,12 +312,24 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       }
     });
     
-    if (makeActive){
-      if (consoles.size() > 1)
-        consolesTabbedPane.setSelectedIndex(consolesTabbedPane.getComponentCount() - 1);
-      if (uiContainer != null)
-        uiContainer.setActive(true);
-    }
+    if (makeActive)
+      makeConsoleActive(console);
+  }
+  
+  
+  
+  /**
+   * Makes the specified console active.
+   */
+  
+  protected void makeConsoleActive(Console console){
+    int index = consoles.indexOf(console);
+    
+    if (index >= 0)
+      consolesTabbedPane.setSelectedIndex(index);
+    
+    if (uiContainer != null)
+      uiContainer.setActive(true);
   }
   
   
@@ -336,9 +366,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   
-  
   /**
-   * Adds a temporary console for chatting with the specified user, possibly
+   * Adds a closeable console for chatting with the specified user, possibly
    * making it the active console.
    */
   
@@ -696,7 +725,70 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   public PreferencesPanel getPreferencesUI(){
     return new ConsolePrefsPanel(this);
   }
-
-
-
+  
+  
+  
+  /**
+   * An action which guides the user to ask a question using the help console.
+   */
+  
+  private class AskHelpQuestionAction extends JinAction{
+    
+    
+    
+    /**
+     * Returns the string <code>"askhelpquestion"</code>.
+     */
+    
+    public String getId(){
+      return "askhelpquestion";
+    }
+    
+    
+    
+    /**
+     * Displays the help console and flashes the input field.
+     */
+    
+    public void actionPerformed(ActionEvent e){
+      Console helpConsole = null;
+      
+      if (helpConsoleDesignation == null)
+        helpConsoleDesignation = createHelpConsoleDesignation();
+      else
+        helpConsole = findHelpConsole();
+      
+      if (helpConsole == null){
+        addConsole(helpConsoleDesignation, true);
+        helpConsole = findHelpConsole();
+      }
+      else
+        makeConsoleActive(helpConsole);
+      
+      helpConsole.flashInputField();
+    }
+    
+    
+    
+    /**
+     * Finds and returns the current help console. Returns <code>null</code> if
+     * none.
+     */
+    
+    private Console findHelpConsole(){
+      for (int i = 0; i < consoles.size(); i++){
+        Console console = (Console)consoles.get(i);
+        if (console.getDesignation() == helpConsoleDesignation)
+          return console;
+      }
+      
+      return null;
+    }
+    
+    
+    
+  }
+  
+  
+  
 }
