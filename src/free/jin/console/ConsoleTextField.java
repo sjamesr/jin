@@ -29,9 +29,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import free.jin.I18n;
 import free.jin.Preferences;
@@ -116,10 +120,41 @@ public class ConsoleTextField extends FixedJTextField{
    */
 
   private int tellerIndex = -1;
-
-
-
-
+  
+  
+  
+  /**
+   * An action which sends the command.
+   */
+  
+  private final Action sendAction = 
+    new AbstractAction(I18n.get(ConsoleTextField.class).getString("sendAction.name")){
+      public void actionPerformed(ActionEvent evt){
+        boolean isControlDown = (evt.getModifiers() & ActionEvent.CTRL_MASK) != 0;
+        boolean isShiftDown = (evt.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
+  
+        String command = getText();
+        long modifiers = 0;
+        if (isShiftDown)
+          modifiers |= Command.BLANKED_MASK;
+        if (isControlDown)
+          modifiers |= Command.SPECIAL_MASK;
+        
+        if ((modifiers&Command.BLANKED_MASK)==0){
+          history.removeElement(command);
+          history.insertElementAt(command,0);
+        }
+  
+        typedInString = "";
+        setText(typedInString);
+        currentHistoryIndex = -1;
+  
+        console.issueCommand(new Command(command, modifiers));
+      }
+    };
+  
+  
+  
   /**
    * Creates a new ConsoleTextField for the given Console.
    */
@@ -133,11 +168,25 @@ public class ConsoleTextField extends FixedJTextField{
     
     Font oldFont = getFont();
     setFont(new Font("Monospaced", oldFont.getStyle(), oldFont.getSize()));
+    
+    getDocument().addDocumentListener(new DocumentListener(){
+      public void changedUpdate(DocumentEvent e){
+        changed(e);
+      }
+      public void insertUpdate(DocumentEvent e){
+        changed(e);
+      }
+      public void removeUpdate(DocumentEvent e){
+        changed(e);
+      }
+      private void changed(DocumentEvent e){
+        sendAction.setEnabled(e.getDocument().getLength() != 0);
+      }
+    });
   }
-
-
-
-
+  
+  
+  
   /**
    * Initializes this <code>ConsoleTextField</code> from the plugin properties.
    */
@@ -167,10 +216,19 @@ public class ConsoleTextField extends FixedJTextField{
       registerKeyboardAction(new TellNextTellerAction(), tellNextTellerKeyStroke, WHEN_FOCUSED);
     }
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Returns the action which sends the command.
+   */
+  
+  public Action getSendAction(){
+    return sendAction;
+  }
+  
+  
+  
   /**
    * Re-reads all the plugin properties used by this instance and/or clears any
    * cached values of such properties.
@@ -215,29 +273,12 @@ public class ConsoleTextField extends FixedJTextField{
 
 
     boolean isControlDown = evt.isControlDown();
-    boolean isShiftDown = evt.isShiftDown();
 
     if (evt.getID() == KeyEvent.KEY_PRESSED){
       switch (evt.getKeyCode()){
         case KeyEvent.VK_ENTER:
-          String command = getText();
-          long modifiers = 0;
-          if (isShiftDown)
-            modifiers |= Command.BLANKED_MASK;
-          if (isControlDown)
-            modifiers |= Command.SPECIAL_MASK;
-          
-          if ((modifiers&Command.BLANKED_MASK)==0){
-            history.removeElement(command);
-            history.insertElementAt(command,0);
-          }
-
-          typedInString = "";
-          setText(typedInString);
-          currentHistoryIndex = -1;
-
-          console.issueCommand(new Command(command, modifiers));
-          break;
+          ActionEvent actionEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "send", evt.getModifiers());
+          sendAction.actionPerformed(actionEvent);
         case KeyEvent.VK_ESCAPE:
           if (evt.getModifiers() == 0){
             typedInString = "";
