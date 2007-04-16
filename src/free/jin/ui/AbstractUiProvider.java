@@ -248,7 +248,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * Restores the geometry of the specified frame from the preferences.
    */
    
-  protected void restoreFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix, RectDouble defaultFrameBounds){
+  public static void restoreFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix, RectDouble defaultFrameBounds){
     Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     Rectangle realDefaultBounds = 
         defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
@@ -279,7 +279,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * with preference names prefixed with the specified string.
    */
 
-  protected void saveFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix){
+  public static void saveFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix){
     
     // Save bounds on screen
     Point frameLocation = frame.isVisible() ? frame.getLocationOnScreen() : frame.getLocation();
@@ -302,7 +302,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * between runs).
    */
 
-  protected boolean frameBoundsOk(Dimension screenSize, Rectangle frameBounds){
+  public static boolean frameBoundsOk(Dimension screenSize, Rectangle frameBounds){
     if (frameBounds.x + frameBounds.width < 50)
       return false;
     if (frameBounds.y < -10)
