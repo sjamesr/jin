@@ -326,16 +326,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     
     /**
-     * Creates a new <code>FindGameAction</code>.
-     */
-    
-    public FindGameAction(){
-      super(false);
-    }
-    
-    
-    
-    /**
      * Returns the id of this action.
      */
       
