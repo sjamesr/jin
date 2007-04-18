@@ -38,7 +38,7 @@ public final class FreechessUser extends PlainServerUser{
    */
   
   private FreechessUser(String handle){
-    super(handle, false);
+    super(handle, false, false);
   }
   
   
