@@ -1558,6 +1558,11 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             isPlayedGame = false;
 
           if ((game.isPlayed() != isPlayedGame) || (newGameType != game.getGameType())){
+            if (!isPlayedGame){
+              clearOffers(gameInfo, Player.WHITE_PLAYER);
+              clearOffers(gameInfo, Player.BLACK_PLAYER);
+            }
+
             updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
               game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
               game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), isPlayedGame,
@@ -2458,11 +2463,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
-   * The set (of <code>ChessclubUser</code>s) of friends who are online.
+   * The set (of <code>ChessclubUser</code>s) of friends who are online. This
+   * isn't necessarily a subset of <code>friends</code> because some of the
+   * elements in <code>friends</code> may be aliases.
    */
   
   private final Set onlineFriends = new HashSet();
-  
   
   
   
@@ -2471,22 +2477,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   protected void friendsDatagramsStateChanged(boolean isOn){
-    if (!isOn)
-      clearFriends();
-  }
-  
-  
-  
-  /**
-   * Removes all friends and notifies interested listeners.
-   */
-  
-  private void clearFriends(){
-    for (Iterator i = friends.iterator(); i.hasNext();){
-      ServerUser user = (ServerUser)i.next();
-      i.remove();
-      listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
+    if (!isOn){
+      friends.clear();
+      onlineFriends.clear();
     }
   }
   
@@ -2573,7 +2566,21 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         listenerManager.fireFriendsEvent(
             new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
         
-        onlineFriends.remove(user);
+        if (user.isAlias()){
+          // Disconnect everyone who is suspect to be online due to the alias
+          // and re-request the list.
+          for (Iterator i = onlineFriends.iterator(); i.hasNext();){
+            ServerUser u = (ServerUser)i.next();
+            if (!friends.contains(u)){
+              i.remove();
+              listenerManager.fireFriendsEvent(
+                  new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, u));
+            }
+          }
+          setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
+        }
+        else
+          onlineFriends.remove(user);
       }
     }
   }
