@@ -41,6 +41,15 @@ public interface ServerUser{
   
   
   /**
+   * Returns whether this user is an alias for another user, or a group of
+   * users.
+   */
+  
+  boolean isAlias();
+  
+  
+  
+  /**
    * Returns whether the specified <code>ServerUser</code> is the same as this
    * one.
    */

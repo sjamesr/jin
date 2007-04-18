@@ -49,16 +49,25 @@ public class PlainServerUser implements ServerUser{
   
   
   /**
-   * Creates a new <code>PlainServerUser</code> with the specified
-   * case-sensitive or case-insensitive user name/handle/nickname. 
+   * Whether the username is an alias.
    */
   
-  protected PlainServerUser(String name, boolean isCaseSensitive){
+  private final boolean isAlias;
+  
+  
+  
+  /**
+   * Creates a new <code>PlainServerUser</code> with the specified
+   * case-sensitive or case-insensitive user name/handle/nickname.
+   */
+  
+  protected PlainServerUser(String name, boolean isCaseSensitive, boolean isAlias){
     if (name == null)
       throw new IllegalArgumentException("name may not be null");
     
     this.name = name;
     this.isCaseSensitive = isCaseSensitive;
+    this.isAlias = isAlias;
   }
   
   
@@ -69,6 +78,16 @@ public class PlainServerUser implements ServerUser{
 
   public String getName(){
     return name;
+  }
+  
+  
+  
+  /**
+   * Returns the value of <code>isAlias</code> passed to the constructor.
+   */
+  
+  public boolean isAlias(){
+    return isAlias;
   }
   
   
