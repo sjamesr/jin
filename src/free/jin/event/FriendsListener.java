@@ -25,7 +25,10 @@ import java.util.EventListener;
 
 
 /**
- * The interface for listening to FriendsEvents.
+ * The interface for listening to FriendsEvents. Note that not all "online
+ * friends" are actually in the friend list because some of the elements in
+ * the friend list may be aliases, or because the server decided to notify us
+ * of some other user (maybe because we have an adjourned game with him).
  */
 
 public interface FriendsListener extends EventListener{

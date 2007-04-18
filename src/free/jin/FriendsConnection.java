@@ -84,7 +84,11 @@ public interface FriendsConnection extends Connection{
   
   /**
    * Returns the set of online friends (a set of <code>ServerUser</code>s).
-   **/
+   * Note that this isn't necessarily a subset of {@link #getFriends()} because
+   * some of the elements there may be aliases or the server decided to notify
+   * us of the login of some user (for example, if we have an adjourned game
+   * with him). 
+   */
   
   Collection getOnlineFriends();
   
