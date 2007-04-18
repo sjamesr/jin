@@ -38,7 +38,7 @@ public final class ChessclubUser extends PlainServerUser{
    */
   
   private ChessclubUser(String handle){
-    super(handle, false);
+    super(handle, false, handle.startsWith("&"));
   }
   
   
