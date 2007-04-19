@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -163,6 +164,16 @@ public class I18n{
   
   
   /**
+   * Returns an i18n key formed from combining the two specified keys.
+   */
+  
+  private static String combineKeys(String key1, String key2){
+    return "".equals(key1) ? key2 : ("".equals(key2) ? key1 : key1 + "." + key2);
+  }
+  
+  
+  
+  /**
    * Returns the translation for the specified key.
    */
   
@@ -249,7 +260,7 @@ public class I18n{
   public JLabel createLabel(String i18nKey){
     JLabel label = new JLabel();
     
-    SwingUtils.applyLabelSpec(label, getString(i18nKey + ".text"));    
+    SwingUtils.applyLabelSpec(label, getString(combineKeys(i18nKey, "text")));    
     
     return label;
   }
@@ -319,7 +330,7 @@ public class I18n{
   public JMenuItem createMenuItem(String i18nKey, Object [] textArgs){
     JMenuItem menuItem = new JMenuItem();
     
-    String labelSpec = getString(i18nKey + ".text");
+    String labelSpec = getString(combineKeys(i18nKey, "text"));
     
     labelSpec = formatMessage(labelSpec, textArgs);
     
@@ -339,8 +350,8 @@ public class I18n{
   public ColorChooser createColorChooser(String i18nKey){
     ColorChooser colorChooser = new ColorChooser();
     
-    SwingUtils.applyLabelSpec(colorChooser, getString(i18nKey + ".text"));
-    colorChooser.setToolTipText(getString(i18nKey + ".tooltip", null));
+    SwingUtils.applyLabelSpec(colorChooser, getString(combineKeys(i18nKey, "text")));
+    colorChooser.setToolTipText(getString(combineKeys(i18nKey, "tooltip"), null));
     
     return colorChooser;
   }
@@ -355,10 +366,24 @@ public class I18n{
    */
   
   public AbstractButton initAbstractButton(AbstractButton button, String i18nKey){
-    SwingUtils.applyLabelSpec(button, getString(i18nKey + ".text"));
-    button.setToolTipText(getString(i18nKey + ".tooltip", null));
+    SwingUtils.applyLabelSpec(button, getString(combineKeys(i18nKey, "text"), null));
+    button.setToolTipText(getString(combineKeys(i18nKey, "tooltip"), null));
     
     return button;
+  }
+  
+  
+  
+  /**
+   * Initializes the specified <code>Action</code> from the specified i18n key.
+   */
+  
+  public Action initAction(Action action, String i18nKey){
+    action.putValue(Action.NAME, getString(combineKeys(i18nKey, "name"), null));
+    action.putValue(Action.SHORT_DESCRIPTION, getString(combineKeys(i18nKey, "shortDescription"), null));
+    action.putValue(Action.LONG_DESCRIPTION, getString(combineKeys(i18nKey, "longDescription"), null));
+    
+    return action;
   }
   
   
@@ -368,31 +393,29 @@ public class I18n{
    */
   
   public TitledBorder createTitledBorder(String i18nKey){
-    String title = getString(i18nKey + ".title");
-    
-    return BorderFactory.createTitledBorder(title);
+    return BorderFactory.createTitledBorder(getTitle(i18nKey));
   }
 
 
 
   /**
-   * Obtains the title of the <code>OptionPanel</code> with the specified i18n key.
+   * Obtains the title associated with the specified i18n key.
    */
   
-  private String getOptionPanelTitle(String i18nKey){
-    return getString(i18nKey + ".title");
+  private String getTitle(String i18nKey){
+    return getString(combineKeys(i18nKey, "title"));
   }
 
 
 
   /**
-   * Obtains the message of the <code>OptionPanel</code> with the specified i18n key.
+   * Obtains the message associated with the specified i18n key.
    * The message string is treated as a pattern and <code>args</code>, if not
    * <code>null</code> are inserted at the appropriate locations.
    */
   
-  private String getOptionPanelMessage(String i18nKey, Object [] args){
-    String message = getString(i18nKey + ".message");
+  private String getMessage(String i18nKey, Object [] args){
+    String message = getString(combineKeys(i18nKey, "message"));
     
     if (args != null)
       message = formatMessage(message, args);
@@ -413,8 +436,8 @@ public class I18n{
    */
   
   public void error(String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getOptionPanelTitle(i18nKey);
-    String message = getOptionPanelMessage(i18nKey, messageArgs);
+    String title = getTitle(i18nKey);
+    String message = getMessage(i18nKey, messageArgs);
     
     OptionPanel.error(title, message, hintParent);
   }
@@ -439,9 +462,8 @@ public class I18n{
    * <p>Creates and shows an error panel.
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
-   * The panel's message is treated as a pattern
-   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
-   * appropriate locations.
+   * The panel's message is treated as a pattern and <code>messageArgs</code>,
+   * if not <code>null</code> are inserted at the appropriate locations.
    */
   
   public void error(String i18nKey, Object [] messageArgs){
@@ -467,16 +489,15 @@ public class I18n{
    * Possible result values are {@link OptionPanel#OK} and {@link OptionPanel#CANCEL}.
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
-   * The panel's message is treated as a pattern
-   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
-   * appropriate locations.
+   * The panel's message is treated as a pattern and <code>messageArgs</code>,
+   * if not <code>null</code> are inserted at the appropriate locations.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
   
   public Object confirm(Object defaultOption, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getOptionPanelTitle(i18nKey);
-    String message = getOptionPanelMessage(i18nKey, messageArgs);
+    String title = getTitle(i18nKey);
+    String message = getMessage(i18nKey, messageArgs);
     
     return OptionPanel.confirm(defaultOption, title, message, hintParent);
   }
@@ -533,16 +554,15 @@ public class I18n{
    * {@link OptionPanel#NO} and {@link OptionPanel#CANCEL}.
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
-   * The panel's message is treated as a pattern
-   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
-   * appropriate locations.
+   * The panel's message is treated as a pattern and <code>messageArgs</code>,
+   * if not <code>null</code> are inserted at the appropriate locations.
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
   
   public Object question(Object defaultOption, String i18nKey, Component hintParent, Object [] messageArgs){
-    String title = getOptionPanelTitle(i18nKey);
-    String message = getOptionPanelMessage(i18nKey, messageArgs);
+    String title = getTitle(i18nKey);
+    String message = getMessage(i18nKey, messageArgs);
     
     return OptionPanel.question(defaultOption, title, message, hintParent);
   }
@@ -571,9 +591,8 @@ public class I18n{
    * {@link OptionPanel#NO} and {@link OptionPanel#CANCEL}.
    * <p>The information required to display the panel (such as the title and 
    * the message) is obtained using the specified i18n key.
-   * The panel's message is treated as a pattern
-   * and <code>messageArgs</code>, if not <code>null</code> are inserted at the
-   * appropriate locations.
+   * The panel's message is treated as a pattern and <code>messageArgs</code>,
+   * if not <code>null</code> are inserted at the appropriate locations.
    */
   
   public Object question(Object defaultOption, String i18nKey, Object [] messageArgs){
@@ -597,12 +616,58 @@ public class I18n{
   
   
   /**
+   * Creates, displays a text query dialog using the specified i18n key and
+   * returns the value specified by the user.
+   * <p>The information required to display the panel (such as the title and 
+   * the message) is obtained using the specified i18n key.
+   * The panel's message is treated as a pattern and <code>messageArgs</code>,
+   * if not <code>null</code> are inserted at the appropriate locations.
+   */
+  
+  public String queryText(String i18nKey, Component hintParent, Object [] messageArgs){
+    String title = getTitle(i18nKey);
+    String message = getMessage(i18nKey, messageArgs);
+    String inputFieldLabelText = getString(combineKeys(i18nKey, "inputFieldLabelText"));
+    
+    return OptionPanel.queryText(null, title, message, inputFieldLabelText);
+  }
+  
+  
+  
+  /**
+   * Creates, displays a text query dialog using the specified i18n key and
+   * returns the value specified by the user.
+   * <p>The information required to display the panel (such as the title and 
+   * the message) is obtained using the specified i18n key.
+   */
+  
+  public String queryText(String i18nKey, Component hintParent){
+    return queryText(i18nKey, hintParent, null);
+  }
+
+  
+  
+  
+  /**
+   * Creates, displays a text query dialog using the specified i18n key and
+   * returns the value specified by the user.
+   * <p>The information required to display the panel (such as the title and 
+   * the message) is obtained using the specified i18n key.
+   */
+  
+  public String queryText(String i18nKey){
+    return queryText(i18nKey, null, null);
+  }
+  
+  
+  
+  /**
    * Displays text in a <code>PlainTextDialog</code>.
    */
   
   public void showPlainTextDialog(String i18nKey, Component hintParent){
-    String title = getString(i18nKey + ".title");
-    String message = getString(i18nKey + ".message");
+    String title = getTitle(i18nKey);
+    String message = getMessage(i18nKey, null);
 
     PlainTextDialog textDialog = new PlainTextDialog(hintParent, title, message);
     textDialog.setTextAreaFont(new Font("Monospaced", Font.PLAIN, 12));
