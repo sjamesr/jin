@@ -41,59 +41,88 @@ import free.util.swing.SwingUtils;
  */
 
 public abstract class DialogPanel extends JPanel{
-
-
-
+  
+  
+  
+  /**
+   * The title of the panel.
+   */
+  
+  private final String title;
+  
+  
+  
   /**
    * The dialog in which we're displayed.
    */
 
   private JDialog dialog = null;
-
-
-
+  
+  
+  
   /**
    * The parent component which we pass to
    * <code>UIProvider.show(DialogPanel, Component)</code>.
    */
-
+  
   private Component hintParent = null;
-
-
-
+  
+  
+  
   /**
    * The default button.
    */
-
+  
   private JButton defaultButton = null;
-
-
-
+  
+  
+  
   /**
    * The result - the information specified by the user.
    */
-
+  
   private Object result;
-
-
-
+  
+  
+  
   /**
    * Has the result been set?
    */
-
+  
   private boolean resultSet = false;
-
-
-
+  
+  
+  
   /**
-   * Returns the title of the panel. This method allows subclasses to specify
-   * the title of the dialog (or whatever other container is used).
+   * Creates a new <code>DialogPanel</code>.
    */
-
-  protected abstract String getTitle();
-
-
-
+  
+  public DialogPanel(){
+    this(null);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>DialogPanel</code> with the specified title.
+   */
+  
+  public DialogPanel(String title){
+    this.title = title;
+  }
+  
+  
+  
+  /**
+   * Returns the title of the panel.
+   */
+  
+  protected String getTitle(){
+    return title;
+  }
+  
+  
+  
   /**
    * Returns the result that should be returned if the user cancels the dialog.
    * The default value returns <code>null</code>.
@@ -102,26 +131,26 @@ public abstract class DialogPanel extends JPanel{
   protected Object getCancelResult(){
     return null;
   }
-
-
-
+  
+  
+  
   /**
    * Sets the default button of this panel. This method is needed since
    * subclasses don't have direct access to the rootpane and thus can't set the
    * default button.
    */
-
+  
   protected void setDefaultButton(JButton button){
     this.defaultButton = button;
   }
-
-
-
+  
+  
+  
   /**
    * Displays the panel in the specified dialog centered relative to the
    * specified <code>hintParent</code>.
    */
-
+  
   public void show(JDialog dialog, Component hintParent){
     this.dialog = dialog;
     SwingUtils.registerEscapeCloser(dialog);
@@ -137,9 +166,9 @@ public abstract class DialogPanel extends JPanel{
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     
     AWTUtilities.centerWindow(dialog, hintParent);
-
+    
     this.resultSet = false;
-
+    
     dialog.setVisible(true);
   }
   
@@ -148,99 +177,99 @@ public abstract class DialogPanel extends JPanel{
   /**
    * Resizes the container of the panel to match the its preferred size.
    */
-   
+  
   public void resizeContainerToFit(){
     if (dialog != null)
       dialog.pack();
   }
-
-
-
+  
+  
+  
   /**
    * Displays this <code>DialogPanel</code> and returns the result. It is
    * recommended for subclasses to add their own method to call this one but
    * cast the result to the specific type.
    */
-
+  
   public Object askResult(){
     Jin.getInstance().getUIProvider().showDialog(this, hintParent);
-
+    
     if (resultSet)
       return result;
     else
       return getCancelResult();
   }
-
-
-
+  
+  
+  
   /**
    * Sets the hint component - the specified component is used as a hint as to
    * where to display the <code>DialogPanel</code>. This method always returns
    * <code>this</code>.
    */
-
+  
   public final DialogPanel setHintParent(Component hintParent){
     this.hintParent = hintParent;
     return this;
   }
-
-
-
+  
+  
+  
   /**
    * Closes the dialog (or whatever container is used) and causes the
    * <code>askResult</code> to return the specified result.
    */
-
+  
   protected void close(Object result){
     this.result = result;
     this.resultSet = true;
     dialog.dispose();
     dialog = null;
   }
-
-
-
+  
+  
+  
   /**
    * An action listener useful for closing the panel with a result known
    * up-front.
    */
-
+  
   protected class ClosingListener implements ActionListener{
-
-
-
+    
+    
+    
     /**
      * The result value.
      */
-
+    
     private final Object result;
-
-
-
+    
+    
+    
     /**
      * Creates a new <code>ClosingListener</code> with the specified result
      * object.
      */
-
+    
     public ClosingListener(Object result){
       this.result = result;
     }
-
-
-
+    
+    
+    
     /**
      * Invoked <code>close</code> with the result object specified in the
      * constructor.
      */
-
+    
     public void actionPerformed(ActionEvent evt){
       close(result);
     }
-
-
-
+    
+    
+    
   }
-
-
-
+  
+  
+  
 }
