@@ -2504,7 +2504,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     if (onlineFriends.add(user)){
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user));
+          new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user));
     }
   }
   
@@ -2553,19 +2553,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     ChessclubUser user = ChessclubUser.get(username);
     
     if (isAdded){
-      if (friends.add(user)){
+      if (friends.add(user))
         listenerManager.fireFriendsEvent(
             new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, user));
-      
-        // Needed to find out whether the new friend is online, per formats.txt
-        setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
-      }
     }
     else{
       if (friends.remove(user)){
-        listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
-        
         if (user.isAlias()){
           // Disconnect everyone who is suspect to be online due to the alias
           // and re-request the list.
@@ -2574,15 +2567,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             if (!friends.contains(u)){
               i.remove();
               listenerManager.fireFriendsEvent(
-                  new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, u));
+                  new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, u));
             }
           }
-          setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
         }
-        else
+        else{
           onlineFriends.remove(user);
+          listenerManager.fireFriendsEvent(
+              new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user));
+        }
+        
+        listenerManager.fireFriendsEvent(
+            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
       }
     }
+    
+    // We need this in all cases:
+    // * When a new friend is added, to find whether he's online
+    // * When an alias is removed, to get the list of "friends" who are online
+    //   due to other aliases.
+    // * When a non-alias is removed, to find out whether 
+    setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
   }
   
   
@@ -3390,7 +3395,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected String getAdjournmentReason(int mode, String actor){
     I18n i18n = I18n.get(getClass());
     
-    
     try{
       String adjournmentReasonKey = "adjournmentReason" + mode;
       return i18n.getFormattedString(adjournmentReasonKey, new Object[]{actor});
@@ -3398,11 +3402,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         return "";
       }
   }
-
-
-
-
-
+  
+  
+  
   private static class GameListInfo{
 
 
