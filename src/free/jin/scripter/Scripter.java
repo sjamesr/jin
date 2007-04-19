@@ -1242,7 +1242,7 @@ public class Scripter extends Plugin{
 
   private class FriendsScriptDispatcher extends ScriptDispatcher implements FriendsListener{
 
-    private final String [] subtypes = new String[]{"online", "connected", "disconnected", "added", "removed"};
+    private final String [] subtypes = new String[]{"stateChanged", "connected", "disconnected", "added", "removed"};
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
     public boolean isSupportedBy(Connection conn){return (conn instanceof FriendsConnection);}
@@ -1255,7 +1255,7 @@ public class Scripter extends Plugin{
       ((FriendsListenerManager)listenerManager).removeFriendsListener(this);
     }
 
-    public void friendOnline(FriendsEvent evt){
+    public void friendStateChanged(FriendsEvent evt){
       runScripts(evt, subtypes[0], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
