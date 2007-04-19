@@ -290,27 +290,50 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * Returns the console with the specified designation, or <code>null</code> if
+   * none exists.
+   */
+  
+  private Console getConsole(ConsoleDesignation designation){
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      if (console.getDesignation().equals(designation))
+        return console;
+    }
+    
+    return null;
+  }
+  
+  
+  
+  /**
    * Adds a console with the specified designation, possibly making it the
-   * active console.
+   * active console. If a console with the specified designation already exists,
+   * it is merely activated, if <code>makeActive</code> is <code>true</code>
+   * (otherwise, no action is taken).
    */
   
   public void addConsole(ConsoleDesignation designation, boolean makeActive){
-    Console console = createConsole(designation);
-    consoles.add(console);
+    Console console = getConsole(designation);
     
-    if (consoles.size() == 1)
-      setSingleConsoleMode();
-    else if (consoles.size() == 2)
-      setMultiConsoleMode();
-    else
-      consolesTabbedPane.addTab(designation.getName(), console);
+    if (console == null){
+      console = createConsole(designation);
+      consoles.add(console);
       
-    console.addComponentListener(new ComponentAdapter(){
-      public void componentShown(ComponentEvent e){
-        Console console = (Console)e.getSource();
-        console.obtainFocus();
-      }
-    });
+      if (consoles.size() == 1)
+        setSingleConsoleMode();
+      else if (consoles.size() == 2)
+        setMultiConsoleMode();
+      else
+        consolesTabbedPane.addTab(designation.getName(), console);
+        
+      console.addComponentListener(new ComponentAdapter(){
+        public void componentShown(ComponentEvent e){
+          Console console = (Console)e.getSource();
+          console.obtainFocus();
+        }
+      });
+    }
     
     if (makeActive)
       makeConsoleActive(console);
@@ -368,7 +391,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Adds a closeable console for chatting with the specified user, possibly
-   * making it the active console.
+   * making it the active console. If one already exists, it is merely
+   * activated, if <code>makeActive</code> is <code>true</code> (otherwise, no
+   * action is taken).
    */
   
   public void addPersonalChatConsole(ServerUser user, boolean makeActive){
@@ -756,33 +781,16 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       if (helpConsoleDesignation == null)
         helpConsoleDesignation = createHelpConsoleDesignation();
       else
-        helpConsole = findHelpConsole();
+        helpConsole = getConsole(helpConsoleDesignation);
       
       if (helpConsole == null){
         addConsole(helpConsoleDesignation, true);
-        helpConsole = findHelpConsole();
+        helpConsole = getConsole(helpConsoleDesignation);
       }
       else
         makeConsoleActive(helpConsole);
       
       helpConsole.flashInputField();
-    }
-    
-    
-    
-    /**
-     * Finds and returns the current help console. Returns <code>null</code> if
-     * none.
-     */
-    
-    private Console findHelpConsole(){
-      for (int i = 0; i < consoles.size(); i++){
-        Console console = (Console)consoles.get(i);
-        if (console.getDesignation() == helpConsoleDesignation)
-          return console;
-      }
-      
-      return null;
     }
     
     
