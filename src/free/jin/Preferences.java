@@ -596,7 +596,7 @@ public abstract class Preferences{
         nameEndIndex--;
       
       int valStartIndex = eqIndex + 1;
-      while ((nameEndIndex < lineLength) && (line.charAt(valStartIndex) <= ' '))
+      while ((valStartIndex < lineLength) && (line.charAt(valStartIndex) <= ' '))
         valStartIndex++;
 
       String prefName = line.substring(0, nameEndIndex + 1).trim();
