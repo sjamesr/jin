@@ -33,7 +33,7 @@ import free.jin.event.JinEvent;
  * A <code>ConsoleDesignation</code> for person-to-person chat.
  */
 
-public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
+public final class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   
@@ -114,6 +114,33 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
       message;
     
     console.addToOutput(text, console.textTypeForEvent(evt));
+  }
+  
+  
+  
+  /**
+   * Returns whether the specified object is a
+   * <code>PersonalChatConsoleDesignation</code> equals to this one. Two
+   * <code>PersonalChatConsoleDesignation</code>s are equal if they have the
+   * same conversation partner.
+   */
+  
+  public boolean equals(Object o){
+    if (!(o instanceof PersonalChatConsoleDesignation))
+      return false;
+    
+    PersonalChatConsoleDesignation designation = (PersonalChatConsoleDesignation)o;
+    return designation.conversationPartner.equals(conversationPartner);
+  }
+  
+  
+  
+  /**
+   * Returns the hash code of this <code>PersonalChatConsoleDesignation</code>.
+   */
+  
+  public int hashCode(){
+    return conversationPartner.hashCode();
   }
   
   
