@@ -564,8 +564,8 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
             case FriendsEvent.FRIEND_REMOVED:
               listener.friendRemoved(evt);
               break;
-            case FriendsEvent.FRIEND_ONLINE:
-              listener.friendOnline(evt);
+            case FriendsEvent.FRIEND_STATE_CHANGED:
+              listener.friendStateChanged(evt);
               break;
           }
         } catch (RuntimeException e){

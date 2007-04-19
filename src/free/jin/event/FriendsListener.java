@@ -36,12 +36,13 @@ public interface FriendsListener extends EventListener{
 
 
   /**
-   * Called to notify that the given friend is online. Note that this does not
-   * necessarily mean that he logged on - it could be that he was already online
-   * but only now got added to our friends list.
+   * Called to notify that the online state of the specified user changed.
+   * Note that this does not necessarily mean that he logged on or off - it
+   * could be that he was already online but only now got added to our friends,
+   * or he was "moved offline" because he was removed from the friends list.
    */
 
-  void friendOnline(FriendsEvent evt);
+  void friendStateChanged(FriendsEvent evt);
 
 
 

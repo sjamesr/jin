@@ -30,79 +30,73 @@ import free.jin.ServerUser;
  */
 
 public class FriendsEvent extends JinEvent{
-
-
-
+  
+  
+  
   /**
    * The id for events when a friend has logged on.
    */
 
   public static final int FRIEND_CONNECTED = 1;
-
-
-
-
+  
+  
+  
   /**
    * The id for events when a friend has logged off.
    */
 
   public static final int FRIEND_DISCONNECTED = 2;
-
-
-
-
+  
+  
+  
   /**
    * The id for events when a new friend is added to the list of friends.
    */
 
   public static final int FRIEND_ADDED = 3;
-
-
-
+  
+  
+  
   /**
    * The id for events when a friend is removed form the list of friends.
    */
 
   public static final int FRIEND_REMOVED = 4;
-
-
-
+  
+  
+  
   /**
-   * The id for events notifying that the friend is online. This differs from
-   * the <code>FRIEND_CONNECTED</code> event in that in this one, it might be
-   * that the friend was already online but we've just now added him to our
-   * friends list, or it's us who logged in while the friend was already on.
+   * The id for events notifying that the online state of the user changed, but
+   * he didn't log on or off - it could be that he was already online but only
+   * now got added to our friends, or he was "moved offline" because he was
+   * removed from the friends list.
    */
-
-  public static final int FRIEND_ONLINE = 5;
-
-
-
-
-
+  
+  public static final int FRIEND_STATE_CHANGED = 5;
+  
+  
+  
   /**
    * The id of the event.
    */
 
   private final int id;
-
-
-
-
+  
+  
+  
   /**
    * The "friend".
    */
 
   private final ServerUser friend;
-
-
-
-
+  
+  
+  
   /**
    * Creates a new <code>FriendsEvent</code> with the specified source
    * <code>FriendsConnection</code> event id and friend.
    */
-
+  
   public FriendsEvent(FriendsConnection source, int id, ServerUser friend){
     super(source);
     
@@ -111,7 +105,7 @@ public class FriendsEvent extends JinEvent{
       case FRIEND_DISCONNECTED:
       case FRIEND_ADDED:
       case FRIEND_REMOVED:
-      case FRIEND_ONLINE:
+      case FRIEND_STATE_CHANGED:
         break;
       default:
         throw new IllegalArgumentException("Unknown FriendsEvent id: "+id);
@@ -123,25 +117,23 @@ public class FriendsEvent extends JinEvent{
     this.id = id;
     this.friend = friend;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the id of the event.
    */
-
+  
   public int getID(){
     return id;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the friend.
    */
-
+  
   public ServerUser getFriend(){
     return friend;
   }
