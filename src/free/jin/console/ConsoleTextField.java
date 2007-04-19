@@ -169,20 +169,28 @@ public class ConsoleTextField extends FixedJTextField{
     Font oldFont = getFont();
     setFont(new Font("Monospaced", oldFont.getStyle(), oldFont.getSize()));
     
+    updateSendAction();
     getDocument().addDocumentListener(new DocumentListener(){
       public void changedUpdate(DocumentEvent e){
-        changed(e);
+        updateSendAction();
       }
       public void insertUpdate(DocumentEvent e){
-        changed(e);
+        updateSendAction();
       }
       public void removeUpdate(DocumentEvent e){
-        changed(e);
-      }
-      private void changed(DocumentEvent e){
-        sendAction.setEnabled(e.getDocument().getLength() != 0);
+        updateSendAction();
       }
     });
+  }
+  
+  
+  
+  /**
+   * Updates the state of <code>sendAction</code>.
+   */
+  
+  private void updateSendAction(){
+    sendAction.setEnabled(getDocument().getLength() != 0);
   }
   
   
