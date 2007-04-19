@@ -21,6 +21,7 @@
 
 package free.jin.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -28,6 +29,7 @@ import java.awt.FlowLayout;
 import javax.swing.*;
 
 import free.jin.I18n;
+import free.util.TableLayout;
 import free.util.TextUtilities;
 import free.util.Utilities;
 
@@ -39,126 +41,128 @@ import free.util.Utilities;
  */
 
 public class OptionPanel extends DialogPanel{
-
-
-
+  
+  
+  
   /**
    * The constant for displaying an information panel.
    */
-
+  
   public static final Object INFO = new String("information");
-
-
-
+  
+  
+  
   /**
    * The constant for displaying a warning panel.
    */
-
+  
   public static final Object WARNING = new String("warning");
-
-
-
+  
+  
+  
   /**
    * The constant for displaying a question panel.
    */
-
+  
   public static final Object QUESTION = new String("question");
-
-
-
+  
+  
+  
   /**
    * The constant for displaying an error panel.
    */
-
+  
   public static final Object ERROR = new String("error");
-
-
-
+  
+  
+  
   /**
    * The "Yes" option.
    */
-
+  
   public static final Object YES = new String("yes");
-
-
-
+  
+  
+  
   /**
    * The "No" option.
    */
-
+  
   public static final Object NO = new String("no");
-
-
-
+  
+  
+  
   /**
    * The "OK" option.
    */
-
+  
   public static final Object OK = new String("ok");
-
-
-
+  
+  
+  
   /**
    * The "Cancel" option.
    */
-
+  
   public static final Object CANCEL = new String("cancel");
-
-
-
+  
+  
+  
   /**
    * The standard order of the predefined options.
    */
-
+  
   private static final Object [] OPTION_ORDER = new Object[]{OK, YES, NO, CANCEL};
-
-
-
+  
+  
+  
   /**
    * The type of this panel - possible values are {@link #INFO},
    * {@link #QUESTION}, {@link #WARNING} and {@link #ERROR}.
    */
-
+  
   private final Object panelType;
-
-
-
-  /**
-   * The title of the panel.
-   */
-
-  private final String title;
-
-
-
+  
+  
+  
   /**
    * The options displayed to the user.
    */
-
+  
   private final Object [] options;
-
-
-
+  
+  
+  
   /**
    * The option that is selected by default.
    */
-
+  
   private final Object defaultOption;
-
-
-
+  
+  
+  
   /**
    * The main message component.
    */
-
+  
   private final Component messageComponent;
-
-
-
+  
+  
+  
+  /**
+   * The component which lets the user to specify his input. <code>null</code>
+   * if none.
+   */
+  
+  private final Component queryComponent;
+  
+  
+  
   /**
    * Creates an <code>OptionPanel</code> with the specified panel type, text
    * and list of options to display to the user,
    *
+   * @param hintParent The hint parent component. 
    * @param panelType The type of this panel - possible values are
    * {@link #INFO}, {@link #QUESTION}, {@link #WARNING} and {@link #ERROR}.
    * @param title The title of the panel.
@@ -167,39 +171,55 @@ public class OptionPanel extends DialogPanel{
    * {@link #CANCEL}.
    * @param defaultOption The option that is selected by default.
    * @param text The text to display to the user.
+   * @param queryComponent A component which allows the user to specify his
+   * input. May be <code>null</code>.
    */
-
+  
   public OptionPanel(Component hintParent, Object panelType, String title, 
-      Object [] options, Object defaultOption, String text){
+      Object [] options, Object defaultOption, String text, Component queryComponent){
+    
+    super(title);
     
     this.panelType = panelType;
-    this.title = title;
     this.options = options;
     this.defaultOption = defaultOption;
     this.messageComponent = createMessageComponent(text);
+    this.queryComponent = queryComponent;
     
     setHintParent(hintParent);
-
+    
     createUI();
   }
-
-
-
+  
+  
+  
+  /**
+   * Creates an <code>OptionPanel</code> with the specified arguments.
+   */
+  
+  public OptionPanel(Component hintParent, Object panelType, String title, 
+      Object [] options, Object defaultOption, String text){
+    
+    this(hintParent, panelType, title, options, defaultOption, text, null);
+  }
+  
+  
+  
   /**
    * Creates a message component for the specified text message.
    */
-
+  
   public Component createMessageComponent(String text){
     String [] lines = TextUtilities.getTokens(text, "\r\n");
     Container messagePanel = Box.createVerticalBox();
-
+    
     for (int i = 0; i < lines.length; i++){
       String line = lines[i];
       JLabel label = new JLabel(line);
       messagePanel.add(label);
       messagePanel.add(Box.createVerticalStrut(2));
     }
-
+    
     return messagePanel;
   }
   
@@ -210,18 +230,18 @@ public class OptionPanel extends DialogPanel{
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
-
+  
   public static void error(String title, String message, Component hintParent){
     OptionPanel panel = new OptionPanel(hintParent, OptionPanel.ERROR, title, new Object[]{OK}, OK, message);
     panel.display();
   }
   
   
-
+  
   /**
    * Creates and shows an error panel with the specified arguments.
    */
-
+  
   public static void error(String title, String message){
     error(title, message, null);
   }
@@ -235,7 +255,7 @@ public class OptionPanel extends DialogPanel{
    * <p><code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
-
+  
   public static Object confirm(Object defaultOption, String title, String message, Component hintParent){
     OptionPanel panel = new OptionPanel(hintParent, OptionPanel.QUESTION, title,
       new Object[]{OK, CANCEL}, defaultOption, message);
@@ -243,13 +263,13 @@ public class OptionPanel extends DialogPanel{
   }
   
   
-
+  
   /**
    * Creates, displays a confirmation panel with the specified arguments and
    * returns the result value. Possible result values are {@link #OK} and
    * {@link #CANCEL}.
    */
-
+  
   public static Object confirm(String title, String message, Object defaultOption){
     return confirm(defaultOption, title, message, null);
   }
@@ -263,7 +283,7 @@ public class OptionPanel extends DialogPanel{
    * <code>hintParent</code> specifies the component over which the error
    * message should be displayed. This is optional and may be <code>null</code>.
    */
-
+  
   public static Object question(Object defaultOption, String title, String message, Component hintParent){
     OptionPanel panel = new OptionPanel(hintParent, OptionPanel.QUESTION, title,
       new Object[]{YES, NO}, defaultOption, message);
@@ -277,7 +297,7 @@ public class OptionPanel extends DialogPanel{
    * Creates a yes/no question dialog with the specified arguments. The possible
    * result options are {@link #YES}, {@link #NO} and {@link #CANCEL}.
    */
-
+  
   public static Object question(String title, String message, Object defaultOption){
     return question(defaultOption, title, message, null);
   }
@@ -285,29 +305,52 @@ public class OptionPanel extends DialogPanel{
   
   
   /**
-   * Returns the title of this <code>DialogPanel</code>.
+   * Queries the user for a text value by displaying him a text field. Returns
+   * the value specified by the user, or <code>null</code> if he canceled the
+   * dialog.
+   * 
+   * @param hintParent The hint parent component.
+   * @param title The title of the panel.
+   * @param text The text displayed in the panel.
+   * @param inputFieldLabelText The text of the label displayed in front of the
+   * text field.
    */
-
-  protected String getTitle(){
-    return title;
+  
+  public static String queryText(Component hintParent, String title, String text, String inputFieldLabelText){
+    JTextField inputField = new JTextField(10);
+    inputField.requestFocusInWindow();
+    
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    if (inputFieldLabelText != null)
+      panel.add(new JLabel(inputFieldLabelText), BorderLayout.LINE_START);
+    panel.add(inputField, BorderLayout.CENTER);
+    
+    Object result = new OptionPanel(hintParent, QUESTION, title, 
+        new Object[]{OK, CANCEL}, OK, text, panel).display();
+    
+    if (result == CANCEL)
+      return null;
+    else
+      return inputField.getText();
   }
-
-
-
+  
+  
+  
+  
   /**
    * Returns the {@link #CANCEL} option.
    */
-
+  
   protected Object getCancelResult(){
     return CANCEL;
   }
-
-
-
+  
+  
+  
   /**
    * If the icon for this panel.
    */
-
+  
   private Icon getIcon(){
     if (panelType == INFO)
       return UIManager.getIcon("OptionPane.informationIcon");
@@ -319,55 +362,73 @@ public class OptionPanel extends DialogPanel{
       return UIManager.getIcon("OptionPane.errorIcon");
     else throw new IllegalArgumentException("Bad panel type: " + panelType);
   }
-
-
-
+  
+  
+  
   /**
    * Creates the UI for this panel.
    */
-
+  
   private void createUI(){
     I18n i18n = I18n.get(OptionPanel.class);
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 2));
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 2));
     buttonPanel.setOpaque(false);
-
+    
     for (int i = 0; i < OPTION_ORDER.length; i++){
       if (!Utilities.contains(options, OPTION_ORDER[i]))
         continue;
-
+      
       Object option = OPTION_ORDER[i];
       JButton button = new JButton(i18n.getString(option.toString() + ".text"));
       button.addActionListener(new ClosingListener(option));
       if (option == defaultOption)
         setDefaultButton(button);
-
+      
       buttonPanel.add(button);
     }
-
-    Box mainPanel = Box.createHorizontalBox();
-    mainPanel.add(new JLabel(getIcon()));
-    mainPanel.add(Box.createHorizontalStrut(10));
-    mainPanel.add(messageComponent);
-
+    
+    Component mainUi = createMainUi();
+    
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    add(mainPanel);
+    add(mainUi);
     add(Box.createVerticalStrut(15));
     add(buttonPanel);
   }
+  
+  
+  
+  /**
+   * Creates the main UI of this panel. 
+   */
+  
+  protected Component createMainUi(){
+    Box mainPanel = Box.createHorizontalBox();
+    
+    JPanel innerPanel = new JPanel(new TableLayout(1, 10, 10));
+    innerPanel.add(messageComponent);
+    if (queryComponent != null)
+      innerPanel.add(queryComponent);
 
-
-
+    mainPanel.add(new JLabel(getIcon()));
+    mainPanel.add(Box.createHorizontalStrut(10));
+    mainPanel.add(innerPanel);
+    
+    return mainPanel;
+  }
+  
+  
+  
   /**
    * Displays this <code>OptionPanel</code> and returns the option chosen by
    * the user. Note that the return value may be {@link #CANCEL} even if you didn't
    * specify it in the constructor, since that is the value returned when the
    * user cancels the panel without selecting any options.
    */
-
+  
   public Object display(){
     return super.askResult();
   }
-
-
-
+  
+  
+  
 }
