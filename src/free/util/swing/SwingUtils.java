@@ -38,9 +38,12 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import free.util.WindowDisposingListener;
 import free.util.imagefilters.IconImageFilters;
@@ -152,6 +155,9 @@ public class SwingUtils{
    */
   
   public static int getLabelMnemonicIndex(String labelSpec){
+    if (labelSpec == null)
+      return -1;
+    
     return labelSpec.indexOf('&'); 
   }
 
@@ -164,6 +170,9 @@ public class SwingUtils{
    */
   
   public static String getLabelText(String labelSpec){
+    if (labelSpec == null)
+      return null;
+    
     int ampIndex = labelSpec.indexOf('&');
     if (ampIndex == -1)
       return labelSpec;
@@ -249,6 +258,23 @@ public class SwingUtils{
   
   public static boolean isWindowsLnF(){
     return UIManager.getLookAndFeel().getID().equals("Windows");
+  }
+  
+  
+  
+  /**
+   * Links the enabled state of the specified component to the selected state of
+   * the specified <code>ListSelectionModel</code>.
+   */
+  
+  public static void linkEnabledToSelected(final JComponent component, final ListSelectionModel model){
+    component.setEnabled(!model.isSelectionEmpty());
+    model.addListSelectionListener(new ListSelectionListener(){
+      public void valueChanged(ListSelectionEvent e){
+        if (!e.getValueIsAdjusting())
+          component.setEnabled(!model.isSelectionEmpty());
+      }
+    });
   }
   
   
