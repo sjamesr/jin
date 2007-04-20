@@ -33,7 +33,6 @@ import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.Server;
 import free.jin.User;
-import free.util.PlatformUtils;
 
 
 /**
@@ -94,32 +93,18 @@ public abstract class JinAction extends AbstractAction{
   
   
   /**
-   * Creates a new <code>JinAction</code> with a name retrieved from its
-   * I18n with the <code>actionName</code> key (possibly appending an ellipsis
-   * to it) and an icon image loaded from a resource named 
-   * <code>getId() + ".png"</code> (if such a resource exists).
+   * Creates a new <code>JinAction</code> with its name, short and long
+   * descriptions retrieved from its I18n using
+   * {@link I18n#initAction(Action, String)} and its icon image loaded from a
+   * resource named <code>getId() + ".png"</code> (if such a resource exists).
    */
   
-  public JinAction(boolean appendEllipsis){
-    String name = getI18n().getString("actionName") + 
-      (appendEllipsis ? PlatformUtils.getEllipsis() : "");
-    putValue(Action.NAME, name);
+  public JinAction(){
+    getI18n().initAction(this, "");
     
     URL iconURL = getClass().getResource(getId() + ".png");
     if (iconURL != null)
       putValue(ICON_IMAGE, Toolkit.getDefaultToolkit().getImage(iconURL));
-  }
-  
-  
-  
-  /**
-   * Creates a new <code>JinAction</code> with a name retrieved from its
-   * I18n with the <code>actionName</code> key and an <code>ImageIcon</code>
-   * loaded from a resource named <code>getId() + ".png"</code>. 
-   */
-  
-  public JinAction(){
-    this(false);
   }
   
   
