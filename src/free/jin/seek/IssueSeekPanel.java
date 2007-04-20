@@ -178,16 +178,12 @@ public class IssueSeekPanel extends JPanel{
   
   
   
-  
-  
-  
-  
   /**
    * Returns the <code>I18n</code> for this class.
    */
   
   private I18n getI18n(){
-    return I18n.get(getClass());
+    return I18n.get(IssueSeekPanel.class);
   }
   
   
