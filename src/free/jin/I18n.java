@@ -376,6 +376,8 @@ public class I18n{
   
   /**
    * Initializes the specified <code>Action</code> from the specified i18n key.
+   * The key suffixes are <code>name</code>, <code>shortDescription</code> and
+   * </code>longDescription</code>. 
    */
   
   public Action initAction(Action action, String i18nKey){
