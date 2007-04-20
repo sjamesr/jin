@@ -833,8 +833,6 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      */
     
     public SaveGameAction(){
-      super(true);
-      
       // We're disabled at first, since there's no game to save
       setEnabled(false);
     }
