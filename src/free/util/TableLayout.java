@@ -264,11 +264,11 @@ public class TableLayout implements LayoutManager2{
       Dimension prefParentSize = calculatePreferredLayoutSize(parent, columnWidths, rowHeights);
       Dimension parentSize = parent.getSize();
       Dimension layoutSize = 
-        new Dimension(parentSize.width - xGap*(rowCount - 1) - parentInsets.left - parentInsets.right,
-                      parentSize.height - yGap*(columnCount - 1) - parentInsets.top - parentInsets.bottom);
+        new Dimension(parentSize.width - xGap*(columnCount - 1) - parentInsets.left - parentInsets.right,
+                      parentSize.height - yGap*(rowCount - 1) - parentInsets.top - parentInsets.bottom);
       Dimension prefLayoutSize =
-        new Dimension(prefParentSize.width - xGap*(rowCount - 1) - parentInsets.left - parentInsets.right,
-                      prefParentSize.height - yGap*(columnCount - 1) - parentInsets.top - parentInsets.bottom);
+        new Dimension(prefParentSize.width - xGap*(columnCount - 1) - parentInsets.left - parentInsets.right,
+                      prefParentSize.height - yGap*(rowCount - 1) - parentInsets.top - parentInsets.bottom);
 
       // Layout the components.
       int y = parentInsets.top +
