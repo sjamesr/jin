@@ -143,8 +143,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
     uiContainer.addPluginUIListener(this);
 
-    issueSeekPanel = new IssueSeekPanel(this, 
-        Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
+    issueSeekPanel = createIssueSeekPanel();
     soughtGraph = new SoughtGraph(this);
     
     
@@ -167,7 +166,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     uiContainer.getContentPane().setLayout(new BorderLayout());
     uiContainer.getContentPane().add(content, BorderLayout.CENTER);
-    
+  }
+  
+  
+  
+  /**
+   * Creates the <code>IssueSeekPanel</code>. This method allows subclasses to
+   * provide their own, custom, versions of <code>IssueSeekPanel</code>.
+   */
+  
+  protected IssueSeekPanel createIssueSeekPanel(){
+    return new IssueSeekPanel(this, Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
   }
   
   
