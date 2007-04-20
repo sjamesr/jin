@@ -21,6 +21,9 @@
 
 package free.jin.seek.icc;
 
+import java.awt.event.ActionEvent;
+
+import free.jin.action.JinAction;
 import free.jin.seek.SoughtGraphPlugin;
 
 
@@ -31,5 +34,82 @@ import free.jin.seek.SoughtGraphPlugin;
 public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
   
   
-   
+  
+  /**
+   * Overrides <code>start</code> to export the 5-min and 1-min actions.
+   */
+  
+  public void start(){
+    super.start();
+    
+    exportAction(new OneMinuteAction());
+    exportAction(new FiveMinuteAction());
+  }
+  
+  
+  
+  /**
+   * A Jin action which issues the "1-minute" command.
+   */
+  
+  private class OneMinuteAction extends JinAction{
+    
+    
+    
+    /**
+     * Returns the string <code>"1-minute"</code>.
+     */
+    
+    public String getId(){
+      return "1-minute";
+    }
+    
+    
+    
+    /**
+     * Issues the "1-minute" command.
+     */
+    
+    public void actionPerformed(ActionEvent e){
+      getConn().sendCommand("1-minute");
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * A Jin action which issues the "5-minute" command.
+   */
+  
+  private class FiveMinuteAction extends JinAction{
+    
+    
+    
+    /**
+     * Returns the string <code>"5-minute"</code>.
+     */
+    
+    public String getId(){
+      return "5-minute";
+    }
+    
+    
+    
+    /**
+     * Issues the "1-minute" command.
+     */
+    
+    public void actionPerformed(ActionEvent e){
+      getConn().sendCommand("5-minute");
+    }
+    
+    
+    
+  }
+  
+  
+  
 }
