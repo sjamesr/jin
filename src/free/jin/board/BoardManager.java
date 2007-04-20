@@ -1439,16 +1439,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     
     /**
-     * Creates a new <code>ChangeBoardAction</code>.
-     */
-    
-    public ChangeBoardAction(){
-      super(false);
-    }
-    
-    
-    
-    /**
      * Returns the id of this action - "changeboard".
      */
     
@@ -1489,16 +1479,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    */
   
   private class ChangePieceSetAction extends JinAction{
-    
-    
-    
-    /**
-     * Creates a new <code>ChangePieceSetAction</code>.
-     */
-    
-    public ChangePieceSetAction(){
-      super(false);
-    }
     
     
     
