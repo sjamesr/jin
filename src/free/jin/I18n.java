@@ -366,7 +366,7 @@ public class I18n{
    */
   
   public AbstractButton initAbstractButton(AbstractButton button, String i18nKey){
-    SwingUtils.applyLabelSpec(button, getString(combineKeys(i18nKey, "text"), null));
+    SwingUtils.applyLabelSpec(button, getString(combineKeys(i18nKey, "text")));
     button.setToolTipText(getString(combineKeys(i18nKey, "tooltip"), null));
     
     return button;
