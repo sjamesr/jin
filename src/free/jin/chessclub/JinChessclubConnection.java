@@ -66,12 +66,14 @@ import free.jin.HistoryListItem;
 import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.LibListItem;
+import free.jin.MatchConnection;
 import free.jin.PGNConnection;
 import free.jin.SearchListItem;
 import free.jin.Seek;
 import free.jin.SeekConnection;
 import free.jin.ServerUser;
 import free.jin.StoredListItem;
+import free.jin.UserMatchOffer;
 import free.jin.UserSeek;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessEventEvent;
@@ -107,7 +109,7 @@ import free.util.Utilities;
  */
 
 public class JinChessclubConnection extends ChessclubConnection implements DatagramListener,
-    Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection{
+    Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection, MatchConnection{
   
   
   
@@ -3140,18 +3142,22 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       throw new IllegalArgumentException("Unsupported sought wild variant: " + seek.getVariant());
     
     Player color = seek.getColor();
+    int minRating = seek.getMinRating() == Integer.MIN_VALUE ? 0 : seek.getMinRating();
+    int maxRating = seek.getMaxRating() == Integer.MAX_VALUE ? 9999 : seek.getMaxRating(); 
     
-    
-    String seekCommand = "seek " + seek.getTime() + " " + seek.getInc() + " " +
-      (seek.isRated() ? "r" : "u") + " " + 
-      "w" + wildNumber + " " +
-      (color == null ? "" : color.isWhite() ? "white " : "black ") +
-      (seek.isManualAccept() ? "manual " : "auto ") +
-      (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
-      (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " " +
-      (seek.isFormula() ? "f" : "");
+    StringBuffer command = new StringBuffer("seek");
+    command.append(" ").append(seek.getTime());
+    command.append(" ").append(seek.getInc());
+    command.append(" ").append(seek.isRated() ? "r" : "u");
+    command.append(" ").append("w").append(wildNumber);
+    if (color != null)
+      command.append(" ").append(color.isWhite() ? "white" : "black");
+    command.append(" ").append(seek.isManualAccept() ? "manual" : "auto");
+    command.append(" ").append(minRating).append("-").append(maxRating);
+    if (seek.isFormula())
+      command.append(" ").append("f");
       
-    sendCommand(seekCommand);
+    sendCommand(command.toString());
   }
 
 
@@ -3636,9 +3642,34 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, evt));
   }
-
-
-
+  
+  
+  
+  /**
+   * Issues the specified match offer.
+   */
+  
+  public void issue(UserMatchOffer offer){
+    int wildNumber = getWildNumber(offer.getVariant());
+    if (wildNumber == -1)
+      throw new IllegalArgumentException("Unsupported sought wild variant: " + offer.getVariant());
+    
+    Player color = offer.getColor();
+    
+    StringBuffer command = new StringBuffer("match");
+    command.append(" ").append(offer.getOpponent().getName());
+    command.append(" ").append(offer.getTime());
+    command.append(" ").append(offer.getIncrement());
+    command.append(" ").append(offer.isRated() ? "r" : "u");
+    command.append(" ").append("w").append(wildNumber);
+    if (color != null)
+      command.append(" ").append(color.isWhite() ? "white" : "black");
+    
+    sendCommand(command.toString());
+  }
+  
+  
+  
   
   
   /**
