@@ -56,6 +56,13 @@ public class UserSeek extends Struct{
   public UserSeek(int time, int inc, boolean isRated, WildVariant variant,
       Player color, int minRating, int maxRating, boolean isManualAccept, boolean isFormula){
     
+    if (time < 0)
+      throw new IllegalArgumentException("time may not be negative");
+    if (inc < 0)
+      throw new IllegalArgumentException("inc may not be negative");
+    if (variant == null)
+      throw new IllegalArgumentException("variant may not be null");
+    
     setIntegerProperty("Time", time);
     setIntegerProperty("Inc", inc);
     setBooleanProperty("IsRated", isRated);
