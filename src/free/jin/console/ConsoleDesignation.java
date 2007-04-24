@@ -23,7 +23,7 @@ package free.jin.console;
 
 import free.jin.Connection;
 import free.jin.event.JinEvent;
-import free.util.Named;
+import free.util.AbstractNamed;
 
 
 
@@ -74,7 +74,7 @@ public interface ConsoleDesignation{
    * Defines a certain type of command which can be issued by the user.
    */
   
-  public static abstract class CommandType extends Named{
+  public static abstract class CommandType extends AbstractNamed{
     
     
     
