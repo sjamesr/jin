@@ -149,6 +149,17 @@ public class IssueMatchPanel extends JPanel{
   
   
   /**
+   * Sets the current opponent to the specified player (may be <code>null</code>
+   * to indicate a blank value). 
+   */
+  
+  public void setOpponent(ServerUser opponent){
+    opponentSelection.setOpponent(opponent);
+  }
+  
+  
+  
+  /**
    * Returns the list of opponents to make easily accessible for matching.
    */
   

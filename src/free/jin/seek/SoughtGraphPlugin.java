@@ -40,6 +40,7 @@ import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.Seek;
 import free.jin.SeekConnection;
+import free.jin.ServerUser;
 import free.jin.action.JinAction;
 import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
@@ -82,21 +83,29 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   /**
+   * The tabbed pane holding the issue seek and match panels.
+   */
+  
+  private JTabbedPane issueTabbedPane;
+  
+  
+  
+  /**
    * The seek graph.
    */
 
   private SoughtGraph soughtGraph;
-
-
-
+  
+  
+  
   /**
    * The container of our UI.
    */
-
+  
   private PluginUIContainer uiContainer;
-
-
-
+  
+  
+  
   /**
    * Sets the plugin context - return <code>false</code> if the connection is
    * not an instance of <code>SeekConnection</code>.
@@ -178,7 +187,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     JLabel soughtGraphLabel = i18n.createLabel("soughtGraphLabel");
     soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
     
-    JTabbedPane issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+    issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
     issueTabbedPane.addTab(i18n.getString("issueSeekTab.text"), issueSeekPanel);
     issueTabbedPane.addTab(i18n.getString("issueMatchTab.text"), issueMatchPanel);
     issueTabbedPane.setSelectedComponent(
@@ -224,7 +233,21 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   }
   
   
-
+  
+  /**
+   * Sets the UI up to issue a match offer to the specified player (may be
+   * <code>null</code>, to indicate a blank opponent).
+   */
+  
+  public void displayMatchUI(ServerUser opponent){
+    issueMatchPanel.setOpponent(opponent);
+    issueMatchPanel.requestFocusInWindow();
+    issueTabbedPane.setSelectedComponent(issueMatchPanel);
+    uiContainer.setActive(true);
+  }
+  
+  
+  
   /**
    * Gets called when the seek graph container is made visible.
    */

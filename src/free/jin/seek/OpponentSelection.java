@@ -100,6 +100,17 @@ public final class OpponentSelection extends WrapperComponent{
   
   
   /**
+   * Sets the currently selected opponent. May be <code>null</code> to indicate
+   * a blank value.
+   */
+  
+  public void setOpponent(ServerUser opponent){
+    box.setSelectedItem(opponent);
+  }
+  
+  
+  
+  /**
    * Creates the UI of this component.
    */
   
