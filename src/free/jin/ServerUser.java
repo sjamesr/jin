@@ -21,13 +21,15 @@
 
 package free.jin;
 
+import free.util.Named;
+
 
 
 /**
  * Represents a user on a chess server.
  */
 
-public interface ServerUser{
+public interface ServerUser extends Named{
   
   
   
@@ -64,5 +66,6 @@ public interface ServerUser{
   
   int hashCode();
   
-
+  
+  
 }
