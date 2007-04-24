@@ -29,7 +29,7 @@ package free.util;
  * Swing container classes (<code>JTables</code> and such).
  */
 
-public class NamedWrapper extends Named{
+public class NamedWrapper extends AbstractNamed{
   
   
   
