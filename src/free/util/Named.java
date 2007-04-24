@@ -21,52 +21,39 @@
 
 package free.util;
 
+import java.util.Comparator;
+
 
 
 /**
- * A base class for classes whose objects have a name.
+ * An interface for classes whose objects have a name.
  */
 
-public abstract class Named{
+public interface Named{
   
   
   
   /**
-   * The name of the object.
+   * A {@link java.util.Comparator} which sorts <code>Named</code> objects
+   * alphabetically.
    */
   
-  private final String name;
+  public static final Comparator ALPHABETIC_NAME_COMPARATOR = new Comparator(){
+    public int compare(Object arg0, Object arg1){
+      Named named1 = (Named)arg0;
+      Named named2 = (Named)arg1;
+      
+      return named1.getName().toLowerCase().compareTo(named2.getName().toLowerCase());
+    }
+  };
   
   
   
   /**
-   * Creates a new <code>Named</code> object with the specified name.
+   * Returns the name of the object.
    */
   
-  public Named(String name){
-    this.name = name;
-  }
-  
-  
-  
-  /**
-   * Returns the object's name.
-   */
-  
-  public String getName(){
-    return name;
-  }
-  
-  
-  
-  /**
-   * Returns the object's name, or the string <code>"null"</code> if the name
-   * is <code>null</code>.
-   */
-  
-  public String toString(){
-    return String.valueOf(getName());
-  }
+  String getName();
   
   
   
