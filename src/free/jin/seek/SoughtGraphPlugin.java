@@ -23,14 +23,17 @@ package free.jin.seek;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -49,7 +52,6 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
-import free.util.TableLayout;
 
 
 /**
@@ -68,6 +70,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
   
   private IssueSeekPanel issueSeekPanel;
+  
+  
+  
+  /**
+   * The panel for issuing match offers.
+   */
+  
+  private IssueMatchPanel issueMatchPanel;
   
   
   
@@ -119,7 +129,21 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public void stop(){
     unregisterListeners();
-    issueSeekPanel.saveSeekOptions();
+    savePrefs();
+  }
+  
+  
+  
+  /**
+   * Saves the plugin's preferences.
+   */
+  
+  private void savePrefs(){
+    issueSeekPanel.savePrefs();
+    issueMatchPanel.savePrefs();
+    
+    Preferences prefs = getPrefs();
+    prefs.setString("visibleIssuePanel", issueSeekPanel.isVisible() ? "seek" : "match");
   }
 
 
@@ -144,22 +168,31 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     uiContainer.addPluginUIListener(this);
 
     issueSeekPanel = createIssueSeekPanel();
+    issueMatchPanel = createIssueMatchPanel();
     soughtGraph = new SoughtGraph(this);
     
+    issueSeekPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    issueMatchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     
-    JPanel issueSeekPanelWrapper = new JPanel(new TableLayout(1, xGap, yGap));
-    issueSeekPanelWrapper.setAlignmentY(JComponent.TOP_ALIGNMENT);
-    issueSeekPanelWrapper.add(i18n.createLabel("issueSeekLabel"));
-    issueSeekPanelWrapper.add(issueSeekPanel);
+    
+    JLabel soughtGraphLabel = i18n.createLabel("soughtGraphLabel");
+    soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
+    
+    JTabbedPane issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+    issueTabbedPane.addTab(i18n.getString("issueSeekTab.text"), issueSeekPanel);
+    issueTabbedPane.addTab(i18n.getString("issueMatchTab.text"), issueMatchPanel);
+    issueTabbedPane.setSelectedComponent(
+        getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
+            (Component)issueSeekPanel : (Component)issueMatchPanel);
     
     JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap));
-    soughtGraphWrapper.add(i18n.createLabel("soughtGraphLabel"), BorderLayout.PAGE_START);
+    soughtGraphWrapper.add(soughtGraphLabel, BorderLayout.PAGE_START);
     soughtGraphWrapper.add(soughtGraph, BorderLayout.CENTER);
     soughtGraph.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
     
     
     JPanel content = new JPanel(new BorderLayout(xGap, yGap));
-    content.add(issueSeekPanelWrapper, BorderLayout.LINE_START);
+    content.add(issueTabbedPane, BorderLayout.LINE_START);
     content.add(soughtGraphWrapper, BorderLayout.CENTER);
     
     content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -177,6 +210,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   protected IssueSeekPanel createIssueSeekPanel(){
     return new IssueSeekPanel(this, Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
+  }
+  
+  
+  
+  /**
+   * Creates the <code>IssueMatchPanel</code>. This method allows subclasses to
+   * provide their own, custom, versions of <code>IssueMatchPanel</code>.
+   */
+  
+  protected IssueMatchPanel createIssueMatchPanel(){
+    return new IssueMatchPanel(this, Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
   }
   
   
