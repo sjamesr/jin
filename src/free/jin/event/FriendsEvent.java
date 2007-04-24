@@ -140,5 +140,15 @@ public class FriendsEvent extends JinEvent{
   
   
   
+  /**
+   * Returns the source <code>FriendsConnection</code>.
+   */
+  
+  public FriendsConnection getFriendsConnection(){
+    return (FriendsConnection)getConnection();
+  }
+  
+  
+  
 }
 
