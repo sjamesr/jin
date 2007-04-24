@@ -21,11 +21,11 @@
 
 package free.util.swing;
 
-import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-import java.awt.BorderLayout;
+
+import javax.swing.JPanel;
 
 /**
  * A small subclass of JPanel which simply overrides the
@@ -87,9 +87,9 @@ public class PreferredSizedPanel extends JPanel{
    * preferred size.
    */
    
-  public PreferredSizedPanel createWrapper(Component component){
-    PreferredSizedPanel panel = new PreferredSizedPanel(new BorderLayout());
-    panel.add(component, BorderLayout.CENTER);
+  public static PreferredSizedPanel createWrapper(Component component){
+    PreferredSizedPanel panel = new PreferredSizedPanel(WrapLayout.getInstance());
+    panel.add(component);
     
     return panel;
   }
