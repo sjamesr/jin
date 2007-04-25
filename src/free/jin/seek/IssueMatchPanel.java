@@ -131,7 +131,6 @@ public class IssueMatchPanel extends JPanel{
     issueMatchButton.setEnabled(isSelectionValid());
     opponentSelection.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent e){
-        System.out.println("Opponent: " + opponentSelection.getOpponentName());
         issueMatchButton.setEnabled(isSelectionValid());
       }
     });
@@ -149,12 +148,13 @@ public class IssueMatchPanel extends JPanel{
   
   
   /**
-   * Sets the current opponent to the specified player (may be <code>null</code>
-   * to indicate a blank value). 
+   * Makes the currently selected opponent the specified one, and transfers
+   * focus to the panel. 
    */
   
-  public void setOpponent(ServerUser opponent){
+  public void prepareFor(ServerUser opponent){
     opponentSelection.setOpponent(opponent);
+    issueMatchButton.requestFocus();
   }
   
   
