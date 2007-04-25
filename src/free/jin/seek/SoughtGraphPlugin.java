@@ -240,9 +240,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
   
   public void displayMatchUI(ServerUser opponent){
-    issueMatchPanel.setOpponent(opponent);
-    issueMatchPanel.requestFocusInWindow();
     issueTabbedPane.setSelectedComponent(issueMatchPanel);
+    issueMatchPanel.prepareFor(opponent);
     uiContainer.setActive(true);
   }
   
