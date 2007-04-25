@@ -54,10 +54,10 @@ public class MultiButton extends JComponent{
   
   
   /**
-   * Creates a new <code>MultiButton</code>.
+   * Creates a new <code>MultiButton</code> with the specified list of actions.
    */
   
-  public MultiButton(){
+  public MultiButton(Action [] actions){
     button = new JButton();
     button.setHorizontalTextPosition(SwingConstants.LEADING);
     
@@ -74,6 +74,19 @@ public class MultiButton extends JComponent{
         popup.setVisible(false);
       }
     });
+    
+    for (int i = 0; i < actions.length; i++)
+      add(actions[i]);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>MultiButton</code>.
+   */
+  
+  public MultiButton(){
+    this(new Action[0]);
   }
   
   
