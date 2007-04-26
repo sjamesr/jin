@@ -26,8 +26,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeListener;
 
 import free.jin.I18n;
+import free.jin.plugin.PluginUIContainer;
+import free.util.AWTUtilities;
 import free.util.swing.WrapperComponent;
 
 
@@ -57,12 +61,22 @@ public final class MoreLessButton extends WrapperComponent{
   
   
   /**
+   * The plugin ui container we're being put into.
+   */
+  
+  private final PluginUIContainer container;
+  
+  
+  
+  /**
    * Creates a new <code>MoreLessButton</code> with the specified target
    * component and initial state.
    */
   
-  public MoreLessButton(Component target, boolean isMore){
+  public MoreLessButton(Component target, boolean isMore, PluginUIContainer container){
     this.target = target;
+    this.container = container;
+    
     this.button = new JButton();
     button.setDefaultCapable(false);
     
@@ -71,10 +85,33 @@ public final class MoreLessButton extends WrapperComponent{
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         setMore(!isMore());
+        fireStateChanged();
       }
     });
     
     add(button);
+  }
+  
+  
+  
+  /**
+   * Adds a change listener to receive notifications when the state of this
+   * component changes.
+   */
+  
+  public void addChangeListener(ChangeListener listener){
+    super.addChangeListener(listener);
+  }
+  
+  
+  
+  /**
+   * Removes the specified change listener from receiving notifications when the
+   * state of this component changes.
+   */
+  
+  public void removeChangeListener(ChangeListener listener){
+    super.removeChangeListener(listener);
   }
   
   
@@ -89,6 +126,16 @@ public final class MoreLessButton extends WrapperComponent{
     button.setActionCommand(isMore ? "less" : "more");
     i18n.initAbstractButton(button, isMore ? "less" : "more");
     target.setVisible(isMore);
+    
+    if (isMore && container.isVisible()){
+      // Need to wait for all delayed layout to finish
+      SwingUtilities.invokeLater(new Runnable(){
+        public void run(){
+          if (!AWTUtilities.fitsInto(target.getMinimumSize(), target.getSize()))
+            container.pack();
+        }
+      });
+    }
   }
   
   
