@@ -240,6 +240,18 @@ public class AWTUtilities{
     }
   }
   
+  
+  
+  /**
+   * Returns whether <code>size1</code> fits inside <code>size2</code>, which it
+   * does iff both its width and height are less than or equal to
+   * <code>size2</code>'s width and height, respectively.
+   */
+  
+  public static boolean fitsInto(Dimension size1, Dimension size2){
+    return (size1.width <= size2.width) && (size1.height <= size2.height);
+  }
+  
 
 
 }
