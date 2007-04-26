@@ -98,7 +98,7 @@ public class ActionsPlugin extends Plugin{
     buttonContainer = createButtonContainer();
     buttonContainer.addPluginUIListener(new PluginUIAdapter(){
       public void pluginUIShown(PluginUIEvent evt){
-        buttonContainer.sizeToFit();
+        buttonContainer.pack();
       }
     });
     
@@ -166,7 +166,7 @@ public class ActionsPlugin extends Plugin{
     buttonContainer.getContentPane().add(content, BorderLayout.CENTER);
     
     if (buttonContainer.isVisible())
-      buttonContainer.sizeToFit();
+      buttonContainer.pack();
   }
   
   
