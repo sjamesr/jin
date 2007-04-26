@@ -319,12 +319,14 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Resizes the frame to its preferred size.
      */
     
-    public void sizeToFit(){
+    public void pack(){
+      setVisible(true);
+      
       boolean isResizable = frame.isResizable();
       
       if (!isResizable)
         frame.setResizable(true);
-      frame.setSize(frame.getPreferredSize());
+      frame.pack();
       if (!isResizable)
         frame.setResizable(false);
     }
