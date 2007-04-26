@@ -37,6 +37,7 @@ import free.jin.Preferences;
 import free.jin.SeekConnection;
 import free.jin.UserSeek;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIContainer;
 import free.util.TableLayout;
 
 
@@ -50,10 +51,10 @@ public class IssueSeekPanel extends JPanel{
   
   
   /**
-   * The plugin we're part of.
+   * The connection.
    */
   
-  private final Plugin plugin;
+  private final SeekConnection conn;
   
   
   
@@ -82,24 +83,26 @@ public class IssueSeekPanel extends JPanel{
   
   
   /**
-   * Creates a new <code>IssueSeekPanel</code> for the specified plugin and with
-   * the specified <code>Preferences</code> object to load settings from.
+   * Creates a new <code>IssueSeekPanel</code> with the specified arguments and
+   * a <code>Preferences</code> object to load/save settings from/to.
    */
    
-  public IssueSeekPanel(Plugin plugin, Preferences prefs){
+  public IssueSeekPanel(Plugin plugin, PluginUIContainer container, Preferences prefs){
     if (plugin == null)
       throw new IllegalArgumentException("plugin may not be null");
+    if (container == null)
+      throw new IllegalArgumentException("container may not be null");
     if (prefs == null)
       throw new IllegalArgumentException("prefs may not be null");
     if (!(plugin.getConn() instanceof SeekConnection))
       throw new IllegalArgumentException("Connection must be an instance of SeekConnection");
     
-    this.plugin = plugin;
+    this.conn = (SeekConnection)plugin.getConn();
     this.prefs = prefs;
     
     I18n i18n = getI18n();
     
-    WildVariant [] variants = plugin.getConn().getSupportedVariants();
+    WildVariant [] variants = conn.getSupportedVariants();
     
     String color = prefs.getString("color", "auto");
     Player pieceColor = "auto".equals(color) ? null :
@@ -118,13 +121,13 @@ public class IssueSeekPanel extends JPanel{
     oppRatingRangeSelection = new OpponentRatingRangeSelection(isRatingLimited, minRating, maxRating);
     manualAcceptSelection = new ManualAcceptSelection(prefs.getBool("manualAccept", false));
     useFormulaSelection = new UseFormulaSelection(prefs.getBool("useFormula", true));
-    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false));
+    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false), container);
     issueSeekButton = i18n.createButton("issueSeekButton");
+    
     
     issueSeekButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        SeekConnection conn = (SeekConnection)IssueSeekPanel.this.plugin.getConn();
-        conn.issue(getSeek());
+        IssueSeekPanel.this.conn.issue(getSeek());
       }
     });
     

@@ -39,7 +39,6 @@ import javax.swing.event.ChangeListener;
 
 import free.chess.Player;
 import free.chess.WildVariant;
-import free.jin.Connection;
 import free.jin.FriendsConnection;
 import free.jin.I18n;
 import free.jin.MatchConnection;
@@ -50,6 +49,7 @@ import free.jin.UsernamePolicy;
 import free.jin.event.FriendsEvent;
 import free.jin.event.FriendsListener;
 import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIContainer;
 import free.util.Named;
 import free.util.TableLayout;
 
@@ -64,10 +64,18 @@ public class IssueMatchPanel extends JPanel{
   
   
   /**
-   * The plugin we're part of.
+   * The plugin we're being used by.
    */
   
   private final Plugin plugin;
+  
+  
+  
+  /**
+   * The connection.
+   */
+  
+  private final MatchConnection conn;
   
   
   
@@ -92,26 +100,29 @@ public class IssueMatchPanel extends JPanel{
   
   
   /**
-   * Creates a new <code>IssueMatchPanel</code> for the specified plugin and
-   * with the specified <code>Preferences</code> object to load settings from.
+   * Creates a new <code>IssueMatchPanel</code> with the specified arguments and
+   * a <code>Preferences</code> object to load/save settings from/to.
    */
   
-  public IssueMatchPanel(Plugin plugin, Preferences prefs){
+  public IssueMatchPanel(Plugin plugin, PluginUIContainer container, Preferences prefs){
     if (plugin == null)
       throw new IllegalArgumentException("plugin may not be null");
+    if (container == null)
+      throw new IllegalArgumentException("container may not be null");
     if (prefs == null)
       throw new IllegalArgumentException("prefs may not be null");
     if (!(plugin.getConn() instanceof MatchConnection))
       throw new IllegalArgumentException("Connection must be an instance of MatchConnection");
     
     this.plugin = plugin;
+    this.conn = (MatchConnection)plugin.getConn();
     this.prefs = prefs;
     
-    String lastOppName = prefs.getString("lastOpponent", null);
-    ServerUser lastOpp = lastOppName == null ? null :
-      plugin.getConn().userForName(lastOppName);
     
-    WildVariant [] variants = plugin.getConn().getSupportedVariants();
+    String lastOppName = prefs.getString("lastOpponent", null);
+    ServerUser lastOpp = lastOppName == null ? null : conn.userForName(lastOppName);
+    
+    WildVariant [] variants = conn.getSupportedVariants();
     
     String color = prefs.getString("color", "auto");
     Player pieceColor = "auto".equals(color) ? null :
@@ -125,7 +136,7 @@ public class IssueMatchPanel extends JPanel{
     ratednessSelection = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
     variantSelection = new VariantSelection(variants, prefs.getString("variant", "Chess"));
     pieceColorSelection = new PieceColorSelection(pieceColor);
-    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false));
+    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false), container);
     issueMatchButton = i18n.createButton("issueMatchButton");
     
     issueMatchButton.setEnabled(isSelectionValid());
@@ -137,8 +148,7 @@ public class IssueMatchPanel extends JPanel{
     
     issueMatchButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
-        MatchConnection conn = (MatchConnection)IssueMatchPanel.this.plugin.getConn();
-        conn.issue(getMatchOffer());
+        IssueMatchPanel.this.conn.issue(getMatchOffer());
       }
     });
     
@@ -164,8 +174,6 @@ public class IssueMatchPanel extends JPanel{
    */
   
   private ListModel getEasyOpponentsModel(){
-    Connection conn = plugin.getConn();
-     
     if (conn instanceof FriendsConnection)
       return new OnlineFriendsListModel((FriendsConnection)conn);
     else
@@ -241,7 +249,7 @@ public class IssueMatchPanel extends JPanel{
    */
   
   private UserMatchOffer getMatchOffer(){
-    ServerUser opp = plugin.getConn().userForName(opponentSelection.getOpponentName());
+    ServerUser opp = conn.userForName(opponentSelection.getOpponentName());
     int time = timeControlsSelection.getTime();
     int inc = timeControlsSelection.getIncrement();
     boolean isRated = ratednessSelection.isRated();
