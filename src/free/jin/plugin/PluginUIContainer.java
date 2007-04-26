@@ -173,11 +173,13 @@ public interface PluginUIContainer{
   
   
   /**
-   * Sets the size of this container to its preferred size.
+   * Sets the size of this container to its preferred size. If the container is
+   * not visible, it is made visible first.
    */
   
-  void sizeToFit();
-
+  void pack();
+  
+  
   
   /**
    * Completely disposes of this PluginUIContainer - it will not be usable
