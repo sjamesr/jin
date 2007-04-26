@@ -22,8 +22,8 @@
 package free.jin.seek;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -34,6 +34,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -53,6 +56,7 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
+import free.util.AWTUtilities;
 
 
 /**
@@ -116,6 +120,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       return false;
 
     return super.setContext(context);
+  }
+  
+  
+  
+  /**
+   * Returns the connection to the server, cast to a
+   * <code>SeekConnection</code>.
+   */
+  
+  private SeekConnection getSeekConn(){
+    return (SeekConnection)getConn();
   }
 
 
@@ -194,10 +209,29 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
         getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
             (Component)issueSeekPanel : (Component)issueMatchPanel);
     
-    JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap));
+    issueTabbedPane.getModel().addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent e){
+        if (!uiContainer.isVisible())
+          return;
+        
+        if (!AWTUtilities.fitsInto(issueTabbedPane.getMinimumSize(), issueTabbedPane.getSize()))
+          uiContainer.pack();
+      }
+    });
+    
+    JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap)){
+      public Dimension getPreferredSize(){
+        // The sought graph doesn't really have a preferred size, as much as a
+        // preferred width:height ratio
+        int height = Math.max(issueTabbedPane.getPreferredSize().height, getMinimumSize().height);
+        int width = (int)(1.5*height);
+        
+        return new Dimension(width, height);
+      }
+    };
     soughtGraphWrapper.add(soughtGraphLabel, BorderLayout.PAGE_START);
     soughtGraphWrapper.add(soughtGraph, BorderLayout.CENTER);
-    soughtGraph.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+    soughtGraph.setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background").darker()));
     
     
     JPanel content = new JPanel(new BorderLayout(xGap, yGap));
@@ -218,7 +252,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
   
   protected IssueSeekPanel createIssueSeekPanel(){
-    return new IssueSeekPanel(this, Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
+    return new IssueSeekPanel(this, uiContainer,
+        Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
   }
   
   
@@ -229,7 +264,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
   
   protected IssueMatchPanel createIssueMatchPanel(){
-    return new IssueMatchPanel(this, Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
+    return new IssueMatchPanel(this, uiContainer,
+        Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
   }
   
   
@@ -252,7 +288,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   public void pluginUIShown(PluginUIEvent evt){
-    SeekConnection conn = (SeekConnection)getConn();
+    SeekConnection conn = getSeekConn();
     
     for (Iterator i = conn.getSeeks().iterator(); i.hasNext();){
       Seek seek = (Seek)i.next();
@@ -271,7 +307,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   public void pluginUIHidden(PluginUIEvent evt){
     soughtGraph.removeAllSeeks();
 
-    SeekConnection conn = (SeekConnection)getConn();
+    SeekConnection conn = getSeekConn();
     conn.getSeekListenerManager().removeSeekListener(this);
   }
   
@@ -305,7 +341,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void unregisterListeners(){
-    SeekConnection conn = (SeekConnection)getConn();
+    SeekConnection conn = getSeekConn();
 
     soughtGraph.removeSeekSelectionListener(this);
     conn.getSeekListenerManager().removeSeekListener(this); // Just in case.
@@ -341,7 +377,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
   public void seekSelected(SeekSelectionEvent evt){
     Seek seek = evt.getSeek();
-    SeekConnection conn = (SeekConnection)getConn();
+    SeekConnection conn = getSeekConn();
     
     // Is it our own seek?
     if (seek.getSeeker().equals(getConn().getUser()))
