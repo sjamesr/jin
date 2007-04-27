@@ -22,6 +22,7 @@
 package free.jin;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -349,9 +350,9 @@ public abstract class Preferences{
   public Rectangle getRect(String prefName){
     return (Rectangle)get(prefName);
   }
-
-
-
+  
+  
+  
   /**
    * Returns the <code>RectDouble</code> preference with the specified name or
    * the specified default value if no such preference exists.
@@ -371,6 +372,29 @@ public abstract class Preferences{
 
   public RectDouble getRectDouble(String prefName){
     return (RectDouble)get(prefName);
+  }
+
+
+
+  /**
+   * Returns the size preference with the specified name or the specified
+   * default value if no such preference exists.
+   */
+  
+  public Dimension getSize(String prefName, Dimension defaultValue){
+    return (Dimension)get(prefName, defaultValue);
+  }
+  
+  
+  
+  /**
+   * Returns the size preference with the specified name.  Throws a
+   * <code>NoSuchElementException</code> if there is no preference with the
+   * specified name.
+   */
+  
+  public Dimension getSize(String prefName){
+    return (Dimension)get(prefName);
   }
 
 
@@ -442,14 +466,24 @@ public abstract class Preferences{
   public void setRect(String prefName, Rectangle prefValue){
     set(prefName, prefValue);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the value of the specified <code>RectDouble</code> preference.
    */
 
   public void setRectDouble(String prefName, RectDouble prefValue){
+    set(prefName, prefValue);
+  }
+
+
+
+  /**
+   * Sets the value of the specified size preference.
+   */
+  
+  public void setSize(String prefName, Dimension prefValue){
     set(prefName, prefValue);
   }
 
@@ -667,6 +701,8 @@ public abstract class Preferences{
       return StringParser.parseRectangle(s.substring("rect.int;".length()));
     else if (s.startsWith("rect.double;"))
       return StringParser.parseRectDouble(s.substring("rect.double;".length()));
+    else if (s.startsWith("size;"))
+      return StringParser.parseDimension(s.substring("size;".length()));
     else
       return s;
   }
@@ -697,6 +733,8 @@ public abstract class Preferences{
       return "rect.int;" + StringEncoder.encodeRectangle((Rectangle)prefValue);
     else if (prefValue instanceof RectDouble)
       return "rect.double;" + StringEncoder.encodeRectDouble((RectDouble)prefValue);
+    else if (prefValue instanceof Dimension)
+      return "size;" + StringEncoder.encodeDimension((Dimension)prefValue);
     else
       throw new IllegalArgumentException("Unsupported preference type: " +
         prefValue.getClass().getName());
