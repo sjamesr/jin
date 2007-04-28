@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -40,6 +41,7 @@ import javax.swing.event.ChangeListener;
 
 import free.jin.Connection;
 import free.jin.I18n;
+import free.jin.MatchConnection;
 import free.jin.Preferences;
 import free.jin.Seek;
 import free.jin.SeekConnection;
@@ -79,7 +81,9 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   /**
-   * The panel for issuing match offers.
+   * The panel for issuing match offers. May be <code>null</code> if there is
+   * no such panel (if, for example, the connection is not an instance of
+   * <code>MatchConnection</code>).
    */
   
   private IssueMatchPanel issueMatchPanel;
@@ -87,7 +91,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   /**
-   * The tabbed pane holding the issue seek and match panels.
+   * The tabbed pane holding the issue seek and match panels. May be
+   * <code>null</code> if there is no issueMatchPanel.
    */
   
   private JTabbedPane issueTabbedPane;
@@ -164,10 +169,13 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   private void savePrefs(){
     issueSeekPanel.savePrefs();
-    issueMatchPanel.savePrefs();
     
-    Preferences prefs = getPrefs();
-    prefs.setString("visibleIssuePanel", issueSeekPanel.isVisible() ? "seek" : "match");
+    if (issueMatchPanel != null){
+      issueMatchPanel.savePrefs();
+      
+      Preferences prefs = getPrefs();
+      prefs.setString("visibleIssuePanel", issueSeekPanel.isVisible() ? "seek" : "match");
+    }
   }
 
 
@@ -196,28 +204,43 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     soughtGraph = new SoughtGraph(this);
     
     issueSeekPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    issueMatchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    if (issueMatchPanel != null)
+      issueMatchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     
+    JComponent issuePanel;
     
     JLabel soughtGraphLabel = i18n.createLabel("soughtGraphLabel");
     soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
     
-    issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
-    issueTabbedPane.addTab(i18n.getString("issueSeekTab.text"), issueSeekPanel);
-    issueTabbedPane.addTab(i18n.getString("issueMatchTab.text"), issueMatchPanel);
-    issueTabbedPane.setSelectedComponent(
-        getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
-            (Component)issueSeekPanel : (Component)issueMatchPanel);
-    
-    issueTabbedPane.getModel().addChangeListener(new ChangeListener(){
-      public void stateChanged(ChangeEvent e){
-        if (!uiContainer.isVisible())
-          return;
-        
-        if (!AWTUtilities.fitsInto(issueTabbedPane.getMinimumSize(), issueTabbedPane.getSize()))
-          uiContainer.pack();
-      }
-    });
+    if (issueMatchPanel != null){
+      issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+      issueTabbedPane.addTab(i18n.getString("issueSeekTab.text"), issueSeekPanel);
+      issueTabbedPane.addTab(i18n.getString("issueMatchTab.text"), issueMatchPanel);
+      issueTabbedPane.setSelectedComponent(
+          getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
+              (Component)issueSeekPanel : (Component)issueMatchPanel);
+      
+      issueTabbedPane.getModel().addChangeListener(new ChangeListener(){
+        public void stateChanged(ChangeEvent e){
+          if (!uiContainer.isVisible())
+            return;
+          
+          if (!AWTUtilities.fitsInto(issueTabbedPane.getMinimumSize(), issueTabbedPane.getSize()))
+            uiContainer.pack();
+        }
+      });
+      
+      issuePanel = issueTabbedPane;
+    }
+    else{
+      JLabel issueSeekLabel = i18n.createLabel("issueSeekLabel");
+      issueSeekLabel.setFont(issueSeekLabel.getFont().deriveFont(Font.BOLD));
+
+      issuePanel = new JPanel();
+      issuePanel.setLayout(new BorderLayout(xGap, yGap));
+      issuePanel.add(issueSeekLabel, BorderLayout.PAGE_START);
+      issuePanel.add(issueSeekPanel, BorderLayout.CENTER);
+    }
     
     JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap)){
       public Dimension getPreferredSize(){
@@ -235,7 +258,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     
     JPanel content = new JPanel(new BorderLayout(xGap, yGap));
-    content.add(issueTabbedPane, BorderLayout.LINE_START);
+    content.add(issuePanel, BorderLayout.LINE_START);
     content.add(soughtGraphWrapper, BorderLayout.CENTER);
     
     content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -261,11 +284,29 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   /**
    * Creates the <code>IssueMatchPanel</code>. This method allows subclasses to
    * provide their own, custom, versions of <code>IssueMatchPanel</code>.
+   * Returns <code>null</code> if there is no <code>IssueMatchPanel</code> (if,
+   * for example, the connection is not an instance of
+   * <code>MatchConnection</code>).
    */
   
   protected IssueMatchPanel createIssueMatchPanel(){
-    return new IssueMatchPanel(this, uiContainer,
-        Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
+    if (getConn() instanceof MatchConnection)
+      return new IssueMatchPanel(this, uiContainer,
+          Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
+    else
+      return null;
+  }
+  
+  
+  
+  /**
+   * Returns whether we have UI for issuing match offers.
+   * 
+   * @see #displayMatchUI(ServerUser)
+   */
+  
+  public boolean hasMatchUI(){
+    return issueMatchPanel != null;
   }
   
   
@@ -273,9 +314,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   /**
    * Sets the UI up to issue a match offer to the specified player (may be
    * <code>null</code>, to indicate a blank opponent).
+   * 
+   * @see #hasMatchUI()
    */
   
   public void displayMatchUI(ServerUser opponent){
+    if (!hasMatchUI())
+      throw new IllegalArgumentException("No UI for matching");
+    
     issueTabbedPane.setSelectedComponent(issueMatchPanel);
     issueMatchPanel.prepareFor(opponent);
     uiContainer.setActive(true);
