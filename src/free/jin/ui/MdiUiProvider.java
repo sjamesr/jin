@@ -126,7 +126,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     I18n i18n = I18n.get(MdiUiProvider.class);
     mainFrame = createMainFrame();
-    restoreFrameGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.",
+    restoreWindowGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.",
         new RectDouble(1d/16, 1d/16, 7d/8, 7d/8));
     
     configureDesktop(desktop = new AdvancedJDesktopPane());
@@ -326,7 +326,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    */
    
   public void stop(){
-    saveFrameGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.");
+    saveWindowGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.");
     mainFrame.dispose();    
   }
 
@@ -815,7 +815,6 @@ public class MdiUiProvider extends AbstractUiProvider{
 
     public void setTitleImpl(String title){
       frame.setTitle(title);
-      frame.repaint(); // Bugfix: the title bar doesn't repaint itself in MS VM
     }
 
 
