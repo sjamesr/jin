@@ -21,26 +21,26 @@
 
 package free.jin.ui;
 
-import free.jin.*;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.Session;
+import free.jin.SessionEvent;
+import free.jin.SessionListener;
 import free.jin.User;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
 import free.util.Pair;
 import free.util.RectDouble;
-
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import javax.swing.JFrame;
 
 
 
@@ -245,75 +245,84 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
-   * Restores the geometry of the specified frame from the preferences.
+   * Restores the geometry of the specified window from the preferences.
    */
    
-  public static void restoreFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix, RectDouble defaultFrameBounds){
+  public static void restoreWindowGeometry(Preferences prefs, Window window, 
+      String prefNamePrefix, RectDouble defaultFrameBounds){
+    
     Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     Rectangle realDefaultBounds = 
         defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
     
     // Restore bounds      
     Rectangle frameBounds = prefs.getRect(prefNamePrefix + "bounds", realDefaultBounds);
-    frameBounds = frameBoundsOk(screenSize, frameBounds) ? frameBounds : realDefaultBounds;
-    frame.setBounds(frameBounds);
+    frameBounds = windowBoundsOk(screenSize, frameBounds) ? frameBounds : realDefaultBounds;
+    window.setBounds(frameBounds);
 
-    
-    // Restore maximized state 
-    boolean vertMaximized = prefs.getBool(prefNamePrefix + "maximized.vert", false);
-    boolean horizMaximized = prefs.getBool(prefNamePrefix + "maximized.horiz", false);
-
-    // Bugfix for Java bug 4464714 - setExtendedState only works once the
-    // the window is realized.
-    if (frame.getPeer() == null)
-      frame.addNotify();
-   
-    int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
-    AWTUtilities.setExtendedFrameState(frame, state);
+    if (window instanceof Frame){
+      Frame frame = (Frame)window;
+      
+      // Restore maximized state 
+      boolean vertMaximized = prefs.getBool(prefNamePrefix + "maximized.vert", false);
+      boolean horizMaximized = prefs.getBool(prefNamePrefix + "maximized.horiz", false);
+      
+      // Bugfix for Java bug 4464714 - setExtendedState only works once the
+      // the window is realized.
+      if (frame.getPeer() == null)
+        frame.addNotify();
+     
+      int state = ((vertMaximized ? Frame.MAXIMIZED_VERT : 0) | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
+      AWTUtilities.setExtendedFrameState(frame, state);
+    }
   }
   
   
   
   /**
-   * Saves the geometry of the specified frame into the preferences
+   * Saves the geometry of the specified window into the preferences
    * with preference names prefixed with the specified string.
    */
 
-  public static void saveFrameGeometry(Preferences prefs, JFrame frame, String prefNamePrefix){
+  public static void saveWindowGeometry(Preferences prefs, Window window, String prefNamePrefix){
     
     // Save bounds on screen
-    Point frameLocation = frame.isVisible() ? frame.getLocationOnScreen() : frame.getLocation();
-    Dimension frameSize = frame.getSize();
+    Point frameLocation = window.isVisible() ? window.getLocationOnScreen() : window.getLocation();
+    Dimension frameSize = window.getSize();
     prefs.setRect(prefNamePrefix + "bounds", new Rectangle(frameLocation, frameSize));
     
-    // Save maximized state
-    int state = AWTUtilities.getExtendedFrameState(frame);
-    prefs.setBool(prefNamePrefix + "maximized.vert", (state & Frame.MAXIMIZED_VERT) != 0);
-    prefs.setBool(prefNamePrefix + "maximized.horiz", (state & Frame.MAXIMIZED_HORIZ) != 0);
+    if (window instanceof Frame){
+      Frame frame = (Frame)window;
+      
+      // Save maximized state
+      int state = AWTUtilities.getExtendedFrameState(frame);
+      prefs.setBool(prefNamePrefix + "maximized.vert", (state & Frame.MAXIMIZED_VERT) != 0);
+      prefs.setBool(prefNamePrefix + "maximized.horiz", (state & Frame.MAXIMIZED_HORIZ) != 0);
+    }
   }
   
   
 
   /**
-   * Returns whether the specified frame bounds are reasonably placed on a
+   * Returns whether the specified window bounds are reasonably placed on a
    * screen of the specified dimensions. This is used to avoid situations where
-   * a frame is displayed outside of the screen where the user can't change its
+   * a window is displayed outside of the screen where the user can't change its
    * size and/or move it (can happen for example if the resolution is changed
    * between runs).
    */
 
-  public static boolean frameBoundsOk(Dimension screenSize, Rectangle frameBounds){
-    if (frameBounds.x + frameBounds.width < 50)
+  public static boolean windowBoundsOk(Dimension screenSize, Rectangle windowBounds){
+    if (windowBounds.x + windowBounds.width < 50)
       return false;
-    if (frameBounds.y < -10)
+    if (windowBounds.y < -10)
       return false;
-    if (frameBounds.width < 30)
+    if (windowBounds.width < 30)
       return false;
-    if (frameBounds.height < 40)
+    if (windowBounds.height < 40)
       return false;
-    if (frameBounds.x > screenSize.width - 10)
+    if (windowBounds.x > screenSize.width - 10)
       return false;
-    if (frameBounds.y > screenSize.height - 20)
+    if (windowBounds.y > screenSize.height - 20)
       return false;
 
     return true;
