@@ -31,51 +31,48 @@ import free.jin.Seek;
  */
 
 public class SeekEvent extends JinEvent{
-
-
-
+  
+  
+  
   /**
    * The id specifying an event fired when a seek is added to the sought list.
    */
-
+  
   public static final int SEEK_ADDED = 1;
-
-
-
+  
+  
+  
   /**
    * The id specifying an event fired when a seek is removed from the sought list.
    */
-
+  
   public static final int SEEK_REMOVED = 2;
-
-
-
-
+  
+  
+  
   /**
    * The id of the SeekEvent.
    */
-
+  
   private final int id;
-
-
-
-
+  
+  
+  
   /**
    * The seek.
    */
-
+  
   private final Seek seek;
-
-
-
-
+  
+  
+  
   /**
    * Creates a new SeekEvent with the given source Connection.
    */
-
+  
   public SeekEvent(SeekConnection conn, int id, Seek seek){
     super(conn);
-
+    
     switch(id){
       case SEEK_ADDED:
       case SEEK_REMOVED:
@@ -83,31 +80,44 @@ public class SeekEvent extends JinEvent{
       default:
         throw new IllegalArgumentException("Bad id: "+id);
     }
-
+    
     this.id = id;
     this.seek = seek;
   }
-
-
-
-
+  
+  
+  
+  
+  /**
+   * Returns the <code>SeekConnection</code> to the server.
+   */
+  
+  public SeekConnection getSeekConnection(){
+    return (SeekConnection)getConnection();
+  }
+  
+  
+  
   /**
    * Returns the id of this SeekEvent, possible values are {@link #SEEK_ADDED}
    * and {@link #SEEK_REMOVED}.
    */
-
+  
   public int getID(){
     return id;
   }
-
-
-
+  
+  
+  
   /**
    * Returns the seek.
    */
-
+  
   public Seek getSeek(){
     return seek;
   }
-
+  
+  
+  
+  
 }
