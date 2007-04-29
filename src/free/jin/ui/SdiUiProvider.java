@@ -349,7 +349,6 @@ public class SdiUiProvider extends AbstractUiProvider{
   
     public void setTitleImpl(String title){
       frame.setTitle(title);
-      frame.repaint(); // Bugfix: the title bar doesn't repaint itself in MS VM
     }
   
   
@@ -410,6 +409,7 @@ public class SdiUiProvider extends AbstractUiProvider{
   
     private void hide(){
       saveState();
+      
       frame.setVisible(false);
   
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_HIDDEN));
@@ -430,7 +430,7 @@ public class SdiUiProvider extends AbstractUiProvider{
   
       String prefix = getPrefsPrefix();
       
-      saveFrameGeometry(prefs, frame, prefix);
+      saveWindowGeometry(prefs, frame, prefix);
     }
   
   
@@ -464,7 +464,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       defaultBounds.setX(defaultBounds.getX() + (sx - 1.0)/2);
       defaultBounds.setY(defaultBounds.getY() + (sy - 1.0)/2);
       
-      restoreFrameGeometry(prefs, frame, prefix, defaultBounds);
+      restoreWindowGeometry(prefs, frame, prefix, defaultBounds);
     }
     
     
@@ -503,7 +503,9 @@ public class SdiUiProvider extends AbstractUiProvider{
     public void windowClosing(WindowEvent e){
       close();
     }
-
+    
+    
+    
     public void windowClosed(WindowEvent e){}
     public void windowDeiconified(WindowEvent e){}
     public void windowIconified(WindowEvent e){}
