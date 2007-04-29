@@ -37,8 +37,8 @@ public interface SeekConnection extends Connection{
 
 
   /**
-   * Returns the SeekListenerManager via which you can register and
-   * unregister SeekListeners.
+   * Returns the <code>SeekListenerManager</code> via which you can register and
+   * unregister <code>SeekListener</code>s.
    */
 
   SeekListenerManager getSeekListenerManager();
@@ -47,8 +47,8 @@ public interface SeekConnection extends Connection{
   
   /**
    * Returns the currently known collection of seeks. Note, that the seeks are
-   * guaranteed to be retrieved only if at least one seek listener is
-   * registered.
+   * guaranteed to be retrieved from the server only if at least one seek
+   * listener is registered.
    */
   
   Collection getSeeks();
