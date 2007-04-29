@@ -793,7 +793,8 @@ public class Console extends JPanel implements KeyListener{
           try{
             int lastOffset = outputComponent.getDocument().getEndPosition().getOffset();
             Rectangle lastCharRect = outputComponent.modelToView(lastOffset - 1);
-            outputComponent.scrollRectToVisible(lastCharRect);
+            if (lastCharRect != null)
+              outputComponent.scrollRectToVisible(lastCharRect);
           } catch (BadLocationException e){e.printStackTrace();}
 
           didScrollToBottom = true;
