@@ -41,7 +41,7 @@ import javax.swing.event.ChangeListener;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.MatchConnection;
+import free.jin.MatchOfferConnection;
 import free.jin.Preferences;
 import free.jin.Seek;
 import free.jin.SeekConnection;
@@ -83,7 +83,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   /**
    * The panel for issuing match offers. May be <code>null</code> if there is
    * no such panel (if, for example, the connection is not an instance of
-   * <code>MatchConnection</code>).
+   * <code>MatchOfferConnection</code>).
    */
   
   private IssueMatchPanel issueMatchPanel;
@@ -286,11 +286,11 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * provide their own, custom, versions of <code>IssueMatchPanel</code>.
    * Returns <code>null</code> if there is no <code>IssueMatchPanel</code> (if,
    * for example, the connection is not an instance of
-   * <code>MatchConnection</code>).
+   * <code>MatchOfferConnection</code>).
    */
   
   protected IssueMatchPanel createIssueMatchPanel(){
-    if (getConn() instanceof MatchConnection)
+    if (getConn() instanceof MatchOfferConnection)
       return new IssueMatchPanel(this, uiContainer,
           Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
     else

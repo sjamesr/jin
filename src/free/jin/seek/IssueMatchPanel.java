@@ -41,7 +41,7 @@ import free.chess.Player;
 import free.chess.WildVariant;
 import free.jin.FriendsConnection;
 import free.jin.I18n;
-import free.jin.MatchConnection;
+import free.jin.MatchOfferConnection;
 import free.jin.Preferences;
 import free.jin.ServerUser;
 import free.jin.UserMatchOffer;
@@ -75,7 +75,7 @@ public class IssueMatchPanel extends JPanel{
    * The connection.
    */
   
-  private final MatchConnection conn;
+  private final MatchOfferConnection conn;
   
   
   
@@ -111,11 +111,11 @@ public class IssueMatchPanel extends JPanel{
       throw new IllegalArgumentException("container may not be null");
     if (prefs == null)
       throw new IllegalArgumentException("prefs may not be null");
-    if (!(plugin.getConn() instanceof MatchConnection))
-      throw new IllegalArgumentException("Connection must be an instance of MatchConnection");
+    if (!(plugin.getConn() instanceof MatchOfferConnection))
+      throw new IllegalArgumentException("Connection must be an instance of MatchOfferConnection");
     
     this.plugin = plugin;
-    this.conn = (MatchConnection)plugin.getConn();
+    this.conn = (MatchOfferConnection)plugin.getConn();
     this.prefs = prefs;
     
     
