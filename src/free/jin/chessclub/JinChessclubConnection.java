@@ -28,9 +28,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -66,7 +68,8 @@ import free.jin.HistoryListItem;
 import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.LibListItem;
-import free.jin.MatchConnection;
+import free.jin.MatchOffer;
+import free.jin.MatchOfferConnection;
 import free.jin.PGNConnection;
 import free.jin.SearchListItem;
 import free.jin.Seek;
@@ -90,6 +93,8 @@ import free.jin.event.GameListListenerManager;
 import free.jin.event.GameStartEvent;
 import free.jin.event.IllegalMoveEvent;
 import free.jin.event.ListenerManager;
+import free.jin.event.MatchOfferEvent;
+import free.jin.event.MatchOfferListenerManager;
 import free.jin.event.MoveMadeEvent;
 import free.jin.event.OfferEvent;
 import free.jin.event.PlainTextEvent;
@@ -109,7 +114,7 @@ import free.util.Utilities;
  */
 
 public class JinChessclubConnection extends ChessclubConnection implements DatagramListener,
-    Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection, MatchConnection{
+    Connection, SeekConnection, GameListConnection, PGNConnection, FriendsConnection, MatchOfferConnection{
   
   
   
@@ -316,6 +321,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     }
 
     return false;
+  }
+  
+  
+  
+  /**
+   * Returns a <code>Player</code> object corresponding to the specified code
+   * for color preference (such as in a game offer). Returns <code>null</code>
+   * if the specified code indicates no preference.
+   */
+  
+  private Player colorPreferenceByCode(int colorPreferenceCode){
+    switch (colorPreferenceCode){
+      case ChessclubConstants.WHITE_COLOR_PREFERENCE: 
+        return Player.WHITE_PLAYER;
+      case ChessclubConstants.BLACK_COLOR_PREFERENCE:
+        return Player.BLACK_PLAYER;
+      case ChessclubConstants.NO_COLOR_PREFERENCE:
+        return null;
+      default:
+        throw new IllegalArgumentException("Unrecognized color preference code: " + colorPreferenceCode);
+    }
   }
 
 
@@ -634,6 +660,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       case Datagram.DG_NOTIFY_ARRIVED: processNotifyArrivedDG(dg); break;
       case Datagram.DG_NOTIFY_LEFT: processNotifyLeftDG(dg); break;
       case Datagram.DG_MY_NOTIFY_LIST: processMyNotifyListDG(dg); break;
+      
+      // Match offer related
+      case Datagram.DG_MATCH: processMatchDG(dg); break;
+      case Datagram.DG_MATCH_REMOVED: processMatchRemovedDG(dg); break;
       
       default:
         throw new IllegalStateException("Unhandled datagram received: " + dg);
@@ -3037,21 +3067,15 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   protected void processSeek(int index, String name, String titles, int rating, int ratingType, int wild,
-      String ratingCategoryString, int time, int inc, boolean isRated, int color, int minRating, int maxRating, 
-      boolean autoaccept, boolean formula, String fancyTimeControl){
+      String ratingCategoryString, int time, int inc, boolean isRated, int colorPreferenceCode,
+      int minRating, int maxRating, boolean autoaccept, boolean formula, String fancyTimeControl){
     
     WildVariant variant = getVariant(wild);
     if (variant == null)
       return;
 
     boolean isProvisional = (ratingType != ChessclubConstants.ESTABLISHED_RATING_TYPE);
-    Player player;
-    if (color == ChessclubConstants.WHITE_COLOR_PREFERENCE)
-      player = Player.WHITE_PLAYER;
-    else if (color == ChessclubConstants.BLACK_COLOR_PREFERENCE)
-      player = Player.BLACK_PLAYER;
-    else
-      player = null;
+    Player player = colorPreferenceByCode(colorPreferenceCode);
 
     boolean isRegistered = (rating != 0);
     boolean isSeekerRated = !isUnrated(titles);
@@ -3646,6 +3670,138 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * The pending match offers. Maps a pair of (challenger,receiver) to the match
+   * offer.
+   */
+  
+  private final Map matchOffers = new HashMap();
+  
+  
+  
+  /**
+   * Returns the <code>MatchOfferListenerManager</code> with which users
+   * register to receive match offer notifications.
+   */
+  
+  public MatchOfferListenerManager getMatchOfferListenerManager(){
+    return getChessclubListenerManager();
+  }
+  
+  
+  
+  /**
+   * Processes a DG_MATCH. 
+   */
+  
+  private void processMatchDG(Datagram dg){
+    String challengerName = dg.getString(0);
+    int challengerRating = dg.getInteger(1);
+    int challengerProvisionalStatus = dg.getInteger(2);
+    String challengerTitles = dg.getString(3);
+    String receiverName = dg.getString(4);
+    int receiverRating = dg.getInteger(5);
+    int receiverProvisionalStatus = dg.getInteger(6);
+    String receiverTitles = dg.getString(7);
+    int wildNumber = dg.getInteger(8);
+    String ratingCategory = dg.getString(9);
+    boolean isRated = dg.getBoolean(10);
+    boolean isAdjourned = dg.getBoolean(11);
+    int challengerTime = dg.getInteger(12);
+    int challengerInc = dg.getInteger(13);
+    int receiverTime = dg.getInteger(14);
+    int receiverInc = dg.getInteger(15);
+    int challengerColorPreferenceCode = dg.getInteger(16);
+    
+    processMatch(
+        challengerName, challengerRating, challengerProvisionalStatus, challengerTitles,
+        receiverName, receiverRating, receiverProvisionalStatus, receiverTitles,
+        wildNumber, ratingCategory, isRated, isAdjourned,
+        challengerTime, challengerInc, receiverTime, receiverInc,
+        challengerColorPreferenceCode);
+  }
+  
+  
+  
+  /**
+   * Fires the appropriate <code>MatchOfferEvent</code>.
+   */
+  
+  protected void processMatch(
+      String challengerName, int challengerRating, int challengerProvisionalStatus, String challengerTitles,
+      String receiverName, int receiverRating, int receiverProvisionalStatus, String receiverTitles,
+      int variantNumber, String ratingCategory, boolean isRated, boolean isAdjourned,
+      int challengerTime, int challengerInc, int receiverTime, int receiverInc,
+      int challengerColorPreferenceCode){
+    
+    WildVariant variant = getVariant(variantNumber);
+    if (variant == null)
+      return;
+    
+    ServerUser challenger = userForName(challengerName);
+    ServerUser receiver = userForName(receiverName);
+    
+    boolean isChallengerProvisional = challengerProvisionalStatus != ChessclubConstants.ESTABLISHED_RATING_TYPE;
+    boolean isReceiverProvisional = receiverProvisionalStatus != ChessclubConstants.ESTABLISHED_RATING_TYPE;
+    
+    MatchOffer matchOffer = new MatchOffer(
+        challenger, displayableTitle(challengerTitles), challengerRating, isChallengerProvisional,
+        receiver, displayableTitle(receiverTitles), receiverRating, isReceiverProvisional,
+        challengerTime*60*1000, challengerInc*1000, receiverTime*60*1000, receiverInc*1000,
+        isRated, variant, ratingCategory,
+        colorPreferenceByCode(challengerColorPreferenceCode));
+    
+    matchOffers.put(new Pair(challenger, receiver), matchOffer);
+    
+    getChessclubListenerManager().fireMatchOfferEvent(
+        new MatchOfferEvent(this, MatchOfferEvent.MATCH_OFFER_MADE, matchOffer));
+  }
+      
+  
+  
+  
+  /**
+   * Processes a DG_MATCH_REMOVED.
+   */
+  
+  private void processMatchRemovedDG(Datagram dg){
+    String challengerName = dg.getString(0);
+    String receiverName = dg.getString(1);
+    String explanation = dg.getString(2);
+    
+    processMatchRemoved(challengerName, receiverName, explanation);
+  }
+  
+  
+  
+  /**
+   * Fires the appropriate <code>MatchOfferEvent</code>.
+   */
+  
+  protected void processMatchRemoved(String challengerName, String receiverName, String explanation){
+    ServerUser challenger = userForName(challengerName);
+    ServerUser receiver = userForName(receiverName);
+    
+    MatchOffer matchOffer = (MatchOffer)matchOffers.remove(new Pair(challenger, receiver));
+    if (matchOffer == null)
+      return;
+    
+    getChessclubListenerManager().fireMatchOfferEvent(
+        new MatchOfferEvent(this, MatchOfferEvent.MATCH_OFFER_WITHDRAWN, matchOffer));
+  }
+  
+  
+  
+  /**
+   * Returns the set of pending match offers.
+   */
+  
+  public Collection getMatchOffers(){
+    return Collections.unmodifiableCollection(matchOffers.values());
+  }
+  
+  
+  
+  /**
    * Issues the specified match offer.
    */
   
@@ -3666,6 +3822,19 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       command.append(" ").append(color.isWhite() ? "white" : "black");
     
     sendCommand(command.toString());
+  }
+  
+  
+  
+  /**
+   * Withdraws the specified match offer, made by the user.
+   */
+  
+  public void withdraw(MatchOffer matchOffer){
+    if (!matchOffer.getChallenger().equals(getUser()))
+      throw new IllegalArgumentException("The specified match offer was not issued by the user");
+    
+    // TODO: Implement me.
   }
   
   
