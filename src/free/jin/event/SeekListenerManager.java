@@ -23,31 +23,30 @@ package free.jin.event;
 
 
 /**
- * The extension of ListenerManager allowing registering and unregistering
- * SeekListeners.
+ * An extension of <code>ListenerManager</code> for
+ * <code>SeekConnection</code>s.
  */
 
 public interface SeekListenerManager extends ListenerManager{
-
-
+  
+  
+  
   /**
-   * Adds the given SeekListener to the list of listeners receiving 
-   * notifications when seeks are added and removed. Note that the
-   * implementation must deliver not only new Seeks to the newly registered 
-   * listener but also all of the current seeks as well.
+   * Adds the specified <code>SeekListener</code> to the list of listeners
+   * receiving notifications when seeks are added and removed.
    */
-
+  
   void addSeekListener(SeekListener listener);
-
-
-
+  
+  
+  
   /**
-   * Removes the given SeekListener from the list of listeners receiving
-   * notifications when seeks are added and removed.
+   * Removes the specified <code>SeekListener</code> from the list of listeners
+   * receiving notifications when seeks are added and removed.
    */
-
+  
   void removeSeekListener(SeekListener listener);
-
-
-
+  
+  
+  
 }
