@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,78 +21,80 @@
 
 package free.jin.event;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.FriendsConnection;
+import free.jin.GameListConnection;
+import free.jin.MatchOfferConnection;
+import free.jin.SeekConnection;
 import free.util.EventListenerList;
+import free.util.UnsupportedOperationException;
 
 
 /**
  * A basic implementation of the <code>ListenerManager</code> interface which
- * uses an EventListenerList to hold the listeners. It also provides conventient
- * event firing methods.
+ * uses an <code>EventListenerList</code> to hold the listeners. It also
+ * provides convenient event firing methods.
  */
 
 public class BasicListenerManager implements ListenerManager, SeekListenerManager,
-    GameListListenerManager, FriendsListenerManager{
-
-
-
+    GameListListenerManager, FriendsListenerManager, MatchOfferListenerManager{
+  
+  
+  
   /**
-   * The Connection source of the events.
+   * The source of the events.
    */
-
+  
   protected final Connection source;
-
-
-
-
+  
+  
+  
   /**
-   * The EventListenerList where we keep all of our listeners.
+   * The <code>EventListenerList</code> where we keep all of our listeners.
    */
-
+  
   protected final EventListenerList listenerList = new EventListenerList();
-
-
-
-
-
+  
+  
+  
   /**
-   * Creates a new <code>BasicListenerManager</code> with the given source
+   * Creates a new <code>BasicListenerManager</code> with the specified source
    * <code>Connection</code>.
    */
-
+  
   public BasicListenerManager(Connection source){
     this.source = source;
   }
-
-
-
-
+  
+  
+  
   /**
    * Adds the given <code>ConnectionListener</code> to receive connection
    * related events.
    */
-
+  
   public void addConnectionListener(ConnectionListener listener){
     listenerList.add(ConnectionListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
    * Removes the given <code>ConnectionListener</code> from receiving connection
    * events.
    */
-
+  
   public void removeConnectionListener(ConnectionListener listener){
     listenerList.remove(ConnectionListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
-   * Notifies all interested <code>Connection</code> listeners that an attempt to connect is being made.
+   * Notifies all interested <code>Connection</code> listeners that an attempt
+   * to connect is being made.
    */
-
+  
   public void fireConnectionAttempted(Connection conn, String hostname, int port){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -106,13 +108,14 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
-
+  
+  
+  
   /**
-   * Notifies all interested <code>Connection</code> listeners that a connection to the server has been established. 
+   * Notifies all interested <code>Connection</code> listeners that a connection
+   * to the server has been established. 
    */
-
+  
   public void fireConnectionEstablished(Connection conn){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -130,9 +133,10 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
   
   
   /**
-   * Notifies all interested <code>Connection</code> listeners that the attempt to connect failed.
+   * Notifies all interested <code>Connection</code> listeners that the attempt
+   * to connect failed.
    */
-
+  
   public void fireConnectingFailed(Connection conn, String reason){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -150,9 +154,10 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
   
   
   /**
-   * Notifies all interested <code>Connection</code> listeners that login succeeded.
+   * Notifies all interested <code>Connection</code> listeners that login
+   * succeeded.
    */
-
+  
   public void fireLoginSucceeded(Connection conn){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -170,9 +175,10 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
   
   
   /**
-   * Notifies all interested <code>Connection</code> listeners that login failed.
+   * Notifies all interested <code>Connection</code> listeners that login
+   * failed.
    */
-
+  
   public void fireLoginFailed(Connection conn, String reason){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -190,9 +196,10 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
   
   
   /**
-   * Notifies all interested <code>Connection</code> listeners that the connection to the server was lost.
+   * Notifies all interested <code>Connection</code> listeners that the
+   * connection to the server was lost.
    */
-
+  
   public void fireConnectionLost(Connection conn){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -207,36 +214,35 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
     }
   }
   
-
-
+  
+  
   /**
-   * Adds the given PlainTextListener to receive notification when otherwise
-   * unidentified text arrives from the server.
+   * Adds the given <code>PlainTextListener</code> to receive notification when
+   * otherwise unidentified text arrives from the server.
    */
-
+  
   public void addPlainTextListener(PlainTextListener listener){
     listenerList.add(PlainTextListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
-   * Removes the given PlainTextListener from the list of PlainTextListeners
+   * Removes the given <code>PlainTextListener</code> from the list of listeners
    * receiving notification when otherwise unidentified text arrives from 
    * the server.
    */
-
+  
   public void removePlainTextListener(PlainTextListener listener){
     listenerList.remove(PlainTextListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Fires the given PlainTextEvent to all interested listeners.
+   * Fires the specified <code>PlainTextEvent</code> to all interested listeners.
    */
-
+  
   public void firePlainTextEvent(PlainTextEvent evt){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -250,38 +256,37 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * Adds the given ChatListener to receive notification when chat related
-   * messages arrive from the server.
+   * Adds the specified <code>ChatListener</code> to receive notification when
+   * chat related messages arrive from the server.
    */
-
+  
   public void addChatListener(ChatListener listener){
     listenerList.add(ChatListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
-   * Removes the given ChatListener from the list of ChatListeners receiving
-   * notification when chat related messages arrive from the server.
+   * Removes the specified <code>ChatListener</code> from the list of
+   * <code>ChatListeners</code> receiving notification when chat related
+   * messages arrive from the server.
    */
-
+  
   public void removeChatListener(ChatListener listener){
     listenerList.remove(ChatListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Dispatches the given ChatEvent to all interested listeners.
+   * Dispatches the specified <code>ChatEvent</code> to all interested
+   * listeners.
    */
-
+  
   public void fireChatEvent(ChatEvent evt){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -295,37 +300,36 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
- 
   
   
   
   /**
-   * Adds the given GameListener to the list of listeners receiving notifications
-   * of GameEvents.
+   * Adds the specified <code>GameListener</code> to the list of listeners
+   * receiving notifications of <code>GameEvent</code>s.
    */
-
+  
   public void addGameListener(GameListener listener){
     listenerList.add(GameListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
-   * Removes the given GameListener from the list of listeners receiving notifications
-   * of GameEvents.
+   * Removes the specified <code>GameListener</code> from the list of listeners
+   * receiving notifications of <code>GameEvent</code>s.
    */
-
+  
   public void removeGameListener(GameListener listener){
     listenerList.remove(GameListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
-   * Dispatches the given GameEvent to all interested listeners.
+   * Dispatches the specified <code>GameEvent</code> to all interested
+   * listeners.
    */
-
+  
   public void fireGameEvent(GameEvent evt){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -358,58 +362,46 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * Adds the given SeekListener to the list of listeners receiving notification
-   * of SeekEvents.
-   *
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of SeekConnection.
+   * Adds the specified <code>SeekListener</code> to the list of listeners
+   * receiving notification of <code>SeekEvent</code>s.
    */
-
+  
   public void addSeekListener(SeekListener listener){
     if (!(source instanceof SeekConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
+    
     listenerList.add(SeekListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Removes the given SeekListener from the list of listeners receiving 
-   * notification of SeekEvents.
-   * 
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of SeekConnection.
+   * Removes the specified <code>SeekListener</code> from the list of listeners
+   * receiving notification of <code>SeekEvent</code>s.
    */
-
+  
   public void removeSeekListener(SeekListener listener){
     if (!(source instanceof SeekConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
+    
     listenerList.remove(SeekListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Fires the given SeekEvent to all interested SeekListeners.
-   * 
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of SeekConnection.
+   * Fires the specified <code>SeekEvent</code> to all interested
+   * <code>SeekListener</code>s.
    */
-
+  
   public void fireSeekEvent(SeekEvent evt){
     if (!(source instanceof SeekConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
+    
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == SeekListener.class){
@@ -431,56 +423,46 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
-
-
+  
+  
+  
   /**
-   * Adds the given GameListListener to receive notifications of GameListEvents.
-   * 
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of GameListConnection.
+   * Adds the specified <code>GameListListener</code> to receive notifications
+   * of <code>GameListEvent</code>s.
    */
-
+  
   public void addGameListListener(GameListListener listener){
     if (!(source instanceof GameListConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
+    
     listenerList.add(GameListListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Removes the given GameListListener from the list of listeners receiving
-   * notifications of GameListEvents.
-   * 
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of GameListConnection.
+   * Removes the specified <code>GameListListener</code> from the list of
+   * listeners receiving notifications of <code>GameListEvent</code>s.
    */
-
+  
   public void removeGameListListener(GameListListener listener){
     if (!(source instanceof GameListConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
+    
     listenerList.remove(GameListListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Fires the given GameListEvent to all interested GameListListeners.
-   * 
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of GameListConnection.
+   * Fires the specified <code>GameListEvent</code> to all interested
+   * <code>GameListListener</code>s.
    */
-
+  
   public void fireGameListEvent(GameListEvent evt){
     if (!(source instanceof GameListConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
+    
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
       if (listeners[i] == GameListListener.class){
@@ -493,59 +475,45 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * Adds the given FriendsListener to the list of listeners receiving
-   * notifications about friends.
-   *
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of FriendsListConnection.
+   * Adds the specified <code>FriendsListener</code> to the list of listeners
+   * receiving notifications of <code>FriendsEvent</code>s.
    */
-
+  
   public void addFriendsListener(FriendsListener listener){
     if (!(source instanceof FriendsConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
+    
     listenerList.add(FriendsListener.class, listener);
   }
-
-
-
-
-
+  
+  
+  
   /**
-   * Removes the given FriendsListener from the list of listeners receiving
-   * notifications about friends.
-   *
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of FriendsListConnection.
+   * Removes the specified <code>FriendsListener</code> from the list of
+   * listeners receiving notifications of <code>FriendsEvent</code>s.
    */
-
+  
   public void removeFriendsListener(FriendsListener listener){
     if (!(source instanceof FriendsConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
+    
     listenerList.remove(FriendsListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
-   * Dispatches the given FriendsEvent to all interested listeners.
-   *
-   * @throws free.util.UnsupportedOperationException if the source Connection
-   * is not an instance of FriendsListConnection.
+   * Dispatches the given <code>FriendsEvent</code> to all interested listeners.
    */
-
+  
   public void fireFriendsEvent(FriendsEvent evt){
     if (!(source instanceof FriendsConnection))
-      throw new free.util.UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
-
+      throw new UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
+    
     Object [] listenerList = this.listenerList.getListenerList();
     for (int i = 0; i < listenerList.length; i += 2){
       if (listenerList[i] == FriendsListener.class){
@@ -574,6 +542,66 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
       }
     }
   }
-
-
+  
+  
+  
+  /**
+   * Adds the specified <code>MatchOfferListener</code> to receive notifications
+   * of <code>MatchOfferEvent</code>s.
+   */
+  
+  public void addMatchOfferListener(MatchOfferListener listener){
+    if (!(source instanceof MatchOfferConnection))
+      throw new UnsupportedOperationException("The source connection is not an instance of MatchOfferConnection");
+    
+    listenerList.add(MatchOfferListener.class, listener);
+  }
+  
+  
+  
+  /**
+   * Removes the specified <code>MatchOfferListener</code> from the list of
+   * listeners receiving notifications of <code>MatchOfferEvent</code>s.
+   */
+  
+  public void removeMatchOfferListener(MatchOfferListener listener){
+    if (!(source instanceof MatchOfferConnection))
+      throw new UnsupportedOperationException("The source connection is not an instance of MatchOfferConnection");
+    
+    listenerList.remove(MatchOfferListener.class, listener);
+  }
+  
+  
+  
+  /**
+   * Dispatches the specified <code>MatchOfferEvent</code> to all interested
+   * listeners.
+   */
+  
+  public void fireMatchOfferEvent(MatchOfferEvent evt){
+    if (!(source instanceof MatchOfferConnection))
+      throw new UnsupportedOperationException("The source Connection is not an instance of MatchOfferConnection");
+    
+    Object [] listenerList = this.listenerList.getListenerList();
+    for (int i = 0; i < listenerList.length; i += 2){
+      if (listenerList[i] == MatchOfferListener.class){
+        MatchOfferListener listener = (MatchOfferListener)listenerList[i+1];
+        try{
+          switch (evt.getID()){
+            case MatchOfferEvent.MATCH_OFFER_MADE:
+              listener.matchOfferMade(evt);
+              break;
+            case MatchOfferEvent.MATCH_OFFER_WITHDRAWN:
+              listener.matchOfferWithdrawn(evt);
+              break;
+          }
+        } catch (RuntimeException e){
+            e.printStackTrace();
+          }
+      }
+    }
+  }
+  
+  
+  
 }
