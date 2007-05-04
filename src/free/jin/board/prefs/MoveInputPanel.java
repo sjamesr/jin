@@ -52,6 +52,14 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   
   
   /**
+   * The "unified" move input style selecting radio button.
+   */
+  
+  protected final JRadioButton unified;
+  
+  
+  
+  /**
    * The "drag and drop" move input style selecting radio button.
    */
    
@@ -192,13 +200,16 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     
     I18n i18n = I18n.get(MoveInputPanel.class);
     
+    unified = i18n.createRadioButton("unifiedRadioButton");
     dragndrop = i18n.createRadioButton("dragndropRadioButton");
     clicknclick = i18n.createRadioButton("clicknclickRadioButton");
     
-    dragndrop.setSelected(boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP);
-    clicknclick.setSelected(boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK);
+    unified.setSelected(boardManager.getMoveInputStyle() == JBoard.UNIFIED_MOVE_INPUT_STYLE);
+    dragndrop.setSelected(boardManager.getMoveInputStyle() == JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE);
+    clicknclick.setSelected(boardManager.getMoveInputStyle() == JBoard.CLICK_N_CLICK_MOVE_INPUT_STYLE);
     
     ButtonGroup moveInputGroup = new ButtonGroup();
+    moveInputGroup.add(unified);
     moveInputGroup.add(dragndrop);
     moveInputGroup.add(clicknclick);
     ActionListener moveInputListener = new ActionListener(){
@@ -208,6 +219,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
         fireStateChanged();
       }
     };
+    unified.addActionListener(moveInputListener);
     dragndrop.addActionListener(moveInputListener);
     clicknclick.addActionListener(moveInputListener);
       
@@ -415,10 +427,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private int getMoveInputStyle(){
-    if (dragndrop.isSelected())
-      return JBoard.DRAG_N_DROP;
+    if (unified.isSelected())
+      return JBoard.UNIFIED_MOVE_INPUT_STYLE;
+    else if (dragndrop.isSelected())
+      return JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE;
     else if (clicknclick.isSelected())
-      return JBoard.CLICK_N_CLICK;
+      return JBoard.CLICK_N_CLICK_MOVE_INPUT_STYLE;
     else
       throw new IllegalStateException("None of the radio buttons are selected");
   }
@@ -495,10 +509,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.setBorder(BorderFactory.createCompoundBorder(
       I18n.get(MoveInputPanel.class).createTitledBorder("moveInputPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
-        
+    
+    unified.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     dragndrop.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     clicknclick.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
+    panel.add(unified);
     panel.add(dragndrop);
     panel.add(clicknclick);
     panel.add(Box.createVerticalGlue());
