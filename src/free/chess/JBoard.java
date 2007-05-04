@@ -82,12 +82,22 @@ public class JBoard extends JComponent{
   private static final Color DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR = Color.blue;
    
   
-   
+  
+  /**
+   * The constant for unified move input style. This style allows both
+   * drag'n'drop and click'n'click move gestures, similarly to how menus work on
+   * many graphical systems.
+   */
+  
+  public static final int UNIFIED_MOVE_INPUT_STYLE = 0;
+  
+  
+  
   /**
    * The constant for drag'n'drop move input style.
    */
 
-  public static final int DRAG_N_DROP = 1;
+  public static final int DRAG_N_DROP_MOVE_INPUT_STYLE = 1;
 
 
 
@@ -95,7 +105,7 @@ public class JBoard extends JComponent{
    * The constant for click'n'click move input style.
    */
 
-  public static final int CLICK_N_CLICK = 2;
+  public static final int CLICK_N_CLICK_MOVE_INPUT_STYLE = 2;
 
 
 
@@ -306,7 +316,7 @@ public class JBoard extends JComponent{
    * The current move input style.
    */
 
-  private int moveInputStyle = DRAG_N_DROP;
+  private int moveInputStyle = UNIFIED_MOVE_INPUT_STYLE;
 
 
 
@@ -429,6 +439,29 @@ public class JBoard extends JComponent{
    */
 
   private Point movedPieceLoc = null;
+  
+  
+  
+  /**
+   * Indicates the current move gesture if in <code>UNIFIED_MOVE_INPUT_STYLE</code>.
+   * Possible values are:
+   * <ul>
+   *  <code>UNIFIED_MOVE_INPUT_STYLE</code> when no move gesture is in progress.
+   *  <code>DRAG_N_DROP_MOVE_INPUT_STYLE</code> if the current move gesture is a drag'n'drop.
+   *  <code>CLICK_N_CLICK_MOVE_INPUT_STYLE</code> if the current move gesture is a click'n'click.
+   * </ul>
+   */
+  
+  private int moveGesture = UNIFIED_MOVE_INPUT_STYLE;
+  
+  
+  
+  /**
+   * The time when the last drag gesture started, in
+   * <code>UNIFIED_MOVE_MODE</code>.
+   */
+  
+  private long dragStartTime;
 
 
 
@@ -597,17 +630,21 @@ public class JBoard extends JComponent{
 
   /**
    * Sets the move input style of this JBoard to the given style. Possible values
-   * are {@link #DRAG_N_DROP} and {@link #CLICK_N_CLICK}.
+   * are {@link #UNIFIED_MOVE_INPUT_STYLE}, 
+   * {@link #DRAG_N_DROP_MOVE_INPUT_STYLE} and 
+   * {@link #CLICK_N_CLICK_MOVE_INPUT_STYLE}.
    */
 
   public void setMoveInputStyle(int newStyle){
     switch(newStyle){
-      case DRAG_N_DROP:
-      case CLICK_N_CLICK:
+      case UNIFIED_MOVE_INPUT_STYLE:
+      case DRAG_N_DROP_MOVE_INPUT_STYLE:
+      case CLICK_N_CLICK_MOVE_INPUT_STYLE:
         break;
       default:
         throw new IllegalArgumentException("Illegal move input style value: "+newStyle);
     }
+    
     int oldStyle = moveInputStyle;
     moveInputStyle = newStyle;
     firePropertyChange("moveInputStyle", oldStyle, newStyle);
@@ -1728,6 +1765,20 @@ public class JBoard extends JComponent{
   
   
   /**
+   * Returns whether we are currently performing the specified gesture or are
+   * simply in the specified move input style. This is just a helper method.
+   */
+  
+  private boolean isGesture(int style){
+    int moveInputStyle = getMoveInputStyle();
+    
+    return ((moveInputStyle == UNIFIED_MOVE_INPUT_STYLE) && (moveGesture == style)) ||
+        (moveInputStyle == style);
+  }
+  
+  
+  
+  /**
    * Processes a mouse event.
    */
 
@@ -1741,14 +1792,12 @@ public class JBoard extends JComponent{
 
     int evtID = evt.getID();
 
-    int inputStyle = getMoveInputStyle();
-
     int x = evt.getX();
     int y = evt.getY();
     
     Rectangle helpRect = null;
 
-    if ((evtID == MouseEvent.MOUSE_EXITED) && (inputStyle == CLICK_N_CLICK)){
+    if ((evtID == MouseEvent.MOUSE_EXITED) && isGesture(CLICK_N_CLICK_MOVE_INPUT_STYLE)){
       if (movedPieceSquare != null){ // Fake the piece being at its original location
         repaint(helpRect = getMoveAreaRect(helpRect));
         squareToRect(movedPieceSquare, helpRect);
@@ -1767,7 +1816,7 @@ public class JBoard extends JComponent{
     }
 
     if (isLeftMouseButton && ((evtID == MouseEvent.MOUSE_PRESSED) ||
-       ((evtID == MouseEvent.MOUSE_RELEASED) && (inputStyle == DRAG_N_DROP)))){
+       ((evtID == MouseEvent.MOUSE_RELEASED) && isGesture(DRAG_N_DROP_MOVE_INPUT_STYLE)))){
       if (movedPieceSquare == null){
 
         // This happens if the user tries to drag an empty square into a piece.
@@ -1786,6 +1835,11 @@ public class JBoard extends JComponent{
         repaint(helpRect = squareToRect(square, helpRect));
         if (isPieceFollowsCursor())
           repaint(helpRect = getMovedPieceGraphicRect(helpRect));
+        
+        if (getMoveInputStyle() == UNIFIED_MOVE_INPUT_STYLE){
+          moveGesture = DRAG_N_DROP_MOVE_INPUT_STYLE;
+          dragStartTime = System.currentTimeMillis();
+        }
        
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_STARTED));
       }
@@ -1811,6 +1865,12 @@ public class JBoard extends JComponent{
 
           position.makeMove(madeMove);
         }
+        else if ((getMoveInputStyle() == UNIFIED_MOVE_INPUT_STYLE) &&
+            (moveGesture == DRAG_N_DROP_MOVE_INPUT_STYLE) && 
+            (System.currentTimeMillis() - dragStartTime < 300)){
+          moveGesture = CLICK_N_CLICK_MOVE_INPUT_STYLE;
+          return;
+        }
         else{ // Picked up the piece and dropped it immediately.
           repaint(helpRect = getMoveAreaRect(helpRect));
           repaint(helpRect = squareToRect(movedPieceSquare, helpRect));
@@ -1818,6 +1878,7 @@ public class JBoard extends JComponent{
 
         movedPieceSquare = null;
         movedPieceLoc = null;
+        moveGesture = 0;
         
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
       }
@@ -1841,7 +1902,6 @@ public class JBoard extends JComponent{
     if ((evtID == MouseEvent.MOUSE_DRAGGED) && !SwingUtilities.isLeftMouseButton(evt)) 
       return;
 
-    int inputStyle = getMoveInputStyle();
     if (movedPieceSquare == null)
       return;
 
@@ -1851,10 +1911,10 @@ public class JBoard extends JComponent{
     Rectangle helpRect = null;
 
     if ((evtID == MouseEvent.MOUSE_DRAGGED) ||
-       ((evtID == MouseEvent.MOUSE_MOVED) && (inputStyle == CLICK_N_CLICK))){
+       ((evtID == MouseEvent.MOUSE_MOVED) && isGesture(CLICK_N_CLICK_MOVE_INPUT_STYLE))){
       repaint(helpRect = getMoveAreaRect(helpRect));
       
-      if ((locationToSquare(x, y) == null) && (inputStyle == CLICK_N_CLICK)){
+      if ((locationToSquare(x, y) == null) && isGesture(CLICK_N_CLICK_MOVE_INPUT_STYLE)){
         // Fake the piece being at its original location
         squareToRect(movedPieceSquare, helpRect);
         movedPieceLoc.x = helpRect.x + helpRect.width/2;
@@ -1879,8 +1939,7 @@ public class JBoard extends JComponent{
     frame.addWindowListener(new free.util.AppKiller());
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
-    board.setBorder(new javax.swing.border.MatteBorder(30, 40, 50, 60, Color.red));
-    board.setMoveInputStyle(CLICK_N_CLICK);
+    board.setMoveInputStyle(UNIFIED_MOVE_INPUT_STYLE);
     board.setFlipped(true);
     board.setCoordsDisplayStyle(RIM_COORDS);
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
