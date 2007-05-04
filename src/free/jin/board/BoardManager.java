@@ -305,9 +305,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     Preferences prefs = getPrefs();
 
     setAutoPromote(prefs.getBool("auto-promote", false));
-
-    setMoveInputStyle("click'n'click".equals(prefs.getString("move-input-style", "drag'n'drop")) ? 
-      JBoard.CLICK_N_CLICK : JBoard.DRAG_N_DROP);
+    
+    String moveInputStyleString = prefs.getString("move-input-style", "unified");
+    if ("click'n'click".equals(moveInputStyleString))
+      setMoveInputStyle(JBoard.CLICK_N_CLICK_MOVE_INPUT_STYLE);
+    else if ("drag'n'drop".equals(moveInputStyleString))
+      setMoveInputStyle(JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE);
+    else
+      setMoveInputStyle(JBoard.UNIFIED_MOVE_INPUT_STYLE);
 
     setPieceFollowsCursor(prefs.getBool("piece-follows-cursor", true));
     
@@ -582,11 +587,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
   public void setMoveInputStyle(int moveInputStyle){
     switch (moveInputStyle){
-      case JBoard.CLICK_N_CLICK:
-      case JBoard.DRAG_N_DROP:
+      case JBoard.UNIFIED_MOVE_INPUT_STYLE:
+      case JBoard.CLICK_N_CLICK_MOVE_INPUT_STYLE:
+      case JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE:
         break;
       default:
-        throw new IllegalArgumentException("Unknown move input style: "+moveInputStyle);
+        throw new IllegalArgumentException("Unknown move input style: " + moveInputStyle);
     }
 
     props.setIntegerProperty("moveInputStyle", moveInputStyle);
@@ -1352,9 +1358,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setString("board-pattern-id", getBoardPattern().getId());
 
     prefs.setBool("auto-promote", isAutoPromote());
-
-    prefs.setString("move-input-style", getMoveInputStyle() == JBoard.CLICK_N_CLICK ?
-      "click'n'click" : "drag'n'drop");
+    
+    String moveInputStyleString;
+    switch(getMoveInputStyle()){
+      case JBoard.UNIFIED_MOVE_INPUT_STYLE: moveInputStyleString = "unified"; break;
+      case JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE: moveInputStyleString = "drag'n'drop"; break;
+      case JBoard.CLICK_N_CLICK_MOVE_INPUT_STYLE: moveInputStyleString = "click'n'click"; break;
+      default:
+        throw new IllegalStateException("Unrecognized move input style: " + getMoveInputStyle());
+    }
+    prefs.setString("move-input-style", moveInputStyleString);
 
     prefs.setBool("piece-follows-cursor", isPieceFollowsCursor());
     
