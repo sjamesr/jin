@@ -390,9 +390,9 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.addFriendsListener(listener);
 
     if (listenerList.getListenerCount(FriendsListener.class) == 1){
-//    source.addDatagramListener(source, Datagram.DG_NOTIFY_STATE);
       source.addDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
       source.addDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
+      source.addDatagramListener(source, Datagram.DG_NOTIFY_STATE);
       source.addDatagramListener(source, Datagram.DG_MY_NOTIFY_LIST);
       // Do not add listeners after this one - it marks the end of the
       // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
