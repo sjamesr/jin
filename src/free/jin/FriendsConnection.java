@@ -42,6 +42,14 @@ public interface FriendsConnection extends Connection{
   
   
   /**
+   * The mask for player state specifying that a logged in friend is playing.
+   */
+  
+  public static final int PLAYING_FRIEND_STATE_MASK = 1;
+  
+  
+  
+  /**
    * Returns the <code>FriendsListenerManager</code> which allows registering
    * and unregistering <code>FriendsListener</code>s.
    */
@@ -99,6 +107,16 @@ public interface FriendsConnection extends Connection{
    */
 
   boolean isFriendOnline(ServerUser user);
+  
+  
+  
+  /**
+   * Returns the state of the specified friend - an <code>OR</code> combination
+   * of the <code>*_FRIEND_STATE_MASK</code> masks. This is only relevant if the
+   * friend is online.
+   */
+  
+  int getFriendState(ServerUser user);
   
   
   
