@@ -659,6 +659,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       // Friends related
       case Datagram.DG_NOTIFY_ARRIVED: processNotifyArrivedDG(dg); break;
       case Datagram.DG_NOTIFY_LEFT: processNotifyLeftDG(dg); break;
+      case Datagram.DG_NOTIFY_STATE: processNotifyStateDG(dg); break;
       case Datagram.DG_MY_NOTIFY_LIST: processMyNotifyListDG(dg); break;
       
       // Match offer related
@@ -2495,12 +2496,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
-   * The set (of <code>ChessclubUser</code>s) of friends who are online. This
-   * isn't necessarily a subset of <code>friends</code> because some of the
-   * elements in <code>friends</code> may be aliases.
+   * A map from friends who are online to <code>Integer</code> objects
+   * specifying their state (as per <code>FriendsConnection</code>). Note that
+   * the keyset of this map isn't necessarily a subset of <code>friends</code>
+   * because some of the elements here may be due to an alias.
    */
   
-  private final Set onlineFriends = new HashSet();
+  private final Map onlineFriendStates = new HashMap();
   
   
   
@@ -2511,7 +2513,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected void friendsDatagramsStateChanged(boolean isOn){
     if (!isOn){
       friends.clear();
-      onlineFriends.clear();
+      onlineFriendStates.clear();
     }
   }
   
@@ -2534,9 +2536,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected void processNotifyArrived(String username){
     ChessclubUser user = ChessclubUser.get(username);
     
-    if (onlineFriends.add(user)){
+    Integer initialState = Integer.valueOf(0);
+    Integer existingState = (Integer)onlineFriendStates.put(user, initialState);
+    
+    if (existingState == null){
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user));
+          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user, initialState.intValue()));
+    }
+    else if (!existingState.equals(initialState)){
+      // Restore previous state
+      onlineFriendStates.put(user, existingState);
     }
   }
   
@@ -2559,9 +2568,46 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected void processNotifyLeft(String username){
     ChessclubUser user = ChessclubUser.get(username);
     
-    if (onlineFriends.remove(user)){
+    if (onlineFriendStates.remove(user) != null){
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user));
+          new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
+    }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_NOTIFY_STATE.
+   */
+  
+  private void processNotifyStateDG(Datagram dg){
+    String username = dg.getString(0);
+    String stateCode = dg.getString(1);
+    int gameNumber = (dg.getFieldCount() > 2) ? dg.getInteger(2) : -1;
+    
+    processNotifyState(username, stateCode, gameNumber);
+  }
+  
+  
+  
+  /**
+   * Invoked when the state of the specified friend changes.
+   */
+  
+  protected void processNotifyState(String username, String stateCode, int gameNumber){
+    ServerUser user = ChessclubUser.get(username);
+    Integer currentState = (Integer)onlineFriendStates.get(user);
+    
+    if (currentState == null) // He isn't even known to be online. I guess this shouldn't happen
+      return;
+    
+    Integer newState = Integer.valueOf(
+        "X".equals(stateCode) ? 0 : PLAYING_FRIEND_STATE_MASK);
+    
+    if (!newState.equals(currentState)){
+      onlineFriendStates.put(user, newState);
+      listenerManager.fireFriendsEvent(
+          new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user, newState.intValue()));
     }
   }
   
@@ -2587,30 +2633,30 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (isAdded){
       if (friends.add(user))
         listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, user));
+            new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, user, 0));
     }
     else{
       if (friends.remove(user)){
         if (user.isAlias()){
           // Disconnect everyone who is suspect to be online due to the alias
           // and re-request the list.
-          for (Iterator i = onlineFriends.iterator(); i.hasNext();){
+          for (Iterator i = onlineFriendStates.keySet().iterator(); i.hasNext();){
             ServerUser u = (ServerUser)i.next();
             if (!friends.contains(u)){
               i.remove();
               listenerManager.fireFriendsEvent(
-                  new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, u));
+                  new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, u, 0));
             }
           }
         }
         else{
-          onlineFriends.remove(user);
+          onlineFriendStates.remove(user);
           listenerManager.fireFriendsEvent(
-              new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user));
+              new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
         }
         
         listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user));
+            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user, 0));
       }
     }
     
@@ -2618,8 +2664,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     // * When a new friend is added, to find whether he's online
     // * When an alias is removed, to get the list of "friends" who are online
     //   due to other aliases.
-    // * When a non-alias is removed, to find out whether 
+    // * When a non-alias is removed, to find out whether he's still in the list
+    //   due to an alias
     setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
+//    setDGOnAgain(Datagram.DG_NOTIFY_STATE);
   }
   
   
@@ -2669,7 +2717,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public Collection getOnlineFriends(){
-    return Collections.unmodifiableCollection(onlineFriends);
+    return Collections.unmodifiableCollection(onlineFriendStates.keySet());
   }
   
   
@@ -2689,7 +2737,22 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public boolean isFriendOnline(ServerUser user){
-    return onlineFriends.contains(user);
+    return onlineFriendStates.containsKey(user);
+  }
+  
+  
+  
+  /**
+   * Returns the state of the friend.
+   */
+  
+  public int getFriendState(ServerUser user){
+    Integer state = (Integer)onlineFriendStates.get(user);
+    
+    if (state == null) // The friend isn't online
+      return 0;
+    else
+      return state.intValue();
   }
   
   
