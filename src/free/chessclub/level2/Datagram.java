@@ -183,6 +183,8 @@ public class Datagram{
   public static final int DG_PASSWORD                = 114;
   public static final int DG_WILD_KEY                = 116;
   public static final int DG_SET2                    = 124;
+  public static final int DG_FIVEMINUTE              = 125;
+  public static final int DG_ONEMINUTE               = 126;
   public static final int DG_KNOWS_FISCHER_RANDOM    = 132;
   
   
