@@ -66,10 +66,7 @@ public class FriendsEvent extends JinEvent{
   
   
   /**
-   * The id for events notifying that the online state of the user changed, but
-   * he didn't log on or off - it could be that he was already online but only
-   * now got added to our friends, or he was "moved offline" because he was
-   * removed from the friends list.
+   * The id for events notifying that the state of the user changed.
    */
   
   public static final int FRIEND_STATE_CHANGED = 5;
@@ -85,7 +82,7 @@ public class FriendsEvent extends JinEvent{
   
   
   /**
-   * The "friend".
+   * The friend.
    */
 
   private final ServerUser friend;
@@ -93,11 +90,20 @@ public class FriendsEvent extends JinEvent{
   
   
   /**
-   * Creates a new <code>FriendsEvent</code> with the specified source
-   * <code>FriendsConnection</code> event id and friend.
+   * The friend's state - an <code>OR</code> combination of the relevant friend
+   * state masks in <code>FriendsConnection</code>.
    */
   
-  public FriendsEvent(FriendsConnection source, int id, ServerUser friend){
+  private final int friendState;
+  
+  
+  
+  /**
+   * Creates a new <code>FriendsEvent</code> with the specified source
+   * <code>FriendsConnection</code> event id, friend and his state.
+   */
+  
+  public FriendsEvent(FriendsConnection source, int id, ServerUser friend, int friendState){
     super(source);
     
     switch (id){
@@ -116,6 +122,7 @@ public class FriendsEvent extends JinEvent{
 
     this.id = id;
     this.friend = friend;
+    this.friendState = friendState;
   }
   
   
@@ -136,6 +143,18 @@ public class FriendsEvent extends JinEvent{
   
   public ServerUser getFriend(){
     return friend;
+  }
+  
+  
+  
+  /**
+   * Returns the friend's state - an <code>OR</code> combination of the relevant
+   * <code>*_FRIEND_STATE_MASK</code> masks in <code>FriendsConnection</code>. This
+   * is only relevant if the friend is online.
+   */
+  
+  public int getFriendState(){
+    return friendState;
   }
   
   
