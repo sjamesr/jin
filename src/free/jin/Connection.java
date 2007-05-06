@@ -244,6 +244,14 @@ public interface Connection{
   
   
   /**
+   * Starts observing the board of the specified player.
+   */
+  
+  void observeBoard(ServerUser user);
+  
+  
+  
+  /**
    * Quits the given game. Whatever relation I had to this game is closed, this
    * may mean, unobserving, resigning, unexamining or any other operation
    * that closes the game. The passed Game object must be the one created by

@@ -2167,6 +2167,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Starts observing the specified player.
+   */
+  
+  public void observeBoard(ServerUser user){
+    sendCommand("observe " + user.getName());
+  }
+  
+  
+  
+  /**
    * Depending on the type of the game, issues either "unobserve <gameNumber>",
    * "unexamine" or "resign" command.
    */

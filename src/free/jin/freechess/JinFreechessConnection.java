@@ -2295,6 +2295,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   
   /**
+   * Starts observing the specified player.
+   */
+  
+  public void observeBoard(ServerUser user){
+    sendCommand("$observe " + user.getName());
+  }
+  
+  
+  
+  /**
    * Quits the specified game.
    */
 
