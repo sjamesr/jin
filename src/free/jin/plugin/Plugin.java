@@ -91,9 +91,26 @@ public abstract class Plugin{
     
     return true;
   }
-
-
-
+  
+  
+  
+  /**
+   * <p>Returns a list of plugin IDs of the plugins which this plugin needs to
+   * be started in order to start itself. This is not a hard dependency on the
+   * existance of the returned plugins (such dependencies should be enforced by
+   * the plugins themselves) - it merely tells the environment the order in
+   * which plugins should be started. The plugins with the returned IDs will be
+   * started before this plugin. No circular dependencies are allowed.
+   * <p>The default implementation returns an empty array. 
+   * <p>Note that this method is invoked before <code>start()</code>.
+   */
+  
+  public String [] getDependencies(){
+    return new String[0];
+  }
+  
+  
+  
   /**
    * Returns the connection to the server.
    */
