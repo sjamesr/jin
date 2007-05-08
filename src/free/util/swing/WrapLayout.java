@@ -26,14 +26,15 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
+import java.awt.Rectangle;
 
 import free.util.UnsupportedOperationException;
 
 
 
 /**
- * A layout manager which makes the sole content child span the entire area of
- * the parent.
+ * A layout manager which makes all the children span the entire area of the
+ * parent.
  */
 
 public class WrapLayout implements LayoutManager2{
@@ -41,40 +42,19 @@ public class WrapLayout implements LayoutManager2{
   
   
   /**
-   * Our sole instance.
+   * Our shared instance.
    */
   
-  private static final WrapLayout INSTANCE = new WrapLayout();
+  private static final WrapLayout SHARED_INSTANCE = new WrapLayout();
   
   
   
   /**
-   * Returns our sole instance.
+   * Returns an instance of <code>WrapLayout</code>.
    */
   
   public static WrapLayout getInstance(){
-    return INSTANCE;
-  }
-  
-  
-  
-  /**
-   * Returns the component to be laid out in the specified container, or
-   * <code>null</code> if none. Throws an exception if the specified container
-   * may not be laid out by us.
-   */
-  
-  private Component getComponent(Container parent){
-    if (parent.getLayout() != this)
-      throw new IllegalStateException("parent.getLayout() != this");
-    
-    int componentCount = parent.getComponentCount();
-    if (componentCount > 1)
-      throw new IllegalStateException("Only a single component is allowed");
-    else if (componentCount == 0)
-      return null;
-    else
-      return parent.getComponent(0);
+    return SHARED_INSTANCE;
   }
   
   
@@ -84,14 +64,15 @@ public class WrapLayout implements LayoutManager2{
    */
   
   public void layoutContainer(Container parent){
-    Component component = getComponent(parent);
-    if (component == null)
-      return;
-    
     Dimension size = parent.getSize();
     Insets insets = parent.getInsets();
-    component.setBounds(insets.left, insets.top,
+    
+    Rectangle bounds = new Rectangle(insets.left, insets.top,
         size.width - insets.left - insets.right, size.height - insets.top - insets.bottom);
+
+    int componentCount = parent.getComponentCount();
+    for (int i = 0; i < componentCount; i++)
+      parent.getComponent(i).setBounds(bounds);
   }
   
   
@@ -115,8 +96,15 @@ public class WrapLayout implements LayoutManager2{
    */
   
   public Dimension minimumLayoutSize(Container parent){
-    Component component = getComponent(parent);
-    Dimension size = component == null ? new Dimension(0, 0) : component.getMinimumSize();
+    Dimension size = new Dimension(0, 0);
+    
+    int componentCount = parent.getComponentCount();
+    for (int i = 0; i < componentCount; i++){
+      Dimension minSize = parent.getComponent(i).getMinimumSize();
+      size.width = Math.max(size.width, minSize.width);
+      size.height = Math.max(size.height, minSize.height);
+    }
+    
     Insets insets = parent.getInsets();
     
     return append(size, insets);
@@ -129,8 +117,15 @@ public class WrapLayout implements LayoutManager2{
    */
   
   public Dimension preferredLayoutSize(Container parent){
-    Component component = getComponent(parent);
-    Dimension size = component == null ? new Dimension(0, 0) : component.getPreferredSize();
+    Dimension size = new Dimension(0, 0);
+    
+    int componentCount = parent.getComponentCount();
+    for (int i = 0; i < componentCount; i++){
+      Dimension prefSize = parent.getComponent(i).getPreferredSize();
+      size.width = Math.max(size.width, prefSize.width);
+      size.height = Math.max(size.height, prefSize.height);
+    }
+    
     Insets insets = parent.getInsets();
     
     return append(size, insets);
@@ -143,8 +138,15 @@ public class WrapLayout implements LayoutManager2{
    */
   
   public Dimension maximumLayoutSize(Container parent){
-    Component component = getComponent(parent);
-    Dimension size = component == null ? new Dimension(0, 0) : component.getMaximumSize();
+    Dimension size = new Dimension(0, 0);
+    
+    int componentCount = parent.getComponentCount();
+    for (int i = 0; i < componentCount; i++){
+      Dimension maxSize = parent.getComponent(i).getMaximumSize();
+      size.width = Math.min(size.width, maxSize.width);
+      size.height = Math.min(size.height, maxSize.height);
+    }
+    
     Insets insets = parent.getInsets();
     
     return append(size, insets);
