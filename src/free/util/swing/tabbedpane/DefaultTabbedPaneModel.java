@@ -77,6 +77,10 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
   public void addTab(Tab tab, int index){
     tabs.add(index, tab);
     fireTabAdded(index);
+    
+    // If the first tab added, select it
+    if ((getTabCount() == 1) && (getSelectedIndex() != 0))
+      setSelectedIndex(0);
   }
   
   
