@@ -21,6 +21,7 @@
 
 package free.util.swing.tabbedpane;
 
+import java.awt.Component;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,12 +49,58 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  public void addTab(Tab tab){
+    addTab(tab, getTabCount());
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public void clearTabs(){
+    for (int i = getTabCount() - 1; i >= 0; i--)
+      removeTab(i);
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
   public int indexOfTab(Tab tab){
     int tabCount = getTabCount();
     for (int i = 0; i < tabCount; i++)
       if (getTab(i).equals(tab))
         return i;
     return -1;
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public int indexOfComponent(Component component){
+    int tabCount = getTabCount();
+    for (int i = 0; i < tabCount; i++)
+      if (getTab(i).getComponent().equals(component))
+        return i;
+    return -1;
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public Tab getSelectedTab(){
+    int selectedIndex = getSelectedIndex();
+    return selectedIndex < 0 ? null : getTab(selectedIndex);
   }
   
   

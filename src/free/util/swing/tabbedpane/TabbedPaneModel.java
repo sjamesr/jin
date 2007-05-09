@@ -21,6 +21,8 @@
 
 package free.util.swing.tabbedpane;
 
+import java.awt.Component;
+
 
 
 /**
@@ -57,10 +59,27 @@ public interface TabbedPaneModel{
   
   
   /**
+   * Returns the index of the tab holding the specified component;
+   * <code>-1</code> if no such tab exists in the model.
+   */
+  
+  int indexOfComponent(Component component);
+  
+  
+  
+  /**
    * Adds a tab at the specified index.
    */
   
   void addTab(Tab tab, int index);
+  
+  
+  
+  /**
+   * Appends a tab.
+   */
+  
+  void addTab(Tab tab);
   
   
   
@@ -73,11 +92,27 @@ public interface TabbedPaneModel{
   
   
   /**
+   * Removes all tabs.
+   */
+  
+  void clearTabs();
+  
+  
+  
+  /**
    * Returns the index of the currently selected tab, or <code>-1</code> if
    * there are no selected tabs.
    */
   
   int getSelectedIndex();
+  
+  
+  
+  /**
+   * Returns the selected tab; <code>null</code> if there are no selected tabs.
+   */
+  
+  Tab getSelectedTab();
   
   
   
