@@ -31,11 +31,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -57,6 +56,11 @@ import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.TextUtilities;
+import free.util.swing.tabbedpane.Tab;
+import free.util.swing.tabbedpane.TabbedPane;
+import free.util.swing.tabbedpane.TabbedPaneEvent;
+import free.util.swing.tabbedpane.TabbedPaneListener;
+import free.util.swing.tabbedpane.TabbedPaneModel;
 
 
 /**
@@ -112,13 +116,13 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
-   * The tabbed pane in which the consoles sit.
+   * The tabbed pane model of the  in which the consoles sit.
    */
   
-  private JTabbedPane consolesTabbedPane;
-
-
-
+  private TabbedPane consolesTabbedPane;
+  
+  
+  
   /**
    * Are we currently paused?
    */
@@ -258,10 +262,21 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     if (iconImageURL != null)
       uiContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
     
-    consolesTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+    consolesTabbedPane = new TabbedPane(SwingConstants.TOP);
+    consolesTabbedPane.setAlwaysShowTabs(false);
+    consolesTabbedPane.setBorder(null);
+    consolesTabbedPane.getModel().addTabbedPaneListener(new TabbedPaneListener(){
+      public void tabRemoved(TabbedPaneEvent evt){
+        consoleTabRemoved(evt);
+      }
+      public void tabAdded(TabbedPaneEvent evt){}
+      public void tabSelected(TabbedPaneEvent evt){}
+      public void tabDeselected(TabbedPaneEvent evt){}
+    });
     
     Container content = uiContainer.getContentPane();
-    content.setLayout(new BorderLayout());
+    content.setLayout(new BorderLayout(0, 0));
+    content.add(consolesTabbedPane);
     
     uiContainer.addPluginUIListener(new PluginUIAdapter(){
       public void pluginUIActivated(PluginUIEvent evt){
@@ -281,12 +296,22 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     if (consoles.size() == 1)
       console = (Console)consoles.get(0);
     else
-      console = (Console)consolesTabbedPane.getSelectedComponent();
+      console = (Console)(consolesTabbedPane.getModel().getSelectedTab().getComponent());
     
     if (console != null)
       console.obtainFocus();
   }
   
+  
+  
+  /**
+   * Invoked when a console tab is removed.
+   */
+  
+  private void consoleTabRemoved(TabbedPaneEvent evt){
+    consoles.remove(evt.getTabIndex());
+  }
+
   
   
   /**
@@ -320,12 +345,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       console = createConsole(designation);
       consoles.add(console);
       
-      if (consoles.size() == 1)
-        setSingleConsoleMode();
-      else if (consoles.size() == 2)
-        setMultiConsoleMode();
-      else
-        consolesTabbedPane.addTab(designation.getName(), console);
+      Tab tab = new Tab(console, designation.getName(), null, designation.isConsoleCloseable());
+      consolesTabbedPane.getModel().addTab(tab);
         
       console.addComponentListener(new ComponentAdapter(){
         public void componentShown(ComponentEvent e){
@@ -349,43 +370,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     int index = consoles.indexOf(console);
     
     if (index >= 0)
-      consolesTabbedPane.setSelectedIndex(index);
+      consolesTabbedPane.getModel().setSelectedIndex(index);
     
     if (uiContainer != null)
       uiContainer.setActive(true);
   }
-  
-  
-  
-  /**
-   * Puts us into single console mode.
-   */
-  
-  private void setSingleConsoleMode(){
-    Container contentPane = uiContainer.getContentPane();
-    contentPane.removeAll();
-    contentPane.add((Console)consoles.get(0));
-  }
-  
-  
-  
-  /**
-   * Puts us into multi console mode.
-   */
-  
-  private void setMultiConsoleMode(){
-    Container contentPane = uiContainer.getContentPane();
-    
-    consolesTabbedPane.removeAll();
-    for (Iterator i = consoles.iterator(); i.hasNext();){
-      Console console = (Console)i.next();
-      consolesTabbedPane.addTab(console.getDesignation().getName(), console);
-    }
-    
-    contentPane.removeAll();
-    contentPane.add(consolesTabbedPane);
-  }
-  
   
   
   
@@ -408,16 +397,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   public void removeConsole(Console console){
-    int index = consoles.indexOf(console);
-    if (index == -1)
-      throw new IllegalArgumentException("Unknown console: " + console);
-    
-    consoles.remove(index);
-    
-    if (consoles.size() == 1)
-      setSingleConsoleMode();
-    else
-      consolesTabbedPane.removeTabAt(index);
+    TabbedPaneModel model = consolesTabbedPane.getModel();
+    model.removeTab(model.indexOfComponent(console));
   }
   
   
