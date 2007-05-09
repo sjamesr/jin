@@ -2530,11 +2530,32 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Returns an Integer (as in FriendsEvent.friendState) representing the state
+   * of a player based on the specified code from ICC (as documented in
+   * formats.txt:DG_STATE). 
+   */
+  
+  private Integer friendStateForCode(String code){
+    int state = 0;
+    
+    if (!"X".equals(code))
+      state |= PLAYING_FRIEND_STATE_MASK;
+    
+    return Integer.valueOf(state);
+  }
+  
+  
+  
+  /**
    * Processes a DG_NOTIFY_ARRIVED.
    */
   
   private void processNotifyArrivedDG(Datagram dg){
-    processNotifyArrived(dg.getString(0));
+    String username = dg.getString(0);
+    String stateCode = dg.getString(1);
+    int gameNumber = (dg.getFieldCount() > 2) ? dg.getInteger(2) : -1;
+
+    processNotifyArrived(username, stateCode, gameNumber);
   }
   
   
@@ -2543,19 +2564,18 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the specified user on our notify list arrives.
    */
   
-  protected void processNotifyArrived(String username){
+  protected void processNotifyArrived(String username, String stateCode, int gameNumber){
     ChessclubUser user = ChessclubUser.get(username);
     
-    Integer initialState = Integer.valueOf(0);
-    Integer existingState = (Integer)onlineFriendStates.put(user, initialState);
+    Integer newState = friendStateForCode(stateCode);
+    Integer existingState = (Integer)onlineFriendStates.put(user, newState);
     
-    if (existingState == null){
+    if (existingState == null){ // Really arrived, not a repeat datagram
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user, initialState.intValue()));
+          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user, newState.intValue()));
     }
-    else if (!existingState.equals(initialState)){
-      // Restore previous state
-      onlineFriendStates.put(user, existingState);
+    else if (!existingState.equals(newState)){
+      processNotifyState(username, stateCode, gameNumber);
     }
   }
   
@@ -2593,7 +2613,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   private void processNotifyStateDG(Datagram dg){
     String username = dg.getString(0);
     String stateCode = dg.getString(1);
-    int gameNumber = (dg.getFieldCount() > 2) ? dg.getInteger(2) : -1;
+    int gameNumber = dg.getInteger(2);
     
     processNotifyState(username, stateCode, gameNumber);
   }
@@ -2611,8 +2631,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (currentState == null) // He isn't even known to be online. I guess this shouldn't happen
       return;
     
-    Integer newState = Integer.valueOf(
-        "X".equals(stateCode) ? 0 : PLAYING_FRIEND_STATE_MASK);
+    Integer newState = friendStateForCode(stateCode);
     
     if (!newState.equals(currentState)){
       onlineFriendStates.put(user, newState);
