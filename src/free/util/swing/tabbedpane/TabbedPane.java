@@ -143,6 +143,14 @@ public class TabbedPane extends JComponent{
   
   
   /**
+   * Whether we show tabs even when there's only a single tab.
+   */
+  
+  private boolean isAlwaysShowTabs = true;
+  
+  
+  
+  /**
    * Creates a new <code>TabbedPane</code> with the specified tab placement -
    * one of:
    * <ul>
@@ -282,6 +290,34 @@ public class TabbedPane extends JComponent{
     this.tabPlacement = tabPlacement;
     
     recreateUI();
+    repaint();
+  }
+  
+  
+  
+  /**
+   * Returns whether we always show tabs, even when the model only has a single
+   * tab.
+   */
+  
+  public boolean isAlwaysShowTabs(){
+    return isAlwaysShowTabs;
+  }
+  
+  
+  
+  /**
+   * Sets whether we always show tabs, even when the model only has a single
+   * tab.
+   */
+  
+  public void setAlwaysShowTabs(boolean isAlwaysShowTabs){
+    this.isAlwaysShowTabs = isAlwaysShowTabs;
+    
+    if (getModel().getTabCount() == 1){
+      recreateUI();
+      repaint();
+    }
   }
   
   
@@ -297,15 +333,20 @@ public class TabbedPane extends JComponent{
     Component component = tab.getComponent();
     boolean isSelected = index == model.getSelectedIndex();
     
-    component.setVisible(isSelected);
-    
     TabHandle tabHandle = getTabHandleFactory().createTabHandle(this, tab);
     tabHandles.add(index, tabHandle);
     
-    handlePanel.add(new TabCell(tabHandle, isSelected));
-    componentPanel.add(tab.getComponent());
+    if (isAlwaysShowTabs() || (model.getTabCount() > 2)){
+      handlePanel.add(new TabCell(tabHandle, isSelected));
+      componentPanel.add(tab.getComponent());
     
-    validate();
+      validate();
+    }
+    else
+      recreateUI();
+    
+    component.setVisible(isSelected);
+      
     repaint();
   }
   
@@ -319,10 +360,16 @@ public class TabbedPane extends JComponent{
     int index = evt.getTabIndex();
     
     tabHandles.remove(index);
-    handlePanel.remove(index);
-    componentPanel.remove(index);
     
-    validate();
+    if (isAlwaysShowTabs() || (model.getTabCount() > 1)){
+      handlePanel.remove(index);
+      componentPanel.remove(index);
+      
+      validate();
+    }
+    else
+      recreateUI();
+    
     repaint();
   }
   
@@ -334,10 +381,13 @@ public class TabbedPane extends JComponent{
   
   private void tabSelected(TabbedPaneEvent evt){
     int index = evt.getTabIndex();
+    TabbedPaneModel model = getModel();
     
+    model.getTab(index).getComponent().setVisible(true);
     ((TabHandle)tabHandles.get(index)).setSelected(true);
-    ((TabCell)handlePanel.getComponent(index)).setSelected(true);
-    getModel().getTab(index).getComponent().setVisible(true);
+    
+    if (isAlwaysShowTabs() || (model.getTabCount() > 1))
+      ((TabCell)handlePanel.getComponent(index)).setSelected(true);
     
     repaint();
   }
@@ -350,10 +400,13 @@ public class TabbedPane extends JComponent{
   
   private void tabDeselected(TabbedPaneEvent evt){
     int index = evt.getTabIndex();
+    TabbedPaneModel model = getModel();
     
+    model.getTab(index).getComponent().setVisible(false);
     ((TabHandle)tabHandles.get(index)).setSelected(false);
-    ((TabCell)handlePanel.getComponent(index)).setSelected(false);
-    getModel().getTab(index).getComponent().setVisible(false);
+    
+    if (isAlwaysShowTabs() || (model.getTabCount() > 1))
+      ((TabCell)handlePanel.getComponent(index)).setSelected(false);
     
     repaint();
   }
@@ -374,6 +427,8 @@ public class TabbedPane extends JComponent{
     // Create new UI
     int selectedIndex = model.getSelectedIndex();
     int tabCount = model.getTabCount();
+    boolean noTabs = (!isAlwaysShowTabs()) && (model.getTabCount() < 2);
+    
     for (int i = 0; i < tabCount; i++){
       Tab tab = model.getTab(i);
       Component component = tab.getComponent();
@@ -381,12 +436,18 @@ public class TabbedPane extends JComponent{
       
       component.setVisible(isSelected);
       
-      handlePanel.add(new TabCell((TabHandle)tabHandles.get(i), isSelected));
+      if (!noTabs)
+        handlePanel.add(new TabCell((TabHandle)tabHandles.get(i), isSelected));
       componentPanel.add(component);
     }
     
-    
     // Add new UI
+    if (noTabs){
+      setLayout(WrapLayout.getInstance());
+      add(componentPanel);
+      return;
+    }
+    
     setLayout(new BorderLayout());
     
     Object tabRowPosition;
@@ -448,6 +509,9 @@ public class TabbedPane extends JComponent{
   
   public void paint(Graphics graphics){
     super.paint(graphics);
+    
+    if ((getModel().getTabCount() <= 1) && !isAlwaysShowTabs())
+      return;
     
     Graphics2D g = (Graphics2D)graphics;
     
