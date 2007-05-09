@@ -21,33 +21,22 @@
 
 package free.util.swing.tabbedpane;
 
-import javax.swing.AbstractButton;
-import javax.swing.JComponent;
 
 
 /**
  * An interface for tab factories.
  */
 
-public interface TabComponentFactory{
+public interface TabHandleFactory{
   
   
   
   /**
-   * Creates the component to be used in the main tab row for the specified tab
-   * in the specified tabbed pane.
+   * Creates the <code>TabHandle</code> to be used in the main tab row for
+   * the specified tab in the specified tabbed pane.
    */
   
-  AbstractButton makeMainRowComponent(TabbedPane tabbedPane, Tab tab);
-  
-  
-  
-  /**
-   * Creates the component to be used in the compact tab row for the specified
-   * tab in the specified tabbed pane.
-   */
-  
-  JComponent makeCompactRowComponent(TabbedPane tabbedPane, Tab tab);
+  TabHandle createTabHandle(TabbedPane tabbedPane, Tab tab);
   
   
   
