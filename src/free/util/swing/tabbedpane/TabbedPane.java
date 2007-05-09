@@ -29,8 +29,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.LayoutManager;
+import java.awt.LayoutManager2;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -39,8 +41,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
+import free.util.UnsupportedOperationException;
 import free.util.swing.WrapLayout;
 
 
@@ -53,18 +55,40 @@ public class TabbedPane extends JComponent{
   
   
   /**
-   * The panel where our tabs reside.
+   * The color of various lines in the tabbed pane.
    */
   
-  private final JPanel tabPanel = new JPanel(new TabRowLayout());
+  private static final Color LINE_COLOR = new Color(0, 0, 0, 96);
+//  static{
+//    Color bg = UIManager.getColor("Panel.background");
+//    float [] hsb = Color.RGBtoHSB(bg.getRed(), bg.getGreen(), bg.getBlue(), null);
+//    hsb[2] *= 0.4f;
+//    LINE_COLOR = new Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
+//  }
   
   
   
   /**
-   * The panel holding the tab components.
+   * The panel where our tab handles reside.
+   */
+  
+  private final JPanel handlePanel = new TabHandlesPanel();
+  
+  
+  
+  /**
+   * The panel holding the components.
    */
   
   private final JPanel componentPanel = new JPanel(WrapLayout.getInstance());
+  
+  
+  
+  /**
+   * Our tab handles.
+   */
+  
+  private final List tabHandles = new ArrayList();
   
   
   
@@ -95,10 +119,10 @@ public class TabbedPane extends JComponent{
   
   
   /**
-   * Our tab factory.
+   * Our tab handle factory.
    */
   
-  private TabComponentFactory tabComponentFactory;
+  private TabHandleFactory tabHandleFactory;
   
   
   
@@ -140,13 +164,16 @@ public class TabbedPane extends JComponent{
         throw new IllegalArgumentException("Unknown tab placement: " + tabPlacement);
     }
     
-    this.tabComponentFactory = new DefaultTabComponentFactory();    
+    this.tabHandleFactory = new DefaultTabHandleFactory();    
     this.model = new DefaultTabbedPaneModel();
     this.tabPlacement = tabPlacement;
     
     registerModelListeners(model);
     
-    setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background").darker(), 1));
+    for (int i = 0; i < model.getTabCount(); i++)
+      tabHandles.add(getTabHandleFactory().createTabHandle(this, model.getTab(i)));
+    
+    setBorder(BorderFactory.createLineBorder(LINE_COLOR, 1));
     
     recreateUI();
   }
@@ -201,24 +228,24 @@ public class TabbedPane extends JComponent{
   
   
   /**
-   * Returns the tab component factory of this tabbed pane.
+   * Returns the tab handle factory of this tabbed pane.
    */
   
-  public TabComponentFactory getTabComponentFactory(){
-    return tabComponentFactory;
+  public TabHandleFactory getTabHandleFactory(){
+    return tabHandleFactory;
   }
   
   
   
   /**
-   * Sets the tab component factory of this tabbed pane.
+   * Sets the tab handle factory of this tabbed pane.
    */
   
-  public void setTabComponentFactory(TabComponentFactory tabComponentFactory){
-    if (tabComponentFactory == null)
-      throw new IllegalArgumentException("tabComponentFactory may not be null");
+  public void setTabHandleFactory(TabHandleFactory tabHandleFactory){
+    if (tabHandleFactory == null)
+      throw new IllegalArgumentException("tabHandleFactory may not be null");
     
-    this.tabComponentFactory = tabComponentFactory;
+    this.tabHandleFactory = tabHandleFactory;
     
     recreateUI();
   }
@@ -268,11 +295,18 @@ public class TabbedPane extends JComponent{
     TabbedPaneModel model = evt.getTabbedPaneModel(); 
     Tab tab = model.getTab(index);
     Component component = tab.getComponent();
+    boolean isSelected = index == model.getSelectedIndex();
     
-    component.setVisible(index == model.getSelectedIndex());
+    component.setVisible(isSelected);
     
-    tabPanel.add(makeTabCell(getTabComponentFactory().makeMainRowComponent(this, tab)));
+    TabHandle tabHandle = getTabHandleFactory().createTabHandle(this, tab);
+    tabHandles.add(index, tabHandle);
+    
+    handlePanel.add(new TabCell(tabHandle, isSelected));
     componentPanel.add(tab.getComponent());
+    
+    validate();
+    repaint();
   }
   
   
@@ -283,8 +317,13 @@ public class TabbedPane extends JComponent{
   
   private void tabRemoved(TabbedPaneEvent evt){
     int index = evt.getTabIndex();
-    tabPanel.remove(index);
+    
+    tabHandles.remove(index);
+    handlePanel.remove(index);
     componentPanel.remove(index);
+    
+    validate();
+    repaint();
   }
   
   
@@ -294,7 +333,13 @@ public class TabbedPane extends JComponent{
    */
   
   private void tabSelected(TabbedPaneEvent evt){
-    getModel().getTab(evt.getTabIndex()).getComponent().setVisible(true);
+    int index = evt.getTabIndex();
+    
+    ((TabHandle)tabHandles.get(index)).setSelected(true);
+    ((TabCell)handlePanel.getComponent(index)).setSelected(true);
+    getModel().getTab(index).getComponent().setVisible(true);
+    
+    repaint();
   }
   
   
@@ -304,18 +349,13 @@ public class TabbedPane extends JComponent{
    */
   
   private void tabDeselected(TabbedPaneEvent evt){
-    getModel().getTab(evt.getTabIndex()).getComponent().setVisible(false);
-  }
-  
-  
-  
-  /**
-   * Creates and returns the component that contains the specified tab component
-   * in the tab row.
-   */
-  
-  private JComponent makeTabCell(JComponent titleComponent){
-    return titleComponent;
+    int index = evt.getTabIndex();
+    
+    ((TabHandle)tabHandles.get(index)).setSelected(false);
+    ((TabCell)handlePanel.getComponent(index)).setSelected(false);
+    getModel().getTab(index).getComponent().setVisible(false);
+    
+    repaint();
   }
   
   
@@ -325,16 +365,11 @@ public class TabbedPane extends JComponent{
    */
   
   protected void recreateUI(){
+    TabbedPaneModel model = getModel();
     
     // Remove existing UI
     removeAll();
-    tabPanel.removeAll();
-    
-    
-    // Get data
-    TabbedPaneModel model = getModel();
-    TabComponentFactory factory = getTabComponentFactory();
-    
+    handlePanel.removeAll();
     
     // Create new UI
     int selectedIndex = model.getSelectedIndex();
@@ -342,10 +377,11 @@ public class TabbedPane extends JComponent{
     for (int i = 0; i < tabCount; i++){
       Tab tab = model.getTab(i);
       Component component = tab.getComponent();
+      boolean isSelected = i == selectedIndex;
       
-      component.setVisible(i == selectedIndex);
+      component.setVisible(isSelected);
       
-      tabPanel.add(makeTabCell(factory.makeMainRowComponent(this, tab)));
+      handlePanel.add(new TabCell((TabHandle)tabHandles.get(i), isSelected));
       componentPanel.add(component);
     }
     
@@ -363,25 +399,45 @@ public class TabbedPane extends JComponent{
         throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
     }
     
-    add(tabPanel, tabRowPosition);
+    add(handlePanel, tabRowPosition);
     add(componentPanel, BorderLayout.CENTER);
     
     
-    // Configure some things
-    tabPanel.setOpaque(false);
-    componentPanel.setOpaque(false);
-
+    // Set the handle panel borders
     int top, left, bottom, right;
-    top = left = bottom = right = 5;
+    final int startOffset = 5; // The offset of the tabs at the start of the tab panel
+    final int endOffset = 5;   // The offset of the tabs at the end of the tab panel
+    final int nearOffset = 0; // The offset of the tab panel from the component
+    final int farOffset = 2;   // The offset of the tab panel from the side opposite to the component
     switch(getTabPlacement()){
-      case  SwingUtilities.TOP: bottom = 1; top = 2; break;
-      case  SwingUtilities.BOTTOM: top = 1; bottom = 2; break;
-      case  SwingUtilities.LEFT: right = 1; left = 2; break;
-      case  SwingUtilities.RIGHT: left = 1; right = 2; break;
+      case SwingUtilities.TOP:
+        top = farOffset;
+        bottom = nearOffset;
+        left = startOffset;
+        right = endOffset;
+        break;
+      case SwingUtilities.BOTTOM:
+        top = nearOffset;
+        bottom = farOffset;
+        left = startOffset;
+        right = endOffset;
+        break;
+      case SwingUtilities.LEFT:
+        top = startOffset;
+        bottom = endOffset;
+        left = farOffset;
+        right = nearOffset;
+        break;
+      case SwingUtilities.RIGHT:
+        top = startOffset;
+        bottom = endOffset;
+        left = nearOffset;
+        right = farOffset;
+        break;
       default:
         throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
     }
-    tabPanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
+    handlePanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
   }
   
   
@@ -390,17 +446,19 @@ public class TabbedPane extends JComponent{
    * Paints the tabbed pane.
    */
   
-  public void paintComponent(Graphics graphics){
+  public void paint(Graphics graphics){
+    super.paint(graphics);
+    
     Graphics2D g = (Graphics2D)graphics;
     
     TabbedPaneModel model = getModel();
     
-    Color borderColor = getBackground().darker();
-    g.setColor(borderColor);
+    g.setColor(LINE_COLOR);
     
     // Draw the lines around the tabs and the lines to the side of the component
-    Rectangle tabPanelBounds = tabPanel.getBounds();
-    Insets tabPanelInsets = tabPanel.getInsets();
+    Rectangle tabPanelBounds = handlePanel.getBounds();
+    Rectangle firstTabBounds = handlePanel.getComponentCount() == 0 ?
+        new Rectangle() : handlePanel.getComponent(0).getBounds();
     
     // The coordinates of the "anchor" point of the current tab.
     // For TOP, it's the top-left, for RIGHT, it's the top-right etc. 
@@ -413,23 +471,23 @@ public class TabbedPane extends JComponent{
     int cx, cy;
     
     // The offset of the selected tab, in the direction perpendicular to the
-    // direction of the tab row
+    // direction of the tab row, from the border.
     int selectedOffset;
     
     switch (tabPlacement){
       case  SwingUtilities.TOP:
-        x = tabPanelBounds.x + tabPanelInsets.left;
+        x = tabPanelBounds.x + firstTabBounds.x - 1;
         y = tabPanelBounds.y;
-        selectedOffset = tabPanelInsets.top;
+        selectedOffset = firstTabBounds.y;
         wc = 0;
         hc = 1;
         cx = 1;
         cy = 0;
         break;
       case  SwingUtilities.BOTTOM:
-        x = tabPanelBounds.x + tabPanelInsets.left;
+        x = tabPanelBounds.x + firstTabBounds.x - 1;
         y = tabPanelBounds.y + tabPanelBounds.height;
-        selectedOffset = tabPanelInsets.bottom;
+        selectedOffset = tabPanelBounds.height - (firstTabBounds.y + firstTabBounds.height);
         wc = 0;
         hc = -1;
         cx = 1;
@@ -437,8 +495,8 @@ public class TabbedPane extends JComponent{
         break;
       case  SwingUtilities.LEFT:
         x = tabPanelBounds.x;
-        y = tabPanelBounds.y + tabPanelInsets.top;
-        selectedOffset = tabPanelInsets.left;
+        y = tabPanelBounds.y + firstTabBounds.y - 1;
+        selectedOffset = firstTabBounds.x;
         wc = 1;
         hc = 0;
         cx = 0;
@@ -446,8 +504,8 @@ public class TabbedPane extends JComponent{
         break;
       case  SwingUtilities.RIGHT:
         x = tabPanelBounds.x + tabPanelBounds.width;
-        y = tabPanelBounds.y + tabPanelInsets.top;
-        selectedOffset = tabPanelInsets.right;
+        y = tabPanelBounds.y + firstTabBounds.y - 1;
+        selectedOffset = tabPanelBounds.width - (firstTabBounds.x + firstTabBounds.width);
         wc = -1;
         hc = 0;
         cx = 0;
@@ -462,28 +520,31 @@ public class TabbedPane extends JComponent{
     
     int dx, dy; // The offset to the end of the current tab
     
+    // The lines drawn below must not overlap because they are/may be drawn with
+    // a translucent color.
+    
     // The small line from the side of the tab row to the first tab
-    dx = -cx*tabPanelInsets.left;
-    dy = -cy*tabPanelInsets.top;
+    dx = -cx*firstTabBounds.x;
+    dy = -cy*firstTabBounds.y;
     g.drawLine(x + w, y + h, x + w + dx, y + h + dy);
     
     int selectedIndex = model.getSelectedIndex();
-    int tabCount = tabPanel.getComponentCount();
+    int tabCount = handlePanel.getComponentCount();
     
     Dimension tabSize = null;
     for (int i = 0; i < tabCount; i++){
-      tabSize = tabPanel.getComponent(i).getSize(tabSize);
+      tabSize = handlePanel.getComponent(i).getSize(tabSize);
       
       dx = cx*(tabSize.width + 1);
       dy = cy*(tabSize.height + 1);
       
       if (selectedIndex == i){ // The selected tab
-        final int cutSize = 2;
+        final int cutSize = 2; // If you adjust this, you also need to change TabCell to match the shape of the tab
         
         int selectedX = x + wc*selectedOffset;
         int selectedY = y + hc*selectedOffset;
         // The line before the selected tab
-        g.drawLine(selectedX + wc*cutSize, selectedY + hc*cutSize, x + w, y + h);
+        g.drawLine(selectedX + wc*cutSize, selectedY + hc*cutSize, x + w - wc, y + h - hc);
         
         // The line after the selected tab
         g.drawLine(selectedX + wc*cutSize + dx, selectedY + hc*cutSize + dy, x + w + dx, y + h + dy);
@@ -493,13 +554,17 @@ public class TabbedPane extends JComponent{
             selectedX - cx*cutSize + dx, selectedY - cy*cutSize + dy); 
         
         // The corners
-        g.drawLine(selectedX + wc*cutSize, selectedY + hc*cutSize, selectedX + cx*cutSize, selectedY + cy*cutSize);
-        g.drawLine(selectedX + wc*cutSize + dx, selectedY + hc*cutSize + dy, selectedX - cx*cutSize + dx, selectedY - cy*cutSize + dy);
+        if (cutSize > 1){
+          g.drawLine(selectedX + wc*cutSize + (cx - wc), selectedY + hc*cutSize + (cy - hc),
+              selectedX + cx*cutSize - (cx - wc), selectedY + cy*cutSize - (cy - hc));
+          g.drawLine(selectedX + wc*cutSize + dx - (cx + wc), selectedY + hc*cutSize + dy - (cy + hc),
+              selectedX - cx*cutSize + dx + (cx + wc) , selectedY - cy*cutSize + dy + (cy + hc));
+        }
       }
       else{
         if (selectedIndex - 1 != i)
-          g.drawLine(x + dx, y + dy, x + dx + w, y + dy + h); // The line between the tabs
-        g.drawLine(x + w, y + h, x + w + dx, y + h + dy); // The line on the component's side
+          g.drawLine(x + dx, y + dy, x + dx + w - wc, y + dy + h - hc); // The line between the tabs
+        g.drawLine(x + w + cx, y + h + cy, x + w + dx, y + h + dy); // The line on the component's side
       }
       
       x += dx;
@@ -515,10 +580,64 @@ public class TabbedPane extends JComponent{
   
   
   /**
+   * The panel hosting the tab handles.
+   */
+  
+  private class TabHandlesPanel extends JPanel{
+    
+    
+    
+    /**
+     * Creates a new <code>TabHandlesPanel</code>.
+     */
+    
+    public TabHandlesPanel(){
+      super(new TabHandlesLayout());
+      
+      setOpaque(false);
+      setBackground(new Color(0, 0, 0, 30)); // Make it slightly darker than normal panels (presumably behind it)
+    }
+    
+    
+    
+    /**
+     * Paints the panel. We do this because we want the panel to be slightly
+     * darker than normal panels. Why don't we just make it opaque and set the
+     * background to a solid, darker, color? Because some systems (Mac OS X, for
+     * example) have non-uniform panel background, which we can't replicate (in
+     * a darker variant). Why don't we make it opaque set the color to a
+     * translucent one? Because Swing would then not repaint the panel behind
+     * this panel (as we've told it that our panel is opaque), making our panel
+     * darker with each repaint. So we are forced to make the panel non-opaque
+     * (in the constructor) and paint the translucent background ourselves.  
+     */
+    
+    public void paint(Graphics g){
+      g.setColor(getBackground());
+      g.fillRect(0, 0, getWidth(), getHeight());
+      
+      super.paint(g);
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
    * The layout manager we use for the main tab row.
    */
   
-  private class TabRowLayout implements LayoutManager{
+  private class TabHandlesLayout implements LayoutManager2{
+    
+    
+    
+    /**
+     * The size of the gap between the tabs. 
+     */
+    
+    private static final int TAB_GAP = 1;
     
     
     
@@ -546,11 +665,11 @@ public class TabbedPane extends JComponent{
       if (minSizes != null)
         return minSizes;
       
-      int tabCount = tabPanel.getComponentCount();
+      int tabCount = handlePanel.getComponentCount();
       minSizes = new Dimension[tabCount];
       
       for (int i = 0; i < tabCount; i++)
-        minSizes[i] = tabPanel.getComponent(i).getMinimumSize();
+        minSizes[i] = handlePanel.getComponent(i).getMinimumSize();
       
       return minSizes;
     }
@@ -565,11 +684,11 @@ public class TabbedPane extends JComponent{
       if (prefSizes != null)
         return prefSizes;
       
-      int tabCount = tabPanel.getComponentCount();
+      int tabCount = handlePanel.getComponentCount();
       prefSizes = new Dimension[tabCount];
       
       for (int i = 0; i < tabCount; i++)
-        prefSizes[i] = tabPanel.getComponent(i).getPreferredSize();
+        prefSizes[i] = handlePanel.getComponent(i).getPreferredSize();
       
       return prefSizes;
     }
@@ -582,14 +701,11 @@ public class TabbedPane extends JComponent{
      */
     
     public void layoutContainer(Container parent){
-      if (parent != tabPanel)
-        throw new IllegalStateException("TabRowLayout may only be used to layout tabPanel");
+      if (parent != handlePanel)
+        throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
       
-      final int tabGap = 1;
-      
-      boolean isVertical = 
-        (getTabPlacement() == SwingUtilities.LEFT) || 
-        (getTabPlacement() == SwingUtilities.RIGHT);
+      int tabPlacement = getTabPlacement();
+      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
 
       Dimension parentSize = parent.getSize();
       Insets insets = parent.getInsets();
@@ -610,7 +726,7 @@ public class TabbedPane extends JComponent{
         totalSize += sizes[i];
       }
       
-      int availableTabSize = (isVertical ? availableHeight : availableWidth) - tabGap*(tabCount - 1);
+      int availableTabSize = (isVertical ? availableHeight : availableWidth) - TAB_GAP*(tabCount - 1);
       if (totalSize > availableTabSize){
         Dimension [] minDims = getMinTabSizes();
         int [] minSizes = new int[minDims.length];
@@ -633,7 +749,7 @@ public class TabbedPane extends JComponent{
          tab.setBounds(x, y, width, height);
          
          d += isVertical ? height : width;
-         d += tabGap;
+         d += TAB_GAP;
       }
     }
     
@@ -716,28 +832,41 @@ public class TabbedPane extends JComponent{
     
     
     /**
+     * Returns the layout size for the specified tab sizes.
+     */
+    
+    private Dimension layoutSize(Dimension [] tabSizes){
+      int tabPlacement = getTabPlacement();
+      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
+      
+      int mainSize = 0; // The size along the main axis
+      int secondarySize = 0; // The size along the secondary axis
+      for (int i = 0; i < tabSizes.length; i++){
+        Dimension size = tabSizes[i];
+        
+        mainSize += isVertical ? size.height : size.width;
+        if (i != tabSizes.length - 1)
+          mainSize += TAB_GAP;
+        secondarySize = Math.max(secondarySize, isVertical ? size.width : size.height);
+      }
+      
+      Insets insets = handlePanel.getInsets();
+      return new Dimension(
+          (isVertical ? secondarySize : mainSize) + insets.left + insets.right,
+          (isVertical ? mainSize : secondarySize) + insets.top + insets.bottom);
+    }
+    
+    
+    
+    /**
      * Returns the minimum size for the tab row.
      */
     
     public Dimension minimumLayoutSize(Container parent){
-      if (parent != tabPanel)
-        throw new IllegalStateException("TabRowLayout may only be used to layout tabPanel");
+      if (parent != handlePanel)
+        throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
       
-      boolean isVertical = 
-        (getTabPlacement() == SwingUtilities.LEFT) || 
-        (getTabPlacement() == SwingUtilities.RIGHT);
-      
-      int size = 0;
-      int componentCount = parent.getComponentCount();
-      for (int i = 0; i < componentCount; i++){
-        Dimension minSize = parent.getComponent(i).getMinimumSize();
-        size = Math.max(size, isVertical ? minSize.width : minSize.height);
-      }
-      
-      Insets insets = parent.getInsets();
-      return new Dimension(
-          (isVertical ? size : 0) + insets.left + insets.right,
-          (isVertical ? 0 : size) + insets.top + insets.bottom);
+      return layoutSize(getMinTabSizes());
     }
     
     
@@ -747,29 +876,35 @@ public class TabbedPane extends JComponent{
      */
     
     public Dimension preferredLayoutSize(Container parent){
-      if (parent != tabPanel)
-        throw new IllegalStateException("TabRowLayout may only be used to layout tabPanel");
+      if (parent != handlePanel)
+        throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
       
-      boolean isVertical = 
-        (getTabPlacement() == SwingUtilities.LEFT) || 
-        (getTabPlacement() == SwingUtilities.RIGHT);
-      
-      int size = 0;
-      int componentCount = parent.getComponentCount();
-      for (int i = 0; i < componentCount; i++){
-        Dimension prefSize = parent.getComponent(i).getPreferredSize();
-        size = Math.max(size, isVertical ? prefSize.width : prefSize.height);
-      }
-      
-      Insets insets = parent.getInsets();
-      return new Dimension(
-          (isVertical ? size : 0) + insets.left + insets.right,
-          (isVertical ? 0 : size) + insets.top + insets.bottom);
+      return layoutSize(getPrefTabSizes());
     }
     
     
     
+    /**
+     * Returns the maximum size for the tab row. 
+     */
+    
+    public Dimension maximumLayoutSize(Container target){
+      return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    
+    
+    /**
+     * Deprecated. Throws an exception.
+     */
+    
     public void addLayoutComponent(String name, Component comp){
+      throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
+    }
+    
+    
+    
+    public void addLayoutComponent(Component comp, Object constraints){
       
     }
     
@@ -777,6 +912,120 @@ public class TabbedPane extends JComponent{
     
     public void removeLayoutComponent(Component comp){
       
+    }
+    
+    
+    
+    /**
+     * Returns our layout alignment along the X axis.
+     */
+    
+    public float getLayoutAlignmentX(Container target){
+      return Component.LEFT_ALIGNMENT;
+    }
+    
+    
+    
+    /**
+     * Returns our layout alignment along the Y axis.
+     */
+    
+    public float getLayoutAlignmentY(Container target){
+      return Component.CENTER_ALIGNMENT;
+    }
+    
+    
+    
+    /**
+     * Flushes cached size values.
+     */
+    
+    public void invalidateLayout(Container target){
+      minSizes = null;
+      prefSizes = null; 
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * A component which holds the tab handle component.
+   */
+  
+  private class TabCell extends JPanel{
+    
+    
+    
+    /**
+     * The handle sits inside this panel.
+     */
+    
+    private final JPanel mainPanel = new JPanel();
+    
+    
+    /**
+     * This is a 1-pixel tall (or wide, in vertical mode) panel which goes
+     * between the main panel and the tab component. Its whole point is that it
+     * is 1 pixel shorter on each side (of the main axis), allowing the round
+     * corners of the selected tab to be drawn properly.
+     */
+    
+    private final JPanel smallPanel = new JPanel();
+    
+    
+    
+    /**
+     * Creates a new <code>TabCell</code> for the specified tab handle.
+     */
+    
+    public TabCell(TabHandle tabHandle, boolean initiallySelected){
+      int tabPlacement = getTabPlacement();
+      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
+      
+      mainPanel.setLayout(WrapLayout.getInstance());
+      mainPanel.add(tabHandle.getComponent());
+      
+      JPanel secondaryPanel = new JPanel(WrapLayout.getInstance());
+      secondaryPanel.setOpaque(false);
+      secondaryPanel.add(smallPanel);
+      if (isVertical)
+        secondaryPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
+      else
+        secondaryPanel.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 1));
+      secondaryPanel.setMinimumSize(new Dimension(1, 1));
+      secondaryPanel.setPreferredSize(new Dimension(1, 1));
+      
+      setLayout(new BorderLayout(0, 0));
+      add(mainPanel, BorderLayout.CENTER);
+      
+      Object secondaryPosition;
+      switch(tabPlacement){
+        case  SwingUtilities.TOP: secondaryPosition = BorderLayout.NORTH; break;
+        case  SwingUtilities.BOTTOM: secondaryPosition = BorderLayout.SOUTH; break;
+        case  SwingUtilities.LEFT: secondaryPosition = BorderLayout.WEST; break;
+        case  SwingUtilities.RIGHT: secondaryPosition = BorderLayout.EAST; break;
+        default:
+          throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
+      }
+      add(secondaryPanel, secondaryPosition);
+      
+      setOpaque(false);
+      setSelected(initiallySelected);
+    }
+    
+    
+    
+    /**
+     * Notifies us of the selection status of the tab whose handle we're
+     * holding.
+     */
+    
+    public void setSelected(boolean isSelected){
+      mainPanel.setOpaque(isSelected);
+      smallPanel.setOpaque(isSelected);
     }
     
     
@@ -793,13 +1042,11 @@ public class TabbedPane extends JComponent{
     tabbedPane.setBorder(null);
     
     Tab [] tabs = new Tab[]{
-        new Tab(new JLabel("Component "), "Short", null, false),
-        new Tab(new JLabel("Component "), "Medium Size", null, false),
-        new Tab(new JLabel("Component "), "Short", null, false),
-        new Tab(new JLabel("Component "), "A very, very, very long tab", null, false),
-        new Tab(new JLabel("Component "), "Short", null, false),
-        new Tab(new JLabel("Component "), "Short", null, false),
-        new Tab(new JLabel("Component "), "Medium Size", null, false),
+        new Tab(new JLabel(""), "Console", null, false),
+        new Tab(new JLabel(""), "Channel 100", null, true),
+        new Tab(new JLabel(""), "Channel 0", null, true),
+        new Tab(new JLabel(""), "AlexTheGreat", null, true),
+        new Tab(new JLabel(""), "Kasparov vs. Karpov", null, true),
     };
     
     for (int i = 0; i < tabs.length; i++)
@@ -814,7 +1061,7 @@ public class TabbedPane extends JComponent{
     contentPane.add(tabbedPane);
     frame.setContentPane(contentPane);
     
-    frame.setBounds(400, 400, 400, 400);
+    frame.setBounds(300, 300, 650, 400);
     frame.setVisible(true);
   }
   

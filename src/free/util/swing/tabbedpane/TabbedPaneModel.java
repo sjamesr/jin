@@ -48,6 +48,15 @@ public interface TabbedPaneModel{
   
   
   /**
+   * Returns the index of the specified tab; <code>-1</code> if no such tab
+   * exists in the model.
+   */
+  
+  int indexOfTab(Tab tab);
+  
+  
+  
+  /**
    * Adds a tab at the specified index.
    */
   

@@ -86,8 +86,16 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    */
   
   public void removeTab(int index){
+    int selected = getSelectedIndex();
+    setSelectedIndex(-1); // Deselect it
+    
     tabs.remove(index);
     fireTabRemoved(index);
+    
+    // Select again
+    if (selected > index)
+      selected = selected - 1;
+    setSelectedIndex(Math.min(selected, getTabCount() - 1));
   }
   
   

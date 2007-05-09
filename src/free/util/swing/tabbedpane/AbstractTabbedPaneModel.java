@@ -28,8 +28,8 @@ import java.util.List;
 
 
 /**
- * A base (still abstract) implementation of a tabbed pane model which handles
- * the listeners.
+ * A partial (still abstract) implementation of a tabbed pane model which
+ * handles some of the mundane tasks. 
  */
 
 public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
@@ -41,6 +41,20 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    */
   
   private final List listeners = new LinkedList();
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public int indexOfTab(Tab tab){
+    int tabCount = getTabCount();
+    for (int i = 0; i < tabCount; i++)
+      if (getTab(i).equals(tab))
+        return i;
+    return -1;
+  }
   
   
   
