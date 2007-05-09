@@ -410,9 +410,9 @@ public class ChessclubListenerManager extends BasicListenerManager{
     super.removeFriendsListener(listener);
 
     if (listenerList.getListenerCount(FriendsListener.class) == 0){
-//    source.removeDatagramListener(source, Datagram.DG_NOTIFY_STATE);      
       source.removeDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
       source.removeDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
+      source.removeDatagramListener(source, Datagram.DG_NOTIFY_STATE);
       source.removeDatagramListener(source, Datagram.DG_MY_NOTIFY_LIST);
       // Do not remove listeners after this one - it marks the end of the
       // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
