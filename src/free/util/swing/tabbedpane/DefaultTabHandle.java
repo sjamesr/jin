@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,6 +47,30 @@ import free.util.swing.SwingUtils;
  */
 
 public class DefaultTabHandle implements TabHandle{
+  
+  
+  
+  /**
+   * The close button icon. 
+   */
+  
+  private static final Icon CLOSE_ICON_NORMAL = new ImageIcon(DefaultTabHandle.class.getResource("close.png"));
+  
+  
+  
+  /**
+   * The rollover version of the close button icon.
+   */
+  
+  private static final Icon CLOSE_ICON_ROLLOVER = new ImageIcon(DefaultTabHandle.class.getResource("close_rollover.png"));
+  
+  
+  
+  /**
+   * The pressed version of the close button icon.
+   */
+  
+  private static final Icon CLOSE_ICON_PRESSED = new ImageIcon(DefaultTabHandle.class.getResource("close_pressed.png"));
   
   
   
@@ -146,9 +171,9 @@ public class DefaultTabHandle implements TabHandle{
   protected JButton makeCloseButton(){
     JButton closeButton = new JButton();
     
-    closeButton.setIcon(new ImageIcon(DefaultTabHandle.class.getResource("close.png")));
-    closeButton.setRolloverIcon(new ImageIcon(DefaultTabHandle.class.getResource("close_rollover.png")));
-    closeButton.setPressedIcon(new ImageIcon(DefaultTabHandle.class.getResource("close_pressed.png")));
+    closeButton.setIcon(CLOSE_ICON_NORMAL);
+    closeButton.setRolloverIcon(CLOSE_ICON_ROLLOVER);
+    closeButton.setPressedIcon(CLOSE_ICON_PRESSED);
     
     closeButton.setBorderPainted(false);
     closeButton.setContentAreaFilled(false);
