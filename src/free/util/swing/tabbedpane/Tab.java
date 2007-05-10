@@ -22,8 +22,13 @@
 package free.util.swing.tabbedpane;
 
 import java.awt.Component;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -46,7 +51,7 @@ public class Tab{
    * The title of the tab; may be <code>null</code>.
    */
   
-  private final String title;
+  private String title;
   
   
   
@@ -54,7 +59,7 @@ public class Tab{
    * The icon of the tab; may be <code>null</code>.
    */
   
-  private final Icon icon;
+  private Icon icon;
   
   
   
@@ -62,7 +67,23 @@ public class Tab{
    * Whether the tab is closeable.
    */
   
-  private final boolean isCloseable;
+  private boolean isCloseable;
+  
+  
+  
+  /**
+   * Our tab close approver.
+   */
+  
+  private TabCloseApprover tabCloseApprover = null;
+  
+  
+  
+  /**
+   * Our change listeners.
+   */
+  
+  private final List changeListeners = new LinkedList();
   
   
   
@@ -89,6 +110,40 @@ public class Tab{
   
   
   /**
+   * Adds a change listener to this tab.
+   */
+  
+  public void addChangeListener(ChangeListener listener){
+    changeListeners.add(listener);
+  }
+  
+  
+  
+  /**
+   * Removes a change listener from this tab.
+   */
+  
+  public void removeChangeListener(ChangeListener listener){
+    changeListeners.remove(listener);
+  }
+  
+  
+  
+  /**
+   * Fires a state change event.
+   */
+  
+  protected void fireStateChanged(){
+    ChangeEvent evt = new ChangeEvent(this);
+    for (Iterator i = changeListeners.iterator(); i.hasNext();){
+      ChangeListener listener = (ChangeListener)i.next();
+      listener.stateChanged(evt);
+    }
+  }
+  
+  
+  
+  /**
    * Returns the component displayed in the tab.
    */
   
@@ -109,6 +164,17 @@ public class Tab{
   
   
   /**
+   * Sets the title of the tab.
+   */
+  
+  public void setTitle(String title){
+    this.title = title;
+    fireStateChanged();
+  }
+  
+  
+  
+  /**
    * Returns the tab's icon; may be <code>null</code>. 
    */
   
@@ -119,11 +185,59 @@ public class Tab{
   
   
   /**
+   * Sets the icon of this tab.
+   */
+  
+  public void setIcon(Icon icon){
+    this.icon = icon;
+    fireStateChanged();
+  }
+  
+  
+  
+  /**
    * Returns whether the tab should display UI to allow the user to close it.
    */
   
   public boolean isCloseable(){
     return isCloseable;
+  }
+  
+  
+  
+  /**
+   * Sets the closeable state of this tab.
+   */
+  
+  public void setCloseable(boolean isCloseable){
+    this.isCloseable = isCloseable;
+    fireStateChanged();
+  }
+  
+  
+  
+  /**
+   * Returns the current approver of tab close actions; <code>null</code> if
+   * none.
+   */
+  
+  public TabCloseApprover getTabCloseApprover(){
+    return tabCloseApprover;
+  }
+  
+  
+  
+  /**
+   * Sets the approver of tab close actions. The approver is consulted when the
+   * user attempts to close the tab. If the approver disapproves, the
+   * action is canceled and the tab isn't closed. A <code>null</code> approver
+   * is not consulted and thus the close action always goes forward. The default
+   * value is <code>null</code>. In addition to this approver, the tabbed pane's
+   * approver is also consulted.
+   */
+  
+  public void setTabCloseApprover(TabCloseApprover tabCloseApprover){
+    this.tabCloseApprover = tabCloseApprover;
   }
   
   
