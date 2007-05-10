@@ -21,11 +21,15 @@
 
 package free.chess;
 
-import free.chess.event.*;
+import java.util.Collection;
+import java.util.StringTokenizer;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import java.util.StringTokenizer;
+
+import free.chess.event.MoveEvent;
+import free.chess.event.MoveListener;
 import free.util.Utilities;
 
 
@@ -38,166 +42,146 @@ import free.util.Utilities;
  */
 
 public final class Position{
-
-
-
+  
+  
+  
   /**
    * The WildVariant of this Position.
    */
-
+  
   private final WildVariant variant;
-
-
-
-
+  
+  
+  
   /**
    * A matrix to keep references to the pieces.
    */
-
+  
   private final Piece [][] pieces = new Piece[8][8];
-
-
-
-
-
+  
+  
+  
   /**
    * The Modifier of this Position.
    */
-
+  
   private final Modifier modifier;
-
-
-
-
-
+  
+  
+  
   /**
    * The Player whose turn it currently is in this Position.
    */                                                                
-
+  
   private Player currentPlayer;
-
-
-
-
+  
+  
+  
   /**
    * A FEN representation of the position.
    */
-
+  
   private String positionFEN;
-
-
-
-
-
+  
+  
+  
   /**
    * Only one ChangeEvent is needed per model instance since the
    * event's only (read-only) state is the source property.  The source
    * of events generated here is always "this".
    */
-
+  
   protected transient ChangeEvent changeEvent = null;
-
-
-
-
+  
+  
+  
   /** 
    * The listeners waiting for model changes. 
    */
-
+  
   protected EventListenerList listenerList = new EventListenerList();
-
-
-
-
+  
+  
+  
   /**
    * Creates a new Position with the regular WildVariant (normal chess).
    *
    * @see #init()
    */
-
+  
   public Position(){
     this(Chess.getInstance());
   }
-
-
-
-
-
+  
+  
+  
   /**
    * Creates a new Position with the given WildVariant.
    */
-
+  
   public Position(WildVariant variant){
     this.variant = variant;
     this.modifier = new Modifier(this);
     init();
   }
-
-
-
-
+  
+  
+  
   /**
    * Creates a new Position which is exactly like the given Position.
    */
-
+  
   public Position(Position source){
     this.variant = source.variant;
     this.modifier = new Modifier(this);
     copyFrom(source);
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the WildVariant of this Position.
    */
-
+  
   public WildVariant getVariant(){
     return variant;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the Piece at the given Square.
    *
    * @param square The location of the piece to return.
    */
-
+  
   public Piece getPieceAt(Square square){
     return getPieceAt(square.getFile(),square.getRank());
   }
-
-
-
-
-
+  
+  
+  
   /**
    * Returns the piece at the square with the given file and rank.
    */
-
+  
   public Piece getPieceAt(int file, int rank){
     return pieces[file][rank];
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the piece at the square specified by the given string, as if by
    * {@link Square#parseSquare(String)}.
    */
-
+  
   public Piece getPieceAt(String square){
     return getPieceAt(Square.parseSquare(square));
   }
-
-
-
-
-
+  
+  
+  
   /** 
    * Puts the given piece at the given square, replacing the piece that was
    * there before.
@@ -205,16 +189,14 @@ public final class Position{
    * @param piece The piece to put.
    * @param square The square where to put the piece.
    */
-
+  
   public void setPieceAt(Piece piece, Square square){
     setPieceAtImpl(piece, square);
     fireStateChanged();
   }
-
-
-
-
-
+  
+  
+  
   /** 
    * Puts the given piece at the given square, replacing the piece that was
    * there before.
@@ -222,40 +204,37 @@ public final class Position{
    * @param piece The piece to put.
    * @param square The square where to put the piece.
    */
-
+  
   public void setPieceAt(Piece piece, String square){
     setPieceAt(piece, Square.parseSquare(square));    
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the player whose turn it is in this position, the "current"
    * player.
    */
-
+  
   public Player getCurrentPlayer(){
     return currentPlayer;
   }
-
-
-
-
+  
+  
+  
   /**
    * Sets the current player in this position to be the given player.
    *
    * @param player The player whose turn it is next.
    */
-
+  
   public void setCurrentPlayer(Player player){
     setCurrentPlayerImpl(player);
     fireStateChanged();
   }
-
-
-
-
+  
+  
+  
   /**
    * Sets this Position to represent the position represented by 
    * the given string. The string should represent a position by specifying
@@ -272,7 +251,7 @@ public final class Position{
   public void setLexigraphic(String pos) throws PositionFormatException{
     if (pos.length() < 64)
       throw new PositionFormatException("Less than 64 letters in the string: " + pos);
-
+    
     int i = 0;
     try{
       for (int rank = 7; rank >= 0; rank--){
@@ -283,22 +262,20 @@ public final class Position{
     } catch (IllegalArgumentException e){
         throw new PositionFormatException(e);
       }
-
+    
     setCurrentPlayerImpl(Player.WHITE_PLAYER);
-
+    
     fireStateChanged();
   }
-
-
-
-
-
+  
+  
+  
   /**
    * Returns a string representing the position by 64 characters indicating what
    * occupies (obtained by calling toShortColorString() on each piece, '-' for 
    * no piece) each square, in lexigraphic order (a8, b8, ..., h1).
    */
-
+  
   public String getLexigraphic(){
     StringBuffer buf = new StringBuffer(64);
     for (int rank=7; rank>=0; rank--)
@@ -309,15 +286,12 @@ public final class Position{
         else
           buf.append(piece.toShortColorString());
       }
-
+    
     return buf.toString();
   }
-
-
-
-
-
-
+  
+  
+  
   /**
    * Sets this Position to represent the position described by the given string
    * in FEN format. The FEN format is described at 
@@ -328,24 +302,24 @@ public final class Position{
    * @throws PositionFormatException if the given string is not in the expected
    * format.
    */
-
+  
   public void setFEN(String fen) throws PositionFormatException{
     StringTokenizer fenTokenizer = new StringTokenizer(fen, " ");
     if (fenTokenizer.countTokens() != 6)
       throw new PositionFormatException("Wrong amount of fields");
-      
+    
     String pos = fenTokenizer.nextToken();
     StringTokenizer ranks = new StringTokenizer(pos,"/");
     if (ranks.countTokens() != 8)
       throw new PositionFormatException("Wrong amount of ranks");
-
+    
     for (int rank = 7; rank >= 0; rank--){
       String rankString = ranks.nextToken();
       int file = 0;
       for (int i = 0; i < rankString.length(); i++){
         if (file > 7)
           throw new PositionFormatException("Rank " + rank + " extends beyond the board");
-
+        
         char c = rankString.charAt(i);
         if (Character.isDigit(c)){
           int emptyFiles = Character.digit(c, 10);
@@ -366,7 +340,7 @@ public final class Position{
       if (file != 8)
         throw new PositionFormatException("Rank " + rank + " is a few files short");
     }
-
+    
     String colorToMove = fenTokenizer.nextToken();
     if (colorToMove.length() != 1)
       throw new PositionFormatException("Wrong amount of characters in active color indicator: " + colorToMove);
@@ -376,58 +350,51 @@ public final class Position{
       setCurrentPlayerImpl(Player.BLACK_PLAYER);
     else
       throw new PositionFormatException("Wrong active color indicator: " + colorToMove);
-
+    
     this.positionFEN = fen;
   }
-
-
-
-
-
+  
+  
+  
   /**
    * Returns the FEN representation of this Position. May return
    * <code>null</code> if the current position wasn't set via the setFEN method.
    * Note that as soon as the position is changed after setFEN was called, this
    * method will return <code>null</code>.
    */
-
+  
   public String getFEN(){
     return positionFEN;
   }
-
-
-
-
-
+  
+  
   
   /**
    * Sets this Position to the initial position.
    */
-
+  
   public final void init(){
     variant.init(this);
   }
-
-
-
-
+  
+  
+  
   /**
    * Clears this position of any pieces. The current player is set to the
    * player with the White pieces.
    */
-
+  
   public void clear(){
     for (int file=0;file<8;file++)
       for (int rank=0;rank<8;rank++)
         setPieceAtImpl(null,Square.getInstance(file,rank));
     setCurrentPlayerImpl(Player.WHITE_PLAYER);
-
+    
     fireStateChanged();
   }
-
-
-
-
+  
+  
+  
   /**
    * Makes the given Move on this position. This method first fires a MoveEvent
    * and then a ChangeEvent.
@@ -437,43 +404,41 @@ public final class Position{
    * @throws IllegalArgumentException if the given Move is incompatible with
    * the wild variant of this Position.
    */
-
+  
   public void makeMove(Move move){
     variant.makeMove(move, this, modifier);
     fireMoveMade(move);
     fireStateChanged();
   }
-
-
-
-
+  
+  
+  
   /**
    * Makes this position a copy of the given position by setting it to
    * the same state. The WildVariants of the Positions must match.
    *
    * @param position The position to copy.
    */
-
+  
   public void copyFrom(Position position){
     if (!variant.equals(position.variant))
       throw new IllegalArgumentException("The WildVariants of the positions don't match");
-
+    
     for (int file = 0; file < pieces.length; file++){
       for (int rank = 0; rank < pieces[file].length; rank++){
         pieces[file][rank] = position.pieces[file][rank];
       }
     }
-
+    
     setCurrentPlayerImpl(position.getCurrentPlayer());
-
+    
     this.positionFEN = position.positionFEN;
     
     fireStateChanged();
   }
-
-
-
-
+  
+  
+  
   /** 
    * Puts the given piece at the given square, replacing the piece that was
    * there before. The difference between this and the setPieceAt(Piece,Square)
@@ -490,10 +455,9 @@ public final class Position{
     pieces[square.getFile()][square.getRank()] = piece;
     positionFEN = null;
   }
-
-
-
-
+  
+  
+  
   /**
    * Sets the current player in this position to be the given player.
    * The difference between this and the setCurrentPlayer(Player)
@@ -502,15 +466,14 @@ public final class Position{
    *
    * @param player The player whose turn it is next.
    */
-
+  
   private void setCurrentPlayerImpl(Player player){
     this.currentPlayer = player;
     positionFEN = null;
   }
-
-
-
-
+  
+  
+  
   /**
    * Adds a ChangeListener.  The change listeners are run each
    * time the Position changes.
@@ -518,32 +481,30 @@ public final class Position{
    * @param l the ChangeListener to add
    * @see #removeChangeListener
    */
-
+  
   public void addChangeListener(ChangeListener l) {
     listenerList.add(ChangeListener.class, l);
   }
   
-
-
-
+  
+  
   /**
    * Removes a ChangeListener.
    *
    * @param l the ChangeListener to remove
    * @see #addChangeListener
    */
-
+  
   public void removeChangeListener(ChangeListener l) {
     listenerList.remove(ChangeListener.class, l);
   }
-
-
-
-
+  
+  
+  
   /** 
    * Run each ChangeListeners stateChanged() method.
    */
-
+  
   protected void fireStateChanged(){
     Object [] listeners = listenerList.getListenerList();
     for (int i = listeners.length-2; i>=0; i-=2 ){
@@ -555,10 +516,9 @@ public final class Position{
       }          
     }
   }   
-
-
-
-
+  
+  
+  
   /**
    * Adds a MoveListener.  The change listeners are run each
    * time a move is made in this position.
@@ -566,33 +526,32 @@ public final class Position{
    * @param l the ChangeListener to add
    * @see #removeChangeListener
    */
-
+  
   public void addMoveListener(MoveListener l) {
     listenerList.add(MoveListener.class, l);
   }
   
-
-
+  
+  
   /**
    * Removes a MoveListener.
    *
    * @param l the ChangeListener to remove
    * @see #addChangeListener
    */
-
+  
   public void removeMoveListener(MoveListener l) {
     listenerList.remove(MoveListener.class, l);
   }
-
-
-
-
+  
+  
+  
   /** 
    * Run each MoveListeners moveMade() method.
    *
    * @param move The Move that was made.
    */
-
+  
   protected void fireMoveMade(Move move){
     MoveEvent evt = new MoveEvent(this,move);
     Object [] listeners = listenerList.getListenerList();
@@ -602,66 +561,77 @@ public final class Position{
       }          
     }
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Returns the squares to which the piece at the specified square may move.
+   * The set is not guaranteed to contain only legal moves, but it is guaranteed
+   * that every legal move by the piece has one of the squares as the target
+   * square.
+   * 
+   * @see WildVariant#getTargetSquares(Position, Square square)
+   */
+  
+  public Collection getTargetSquares(Square square){
+    return variant.getTargetSquares(this, square);
+  }
+  
+  
+  
   /**
    * Returns a textual representation of the board.
    */
-
+  
   public String toString(){
     if (getCurrentPlayer().isWhite())
-      return "White to move in "+getLexigraphic();
+      return "White to move in " + getLexigraphic();
     else
-      return "Black to move in "+getLexigraphic();
+      return "Black to move in " + getLexigraphic();
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns true iff the specified <code>Position</code> is the same as this
    * one.
    */
-
+  
   public boolean equals(Position pos){
     if (!variant.equals(pos.variant))
       return false;
-
+    
     if (!currentPlayer.equals(pos.currentPlayer))
       return false;
-
+    
     for (int file = 0; file < pieces.length; file++)
       for (int rank = 0; rank < pieces[file].length; rank++)
         if (!Utilities.areEqual(pieces[file][rank], pos.pieces[file][rank]))
           return false;
-
+    
     return true;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns true iff the specified object is a <code>Position</code> and
    * represents the same position as this one.
    */
-
+  
   public boolean equals(Object obj){
     if (!(obj instanceof Position))
       return false;
-
+    
     return equals((Position)obj);
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the hashcode of this position.
    */
-
+  
   public int hashCode(){
     int result = 17;
     result = 37*result + variant.hashCode();
@@ -672,65 +642,65 @@ public final class Position{
         int c = (piece == null) ? 0 : piece.hashCode();
         result = 37*result + c;
       }
-
+    
     return result;
   }
-
-
-
-
+  
+  
+  
   /**
    * Instances of this class is allowed to make modifications to a Position
    * without triggering the Position instance to fire any events. It should only
    * be used by WildVariant implementations for making multi-step atomic changes 
-   * which don't trigger firing many events to a Position and the firing an event
-   * indicating the change is done.
+   * which don't trigger firing many events to a Position and then firing an
+   * event indicating the change is done.
    */
-
+  
   public static final class Modifier{
-
-     
-
+    
+    
+    
     /**
      * The Position we're modifying. Don't eliminate this by making the Modifier
      * class nonstatic because it causes Jikes to create invalid bytecode.
      * See http://www-124.ibm.com/pipermail/jikes-dev/2000-November/001585.html
      */
-
+    
     private final Position position;
-
-
-
+    
+    
+    
     /**
      * Creates a new PositionModifier with the given Position.
      */
-
+    
     private Modifier(Position position){
       this.position = position;
     }
-
-
-
+    
+    
+    
     /**
      * Puts the given piece at the given Square.
      */
-
+    
     public void setPieceAt(Piece piece, Square square){
       position.setPieceAtImpl(piece, square);
     }
-
-
-
+    
+    
+    
     /**
      * Sets the current player.
      */
-
+    
     public void setCurrentPlayer(Player player){
       position.setCurrentPlayerImpl(player);
     }
-
-
+    
+    
+    
   }
-
-
+  
+  
 }
