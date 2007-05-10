@@ -37,6 +37,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import free.util.swing.SwingUtils;
 
@@ -99,6 +101,22 @@ public class DefaultTabHandle implements TabHandle{
   
   
   /**
+   * The label we employ for the title and icon.
+   */
+  
+  private final JLabel label;
+  
+  
+  
+  /**
+   * The close button.
+   */
+  
+  private final JButton closeButton;
+  
+  
+  
+  /**
    * Creates a new <code>DefaultTabHandle</code> for the specified tab to be
    * used in the specified tabbed pane.
    */
@@ -106,43 +124,56 @@ public class DefaultTabHandle implements TabHandle{
   public DefaultTabHandle(TabbedPane tabbedPane, Tab tab){
     this.tabbedPane = tabbedPane;
     this.tab = tab;
-    this.component = new JPanel(new BorderLayout(2, 2));
     
     MouseListener pressListener = new MouseAdapter(){
       public void mousePressed(MouseEvent e){
-        TabbedPaneModel model = DefaultTabHandle.this.tabbedPane.getModel(); 
-        model.setSelectedIndex(model.indexOfTab(DefaultTabHandle.this.tab));
+        selectInvoked();
         e.consume();
       }
-    }; 
+    };
     
+    
+    // Create the component
+    this.component = new JPanel(new BorderLayout(2, 2));
     component.setBorder(BorderFactory.createEmptyBorder(2, 10, 0, 10));
     component.setOpaque(false);
     component.setMinimumSize(new Dimension(20, component.getMinimumSize().height));
     component.addMouseListener(pressListener);
     
-    JLabel label = makeLabel();
-    label.addMouseListener(pressListener);
-    component.add(label, BorderLayout.CENTER);
     
+    // Create the label
+    this.label = makeLabel();
+    confLabelFromTab();
+    label.addMouseListener(pressListener);
+    
+    
+    // Create the close button
+    this.closeButton = makeCloseButton();
+    closeButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        closeInvoked();
+      }
+    });
+    
+    
+    // Add label and button to the component
+    component.add(label, BorderLayout.CENTER);
     if (tab.isCloseable()){
-      JButton closeButton = makeCloseButton();
-      
-      closeButton.addActionListener(new ActionListener(){
-        public void actionPerformed(ActionEvent e){
-          TabbedPaneModel model = DefaultTabHandle.this.tabbedPane.getModel(); 
-          model.removeTab(model.indexOfTab(DefaultTabHandle.this.tab));
-        }
-      });
-      
       if (SwingUtils.isMacLnF())
         component.add(closeButton, BorderLayout.LINE_START);
       else
         component.add(closeButton, BorderLayout.LINE_END);
     }
     
+    
     TabbedPaneModel model = tabbedPane.getModel();
     setSelected(model.getSelectedIndex() == model.indexOfTab(tab));
+    
+    tab.addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent e){
+        confLabelFromTab();
+      }
+    });
   }
   
   
@@ -151,11 +182,8 @@ public class DefaultTabHandle implements TabHandle{
    * Creates the label part of the tab handle.
    */
   
-  protected JLabel makeLabel(){
+  private JLabel makeLabel(){
     JLabel label = new JLabel();
-    label.setText(tab.getTitle());
-    label.setToolTipText(tab.getTitle());
-    label.setIcon(tab.getIcon());
     label.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
     label.setOpaque(false);
     
@@ -165,10 +193,22 @@ public class DefaultTabHandle implements TabHandle{
   
   
   /**
+   * Sets the label's properties from the tab's properties.
+   */
+  
+  private void confLabelFromTab(){
+    label.setText(tab.getTitle());
+    label.setToolTipText(tab.getTitle());
+    label.setIcon(tab.getIcon());
+  }
+  
+  
+  
+  /**
    * Creates the button that closes the tab.
    */
   
-  protected JButton makeCloseButton(){
+  private JButton makeCloseButton(){
     JButton closeButton = new JButton();
     
     closeButton.setIcon(CLOSE_ICON_NORMAL);
@@ -182,6 +222,37 @@ public class DefaultTabHandle implements TabHandle{
     closeButton.setOpaque(false);
     
     return closeButton;
+  }
+  
+  
+  
+  /**
+   * Invoked when the user presses the tab handle. Makes the tab we're
+   * representing selected.
+   */
+  
+  protected void selectInvoked(){
+    TabbedPaneModel model = tabbedPane.getModel(); 
+    model.setSelectedIndex(model.indexOfTab(tab));
+  }
+  
+  
+  
+  /**
+   * Invoked when the user presses the close button. Consults the
+   * <code>TabCloseApprover</code> of the tabbed pane and closes the tab.
+   */
+  
+  protected void closeInvoked(){
+    TabbedPaneModel model = DefaultTabHandle.this.tabbedPane.getModel();
+    int tabIndex = model.indexOfTab(DefaultTabHandle.this.tab);
+    
+    TabCloseApprover mainApprover = tabbedPane.getTabCloseApprover();
+    TabCloseApprover tabApprover = tab.getTabCloseApprover();
+    
+    if (((mainApprover == null) || mainApprover.mayClose(tabbedPane, tab, tabIndex)) &&
+        ((tabApprover == null) || tabApprover.mayClose(tabbedPane, tab, tabIndex)))
+      model.removeTab(tabIndex);
   }
   
   
