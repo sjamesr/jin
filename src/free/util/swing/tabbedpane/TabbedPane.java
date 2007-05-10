@@ -151,6 +151,14 @@ public class TabbedPane extends JComponent{
   
   
   /**
+   * Our approver of tab close actions.
+   */
+  
+  private TabCloseApprover tabCloseApprover = null;
+  
+  
+  
+  /**
    * Creates a new <code>TabbedPane</code> with the specified tab placement -
    * one of:
    * <ul>
@@ -318,6 +326,32 @@ public class TabbedPane extends JComponent{
       recreateUI();
       repaint();
     }
+  }
+  
+  
+  
+  /**
+   * Returns the current approver of tab close actions; <code>null</code> if
+   * none.
+   */
+  
+  public TabCloseApprover getTabCloseApprover(){
+    return tabCloseApprover;
+  }
+  
+  
+  
+  /**
+   * Sets the approver of tab close actions. The approver is consulted when the
+   * user attempts to close a closeable tab. If the approver disapproves, the
+   * action is canceled and the tab isn't closed. A <code>null</code> approver
+   * is not consulted and thus the close action always goes forward. The default
+   * value is <code>null</code>. In addition to this approver, the approver of
+   * the tab being closed is also consulted.
+   */
+  
+  public void setTabCloseApprover(TabCloseApprover tabCloseApprover){
+    this.tabCloseApprover = tabCloseApprover;
   }
   
   
@@ -550,7 +584,7 @@ public class TabbedPane extends JComponent{
         break;
       case  SwingUtilities.BOTTOM:
         x = tabPanelBounds.x + firstTabBounds.x - 1;
-        y = tabPanelBounds.y + tabPanelBounds.height;
+        y = tabPanelBounds.y + tabPanelBounds.height - 1;
         selectedOffset = tabPanelBounds.height - (firstTabBounds.y + firstTabBounds.height);
         wc = 0;
         hc = -1;
@@ -567,7 +601,7 @@ public class TabbedPane extends JComponent{
         cy = 1;
         break;
       case  SwingUtilities.RIGHT:
-        x = tabPanelBounds.x + tabPanelBounds.width;
+        x = tabPanelBounds.x + tabPanelBounds.width - 1;
         y = tabPanelBounds.y + firstTabBounds.y - 1;
         selectedOffset = tabPanelBounds.width - (firstTabBounds.x + firstTabBounds.width);
         wc = -1;
@@ -579,8 +613,8 @@ public class TabbedPane extends JComponent{
         throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
     }
     
-    int w = wc*tabPanelBounds.width; // The x-axis offset from the anchor to the component
-    int h = hc*tabPanelBounds.height; // The y-axis offset from the anchor to the component
+    int w = wc*(tabPanelBounds.width - 1); // The x-axis offset from the anchor to the component
+    int h = hc*(tabPanelBounds.height - 1); // The y-axis offset from the anchor to the component
     
     int dx, dy; // The offset to the end of the current tab
     
@@ -588,8 +622,8 @@ public class TabbedPane extends JComponent{
     // a translucent color.
     
     // The small line from the side of the tab row to the first tab
-    dx = -cx*firstTabBounds.x;
-    dy = -cy*firstTabBounds.y;
+    dx = -cx*(firstTabBounds.x - 1);
+    dy = -cy*(firstTabBounds.y - 1);
     g.drawLine(x + w, y + h, x + w + dx, y + h + dy);
     
     int selectedIndex = model.getSelectedIndex();
@@ -815,6 +849,9 @@ public class TabbedPane extends JComponent{
          d += isVertical ? height : width;
          d += TAB_GAP;
       }
+      
+      // Seems we are sometimes painted before being properly laid out
+      TabbedPane.this.repaint();
     }
     
     
@@ -852,6 +889,8 @@ public class TabbedPane extends JComponent{
           }
           else if (diff == largestDiff)
             largestIndices[largestCount++] = i;
+          else if (diff > secondLargest)
+            secondLargest = diff;
         }
         
         if (largestDiff == 0)
