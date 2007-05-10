@@ -21,10 +21,20 @@
 
 package free.jin.board.prefs;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -39,8 +49,8 @@ import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
+import free.util.TableLayout;
 import free.util.swing.ColorChooser;
-import free.util.swing.PreferredSizedPanel;
 
 
 /**
@@ -88,6 +98,14 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   protected final JCheckBox pieceFollowsCursor;
+  
+  
+  
+  /**
+   * The "draw piece in target square" checkbox.
+   */
+  
+  protected final JCheckBox showPieceInTargetSquare;
   
   
   
@@ -182,6 +200,14 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   
   
   /**
+   * The "highlight legal target squares" checkbox.
+   */
+  
+  protected final JCheckBox highlightLegalTargetSquares;
+  
+  
+  
+  /**
    * The last move made on the board.
    */
    
@@ -212,10 +238,10 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     moveInputGroup.add(unified);
     moveInputGroup.add(dragndrop);
     moveInputGroup.add(clicknclick);
+    
     ActionListener moveInputListener = new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setMoveInputStyle(getMoveInputStyle());
-        
         fireStateChanged();
       }
     };
@@ -228,7 +254,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     autoPromote.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setManualPromote(!autoPromote.isSelected());
-        
         fireStateChanged();
       }
     });
@@ -238,7 +263,15 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     pieceFollowsCursor.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
-        
+        fireStateChanged();
+      }
+    });
+    
+    showPieceInTargetSquare = i18n.createCheckBox("showPieceInTargetSquareCheckBox");
+    showPieceInTargetSquare.setSelected(boardManager.isShowShadowPieceInTargetSquare());
+    showPieceInTargetSquare.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        MoveInputPanel.this.previewBoard.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
         fireStateChanged();
       }
     });
@@ -250,19 +283,16 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
         boolean selected = highlightMadeMoveSquares.isSelected();
         MoveInputPanel.this.previewBoard.setHighlightMadeMoveSquares(selected);
         madeMoveSquaresHighlightColor.setEnabled(selected);
-       
         fireStateChanged();
       }
     });
     
-    
     madeMoveSquaresHighlightColor = i18n.createColorChooser("madeMoveSquaresHighlightColorChooser");
     madeMoveSquaresHighlightColor.setColor(boardManager.getMadeMoveSquaresHighlightColor());
+    madeMoveSquaresHighlightColor.setEnabled(highlightMadeMoveSquares.isSelected());
     madeMoveSquaresHighlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
-        MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(
-          madeMoveSquaresHighlightColor.getColor());
-          
+        MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(madeMoveSquaresHighlightColor.getColor());
         fireStateChanged();
       }
     });
@@ -346,7 +376,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       public void actionPerformed(ActionEvent evt){
         if (lastMove.getPlayer().isWhite())
           MoveInputPanel.this.previewBoard.setHighlightedMove(highlightOwnMoves.isSelected() ? lastMove : null);
-        
         fireStateChanged();
       }
     });
@@ -354,7 +383,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightColor.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setMoveHighlightingColor(highlightColor.getColor());
-        
         fireStateChanged();
       }
     });
@@ -371,7 +399,15 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
         lastMove = move;
       }
     });
-
+    
+    highlightLegalTargetSquares = i18n.createCheckBox("highlightLegalTargetSquaresCheckBox");
+    highlightLegalTargetSquares.setSelected(boardManager.isHighlightPossibleTargetSquares());
+    highlightLegalTargetSquares.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        MoveInputPanel.this.previewBoard.setHighlightPossibleTargetSquares(highlightLegalTargetSquares.isSelected());
+        fireStateChanged();
+      }
+    });
     
     
     JComponent moveInputPanel = createMoveInputUI();
@@ -379,45 +415,17 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     JComponent moveVisualizationPanel = createMoveVisualizationUI();
     JComponent movingInAdvancePanel = createMovingInAdvanceUI();
     JComponent moveHighlightPanel = createMoveHighlightUI();
+    JComponent moveAssistancePanel = createMoveAssistanceUI();
     
-    madeMoveSquaresHighlightColor.setEnabled(highlightMadeMoveSquares.isSelected());
-    
-    
-    JPanel row1Panel = new PreferredSizedPanel();
-    row1Panel.setLayout(new BoxLayout(row1Panel, BoxLayout.X_AXIS));
-    
-    moveInputPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
-    promotePanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
-                                 
-    row1Panel.add(moveInputPanel);
-    row1Panel.add(Box.createHorizontalStrut(10));
-    row1Panel.add(promotePanel);
-    row1Panel.add(Box.createHorizontalGlue());
-    
-    JPanel row2Panel = new PreferredSizedPanel();
-    row2Panel.setLayout(new BoxLayout(row2Panel, BoxLayout.X_AXIS));
-    row2Panel.add(moveVisualizationPanel);
-    row2Panel.add(Box.createHorizontalStrut(10));
-    row2Panel.add(movingInAdvancePanel);
-    row2Panel.add(Box.createHorizontalGlue());
-    
-    JPanel row3Panel = new PreferredSizedPanel();
-    row3Panel.setLayout(new BoxLayout(row3Panel, BoxLayout.X_AXIS));
-    row3Panel.add(moveHighlightPanel);
-    
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+    setLayout(new TableLayout(2, 10, 10));
     
-    row1Panel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    row2Panel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    row3Panel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    
-    add(row1Panel);
-    add(Box.createVerticalStrut(10));
-    add(row2Panel);
-    add(Box.createVerticalStrut(10));
-    add(row3Panel);
-    add(Box.createVerticalGlue());
+    add(moveInputPanel);
+    add(promotePanel);
+    add(moveVisualizationPanel);
+    add(moveAssistancePanel);
+    add(moveHighlightPanel);
+    add(movingInAdvancePanel);
   }
   
   
@@ -482,6 +490,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
   public void initPreviewBoard(){
     previewBoard.setMoveInputStyle(getMoveInputStyle());
     previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
+    previewBoard.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
     previewBoard.setHighlightMadeMoveSquares(highlightMadeMoveSquares.isSelected());
     previewBoard.setManualPromote(!autoPromote.isSelected());
     
@@ -504,10 +513,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createMoveInputUI(){
-    JPanel panel = new PreferredSizedPanel();
+    I18n i18n = I18n.get(MoveInputPanel.class);
+    
+    JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      I18n.get(MoveInputPanel.class).createTitledBorder("moveInputPanel"),
+      i18n.createTitledBorder("moveInputPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     unified.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -517,7 +528,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(unified);
     panel.add(dragndrop);
     panel.add(clicknclick);
-    panel.add(Box.createVerticalGlue());
+    panel.add(Box.createGlue());
     
     return panel;
   }
@@ -529,16 +540,18 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createPromotionUI(){
+    I18n i18n = I18n.get(MoveInputPanel.class);
+    
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      I18n.get(MoveInputPanel.class).createTitledBorder("promotionPanel"),
+      i18n.createTitledBorder("promotionPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
     autoPromote.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     panel.add(autoPromote);
-    panel.add(Box.createVerticalGlue());
+    panel.add(Box.createGlue());
     
     return panel;
   }
@@ -550,20 +563,24 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private JComponent createMoveVisualizationUI(){
+    I18n i18n = I18n.get(MoveInputPanel.class);
+    
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createCompoundBorder(
-      I18n.get(MoveInputPanel.class).createTitledBorder("moveVisualizationPanel"),
+      i18n.createTitledBorder("moveVisualizationPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
-    pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);    
+    pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    showPieceInTargetSquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     highlightMadeMoveSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     madeMoveSquaresHighlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     panel.add(pieceFollowsCursor);
+    panel.add(showPieceInTargetSquare);
     panel.add(highlightMadeMoveSquares);
     panel.add(madeMoveSquaresHighlightColor);
-    panel.add(Box.createVerticalGlue());
+    panel.add(Box.createGlue());
     
     return panel;
   }
@@ -591,22 +608,31 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     panel.add(immediateSendMove);
     panel.add(premove);
     panel.add(Box.createVerticalStrut(5));
+    Font warningLabelFont = UIManager.getFont("Label.font");
+    warningLabelFont = warningLabelFont.deriveFont(warningLabelFont.getSize2D() - 2);
     String [] warnings = i18n.getString("moveInAdvanceChangeWarning").split("\n");
-    for (int i = 0; i < warnings.length; i++)
-      panel.add(new JLabel(warnings[i]));
-    panel.add(Box.createVerticalGlue());
+    for (int i = 0; i < warnings.length; i++){
+      JLabel label = new JLabel(warnings[i]);
+      label.setFont(warningLabelFont);
+      panel.add(label);
+    }
+    panel.add(Box.createGlue());
 
     return panel;    
   }
   
   
   
+  /**
+   * Creates the move highlight panel.
+   */
+  
   private JComponent createMoveHighlightUI(){
     I18n i18n = I18n.get(MoveInputPanel.class);
 
-    JPanel contentPanel = new PreferredSizedPanel();
-    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-    contentPanel.setBorder(BorderFactory.createCompoundBorder(
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBorder(BorderFactory.createCompoundBorder(
       i18n.createTitledBorder("moveHighlightPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
@@ -617,17 +643,38 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightOwnMoves.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     highlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
-    contentPanel.add(none);
-    contentPanel.add(targetSquare);
-    contentPanel.add(bothSquares);
-    contentPanel.add(arrow);
-    contentPanel.add(highlightOwnMoves);
-    contentPanel.add(highlightColor);
-    contentPanel.add(Box.createVerticalGlue());
+    panel.add(none);
+    panel.add(targetSquare);
+    panel.add(bothSquares);
+    panel.add(arrow);
+    panel.add(highlightOwnMoves);
+    panel.add(highlightColor);
+    panel.add(Box.createGlue());
     
-    contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    return panel;
+  }
+  
+  
+  
+  /**
+   * Creates the move assistance panel.
+   */
+  
+  private JComponent createMoveAssistanceUI(){
+    I18n i18n = I18n.get(MoveInputPanel.class);
+
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBorder(BorderFactory.createCompoundBorder(
+      i18n.createTitledBorder("moveAssistancePanel"),
+      BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    return contentPanel;
+    highlightLegalTargetSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    
+    panel.add(highlightLegalTargetSquares);
+    panel.add(Box.createGlue());
+    
+    return panel;
   }
 
   
@@ -643,6 +690,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     boardManager.setAutoPromote(autoPromote.isSelected());
     
     boardManager.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
+    boardManager.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
     boardManager.setHighlightMadeMoveSquares(highlightMadeMoveSquares.isSelected());
     boardManager.setMadeMoveSquaresHighlightColor(madeMoveSquaresHighlightColor.getColor());
     
@@ -651,6 +699,8 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     boardManager.setMoveHighlightingStyle(getMoveHighlightingStyle());
     boardManager.setHighlightingOwnMoves(highlightOwnMoves.isSelected());
     boardManager.setMoveHighlightingColor(highlightColor.getColor());
+    
+    boardManager.setHighlightPossibleTargetSquares(highlightLegalTargetSquares.isSelected());
   }
   
   

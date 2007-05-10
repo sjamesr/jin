@@ -680,8 +680,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setCoordsDisplayColor(boardManager.getCoordsDisplayColor());
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
+    board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
+    board.setHighlightPossibleTargetSquares(boardManager.isHighlightPossibleTargetSquares());
   }
-
 
 
 
@@ -2037,7 +2038,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
                "darkSquareColor".equals(propertyName)){
         board.setBoardPainter(boardManager.getBoardPainter());
       }
-
+      else if ("showShadowPieceInTargetSquare".equals(propertyName))
+        board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
+      else if ("highlightPossibleTargetSquares".equals(propertyName))
+        board.setHighlightPossibleTargetSquares(boardManager.isHighlightPossibleTargetSquares());
     }
     else if (src == game){
       gameLabel.setText(createGameLabelText(game));

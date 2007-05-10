@@ -369,6 +369,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     setLightSquareColor(prefs.getColor("light-square-color", new Color(0xffcf90)));
     setDarkSquareColor(prefs.getColor("dark-square-color", new Color(0x8f604f)));
+    
+    setShowShadowPieceInTargetSquare(prefs.getBool("shadow-piece-in-target-square", false));
+    setHighlightPossibleTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
   }
 
 
@@ -868,6 +871,48 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    
   public void setCoordsDisplayColor(Color color){
     props.setProperty("coordsDisplayColor", color);
+  }
+  
+  
+  
+  /**
+   * Sets whether during a move a shadow piece is displayed at the target
+   * square.
+   */
+  
+  public void setShowShadowPieceInTargetSquare(boolean newValue){
+    props.setBooleanProperty("showShadowPieceInTargetSquare", newValue);
+  }
+  
+  
+  
+  /**
+   * Returns whether during a move a shadow piece is displayed at the target
+   * square.
+   */
+  
+  public boolean isShowShadowPieceInTargetSquare(){
+    return props.getBooleanProperty("showShadowPieceInTargetSquare");
+  }
+  
+  
+  
+  /**
+   * Sets whether during a move the possible target squares are highlighted.
+   */
+  
+  public void setHighlightPossibleTargetSquares(boolean newValue){
+    props.setBooleanProperty("highlightPossibleTargetSquares", newValue);
+  }
+  
+  
+  
+  /**
+   * Returns whether during a move the possible target squares are highlighted.
+   */
+  
+  public boolean isHighlightPossibleTargetSquares(){
+    return props.getBooleanProperty("highlightPossibleTargetSquares");
   }
   
   
@@ -1424,6 +1469,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
 
     prefs.setColor("light-square-color", getLightSquareColor());
     prefs.setColor("dark-square-color", getDarkSquareColor());
+    
+    prefs.setBool("shadow-piece-in-target-square", isShowShadowPieceInTargetSquare());
+    prefs.setBool("highlight-possible-target-squares", isHighlightPossibleTargetSquares());
   }
 
 
