@@ -31,6 +31,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -353,6 +354,14 @@ public class JBoard extends JComponent{
   
   
   /**
+   * Whether a shadow piece is shown in the target square while making a move.
+   */
+  
+  private boolean isShowShadowPieceInTargetSquare = false;
+  
+  
+  
+  /**
    * The current coordinates display style.
    */
    
@@ -426,7 +435,8 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The square of the currently moved/dragged piece, or null if none.
+   * The square of the currently moved piece; <code>null</code> when not making
+   * a move.
    */
 
   private Square movedPieceSquare = null;
@@ -434,11 +444,21 @@ public class JBoard extends JComponent{
 
 
   /**
-   * The location of the cursor when a piece is moved/dragged, null if no piece
-   * is currently moved/dragged.
+   * The location of the cursor when a move is being made; <code>null</code>
+   * when not making a move.
    */
 
   private Point movedPieceLoc = null;
+  
+  
+  
+  /**
+   * The current target square during a move, <code>null</code> if none. Note
+   * that this may be <code>null</code> even during a move (for example, if the
+   * snap-to-legal-square mechanism can't determine the best target).
+   */
+  
+  private Square targetSquare;
   
   
   
@@ -450,6 +470,8 @@ public class JBoard extends JComponent{
    *  <code>DRAG_N_DROP_MOVE_INPUT_STYLE</code> if the current move gesture is a drag'n'drop.
    *  <code>CLICK_N_CLICK_MOVE_INPUT_STYLE</code> if the current move gesture is a click'n'click.
    * </ul>
+   * This is not a property, but a helper variable - it just reuses the
+   * constants because it makes sense.
    */
   
   private int moveGesture = UNIFIED_MOVE_INPUT_STYLE;
@@ -843,6 +865,32 @@ public class JBoard extends JComponent{
   
   
   /**
+   * sets whether during a move a shadow piece is displayed at the target
+   * square.
+   */
+  
+  public void setShowShadowPieceInTargetSquare(boolean newValue){
+    boolean oldValue = this.isShowShadowPieceInTargetSquare;
+    this.isShowShadowPieceInTargetSquare = newValue;
+    if (isMovingPiece())
+      repaint(squareToRect(targetSquare, null));
+    firePropertyChange("isShowShadowPieceInTargetSquare", oldValue, newValue);
+  }
+  
+  
+  
+  /**
+   * Returns whether during a move a shadow piece is displayed at the target
+   * square.
+   */
+  
+  public boolean isShowShadowPieceInTargetSquare(){
+    return isShowShadowPieceInTargetSquare;
+  }
+  
+  
+  
+  /**
    * Sets the coordinate display style. Possible values are {@link #NO_COORDS},
    * {@link #RIM_COORDS}, {@link #OUTSIDE_COORDS} and
    * {@link #EVERY_SQUARE_COORDS}.
@@ -1127,11 +1175,16 @@ public class JBoard extends JComponent{
   public void cancelMovingPiece(){
     if (!isMovingPiece())
       throw new IllegalStateException();
-
-    repaint(getMoveAreaRect(null));
-    repaint(squareToRect(movedPieceSquare, null));
+    
+    Rectangle rect = new Rectangle();
+    repaint(getMoveAreaRect(rect));
+    repaint(squareToRect(movedPieceSquare, rect));
+    if (targetSquare != null)
+      repaint(squareToRect(targetSquare, rect));
+    
     movedPieceSquare = null;
     movedPieceLoc = null;
+    targetSquare = null;
     
     fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
   }
@@ -1201,13 +1254,11 @@ public class JBoard extends JComponent{
           drawSquare(g, from, highlightSize - Math.max(1, highlightSize/3), getMoveHighlightingColor());
           drawSquare(g, to, highlightSize, getMoveHighlightingColor());
         }
-        else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING){
+        else if (moveHighlightingStyle == ARROW_MOVE_HIGHLIGHTING)
           drawArrow(g, from, to, highlightSize+1, getMoveHighlightingColor());
-        }
       }
-      if ((to != null) && (moveHighlightingStyle == TARGET_SQUARE_MOVE_HIGHLIGHTING)){
+      if ((to != null) && (moveHighlightingStyle == TARGET_SQUARE_MOVE_HIGHLIGHTING))
         drawSquare(g, to, highlightSize, getMoveHighlightingColor());
-      }
     }
 
     // Paint the coordinates. Reset the original clip because of
@@ -1221,19 +1272,29 @@ public class JBoard extends JComponent{
     // Allow PaintHooks to paint
     callPaintHooks(g);
 
-    // Paint the currently moved piece, or highlighted square
+    // Paint stuff drawn during a move
     if (movedPieceSquare != null){
+      
+      // Paint shadow piece in target square.
+      if (isShowShadowPieceInTargetSquare && (targetSquare != null)){
+        squareToRect(targetSquare, rect);
+        Piece piece = position.getPieceAt(movedPieceSquare);
+        piecePainter.paintPiece(piece, g, this, rect, true);
+      }
+      
+      // Paint target square highlight 
       if (isHighlightMadeMoveSquares){
-        getTargetSquareRect(rect);
+        squareToRect(movedPieceSquare, rect);
+        
         int targetHighlightSize = Math.max(2, Math.min(rect.width, rect.height)/15);
         int originHighlightSize = Math.min(2*targetHighlightSize/3, targetHighlightSize - 1);
         
-        Square square = locationToSquare(rect.x, rect.y);
-        if (square != null) // May be null if mouse is dragged out of the board
-          drawSquare(g, square, targetHighlightSize, getMadeMoveSquaresHighlightColor());
-        
         drawSquare(g, movedPieceSquare, originHighlightSize, getMadeMoveSquaresHighlightColor());
+        if (targetSquare != null)
+          drawSquare(g, targetSquare, targetHighlightSize, getMadeMoveSquaresHighlightColor());
       }
+      
+      // Paint moved piece
       if (isPieceFollowsCursor){
         getMovedPieceGraphicRect(rect);
         Piece piece = position.getPieceAt(movedPieceSquare);
@@ -1490,12 +1551,18 @@ public class JBoard extends JComponent{
     // Mac OS X draws it differently from other platforms for some reason
     if (PlatformUtils.isMacOSX())
       path.transform(AffineTransform.getTranslateInstance(-0.5, -0.5));
-
+    
+    Color oldColor = g.getColor();
+    Stroke oldStroke = g.getStroke();
+    
     g.setColor(color);
     g.setStroke(new BasicStroke(size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
     
     g.draw(path);
-
+    
+    g.setColor(oldColor);
+    g.setStroke(oldStroke);
+    
     g.translate(-rect.x, -rect.y);
   }
 
@@ -1612,38 +1679,12 @@ public class JBoard extends JComponent{
   
   
   /**
-   * Calculates a rectangle (in pixels) of the square under the mouse, which
-   * needs to be highlighted when in <code>highlightMadeMoveSquares</code> mode.
-   * Throws an <code>IllegalStateException</code> if we are not in
-   * <code>highlightMadeMove</code> or if a piece is not currently being
-   * moved.
+   * Calculates the target square during a move based on the specified cursor
+   * location.
    */
    
-  private Rectangle getTargetSquareRect(Rectangle rect){
-    if (!isHighlightMadeMoveSquares())
-      throw new IllegalStateException("Not in highlightMadeMoveSquares mode");
-    
-    if (movedPieceLoc == null)
-      throw new IllegalStateException("No piece is being moved");
-    
-    rect = getBoardRect(rect);
-    int squareWidth = rect.width/8;
-    int squareHeight = rect.height/8;
-    
-    rect.x = movedPieceLoc.x - (movedPieceLoc.x - rect.x)%squareWidth;
-    rect.y = movedPieceLoc.y - (movedPieceLoc.y - rect.y)%squareHeight;
-    
-    // This is needed because the way we do rounding, it gets rounded towards
-    // zero, which is not what we want for negative values.
-    if (movedPieceLoc.x < 0)
-      rect.x -= squareWidth;
-    if (movedPieceLoc.y < 0)
-      rect.y -= squareHeight;
-    
-    rect.width = squareWidth;
-    rect.height = squareHeight;
-    
-    return rect;
+  private Square calcTargetSquare(Point cursorLocation){
+    return locationToSquare(cursorLocation);
   }
    
   
@@ -1659,16 +1700,19 @@ public class JBoard extends JComponent{
   private Rectangle getMoveAreaRect(Rectangle rect){
     if (movedPieceLoc == null)
       throw new IllegalStateException("No piece is being moved");
-
+    
     if (isPieceFollowsCursor()){
-      if (isHighlightMadeMoveSquares()){
+      if (isHighlightMadeMoveSquares() || isShowShadowPieceInTargetSquare()){
         if (rect == null)
           rect = new Rectangle();
         
         Rectangle pieceGraphic = getMovedPieceGraphicRect(null);
-        Rectangle targetSquare = getTargetSquareRect(null);
+        Rectangle targetRect = targetSquare == null ? null : squareToRect(targetSquare, null);
         
-        rect.setBounds(pieceGraphic.union(targetSquare));
+        if (targetRect == null)
+          rect.setBounds(pieceGraphic);
+        else
+          rect.setBounds(pieceGraphic.union(targetRect));
         
         return rect;
       }
@@ -1676,8 +1720,8 @@ public class JBoard extends JComponent{
         return getMovedPieceGraphicRect(rect);
     }
     else{
-      if (isHighlightMadeMoveSquares())
-        return getTargetSquareRect(rect);
+      if (isHighlightMadeMoveSquares() || isShowShadowPieceInTargetSquare())
+        return squareToRect(targetSquare, rect);
       else{
         if (rect == null)
           return new Rectangle(0,0,0,0);
@@ -1803,6 +1847,7 @@ public class JBoard extends JComponent{
         squareToRect(movedPieceSquare, helpRect);
         movedPieceLoc.x = helpRect.x + helpRect.width/2;
         movedPieceLoc.y = helpRect.y + helpRect.height/2;
+        targetSquare = null;
         repaint(getMoveAreaRect(helpRect));
       }
     }
@@ -1828,9 +1873,11 @@ public class JBoard extends JComponent{
         if ((piece == null) || (!canBeMoved(piece))){
           movedPieceSquare = null;
           movedPieceLoc = null;
+          targetSquare = null;
           return;
         }
         movedPieceLoc = new Point(x, y);
+        targetSquare = calcTargetSquare(movedPieceLoc);
 
         repaint(helpRect = squareToRect(square, helpRect));
         if (isPieceFollowsCursor())
@@ -1878,6 +1925,7 @@ public class JBoard extends JComponent{
 
         movedPieceSquare = null;
         movedPieceLoc = null;
+        targetSquare = null;
         moveGesture = 0;
         
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
@@ -1919,10 +1967,12 @@ public class JBoard extends JComponent{
         squareToRect(movedPieceSquare, helpRect);
         movedPieceLoc.x = helpRect.x + helpRect.width/2;
         movedPieceLoc.y = helpRect.y + helpRect.height/2;
+        targetSquare = null;
       }
       else{
         movedPieceLoc.x = x;
         movedPieceLoc.y = y;
+        targetSquare = calcTargetSquare(movedPieceLoc);
       }
       repaint(helpRect = getMoveAreaRect(helpRect));
     }
@@ -1939,9 +1989,7 @@ public class JBoard extends JComponent{
     frame.addWindowListener(new free.util.AppKiller());
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
-    board.setMoveInputStyle(UNIFIED_MOVE_INPUT_STYLE);
-    board.setFlipped(true);
-    board.setCoordsDisplayStyle(RIM_COORDS);
+    board.setShowShadowPieceInTargetSquare(true);
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
     frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);
