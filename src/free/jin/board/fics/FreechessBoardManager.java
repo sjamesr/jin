@@ -43,30 +43,30 @@ import java.beans.PropertyChangeEvent;
  */
 
 public class FreechessBoardManager extends BoardManager implements IvarStateChangeListener{
-
-
-
+  
+  
+  
   /**
    * The current primary (observed) game.
    */
-
+  
   private Object primaryObservedGameID = null;
-
-
-
+  
+  
+  
   /**
    * The current primary (played) game.
    */
-
+  
   private Object primaryPlayedGameID = null;
-
-
+  
+  
   
   /**
    * Creates a new <code>FreechessBoardManager</code>. Registers a listener for
    * the moveSendingMode property to reflect its value in the premove ivar.
    */
-   
+  
   public FreechessBoardManager(){
     addPropertyChangeListener(new PropertyChangeListener(){
       public void propertyChange(PropertyChangeEvent evt){
@@ -78,74 +78,78 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
           if (!newValue.equals(oldValue) &&
               (premoveValue.equals(newValue) || premoveValue.equals(oldValue))){
             JinFreechessConnection conn = (JinFreechessConnection)getConn();
-            conn.setIvarState(Ivar.PREMOVE, premoveValue.equals(newValue));
+            if (conn.isConnected())
+              conn.setIvarState(Ivar.PREMOVE, premoveValue.equals(newValue));
           }
         }
       }
     });
   }
-
-
+  
+  
   
   /**
    * Registers our own listeners.
    */
-
+  
   protected void registerConnListeners(){
     super.registerConnListeners();
     
     FreechessListenerManager listenerManager = 
       ((JinFreechessConnection)getConn()).getFreechessListenerManager();
-
+    
     listenerManager.addIvarStateChangeListener(this);
   }
-
-
+  
+  
   
   /**
    * Unregisters the listeners we've registered in
    * <code>registerConnListeners</code>.
    */
-
+  
   protected void unregisterConnListeners(){
     super.unregisterConnListeners();
     
     FreechessListenerManager listenerManager = 
       ((JinFreechessConnection)getConn()).getFreechessListenerManager();
-
+    
     listenerManager.removeIvarStateChangeListener(this);
   }
   
-
+  
   
   /**
    * Overrides BoardManager.createBoardPanel() to return a FreechessBoardPanel.
    */
-
+  
   protected BoardPanel createBoardPanel(Game game){
     BoardPanel boardPanel = new FreechessBoardPanel(this, game);
-
+    
     return boardPanel;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Overrides the superclass' method to set the primary game properly.
    */
-
+  
   public void pluginUIActivated(PluginUIEvent e){
+    Connection conn = getConn();
+    if (!conn.isConnected())
+      return;
+    
     BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.get(e.getSource());
     if (boardPanel == null) // This means that the frame is in the process 
       return;               // of being initialized and isn't ready yet.
-
+    
     Game game = boardPanel.getGame();
     Object gameID = game.getID();
     if (boardPanel.isActive()){
       int gameType = game.getGameType();
-      Connection conn = getConn();
-
+      
       if (gameType == Game.OBSERVED_GAME){
         if (!gameID.equals(primaryObservedGameID)){
           conn.sendCommand("$$primary "+gameID);
@@ -159,26 +163,27 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
         }
       }
     }
-
+    
     super.pluginUIActivated(e);
   }
-
-
+  
+  
+  
   /**
    * Overrides the superclass' method to set <code>primaryObservedGameID</code>
    * and <code>primaryPlayedGameID</code> properly.
    */
-
+  
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
     int gameType = game.getGameType();
     Object gameID = game.getID();
-
+    
     if ((gameType == Game.OBSERVED_GAME) && (primaryObservedGameID == null))
       primaryObservedGameID = gameID;
     else if ((gameType == Game.MY_GAME) && (primaryPlayedGameID == null))
       primaryPlayedGameID = gameID;
-
+    
     super.gameStarted(evt);
   }
 
@@ -188,34 +193,34 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * Overrides the superclass' method to set <code>primaryObservedGameID</code>
    * and <code>primaryPlayedGameID</code> properly.
    */
-
+  
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
     int gameType = game.getGameType();
     Object gameID = game.getID();
-
+    
     if ((gameType == Game.OBSERVED_GAME) && gameID.equals(primaryObservedGameID))
       primaryObservedGameID = null;
     else if ((gameType == Game.MY_GAME) && gameID.equals(primaryPlayedGameID))
       primaryPlayedGameID = null;
-
+    
     super.gameEnded(evt);
   }
-
   
-
+  
+  
   /**
    * <code>IvarStateChangeListener</code> implementation.
    */
-   
+  
   public void ivarStateChanged(IvarStateChangeEvent evt){
     // Did the user try to set iv_premove manually to false?
     if ((evt.getIvar() == Ivar.PREMOVE) && (evt.getState() == false) &&
-      (getMoveSendingMode() == PREMOVE_MOVE_SENDING_MODE)){
-
+        (getMoveSendingMode() == PREMOVE_MOVE_SENDING_MODE)){
+      
       setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
     }
-      // Punish the bastard ;-)
+    // Punish the bastard ;-)
   }
   
   
@@ -234,7 +239,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
       prefs.setBool("setDefaultAutoflagValue", false);
     }
   }
-
-
+  
+  
   
 }

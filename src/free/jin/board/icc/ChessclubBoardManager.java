@@ -73,6 +73,10 @@ public class ChessclubBoardManager extends BoardManager{
    */
 
   public void pluginUIActivated(PluginUIEvent e){
+    Connection conn = getConn();
+    if (!conn.isConnected())
+      return;
+    
     BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.get(e.getSource());
     if (boardPanel == null) // This means that the frame is in the process 
       return;               // of being initialized and isn't ready yet.
@@ -81,7 +85,6 @@ public class ChessclubBoardManager extends BoardManager{
     if (boardPanel.isActive()){
       int gameType = game.getGameType();
       Object gameID = game.getID();
-      Connection conn = getConn();
 
       if (!gameID.equals(primaryGameID)){
         if ((myGamesCount > 1) && (gameType == Game.MY_GAME))
