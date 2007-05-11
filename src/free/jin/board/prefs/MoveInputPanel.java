@@ -401,10 +401,10 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     highlightLegalTargetSquares = i18n.createCheckBox("highlightLegalTargetSquaresCheckBox");
-    highlightLegalTargetSquares.setSelected(boardManager.isHighlightPossibleTargetSquares());
+    highlightLegalTargetSquares.setSelected(boardManager.isHighlightLegalTargetSquares());
     highlightLegalTargetSquares.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        MoveInputPanel.this.previewBoard.setHighlightPossibleTargetSquares(highlightLegalTargetSquares.isSelected());
+        MoveInputPanel.this.previewBoard.setHighlightLegalTargetSquares(highlightLegalTargetSquares.isSelected());
         fireStateChanged();
       }
     });
@@ -700,7 +700,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     boardManager.setHighlightingOwnMoves(highlightOwnMoves.isSelected());
     boardManager.setMoveHighlightingColor(highlightColor.getColor());
     
-    boardManager.setHighlightPossibleTargetSquares(highlightLegalTargetSquares.isSelected());
+    boardManager.setHighlightLegalTargetSquares(highlightLegalTargetSquares.isSelected());
   }
   
   

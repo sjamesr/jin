@@ -372,10 +372,10 @@ public class JBoard extends JComponent{
   
   
   /**
-   * Whether possible target squares are highlighted when making a move.
+   * Whether legal target squares are highlighted when making a move.
    */
   
-  private boolean isHighlightPossibleTargetSquares = false;
+  private boolean isHighlightLegalTargetSquares = false;
   
   
   
@@ -927,12 +927,12 @@ public class JBoard extends JComponent{
   
   
   /**
-   * Sets whether during a move the possible target squares are highlighted.
+   * Sets whether during a move the legal target squares are highlighted.
    */
   
-  public void setHighlightPossibleTargetSquares(boolean newValue){
-    boolean oldValue = this.isHighlightPossibleTargetSquares;
-    this.isHighlightPossibleTargetSquares = newValue;
+  public void setHighlightLegalTargetSquares(boolean newValue){
+    boolean oldValue = this.isHighlightLegalTargetSquares;
+    this.isHighlightLegalTargetSquares = newValue;
     
     if (isMovingPiece()){
       if (newValue)
@@ -943,17 +943,17 @@ public class JBoard extends JComponent{
       repaint();
     }
     
-    firePropertyChange("isHighlightPossibleTargetSquares", oldValue, newValue);
+    firePropertyChange("isHighlightLegalTargetSquares", oldValue, newValue);
   }
   
   
   
   /**
-   * Returns whether during a move the possible target squares are highlighted.
+   * Returns whether during a move the legal target squares are highlighted.
    */
   
-  public boolean isHighlightPossibleTargetSquares(){
-    return isHighlightPossibleTargetSquares;
+  public boolean isHighlightLegalTargetSquares(){
+    return isHighlightLegalTargetSquares;
   }
   
   
@@ -1322,7 +1322,7 @@ public class JBoard extends JComponent{
       }
     
     // Paint possible target squares
-    if (isHighlightPossibleTargetSquares && (possibleTargetSquares != null)){
+    if (isHighlightLegalTargetSquares && (possibleTargetSquares != null)){
       g.setColor(possibleTargetSquaresHighlightColor);
       for (Iterator i = possibleTargetSquares.iterator(); i.hasNext();){
         rect = squareToRect((Square)i.next(), rect);
@@ -2006,7 +2006,7 @@ public class JBoard extends JComponent{
         }
         movedPieceLoc = new Point(x, y);
         targetSquare = calcTargetSquare(movedPieceLoc);
-        if (isHighlightPossibleTargetSquares())
+        if (isHighlightLegalTargetSquares())
           possibleTargetSquares = position.getTargetSquares(movedPieceSquare);
         
         repaint(squareToRect(square, helpRect));
@@ -2126,7 +2126,7 @@ public class JBoard extends JComponent{
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
 //    board.setShowShadowPieceInTargetSquare(true);
-    board.setHighlightPossibleTargetSquares(true);
+    board.setHighlightLegalTargetSquares(true);
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
     frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);

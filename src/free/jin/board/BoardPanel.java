@@ -681,7 +681,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setManualPromote(!boardManager.isAutoPromote());
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
     board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
-    board.setHighlightPossibleTargetSquares(boardManager.isHighlightPossibleTargetSquares());
+    board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
   }
 
 
@@ -2040,8 +2040,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       }
       else if ("showShadowPieceInTargetSquare".equals(propertyName))
         board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
-      else if ("highlightPossibleTargetSquares".equals(propertyName))
-        board.setHighlightPossibleTargetSquares(boardManager.isHighlightPossibleTargetSquares());
+      else if ("highlightLegalTargetSquares".equals(propertyName))
+        board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
     }
     else if (src == game){
       gameLabel.setText(createGameLabelText(game));

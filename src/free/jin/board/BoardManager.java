@@ -371,7 +371,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setDarkSquareColor(prefs.getColor("dark-square-color", new Color(0x8f604f)));
     
     setShowShadowPieceInTargetSquare(prefs.getBool("shadow-piece-in-target-square", false));
-    setHighlightPossibleTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
+    setHighlightLegalTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
   }
 
 
@@ -898,21 +898,21 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   /**
-   * Sets whether during a move the possible target squares are highlighted.
+   * Sets whether during a move the legal target squares are highlighted.
    */
   
-  public void setHighlightPossibleTargetSquares(boolean newValue){
-    props.setBooleanProperty("highlightPossibleTargetSquares", newValue);
+  public void setHighlightLegalTargetSquares(boolean newValue){
+    props.setBooleanProperty("highlightLegalTargetSquares", newValue);
   }
   
   
   
   /**
-   * Returns whether during a move the possible target squares are highlighted.
+   * Returns whether during a move the legal target squares are highlighted.
    */
   
-  public boolean isHighlightPossibleTargetSquares(){
-    return props.getBooleanProperty("highlightPossibleTargetSquares");
+  public boolean isHighlightLegalTargetSquares(){
+    return props.getBooleanProperty("highlightLegalTargetSquares");
   }
   
   
@@ -1471,7 +1471,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setColor("dark-square-color", getDarkSquareColor());
     
     prefs.setBool("shadow-piece-in-target-square", isShowShadowPieceInTargetSquare());
-    prefs.setBool("highlight-possible-target-squares", isHighlightPossibleTargetSquares());
+    prefs.setBool("highlight-possible-target-squares", isHighlightLegalTargetSquares());
   }
 
 
