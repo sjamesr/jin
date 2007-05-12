@@ -82,88 +82,88 @@ import free.util.BeanProperties;
 
 public class BoardManager extends Plugin implements GameListener, UserMoveListener,
     PluginUIListener, ConnectionListener{
-
-
-
+  
+  
+  
   /**
    * The code for move sending mode where the user is not allowed to move his
    * pieces when it's not his turn.
    */
-
+  
   public static final int LEGAL_CHESS_MOVE_SENDING_MODE = 1;
-
-
-
+  
+  
+  
   /**
    * The code for move sending mode where the user is allowed to pick up his
    * pieces (more than once) and make moves when it's not his turn. The moves
    * are then sent immediately to the server.
    */
-
+  
   public static final int PREDRAG_MOVE_SENDING_MODE = 2;
-
-
-
+  
+  
+  
   /**
    * The code for premove move sending mode. The user is allowed to pick up
    * a piece and make a move when it's not his turn. The move is then not sent
    * until it is the user's move. After making the "premove", the user cannot
    * make additional "premoves".
    */
-
-  public static final int PREMOVE_MOVE_SENDING_MODE = 3;
-
   
-
+  public static final int PREMOVE_MOVE_SENDING_MODE = 3;
+  
+  
+  
   /**
    * A reference to the sound manager, if one exists.
    */
-
+  
   private Plugin soundManager = null;
-
-
-
+  
+  
+  
   /**
    * A Hashtable mapping Game objects to BoardPanel objects which are currently
    * used.
    */
-
+  
   protected final Hashtable gamesToBoardPanels = new Hashtable();
-
-
-
-
+  
+  
+  
+  
   /**
    * A Hashtable mapping PluginUIContainer objects to BoardPanels they contain.
    */
-
+  
   protected final Hashtable containersToBoardPanels = new Hashtable();
-
-
-
-
+  
+  
+  
+  
   /**
    * A Hashtable mapping BoardPanels to their PluginUIContainers.
    */
-
+  
   protected final Hashtable boardPanelsToContainers = new Hashtable();
-
-
-
-
+  
+  
+  
+  
   /**
    * A list of the PluginUIContainers in the order they were created.
    */
-
+  
   protected final Vector containers = new Vector();
-
-
-
-
+  
+  
+  
+  
   /**
    * A <code>BeanProperties</code> object where we keep our properties.
    */
-
+  
   private final BeanProperties props = new BeanProperties(this);
   
   
@@ -171,7 +171,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * The current piece painter.
    */
-   
+  
   private PiecePainter piecePainter;
   
   
@@ -179,16 +179,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * The current board painter.
    */
-   
+  
   private BoardPainter boardPainter;
-
-
-
-
+  
+  
+  
+  
   /**
    * Starts this plugin.
    */
-
+  
   public void start() throws PluginStartException{
     obtainSoundManager();
     initPreferences();
@@ -197,34 +197,34 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     exportAction(new ChangeBoardAction());
     exportAction(new ChangePieceSetAction());
   }
-
-
-
+  
+  
+  
   /**
    * Stops this plugin.
    */
-
+  
   public void stop(){
     unregisterConnListeners();
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Obtains a reference to the SoundManager, if one exists.
    */
-
+  
   private void obtainSoundManager(){
     soundManager = getPlugin("sound");
   }
-
-
-
+  
+  
+  
   /**
    * Plays the sound for the given event name.
    */
-
+  
   public void playSound(String eventName){
     if (soundManager != null)
       playSoundImpl(eventName);
@@ -238,35 +238,35 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Actually plays the sound for the specified event name. This is (or should
    * be only called if a sound manager exists).
    */
-   
+  
   protected void playSoundImpl(String eventName){
     try{
       Class soundManagerClass = Class.forName("free.jin.sound.SoundManager");
       Method playEventSoundMethod = soundManagerClass.getMethod("playEventSound",
-        new Class[]{String.class});
-        
+          new Class[]{String.class});
+      
       playEventSoundMethod.invoke(soundManager, new Object[]{eventName});
     } catch (ClassNotFoundException e){e.printStackTrace();}
-      catch (NoSuchMethodException e){e.printStackTrace();}
-      catch (IllegalAccessException e){e.printStackTrace();}
-      catch (InvocationTargetException e){e.printStackTrace();}
+    catch (NoSuchMethodException e){e.printStackTrace();}
+    catch (IllegalAccessException e){e.printStackTrace();}
+    catch (InvocationTargetException e){e.printStackTrace();}
     
   }
-
-
-
+  
+  
+  
   /**
    * Loads the piece sets.
    */
-   
+  
   // protected void loadPieceSets() throws PluginStartException{
   //   Resource [] pieceSetsArr = getResources("pieces");
-
+  
   //   if ((pieceSetsArr == null) || (pieceSetsArr.length == 0)){
   //     pieceSets.put("default", PieceSet.DEFAULT_PIECE_SET);
   //     return;
   //   }
-      
+  
   //   for (int i = 0; i < pieceSetsArr.length; i++){
   //     PieceSet pieceSet = (PieceSet)pieceSetsArr[i];
   //     if (pieceSet.isCompatibleWith(getServer()))
@@ -279,31 +279,31 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Loads the board patterns.
    */
-   
+  
   // protected void loadBoardPatterns() throws PluginStartException{
   //   Resource [] boardPatternsArr = getResources("boards");
-
+  
   //   if ((boardPatternsArr == null) || (boardPatternsArr.length == 0)){
   //     boardPatterns.put("default", BoardPattern.DEFAULT_BOARD_PATTERN);
   //     return;
   //   }
-      
+  
   //   for (int i = 0; i < boardPatternsArr.length; i++){
   //     BoardPattern boardPattern = (BoardPattern)boardPatternsArr[i];
   //     if (boardPattern.isCompatibleWith(getServer()))
   //       boardPatterns.put(boardPattern.getId(), boardPattern);
   //   }
   // }
-
-
-
+  
+  
+  
   /**
    * Initializes various preferences from the user's properties.
    */
-
+  
   protected void initPreferences(){
     Preferences prefs = getPrefs();
-
+    
     setAutoPromote(prefs.getBool("auto-promote", false));
     
     String moveInputStyleString = prefs.getString("move-input-style", "unified");
@@ -313,13 +313,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setMoveInputStyle(JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE);
     else
       setMoveInputStyle(JBoard.UNIFIED_MOVE_INPUT_STYLE);
-
+    
     setPieceFollowsCursor(prefs.getBool("piece-follows-cursor", true));
     
     setHighlightMadeMoveSquares(prefs.getBool("highlight-made-move-squares", false));
     setMadeMoveSquaresHighlightColor(
-      prefs.getColor("highlight-made-move-squares.color", new Color(0x0000ff)));
-
+        prefs.getColor("highlight-made-move-squares.color", new Color(0x0000ff)));
+    
     String moveHighlightingStyleString = prefs.getString("move-highlight.style", "square");
     if ("target-square".equals(moveHighlightingStyleString))
       setMoveHighlightingStyle(JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING);
@@ -329,11 +329,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setMoveHighlightingStyle(JBoard.ARROW_MOVE_HIGHLIGHTING);
     else
       setMoveHighlightingStyle(JBoard.NO_MOVE_HIGHLIGHTING);
-
+    
     setHighlightingOwnMoves(prefs.getBool("move-highlight.highlight-own", false));
-
+    
     setMoveHighlightingColor(prefs.getColor("move-highlight.color", new Color(0x00b2b2)));
-
+    
     String moveSendingModeString = prefs.getString("move-sending-mode", "predrag");
     if ("legal-chess".equals(moveSendingModeString))
       setMoveSendingMode(LEGAL_CHESS_MOVE_SENDING_MODE);
@@ -353,7 +353,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       setCoordsDisplayStyle(JBoard.NO_COORDS);
     
     setCoordsDisplayColor(prefs.getColor("coords-display.color", Color.blue.darker()));
-
+    
     String pieceSetId = prefs.getString("piece-set-id", null);
     if (pieceSetId != null)
       setPieceSet((PieceSet)getResource("pieces", pieceSetId));
@@ -366,50 +366,51 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setBlackPieceColor(prefs.getColor("black-piece-color", Color.black));
     setWhiteOutlineColor(prefs.getColor("white-outline-color", Color.black));
     setBlackOutlineColor(prefs.getColor("black-outline-color", Color.white));
-
+    
     setLightSquareColor(prefs.getColor("light-square-color", new Color(0xffcf90)));
     setDarkSquareColor(prefs.getColor("dark-square-color", new Color(0x8f604f)));
     
     setShowShadowPieceInTargetSquare(prefs.getBool("shadow-piece-in-target-square", false));
     setHighlightLegalTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
+    setSnapToLegalSquare(prefs.getBool("snap-to-legal-square", true));
   }
-
-
-
+  
+  
+  
   /**
    * Registers the specified <code>PropertyChangeListener</code>.
    */
-
+  
   public void addPropertyChangeListener(PropertyChangeListener listener){
     props.addPropertyChangeListener(listener);
   }
-
   
-
-
+  
+  
+  
   /**
    * Unregisters the specified <code>PropertyChangeListener</code>.
    */
-
+  
   public void removePropertyChangeListener(PropertyChangeListener listener){
     props.removePropertyChangeListener(listener);
   }
-
-
-
+  
+  
+  
   /**
    * Configures the current <code>PiecePainter</code> to prepare it for usage.
    */
-
+  
   protected void configurePiecePainter(){
     if (piecePainter instanceof ColoredPiecePainter){
       ColoredPiecePainter coloredPiecePainter = (ColoredPiecePainter)piecePainter;
-
+      
       Color whiteColor = getWhitePieceColor(); 
       Color blackColor = getBlackPieceColor(); 
       Color whiteOutline = getWhiteOutlineColor();
       Color blackOutline = getBlackOutlineColor();
-
+      
       if (whiteColor != null)
         coloredPiecePainter.setWhiteColor(whiteColor);
       if (blackColor != null)
@@ -420,174 +421,174 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         coloredPiecePainter.setBlackOutline(blackOutline);
     }
   }
-
-
-
+  
+  
+  
   /**
    * Configures the current <code>BoardPainter</code> preparing it to be used.
    */
-
+  
   protected void configureBoardPainter(){
     if (boardPainter instanceof ColoredBoardPainter){
       ColoredBoardPainter coloredBoardPainter = (ColoredBoardPainter)boardPainter;
-
+      
       Color lightColor = getLightSquareColor();
       Color darkColor = getDarkSquareColor();
-
+      
       if (lightColor != null)
         coloredBoardPainter.setLightColor(lightColor);
       if (darkColor != null)
         coloredBoardPainter.setDarkColor(darkColor);
     }
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current white pieces color.
    */
-
+  
   public Color getWhitePieceColor(){
     return (Color)props.getProperty("whitePieceColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the white piece color to the specified value.
    */
-
+  
   public void setWhitePieceColor(Color color){
     props.setProperty("whitePieceColor", color);
     configurePiecePainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current black pieces color.
    */
-
+  
   public Color getBlackPieceColor(){
     return (Color)props.getProperty("blackPieceColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the black piece color to the specified value.
    */
-
+  
   public void setBlackPieceColor(Color color){
     props.setProperty("blackPieceColor", color);
     configurePiecePainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current white pieces outline color.
    */
-
+  
   public Color getWhiteOutlineColor(){
     return (Color)props.getProperty("whiteOutlineColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the white piece outline color to the specified value.
    */
-
+  
   public void setWhiteOutlineColor(Color color){
     props.setProperty("whiteOutlineColor", color);
     configurePiecePainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current black pieces outline color.
    */
-
+  
   public Color getBlackOutlineColor(){
     return (Color)props.getProperty("blackOutlineColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the black piece outline color to the specified value.
    */
-
+  
   public void setBlackOutlineColor(Color color){
     props.setProperty("blackOutlineColor", color);
     configurePiecePainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current light squares color.
    */
-
+  
   public Color getLightSquareColor(){
     return (Color)props.getProperty("lightSquareColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the light squares color to the specified value.
    */
-
+  
   public void setLightSquareColor(Color color){
     props.setProperty("lightSquareColor", color);
     configureBoardPainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current dark squares color.
    */
-
+  
   public Color getDarkSquareColor(){
     return (Color)props.getProperty("darkSquareColor", null);
   }
-
-
-
+  
+  
+  
   /**
    * Sets the dark squares color to the specified value.
    */
-
+  
   public void setDarkSquareColor(Color color){
     props.setProperty("darkSquareColor", color);
     configureBoardPainter();
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current move input style. Possible values are defined in
    * <code>free.chess.JBoard</code>.
    */
-
+  
   public int getMoveInputStyle(){
     return props.getIntegerProperty("moveInputStyle");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the move input style to the specified value.
    *
    * @param moveInputStyle The new move input style. Possible values are defined
    * in <code>free.chess.JBoard</code>.
    */
-
+  
   public void setMoveInputStyle(int moveInputStyle){
     switch (moveInputStyle){
       case JBoard.UNIFIED_MOVE_INPUT_STYLE:
@@ -597,16 +598,16 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       default:
         throw new IllegalArgumentException("Unknown move input style: " + moveInputStyle);
     }
-
+    
     props.setIntegerProperty("moveInputStyle", moveInputStyle);
   }
-
-
-
+  
+  
+  
   /**
    * Returns whether the moved piece follows the mouse cursor.
    */
-   
+  
   public boolean isPieceFollowsCursor(){
     return props.getBooleanProperty("pieceFollowsCursor");
   }
@@ -616,13 +617,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Sets whether the moved piece follows the mouse cursor.
    */
-   
+  
   public void setPieceFollowsCursor(boolean pieceFollowsCursor){
     props.setBooleanProperty("pieceFollowsCursor", pieceFollowsCursor);
   }
-
-
-
+  
+  
+  
   /**
    * Returns whether the currently made move is highlighted by highlighting the
    * origin and target squares. This refers to the move that is currently being
@@ -630,7 +631,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * opposed to the last move highlighting, which is specified by the
    * <code>setMoveHighlightingStyle</code> method.
    */
-   
+  
   public boolean isHighlightMadeMoveSquares(){
     return props.getBooleanProperty("highlightMadeMoveSquares");
   }
@@ -640,82 +641,82 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Sets whether the currently made move is highlighted.
    */
-   
+  
   public void setHighlightMadeMoveSquares(boolean highlight){
     props.setBooleanProperty("highlightMadeMoveSquares", highlight);
   }
-
-
   
-
+  
+  
+  
   /**
    * Returns the color used for highlighting in
    * <code>highlightMadeMoveSquares</code> mode.
    */
-
+  
   public Color getMadeMoveSquaresHighlightColor(){
     return (Color)props.getProperty("madeMoveSquaresHighlightColor");
   }
-
-
-
+  
+  
+  
   /**
    * Sets the color used for highlighting in
    * <code>highlightMadeMoveSquares</code> mode.
    */
-
+  
   public void setMadeMoveSquaresHighlightColor(Color color){
     props.setProperty("madeMoveSquaresHighlightColor", color);
   }
-
-
   
-
+  
+  
+  
   /**
    * Returns <code>true</code> if promotable pieces are automatically promoted
    * to the default promotion piece. Otherwise, returns <code>false</code>
    */
-
+  
   public boolean isAutoPromote(){
     return props.getBooleanProperty("autoPromote");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets whether promotable pieces are promoted automatically to the default
    * promotion piece.
    *
    * @param autoPromote <code>true</code> if promotion should be automatic.
    */
-
+  
   public void setAutoPromote(boolean isAutoPromote){
     props.setBooleanProperty("autoPromote", isAutoPromote);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the current move highlighting style. Posssible values are defined
    * in <code>free.chess.JBoard</code>.
    */
-
+  
   public int getMoveHighlightingStyle(){
     return props.getIntegerProperty("moveHighlightingStyle");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the current move highlighting style to the specified value.
    * 
    * @param moveHighlightingStyle The new move highlighting style. Possible
    * values are defined in <code>free.chess.JBoard</code>.
    */
-
+  
   public void setMoveHighlightingStyle(int moveHighlightingStyle){
     switch (moveHighlightingStyle){
       case JBoard.NO_MOVE_HIGHLIGHTING:
@@ -726,27 +727,27 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       default:
         throw new IllegalStateException("Unknown move higlighting style: "+moveHighlightingStyle);
     }
-
+    
     props.setIntegerProperty("moveHighlightingStyle", moveHighlightingStyle);
   }
-
-
-
-
-
+  
+  
+  
+  
+  
   /**
    * Returns <code>true</code> if own moves are highlighted as well as the
    * opponent's moves. Returns <code>false</code> if only the opponent's moves
    * are highlighted (if move highlighting is enabled of course). 
    */
-
+  
   public boolean isHighlightingOwnMoves(){
     return props.getBooleanProperty("highlightingOwnMoves");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets whether own moves will be highlighted.
    *
@@ -754,49 +755,49 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * highlighted as well as the opponent's moves. <code>false</code> if only
    * the opponent's moves should be highlighted.
    */
-
+  
   public void setHighlightingOwnMoves(boolean isHighlightingOwnMoves){
     props.setBooleanProperty("highlightingOwnMoves", isHighlightingOwnMoves);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the current move highlighting color.
    */
-
+  
   public Color getMoveHighlightingColor(){
     return (Color)props.getProperty("moveHighlightingColor");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the current move highlighting color to the specified value.
    *
    * @param moveHighlightingColor The new move highlighting color.
    */
-
+  
   public void setMoveHighlightingColor(Color moveHighlightingColor){
     props.setProperty("moveHighlightingColor", moveHighlightingColor);
   }
-
-
-
+  
+  
+  
   
   /**
    * Returns the current move sending mode.
    */
-
+  
   public int getMoveSendingMode(){
     return props.getIntegerProperty("moveSendingMode");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the move sending mode to the specified value. Possible values are
    * <UL>
@@ -805,7 +806,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    *   <LI><code>PREMOVE_MOVE_SENDING_MODE</code>
    * </UL>
    */
-
+  
   public void setMoveSendingMode(int moveSendingMode){
     switch(moveSendingMode){
       case LEGAL_CHESS_MOVE_SENDING_MODE:
@@ -814,9 +815,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         break;
       default:
         throw new IllegalArgumentException("Unrecognized value for move sending mode: " +
-          moveSendingMode);
+            moveSendingMode);
     }
-
+    
     props.setIntegerProperty("moveSendingMode", moveSendingMode);
   }
   
@@ -826,7 +827,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Returns the current coordinate display style.  Possible values are defined
    * in <code>free.chess.JBoard</code>.
    */
-   
+  
   public int getCoordsDisplayStyle(){
     return props.getIntegerProperty("coordsDisplayStyle");
   }
@@ -838,7 +839,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Sets the coordinate display style to the specified value. Possible values
    * are defined in <code>free.chess.JBoard</code>.
    */
-   
+  
   public void setCoordsDisplayStyle(int coordsDisplayStyle){
     switch (coordsDisplayStyle){
       case JBoard.NO_COORDS:
@@ -852,13 +853,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     props.setIntegerProperty("coordsDisplayStyle", coordsDisplayStyle);
   }
-
-
+  
+  
   
   /**
    * Returns the color used for coordinates display.
    */
-   
+  
   public Color getCoordsDisplayColor(){
     return (Color)props.getProperty("coordsDisplayColor");
   }
@@ -868,7 +869,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Sets the color used for coordinates display to the specified value.
    */
-   
+  
   public void setCoordsDisplayColor(Color color){
     props.setProperty("coordsDisplayColor", color);
   }
@@ -916,11 +917,33 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   }
   
   
-
+  
+  /**
+   * Sets whether the target square during a move is snapped to the nearest
+   * legal square.
+   */
+  
+  public void setSnapToLegalSquare(boolean newValue){
+    props.setBooleanProperty("snapToLegalSquare", newValue);
+  }
+  
+  
+  
+  /**
+   * Returns whether the target square during a move is snapped to the nearest
+   * legal square.
+   */
+  
+  public boolean isSnapToLegalSquare(){
+    return props.getBooleanProperty("snapToLegalSquare");
+  }
+  
+  
+  
   /**
    * Returns the current piece set.
    */
-
+  
   public PieceSet getPieceSet(){
     return (PieceSet)props.getProperty("pieceSet", null);
   }
@@ -931,17 +954,17 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Returns the current piece painter. The returned value should not be
    * modified.
    */
-   
+  
   public PiecePainter getPiecePainter(){
     return piecePainter;
   }
-
-
-
+  
+  
+  
   /**
    * Returns the current board pattern.
    */
-
+  
   public BoardPattern getBoardPattern(){
     return (BoardPattern)props.getProperty("boardPattern", null);
   }
@@ -952,18 +975,18 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Returns the current board painter. The returned value should not be
    * modified.
    */
-   
-   public BoardPainter getBoardPainter(){
-     return boardPainter;
-   }
-
-
-
+  
+  public BoardPainter getBoardPainter(){
+    return boardPainter;
+  }
+  
+  
+  
   /**
    * Sets the piece set to the specified one. If the specified piece set is
    * <code>null</code>, the default piece set is used.
    */
-   
+  
   public void setPieceSet(PieceSet set){
     PieceSet pieceSet = set == null ? PieceSet.DEFAULT_PIECE_SET : set;
     piecePainter = pieceSet.getPiecePainter();
@@ -971,14 +994,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     props.setProperty("pieceSet", pieceSet);    
   }
-
-
-
+  
+  
+  
   /**
    * Sets the board pattern to the specified one. If the specified pattern is
    * <code>null</code>, the default one is used.
    */
-
+  
   public void setBoardPattern(BoardPattern pattern){
     BoardPattern boardPattern = pattern == null ? BoardPattern.DEFAULT_BOARD_PATTERN : pattern;
     boardPainter = boardPattern.getBoardPainter();
@@ -988,14 +1011,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   }
   
   
-
+  
   /**
    * Registers all the necessary listeners with the Connection.
    */
-
+  
   protected void registerConnListeners(){
     ListenerManager listenerManager = getConn().getListenerManager();
-
+    
     listenerManager.addGameListener(this);
     listenerManager.addConnectionListener(this);
   }
@@ -1005,42 +1028,42 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Preloads certain things. This method is called once when the plugin starts.
    */
-   
+  
   private void preload(){
     createBoardPanel(new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
         5*60*1000, 2000, 1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER));
   }
-
-
-
+  
+  
+  
   /**
    * Unregisters all the necessary listeners from the Connection. 
    */
-
+  
   protected void unregisterConnListeners(){
     ListenerManager listenerManager = getConn().getListenerManager();
-
+    
     listenerManager.removeGameListener(this);
     listenerManager.removeConnectionListener(this);
   } 
-
-
-
+  
+  
+  
   /**
    * Returns the BoardPanel displaying the given Game.
    */
-
+  
   public BoardPanel getBoardPanel(Game game){
     return (BoardPanel)gamesToBoardPanels.get(game);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Gets called when a game starts.
    */
-
+  
   public void gameStarted(GameStartEvent evt){
     createNewBoardPanel(evt.getGame());
   }
@@ -1055,7 +1078,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   protected void createNewBoardPanel(Game game){
     BoardPanel boardPanel = createBoardPanel(game);
     initBoardPanel(game, boardPanel);
-
+    
     game.addPropertyChangeListener(new PropertyChangeListener(){
       public void propertyChange(PropertyChangeEvent evt){
         Game game = (Game)evt.getSource();
@@ -1064,22 +1087,22 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         if (boardPanel != null){
           PluginUIContainer boardContainer =
             (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
-
+          
           if (boardContainer != null) // It could be null if the container has been closed
             boardContainer.setTitle(getBoardTitle(boardPanel));
         }
       }
     });
   }
-
-
-
+  
+  
+  
   /**
    * Obtains and returns a PluginUIContainer to be used for a board.
    * An unused container is looked for, and if none is found, a new one is
    * created.
    */
-
+  
   private PluginUIContainer createBoardContainer(){
     for (int i = 0; i < containers.size(); i++){
       PluginUIContainer container = (PluginUIContainer)containers.elementAt(i);
@@ -1087,99 +1110,99 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       if ((panel == null) || !panel.isActive())
         return recycleContainer(container);
     }
-
+    
     return createNewBoardContainer();
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Creates and configures a new PluginUIContainer for use with a board.
    */
-
+  
   private PluginUIContainer createNewBoardContainer(){
     PluginUIContainer boardContainer = 
       createContainer(String.valueOf(containers.size()), UIProvider.SELF_MANAGED_CONTAINER_MODE);
-
+    
     containers.addElement(boardContainer);
-
+    
     URL iconImageURL = BoardManager.class.getResource("board.gif");
     if (iconImageURL!= null)
       boardContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
     
     boardContainer.addPluginUIListener(this);
-
+    
     return boardContainer;
   }
-
-
-
-
-
+  
+  
+  
+  
+  
   /**
    * Recycles the specified container, making it ready to be used again.
    */
-
+  
   private PluginUIContainer recycleContainer(PluginUIContainer container){
     BoardPanel oldBoardPanel = (BoardPanel)containersToBoardPanels.remove(container);
     if (oldBoardPanel != null){
       oldBoardPanel.done();
       boardPanelsToContainers.remove(oldBoardPanel);
     }
-
+    
     Container contentPane = container.getContentPane();
     contentPane.removeAll(); // wash it
-
+    
     return container;
   }
-
   
-
-
+  
+  
+  
   /**
    * Creates and configures a new BoardPanel for the given Game.
    */
-
+  
   protected BoardPanel createBoardPanel(Game game){
     BoardPanel boardPanel = new BoardPanel(this, game);
-
+    
     return boardPanel;
   }
-
-
-
+  
+  
+  
   
   /**
    * Initializes the given BoardPanel, making it ready for use.
    */
-
+  
   protected void initBoardPanel(Game game, BoardPanel boardPanel){
     boardPanel.addUserMoveListener(this);
     getConn().getListenerManager().addGameListener(boardPanel);
     gamesToBoardPanels.put(game, boardPanel);
-
+    
     PluginUIContainer boardContainer = createBoardContainer();
     Container content = boardContainer.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(boardPanel, BorderLayout.CENTER);
     content.invalidate(); // Better wash this container - no 
     content.validate();   // knowing what used to be in it ;-)
-
+    
     boardContainer.setTitle(getBoardTitle(boardPanel));
-
+    
     containersToBoardPanels.put(boardContainer, boardPanel);
     boardPanelsToContainers.put(boardPanel, boardContainer);
-
+    
     boardContainer.setActive(true);
   }
-
-
-
+  
+  
+  
   /*
    * GameListener implementation.
    */
-
+  
   public void moveMade(MoveMadeEvent evt){}
   public void positionChanged(PositionChangedEvent evt){}
   public void takebackOccurred(TakebackEvent evt){}
@@ -1187,14 +1210,14 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void clockAdjusted(ClockAdjustmentEvent evt){}
   public void boardFlipped(BoardFlipEvent evt){}
   public void offerUpdated(OfferEvent evt){}
-
-
-
-
+  
+  
+  
+  
   /**
    * Cleanup the game.
    */
-
+  
   public void gameEnded(GameEndEvent evt){
     gameEndCleanup(evt.getGame());
   }
@@ -1229,9 +1252,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     for (int i = 0; i < games.size(); i++)
       gameEndCleanup((Game)games.elementAt(i));
   }
-
   
-    
+  
+  
   /**
    * Performs cleanup when we stop looking at the specified game.
    */
@@ -1245,7 +1268,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       
       PluginUIContainer boardContainer =
         (PluginUIContainer)boardPanelsToContainers.get(boardPanel);
-
+      
       if (boardContainer != null) // It could be null if the container has been closed
         boardContainer.setTitle(getBoardTitle(boardPanel));
     }
@@ -1263,8 +1286,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     I18n i18n = getI18n();
     
     Object [] titleArgs = new Object[]{
-      game.getWhiteName() + game.getWhiteTitles(),
-      game.getBlackName() + game.getBlackTitles()
+        game.getWhiteName() + game.getWhiteTitles(),
+        game.getBlackName() + game.getBlackTitles()
     };
     
     String result;
@@ -1289,7 +1312,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   /**
    * Returns whether the user is currently playing a game.
    */
-   
+  
   public boolean isUserPlaying(){
     Enumeration games = gamesToBoardPanels.keys();
     while (games.hasMoreElements()){
@@ -1300,40 +1323,40 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     return false;
   }
-
-
-
+  
+  
+  
   /**
    * Gets called when the user makes a move on the board.
    */
-
+  
   public void userMadeMove(UserMoveEvent evt){
     Object src = evt.getSource();
-
+    
     if (src instanceof BoardPanel){
       BoardPanel boardPanel = (BoardPanel)src;
       Game game = boardPanel.getGame();
       getConn().makeMove(game, evt.getMove());
     }
   }
-
-
-
+  
+  
+  
   /**
    * PluginUIListener implementation. Handles proper closing of the frame.
    */
-
+  
   public void pluginUIClosing(PluginUIEvent evt){
     PluginUIContainer boardContainer = evt.getPluginUIContainer();
     BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.get(boardContainer);
-
+    
     if (boardPanel.isActive()){ // otherwise, the user is just closing a "dead" frame.
       Game game = boardPanel.getGame();
-
+      
       Object result = OptionPanel.OK;
       if (game.getGameType() == Game.MY_GAME)
         result = getI18n().confirm(OptionPanel.OK, game.isPlayed() ? "resignDialog" : "unexamineDialog", boardPanel);
-
+      
       if (result == OptionPanel.OK){
         getConn().quitGame(game);
         boardContainer.setVisible(false);
@@ -1342,27 +1365,27 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else
       boardContainer.setVisible(false);
   }
-
-
-
+  
+  
+  
   /**
    * Performs any necessary cleanup.
    */
-
+  
   public void pluginUIHidden(PluginUIEvent evt){
     PluginUIContainer boardContainer = evt.getPluginUIContainer();
     BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.remove(boardContainer);
     boardPanelsToContainers.remove(boardPanel);
-
+    
     boardPanel.done();  
   }
-
-
-
+  
+  
+  
   /**
    * PluginUIListener implementation.
    */
-
+  
   public void pluginUIShown(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
@@ -1370,9 +1393,9 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void pluginUITitleChanged(PluginUIEvent evt){}
   public void pluginUIIconChanged(PluginUIEvent evt){}
   
-
-
-
+  
+  
+  
   /**
    * Overrides <code>Plugin.hasPreferencesUI()</code> to return
    * <code>true</code>.
@@ -1381,33 +1404,33 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public boolean hasPreferencesUI(){
     return true;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Creates and returns a PreferencesPanel which allows the user to modify
    * some of this plugin's settings.
    */
-
+  
   public PreferencesPanel getPreferencesUI(){
     return new BoardPreferencesPanel(this);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Saves the user preferences.
    */
-
+  
   public void saveState(){
     Preferences prefs = getPrefs();
-
+    
     prefs.setString("piece-set-id", getPieceSet().getId());    
-
+    
     prefs.setString("board-pattern-id", getBoardPattern().getId());
-
+    
     prefs.setBool("auto-promote", isAutoPromote());
     
     String moveInputStyleString;
@@ -1419,12 +1442,12 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
         throw new IllegalStateException("Unrecognized move input style: " + getMoveInputStyle());
     }
     prefs.setString("move-input-style", moveInputStyleString);
-
+    
     prefs.setBool("piece-follows-cursor", isPieceFollowsCursor());
     
     prefs.setBool("highlight-made-move-squares", isHighlightMadeMoveSquares());
     prefs.setColor("highlight-made-move-squares.color",getMadeMoveSquaresHighlightColor());
-
+    
     String moveHighlightingString;
     switch (getMoveHighlightingStyle()){
       case JBoard.NO_MOVE_HIGHLIGHTING: moveHighlightingString = "none"; break;
@@ -1447,11 +1470,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     }
     prefs.setString("coords-display.style", coordsDisplayStyleString);
     prefs.setColor("coords-display.color", getCoordsDisplayColor());
-
+    
     prefs.setBool("move-highlight.highlight-own", isHighlightingOwnMoves());
-
+    
     prefs.setColor("move-highlight.color", getMoveHighlightingColor());
-
+    
     int moveSendingMode = getMoveSendingMode();
     String moveSendingModeString;
     if (moveSendingMode == LEGAL_CHESS_MOVE_SENDING_MODE)
@@ -1461,36 +1484,36 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     else // if (moveSendingMode == PREMOVE_MOVE_SENDING_MODE)
       moveSendingModeString = "premove";
     prefs.setString("move-sending-mode", moveSendingModeString);
-
+    
     prefs.setColor("white-piece-color", getWhitePieceColor());
     prefs.setColor("black-piece-color", getBlackPieceColor());
     prefs.setColor("white-outline-color", getWhiteOutlineColor());
     prefs.setColor("black-outline-color", getBlackOutlineColor());
-
+    
     prefs.setColor("light-square-color", getLightSquareColor());
     prefs.setColor("dark-square-color", getDarkSquareColor());
     
     prefs.setBool("shadow-piece-in-target-square", isShowShadowPieceInTargetSquare());
     prefs.setBool("highlight-possible-target-squares", isHighlightLegalTargetSquares());
+    prefs.setBool("snap-to-legal-square", isSnapToLegalSquare());
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the string "board".
    */
-
+  
   public String getId(){
     return "board";
   }
-
-
-
+  
+  
+  
   /**
    * Returns the plugin name.
    */
-
+  
   public String getName(){
     return getI18n().getString("pluginName");
   }
@@ -1582,8 +1605,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     
   }
-
-
-
+  
+  
+  
   
 }

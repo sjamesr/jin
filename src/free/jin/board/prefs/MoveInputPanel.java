@@ -65,7 +65,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "unified" move input style selecting radio button.
    */
   
-  protected final JRadioButton unified;
+  private final JRadioButton unified;
   
   
   
@@ -73,7 +73,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "drag and drop" move input style selecting radio button.
    */
    
-  protected final JRadioButton dragndrop;
+  private final JRadioButton dragndrop;
   
   
   
@@ -81,7 +81,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "click and click" move input style selecting radio button.
    */
    
-  protected final JRadioButton clicknclick;
+  private final JRadioButton clicknclick;
   
   
   
@@ -89,7 +89,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "auto promote" checkbox.
    */
    
-  protected final JCheckBox autoPromote;
+  private final JCheckBox autoPromote;
   
   
   
@@ -97,7 +97,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "piece follows cursor" checkbox.
    */
    
-  protected final JCheckBox pieceFollowsCursor;
+  private final JCheckBox pieceFollowsCursor;
   
   
   
@@ -105,7 +105,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "draw piece in target square" checkbox.
    */
   
-  protected final JCheckBox showPieceInTargetSquare;
+  private final JCheckBox showPieceInTargetSquare;
   
   
   
@@ -113,7 +113,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "highlight move squares" checkbox.
    */
    
-  protected final JCheckBox highlightMadeMoveSquares;
+  private final JCheckBox highlightMadeMoveSquares;
   
   
   
@@ -121,7 +121,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The color chooser for the made move squares highlight color.
    */
    
-  protected final ColorChooser madeMoveSquaresHighlightColor;
+  private final ColorChooser madeMoveSquaresHighlightColor;
   
   
   
@@ -130,7 +130,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * turn. 
    */
    
-  protected final JRadioButton disallowMoveInAdvance;
+  private final JRadioButton disallowMoveInAdvance;
   
   
   
@@ -139,7 +139,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * immediately. 
    */
    
-  protected final JRadioButton immediateSendMove;
+  private final JRadioButton immediateSendMove;
   
   
   
@@ -147,7 +147,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The radio button for enabling premove.
    */
    
-  protected final JRadioButton premove;
+  private final JRadioButton premove;
   
   
   
@@ -203,7 +203,15 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * The "highlight legal target squares" checkbox.
    */
   
-  protected final JCheckBox highlightLegalTargetSquares;
+  private final JCheckBox highlightLegalTargetSquares;
+  
+  
+  
+  /**
+   * The "snap to legal squares" checkbox.
+   */
+  
+  private final JCheckBox snapToLegalTargetSquares;
   
   
   
@@ -212,7 +220,6 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    */
    
   private Move lastMove = null;
-  
   
   
   
@@ -409,6 +416,15 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       }
     });
     
+    snapToLegalTargetSquares = i18n.createCheckBox("snapToLegalSquaresCheckBox");
+    snapToLegalTargetSquares.setSelected(boardManager.isSnapToLegalSquare());
+    snapToLegalTargetSquares.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        MoveInputPanel.this.previewBoard.setSnapToLegalSquare(snapToLegalTargetSquares.isSelected());
+        fireStateChanged();
+      }
+    });
+    
     
     JComponent moveInputPanel = createMoveInputUI();
     JComponent promotePanel = createPromotionUI();
@@ -492,6 +508,9 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
     previewBoard.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
     previewBoard.setHighlightMadeMoveSquares(highlightMadeMoveSquares.isSelected());
+    previewBoard.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
+    previewBoard.setHighlightLegalTargetSquares(highlightLegalTargetSquares.isSelected());
+    previewBoard.setSnapToLegalSquare(snapToLegalTargetSquares.isSelected());
     previewBoard.setManualPromote(!autoPromote.isSelected());
     
     previewBoard.setMoveHighlightingStyle(getMoveHighlightingStyle());
@@ -672,13 +691,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightLegalTargetSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     
     panel.add(highlightLegalTargetSquares);
+    panel.add(snapToLegalTargetSquares);
     panel.add(Box.createGlue());
     
     return panel;
   }
 
-  
-  
 
   
   /**
@@ -701,6 +719,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     boardManager.setMoveHighlightingColor(highlightColor.getColor());
     
     boardManager.setHighlightLegalTargetSquares(highlightLegalTargetSquares.isSelected());
+    boardManager.setSnapToLegalSquare(snapToLegalTargetSquares.isSelected());
   }
   
   

@@ -46,6 +46,7 @@ import javax.swing.event.ChangeListener;
 
 import free.chess.event.MoveProgressEvent;
 import free.chess.event.MoveProgressListener;
+import free.util.MathUtilities;
 import free.util.PaintHook;
 import free.util.PlatformUtils;
 import free.util.Utilities;
@@ -249,7 +250,13 @@ public class JBoard extends JComponent{
   
   
   
-
+  /**
+   * A flag we set when we modify the position so that we don't get in our own
+   * way in the position change listener.
+   */
+  
+  private boolean isModifyingPosition = false;
+  
   /**
    * The ChangeListener to the Position.
    */
@@ -257,6 +264,9 @@ public class JBoard extends JComponent{
   private ChangeListener positionChangeListener = new ChangeListener(){
     
     public void stateChanged(ChangeEvent evt){
+      if (isModifyingPosition)
+        return;
+      
       // Repaint only the parts that really need to be repainted by checking
       // which squares changed.
       boolean checkMovingPieceSquare = (movedPieceSquare != null);
@@ -380,6 +390,15 @@ public class JBoard extends JComponent{
   
   
   /**
+   * Whether the target square snaps to the nearest legal square when making a
+   * move.
+   */
+  
+  private boolean isSnapToLegalSquare = false;
+  
+  
+  
+  /**
    * The current coordinates display style.
    */
    
@@ -440,7 +459,7 @@ public class JBoard extends JComponent{
    * The color with which possible target squares are highlighted.
    */
   
-  private Color possibleTargetSquaresHighlightColor = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
+  private Color legalTargetSquaresHighlightColor = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
 
 
 
@@ -494,7 +513,7 @@ public class JBoard extends JComponent{
    * in snap-to-legal-square, nor in highlight-legal-moves mode).
    */
   
-  private Collection possibleTargetSquares = null;
+  private Collection legalTargetSquares = null;
   
   
   
@@ -936,9 +955,9 @@ public class JBoard extends JComponent{
     
     if (isMovingPiece()){
       if (newValue)
-        possibleTargetSquares = position.getTargetSquares(movedPieceSquare);
+        legalTargetSquares = position.getTargetSquares(movedPieceSquare);
       else
-        possibleTargetSquares = null;
+        legalTargetSquares = null;
       
       repaint();
     }
@@ -959,33 +978,58 @@ public class JBoard extends JComponent{
   
   
   /**
-   * Sets the color with which possible target squares are highlighted. This
+   * Sets the color with which legal target squares are highlighted. This
    * should normally be a translucent color, so that for captures, the captured
    * piece is visible. Passing <code>null</code> causes the color to be reset
    * to the default one.
    */
   
-  public void setPossibleTargetSquaresHighlightColor(Color color){
+  public void setLegalTargetSquaresHighlightColor(Color color){
     if (color == null)
       color = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
     
-    Object oldColor = this.possibleTargetSquaresHighlightColor;
-    this.possibleTargetSquaresHighlightColor = color;
+    Object oldColor = this.legalTargetSquaresHighlightColor;
+    this.legalTargetSquaresHighlightColor = color;
     
-    if (possibleTargetSquares != null)
-      repaintPossibleTargetSquares(null);
+    if (legalTargetSquares != null)
+      repaintLegalTargetSquares(null);
     
-    firePropertyChange("possibleTargetSquaresHighlightColor", oldColor, color);
+    firePropertyChange("legalTargetSquaresHighlightColor", oldColor, color);
   }
   
   
   
   /**
-   * Returns the color with which possible target squares are highlighted.
+   * Returns the color with which legal target squares are highlighted.
    */
   
-  public Color getPossibleTargetSquaresHighlightColor(){
-    return possibleTargetSquaresHighlightColor;
+  public Color getLegalTargetSquaresHighlightColor(){
+    return legalTargetSquaresHighlightColor;
+  }
+  
+  
+  
+  /**
+   * Sets whether the target square snaps to the nearest legal square when
+   * making a move.
+   */
+  
+  public void setSnapToLegalSquare(boolean newValue){
+    boolean oldValue = this.isSnapToLegalSquare;
+    this.isSnapToLegalSquare = newValue;
+    
+    firePropertyChange("isSnapToLegalSquare", oldValue, newValue);
+  }
+  
+  
+  
+  /**
+   * Returns whether the target square snaps to the nearest legal square when
+   * making a move.
+   */
+  
+  public boolean isSnapToLegalSquare(){
+    return isSnapToLegalSquare;
   }
   
   
@@ -1281,7 +1325,7 @@ public class JBoard extends JComponent{
     
     g.setColor(getBackground());
     g.fillRect(0, 0, getWidth(), getHeight());
-
+    
     Rectangle rect = null; // Helper rect - reused many times 
     
     rect = getBoardRect(rect);
@@ -1322,9 +1366,9 @@ public class JBoard extends JComponent{
       }
     
     // Paint possible target squares
-    if (isHighlightLegalTargetSquares && (possibleTargetSquares != null)){
-      g.setColor(possibleTargetSquaresHighlightColor);
-      for (Iterator i = possibleTargetSquares.iterator(); i.hasNext();){
+    if (isHighlightLegalTargetSquares && (legalTargetSquares != null)){
+      g.setColor(legalTargetSquaresHighlightColor);
+      for (Iterator i = legalTargetSquares.iterator(); i.hasNext();){
         rect = squareToRect((Square)i.next(), rect);
         if (rect.intersects(clipRect))
           g.fill(rect);
@@ -1773,7 +1817,34 @@ public class JBoard extends JComponent{
    */
    
   private Square calcTargetSquare(Point cursorLocation){
-    return locationToSquare(cursorLocation);
+    if (isSnapToLegalSquare && (legalTargetSquares != null)){
+      // Check the usual case - square under the cursor
+      Square cursorSquare = locationToSquare(cursorLocation);
+      if (movedPieceSquare.equals(cursorSquare) || legalTargetSquares.contains(cursorSquare))
+        return cursorSquare;
+      
+      Rectangle rect = squareToRect(0, 0, null);
+      int minDistanceSquared = // We don't want squares which are too far.
+        MathUtilities.sqr((int)(1.5*Math.max(rect.width, rect.height))); 
+      Square nearestSquare = null;
+      for (Iterator i = legalTargetSquares.iterator(); i.hasNext();){
+        Square square = (Square)i.next();
+        squareToRect(square, rect);
+        
+        int dx = cursorLocation.x - (rect.x + rect.width/2);
+        int dy = cursorLocation.y - (rect.y + rect.height/2);
+        int distanceSquared = dx*dx + dy*dy;
+        
+        if (distanceSquared < minDistanceSquared){
+          minDistanceSquared = distanceSquared;
+          nearestSquare = square;
+        }
+      }
+      
+      return nearestSquare;
+    }
+    else
+      return locationToSquare(cursorLocation);
   }
    
   
@@ -1915,8 +1986,8 @@ public class JBoard extends JComponent{
    * Causes the possible target squares to be repainted.
    */
   
-  private void repaintPossibleTargetSquares(Rectangle helpRect){
-    for (Iterator i = possibleTargetSquares.iterator(); i.hasNext();)
+  private void repaintLegalTargetSquares(Rectangle helpRect){
+    for (Iterator i = legalTargetSquares.iterator(); i.hasNext();)
       repaint(helpRect = squareToRect((Square)i.next(), helpRect));
   }
   
@@ -1938,13 +2009,13 @@ public class JBoard extends JComponent{
     repaint(squareToRect(movedPieceSquare, rect));
     if (targetSquare != null)
       repaint(squareToRect(targetSquare, rect));
-    if (possibleTargetSquares != null)
-      repaintPossibleTargetSquares(rect);
+    if (legalTargetSquares != null)
+      repaintLegalTargetSquares(rect);
     
     movedPieceSquare = null;
     movedPieceLoc = null;
     targetSquare = null;
-    possibleTargetSquares = null;
+    legalTargetSquares = null;
     
     fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
   }
@@ -1968,7 +2039,7 @@ public class JBoard extends JComponent{
     int x = evt.getX();
     int y = evt.getY();
     
-    Rectangle helpRect = new Rectangle();;
+    Rectangle helpRect = new Rectangle();
 
     if ((evtID == MouseEvent.MOUSE_EXITED) && isGesture(CLICK_N_CLICK_MOVE_INPUT_STYLE)){
       if (movedPieceSquare != null){ // Fake the piece being at its original location
@@ -2005,27 +2076,31 @@ public class JBoard extends JComponent{
           return;
         }
         movedPieceLoc = new Point(x, y);
+        
+        if (isHighlightLegalTargetSquares() || isSnapToLegalSquare())
+          legalTargetSquares = position.getTargetSquares(movedPieceSquare);
+        
         targetSquare = calcTargetSquare(movedPieceLoc);
-        if (isHighlightLegalTargetSquares())
-          possibleTargetSquares = position.getTargetSquares(movedPieceSquare);
         
         repaint(squareToRect(square, helpRect));
-        if (isPieceFollowsCursor())
-          repaint(getMovedPieceGraphicRect(helpRect));
-        if (possibleTargetSquares != null)
-          repaintPossibleTargetSquares(helpRect);
+        repaint(getMoveAreaRect(helpRect));
+        if (isHighlightLegalTargetSquares())
+          repaintLegalTargetSquares(helpRect);
         
         if (getMoveInputStyle() == UNIFIED_MOVE_INPUT_STYLE){
           moveGesture = DRAG_N_DROP_MOVE_INPUT_STYLE;
-          dragStartTime = System.currentTimeMillis();
+          dragStartTime = evt.getWhen();
         }
        
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_STARTED));
       }
       else{
-        if (!square.equals(movedPieceSquare)){
+        if (targetSquare == null){ // Moved to a non-target square
+          
+        }
+        else if (!targetSquare.equals(movedPieceSquare)){
           WildVariant variant = position.getVariant();
-          Piece [] promotionTargets = variant.getPromotionTargets(position, movedPieceSquare, square);
+          Piece [] promotionTargets = variant.getPromotionTargets(position, movedPieceSquare, targetSquare);
           Move madeMove;
           if (promotionTargets != null){
             Piece promotionTarget;
@@ -2037,31 +2112,38 @@ public class JBoard extends JComponent{
             else
               promotionTarget = promotionTargets[0];
 
-            madeMove = variant.createMove(position, movedPieceSquare, square, promotionTarget, null);
+            madeMove = variant.createMove(position, movedPieceSquare, targetSquare, promotionTarget, null);
           }
           else
-            madeMove = variant.createMove(position, movedPieceSquare, square, null, null);
-
+            madeMove = variant.createMove(position, movedPieceSquare, targetSquare, null, null);
+          
+          isModifyingPosition = true;
           position.makeMove(madeMove);
+          isModifyingPosition = false;
         }
         else if ((getMoveInputStyle() == UNIFIED_MOVE_INPUT_STYLE) &&
             (moveGesture == DRAG_N_DROP_MOVE_INPUT_STYLE) && 
-            (System.currentTimeMillis() - dragStartTime < 300)){
+            (evt.getWhen() - dragStartTime < 300)){
           moveGesture = CLICK_N_CLICK_MOVE_INPUT_STYLE;
           return;
         }
         else{ // Picked up the piece and dropped it immediately.
-          repaint(getMoveAreaRect(helpRect));
-          repaint(squareToRect(movedPieceSquare, helpRect));
+          
         }
         
-        if (possibleTargetSquares != null)
-          repaintPossibleTargetSquares(helpRect);
+        repaint(getMoveAreaRect(helpRect));
+        
+        repaint(squareToRect(movedPieceSquare, helpRect));
+        if (targetSquare != null)
+          repaint(squareToRect(targetSquare, helpRect));
+        
+        if (isHighlightLegalTargetSquares())
+          repaintLegalTargetSquares(helpRect);
 
         movedPieceSquare = null;
         movedPieceLoc = null;
         targetSquare = null;
-        possibleTargetSquares = null;
+        legalTargetSquares = null;
         moveGesture = 0;
         
         fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
@@ -2126,7 +2208,7 @@ public class JBoard extends JComponent{
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
 //    board.setShowShadowPieceInTargetSquare(true);
-    board.setHighlightLegalTargetSquares(true);
+    board.setSnapToLegalSquare(true);
     frame.getContentPane().add(board, java.awt.BorderLayout.CENTER);
     frame.setBounds(50, 50, 400, 400);
     frame.setVisible(true);

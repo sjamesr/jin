@@ -682,6 +682,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setMoveHighlightingColor(boardManager.getMoveHighlightingColor());
     board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
     board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
+    board.setSnapToLegalSquare(boardManager.isSnapToLegalSquare());
   }
 
 
@@ -2042,6 +2043,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
       else if ("highlightLegalTargetSquares".equals(propertyName))
         board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
+      else if ("snapToLegalSquare".equals(propertyName))
+        board.setSnapToLegalSquare(boardManager.isSnapToLegalSquare());
     }
     else if (src == game){
       gameLabel.setText(createGameLabelText(game));
