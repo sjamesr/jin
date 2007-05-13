@@ -283,18 +283,24 @@ public class Console extends JPanel implements KeyListener{
     this.commandTypeComponent = createCommandTypeComponent();
     this.inputComponent = createInputComponent();
     
-    registerKeyboardAction(clearAction, 
-        KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-        WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
+    KeyStroke clearAccelerator = 
+      KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    registerKeyboardAction(clearAction, clearAccelerator, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    clearAction.putValue(Action.ACCELERATOR_KEY, clearAccelerator);
+    
+    KeyStroke closeAccelerator = 
+      KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    registerKeyboardAction(closeAction, closeAccelerator, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    closeAction.putValue(Action.ACCELERATOR_KEY, closeAccelerator);
+    
+    closeAction.setEnabled(designation.isConsoleCloseable());
+    
     createUI();
     
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     
     setFocusable(false);
-    
-    closeAction.setEnabled(designation.isConsoleCloseable());
     
     init();
   }
@@ -394,7 +400,7 @@ public class Console extends JPanel implements KeyListener{
    */
   
   protected JComponent createActionsComponent(){
-    MultiButton button = new MultiButton();
+    MultiButton button = new MultiButton(I18n.get(Console.class).getString("actionsButton.text"));
     
     button.add(inputComponent.getSendAction());
     button.add(clearAction);
