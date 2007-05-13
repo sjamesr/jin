@@ -477,6 +477,7 @@ public class TabbedPane extends JComponent{
     
     // Add new UI
     if (noTabs){
+      componentPanel.setBorder(null);
       setLayout(WrapLayout.getInstance());
       add(componentPanel);
       return;
@@ -497,14 +498,15 @@ public class TabbedPane extends JComponent{
     add(handlePanel, tabRowPosition);
     add(componentPanel, BorderLayout.CENTER);
     
+    int tabPlacement = getTabPlacement();
     
-    // Set the handle panel borders
+    // Set the handle panel border
     int top, left, bottom, right;
     final int startOffset = 5; // The offset of the tabs at the start of the tab panel
     final int endOffset = 5;   // The offset of the tabs at the end of the tab panel
     final int nearOffset = 0; // The offset of the tab panel from the component
     final int farOffset = 2;   // The offset of the tab panel from the side opposite to the component
-    switch(getTabPlacement()){
+    switch(tabPlacement){
       case SwingUtilities.TOP:
         top = farOffset;
         bottom = nearOffset;
@@ -530,9 +532,30 @@ public class TabbedPane extends JComponent{
         right = farOffset;
         break;
       default:
-        throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
+        throw new IllegalStateException("Unknown tab placement: " + tabPlacement);
     }
     handlePanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
+    
+    // Set the component panel border
+    final int tabOffset = 3; // The offset of the component to the tabs
+    top = left = bottom = right = 0;
+    switch (tabPlacement){
+      case SwingUtilities.TOP:
+        top = tabOffset;
+        break;
+      case SwingUtilities.BOTTOM:
+        bottom = tabOffset;
+        break;
+      case SwingUtilities.LEFT:
+        left = tabOffset;
+        break;
+      case SwingUtilities.RIGHT:
+        right = tabOffset;
+        break;
+      default:
+        throw new IllegalStateException("Unknown tab placement: " + tabPlacement);
+    }
+    componentPanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
   }
   
   
