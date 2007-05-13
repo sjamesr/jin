@@ -1,18 +1,14 @@
 package free.util.swing;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Font;
 
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 
 
@@ -25,55 +21,38 @@ public class MultiButton extends JComponent{
   
   
   /**
-   * The button we employ for the action user interaction.
+   * The menu which is the actual component we're displaying.
    */
   
-  private final JButton button;
+  private JMenu menu;
   
   
   
   /**
-   * The popup we display to allow the user to create 
+   * Whether we're using the unicode "BLACK DOWN-POINTING SMALL TRIANGLE"
+   * character. If <code>false</code>, we're using <code>ArrowIcon</code>.
    */
   
-  private final JPopupMenu popup = new JPopupMenu();
+  private boolean usingUnicodeArrow = false;
   
   
   
   /**
-   * The action listener for menu items.
+   * Creates a new <code>MultiButton</code> with the specified text and list of
+   * actions.
    */
   
-  private final ActionListener menuItemActionListener = new ActionListener(){
-    public void actionPerformed(ActionEvent e){
-      JMenuItem source = (JMenuItem)e.getSource();
-      setButtonAction(source.getAction());
-    }
-  };
-  
-  
-  
-  /**
-   * Creates a new <code>MultiButton</code> with the specified list of actions.
-   */
-  
-  public MultiButton(Action [] actions){
-    button = new JButton();
-    button.setHorizontalTextPosition(SwingConstants.LEADING);
+  public MultiButton(String text, Action [] actions){
+    menu = new JMenu();
+    menu.setBackground(UIManager.getColor("Panel.background"));
+    menu.setBorder(null);
+    
+    setText(text);
     
     // We should support the keyboard, but we don't, yet
-    button.setFocusable(false);
+    menu.setFocusable(false);
     
     createUI();
-    
-    button.addMouseListener(new MouseAdapter(){
-      public void mousePressed(MouseEvent evt){
-        popup.show(MultiButton.this, 0, getHeight());
-      }
-      public void mouseReleased(MouseEvent evt){
-        popup.setVisible(false);
-      }
-    });
     
     for (int i = 0; i < actions.length; i++)
       add(actions[i]);
@@ -82,11 +61,49 @@ public class MultiButton extends JComponent{
   
   
   /**
-   * Creates a new <code>MultiButton</code>.
+   * Creates a new <code>MultiButton</code> with the specified text and 
+   * initially no actions.
+   */
+  
+  public MultiButton(String text){
+    this(text, new Action[0]);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>MultiButton</code> with initially no text nor actions.
    */
   
   public MultiButton(){
-    this(new Action[0]);
+    this(null, new Action[0]);
+  }
+  
+  
+  
+  /**
+   * Sets the text of this button.
+   */
+  
+  public void setText(String text){
+    if (usingUnicodeArrow)
+      menu.setText(text + " \u25BE");
+    else
+      menu.setText(text);
+  }
+  
+  
+  
+  /**
+   * Returns the text of this button.
+   */
+  
+  public String getText(){
+    String text = menu.getText();
+    if (usingUnicodeArrow)
+      return text.substring(0, text.length() - 2);
+    else
+      return text;
   }
   
   
@@ -96,8 +113,14 @@ public class MultiButton extends JComponent{
    */
   
   private void createUI(){
-    setLayout(new BorderLayout());
-    add(BorderLayout.CENTER, button);
+    JMenuBar menubar = new JMenuBar();
+    menubar.setOpaque(false);
+    menubar.setBorder(null);
+    
+    menubar.add(menu);
+    
+    setLayout(WrapLayout.getInstance());
+    add(menubar);
   }
   
   
@@ -107,24 +130,7 @@ public class MultiButton extends JComponent{
    */
   
   public void add(Action action){
-    if (popup.getComponentCount() == 0)
-      setButtonAction(action);
-    
-    JMenuItem menuItem = popup.add(action);
-    menuItem.addActionListener(menuItemActionListener);
-  }
-  
-  
-  
-  /**
-   * Sets the button's action.
-   */
-  
-  private void setButtonAction(Action action){
-    button.setAction(action);
-    
-    if (isDisplayable())
-      button.setIcon(createArrowIcon()); // Override the action's icon
+    menu.add(action);
   }
   
   
@@ -137,7 +143,16 @@ public class MultiButton extends JComponent{
   public void addNotify(){
     super.addNotify();
     
-    button.setIcon(createArrowIcon());
+    Font font = menu.getFont();
+    if (font.canDisplay('\u25BE')){
+      String text = getText();
+      usingUnicodeArrow = true;
+      setText(text);
+    }
+    else{
+      menu.setHorizontalTextPosition(SwingConstants.LEADING);
+      menu.setIcon(createArrowIcon());
+    }
   }
   
   
