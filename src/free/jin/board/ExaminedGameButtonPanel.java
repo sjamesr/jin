@@ -113,7 +113,31 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     forwardButton = createForwardButton();
     endButton = createEndGameButton();
     
+    registerKeyboardActions();
+    
     createUI();
+  }
+  
+  
+  
+  /**
+   * Registers some extra keyboard actions.
+   */
+  
+  private void registerKeyboardActions(){
+    // Forward 10 plies
+    registerKeyboardAction(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        plugin.getConn().goForward(game, 10);
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, getButtonKeyModifier()), WHEN_IN_FOCUSED_WINDOW);
+    
+    // Backward 10 plies
+    registerKeyboardAction(new ActionListener(){
+      public void actionPerformed(ActionEvent evt){
+        plugin.getConn().goBackward(game, 10);
+      }
+    }, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, getButtonKeyModifier()), WHEN_IN_FOCUSED_WINDOW);
   }
 
 
