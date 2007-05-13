@@ -123,6 +123,8 @@ public class ConsoleTextPane extends FixedJTextPane{
       KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), copyAction);
 
     enableEvents(MouseEvent.MOUSE_EVENT_MASK | MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    
+    setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
   }
   
   
