@@ -1172,28 +1172,28 @@ public class Console extends JPanel implements KeyListener{
 
   public void keyPressed(KeyEvent evt){
     int keyCode = evt.getKeyCode();
-    boolean isControlDown = evt.isControlDown();
-
     if ((evt.getSource() == inputComponent)){
       if (evt.getID() == KeyEvent.KEY_PRESSED){
         JScrollBar vscrollbar = outputScrollPane.getVerticalScrollBar();
         Rectangle viewRect = outputScrollPane.getViewport().getViewRect();
         int value = vscrollbar.getValue();
-
-        switch (keyCode){
-          case KeyEvent.VK_PAGE_UP: // Page Up
-            vscrollbar.setValue(value -
-              outputComponent.getScrollableBlockIncrement(viewRect,
-              SwingConstants.VERTICAL, -1));
-            break;
-          case KeyEvent.VK_PAGE_DOWN: // Page Down
-            vscrollbar.setValue(value + 
-              outputComponent.getScrollableBlockIncrement(viewRect,
-              SwingConstants.VERTICAL, +1));
-            break;
+        
+        if (evt.getModifiers() == 0){
+          switch (keyCode){
+            case KeyEvent.VK_PAGE_UP: // Page Up
+              vscrollbar.setValue(value -
+                outputComponent.getScrollableBlockIncrement(viewRect,
+                SwingConstants.VERTICAL, -1));
+              break;
+            case KeyEvent.VK_PAGE_DOWN: // Page Down
+              vscrollbar.setValue(value + 
+                outputComponent.getScrollableBlockIncrement(viewRect,
+                SwingConstants.VERTICAL, +1));
+              break;
+          }
         }
 
-        if (isControlDown){
+        if (evt.isControlDown()){
           switch (keyCode){
             case KeyEvent.VK_UP: // Ctrl-Up
               vscrollbar.setValue(value -
@@ -1203,19 +1203,13 @@ public class Console extends JPanel implements KeyListener{
               vscrollbar.setValue(value + 
                 outputComponent.getScrollableUnitIncrement(viewRect, SwingConstants.VERTICAL, +1));
               break;
-            case KeyEvent.VK_HOME: // Ctrl-Home
-              vscrollbar.setValue(vscrollbar.getMinimum());
-              break;
-            case KeyEvent.VK_END: // Ctrl-End
-              vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
-              break;
-            // case KeyEvent.VK_A: // Ctrl-A
-            //   int documentLength = outputComponent.getDocument().getLength();
-            //   outputComponent.setSelectionStart(0);
-            //   outputComponent.setSelectionEnd(documentLength - 1);
-              // The -1 here is important because otherwise it selects the end of
-              // line at the end too, and then adding more text selects it too.
-            //   break;
+              // These get in the way of the examined board shortcuts
+//            case KeyEvent.VK_HOME: // Ctrl-Home
+//              vscrollbar.setValue(vscrollbar.getMinimum());
+//              break;
+//            case KeyEvent.VK_END: // Ctrl-End
+//              vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
+//              break;
           }
         }
       }
