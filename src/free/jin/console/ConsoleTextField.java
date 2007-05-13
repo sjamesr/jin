@@ -181,6 +181,7 @@ public class ConsoleTextField extends FixedJTextField{
         updateSendAction();
       }
     });
+    sendAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
   }
   
   
