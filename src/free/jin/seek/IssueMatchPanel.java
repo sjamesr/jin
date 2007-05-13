@@ -130,7 +130,7 @@ public class IssueMatchPanel extends JPanel{
     
     I18n i18n = I18n.get(IssueMatchPanel.class);
     
-    opponentSelection = new OpponentSelection(getEasyOpponentsModel(), lastOpp);
+    opponentSelection = new OpponentSelection(getEasyAccessOpponentsModel(), lastOpp);
     timeControlsSelection = new TimeControlsSelection(prefs.getInt("time", 10), prefs.getInt("inc", 0));
     advancedPanel = new JPanel();
     ratednessSelection = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
@@ -173,7 +173,7 @@ public class IssueMatchPanel extends JPanel{
    * Returns the list of opponents to make easily accessible for matching.
    */
   
-  private ListModel getEasyOpponentsModel(){
+  private ListModel getEasyAccessOpponentsModel(){
     if (conn instanceof FriendsConnection)
       return new OnlineFriendsListModel((FriendsConnection)conn);
     else
