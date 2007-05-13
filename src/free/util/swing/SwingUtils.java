@@ -142,6 +142,7 @@ public class SwingUtils{
     button.setPressedIcon(new ImageIcon(IconImageFilters.getPressed(image)));
     button.setDisabledIcon(new ImageIcon(IconImageFilters.getDisabled(image)));
     
+    button.setFocusable(false);
     button.setBorderPainted(false);
     button.setContentAreaFilled(false);
     button.setMargin(new Insets(0, 0, 0, 0));
