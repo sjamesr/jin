@@ -138,7 +138,7 @@ public class WrapLayout implements LayoutManager2{
    */
   
   public Dimension maximumLayoutSize(Container parent){
-    Dimension size = new Dimension(0, 0);
+    Dimension size = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     
     int componentCount = parent.getComponentCount();
     for (int i = 0; i < componentCount; i++){
