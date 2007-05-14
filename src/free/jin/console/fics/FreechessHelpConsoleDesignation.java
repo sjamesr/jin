@@ -37,11 +37,11 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
   
   /**
    * Creates a new <code>FreechessHelpConsoleDesignation</code> with the
-   * specified encoding.
+   * specified encoding and closeable status.
    */
   
-  public FreechessHelpConsoleDesignation(String encoding){
-    super(encoding);
+  public FreechessHelpConsoleDesignation(String encoding, boolean isCloseable){
+    super(encoding, isCloseable);
   }
   
   

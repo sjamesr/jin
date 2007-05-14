@@ -48,12 +48,12 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   /**
    * Creates a new <code>HelpConsoleDesignation</code> with the specified
-   * encoding.
+   * encoding and closeable status.
    */
   
-  public HelpConsoleDesignation(String encoding){
+  public HelpConsoleDesignation(String encoding, boolean isCloseable){
     super(I18n.get(HelpConsoleDesignation.class).getString("name"),
-        encoding, true);
+        encoding, isCloseable);
   }
   
   

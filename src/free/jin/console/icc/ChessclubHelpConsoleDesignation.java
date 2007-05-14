@@ -37,11 +37,11 @@ public class ChessclubHelpConsoleDesignation extends HelpConsoleDesignation{
   
   /**
    * Creates a new <code>ChessclubHelpConsoleDesignation</code> with the
-   * specified encoding.
+   * specified encoding and closeable status.
    */
   
-  public ChessclubHelpConsoleDesignation(String encoding){
-    super(encoding);
+  public ChessclubHelpConsoleDesignation(String encoding, boolean isCloseable){
+    super(encoding, isCloseable);
   }
   
   
