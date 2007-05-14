@@ -22,9 +22,20 @@
 
 package free.chessclub;
 
-import java.io.*;
-import java.util.*;
-import free.chessclub.level2.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PushbackInputStream;
+import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import free.chessclub.level2.Datagram;
+import free.chessclub.level2.DatagramEvent;
+import free.chessclub.level2.DatagramListener;
 import free.util.Connection;
 import free.util.EventListenerList;
 
@@ -46,32 +57,32 @@ public class ChessclubConnection extends free.util.Connection{
   /**
    * Maps rating keys to their english names.
    */
-
+  
   private final Hashtable ratingCategoryNames = new Hashtable();
-
-
-
-
+  
+  
+  
+  
   /**
    * Maps wild variant indices to their english names.
    */
-
+  
   private final Hashtable variantNames = new Hashtable();
-
-
-
-
+  
+  
+  
+  
   /**
    * The PrintStream where this <code>ChessclubConnection</code> logs the
    * commands we send to the server and information we receive from it. May be
    * <code>null</code> if we're not logging the above information.
    */
-
-  private final PrintStream logStream;
-
   
-
-
+  private final PrintStream logStream;
+  
+  
+  
+  
   /**
    * The level2 settings requested by the client. The bit at each index
    * specifies whether the Datagram with that index
@@ -80,56 +91,64 @@ public class ChessclubConnection extends free.util.Connection{
    * effect once the server reads them and responds with a DG_SET2. The
    * "real" level 2 settings are stored in level2settings.
    */
-
+  
   private BitSet requestedLevel2Settings = new BitSet();
-
-
-
-
+  
+  
+  
+  
   /**
    * The current board sending "style".
    */
-
+  
   private int style = 1;
-
-
-
+  
+  
+  
   /**
    * The value we're supposed to assign to the interface variable during login.
    */
-
+  
   private String interfaceVar = "Java chessclub.com library (http://www.jinchess.com/)";
-     
-
-
-
+  
+  
+  
+  
   /**
    * The "real" level 2 settings on which currently the client and the server
    * agree.
    */
-
+  
   private BitSet level2Settings = new BitSet();
-
-
-
-
+  
+  
+  
+  
   /**
    * This is set to <code>true</code> when the "level2settings=..." line has
    * been sent.
    */
-
+  
   private boolean level2SettingsSent = false;
-
-
-
+  
+  
+  
+  /**
+   * The queue of commands we are to send on-login.
+   */
+  
+  private LinkedList onLoginCommandQueue = new LinkedList();
+  
+  
+  
   /**
    * A list of listeners to our datagram events, lazily instantiated.
    */
-   
+  
   private final EventListenerList [] datagramListeners = new EventListenerList[Datagram.MAX_DG_ID + 1];
-
-
-
+  
+  
+  
   /**
    * Creates a new ChessclubConnection with a chessclub.com server, the 
    * ChessclubConnection is initially unconnected. After creating the 
@@ -146,30 +165,30 @@ public class ChessclubConnection extends free.util.Connection{
    *
    * @see #setDGState(int, boolean)
    */
-
+  
   public ChessclubConnection(String requestedUsername, String password, PrintStream logStream){
     super(requestedUsername, password);
     
     this.logStream = logStream;
-
+    
     // We need this to get the real username
     setDGState(Datagram.DG_WHO_AM_I, true); 
-
+    
     // We need this to set the login error message properly
     setDGState(Datagram.DG_LOGIN_FAILED, true); 
-
+    
     // We need this to know the key to rating name mapping.
     setDGState(Datagram.DG_RATING_TYPE_KEY, true); 
-
+    
     // We need this to know the wild number to wild name mapping.
     setDGState(Datagram.DG_WILD_KEY, true);
     
     // We need this to know which datagrams are actually on.
     setDGState(Datagram.DG_SET2, true);
   }
-
-
-
+  
+  
+  
   /**
    * Adds the specified <code>DatagramListener</code> to receive notifications
    * when datagrams with the specified id arrive. Registering the first listener
@@ -184,7 +203,7 @@ public class ChessclubConnection extends free.util.Connection{
    * have requested them). You can check which of the optional fields are on
    * via the <code>isDGOn(int)</code> method.
    */
-   
+  
   public void addDatagramListener(DatagramListener dgListener, int dgId){
     if (datagramListeners[dgId] == null){
       datagramListeners[dgId] = new EventListenerList();
@@ -206,7 +225,7 @@ public class ChessclubConnection extends free.util.Connection{
    * unregister listeners for datagrams you never indend to receive. It may seem
    * a bit silly, but it's cleaner than making <code>setDGState</code> public.
    */
-   
+  
   public void removeDatagramListener(DatagramListener dgListener, int dgId){
     if (datagramListeners[dgId] == null)
       return;
@@ -225,7 +244,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Fires a <code>DatagramEvent</code> for the specified <code>Datagram</code>
    * to all registered listeners.
    */
-   
+  
   protected void fireDatagramEvent(Datagram datagram){
     DatagramEvent evt = new DatagramEvent(this, datagram);
     
@@ -237,10 +256,10 @@ public class ChessclubConnection extends free.util.Connection{
     }
   }
   
-
-   
-   
-   /**
+  
+  
+  
+  /**
    * Sets the given level2 datagram on or off. If the ChessclubConnection is
    * already logged in, then the <code>set-2 [DG number] [0/1]</code> string
    * is sent to the server, otherwise the setting is saved, and in the login
@@ -267,16 +286,16 @@ public class ChessclubConnection extends free.util.Connection{
    * @see #isEssentialDG(int)
    * @see #isDGOn(int)
    */
-
+  
   protected final synchronized boolean setDGState(int dgNumber, boolean state){
     if ((state == false) && isEssentialDG(dgNumber))
       return false;
-
+    
     if (state)
       requestedLevel2Settings.set(dgNumber);
     else
       requestedLevel2Settings.clear(dgNumber);
-
+    
     if (level2SettingsSent){
       if (isLoggedIn())
         sendCommand("set-2 "+dgNumber+" "+(state ? "1" : "0"));
@@ -289,14 +308,14 @@ public class ChessclubConnection extends free.util.Connection{
       else
         level2Settings.clear(dgNumber);
     }
-
+    
     return true;
   }
-
-
-
-
-
+  
+  
+  
+  
+  
   /**
    * Sets the given datagram on again. This is needed because some datagrams
    * won't correctly keep you up-to-date with the current state of events, and
@@ -306,37 +325,37 @@ public class ChessclubConnection extends free.util.Connection{
    * @throws IllegalStateException if the datagram is not on already or if we're
    * not logged in yet.
    */
-
+  
   protected synchronized void setDGOnAgain(int dgNumber){
     if (!isDGOn(dgNumber))
       throw new IllegalStateException("Cannot set on again a datagram which is not on");
     if (!isLoggedIn())
       throw new IllegalStateException("Cannot set on again a datagram when not yet logged in");
-
+    
     sendCommand("set-2 " + dgNumber + " 1");
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the interface variable to have the given value. This works only if the
    * ChessclubConnection is not logged on yet, otherwise, throws an 
    * IllegalArgumentException. The actual interface variable will be set during 
    * the login procedure.
    */
-
+  
   public final synchronized void setInterface(String interfaceVar){
     if (isLoggedIn())
       throw new IllegalStateException();
     
     this.interfaceVar = interfaceVar;
   }
-
-
-
-
-
+  
+  
+  
+  
+  
   /**
    * Sets the style. If the ChessclubConnection is already logged in, then
    * a "set-quietly style <style>" command is send immediately, otherwise, the setting
@@ -344,27 +363,27 @@ public class ChessclubConnection extends free.util.Connection{
    * mehod returns a value different than 0 and different from the given style,
    * this method will throw an IllegalAccessException.
    */
-
+  
   public final synchronized boolean setStyle(int style){
     int essentialStyle = getEssentialStyle();
     if ((essentialStyle != -1) && (essentialStyle != style))
       return false;
-
+    
     this.style = style;
     if (isLoggedIn())
       sendCommand("set-quietly style " + style);
-
+    
     return true;
   }
-
-
-
+  
+  
+  
   /**
    * Returns true if the datagram with the given id is essential for the normal
    * operation of the instance and therefore cannot be turned off. Overriding
    * methods MUST check with the superclass method before returning false.
    */
-
+  
   protected boolean isEssentialDG(int dgNumber){
     switch (dgNumber){
       case Datagram.DG_WHO_AM_I:
@@ -376,22 +395,22 @@ public class ChessclubConnection extends free.util.Connection{
         return false;
     }
   }
-
-
-
+  
+  
+  
   /**
    * Returns the style which is essential for the normal operation of this class
    * and therefore cannot be changed. Returns -1 if the style setting is not
    * essential. Overriding methods MUST check with the superclass method before
    * returning a value. This method returns -1.
    */
-
+  
   protected int getEssentialStyle(){
     return -1;
   }
-
-
-
+  
+  
+  
   /**
    * Returns true if the given level2 datagram is turned on.
    * Note that this method returns the actual level2 settings, not the ones
@@ -404,17 +423,17 @@ public class ChessclubConnection extends free.util.Connection{
    *
    * @see #setDGState(int,boolean)
    */
-
+  
   public synchronized boolean isDGOn(int dg){
     return level2Settings.get(dg);
   }
-
   
-
+  
+  
   /**
    * Sends the login information to the server.
    */
-
+  
   protected void sendLoginSequence(){
     if ((getPassword() == null) || (getPassword().length() == 0))
       sendCommand(getRequestedUsername());
@@ -443,14 +462,13 @@ public class ChessclubConnection extends free.util.Connection{
     
     super.handleConnected();
   }
-
-
-
-
+  
+  
+  
   /**
    * Sets the various things we need to set on login.
    */
-
+  
   protected void handleLoginSucceeded(){
     synchronized(this){
       // Apply any level2 changes which might have occurred when we were waiting
@@ -460,11 +478,17 @@ public class ChessclubConnection extends free.util.Connection{
         if (state != level2Settings.get(i))
           sendCommand("set-2 "+ i +" " + (state ? "1" : "0"));
       }
-
+      
       sendCommand("set-quietly prompt 0");
       sendCommand("set-quietly highlight 0");
       sendCommand("set-quietly style " + style);
       sendCommand("set-quietly interface " + interfaceVar);
+      
+      for (Iterator i = onLoginCommandQueue.iterator(); i.hasNext();){
+        String command = (String)i.next();
+        sendCommand(command);
+      }
+      onLoginCommandQueue.clear();
     }
     
     super.handleLoginSucceeded();
@@ -573,7 +597,7 @@ public class ChessclubConnection extends free.util.Connection{
   
   private String filterLine(String line){
     int len = line.length();
-
+    
     // Keep initially empty lines.
     if (len == 0)
       return "";
@@ -609,35 +633,35 @@ public class ChessclubConnection extends free.util.Connection{
    * If the connection is currently logged in, sends the "exit" command to the
    * server. Otherwise the call is simply ignored.
    */
-
+  
   public void quit(){
     if (isLoggedIn())
       sendCommand("exit");
   }
-
-
-
+  
+  
+  
   /**
    * Sends the specified command to the server.
    */
-   
+  
   public void sendCommand(String command){
     sendCommand(command, true);
   }
   
-
-
+  
+  
   /**
    * Sends the given command to the server, optionally logging it to the log stream.
    */
-
+  
   public synchronized void sendCommand(String command, boolean log){
     if (!isConnected())
       throw new IllegalStateException("Not connected");
     
     if (log && (logStream != null))
       logStream.println("SENDING COMMAND: " + command);
-
+    
     try{
       OutputStream out = getOutputStream();
       out.write(command.getBytes("ISO8859_1"));
@@ -647,9 +671,23 @@ public class ChessclubConnection extends free.util.Connection{
         connectionInterrupted(e);
       }
   }
-
-
-
+  
+  
+  
+  /**
+   * If we're logged in, sends the specified command to the server, otherwise
+   * the command is put into a queue and sent on-login.
+   */
+  
+  public synchronized void sendCommandWhenLoggedIn(String command){
+    if (isLoggedIn())
+      sendCommand(command);
+    else
+      onLoginCommandQueue.addLast(command);
+  }
+  
+  
+  
   /**
    * Returns the name of the rating category with the given index. Note that
    * this is unknown until the login procedure is done (which may be even after
@@ -658,13 +696,13 @@ public class ChessclubConnection extends free.util.Connection{
    * like DG_WHO_AM_I). Returns null if no such rating category exists, or it's
    * unknown yet.
    */
-
+  
   public String getRatingCategoryName(int index){
     return (String)ratingCategoryNames.get(new Integer(index));
   }
-
-
-
+  
+  
+  
   /**
    * Returns the name of the wild variant with the given number.Note that
    * this is unknown until the login procedure is done (which may be even after
@@ -673,13 +711,13 @@ public class ChessclubConnection extends free.util.Connection{
    * like DG_WHO_AM_I). Returns null if no such wild variant exists, or it's
    * unknown yet.
    */
-
+  
   public String getVariantName(int number){
     return (String)variantNames.get(new Integer(number));
   }
-
-
-
+  
+  
+  
   /**
    * This method is called when a new level2 datagram arrives from the server.
    *
@@ -687,11 +725,11 @@ public class ChessclubConnection extends free.util.Connection{
    *
    * @see #processDatagram(Datagram)
    */
-
+  
   public final void handleDatagram(Datagram datagram){
     if (logStream != null)
       logStream.println(datagram);
-
+    
     int id = datagram.getId();
     if ((id == Datagram.DG_WHO_AM_I) && !isLoggedIn())
       loginSucceeded(datagram.getString(0));
@@ -715,7 +753,7 @@ public class ChessclubConnection extends free.util.Connection{
       else
         level2Settings.clear(dgType);
     }
-
+    
     fireDatagramEvent(datagram);
   }
   
@@ -728,27 +766,27 @@ public class ChessclubConnection extends free.util.Connection{
    *
    * @see #processLine(String)
    */
-
+  
   public final void handleLine(String line){
     if (logStream != null)
       logStream.println(line);
     
     processLine(line);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * This method is called to process a single line of text.
    *
    * @param line The line that was received, '\n' not included.
    */
-
+  
   protected void processLine(String line){
     
   }
-
-
-
+  
+  
+  
 }

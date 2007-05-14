@@ -25,6 +25,8 @@ package free.freechess;
 import java.io.*;
 import java.util.BitSet;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,6 +115,13 @@ public class FreechessConnection extends Connection{
    */
 
   private final Hashtable linesToFilter = new Hashtable();
+  
+  
+  /**
+   * The queue of commands we are to send on-login.
+   */
+  
+  private LinkedList onLoginCommandQueue = new LinkedList();
 
 
 
@@ -355,6 +364,12 @@ public class FreechessConnection extends Connection{
 
       sendCommand("$set ptime 0");
       filterLine("Your prompt will now not show the time.");
+      
+      for (Iterator i = onLoginCommandQueue.iterator(); i.hasNext();){
+        String command = (String)i.next();
+        sendCommand(command);
+      }
+      onLoginCommandQueue.clear();
     }
   }
 
@@ -390,10 +405,23 @@ public class FreechessConnection extends Connection{
         connectionInterrupted(e);
       }
   }
-
-
-
-
+  
+  
+  
+  /**
+   * If we're logged in, sends the specified command to the server, otherwise
+   * the command is put into a queue and sent on-login.
+   */
+  
+  public synchronized void sendCommandWhenLoggedIn(String command){
+    if (isLoggedIn())
+      sendCommand(command);
+    else
+      onLoginCommandQueue.addLast(command);
+  }
+  
+  
+  
   /**
    * This method is called when a line of text that isn't identified as some
    * known type of information arrives from the server.
