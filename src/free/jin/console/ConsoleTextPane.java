@@ -21,21 +21,46 @@
 
 package free.jin.console;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.awt.image.BufferedImage;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.Keymap;
+import javax.swing.text.Utilities;
 
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.util.GraphicsUtilities;
+import free.util.ImageUtilities;
 import free.util.PlatformUtils;
 import free.workarounds.FixedJTextPane;
 
@@ -52,76 +77,84 @@ import free.workarounds.FixedJTextPane;
  */
 
 public class ConsoleTextPane extends FixedJTextPane{
-
+  
+  
   
   /**
    * The Console we're a part of.
    */
-
+  
   protected final Console console;
+  
+  
+  
+  /**
+   * The paint we use for the background; <code>null</code> if none.
+   */
+  
+  private Paint backgroundPaint = null;
   
   
   
   /**
    * The default Popup.
    */
-
+  
   protected JPopupMenu defaultPopupMenu = null;
-
-
-
-
+  
+  
+  
+  
   /**
    * We keep the links here.
    */
-
+  
   private Vector links = new Vector();
-
-
-
-
+  
+  
+  
+  
   /**
    * Our regular cursor (our real cursor might be hand while over a link).
    */
-
+  
   private Cursor regCursor = Cursor.getDefaultCursor();
-
-
-
-
+  
+  
+  
+  
   /**
    * What is the link we're currently over? Null if none.
    */
-
+  
   private Link curLink = null;
-
-
-
-
+  
+  
+  
   /**
    * Creates a new ConsoleTextPane which will be a part of the given Console.
    */
-
+  
   public ConsoleTextPane(Console console){
     this.console = console;
-
+    
     setEditable(false);
-
+    
     ToolTipManager tooltipManager = ToolTipManager.sharedInstance();
     if (!tooltipManager.isEnabled())
       tooltipManager.setEnabled(true);
-
+    
     tooltipManager.registerComponent(this);
-
+    
     Action copyAction = new DefaultEditorKit.CopyAction();
     Keymap keymap = getKeymap();
     keymap.removeBindings();
     keymap.setResolveParent(null);
     keymap.addActionForKeyStroke(
-      KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), copyAction);
+        KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0), copyAction);
     keymap.addActionForKeyStroke(
-      KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), copyAction);
-
+        KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), copyAction);
+    
     enableEvents(MouseEvent.MOUSE_EVENT_MASK | MouseEvent.MOUSE_MOTION_EVENT_MASK);
     
     setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -133,131 +166,91 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Re-reads all the plugin properties used by this instance and/or clears any
    * cached values of such properties.
    */
-
+  
   public void refreshFromProperties(){
     defaultPopupMenu = null;
-    renderingHints = null;
     repaint();
   }
-
-
-
-
-  /**
-   * A Hashtable mapping <code>RenderingHints$Key</code> objects (as strings,
-   * so that they can be used via BeanShell to their current values (again, as
-   * strings).
-   */
-
-  private Hashtable renderingHints = null;
-
-
-
-  /**
-   * This is set to <code>false</code> if we find out that we're not running
-   * under a Java2D capable JVM.
-   */
-
-  private static boolean renderingHintsSupported = true;
-
-
-
+  
+  
   
   /**
-   * Some classes, methods and fields we use for rendering hints setting.
+   * Sets the image we use for the background pattern.
    */
+  
+  public void setBackgroundPattern(Image image){
+    setBackground(new Color(0, 0, 0, 0)); // Otherwise the background color is painted over the pattern
+    
+    ImageUtilities.preload(image);
+    BufferedImage bi = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    bi.getGraphics().drawImage(image, 0, 0, null);
+    backgroundPaint = new TexturePaint(bi, new Rectangle(0, 0, bi.getWidth(), bi.getHeight()));
+  }
+  
 
-  private Class g2Class, rhClass, rhKeyClass;
-  private Class [] argumentTypes;
-  private Method setRenderingHint;
-
-
-
-
+  
   /**
    * Overrides <code>paintComponent</code> to enable/disable antialiasing and
    * perhaps other expensive rendering hints.
    */
-
+  
   protected void paintComponent(Graphics g){
-    if (renderingHints == null){
-      renderingHints = new Hashtable(10, 0.1f);
-      boolean antialias = console.getPrefs().getBool("output-text.antialias", false);
-//      String fractionalMetrics = console.getProperty("output-text.fractionalMetrics");
-
-      String textAntialiasValue = "VALUE_TEXT_ANTIALIAS_" + (antialias ? "ON" : "OFF");
-      renderingHints.put("KEY_TEXT_ANTIALIASING", textAntialiasValue);
-//      if (fractionalMetrics != null)
-//        renderingHints.put("KEY_FRACTIONALMETRICS", fractionalMetrics);
-    }
-
-    if (renderingHintsSupported && !renderingHints.isEmpty()){
-      try{
-        if (g2Class == null){
-          g2Class = Class.forName("java.awt.Graphics2D");
-          rhClass = Class.forName("java.awt.RenderingHints");
-          rhKeyClass = Class.forName("java.awt.RenderingHints$Key");
-          argumentTypes = new Class[]{rhKeyClass, Object.class};
-          setRenderingHint = g2Class.getMethod("setRenderingHint", argumentTypes);
-        }
-
-        Enumeration renderingHintsEnum = renderingHints.keys();
-        while (renderingHintsEnum.hasMoreElements()){
-          String keyName = (String)renderingHintsEnum.nextElement();
-          String valueName = (String)renderingHints.get(keyName);
-          Object key = rhClass.getField(keyName).get(null);
-          Object value = rhClass.getField(valueName).get(null);
-          Object [] args = new Object[]{key, value};
-          setRenderingHint.invoke(g, args);
-        }
-      } catch (Exception e){
-          System.err.println("Failed to set rendering hints. Probably not running under a Java2D capable JVM.");
-          renderingHintsSupported = false;
-        }
-    }
-
+    Graphics2D g2d = (Graphics2D)g;
+    
+    Paint standardPaint = g2d.getPaint();
+    
+    g2d.setPaint(backgroundPaint);
+    g2d.fill(g2d.getClip());
+    
+    g2d.setPaint(standardPaint);
+    
+    boolean antialias = console.getPrefs().getBool("output-text.antialias", false);
+    Object textAntialiasValue = antialias ?
+        RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+    g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, textAntialiasValue);
+    
     super.paintComponent(g);
   }
-
-
+  
+  
   
   /**
    * Should we use the hack that prevents the text pane from becoming taller
    * than Short.MAX_VALUE pixels?
    */
-
+  
   private static final boolean SHOULD_USE_16_BIT_GRAPHICS_HACK = 
     !PlatformUtils.isJavaBetterThan("1.2") && (PlatformUtils.isOldWindows() || PlatformUtils.isSolaris());
-
-
-
-
+  
+  
+  
+  
   /**
    * Overrides <code>reshape(int, int, int, int)</code> to possibly prevent
    * the text pane from becoming taller than Short.MAX_VALUE pixels tall.
    * See bug http://developer.java.sun.com/developer/bugParade/bugs/4138673.html
    * for details.
    */
-
+  
   public void reshape(int x, int y, int width, int height){
     if ((height > Short.MAX_VALUE) && SHOULD_USE_16_BIT_GRAPHICS_HACK){
       try{
         // Remove lines until our preferred height is less than Short.MAX_VALUE
         Document document = getDocument();
         while (getPreferredSize().height >= Short.MAX_VALUE){
-
+          
           // Find the first newline
           int documentLength = document.getLength();
           String text = document.getText(0, Math.min(200, documentLength));
           int newlineIndex;
           while ((newlineIndex = text.indexOf('\n')) == -1)
             text = document.getText(0, Math.min(text.length() * 2, documentLength));
-
+          
           // Remove the first line
           document.remove(0, newlineIndex + 1);
         }
       } catch (BadLocationException e){e.printStackTrace();}
-
+      
       Container parent = getParent();
       if (parent != null){
         parent.invalidate();
@@ -268,11 +261,11 @@ public class ConsoleTextPane extends FixedJTextPane{
     else
       super.reshape(x, y, width, height);
   }
-
-
-
-
-    
+  
+  
+  
+  
+  
   /**
    * We override this to prevent unnecessary Toolkit.beep()s which are caused
    * when you press a key when the text pane has focus because it's not
@@ -281,38 +274,38 @@ public class ConsoleTextPane extends FixedJTextPane{
    * {@link free.jin.console.Console#keyPressed(java.awt.event.KeyEvent)} for
    * more details.
    */
-
+  
   protected void processComponentKeyEvent(KeyEvent evt){
     if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null)){
       evt.consume(); // Otherwise the parent scrollpane gets it and starts doing
-                     // things we already handle, like scrolling on PAGE_UP
+      // things we already handle, like scrolling on PAGE_UP
       return;
     }
-
+    
     super.processComponentKeyEvent(evt);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns a JPopupMenu for the given mouse event. This method is called each
    * time the right mouse button is clicked over the ConsoleTextPane, if it
    * returns null, no popup is shown. The default implementation returns obtains
    * the popup items from the plugin properties.
    */
-
+  
   protected JPopupMenu getPopupMenu(MouseEvent evt){
     String selection = getSelectedText();
     int selectionStart = getSelectionStart();
     int selectionEnd = getSelectionEnd();
-
+    
     if ((selection == null) || (selection.length() == 0) ||
         !isOverText(evt.getX(), evt.getY(), selectionStart, selectionEnd)){
       int pressedLocation = viewToModel(evt.getPoint());
       if (pressedLocation == -1)
         return null;
-
+      
       try{
         int wordStart = getWordStart(pressedLocation);
         int wordEnd = getWordEnd(pressedLocation);
@@ -320,18 +313,18 @@ public class ConsoleTextPane extends FixedJTextPane{
           selection = getDocument().getText(wordStart, wordEnd - wordStart);
           if (selection.trim().length() != 0) // Don't override current selection with whitespace selection
             select(wordStart, wordEnd);
-
+          
           selection = getSelectedText();
         }
       } catch (BadLocationException e){
           e.printStackTrace();
           return null;
-        }
+      }
     }
-
+    
     if ((selection == null) || (selection.length() == 0))
       return null;
-
+    
     if (defaultPopupMenu == null)
       defaultPopupMenu = createPopupMenu();
     
@@ -355,9 +348,9 @@ public class ConsoleTextPane extends FixedJTextPane{
     int itemCount = prefs.getInt(popupPrefix + "itemCount", 0);
     if (itemCount == 0)
       return null;
-
+    
     JPopupMenu popupMenu = new JPopupMenu();
-
+    
     for (int i = 0; i < itemCount; i++){
       String itemPrefix = popupPrefix + i + ".";
       
@@ -380,7 +373,7 @@ public class ConsoleTextPane extends FixedJTextPane{
       else
         throw new IllegalStateException("Unknown console popup item type: " + itemType);
     }  
-
+    
     popupMenu.setSize(popupMenu.getPreferredSize());
     
     return popupMenu;
@@ -391,7 +384,7 @@ public class ConsoleTextPane extends FixedJTextPane{
   /**
    * Returns the start of the word at the specified location.
    */
-
+  
   private int getWordStart(int location) throws BadLocationException{
     Document document = getDocument();
     Element lineElement = Utilities.getParagraphElement(this, location);
@@ -401,9 +394,9 @@ public class ConsoleTextPane extends FixedJTextPane{
     String text = document.getText(lineStart, lineEnd - lineStart);
     if ((text == null) || (text.length() == 0))
       return location;
-
+    
     location -= lineStart;
-
+    
     char locationChar = text.charAt(location);
     boolean isWhitespaceWord;
     if (isWhitespaceChar(locationChar))
@@ -412,24 +405,24 @@ public class ConsoleTextPane extends FixedJTextPane{
       isWhitespaceWord = false;
     else 
       return location + lineStart;
-
+    
     for (int i = location; i >= 0; i--){
       char c = text.charAt(i);
       if ((isWhitespaceWord && !isWhitespaceChar(c)) || 
-           !isWhitespaceWord && !isWordChar(c))
+          !isWhitespaceWord && !isWordChar(c))
         return lineStart + i + 1;
     }
-
+    
     return lineStart;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the end of the word at the specified location.
    */
-
+  
   private int getWordEnd(int location) throws BadLocationException{
     Document document = getDocument();
     Element lineElement = Utilities.getParagraphElement(this, location);
@@ -439,11 +432,11 @@ public class ConsoleTextPane extends FixedJTextPane{
     String text = document.getText(lineStart, lineEnd - lineStart);
     if ((text == null) || (text.length() == 0))
       return location;
-
+    
     location -= lineStart;
-
+    
     int textLength = text.length();
-
+    
     char locationChar = text.charAt(location);
     boolean isWhitespaceWord;
     if (isWhitespaceChar(locationChar))
@@ -452,51 +445,51 @@ public class ConsoleTextPane extends FixedJTextPane{
       isWhitespaceWord = false;
     else 
       return location + lineStart + 1;
-
+    
     for (int i = location; i < textLength; i++){
       char c = text.charAt(i);
       if ((isWhitespaceWord && !isWhitespaceChar(c)) || 
-           !isWhitespaceWord && !isWordChar(c))
+          !isWhitespaceWord && !isWordChar(c))
         return lineStart + i;
     }
-
+    
     return lineEnd;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns <code>true</code> if the specified character should be considered
    * a word character by the text selection mechanism, <code>false</code>
    * otherwise.
    */
-
+  
   protected boolean isWordChar(char c){
     return Character.isLetter(c) || Character.isDigit(c);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns <code>true</code> if the specified character should be considered
    * a whitespace character by the text selection mechanism, <code>false</code>
    * otherwise.
    */
-
+  
   protected boolean isWhitespaceChar(char c){
     return Character.isWhitespace(c);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Expurgates the current selection by replacing all non-whitespace characters
    * with asterisks.
    */
-
+  
   protected void expurgateSelection(){
     String selection = getSelectedText();
     int selectionLength = selection.length();
@@ -508,54 +501,54 @@ public class ConsoleTextPane extends FixedJTextPane{
       else
         asterisks.append('*');
     }
-
+    
     boolean isEditable = isEditable();
     setEditable(true);
     replaceSelection(asterisks.toString());
     setEditable(isEditable);
   }
-
-
-
-
+  
+  
+  
+  
   
   /**
    * Adds the given Link to this ConsoleTextPane, making the text between the
    * starting index and the ending index clickable.
    */
-
+  
   public void addLink(Link link){
     links.addElement(link);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Removes all the links.
    */
-
+  
   public void removeLinks(){
     links.removeAllElements();
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Due to a bug in MS VM, which never sends mouse events with clickCount more
    * than 2, we're forced to count clicks ourselves. 
    */
-
+  
   private int clickCount = 0;
   private long lastReleaseTime;
-
-
-
+  
+  
+  
   /**
    * Updates the click count, if necessary.
    */
-
+  
   private void updateClickCount(MouseEvent evt){
     if (PlatformUtils.isOldMicrosoftVM()){
       switch (evt.getID()){
@@ -577,32 +570,32 @@ public class ConsoleTextPane extends FixedJTextPane{
       }
     }
   }
-
-
-
+  
+  
+  
   /**
    * Returns the click count for the specified mouse event.
    */
-
+  
   private int getClickCount(MouseEvent evt){
     return PlatformUtils.isOldMicrosoftVM() ? clickCount : evt.getClickCount();
   }
-
-
-
+  
+  
+  
   /**
    * Processes the given MouseEvent.
    */
-
+  
   protected void processMouseEvent(MouseEvent evt){
     updateClickCount(evt);
-
+    
     // We want to handle events where clickCount >= 2 ourselves
     if (evt.getClickCount() < 2)
       super.processMouseEvent(evt);
-
+    
     int pressedLoc = viewToModel(evt.getPoint());
-
+    
     if (pressedLoc != -1){
       try{
         if ((getClickCount(evt) >= 2) && (evt.getID() == MouseEvent.MOUSE_PRESSED)
@@ -610,7 +603,7 @@ public class ConsoleTextPane extends FixedJTextPane{
           if ((getClickCount(evt) % 2) == 0){
             int start = getWordStart(pressedLoc);
             int end = getWordEnd(pressedLoc);
-
+            
             select(start, end);
           }
           else{
@@ -618,13 +611,13 @@ public class ConsoleTextPane extends FixedJTextPane{
             Element paragraphElement = Utilities.getParagraphElement(this, pressedLoc);
             int start = paragraphElement.getStartOffset();
             int end = Math.min(paragraphElement.getEndOffset(), document.getLength());
-
+            
             select(start, end);
           }
         }
       } catch (BadLocationException e){}
     }
-
+    
     if (evt.isPopupTrigger()){
       JPopupMenu popup = getPopupMenu(evt);
       if (popup != null){ 
@@ -654,58 +647,58 @@ public class ConsoleTextPane extends FixedJTextPane{
         popup.show(this,x,y);
       }
     }
-
+    
     if (evt.getID() == MouseEvent.MOUSE_EXITED){
       curLink = null;
       setCursor(regCursor);
     }
-
-        // We're not doing anything on a MOUSE_ENTERED event (although we should)
-        // because if we do, and the user clicks in a popup directly over a link
-        // we get a MOUSE_ENTERED event immediately followed by a MOUSE_CLICK
-        // event (bug http://developer.java.sun.com/developer/bugParade/bugs/4119993.html probably)
-        // and so we run the link.
+    
+    // We're not doing anything on a MOUSE_ENTERED event (although we should)
+    // because if we do, and the user clicks in a popup directly over a link
+    // we get a MOUSE_ENTERED event immediately followed by a MOUSE_CLICK
+    // event (bug http://developer.java.sun.com/developer/bugParade/bugs/4119993.html probably)
+    // and so we run the link.
     if (/*(evt.getID() == MouseEvent.MOUSE_ENTERED) || */
         (evt.getID() == MouseEvent.MOUSE_RELEASED)){
       processPossibleLinkUpdate(evt);
     } 
-
+    
     if ((evt.getID() == MouseEvent.MOUSE_CLICKED) && SwingUtilities.isLeftMouseButton(evt)){
       if (curLink != null)
         console.issueCommand(curLink.getCommand());
     } 
-
+    
   }
-
-
-
-
+  
+  
+  
+  
   /** 
    * Processes the given Mouse(Motion)Event.
    */
-
+  
   protected void processMouseMotionEvent(MouseEvent evt){
     updateClickCount(evt);
-
+    
     super.processMouseMotionEvent(evt);
-
+    
     if (evt.getID() == MouseEvent.MOUSE_MOVED){
       processPossibleLinkUpdate(evt);
     }
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * This method is called when a mouse event occurs that might change whether
    * we're over a link. This method determines whether it changed and updates
    * all the variables.
    */
-
+  
   private void processPossibleLinkUpdate(MouseEvent evt){
     Link newLink = getLink(evt.getX(), evt.getY());
-
+    
     if (newLink == null){
       if (curLink != null){
         curLink = null;
@@ -717,50 +710,50 @@ public class ConsoleTextPane extends FixedJTextPane{
       setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR), false);
     }
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the link at the given location, or null if none.
    */
-
+  
   protected Link getLink(int x, int y){
     int numLinks = links.size();
     for (int i = 0; i < numLinks; i++){
       Link link = (Link)links.elementAt(i);
       int linkStart = link.getStartPosition().getOffset();
       int linkEnd = link.getEndPosition().getOffset();
-
+      
       if (isOverText(x, y, linkStart, linkEnd))
         return link;
     }
-
+    
     return null;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns <code>true</code> if the specified location (in pixels) is on a
    * character between the two specified positions in the text.
    */
-
+  
   protected boolean isOverText(int x, int y, int startPos, int endPos){
     Rectangle startCharRect, endCharRect;
     try{
       startCharRect = modelToView(startPos);
       endCharRect = modelToView(endPos);
     } catch (BadLocationException e){ // Shouldn't happen
-        e.printStackTrace();
-        return false;
-      }
-
+      e.printStackTrace();
+      return false;
+    }
+    
     // Sometimes modelToView returns null, not sure why.
     if ((startCharRect == null) || (endCharRect == null)) 
       return false;
-
+    
     if (startCharRect.y + startCharRect.height <= endCharRect.y){ // Separate lines.
       if (y > startCharRect.y){
         if (y <= startCharRect.y + startCharRect.height){
@@ -769,14 +762,14 @@ public class ConsoleTextPane extends FixedJTextPane{
               int lineEnd = Utilities.getRowEnd(this, startPos);
               if (lineEnd == -1)
                 return false;
-
+              
               Rectangle lineEndCharRect = modelToView(lineEnd);
               if (x <= lineEndCharRect.x + lineEndCharRect.width)
                 return true;
             } catch (BadLocationException e){ // Shouldn't happen
-                e.printStackTrace();
-                return false;
-              }
+              e.printStackTrace();
+              return false;
+            }
           }
         }
         else if (y < endCharRect.y)
@@ -791,29 +784,29 @@ public class ConsoleTextPane extends FixedJTextPane{
       if (startCharRect.union(endCharRect).contains(x, y))
         return true;
     }
-
+    
     return false;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the tooltip to display.
    */
-
+  
   public String getToolTipText(MouseEvent evt){
     Link link = getLink(evt.getX(), evt.getY());
     if (link != null){
       Command command = link.getCommand();
       if (!command.isSpecial()){
         String commandString = command.getCommandString();
-
+        
         try{
           int startIndex = link.getStartPosition().getOffset();
           int length = link.getEndPosition().getOffset() - startIndex;
           String linkText = getText(startIndex, length);
-
+          
           if (linkText.equals(commandString))
             return null;
           else
@@ -824,32 +817,32 @@ public class ConsoleTextPane extends FixedJTextPane{
     
     return null;
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Overrides setCursor to save information about the regular cursor.
    */
-
+  
   public void setCursor(Cursor cursor){
     setCursor(cursor, true);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Sets the cursor to the given Cursor, if the given boolean value is true,
    * saves the given cursor into regCursor.
    */
-
+  
   private void setCursor(Cursor cursor, boolean save){
     super.setCursor(cursor);
     if (save)
       regCursor = cursor;
   }
-
+  
   
   
   /**
@@ -863,17 +856,17 @@ public class ConsoleTextPane extends FixedJTextPane{
     int scroll = viewRect.height-3*getScrollableUnitIncrement(viewRect, orientation, direction); 
     return scroll <= 0 ? viewRect.height : scroll;
   }
-
-
-
+  
+  
+  
   /**
    * Returns the unit scroll amount.
    */
-
+  
   public int getScrollableUnitIncrement(Rectangle viewRect, int orientation, int direction){
     if (orientation == SwingConstants.HORIZONTAL)
       return super.getScrollableUnitIncrement(viewRect, orientation, direction);
-
+    
     FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
     return metrics.getHeight();
   }
@@ -1023,5 +1016,5 @@ public class ConsoleTextPane extends FixedJTextPane{
   }
   
   
-
+  
 }

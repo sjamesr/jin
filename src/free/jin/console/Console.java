@@ -24,6 +24,7 @@ package free.jin.console;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -666,12 +667,20 @@ public class Console extends JPanel implements KeyListener{
     attributesCache.clear(); // Clear the cache
 
     /********************* OUTPUT COMPONENT ***********************/
-
-    // We set it here because of a Swing bug which causes the background to be 
-    // drawn with the foreground color if you set the background as an attribute.
-    Color outputBg = prefs.getColor("background", null);
-    if (outputBg != null)
-      outputComponent.setBackground(outputBg);
+    
+    String backgroundType = prefs.getString("background.type", "color");
+    
+    if ("color".equals(backgroundType)){
+      // We set it here because of a Swing bug which causes the background to be 
+      // drawn with the foreground color if you set the background as an attribute.
+      Color outputBg = prefs.getColor("background", null);
+      if (outputBg != null)
+        outputComponent.setBackground(outputBg);
+    }
+    else if ("pattern".equals(backgroundType)){
+      Image image = getToolkit().getImage(Console.class.getResource("background.png"));
+      outputComponent.setBackgroundPattern(image);
+    }
 
     Color outputSelection = prefs.getColor("output-selection", null);
     if (outputSelection != null)
