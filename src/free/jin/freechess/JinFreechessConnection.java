@@ -340,7 +340,48 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
   
   public void sendPersonalTell(ServerUser user, String message){
-    sendCommand("xtell " + user.getName() + "! " + message);
+    sendCommand("$xtell " + user.getName() + "! " + message);
+  }
+  
+  
+  
+  /**
+   * Does nothing, since nothing needs to be done.
+   */
+  
+  public void joinPersonalChat(ServerUser user){
+    
+  }
+  
+  
+  
+  /**
+   * Joins channel 1.
+   */
+  
+  public void joinHelpForum(){
+    sendCommandWhenLoggedIn("+channel 1");
+  }
+  
+  
+  
+  /**
+   * Joins the specified chat forum.
+   */
+  
+  public void joinChat(String type, Object forum){
+    if ("shout".equals(type))
+      sendCommandWhenLoggedIn("$set shout 1");
+    else if ("cshout".equals(type))
+      sendCommandWhenLoggedIn("$set sshout 1");
+    else if ("channel-tell".equals(type)){
+      Integer channel = (Integer)forum;
+      sendCommandWhenLoggedIn("+channel " + channel.intValue());
+    }
+    else if ("kibitz".equals(type)){
+      Integer game = (Integer)forum;
+      sendCommandWhenLoggedIn("$observe " + game);
+    }
   }
   
   

@@ -711,6 +711,47 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Does nothing, since nothing needs to be done.
+   */
+  
+  public void joinPersonalChat(ServerUser user){
+    
+  }
+  
+  
+  
+  /**
+   * Joins channel 1.
+   */
+  
+  public void joinHelpForum(){
+    sendCommandWhenLoggedIn("+channel 1");
+  }
+  
+  
+  
+  /**
+   * Joins the specified chat forum.
+   */
+  
+  public void joinChat(String type, Object forum){
+    if ("shout".equals(type))
+      sendCommandWhenLoggedIn("set-quietly shout 1");
+    else if ("sshout".equals(type))
+      sendCommandWhenLoggedIn("set-quietly sshout 1");
+    else if ("channel-tell".equals(type)){
+      Integer channel = (Integer)forum;
+      sendCommandWhenLoggedIn("+channel " + channel.intValue());
+    }
+    else if ("kibitz".equals(type)){
+      Integer game = (Integer)forum;
+      sendCommandWhenLoggedIn("observe " + game);
+    }
+  }
+
+  
+  
+  /**
    * Processes a DG_PERSONAL_TELL.
    */
    

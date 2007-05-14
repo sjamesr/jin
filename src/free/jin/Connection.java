@@ -232,8 +232,40 @@ public interface Connection{
    */
   
   void sendPersonalTell(ServerUser user, String message);
-
-
+  
+  
+  
+  /**
+   * Joins a personal chat session with the specified user.
+   */
+  
+  void joinPersonalChat(ServerUser user);
+  
+  
+  
+  /**
+   * Joins the server's help forum.
+   */
+  
+  void joinHelpForum();
+  
+  
+  
+  /**
+   * Joins the specified chat forum. The values may be any which the connection
+   * is capable of producing in a <code>ChatEvent</code>, but the connection may
+   * ignore a call with if the specified <code>type</code> is not the primary
+   * type for a certain chatting forum. For example, ICS shouts have two types -
+   * normal "shout" type and a special "ishout" type. This method must accept
+   * the "ishout" type (as in, not throw an exception), but it may ignore it.
+   * 
+   * @see ChatEvent#getType()
+   * @see ChatEvent#getForum()
+   */
+  
+  void joinChat(String type, Object forum);
+  
+  
   
   /**
    * Starts a new, empty, examination game.
