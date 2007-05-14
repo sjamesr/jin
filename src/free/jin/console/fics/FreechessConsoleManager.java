@@ -24,6 +24,7 @@ package free.jin.console.fics;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
+import free.jin.console.ics.ICSGeneralChatConsoleDesignation;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -49,8 +50,18 @@ public class FreechessConsoleManager extends ConsoleManager{
    * Returns a FICS-specific help console designation.
    */
   
-  protected ConsoleDesignation createHelpConsoleDesignation(){
-    return new FreechessHelpConsoleDesignation(getEncoding());
+  protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable){
+    return new FreechessHelpConsoleDesignation(getEncoding(), isCloseable);
+  }
+  
+  
+  
+  /**
+   * Returns a FICS-specific general chat console designation.
+   */
+  
+  protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
+    return new ICSGeneralChatConsoleDesignation(getEncoding(), isCloseable);
   }
 
 

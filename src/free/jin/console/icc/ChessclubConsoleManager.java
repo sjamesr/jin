@@ -24,6 +24,7 @@ package free.jin.console.icc;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
+import free.jin.console.ics.ICSGeneralChatConsoleDesignation;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -49,8 +50,18 @@ public class ChessclubConsoleManager extends ConsoleManager{
    * Returns an ICC-specific help console designation.
    */
   
-  protected ConsoleDesignation createHelpConsoleDesignation(){
-    return new ChessclubHelpConsoleDesignation(getEncoding());
+  protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable){
+    return new ChessclubHelpConsoleDesignation(getEncoding(), isCloseable);
+  }
+  
+  
+  
+  /**
+   * Returns an ICC-specific general chat console designation.
+   */
+  
+  protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
+    return new ICSGeneralChatConsoleDesignation(getEncoding(), isCloseable);
   }
   
   

@@ -199,10 +199,15 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     if ("system".equals(type))
       return createSystemConsoleDesignation();
     else if ("help".equals(type)){
-      helpConsoleDesignation = createHelpConsoleDesignation();
+      boolean isCloseable = prefs.getBool(prefsPrefix + "closeable", true);
+      helpConsoleDesignation = createHelpConsoleDesignation(isCloseable);
       return helpConsoleDesignation;
     }
     else if ("chat".equals(type)){
+      boolean isCloseable = prefs.getBool(prefsPrefix + "closeable", true);
+      return createGeneralChatConsoleDesignation(isCloseable);
+    }
+    else if ("customchat".equals(type)){
       String name = prefs.getString(prefsPrefix + "name", null);
       if (name == null)
         name = i18n.getString(prefs.getString(prefsPrefix + "nameKey"));
@@ -244,7 +249,16 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * implemented by a server-specific console manager.
    */
   
-  protected abstract ConsoleDesignation createHelpConsoleDesignation();
+  protected abstract ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable);
+  
+  
+  
+  /**
+   * Creates the general chat console designation. This method is meant to be
+   * implemented by a server-specific console manager.
+   */
+  
+  protected abstract ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable);
   
   
   
@@ -760,7 +774,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       Console helpConsole = null;
       
       if (helpConsoleDesignation == null)
-        helpConsoleDesignation = createHelpConsoleDesignation();
+        helpConsoleDesignation = createHelpConsoleDesignation(true);
       else
         helpConsole = getConsole(helpConsoleDesignation);
       
