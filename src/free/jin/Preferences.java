@@ -1039,6 +1039,12 @@ public abstract class Preferences{
     public Object get(String prefName, Object defaultValue){
       return mainDelegate.get(prefName, defaultDelegate.get(prefName, defaultValue));
     }
+    
+    
+    
+    public Object lookup(String pref, Object defaultValue){
+      return mainDelegate.lookup(pref, defaultDelegate.lookup(pref, defaultValue));
+    }
 
 
 
