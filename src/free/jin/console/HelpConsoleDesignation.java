@@ -59,6 +59,16 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
+   * Joins the help forum.
+   */
+  
+  public void consoleAdded(Connection connection, Console console){
+    connection.joinHelpForum();
+  }
+  
+  
+  
+  /**
    * The default implementation accepts all chat events.
    */
   

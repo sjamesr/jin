@@ -45,6 +45,16 @@ public interface ConsoleDesignation{
   
   
   /**
+   * This method is invoked when a console with this designation is added.
+   * Designations which display events occurring in forums which require
+   * to actively join them should do so in this method.
+   */
+  
+  void consoleAdded(Connection connection, Console console);
+  
+  
+  
+  /**
    * Receives the specified <code>JinEvent</code>, possibly displaying it in
    * some manner in the specified console.
    */

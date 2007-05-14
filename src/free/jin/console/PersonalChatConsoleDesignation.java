@@ -69,6 +69,16 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
   
   
   /**
+   * Joins all the chat types we're accepting.
+   */
+  
+  public void consoleAdded(Connection connection, Console console){
+    connection.joinPersonalChat(conversationPartner);
+  }
+  
+  
+  
+  /**
    * Returns our sole command type - sending a personal tell to our conversation
    * partner.
    */
@@ -76,7 +86,6 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
   public CommandType [] getCommandTypes(){
     return new CommandType[]{sendPersonalTell};
   }
-
   
   
   

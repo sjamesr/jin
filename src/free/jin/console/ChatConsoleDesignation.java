@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import free.jin.Connection;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
@@ -69,6 +70,19 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
+   * Joins all the chat types we're accepting.
+   */
+  
+  public void consoleAdded(Connection connection, Console console){
+    for (Iterator i = acceptedChatTypes.iterator(); i.hasNext();){
+      ChatType chatType = (ChatType)i.next();
+      connection.joinChat(chatType.getType(), chatType.getForum());
+    }
+  }
+  
+  
+  
+  /**
    * Adds the specified <code>CommandType</code> to the list of of command types
    * this <code>ChatConsoleDesignation</code> is able to issue.
    */
@@ -91,13 +105,10 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Make the specified chat event subset accepted. Passing <code>null</code>
-   * for an argument means that any value for that chat event property is
-   * accepted. For example:
-   * <blockquote>addAccepted("channel", new Integer(50), null)</blockquote>
-   * accepts all channel 50 tells, while
-   * <blockquote>addAccepted(null, null, "AlexTheGreat")</blockquote>
-   * accepts all chat events coming from <code>AlexTheGreat</code>.
+   * Make the specified chat type accepted by this chat console.
+   * The combination of <code>type</code>, <code>forum</code> and
+   * <code>sender</code> must be one which corresponds to an actual possible
+   * chat type on the server.
    */
   
   public void addAccepted(String type, Object forum, ServerUser sender){
@@ -219,6 +230,36 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
         return false;
       
       return true;
+    }
+    
+    
+    
+    /**
+     * Returns the type of this chat type.
+     */
+    
+    public String getType(){
+      return type;
+    }
+    
+    
+    
+    /**
+     * Returns the forum of this chat type.
+     */
+    
+    public Object getForum(){
+      return forum;
+    }
+    
+    
+    
+    /**
+     * Returns the sender of this chat type.
+     */
+    
+    public ServerUser getSender(){
+      return sender;
     }
     
     

@@ -368,6 +368,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
           console.obtainFocus();
         }
       });
+      
+      designation.consoleAdded(getConn(), console);
     }
     
     if (makeActive)

@@ -59,6 +59,16 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
+   * Does nothing, since nothing needs to be done.
+   */
+  
+  public void consoleAdded(Connection connection, Console console){
+    
+  }
+  
+  
+  
+  /**
    * Returns our sole command type - sending user-typed commands as-is to the
    * server.
    */
