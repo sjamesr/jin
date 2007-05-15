@@ -176,11 +176,13 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   private void createConsoles(){
-    int consoleCount = getPrefs().getInt("consoles.count", 0);
+    Preferences prefs = getPrefs();
+    int consoleCount = prefs.getInt("consoles.count", 0);
+    int activeConsole = prefs.getInt("consoles.selected", consoleCount - 1);
     for (int i = 0; i < consoleCount; i++){
       ConsoleDesignation designation = 
         loadConsoleDesignation("consoles." + i + ".");
-      addConsole(designation, false);
+      addConsole(designation, i == activeConsole);
     }
   }
   
@@ -702,7 +704,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
 
   public void saveState(){
+    Preferences prefs = getPrefs();
     
+    prefs.setInt("consoles.selected", consolesTabbedPane.getModel().getSelectedIndex());
   }
 
 
