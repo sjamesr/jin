@@ -21,7 +21,6 @@
 
 package free.jin.console;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -165,9 +164,6 @@ public class ConsoleTextField extends FixedJTextField{
     enableEvents(KeyEvent.KEY_EVENT_MASK | FocusEvent.FOCUS_EVENT_MASK | MouseEvent.MOUSE_EVENT_MASK);
 
     initFromProperties();
-    
-    Font oldFont = getFont();
-    setFont(new Font("Monospaced", oldFont.getStyle(), oldFont.getSize()));
     
     updateSendAction();
     getDocument().addDocumentListener(new DocumentListener(){
