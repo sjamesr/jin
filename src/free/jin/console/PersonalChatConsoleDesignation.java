@@ -50,6 +50,15 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    */
   
   private final CommandType sendPersonalTell;
+  
+  
+  
+  /**
+   * The number of unseen (added when the console is invisible) messages we've
+   * received.
+   */
+  
+  private int unseenMessageCount = 0;
 
   
   
@@ -69,11 +78,22 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
   
   
   /**
-   * Joins all the chat types we're accepting.
+   * Joins personal chat with out conversation partner.
    */
   
-  public void consoleAdded(Connection connection, Console console){
+  protected void joinForums(Connection connection){
     connection.joinPersonalChat(conversationPartner);
+  }
+  
+  
+  
+  /**
+   * Clears the unseen message count.
+   */
+  
+  protected void consoleShown(){
+    unseenMessageCount = 0;
+    setName(conversationPartner.getName());
   }
   
   
@@ -108,7 +128,7 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    * Appends the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt, Console console){
+  protected void append(JinEvent evt){
     // We already know it's a ChatEvent because it passed accept(JinEvent)
     ChatEvent chatEvent = (ChatEvent)evt;
     
@@ -122,7 +142,13 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
       ": " +
       message;
     
+    Console console = getConsole();
     console.addToOutput(text, console.textTypeForEvent(evt));
+    
+    if (!console.isVisible()){
+      unseenMessageCount++;
+      setName(conversationPartner.getName() + " (" + unseenMessageCount + ")");
+    }
   }
   
   
