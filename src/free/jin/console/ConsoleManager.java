@@ -562,6 +562,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
 
   public void chatMessageReceived(ChatEvent evt){
+    if ((evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY) && 
+        getPrefs().getBool("newConsoleOnPersonalTell", false))
+      addConsole(new PersonalChatConsoleDesignation(evt.getSender(), getEncoding(), true), false);
+      
     eventForConsoleReceived(evt);
   }
   
