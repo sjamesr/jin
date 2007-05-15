@@ -289,6 +289,20 @@ public class LicensePanel extends DialogPanel{
     beanshellPanel.add(new JLabel("<html>.</html>"));
     add(beanshellPanel);
     add(Box.createVerticalStrut(5));
+    
+    JPanel swingLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    swingLayoutPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
+    LinkLabel swingLayoutWebsiteLabel = new LinkLabel("Swing Layout project");
+    swingLayoutWebsiteLabel.setToolTipText("https://swing-layout.dev.java.net/");
+    swingLayoutWebsiteLabel.addActionListener(new UrlDisplayingAction("https://swing-layout.dev.java.net/"));
+    swingLayoutPanel.add(swingLayoutWebsiteLabel);
+    swingLayoutPanel.add(new JLabel("<html>, licensed under the&nbsp</html>"));
+    LinkLabel swingLayoutLicenseLabel = new LinkLabel("GNU Lesser General Public License");
+    swingLayoutLicenseLabel.addActionListener(lgplActionListener);
+    swingLayoutPanel.add(swingLayoutLicenseLabel);
+    swingLayoutPanel.add(new JLabel("<html>.</html>"));
+    add(swingLayoutPanel);
+    add(Box.createVerticalStrut(5));
    
     JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     xboardPanel.add(new JLabel("<html>Jin includes a piece set from&nbsp</html>"));
