@@ -71,13 +71,15 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
    * Appends the text for the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt, Console console){
+  protected void append(JinEvent evt){
     ChatEvent chatEvent = (ChatEvent)evt;
     if ("shout".equals(chatEvent.getType()))
-      super.append(evt, console);
-    else
+      super.append(evt);
+    else{
+      Console console = getConsole();
       console.addToOutput("--> " + chatEvent.getSender().getName() + " " + chatEvent.getMessage(),
           console.textTypeForEvent(evt));
+    }
   }
   
   

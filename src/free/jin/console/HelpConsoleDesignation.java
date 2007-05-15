@@ -62,7 +62,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Joins the help forum.
    */
   
-  public void consoleAdded(Connection connection, Console console){
+  protected void joinForums(Connection connection){
     connection.joinHelpForum();
   }
   
@@ -82,8 +82,9 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Appends the specified help message to the console.
    */
 
-  protected void append(JinEvent evt, Console console){
+  protected void append(JinEvent evt){
     ChatEvent chatEvent = (ChatEvent)evt;
+    Console console = getConsole();
     
     ServerUser sender = chatEvent.getSender();
     String title = chatEvent.getSenderTitle();

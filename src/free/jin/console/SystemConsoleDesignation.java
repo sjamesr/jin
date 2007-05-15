@@ -59,16 +59,6 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
-   * Does nothing, since nothing needs to be done.
-   */
-  
-  public void consoleAdded(Connection connection, Console console){
-    
-  }
-  
-  
-  
-  /**
    * Returns our sole command type - sending user-typed commands as-is to the
    * server.
    */
@@ -93,11 +83,11 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Appends the specified event to the console.
    */
   
-  protected void append(JinEvent evt, Console console){
+  protected void append(JinEvent evt){
     if (evt instanceof PlainTextEvent)
-      appendPlainText((PlainTextEvent)evt, console);
+      appendPlainText((PlainTextEvent)evt);
     else if (evt instanceof ChatEvent)
-      appendChat((ChatEvent)evt, console);
+      appendChat((ChatEvent)evt);
   }
   
   
@@ -106,8 +96,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Appends the text of the specified plain text event to the console.
    */
   
-  private void appendPlainText(PlainTextEvent evt, Console console){
-    console.addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
+  private void appendPlainText(PlainTextEvent evt){
+    getConsole().addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
   }
   
   
@@ -118,7 +108,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * @see #textForChat(ChatEvent, String)
    */
   
-  private void appendChat(ChatEvent evt, Console console){
+  private void appendChat(ChatEvent evt){
+    Console console = getConsole();
     console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
     if (isPersonalTell(evt))
       console.personalTellReceived(evt.getSender());

@@ -21,6 +21,8 @@
 
 package free.jin.console;
 
+import java.beans.PropertyChangeListener;
+
 import free.jin.Connection;
 import free.jin.event.JinEvent;
 import free.util.AbstractNamed;
@@ -37,6 +39,22 @@ public interface ConsoleDesignation{
   
   
   /**
+   * Adds a property change listener.
+   */
+  
+  void addPropertyChangeListener(PropertyChangeListener listener);
+  
+  
+  
+  /**
+   * Removes a property change listener.
+   */
+  
+  void removePropertyChangeListener(PropertyChangeListener listener);
+  
+  
+  
+  /**
    * Returns the name of this designation.
    */
   
@@ -45,12 +63,12 @@ public interface ConsoleDesignation{
   
   
   /**
-   * This method is invoked when a console with this designation is added.
-   * Designations which display events occurring in forums which require
-   * to actively join them should do so in this method.
+   * This method is invoked to tell the designation what console it is
+   * responsible for. It is invoked before any calls to
+   * {@link #receive(JinEvent)}.
    */
   
-  void consoleAdded(Connection connection, Console console);
+  void setConsole(Console console);
   
   
   
@@ -59,7 +77,7 @@ public interface ConsoleDesignation{
    * some manner in the specified console.
    */
   
-  void receive(JinEvent evt, Console console);
+  void receive(JinEvent evt);
   
   
   

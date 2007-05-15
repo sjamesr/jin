@@ -27,6 +27,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -354,15 +356,24 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * (otherwise, no action is taken).
    */
   
-  public void addConsole(ConsoleDesignation designation, boolean makeActive){
+  public void addConsole(final ConsoleDesignation designation, boolean makeActive){
     Console console = getConsole(designation);
     
     if (console == null){
       console = createConsole(designation);
       consoles.add(console);
+      designation.setConsole(console);
       
-      Tab tab = new Tab(console, designation.getName(), null, designation.isConsoleCloseable());
+      final Tab tab = new Tab(console, designation.getName(), null, designation.isConsoleCloseable());
       consolesTabbedPane.getModel().addTab(tab);
+      
+      designation.addPropertyChangeListener(new PropertyChangeListener(){
+        public void propertyChange(PropertyChangeEvent evt){
+          if ("name".equals(evt.getPropertyName())){
+            tab.setTitle(designation.getName());
+          }
+        }
+      });
         
       console.addComponentListener(new ComponentAdapter(){
         public void componentShown(ComponentEvent e){
@@ -370,8 +381,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
           console.obtainFocus();
         }
       });
-      
-      designation.consoleAdded(getConn(), console);
     }
     
     if (makeActive)
@@ -423,7 +432,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Creates a single <code>Console</code> for this <code>ConsoleManager</code>.
-   * @param designation TODO
    */
 
   protected Console createConsole(ConsoleDesignation designation){
@@ -583,7 +591,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
-      console.getDesignation().receive(evt, console);
+      console.getDesignation().receive(evt);
     }
   }
   

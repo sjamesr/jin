@@ -73,7 +73,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * Joins all the chat types we're accepting.
    */
   
-  public void consoleAdded(Connection connection, Console console){
+  protected void joinForums(Connection connection){
     for (Iterator i = acceptedChatTypes.iterator(); i.hasNext();){
       ChatType chatType = (ChatType)i.next();
       connection.joinChat(chatType.getType(), chatType.getForum());
@@ -142,7 +142,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * Appends the text for the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt, Console console){
+  protected void append(JinEvent evt){
     // We already know it's a ChatEvent because it passed accept(JinEvent)
     ChatEvent chatEvent = (ChatEvent)evt;
     
@@ -160,6 +160,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
       ": " +
       message;
     
+    Console console = getConsole();
     console.addToOutput(text, console.textTypeForEvent(evt));
   }
   

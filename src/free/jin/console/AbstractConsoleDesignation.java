@@ -21,6 +21,11 @@
 
 package free.jin.console;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 import free.jin.Connection;
 import free.jin.event.JinEvent;
 import free.util.TextUtilities;
@@ -29,7 +34,8 @@ import free.util.TextUtilities;
 
 
 /**
- * A skeleton implementation of <code>ConsoleDesignation</code>
+ * A skeleton implementation of <code>ConsoleDesignation</code> wit some useful
+ * facilities.
  */
 
 public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
@@ -40,7 +46,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * The name of the designation.
    */
   
-  private final String name;
+  private String name;
   
   
   
@@ -62,6 +68,22 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * The console we're responsible for.
+   */
+  
+  private Console console;
+  
+  
+  
+  /**
+   * Our property change support.
+   */
+  
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this); 
+  
+  
+  
+  /**
    * Creates a new <code>AbstractConsoleDesignation</code> with the specified
    * name, encoding and closeable status.
    */
@@ -75,11 +97,106 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * Sets our console.
+   */
+  
+  public void setConsole(Console console){
+    this.console = console;
+    
+    console.addComponentListener(new ComponentAdapter(){
+      public void componentShown(ComponentEvent e){
+        consoleShown();
+      }
+      public void componentHidden(ComponentEvent e){
+        consoleHidden();
+      }
+    });
+    
+    joinForums(console.getConsoleManager().getConn());
+  }
+  
+  
+  
+  /**
+   * Returns the console we're responsible for.
+   */
+  
+  public Console getConsole(){
+    return console;
+  }
+  
+  
+  
+  /**
+   * This method should be overridden by subclasses to join any forums this
+   * designation accepts which need to be joined explicitly.
+   */
+  
+  protected void joinForums(Connection connection){
+    
+  }
+  
+  
+  
+  /**
+   * Invoked when the console we're responsible for is shown.
+   */
+  
+  protected void consoleShown(){
+    
+  }
+  
+  
+  
+  /**
+   * Invoked when the console we're responsible for is hidden.
+   */
+  
+  protected void consoleHidden(){
+    
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public void addPropertyChangeListener(PropertyChangeListener listener){
+    propertyChangeSupport.addPropertyChangeListener(listener);
+  }
+  
+  
+  
+  /**
+   * Removes a property change listener.
+   */
+  
+  public void removePropertyChangeListener(PropertyChangeListener listener){
+    propertyChangeSupport.removePropertyChangeListener(listener);
+  }
+  
+  
+  
+  /**
    * Returns the name of this designation.
    */
 
   public String getName(){
     return name;
+  }
+  
+  
+  
+  /**
+   * Sets the name of this designation.
+   */
+  
+  protected void setName(String name){
+    String oldName = this.name;
+    this.name = name;
+    
+    propertyChangeSupport.firePropertyChange("name", oldName, name);
   }
   
   
@@ -149,9 +266,9 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * it and, if accepted, sending it to the console.
    */
   
-  public void receive(JinEvent evt, Console console){
+  public void receive(JinEvent evt){
     if (accept(evt))
-      append(evt, console);
+      append(evt);
   }
   
   
@@ -170,7 +287,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * there in some manner. 
    */
   
-  protected abstract void append(JinEvent evt, Console console);
+  protected abstract void append(JinEvent evt);
   
   
   
