@@ -71,6 +71,9 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
+
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Jin;
@@ -325,14 +328,26 @@ public class Console extends JPanel implements KeyListener{
   private void createUI(){
     JComponent actionsComponent = createActionsComponent();
     
-    JPanel commandTypePanel = new JPanel(new BorderLayout());
-    commandTypePanel.add(commandTypeComponent, BorderLayout.LINE_START);
-    commandTypePanel.add(new JLabel(":"), BorderLayout.LINE_END);
+    JLabel colonLabel = new JLabel(":");
     
-    JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
-    bottomPanel.add(commandTypePanel, BorderLayout.LINE_START);
-    bottomPanel.add(inputComponent, BorderLayout.CENTER);
-    bottomPanel.add(actionsComponent, BorderLayout.LINE_END);
+    JPanel bottomPanel = new JPanel();
+    GroupLayout bottomPanelLayout = new GroupLayout(bottomPanel);
+    bottomPanel.setLayout(bottomPanelLayout);
+    
+    bottomPanelLayout.setHorizontalGroup(
+        bottomPanelLayout.createSequentialGroup()
+          .add(commandTypeComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+          .add(colonLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+          .addPreferredGap(LayoutStyle.RELATED)
+          .add(inputComponent, 0, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .addPreferredGap(LayoutStyle.UNRELATED)
+          .add(actionsComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE));
+    bottomPanelLayout.setVerticalGroup(
+        bottomPanelLayout.createParallelGroup(GroupLayout.BASELINE)
+          .add(commandTypeComponent)
+          .add(colonLabel)
+          .add(inputComponent)
+          .add(actionsComponent));
     
     // Hack to make room for the window resize handle
     if (PlatformUtils.isMacOSX() && (Jin.getInstance().getUIProvider() instanceof SdiUiProvider))
@@ -615,15 +630,24 @@ public class Console extends JPanel implements KeyListener{
    */
   
   private JComponent createCommandTypeComponent(){
-    ConsoleDesignation.CommandType [] commandTypes =
-      designation.getCommandTypes();
+    ConsoleDesignation.CommandType [] commandTypes = designation.getCommandTypes();
     
-    if (commandTypes.length == 1)
-      return new JLabel(commandTypes[0].toString());
+    JComboBox box = new JComboBox(commandTypes);
+    box.setEditable(false);
+    box.setFocusable(false);
+    Dimension boxPrefSize = box.getPreferredSize();
+    
+    JLabel label = new JLabel(commandTypes[0].toString());
+    Dimension labelPrefSize = label.getPreferredSize();
+    
+    int height = Math.max(boxPrefSize.height, labelPrefSize.height);
+    
+    if (commandTypes.length == 1){
+      label.setPreferredSize(new Dimension(labelPrefSize.width, height));
+      return label;
+    }
     else{
-      JComboBox box = new JComboBox(commandTypes);
-      box.setEditable(false);
-      box.setFocusable(false);
+      box.setPreferredSize(new Dimension(boxPrefSize.width, height));
       return box;
     }
   }
