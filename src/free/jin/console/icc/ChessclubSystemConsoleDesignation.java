@@ -48,18 +48,6 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   /**
-   * Returns whether the specified chat event is a personal tell. 
-   */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    String type = evt.getType();
-    return type.equals("tell") || type.equals("say") || type.equals("atell") ||
-        type.equals("ptell");
-  }
-  
-  
-  
-  /**
    * Returns the text which should be added to the console for the specified
    * chat event.
    */
