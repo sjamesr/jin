@@ -71,6 +71,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.jdesktop.layout.Baseline;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 
@@ -349,11 +350,18 @@ public class Console extends JPanel implements KeyListener{
           .add(inputComponent)
           .add(actionsComponent));
     
+    bottomPanel.setSize(bottomPanel.getPreferredSize());
+    bottomPanel.doLayout();
+    Rectangle inputBounds = inputComponent.getBounds();
+    int topGap = inputBounds.y;
+    int bottomGap = bottomPanel.getHeight() - (inputBounds.y + inputBounds.height);
+    int vgap = Math.max(2, Math.max(topGap, bottomGap));
+    
     // Hack to make room for the window resize handle
     if (PlatformUtils.isMacOSX() && (Jin.getInstance().getUIProvider() instanceof SdiUiProvider))
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5 ,2, 18));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(vgap - topGap, 5 , vgap - bottomGap, 18));
     else
-      bottomPanel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+      bottomPanel.setBorder(BorderFactory.createEmptyBorder(vgap - topGap, 5, vgap - bottomGap, 5));
     
     setLayout(new BorderLayout());
     add(outputScrollPane, BorderLayout.CENTER);
@@ -642,12 +650,22 @@ public class Console extends JPanel implements KeyListener{
     
     int height = Math.max(boxPrefSize.height, labelPrefSize.height);
     
+    int boxBaseline = Baseline.getBaseline(box, 50, height);
+    int labelBaseline = Baseline.getBaseline(label, 50, height); 
+    int maxBaseline = Math.max(boxBaseline, labelBaseline);
+    
     if (commandTypes.length == 1){
       label.setPreferredSize(new Dimension(labelPrefSize.width, height));
+      label.setMinimumSize(label.getPreferredSize());
+      if (maxBaseline > labelBaseline)
+        label.setBorder(BorderFactory.createEmptyBorder(maxBaseline - labelBaseline, 0, 0, 0));
       return label;
     }
     else{
       box.setPreferredSize(new Dimension(boxPrefSize.width, height));
+      box.setMinimumSize(box.getPreferredSize());
+      if (maxBaseline > boxBaseline)
+        box.setBorder(BorderFactory.createEmptyBorder(maxBaseline - boxBaseline, 0, 0, 0));
       return box;
     }
   }
