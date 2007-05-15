@@ -292,7 +292,7 @@ public class LicensePanel extends DialogPanel{
     
     JPanel swingLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     swingLayoutPanel.add(new JLabel("<html>Jin uses the&nbsp</html>"));
-    LinkLabel swingLayoutWebsiteLabel = new LinkLabel("Swing Layout project");
+    LinkLabel swingLayoutWebsiteLabel = new LinkLabel("swing-layout project");
     swingLayoutWebsiteLabel.setToolTipText("https://swing-layout.dev.java.net/");
     swingLayoutWebsiteLabel.addActionListener(new UrlDisplayingAction("https://swing-layout.dev.java.net/"));
     swingLayoutPanel.add(swingLayoutWebsiteLabel);
