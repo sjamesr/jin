@@ -23,6 +23,7 @@ package free.jin.console.ics;
 
 import free.jin.Connection;
 import free.jin.I18n;
+import free.jin.ServerUser;
 import free.jin.console.ChatConsoleDesignation;
 import free.jin.console.Console;
 import free.jin.event.ChatEvent;
@@ -52,16 +53,18 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
     
     I18n i18n = I18n.get(ICSGeneralChatConsoleDesignation.class);
     
-    addCommandType(new CommandType(i18n.getString("shoutCommandName")){
-      public void executeCommand(String userText, Connection connection){
+    addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
+      protected void executeCommand(String userText, Connection connection){
         connection.sendCommand("shout " + userText);
       }
+      protected void echoCommand(String userText, ServerUser user){}
     });
 
-    addCommandType(new CommandType(i18n.getString("ishoutCommandName")){
-      public void executeCommand(String userText, Connection connection){
+    addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
+      protected void executeCommand(String userText, Connection connection){
         connection.sendCommand("i " + userText);
       }
+      protected void echoCommand(String userText, ServerUser user){}
     });
   }
   

@@ -23,6 +23,7 @@ package free.jin.console;
 
 import free.jin.Connection;
 import free.jin.I18n;
+import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
@@ -141,7 +142,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * server.
    */
   
-  private class IssueCommand extends CommandType{
+  private class IssueCommand extends AbstractCommandType{
     
     
     
@@ -159,8 +160,19 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Issues the specified command.
      */
     
-    public void executeCommand(String command, Connection connection){
+    protected void executeCommand(String command, Connection connection){
       connection.sendCommand(encode(command, connection));
+    }
+    
+    
+    
+    /**
+     * Echoes the specified command to the console.
+     */
+    
+    protected void echoCommand(String command, ServerUser user){
+      Console console = getConsole();
+      console.addToOutput(command, console.getUserTextType());
     }
     
     

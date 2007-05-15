@@ -112,7 +112,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * A <code>CommandType</code> which asks a help question.
    */
   
-  private class AskHelpQuestion extends CommandType{
+  private class AskHelpQuestion extends AbstractCommandType{
     
     
     
@@ -130,8 +130,19 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Asks the specified help question.
      */
     
-    public void executeCommand(String userText, Connection connection){
+    protected void executeCommand(String userText, Connection connection){
       connection.sendHelpQuestion(encode(userText, connection));
+    }
+    
+    
+    
+    /**
+     * Echoes the question to the console.
+     */
+    
+    protected void echoCommand(String userText, ServerUser user){
+      Console console = getConsole();
+      console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
     }
     
     

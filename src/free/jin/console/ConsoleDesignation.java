@@ -25,7 +25,7 @@ import java.beans.PropertyChangeListener;
 
 import free.jin.Connection;
 import free.jin.event.JinEvent;
-import free.util.AbstractNamed;
+import free.util.Named;
 
 
 
@@ -102,25 +102,19 @@ public interface ConsoleDesignation{
    * Defines a certain type of command which can be issued by the user.
    */
   
-  public static abstract class CommandType extends AbstractNamed{
+  public interface CommandType extends Named{
     
     
     
     /**
-     * Creates a new <code>CommandType</code> with the specified name.
+     * Invoked when a command is issued by the user with this command type.
+     * 
+     * @param userText The text entered by the user.
+     * @param connection The connection to the server.
+     * @param doNotEcho Set if the command should not be echoed to the console.
      */
     
-    public CommandType(String name){
-      super(name);
-    }
-    
-    
-    
-    /**
-     * Executes the command specified by the text typed by the user.
-     */
-    
-    public abstract void executeCommand(String userText, Connection connection);
+    public abstract void issueCommand(String userText, Connection connection, boolean doNotEcho);
     
     
     

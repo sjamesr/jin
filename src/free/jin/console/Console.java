@@ -967,6 +967,16 @@ public class Console extends JPanel implements KeyListener{
   
   
   /**
+   * Returns the text type for user-typed text.
+   */
+  
+  public String getUserTextType(){
+    return "user";
+  }
+  
+  
+  
+  /**
    * Actually does the work of adding the given text to the output component's
    * Document.
    */
@@ -1093,17 +1103,17 @@ public class Console extends JPanel implements KeyListener{
   void issueCommand(Command command){
     String commandString = command.getCommandString();
 
-    if (!command.isBlanked())
-      addToOutput(commandString, "user");
-    
-    if (command.isSpecial())
+    if (command.isSpecial()){
       executeSpecialCommand(commandString);
+      if (!command.isBlanked())
+        addToOutput(commandString, "user");
+    }
     else{
       Connection conn = consoleManager.getConn();
       if (!conn.isConnected())
         addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
       else
-        getSelectedCommandType().executeCommand(commandString, consoleManager.getConn());
+        getSelectedCommandType().issueCommand(commandString, consoleManager.getConn(), command.isBlanked());
     }
   }
 

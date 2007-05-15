@@ -184,7 +184,7 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    * A command type which sends a personal tell to our conversation partner.
    */
   
-  private class SendPersonalTell extends CommandType{
+  private class SendPersonalTell extends AbstractCommandType{
     
     
     
@@ -204,9 +204,20 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
      * Sends the specified personal tell to our conversation partner. 
      */
     
-    public void executeCommand(String message, Connection connection){
+    protected void executeCommand(String message, Connection connection){
       connection.sendPersonalTell(conversationPartner, 
           encode(message, connection));
+    }
+    
+    
+    
+    /**
+     * Echoes the message to the console.
+     */
+    
+    protected void echoCommand(String userText, ServerUser user){
+      Console console = getConsole();
+      console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
     }
     
     

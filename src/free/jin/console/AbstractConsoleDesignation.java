@@ -27,7 +27,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import free.jin.Connection;
+import free.jin.ServerUser;
 import free.jin.event.JinEvent;
+import free.util.AbstractNamed;
 import free.util.TextUtilities;
 
 
@@ -288,6 +290,67 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected abstract void append(JinEvent evt);
+  
+  
+  
+  /**
+   * A skeleton implementation of a command type.
+   */
+  
+  protected abstract class AbstractCommandType extends AbstractNamed implements CommandType{
+    
+    
+    
+    /**
+     * Creates a new <code>AbstractCommandType</code> with the specified name.
+     */
+    
+    public AbstractCommandType(String name){
+      super(name);
+    }
+    
+    
+    
+    /**
+     * Invoked when a command is issued by the user with this command type.
+     * In turn, the default implementation invokes <code>executeCommand</code>
+     * and, if the <code>doNotEcho</code> flag is unset,
+     * <code>echoCommand</code>.
+     */
+    
+    public void issueCommand(String userText, Connection connection, boolean doNotEcho){
+      executeCommand(userText, connection);
+      
+      if (!doNotEcho)
+        echoCommand(userText, connection.getUser());
+    }
+    
+    
+    
+    /**
+     * Executes the command specified by the user text. Usually, this meands
+     * sending some command to the server.
+     * 
+     * @param userText The text entered by the user.
+     * @param connection The connection to the server.
+     */
+    
+    protected abstract void executeCommand(String userText, Connection connection);
+      
+    
+    
+    /**
+     * Echoes the command to the console.
+     * 
+     * @param userText The text entered by the user.
+     * @param user The user we're logged in with.
+     */
+    
+    protected abstract void echoCommand(String userText, ServerUser user);
+      
+    
+    
+  }
   
   
   
