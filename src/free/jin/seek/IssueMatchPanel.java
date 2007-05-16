@@ -22,6 +22,7 @@
 package free.jin.seek;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -52,7 +54,9 @@ import free.jin.event.FriendsEvent;
 import free.jin.event.FriendsListener;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
+import free.util.AWTUtilities;
 import free.util.Named;
+import free.util.swing.MoreLessOptionsButton;
 
 
 
@@ -94,7 +98,7 @@ public class IssueMatchPanel extends JPanel{
   private final RatednessSelection ratedness;
   private final VariantSelection variant;
   private final PieceColorSelection pieceColor;
-  private final MoreLessButton moreLess;
+  private final MoreLessOptionsButton moreLess;
   private final JButton issueMatch;
   
   
@@ -104,7 +108,7 @@ public class IssueMatchPanel extends JPanel{
    * a <code>Preferences</code> object to load/save settings from/to.
    */
   
-  public IssueMatchPanel(Plugin plugin, PluginUIContainer container, Preferences prefs){
+  public IssueMatchPanel(Plugin plugin, final PluginUIContainer container, Preferences prefs){
     if (plugin == null)
       throw new IllegalArgumentException("plugin may not be null");
     if (container == null)
@@ -136,10 +140,25 @@ public class IssueMatchPanel extends JPanel{
     variant = new VariantSelection(variants, prefs.getString("variant", "Chess"));
     pieceColor = new PieceColorSelection(pieceColorPref);
     issueMatch = i18n.createButton("issueMatchButton");
-    moreLess = new MoreLessButton(prefs.getBool("isMore", false), container, new Component[]{
+    moreLess = new MoreLessOptionsButton(prefs.getBool("isMore", false), new Component[]{
       ratedness.getBox(),
       variant.getLabel(), variant.getBox(),
       pieceColor.getLabel(), pieceColor.getBox()
+    });
+    
+    moreLess.addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent e){
+        if (moreLess.isMore() && container.isVisible()){
+          // Need to wait for all delayed layout to finish
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              Container contentPane = container.getContentPane();
+              if (!AWTUtilities.fitsInto(contentPane.getMinimumSize(), contentPane.getSize()))
+                container.pack();
+            }
+          });
+        }
+      }
     });
     
     issueMatch.setEnabled(isSelectionValid());

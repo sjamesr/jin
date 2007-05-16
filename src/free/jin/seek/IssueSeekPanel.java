@@ -22,11 +22,15 @@
 package free.jin.seek;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
@@ -39,6 +43,8 @@ import free.jin.SeekConnection;
 import free.jin.UserSeek;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
+import free.util.AWTUtilities;
+import free.util.swing.MoreLessOptionsButton;
 
 
 
@@ -74,7 +80,7 @@ public class IssueSeekPanel extends JPanel{
   private final OpponentRatingRangeSelection oppRatingRange;
   private final ManualAcceptSelection manualAccept;
   private final UseFormulaSelection useFormula;
-  private final MoreLessButton moreLess;
+  private final MoreLessOptionsButton moreLess;
   private final JButton issueSeek;
   
   
@@ -85,7 +91,7 @@ public class IssueSeekPanel extends JPanel{
    * a <code>Preferences</code> object to load/save settings from/to.
    */
    
-  public IssueSeekPanel(Plugin plugin, PluginUIContainer container, Preferences prefs){
+  public IssueSeekPanel(Plugin plugin, final PluginUIContainer container, Preferences prefs){
     if (plugin == null)
       throw new IllegalArgumentException("plugin may not be null");
     if (container == null)
@@ -120,7 +126,7 @@ public class IssueSeekPanel extends JPanel{
     manualAccept = new ManualAcceptSelection(prefs.getBool("manualAccept", false));
     useFormula = new UseFormulaSelection(prefs.getBool("useFormula", true));
     issueSeek = i18n.createButton("issueSeekButton");
-    moreLess = new MoreLessButton(prefs.getBool("isMore", false), container, new Component[]{
+    moreLess = new MoreLessOptionsButton(prefs.getBool("isMore", false), new Component[]{
       variant.getLabel(), variant.getBox(),
       pieceColor.getLabel(), pieceColor.getBox(),
       ratedness.getBox(),
@@ -130,7 +136,21 @@ public class IssueSeekPanel extends JPanel{
       oppRatingRange.getMaximumLimitedBox(), oppRatingRange.getMaximumLimitSpinner()
     });
     
-    
+    moreLess.addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent e){
+        if (moreLess.isMore() && container.isVisible()){
+          // Need to wait for all delayed layout to finish
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              Container contentPane = container.getContentPane();
+              if (!AWTUtilities.fitsInto(contentPane.getMinimumSize(), contentPane.getSize()))
+                container.pack();
+            }
+          });
+        }
+      }
+    });
+
     issueSeek.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         IssueSeekPanel.this.conn.issue(getSeek());
