@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.layout.GroupLayout;
@@ -191,7 +192,9 @@ public class IssueSeekPanel extends JPanel{
     timeControls.getIncrementLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
     variant.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
     pieceColor.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    
+    oppRatingRange.getMinimumLimitedBox().setHorizontalAlignment(SwingConstants.TRAILING);
+    oppRatingRange.getMaximumLimitedBox().setHorizontalAlignment(SwingConstants.TRAILING);
+
     timeControls.getTimeUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
     timeControls.getIncrementUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
     
