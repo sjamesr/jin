@@ -23,14 +23,10 @@ package free.jin.seek;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import free.chess.Player;
 import free.jin.I18n;
 import free.util.NamedWrapper;
-import free.util.TableLayout;
-import free.util.swing.PreferredSizedPanel;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -39,7 +35,15 @@ import free.util.swing.WrapperComponent;
  * which he wants to play.
  */
 
-public final class PieceColorSelection extends WrapperComponent{
+public final class PieceColorSelection{
+  
+  
+  
+  /**
+   * The label.
+   */
+  
+  private final JLabel label;
   
   
   
@@ -66,30 +70,32 @@ public final class PieceColorSelection extends WrapperComponent{
     Object selected = initialColor == null ? automatic : (initialColor.isWhite() ? white : black);
     Object [] pieceColorSelections = new Object[]{automatic, white, black};
     
+    this.label = i18n.createLabel("");
     this.box = new JComboBox(pieceColorSelections);
+    
+    label.setLabelFor(box);
     box.setEditable(false);
     box.setSelectedItem(selected);
-    
-    createUI();
   }
   
   
   
   /**
-   * Creates the UI of this component.
+   * Returns the label.
    */
   
-  private void createUI(){
-    I18n i18n = I18n.get(PieceColorSelection.class);
-    
-    JLabel label = i18n.createLabel("");
-    label.setLabelFor(box);
-    
-    JPanel content = new PreferredSizedPanel(new TableLayout(2, 4, 6));
-    content.add(label);
-    content.add(box);
-    
-    add(content);
+  public JLabel getLabel(){
+    return label;
+  }
+  
+  
+  
+  /**
+   * Returns the box.
+   */
+  
+  public JComboBox getBox(){
+    return box;
   }
   
   

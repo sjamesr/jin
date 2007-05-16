@@ -24,7 +24,6 @@ package free.jin.seek;
 import javax.swing.JCheckBox;
 
 import free.jin.I18n;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -32,7 +31,7 @@ import free.util.swing.WrapperComponent;
  * A UI element which allows the user to specify the ratedness of a game.
  */
 
-public final class RatednessSelection extends WrapperComponent{
+public final class RatednessSelection{
   
   
   
@@ -53,11 +52,19 @@ public final class RatednessSelection extends WrapperComponent{
     I18n i18n = I18n.get(RatednessSelection.class);
     
     this.box = i18n.createCheckBox("");
+    
     box.setSelected(!isUserGuest && isRated);
-    
-    add(box);
-    
-    setEnabled(!isUserGuest);
+    box.setEnabled(!isUserGuest);
+  }
+  
+  
+  
+  /**
+   * Returns the checkbox.
+   */
+  
+  public JCheckBox getBox(){
+    return box;
   }
   
   

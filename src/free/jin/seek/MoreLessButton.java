@@ -22,17 +22,16 @@
 package free.jin.seek;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeListener;
 
 import free.jin.I18n;
 import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -40,7 +39,7 @@ import free.util.swing.WrapperComponent;
  * A UI element which allows the user to show/hide a part of the UI. 
  */
 
-public final class MoreLessButton extends WrapperComponent{
+public final class MoreLessButton{
   
   
   
@@ -53,10 +52,10 @@ public final class MoreLessButton extends WrapperComponent{
   
   
   /**
-   * The component we show/hide.
+   * The list of components we show/hide.
    */
   
-  private final Component target;
+  private final Component [] components;
   
   
   
@@ -69,12 +68,13 @@ public final class MoreLessButton extends WrapperComponent{
   
   
   /**
-   * Creates a new <code>MoreLessButton</code> with the specified target
-   * component and initial state.
+   * Creates a new <code>MoreLessButton</code> with the specified components to
+   * show/hide, initial state and the plugin ui container the components are all
+   * inside of.
    */
   
-  public MoreLessButton(Component target, boolean isMore, PluginUIContainer container){
-    this.target = target;
+  public MoreLessButton(boolean isMore, PluginUIContainer container, Component [] components){
+    this.components = components;
     this.container = container;
     
     this.button = new JButton();
@@ -85,33 +85,18 @@ public final class MoreLessButton extends WrapperComponent{
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
         setMore(!isMore());
-        fireStateChanged();
       }
     });
-    
-    add(button);
   }
   
   
   
   /**
-   * Adds a change listener to receive notifications when the state of this
-   * component changes.
+   * Returns the button.
    */
   
-  public void addChangeListener(ChangeListener listener){
-    super.addChangeListener(listener);
-  }
-  
-  
-  
-  /**
-   * Removes the specified change listener from receiving notifications when the
-   * state of this component changes.
-   */
-  
-  public void removeChangeListener(ChangeListener listener){
-    super.removeChangeListener(listener);
+  public JButton getButton(){
+    return button;
   }
   
   
@@ -125,13 +110,16 @@ public final class MoreLessButton extends WrapperComponent{
     
     button.setActionCommand(isMore ? "less" : "more");
     i18n.initAbstractButton(button, isMore ? "less" : "more");
-    target.setVisible(isMore);
+    
+    for (int i = 0; i < components.length; i++)
+      components[i].setVisible(isMore);
     
     if (isMore && container.isVisible()){
       // Need to wait for all delayed layout to finish
       SwingUtilities.invokeLater(new Runnable(){
         public void run(){
-          if (!AWTUtilities.fitsInto(target.getMinimumSize(), target.getSize()))
+          Container contentPane = container.getContentPane();
+          if (!AWTUtilities.fitsInto(contentPane.getMinimumSize(), contentPane.getSize()))
             container.pack();
         }
       });

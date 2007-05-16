@@ -25,9 +25,8 @@ import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.ListModel;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -36,10 +35,8 @@ import javax.swing.text.JTextComponent;
 
 import free.jin.I18n;
 import free.jin.ServerUser;
-import free.util.TableLayout;
+import free.util.ChangeSupport;
 import free.util.swing.ListWrapperComboBoxModel;
-import free.util.swing.PreferredSizedPanel;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -47,7 +44,15 @@ import free.util.swing.WrapperComponent;
  * A UI element which allows the user to select his opponent in a match offer.
  */
 
-public final class OpponentSelection extends WrapperComponent{
+public final class OpponentSelection{
+  
+  
+  
+  /**
+   * The label.
+   */
+  
+  private final JLabel label;
   
   
   
@@ -60,20 +65,29 @@ public final class OpponentSelection extends WrapperComponent{
   
   
   /**
+   * Our support for state change notifications.
+   */
+  
+  private final ChangeSupport changeSupport = new ChangeSupport(this);
+  
+  
+  
+  /**
    * Creates a new <code>OpponentSelection</code> with the specified list of
    * opponents for easy selection and an initial value.
    */
   
   public OpponentSelection(ListModel easyAccessOpponents, ServerUser initialOpponent){
-    new DefaultComboBoxModel();
+    I18n i18n = I18n.get(OpponentSelection.class);
     
+    this.label = i18n.createLabel("");
     this.box = new JComboBox(new ListWrapperComboBoxModel(easyAccessOpponents));
     box.setEditable(true);
     box.setSelectedItem(initialOpponent);
     
     box.addItemListener(new ItemListener(){
       public void itemStateChanged(ItemEvent e){
-        fireStateChanged();
+        changeSupport.fireStateChanged();
       }
     });
     
@@ -84,17 +98,35 @@ public final class OpponentSelection extends WrapperComponent{
     if (editor instanceof JTextComponent)
       ((JTextComponent)editor).getDocument().addDocumentListener(new DocumentListener(){
         public void changedUpdate(DocumentEvent e){
-          fireStateChanged();
+          changeSupport.fireStateChanged();
         }
         public void insertUpdate(DocumentEvent e){
-          fireStateChanged();
+          changeSupport.fireStateChanged();
         }
         public void removeUpdate(DocumentEvent e){
-          fireStateChanged();
+          changeSupport.fireStateChanged();
         }
       });
-    
-    createUI();
+  }
+  
+  
+  
+  /**
+   * Returns the label.
+   */
+  
+  public JLabel getLabel(){
+    return label;
+  }
+  
+  
+  
+  /**
+   * Returns the opponent selection combo box.
+   */
+  
+  public JComboBox getBox(){
+    return box;
   }
   
   
@@ -106,22 +138,6 @@ public final class OpponentSelection extends WrapperComponent{
   
   public void setOpponent(ServerUser opponent){
     box.setSelectedItem(opponent);
-  }
-  
-  
-  
-  /**
-   * Creates the UI of this component.
-   */
-  
-  private void createUI(){
-    I18n i18n = I18n.get(OpponentSelection.class);
-    
-    JPanel content = new PreferredSizedPanel(new TableLayout(2, 4, 5));
-    content.add(i18n.createLabel(""));
-    content.add(box);
-    
-    add(content);
   }
   
   
@@ -150,7 +166,7 @@ public final class OpponentSelection extends WrapperComponent{
    */
   
   public void addChangeListener(ChangeListener listener){
-    super.addChangeListener(listener);
+    changeSupport.addChangeListener(listener);
   }
   
   
@@ -161,7 +177,7 @@ public final class OpponentSelection extends WrapperComponent{
    */
   
   public void removeChangeListener(ChangeListener listener){
-    super.removeChangeListener(listener);
+    changeSupport.removeChangeListener(listener);
   }
   
   

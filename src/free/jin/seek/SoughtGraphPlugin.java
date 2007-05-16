@@ -21,7 +21,6 @@
 
 package free.jin.seek;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -36,6 +35,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -56,6 +58,8 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
+import free.util.swing.WrapLayout;
+import free.util.swing.WrapperComponent;
 import free.util.swing.tabbedpane.Tab;
 import free.util.swing.tabbedpane.TabbedPane;
 import free.util.swing.tabbedpane.TabbedPaneModel;
@@ -187,9 +191,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   protected void createUI(){
     I18n i18n = getI18n();
     
-    int xGap = 10;
-    int yGap = 10;
-    
     uiContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
     uiContainer.setTitle(i18n.getString("uiContainerTitle"));
 
@@ -203,37 +204,29 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     issueMatchPanel = createIssueMatchPanel();
     soughtGraph = new SoughtGraph(this);
     
-    issueSeekPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    if (issueMatchPanel != null)
-      issueMatchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    
-    JComponent issuePanel;
-    
     JLabel soughtGraphLabel = i18n.createLabel("soughtGraphLabel");
     soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
     
-    if (issueMatchPanel != null){
-      issueTabbedPane = new TabbedPane(SwingConstants.TOP);
-      TabbedPaneModel model = issueTabbedPane.getModel();
-      model.addTab(new Tab(issueSeekPanel, i18n.getString("issueSeekTab.text"), null, false));
+    issueTabbedPane = new TabbedPane(SwingConstants.TOP);
+    issueTabbedPane.setAlwaysShowTabs(false);
+    
+    TabbedPaneModel model = issueTabbedPane.getModel();
+    model.addTab(new Tab(issueSeekPanel, i18n.getString("issueSeekTab.text"), null, false));
+    if (issueMatchPanel != null)
       model.addTab(new Tab(issueMatchPanel, i18n.getString("issueMatchTab.text"), null, false));
-      model.setSelectedIndex(model.indexOfComponent(
-          getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
-              (Component)issueSeekPanel : (Component)issueMatchPanel));
-      
-      issuePanel = issueTabbedPane;
-    }
-    else{
-      JLabel issueSeekLabel = i18n.createLabel("issueSeekLabel");
-      issueSeekLabel.setFont(issueSeekLabel.getFont().deriveFont(Font.BOLD));
+    model.setSelectedIndex(model.indexOfComponent(
+        getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
+            (Component)issueSeekPanel : (Component)issueMatchPanel));
 
-      issuePanel = new JPanel();
-      issuePanel.setLayout(new BorderLayout(xGap, yGap));
-      issuePanel.add(issueSeekLabel, BorderLayout.PAGE_START);
-      issuePanel.add(issueSeekPanel, BorderLayout.CENTER);
+    
+    JLabel issueSeekLabel = null;
+    if (issueMatchPanel == null){
+      issueSeekLabel = i18n.createLabel("issueSeekLabel");
+      issueSeekLabel.setFont(issueSeekLabel.getFont().deriveFont(Font.BOLD));
     }
     
-    JPanel soughtGraphWrapper = new JPanel(new BorderLayout(xGap, yGap)){
+    
+    JComponent soughtGraphWrapper = new WrapperComponent(){
       public Dimension getPreferredSize(){
         // The sought graph doesn't really have a preferred size, as much as a
         // preferred width:height ratio
@@ -243,19 +236,48 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
         return new Dimension(width, height);
       }
     };
-    soughtGraphWrapper.add(soughtGraphLabel, BorderLayout.PAGE_START);
-    soughtGraphWrapper.add(soughtGraph, BorderLayout.CENTER);
+    soughtGraphWrapper.add(soughtGraph);
     soughtGraph.setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background").darker()));
     
     
-    JPanel content = new JPanel(new BorderLayout(xGap, yGap));
-    content.add(issuePanel, BorderLayout.LINE_START);
-    content.add(soughtGraphWrapper, BorderLayout.CENTER);
+    JPanel content = new JPanel();
+    GroupLayout layout = new GroupLayout(content);
+    content.setLayout(layout);
+    layout.setAutocreateContainerGaps(true);
     
-    content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    if (issueSeekLabel == null){
+      layout.setHorizontalGroup(layout.createSequentialGroup()
+          .add(issueTabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+          .addPreferredGap(LayoutStyle.UNRELATED)
+          .add(layout.createParallelGroup()
+            .add(soughtGraphLabel).add(soughtGraphWrapper)));
+        
+        layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.TRAILING)
+          .add(issueTabbedPane)
+          .add(layout.createSequentialGroup()
+            .add(soughtGraphLabel)
+            .addPreferredGap(LayoutStyle.RELATED)
+            .add(soughtGraphWrapper)));
+    }
+    else{
+      layout.setHorizontalGroup(layout.createSequentialGroup()
+        .add(layout.createParallelGroup()
+          .add(issueSeekLabel)
+          .add(issueTabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(LayoutStyle.UNRELATED)
+        .add(layout.createParallelGroup()
+          .add(soughtGraphLabel).add(soughtGraphWrapper)));
+      
+      layout.setVerticalGroup(layout.createSequentialGroup()
+        .add(layout.createParallelGroup(GroupLayout.BASELINE)
+          .add(issueSeekLabel).add(soughtGraphLabel))
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(GroupLayout.LEADING)
+          .add(issueTabbedPane).add(soughtGraphWrapper)));
+    }
     
-    uiContainer.getContentPane().setLayout(new BorderLayout());
-    uiContainer.getContentPane().add(content, BorderLayout.CENTER);
+    uiContainer.getContentPane().setLayout(WrapLayout.getInstance());
+    uiContainer.getContentPane().add(content);
   }
   
   

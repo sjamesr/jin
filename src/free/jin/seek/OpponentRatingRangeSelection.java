@@ -21,26 +21,16 @@
 
 package free.jin.seek;
 
-import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import free.jin.I18n;
-import free.util.AWTUtilities;
-import free.util.TableLayout;
-import free.util.swing.PreferredSizedPanel;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -49,31 +39,55 @@ import free.util.swing.WrapperComponent;
  * opponent(s). 
  */
 
-public final class OpponentRatingRangeSelection extends WrapperComponent{
+public final class OpponentRatingRangeSelection{
   
   
   
   /**
-   * The checkbox specifying whether the range is limited.
+   * The checkbox specifying whether the range is limited at the bottom.
    */
   
-  private final JCheckBox isLimited;
+  private final JCheckBox minimumLimitedBox;
   
   
   
   /**
-   * The minimum rating model.
+   * The model of the minimum rating spinner.
    */
   
-  private final SpinnerNumberModel minimum;
+  private final SpinnerNumberModel minimumModel;
   
   
   
   /**
-   * The maximum rating model.
+   * The minimum rating spinner.
    */
   
-  private final SpinnerNumberModel maximum;
+  private final JSpinner minimumSpinner;
+  
+  
+  
+  /**
+   * The model of the maximum rating spinner.
+   */
+  
+  private final SpinnerNumberModel maximumModel;
+  
+  
+  
+  /**
+   * The checkbox specifying whether the range is limited at the top.
+   */
+  
+  private final JCheckBox maximumLimitedBox;
+  
+  
+  
+  /**
+   * The maximum rating spinner.
+   */
+  
+  private final JSpinner maximumSpinner;
   
   
   
@@ -81,95 +95,106 @@ public final class OpponentRatingRangeSelection extends WrapperComponent{
    * Creates a new <code>OpponentRatingRangeSelection</code> with the specified
    * initial state.
    * 
-   * @isInitiallyLimited Whether the range is initially limited.
+   * @isMininimumLimited Whether the range is initially limited at the bottom.
    * @initialMinimum The initial minimum rating value.
+   * @isMaximumLimited Whether the range is initially limited at the top.
    * @initialMaximum The initial maximum rating value.
    */
   
-  public OpponentRatingRangeSelection(boolean isInitiallyLimited, int initialMinimum, int initialMaximum){
+  public OpponentRatingRangeSelection(boolean isMinimumLimited, int initialMinimum, 
+      boolean isMaximumLimited, int initialMaximum){
+    
     I18n i18n = I18n.get(OpponentRatingRangeSelection.class);
     
-    isLimited = i18n.createCheckBox("isLimitedBox"); 
-    minimum = new SpinnerNumberModel(initialMinimum, 0, 9999, 50);
-    maximum = new SpinnerNumberModel(initialMaximum, 0, 9999, 50);
+    this.minimumModel = new SpinnerNumberModel(initialMinimum, 0, 9999, 50);
+    this.maximumModel = new SpinnerNumberModel(initialMaximum, 0, 9999, 50);
     
-    isLimited.setSelected(isInitiallyLimited);
+    this.minimumLimitedBox = i18n.createCheckBox("minimumLimitedCheckBox");
+    this.minimumSpinner = new JSpinner(minimumModel);
+    this.maximumLimitedBox = i18n.createCheckBox("maximumLimitedCheckBox");
+    this.maximumSpinner = new JSpinner(maximumModel);
     
-    minimum.addChangeListener(new ChangeListener(){
+    minimumLimitedBox.setSelected(isMinimumLimited);
+    maximumLimitedBox.setSelected(isMaximumLimited);
+    
+    minimumSpinner.setEnabled(minimumLimitedBox.isSelected());
+    maximumSpinner.setEnabled(maximumLimitedBox.isSelected());
+    
+    minimumModel.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent e){
-        if (minimum.getNumber().intValue() > maximum.getNumber().intValue())
-          maximum.setValue(minimum.getNumber());
+        if (minimumModel.getNumber().intValue() > maximumModel.getNumber().intValue())
+          maximumModel.setValue(minimumModel.getNumber());
       }
     });
     
-    maximum.addChangeListener(new ChangeListener(){
+    maximumModel.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent e){
-        if (minimum.getNumber().intValue() > maximum.getNumber().intValue())
-          minimum.setValue(maximum.getNumber());
+        if (minimumModel.getNumber().intValue() > maximumModel.getNumber().intValue())
+          minimumModel.setValue(maximumModel.getNumber());
       }
     });
     
-    createUI();
-  }
-  
-  
-  
-  /**
-   * Creates the UI of this component.
-   */
-  
-  private void createUI(){
-    I18n i18n = I18n.get(OpponentRatingRangeSelection.class);
-    
-    JSpinner minSpinner = new JSpinner(minimum);
-    JSpinner maxSpinner = new JSpinner(maximum);
-    
-    Font normalFont = UIManager.getFont("Label.font");
-    int minMaxLabelsFontSize = Math.max(9, normalFont.getSize() - 4);
-    Font minMaxLabelsFont = normalFont.deriveFont((float)minMaxLabelsFontSize);
-    
-    JLabel minLabel = i18n.createLabel("minLabel");
-    minLabel.setFont(minMaxLabelsFont);
-    minLabel.setLabelFor(minSpinner);
-    minLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-    
-    JLabel maxLabel = i18n.createLabel("maxLabel");
-    maxLabel.setFont(minMaxLabelsFont);
-    maxLabel.setLabelFor(maxSpinner);
-    maxLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-    
-    final JPanel rangePanel = new JPanel(new TableLayout(3, 4, 1));
-    rangePanel.add(minSpinner);
-    rangePanel.add(new JLabel("-"));
-    rangePanel.add(maxSpinner);
-    rangePanel.add(minLabel);
-    rangePanel.add(new JPanel());
-    rangePanel.add(maxLabel);
-    
-    AWTUtilities.setContainerEnabled(rangePanel, isLimited.isSelected());
-    isLimited.addItemListener(new ItemListener(){
+    minimumLimitedBox.addItemListener(new ItemListener(){
       public void itemStateChanged(ItemEvent evt){
-        AWTUtilities.setContainerEnabled(rangePanel, isLimited.isSelected());
+        minimumSpinner.setEnabled(minimumLimitedBox.isSelected());
       }
     });
-    
-    rangePanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
-    
-    JPanel content = new PreferredSizedPanel(new TableLayout(1, 4, 6));
-    content.add(isLimited);
-    content.add(rangePanel);
 
-    add(content);
+    maximumLimitedBox.addItemListener(new ItemListener(){
+      public void itemStateChanged(ItemEvent evt){
+        maximumSpinner.setEnabled(maximumLimitedBox.isSelected());
+      }
+    });
   }
   
   
   
   /**
-   * Returns whether the rating range is limited.
+   * Returns the bottom limit enabled checkbox.
    */
   
-  public boolean isLimited(){
-    return isLimited.isSelected();
+  public JCheckBox getMinimumLimitedBox(){
+    return minimumLimitedBox;
+  }
+  
+  
+  
+  /**
+   * Returns the bottom limit spinner.
+   */
+  
+  public JSpinner getMinimumLimitSpinner(){
+    return minimumSpinner;
+  }
+  
+  
+  
+  /**
+   * Returns the top limit enabled checkbox.
+   */
+  
+  public JCheckBox getMaximumLimitedBox(){
+    return maximumLimitedBox;
+  }
+  
+  
+  
+  /**
+   * Returns the top limit spinner.
+   */
+  
+  public JSpinner getMaximumLimitSpinner(){
+    return maximumSpinner;
+  }
+  
+  
+  
+  /**
+   * Returns whether the rating range is limited at the bottom.
+   */
+  
+  public boolean isMinimumLimited(){
+    return minimumLimitedBox.isSelected();
   }
   
   
@@ -179,7 +204,17 @@ public final class OpponentRatingRangeSelection extends WrapperComponent{
    */
   
   public int getMinimum(){
-    return minimum.getNumber().intValue();
+    return minimumModel.getNumber().intValue();
+  }
+  
+  
+  
+  /**
+   * Returns whether the rating range is limited at the top.
+   */
+  
+  public boolean isMaximumLimited(){
+    return maximumLimitedBox.isSelected();
   }
   
   
@@ -189,7 +224,7 @@ public final class OpponentRatingRangeSelection extends WrapperComponent{
    */
   
   public int getMaximum(){
-    return maximum.getNumber().intValue();
+    return maximumModel.getNumber().intValue();
   }
   
   

@@ -21,16 +21,11 @@
 
 package free.jin.seek;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import free.jin.I18n;
-import free.util.TableLayout;
-import free.util.swing.PreferredSizedPanel;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -38,7 +33,15 @@ import free.util.swing.WrapperComponent;
  * A UI element which allows the user to specify the time controls of a game.
  */
 
-public final class TimeControlsSelection extends WrapperComponent{
+public final class TimeControlsSelection{
+  
+  
+  
+  /**
+   * The "Time:" label.
+   */
+  
+  private JLabel timeLabel;
   
   
   
@@ -51,10 +54,34 @@ public final class TimeControlsSelection extends WrapperComponent{
   
   
   /**
+   * The time units label.
+   */
+  
+  private final JLabel timeUnitsLabel;
+  
+  
+  
+  /**
+   * The "Increment:" label.
+   */
+  
+  private final JLabel incrementLabel;
+  
+  
+  
+  /**
    * The increment control.
    */
   
   private final JSpinner increment;
+  
+  
+  
+  /**
+   * The increment units label.
+   */
+  
+  private final JLabel incrementUnitsLabel;
   
   
   
@@ -64,51 +91,78 @@ public final class TimeControlsSelection extends WrapperComponent{
    */
   
   public TimeControlsSelection(int initialTime, int initialIncrement){
-    this.time = new JSpinner(new SpinnerNumberModel(initialTime, 0, 600, 1));
-    this.increment = new JSpinner(new SpinnerNumberModel(initialIncrement, 0, 300, 1));
+    I18n i18n = I18n.get(TimeControlsSelection.class);
     
-    createUI();
+    this.timeLabel = i18n.createLabel("timeLabel");
+    this.time = new JSpinner(new SpinnerNumberModel(initialTime, 0, 600, 1));
+    this.timeUnitsLabel = i18n.createLabel("secondsLabel");
+ 
+    this.incrementLabel = i18n.createLabel("incrementLabel"); 
+    this.increment = new JSpinner(new SpinnerNumberModel(initialIncrement, 0, 300, 1));
+    this.incrementUnitsLabel = i18n.createLabel("minutesLabel");
+    
+    timeLabel.setLabelFor(time);
+    incrementLabel.setLabelFor(increment);
   }
   
   
   
   /**
-   * Creates the UI of this component.
+   * Returns the time label. 
    */
   
-  private final void createUI(){
-    I18n i18n = I18n.get(TimeControlsSelection.class);
-    
-    JPanel content = new PreferredSizedPanel(new TableLayout(3, 4, 6));
-    
-    JLabel timeLabel = i18n.createLabel("timeLabel");
-    timeLabel.setLabelFor(time);
-    timeLabel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-    
-    JLabel incLabel = i18n.createLabel("incrementLabel");
-    incLabel.setLabelFor(increment);
-    incLabel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-    
-    JLabel secondsLabel = i18n.createLabel("secondsLabel");
-    secondsLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    
-    JLabel minutesLabel = i18n.createLabel("minutesLabel");
-    minutesLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    
-    time.setMaximumSize(time.getPreferredSize());
-    increment.setMaximumSize(increment.getPreferredSize());
-    
-    // First row
-    content.add(timeLabel);
-    content.add(time);
-    content.add(minutesLabel);
-    
-    // Second row
-    content.add(incLabel);
-    content.add(increment);
-    content.add(secondsLabel);
-    
-    add(content);
+  public JLabel getTimeLabel(){
+    return timeLabel;
+  }
+  
+  
+  
+  /**
+   * Returns the time spinner.
+   */
+  
+  public JSpinner getTimeSpinner(){
+    return time;
+  }
+  
+  
+  
+  /**
+   * Returns the time units label.
+   */
+  
+  public JLabel getTimeUnitsLabel(){
+    return timeUnitsLabel;
+  }
+  
+  
+  
+  /**
+   * Returns the increment label.
+   */
+  
+  public JLabel getIncrementLabel(){
+    return incrementLabel;
+  }
+  
+  
+  
+  /**
+   * Returns the increment spinner.
+   */
+  
+  public JSpinner getIncrementSpinner(){
+    return increment;
+  }
+  
+  
+  
+  /**
+   * Returns the increment units label.
+   */
+  
+  public JLabel getIncrementUnitsLabel(){
+    return incrementUnitsLabel;
   }
   
   

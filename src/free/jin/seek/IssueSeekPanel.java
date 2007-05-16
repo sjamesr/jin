@@ -21,14 +21,16 @@
 
 package free.jin.seek;
 
-import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -38,7 +40,6 @@ import free.jin.SeekConnection;
 import free.jin.UserSeek;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
-import free.util.TableLayout;
 
 
 
@@ -67,17 +68,15 @@ public class IssueSeekPanel extends JPanel{
   
   
   // The various UI elements.
-  private final TimeControlsSelection timeControlsSelection;
-  private final JPanel advancedPanel;
-  private final RatednessSelection ratednessSelection;
-  private final VariantSelection variantSelection;
-  private final PieceColorSelection pieceColorSelection;
-  private final OpponentRatingRangeSelection oppRatingRangeSelection;
-  private final ManualAcceptSelection manualAcceptSelection;
-  private final UseFormulaSelection useFormulaSelection;
-  private final MoreLessButton moreLessButton;
-  
-  private final JButton issueSeekButton;
+  private final TimeControlsSelection timeControls;
+  private final RatednessSelection ratedness;
+  private final VariantSelection variant;
+  private final PieceColorSelection pieceColor;
+  private final OpponentRatingRangeSelection oppRatingRange;
+  private final ManualAcceptSelection manualAccept;
+  private final UseFormulaSelection useFormula;
+  private final MoreLessButton moreLess;
+  private final JButton issueSeek;
   
   
   
@@ -105,27 +104,35 @@ public class IssueSeekPanel extends JPanel{
     WildVariant [] variants = conn.getSupportedVariants();
     
     String color = prefs.getString("color", "auto");
-    Player pieceColor = "auto".equals(color) ? null :
+    Player pieceColorPref = "auto".equals(color) ? null :
       ("white".equals(color) ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
     
-    boolean isRatingLimited = prefs.getBool("limitRating", false);
+    boolean isMinLimited = prefs.getBool("minRatingLimited", false);
+    boolean isMaxLimited = prefs.getBool("maxRatingLimited", false);
     int minRating = Math.max(0, prefs.getInt("minRating", 0));
     int maxRating = Math.min(9999, prefs.getInt("maxRating", 9999));
 
     // Create ui elements
-    timeControlsSelection = new TimeControlsSelection(prefs.getInt("time", 10), prefs.getInt("inc", 0));
-    advancedPanel = new JPanel();
-    ratednessSelection = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
-    variantSelection = new VariantSelection(variants, prefs.getString("variant", "Chess"));
-    pieceColorSelection = new PieceColorSelection(pieceColor);
-    oppRatingRangeSelection = new OpponentRatingRangeSelection(isRatingLimited, minRating, maxRating);
-    manualAcceptSelection = new ManualAcceptSelection(prefs.getBool("manualAccept", false));
-    useFormulaSelection = new UseFormulaSelection(prefs.getBool("useFormula", true));
-    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false), container);
-    issueSeekButton = i18n.createButton("issueSeekButton");
+    timeControls = new TimeControlsSelection(prefs.getInt("time", 10), prefs.getInt("inc", 0));
+    ratedness = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
+    variant = new VariantSelection(variants, prefs.getString("variant", "Chess"));
+    pieceColor = new PieceColorSelection(pieceColorPref);
+    oppRatingRange = new OpponentRatingRangeSelection(isMinLimited, minRating, isMaxLimited, maxRating);
+    manualAccept = new ManualAcceptSelection(prefs.getBool("manualAccept", false));
+    useFormula = new UseFormulaSelection(prefs.getBool("useFormula", true));
+    issueSeek = i18n.createButton("issueSeekButton");
+    moreLess = new MoreLessButton(prefs.getBool("isMore", false), container, new Component[]{
+      variant.getLabel(), variant.getBox(),
+      pieceColor.getLabel(), pieceColor.getBox(),
+      ratedness.getBox(),
+      manualAccept.getBox(),
+      useFormula.getBox(),
+      oppRatingRange.getMinimumLimitedBox(), oppRatingRange.getMinimumLimitSpinner(),
+      oppRatingRange.getMaximumLimitedBox(), oppRatingRange.getMaximumLimitSpinner()
+    });
     
     
-    issueSeekButton.addActionListener(new ActionListener(){
+    issueSeek.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         IssueSeekPanel.this.conn.issue(getSeek());
       }
@@ -159,12 +166,13 @@ public class IssueSeekPanel extends JPanel{
     prefs.setString("variant", seek.getVariant().getName());
     Player color = seek.getColor();
     prefs.setString("color", color == null ? "auto" : color.isWhite() ? "white" : "black");
-    prefs.setBool("limitRating", oppRatingRangeSelection.isLimited());
-    prefs.setInt("minRating", oppRatingRangeSelection.getMinimum());
-    prefs.setInt("maxRating", oppRatingRangeSelection.getMaximum());
+    prefs.setBool("minRatingLimited", oppRatingRange.isMinimumLimited());
+    prefs.setBool("maxRatingLimited", oppRatingRange.isMaximumLimited());
+    prefs.setInt("minRating", oppRatingRange.getMinimum());
+    prefs.setInt("maxRating", oppRatingRange.getMaximum());
     prefs.setBool("manualAccept", seek.isManualAccept());
     prefs.setBool("useFormula", seek.isFormula());
-    prefs.setBool("isMore", moreLessButton.isMore());
+    prefs.setBool("isMore", moreLess.isMore());
   }
 
   
@@ -175,47 +183,78 @@ public class IssueSeekPanel extends JPanel{
    */
    
   private void createUI(){
-    int xGap = 4; // The standard horizontal gap
-    int yGap = 6; // The standard verical gap
+    GroupLayout layout = new GroupLayout(this);
+    setLayout(layout);
+    layout.setAutocreateContainerGaps(true);
     
-    JPanel buttonsPanel = new JPanel(new TableLayout(2, xGap, yGap));
-    buttonsPanel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-    buttonsPanel.add(moreLessButton);
-    buttonsPanel.add(issueSeekButton);
+    timeControls.getTimeLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    timeControls.getIncrementLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    variant.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    pieceColor.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
     
-    // Holds the panel displayed when "More Options" is clicked
-    JPanel advancedPanelHolder = new JPanel(new BorderLayout());
-    advancedPanelHolder.add(advancedPanel);
-    
-    // Layout the subcontainers in the main container
-    setLayout(new TableLayout(1, xGap, yGap));
-    setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    timeControlsSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    advancedPanelHolder.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    buttonsPanel.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-    
-    add(timeControlsSelection);
-    add(Box.createVerticalStrut(yGap));
-    add(advancedPanelHolder);
-    add(buttonsPanel);
+    timeControls.getTimeUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
+    timeControls.getIncrementUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
     
     
-    // Advanced options panel
-    advancedPanel.setLayout(new TableLayout(1, xGap, yGap));
+    layout.setHorizontalGroup(layout.createParallelGroup()
+      .add(layout.createSequentialGroup()
+        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+          .add(timeControls.getTimeLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(timeControls.getIncrementLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(variant.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(pieceColor.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(oppRatingRange.getMinimumLimitedBox(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(oppRatingRange.getMaximumLimitedBox(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+          .add(layout.createSequentialGroup()
+            .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+              .add(timeControls.getTimeSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+              .add(timeControls.getIncrementSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+              .add(oppRatingRange.getMinimumLimitSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+              .add(oppRatingRange.getMaximumLimitSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+            .addPreferredGap(LayoutStyle.RELATED)
+            .add(layout.createParallelGroup(GroupLayout.LEADING, true)
+              .add(timeControls.getTimeUnitsLabel())
+              .add(timeControls.getIncrementUnitsLabel())))
+          .add(variant.getBox())
+          .add(pieceColor.getBox())
+          .add(ratedness.getBox())
+          .add(manualAccept.getBox())
+          .add(useFormula.getBox())))
+      .add(layout.createSequentialGroup()
+        .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
+        .add(moreLess.getButton()).addPreferredGap(LayoutStyle.RELATED).add(issueSeek)));
+      
+    layout.setVerticalGroup(layout.createSequentialGroup()
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(timeControls.getTimeLabel()).add(timeControls.getTimeSpinner()).add(timeControls.getTimeUnitsLabel()))
+      .addPreferredGap(LayoutStyle.RELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(timeControls.getIncrementLabel()).add(timeControls.getIncrementSpinner()).add(timeControls.getIncrementUnitsLabel()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(variant.getLabel()).add(variant.getBox()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(pieceColor.getLabel()).add(pieceColor.getBox()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(ratedness.getBox())
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(manualAccept.getBox())
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(useFormula.getBox())
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(oppRatingRange.getMinimumLimitedBox()).add(oppRatingRange.getMinimumLimitSpinner()))
+      .addPreferredGap(LayoutStyle.RELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(oppRatingRange.getMaximumLimitedBox()).add(oppRatingRange.getMaximumLimitSpinner()))
+      .addPreferredGap(LayoutStyle.UNRELATED, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(moreLess.getButton()).add(issueSeek)));
     
-    ratednessSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    variantSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    pieceColorSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    oppRatingRangeSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    manualAcceptSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    useFormulaSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    
-    advancedPanel.add(variantSelection);
-    advancedPanel.add(pieceColorSelection);
-    advancedPanel.add(ratednessSelection);
-    advancedPanel.add(manualAcceptSelection);
-    advancedPanel.add(useFormulaSelection);
-    advancedPanel.add(oppRatingRangeSelection);
+    layout.linkSize(new Component[]{moreLess.getButton(), issueSeek});
   }
   
   
@@ -225,27 +264,20 @@ public class IssueSeekPanel extends JPanel{
    */
   
   private UserSeek getSeek(){
-    int time = timeControlsSelection.getTime();
-    int inc = timeControlsSelection.getIncrement();
-    boolean isRated = ratednessSelection.isRated();
-    WildVariant variant = variantSelection.getVariant();
-    Player color = pieceColorSelection.getColor();
+    int time = timeControls.getTime();
+    int inc = timeControls.getIncrement();
+    boolean isRated = ratedness.isRated();
+    WildVariant wild = variant.getVariant();
+    Player color = pieceColor.getColor();
     
-    int minRating, maxRating;
-    if (oppRatingRangeSelection.isLimited()){
-      minRating = oppRatingRangeSelection.getMinimum();
-      maxRating = oppRatingRangeSelection.getMaximum();
-    }
-    else{
-      minRating = Integer.MIN_VALUE;
-      maxRating = Integer.MAX_VALUE;
-    }
+    int minRating = oppRatingRange.isMinimumLimited() ? oppRatingRange.getMinimum() : Integer.MIN_VALUE;
+    int maxRating = oppRatingRange.isMaximumLimited() ? oppRatingRange.getMaximum() : Integer.MAX_VALUE;
     
-    boolean manualAccept = manualAcceptSelection.isManualAccept();
-    boolean useFormula = useFormulaSelection.useFormula();
+    boolean isManualAccept = manualAccept.isManualAccept();
+    boolean isUseFormula = useFormula.useFormula();
     
-    return new UserSeek(time, inc, isRated, variant, color, minRating,
-      maxRating, manualAccept, useFormula);
+    return new UserSeek(time, inc, isRated, wild, color, minRating,
+      maxRating, isManualAccept, isUseFormula);
   }
   
   

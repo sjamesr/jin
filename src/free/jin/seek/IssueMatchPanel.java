@@ -21,7 +21,7 @@
 
 package free.jin.seek;
 
-import java.awt.FlowLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -31,11 +31,14 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -51,7 +54,6 @@ import free.jin.event.FriendsListener;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.util.Named;
-import free.util.TableLayout;
 
 
 
@@ -88,14 +90,13 @@ public class IssueMatchPanel extends JPanel{
   
   
   // The various UI elements.
-  private final OpponentSelection opponentSelection;
-  private final TimeControlsSelection timeControlsSelection;
-  private final JPanel advancedPanel;
-  private final RatednessSelection ratednessSelection;
-  private final VariantSelection variantSelection;
-  private final PieceColorSelection pieceColorSelection;
-  private final MoreLessButton moreLessButton;
-  private final JButton issueMatchButton;
+  private final OpponentSelection opponent;
+  private final TimeControlsSelection timeControls;
+  private final RatednessSelection ratedness;
+  private final VariantSelection variant;
+  private final PieceColorSelection pieceColor;
+  private final MoreLessButton moreLess;
+  private final JButton issueMatch;
   
   
   
@@ -125,28 +126,31 @@ public class IssueMatchPanel extends JPanel{
     WildVariant [] variants = conn.getSupportedVariants();
     
     String color = prefs.getString("color", "auto");
-    Player pieceColor = "auto".equals(color) ? null :
+    Player pieceColorPref = "auto".equals(color) ? null :
       ("white".equals(color) ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
     
     I18n i18n = I18n.get(IssueMatchPanel.class);
     
-    opponentSelection = new OpponentSelection(getEasyAccessOpponentsModel(), lastOpp);
-    timeControlsSelection = new TimeControlsSelection(prefs.getInt("time", 10), prefs.getInt("inc", 0));
-    advancedPanel = new JPanel();
-    ratednessSelection = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
-    variantSelection = new VariantSelection(variants, prefs.getString("variant", "Chess"));
-    pieceColorSelection = new PieceColorSelection(pieceColor);
-    moreLessButton = new MoreLessButton(advancedPanel, prefs.getBool("isMore", false), container);
-    issueMatchButton = i18n.createButton("issueMatchButton");
+    opponent = new OpponentSelection(getEasyAccessOpponentsModel(), lastOpp);
+    timeControls = new TimeControlsSelection(prefs.getInt("time", 10), prefs.getInt("inc", 0));
+    ratedness = new RatednessSelection(prefs.getBool("isRated", true), plugin.getUser().isGuest());
+    variant = new VariantSelection(variants, prefs.getString("variant", "Chess"));
+    pieceColor = new PieceColorSelection(pieceColorPref);
+    issueMatch = i18n.createButton("issueMatchButton");
+    moreLess = new MoreLessButton(prefs.getBool("isMore", false), container, new Component[]{
+      ratedness.getBox(),
+      variant.getLabel(), variant.getBox(),
+      pieceColor.getLabel(), pieceColor.getBox()
+    });
     
-    issueMatchButton.setEnabled(isSelectionValid());
-    opponentSelection.addChangeListener(new ChangeListener(){
+    issueMatch.setEnabled(isSelectionValid());
+    opponent.addChangeListener(new ChangeListener(){
       public void stateChanged(ChangeEvent e){
-        issueMatchButton.setEnabled(isSelectionValid());
+        issueMatch.setEnabled(isSelectionValid());
       }
     });
     
-    issueMatchButton.addActionListener(new ActionListener(){
+    issueMatch.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         IssueMatchPanel.this.conn.issue(getMatchOffer());
       }
@@ -162,9 +166,9 @@ public class IssueMatchPanel extends JPanel{
    * focus to the panel. 
    */
   
-  public void prepareFor(ServerUser opponent){
-    opponentSelection.setOpponent(opponent);
-    issueMatchButton.requestFocus();
+  public void prepareFor(ServerUser opponentUser){
+    opponent.setOpponent(opponentUser);
+    issueMatch.requestFocus();
   }
   
   
@@ -187,31 +191,61 @@ public class IssueMatchPanel extends JPanel{
    */
   
   private void createUI(){
-    setLayout(new TableLayout(1, 4, 6));
+    GroupLayout layout = new GroupLayout(this);
+    setLayout(layout);
+    layout.setAutocreateContainerGaps(true);
     
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-    buttonPanel.add(moreLessButton);
-    buttonPanel.add(issueMatchButton);
+    timeControls.getTimeLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    timeControls.getIncrementLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    variant.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
+    pieceColor.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
     
-    opponentSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    timeControlsSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    timeControls.getTimeUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
+    timeControls.getIncrementUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
     
-    // Advanced options panel
-    advancedPanel.setLayout(new TableLayout(1, 4, 6));
-
-    ratednessSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    variantSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    pieceColorSelection.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.CENTER, true)
+      .add(layout.createSequentialGroup()
+        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+          .add(timeControls.getTimeLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(timeControls.getIncrementLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(variant.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+          .add(pieceColor.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+          .add(layout.createSequentialGroup()
+            .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+              .add(timeControls.getTimeSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+              .add(timeControls.getIncrementSpinner(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+            .addPreferredGap(LayoutStyle.RELATED)
+            .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+              .add(timeControls.getTimeUnitsLabel())
+              .add(timeControls.getIncrementUnitsLabel())))
+          .add(variant.getBox())
+          .add(pieceColor.getBox())
+          .add(ratedness.getBox())))
+      .add(layout.createSequentialGroup()
+        .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
+        .add(moreLess.getButton()).addPreferredGap(LayoutStyle.RELATED).add(issueMatch)));
+      
+    layout.setVerticalGroup(layout.createSequentialGroup()
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(timeControls.getTimeLabel()).add(timeControls.getTimeSpinner()).add(timeControls.getTimeUnitsLabel()))
+      .addPreferredGap(LayoutStyle.RELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(timeControls.getIncrementLabel()).add(timeControls.getIncrementSpinner()).add(timeControls.getIncrementUnitsLabel()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(variant.getLabel()).add(variant.getBox()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(pieceColor.getLabel()).add(pieceColor.getBox()))
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(ratedness.getBox())
+      .addPreferredGap(LayoutStyle.UNRELATED, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+      .add(layout.createParallelGroup(GroupLayout.BASELINE)
+        .add(moreLess.getButton()).add(issueMatch)));
     
-    advancedPanel.add(ratednessSelection);
-    advancedPanel.add(variantSelection);
-    advancedPanel.add(pieceColorSelection);
-    
-    add(opponentSelection);
-    add(timeControlsSelection);
-    add(advancedPanel);
-    add(buttonPanel);
+    layout.linkSize(new Component[]{moreLess.getButton(), issueMatch});
   }
   
   
@@ -221,14 +255,14 @@ public class IssueMatchPanel extends JPanel{
    */
   
   public void savePrefs(){
-    prefs.setString("lastOpponent", opponentSelection.getOpponentName());
-    prefs.setInt("time", timeControlsSelection.getTime());
-    prefs.setInt("inc", timeControlsSelection.getIncrement());
-    prefs.setBool("isRated", ratednessSelection.isRated());
-    prefs.setString("variant", variantSelection.getVariant().getName());
-    Player color = pieceColorSelection.getColor();
+    prefs.setString("lastOpponent", opponent.getOpponentName());
+    prefs.setInt("time", timeControls.getTime());
+    prefs.setInt("inc", timeControls.getIncrement());
+    prefs.setBool("isRated", ratedness.isRated());
+    prefs.setString("variant", variant.getVariant().getName());
+    Player color = pieceColor.getColor();
     prefs.setString("color", color == null ? "auto" : color.isWhite() ? "white" : "black");
-    prefs.setBool("isMore", moreLessButton.isMore());
+    prefs.setBool("isMore", moreLess.isMore());
   }
   
   
@@ -239,7 +273,7 @@ public class IssueMatchPanel extends JPanel{
   
   private boolean isSelectionValid(){
     UsernamePolicy policy = plugin.getUser().getServer().getUsernamePolicy();
-    return policy.invalidityReason(opponentSelection.getOpponentName()) == null;
+    return policy.invalidityReason(opponent.getOpponentName()) == null;
   }
   
   
@@ -249,14 +283,14 @@ public class IssueMatchPanel extends JPanel{
    */
   
   private UserMatchOffer getMatchOffer(){
-    ServerUser opp = conn.userForName(opponentSelection.getOpponentName());
-    int time = timeControlsSelection.getTime();
-    int inc = timeControlsSelection.getIncrement();
-    boolean isRated = ratednessSelection.isRated();
-    WildVariant variant = variantSelection.getVariant();
-    Player color = pieceColorSelection.getColor();
+    ServerUser opp = conn.userForName(opponent.getOpponentName());
+    int time = timeControls.getTime();
+    int inc = timeControls.getIncrement();
+    boolean isRated = ratedness.isRated();
+    WildVariant wild = variant.getVariant();
+    Player color = pieceColor.getColor();
     
-    return new UserMatchOffer(opp, time, inc, isRated, variant, color);
+    return new UserMatchOffer(opp, time, inc, isRated, wild, color);
   }
   
   

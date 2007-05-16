@@ -24,7 +24,6 @@ package free.jin.seek;
 import javax.swing.JCheckBox;
 
 import free.jin.I18n;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -33,7 +32,7 @@ import free.util.swing.WrapperComponent;
  * opponents to pass his formula before they may accept the sought game.
  */
 
-public class UseFormulaSelection extends WrapperComponent{
+public class UseFormulaSelection{
   
   
   
@@ -55,8 +54,16 @@ public class UseFormulaSelection extends WrapperComponent{
     
     this.box = i18n.createCheckBox("");
     box.setSelected(useFormula);
-    
-    add(box);
+  }
+  
+  
+  
+  /**
+   * Returns the checkbox.
+   */
+  
+  public JCheckBox getBox(){
+    return box;
   }
   
   

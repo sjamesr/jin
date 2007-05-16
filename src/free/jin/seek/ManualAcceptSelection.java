@@ -24,7 +24,6 @@ package free.jin.seek;
 import javax.swing.JCheckBox;
 
 import free.jin.I18n;
-import free.util.swing.WrapperComponent;
 
 
 
@@ -33,7 +32,7 @@ import free.util.swing.WrapperComponent;
  * manually the start of a sought game.
  */
 
-public class ManualAcceptSelection extends WrapperComponent{
+public class ManualAcceptSelection{
   
   
   
@@ -55,8 +54,16 @@ public class ManualAcceptSelection extends WrapperComponent{
     
     this.box = i18n.createCheckBox("");
     box.setSelected(isManualAccept);
-    
-    add(box);
+  }
+  
+  
+  
+  /**
+   * Returns the checkbox.
+   */
+  
+  public JCheckBox getBox(){
+    return box;
   }
   
   

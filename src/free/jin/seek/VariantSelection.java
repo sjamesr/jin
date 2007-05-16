@@ -23,14 +23,10 @@ package free.jin.seek;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import free.chess.WildVariant;
 import free.jin.I18n;
 import free.util.NamedWrapper;
-import free.util.TableLayout;
-import free.util.swing.PreferredSizedPanel;
-import free.util.swing.WrapperComponent;
 import free.workarounds.FixedJComboBox;
 
 
@@ -39,7 +35,15 @@ import free.workarounds.FixedJComboBox;
  * A UI element which allows the user to select a chess variant.
  */
 
-public final class VariantSelection extends WrapperComponent{
+public final class VariantSelection{
+  
+  
+  
+  /**
+   * The label.
+   */
+  
+  private final JLabel label;
   
   
   
@@ -57,12 +61,34 @@ public final class VariantSelection extends WrapperComponent{
    */
   
   public VariantSelection(WildVariant [] variants, String selectedVariantName){
+    I18n i18n = I18n.get(VariantSelection.class);
+    
+    this.label = i18n.createLabel(""); 
     this.box = new FixedJComboBox(nameWrap(variants));
     
+    label.setLabelFor(box);
     box.setEditable(false);
     box.setSelectedIndex(variantIndexByName(variants, selectedVariantName));
-    
-    createUI();
+  }
+  
+  
+  
+  /**
+   * Returns the label.
+   */
+  
+  public JLabel getLabel(){
+    return label;
+  }
+  
+  
+  
+  /**
+   * Returns the combo box.
+   */
+  
+  public JComboBox getBox(){
+    return box;
   }
   
   
@@ -83,26 +109,6 @@ public final class VariantSelection extends WrapperComponent{
     }
     
     return wrappers;
-  }
-  
-  
-  
-  /**
-   * Creates the UI of this component.
-   */
-  
-  private void createUI(){
-    I18n i18n = I18n.get(VariantSelection.class);
-    
-    JPanel content = new PreferredSizedPanel(new TableLayout(2, 4, 6));
-    
-    JLabel label = i18n.createLabel("");
-    label.setLabelFor(box);
-    
-    content.add(label);
-    content.add(box);
-    
-    add(content);
   }
   
   
