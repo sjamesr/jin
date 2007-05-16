@@ -27,8 +27,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
@@ -188,26 +186,15 @@ public class IssueSeekPanel extends JPanel{
     setLayout(layout);
     layout.setAutocreateContainerGaps(true);
     
-    timeControls.getTimeLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    timeControls.getIncrementLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    variant.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    pieceColor.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    oppRatingRange.getMinimumLimitedBox().setHorizontalAlignment(SwingConstants.TRAILING);
-    oppRatingRange.getMaximumLimitedBox().setHorizontalAlignment(SwingConstants.TRAILING);
-
-    timeControls.getTimeUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
-    timeControls.getIncrementUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
-    
-    
     layout.setHorizontalGroup(layout.createParallelGroup()
       .add(layout.createSequentialGroup()
-        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
-          .add(timeControls.getTimeLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(timeControls.getIncrementLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(variant.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(pieceColor.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(oppRatingRange.getMinimumLimitedBox(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(oppRatingRange.getMaximumLimitedBox(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+        .add(layout.createParallelGroup(GroupLayout.TRAILING, false)
+          .add(timeControls.getTimeLabel())
+          .add(timeControls.getIncrementLabel())
+          .add(variant.getLabel())
+          .add(pieceColor.getLabel())
+          .add(oppRatingRange.getMinimumLimitedBox())
+          .add(oppRatingRange.getMaximumLimitedBox()))
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.LEADING, false)
           .add(layout.createSequentialGroup()

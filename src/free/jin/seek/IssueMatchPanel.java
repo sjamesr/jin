@@ -33,7 +33,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -195,21 +194,13 @@ public class IssueMatchPanel extends JPanel{
     setLayout(layout);
     layout.setAutocreateContainerGaps(true);
     
-    timeControls.getTimeLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    timeControls.getIncrementLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    variant.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    pieceColor.getLabel().setHorizontalAlignment(SwingUtilities.TRAILING);
-    
-    timeControls.getTimeUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
-    timeControls.getIncrementUnitsLabel().setHorizontalAlignment(SwingUtilities.LEADING);
-    
-    layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.CENTER, true)
+    layout.setHorizontalGroup(layout.createParallelGroup()
       .add(layout.createSequentialGroup()
-        .add(layout.createParallelGroup(GroupLayout.LEADING, false)
-          .add(timeControls.getTimeLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(timeControls.getIncrementLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(variant.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .add(pieceColor.getLabel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE))
+        .add(layout.createParallelGroup(GroupLayout.TRAILING, false)
+          .add(timeControls.getTimeLabel())
+          .add(timeControls.getIncrementLabel())
+          .add(variant.getLabel())
+          .add(pieceColor.getLabel()))
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.LEADING, false)
           .add(layout.createSequentialGroup()
