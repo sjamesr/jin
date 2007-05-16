@@ -134,10 +134,13 @@ public class DefaultTabHandle implements TabHandle{
     
     
     // Create the component
-    this.component = new JPanel(new BorderLayout(2, 2));
+    this.component = new JPanel(new BorderLayout(2, 2)){
+      public Dimension getMinimumSize(){
+        return new Dimension(20, super.getMinimumSize().height);
+      }
+    };
     component.setBorder(BorderFactory.createEmptyBorder(2, 10, 0, 10));
     component.setOpaque(false);
-    component.setMinimumSize(new Dimension(20, component.getMinimumSize().height));
     component.addMouseListener(pressListener);
     
     
