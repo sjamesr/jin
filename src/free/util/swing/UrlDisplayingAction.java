@@ -34,89 +34,90 @@ import free.util.BrowserControl;
  */
 
 public class UrlDisplayingAction extends AbstractAction{
-
-
+  
+  
   /**
    * The URL.
    */
-
-  private final String url;
-
-
-
+  
+  private String url;
+  
+  
+  
   /**
    * Creates a new <code>UrlDisplayingAction</code> with the specified URL.
    */
-
+  
   public UrlDisplayingAction(String url){
-    super();
-
-    if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
-
-    this.url = url;
+    this(url, null, null);
   }
-
-
-
+  
+  
+  
   /**
    * Creates a new <code>UrlDisplayingAction</code> with the specified URL and
    * name.
    */
-
+  
   public UrlDisplayingAction(String url, String name){
-    super(name);
-
-    if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
-
-    this.url = url;
+    this(url, name, null);
   }
-
-
-
+  
+  
+  
   /**
    * Creates a new <code>UrlDisplayingAction</code> with the specified URL,
    * name and icon.
    */
-
+  
   public UrlDisplayingAction(String url, String name, Icon icon){
     super(name, icon);
-
-    if ((url == null) || (url.length() == 0))
-      throw new IllegalArgumentException("The url may not be null or empty"); //$NON-NLS-1$
-
+    
+    setUrl(url);
+  }
+  
+  
+  
+  /**
+   * Sets the URL displayed when the action is invoked. If <code>url</code> is
+   * <code>null</code>, nothing is done when the action is invoked.
+   */
+  
+  public void setUrl(String url){
     this.url = url;
   }
-
-
-
+  
+  
+  
   /**
    * Returns the URL.
    */
-
+  
   public String getURL(){
     return url;
   }
-
-
-
+  
+  
+  
   /**
    * Tries to show the url using <code>BrowserControl</code>. Displays an error
    * message to the user if fails.
    */
-
+  
   public void actionPerformed(ActionEvent evt){
+    if (url == null)
+      return;
+    
     if (!BrowserControl.displayURL(getURL())){
       Object source = evt.getSource();
       Component parent = null;
       if (source instanceof Component)
         parent = SwingUtils.frameForComponent((Component)source);
-
+      
       BrowserControl.showDisplayBrowserFailedDialog(getURL(), parent, true);
     }
   }
-
-
-
+  
+  
+  
 }
