@@ -34,10 +34,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -58,7 +56,9 @@ import free.jin.plugin.PluginUIListener;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
-import free.util.AWTUtilities;
+import free.util.swing.tabbedpane.Tab;
+import free.util.swing.tabbedpane.TabbedPane;
+import free.util.swing.tabbedpane.TabbedPaneModel;
 
 
 /**
@@ -95,7 +95,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * <code>null</code> if there is no issueMatchPanel.
    */
   
-  private JTabbedPane issueTabbedPane;
+  private TabbedPane issueTabbedPane;
   
   
   
@@ -213,22 +213,13 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
     
     if (issueMatchPanel != null){
-      issueTabbedPane = new JTabbedPane(JTabbedPane.TOP);
-      issueTabbedPane.addTab(i18n.getString("issueSeekTab.text"), issueSeekPanel);
-      issueTabbedPane.addTab(i18n.getString("issueMatchTab.text"), issueMatchPanel);
-      issueTabbedPane.setSelectedComponent(
+      issueTabbedPane = new TabbedPane(SwingConstants.TOP);
+      TabbedPaneModel model = issueTabbedPane.getModel();
+      model.addTab(new Tab(issueSeekPanel, i18n.getString("issueSeekTab.text"), null, false));
+      model.addTab(new Tab(issueMatchPanel, i18n.getString("issueMatchTab.text"), null, false));
+      model.setSelectedIndex(model.indexOfComponent(
           getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
-              (Component)issueSeekPanel : (Component)issueMatchPanel);
-      
-      issueTabbedPane.getModel().addChangeListener(new ChangeListener(){
-        public void stateChanged(ChangeEvent e){
-          if (!uiContainer.isVisible())
-            return;
-          
-          if (!AWTUtilities.fitsInto(issueTabbedPane.getMinimumSize(), issueTabbedPane.getSize()))
-            uiContainer.pack();
-        }
-      });
+              (Component)issueSeekPanel : (Component)issueMatchPanel));
       
       issuePanel = issueTabbedPane;
     }
@@ -322,7 +313,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     if (!hasMatchUI())
       throw new IllegalArgumentException("No UI for matching");
     
-    issueTabbedPane.setSelectedComponent(issueMatchPanel);
+    TabbedPaneModel model = issueTabbedPane.getModel();
+    model.setSelectedIndex(model.indexOfComponent(issueMatchPanel));
     issueMatchPanel.prepareFor(opponent);
     uiContainer.setActive(true);
   }
