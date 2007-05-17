@@ -68,6 +68,7 @@
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
+			    debug="true"
 		       classpathref="compile.class.path">
 			<compilerarg compiler="modern" line="-target ${build.target}" />
 			<compilerarg compiler="modern" line="-source 1.2" />
@@ -233,6 +234,10 @@
 		     includes="free/chess/**"
 		     compress="${build.compress}"
 		/>
+		
+		
+		<!-- swing-layout library -->
+		<move file="${libs.dir}/swing-layout.jar" todir="${build.dir}"/>
 
 
 		<!-- Jin classes -->
@@ -243,7 +248,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="free.jin.JinApplication"/>
 				<attribute name="Class-Path" 
-					value="util.jar chess.jar ${manifest.classpath.lf} ${manifest.classpath.user}"/>
+					value="util.jar chess.jar swing-layout.jar ${manifest.classpath.lf} ${manifest.classpath.user}"/>
 			</manifest>
 		</jar>
 		
