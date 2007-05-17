@@ -29,7 +29,6 @@ import free.jin.ui.OptionPanel;
 import free.jin.ui.ServerChoicePanel;
 import free.util.EventListenerList;
 import free.util.TextUtilities;
-import free.util.Utilities;
 
 
 /**
@@ -459,14 +458,10 @@ public class ConnectionManager{
   private void saveLastUser(User user){
     Preferences prefs = Jin.getInstance().getPrefs();
     String serverId = user.getServer().getId();
-    String oldServerId = prefs.getString("last-login.serverId", null);
 
     prefs.setString("last-login.serverId", serverId);
-    if (!Utilities.areEqual(serverId, oldServerId))
-      prefs.setString("last-login.username",
+    prefs.setString("last-login.username",
         user.isGuest() || !Jin.getInstance().isKnownUser(user) ? null : user.getUsername());
-    else if (!user.isGuest())
-      prefs.setString("last-login.username", user.getUsername());
   }
 
 
