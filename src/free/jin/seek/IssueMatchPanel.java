@@ -146,8 +146,8 @@ public class IssueMatchPanel extends JPanel{
       pieceColor.getLabel(), pieceColor.getBox()
     });
     
-    moreLess.addChangeListener(new ChangeListener(){
-      public void stateChanged(ChangeEvent e){
+    moreLess.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
         if (moreLess.isMore() && container.isVisible()){
           // Need to wait for all delayed layout to finish
           SwingUtilities.invokeLater(new Runnable(){
@@ -235,7 +235,7 @@ public class IssueMatchPanel extends JPanel{
           .add(ratedness.getBox())))
       .add(layout.createSequentialGroup()
         .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
-        .add(moreLess.getButton()).addPreferredGap(LayoutStyle.RELATED).add(issueMatch)));
+        .add(moreLess).addPreferredGap(LayoutStyle.RELATED).add(issueMatch)));
       
     layout.setVerticalGroup(layout.createSequentialGroup()
       .add(layout.createParallelGroup(GroupLayout.BASELINE)
@@ -253,9 +253,9 @@ public class IssueMatchPanel extends JPanel{
       .add(ratedness.getBox())
       .addPreferredGap(LayoutStyle.UNRELATED, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
       .add(layout.createParallelGroup(GroupLayout.BASELINE)
-        .add(moreLess.getButton()).add(issueMatch)));
+        .add(moreLess).add(issueMatch)));
     
-    layout.linkSize(new Component[]{moreLess.getButton(), issueMatch});
+    layout.linkSize(new Component[]{moreLess, issueMatch});
   }
   
   

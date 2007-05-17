@@ -29,8 +29,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
@@ -136,8 +134,8 @@ public class IssueSeekPanel extends JPanel{
       oppRatingRange.getMaximumLimitedBox(), oppRatingRange.getMaximumLimitSpinner()
     });
     
-    moreLess.addChangeListener(new ChangeListener(){
-      public void stateChanged(ChangeEvent e){
+    moreLess.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
         if (moreLess.isMore() && container.isVisible()){
           // Need to wait for all delayed layout to finish
           SwingUtilities.invokeLater(new Runnable(){
@@ -234,7 +232,7 @@ public class IssueSeekPanel extends JPanel{
           .add(useFormula.getBox())))
       .add(layout.createSequentialGroup()
         .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
-        .add(moreLess.getButton()).addPreferredGap(LayoutStyle.RELATED).add(issueSeek)));
+        .add(moreLess).addPreferredGap(LayoutStyle.RELATED).add(issueSeek)));
       
     layout.setVerticalGroup(layout.createSequentialGroup()
       .add(layout.createParallelGroup(GroupLayout.BASELINE)
@@ -262,9 +260,9 @@ public class IssueSeekPanel extends JPanel{
         .add(oppRatingRange.getMaximumLimitedBox()).add(oppRatingRange.getMaximumLimitSpinner()))
       .addPreferredGap(LayoutStyle.UNRELATED, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
       .add(layout.createParallelGroup(GroupLayout.BASELINE)
-        .add(moreLess.getButton()).add(issueSeek)));
+        .add(moreLess).add(issueSeek)));
     
-    layout.linkSize(new Component[]{moreLess.getButton(), issueSeek});
+    layout.linkSize(new Component[]{moreLess, issueSeek});
   }
   
   
