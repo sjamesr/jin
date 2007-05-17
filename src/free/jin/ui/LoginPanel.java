@@ -384,7 +384,7 @@ public class LoginPanel extends DialogPanel{
     if (connDetails == null){
       usernameField.setText("");
       passwordField.setText("");
-      savePasswordCheckBox.setSelected(true);
+      savePasswordCheckBox.setSelected(false);
     }
     else if (connDetails.isGuest()){
       usernameField.setText(connDetails.getUsername());
