@@ -21,16 +21,23 @@
 
 package free.jin.ui;
 
-import javax.swing.*;
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.border.EmptyBorder;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+
+import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.Jin;
 import free.util.AWTUtilities;
 import free.util.swing.SwingUtils;
+import free.util.swing.WrapLayout;
 
 
 /**
@@ -158,9 +165,14 @@ public abstract class DialogPanel extends JPanel{
     dialog.setTitle(getTitle());
     dialog.setResizable(false);
     
-    JPanel content = new JPanel(new BorderLayout());
-    content.setBorder(new EmptyBorder(10, 10, 10, 10));
-    content.add(this, BorderLayout.CENTER);
+    JPanel content = new JPanel(WrapLayout.getInstance());
+    LayoutStyle layoutStyle = LayoutStyle.getSharedInstance();
+    content.setBorder(BorderFactory.createEmptyBorder(
+        layoutStyle.getContainerGap(content, SwingConstants.NORTH, dialog),
+        layoutStyle.getContainerGap(content, SwingConstants.WEST, dialog),
+        layoutStyle.getContainerGap(content, SwingConstants.SOUTH, dialog),
+        layoutStyle.getContainerGap(content, SwingConstants.EAST, dialog)));
+    content.add(this);
     dialog.setContentPane(content);
     dialog.getRootPane().setDefaultButton(defaultButton);
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
