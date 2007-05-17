@@ -25,6 +25,7 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JLabel;
 
 
@@ -36,97 +37,110 @@ import javax.swing.JLabel;
  */
 
 public class LinkLabel extends JLabel{
-
-
-
+  
+  
+  
   /**
    * The normal text set by the user.
    */
-
+  
   private String text;
-
-
-
-
+  
+  
+  
   /**
    * Creates a new LinkLabel with the given text.
    */
-
+  
   public LinkLabel(String text){
     super(text);
-
+    
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
+    
     enableEvents(MouseEvent.MOUSE_EVENT_MASK);
   }
-
-
-
-
+  
+  
+  
+  /**
+   * Sets the enabled status of this <code>LinkLabel</code>.
+   */
+  
+  public void setEnabled(boolean enabled){
+    super.setEnabled(enabled);
+    
+    setText(text);
+    setCursor(enabled ? 
+        Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : 
+        Cursor.getDefaultCursor());
+  }
+  
+  
+  
   /**
    * Sets the text of the label.
    */
-
+  
   public void setText(String text){
-    super.setText("<html><font color=\"#0000CF\"><u>"+text+"</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+    if (isEnabled())
+      super.setText("<html><font color=\"#0000CF\"><u>" + text + "</u></font></html>");
+    else
+      super.setText(text);
+    
     this.text = text;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the text set by the user.
    */
-
+  
   public String getNormalText(){
     return text;
   }
-
-
-
-
+  
+  
+  
   /**
    * Processes mouse events and responds to clicks.
    */
-
+  
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
-    if (evt.getID() == MouseEvent.MOUSE_CLICKED)
+    
+    if (isEnabled() && (evt.getID() == MouseEvent.MOUSE_CLICKED))
       fireActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, getNormalText()));
   }
-
-
-
-
+  
+  
+  
   /**
    * Adds an ActionListener to the list of listeners receiving notifications
    * when the label is clicked.
    */
-
+  
   public void addActionListener(ActionListener listener){
     listenerList.add(ActionListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
    * Removes the given ActionListener from the list of listeners receiving
    * notifications when the label is clicked.
    */
-
+  
   public void removeActionListener(ActionListener listener){
     listenerList.remove(ActionListener.class, listener);
   }
-
-
-
-
+  
+  
+  
   /**
    * Fires an ActionEvent to all interested listeners.
    */
-
+  
   protected void fireActionPerformed(ActionEvent evt){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -136,6 +150,7 @@ public class LinkLabel extends JLabel{
       }
     }
   }
-
-
+  
+  
+  
 }
