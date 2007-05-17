@@ -23,12 +23,9 @@ package free.util.swing;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.event.ChangeListener;
 
-import free.util.ChangeSupport;
 import free.util.Localization;
 
 
@@ -37,7 +34,7 @@ import free.util.Localization;
  * A UI element which allows the user to show/hide a part of the UI. 
  */
 
-public final class MoreLessOptionsButton{
+public final class MoreLessOptionsButton extends JButton{
   
   
   
@@ -50,26 +47,10 @@ public final class MoreLessOptionsButton{
   
   
   /**
-   * The actual button.
-   */
-  
-  private final JButton button;
-  
-  
-  
-  /**
    * The list of components we show/hide.
    */
   
   private final Component [] components;
-  
-  
-  
-  /**
-   * Our change support.
-   */
-  
-  private final ChangeSupport changeSupport = new ChangeSupport(this);
   
   
   
@@ -82,16 +63,21 @@ public final class MoreLessOptionsButton{
   public MoreLessOptionsButton(boolean isMore, Component [] components){
     this.components = components;
     
-    this.button = new JButton();
-    button.setDefaultCapable(false);
+    setDefaultCapable(false);
     
     setMore(isMore);
+  }
+  
+  
+  
+  /**
+   * Invoked when the button is pressed.
+   */
+  
+  protected void fireActionPerformed(ActionEvent evt){
+    setMore(!isMore());
     
-    button.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e){
-        setMore(!isMore());
-      }
-    });
+    super.fireActionPerformed(evt);
   }
   
   
@@ -109,47 +95,17 @@ public final class MoreLessOptionsButton{
   
   
   /**
-   * Returns the button.
-   */
-  
-  public JButton getButton(){
-    return button;
-  }
-  
-  
-  
-  /**
-   * Adds a change listener.
-   */
-  
-  public void addChangeListener(ChangeListener listener){
-    changeSupport.addChangeListener(listener);
-  }
-  
-  
-  
-  /**
-   * Removes a change listener.
-   */
-  
-  public void removeChangeListener(ChangeListener listener){
-    changeSupport.removeChangeListener(listener);
-  }
-  
-  
-  
-  /**
    * Sets the state to the specified one.
    */
   
   private void setMore(boolean isMore){
-    button.setActionCommand(isMore ? "less" : "more");
-    button.setText(getL10n().getString(isMore ? "less.text" : "more.text"));
+    setActionCommand(isMore ? "less" : "more");
+    setText(getL10n().getString(isMore ? "less.text" : "more.text"));
     
     for (int i = 0; i < components.length; i++)
       components[i].setVisible(isMore);
     
-    changeSupport.fireStateChanged();
+    fireStateChanged();
   }
   
   
@@ -159,7 +115,7 @@ public final class MoreLessOptionsButton{
    */
   
   public boolean isMore(){
-    return "less".equals(button.getActionCommand());
+    return "less".equals(getActionCommand());
   }
   
   
