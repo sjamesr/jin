@@ -142,6 +142,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * The system console designation, if any.
+   */
+  
+  private ConsoleDesignation systemConsoleDesignation;
+  
+  
+  
+  /**
    * The help console designation, if any.
    */
   
@@ -200,8 +208,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     I18n i18n = getI18n();
 
     String type = prefs.getString(prefsPrefix + "type");
-    if ("system".equals(type))
-      return createSystemConsoleDesignation();
+    if ("system".equals(type)){
+      systemConsoleDesignation = createSystemConsoleDesignation();
+      return systemConsoleDesignation;
+    }
     else if ("help".equals(type)){
       boolean isCloseable = prefs.getBool(prefsPrefix + "closeable", true);
       helpConsoleDesignation = createHelpConsoleDesignation(isCloseable);
@@ -241,7 +251,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Creates the system console designation. This method is meant to be
-   * implemented by a server-specific console manager.
+   * implemented by a server-specific console manager. Note that the returned
+   * designation is treated specially - it is only passed events which were not
+   * already handled by any of the other consoles.
    */
   
   protected abstract ConsoleDesignation createSystemConsoleDesignation();
@@ -589,10 +601,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       return;
     }
     
+    boolean handled = false;
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
-      console.getDesignation().receive(evt);
+      ConsoleDesignation designation = console.getDesignation();
+      if (designation != systemConsoleDesignation)
+        handled |= console.getDesignation().receive(evt);
     }
+    
+    // We treat the system console specially because we want it to only receive
+    // events which weren't handled by any of the other consoles.
+    if (!handled && (systemConsoleDesignation != null))
+      systemConsoleDesignation.receive(evt);
   }
   
   
