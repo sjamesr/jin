@@ -133,6 +133,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public JinChessclubConnection(String username, String password){
     super(username, password, System.out);
     
+    setLevel1(5); // For client tags
+    
     // Needed to know when to clear certain data structures
     addDatagramListener(this, Datagram.DG_SET2);
 
@@ -554,10 +556,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     String border = TextUtilities.padStart("", '*', maxLineLength + 4);
     
-    processLine(border);
+    processLine(border, null);
     for (int i = 0; i < messageLines.length; i++)
-      processLine("* " + TextUtilities.padEnd(messageLines[i], ' ', maxLineLength) + " *");
-    processLine(border);
+      processLine("* " + TextUtilities.padEnd(messageLines[i], ' ', maxLineLength) + " *", null);
+    processLine(border, null);
   }
 
 
@@ -596,8 +598,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a single line of plain text.
    */
 
-  protected void processLine(String line){
-    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
+  protected void processLine(String line, String clientTag){
+    super.processLine(line, clientTag);
+    listenerManager.firePlainTextEvent(new PlainTextEvent(this, clientTag, line));
   }
   
   
@@ -611,60 +614,62 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   public void datagramReceived(DatagramEvent evt){
     Datagram dg = evt.getDatagram();
+    String clientTag = evt.getClientTag();
+    
     switch (dg.getId()){
       // Datagram turned on/off
-      case Datagram.DG_SET2: processSet2DG(dg); break;
+      case Datagram.DG_SET2: processSet2DG(dg, clientTag); break;
       
       // Chat related
-      case Datagram.DG_PERSONAL_TELL: processPersonalTellDG(dg); break; 
-      case Datagram.DG_PERSONAL_QTELL: processPersonalQTellDG(dg); break;
-      case Datagram.DG_SHOUT: processShoutDG(dg); break;
-      case Datagram.DG_CHANNEL_TELL: processChannelTellDG(dg); break;
-      case Datagram.DG_CHANNEL_QTELL: processChannelQTellDG(dg); break;
-      case Datagram.DG_KIBITZ: processKibitzDG(dg); break;
+      case Datagram.DG_PERSONAL_TELL: processPersonalTellDG(dg, clientTag); break; 
+      case Datagram.DG_PERSONAL_QTELL: processPersonalQTellDG(dg, clientTag); break;
+      case Datagram.DG_SHOUT: processShoutDG(dg, clientTag); break;
+      case Datagram.DG_CHANNEL_TELL: processChannelTellDG(dg, clientTag); break;
+      case Datagram.DG_CHANNEL_QTELL: processChannelQTellDG(dg, clientTag); break;
+      case Datagram.DG_KIBITZ: processKibitzDG(dg, clientTag); break;
       
       // Game related
-      case Datagram.DG_MY_GAME_STARTED: processMyGameStartedDG(dg); break;
-      case Datagram.DG_STARTED_OBSERVING: processStartedObservingDG(dg); break;
-      case Datagram.DG_ISOLATED_BOARD: processIsolatedBoardDG(dg); break;
-      case Datagram.DG_MY_GAME_CHANGE: processMyGameChangeDG(dg); break;
-      case Datagram.DG_MY_GAME_RESULT: processMyGameResultDG(dg); break;
-      case Datagram.DG_POSITION_BEGIN: processPositionBeginDG(dg); break;
-      case Datagram.DG_MY_RELATION_TO_GAME: processMyRelationToGameDG(dg); break;
-      case Datagram.DG_SEND_MOVES: processSendMovesDG(dg); break;
-      case Datagram.DG_BACKWARD: processBackwardDG(dg); break;
-      case Datagram.DG_TAKEBACK: processTakebackDG(dg); break;
-      case Datagram.DG_ILLEGAL_MOVE: processIllegalMoveDG(dg); break;
-      case Datagram.DG_MSEC: processMsecDG(dg); break;
-      case Datagram.DG_OFFERS_IN_MY_GAME: processOffersInMyGameDG(dg); break;
-      case Datagram.DG_MORETIME: processMoretimeDG(dg); break;
-      case Datagram.DG_FLIP: processFlipDG(dg); break;
-      case Datagram.DG_ARROW: processArrowDG(dg); break;
-      case Datagram.DG_UNARROW: processUnarrowDG(dg); break;
-      case Datagram.DG_CIRCLE: processCircleDG(dg); break;
-      case Datagram.DG_UNCIRCLE: processUncircleDG(dg); break;
+      case Datagram.DG_MY_GAME_STARTED: processMyGameStartedDG(dg, clientTag); break;
+      case Datagram.DG_STARTED_OBSERVING: processStartedObservingDG(dg, clientTag); break;
+      case Datagram.DG_ISOLATED_BOARD: processIsolatedBoardDG(dg, clientTag); break;
+      case Datagram.DG_MY_GAME_CHANGE: processMyGameChangeDG(dg, clientTag); break;
+      case Datagram.DG_MY_GAME_RESULT: processMyGameResultDG(dg, clientTag); break;
+      case Datagram.DG_POSITION_BEGIN: processPositionBeginDG(dg, clientTag); break;
+      case Datagram.DG_MY_RELATION_TO_GAME: processMyRelationToGameDG(dg, clientTag); break;
+      case Datagram.DG_SEND_MOVES: processSendMovesDG(dg, clientTag); break;
+      case Datagram.DG_BACKWARD: processBackwardDG(dg, clientTag); break;
+      case Datagram.DG_TAKEBACK: processTakebackDG(dg, clientTag); break;
+      case Datagram.DG_ILLEGAL_MOVE: processIllegalMoveDG(dg, clientTag); break;
+      case Datagram.DG_MSEC: processMsecDG(dg, clientTag); break;
+      case Datagram.DG_OFFERS_IN_MY_GAME: processOffersInMyGameDG(dg, clientTag); break;
+      case Datagram.DG_MORETIME: processMoretimeDG(dg, clientTag); break;
+      case Datagram.DG_FLIP: processFlipDG(dg, clientTag); break;
+      case Datagram.DG_ARROW: processArrowDG(dg, clientTag); break;
+      case Datagram.DG_UNARROW: processUnarrowDG(dg, clientTag); break;
+      case Datagram.DG_CIRCLE: processCircleDG(dg, clientTag); break;
+      case Datagram.DG_UNCIRCLE: processUncircleDG(dg, clientTag); break;
       
       // Seek related
-      case Datagram.DG_SEEK: processSeekDG(dg); break;
-      case Datagram.DG_SEEK_REMOVED: processSeekRemovedDG(dg); break;
+      case Datagram.DG_SEEK: processSeekDG(dg, clientTag); break;
+      case Datagram.DG_SEEK_REMOVED: processSeekRemovedDG(dg, clientTag); break;
       
       // Game list related
-      case Datagram.DG_GAMELIST_BEGIN: processGamelistBeginDG(dg); break;
-      case Datagram.DG_GAMELIST_ITEM: processGamelistItemDG(dg); break;
+      case Datagram.DG_GAMELIST_BEGIN: processGamelistBeginDG(dg, clientTag); break;
+      case Datagram.DG_GAMELIST_ITEM: processGamelistItemDG(dg, clientTag); break;
       
       // Tourney related
-      case Datagram.DG_TOURNEY: processTourneyDG(dg); break;
-      case Datagram.DG_REMOVE_TOURNEY: processRemoveTourneyDG(dg); break;
+      case Datagram.DG_TOURNEY: processTourneyDG(dg, clientTag); break;
+      case Datagram.DG_REMOVE_TOURNEY: processRemoveTourneyDG(dg, clientTag); break;
       
       // Friends related
-      case Datagram.DG_NOTIFY_ARRIVED: processNotifyArrivedDG(dg); break;
-      case Datagram.DG_NOTIFY_LEFT: processNotifyLeftDG(dg); break;
-      case Datagram.DG_NOTIFY_STATE: processNotifyStateDG(dg); break;
-      case Datagram.DG_MY_NOTIFY_LIST: processMyNotifyListDG(dg); break;
+      case Datagram.DG_NOTIFY_ARRIVED: processNotifyArrivedDG(dg, clientTag); break;
+      case Datagram.DG_NOTIFY_LEFT: processNotifyLeftDG(dg, clientTag); break;
+      case Datagram.DG_NOTIFY_STATE: processNotifyStateDG(dg, clientTag); break;
+      case Datagram.DG_MY_NOTIFY_LIST: processMyNotifyListDG(dg, clientTag); break;
       
       // Match offer related
-      case Datagram.DG_MATCH: processMatchDG(dg); break;
-      case Datagram.DG_MATCH_REMOVED: processMatchRemovedDG(dg); break;
+      case Datagram.DG_MATCH: processMatchDG(dg, clientTag); break;
+      case Datagram.DG_MATCH_REMOVED: processMatchRemovedDG(dg, clientTag); break;
       
       default:
         throw new IllegalStateException("Unhandled datagram received: " + dg);
@@ -677,8 +682,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_SET2.
    */
   
-  private void processSet2DG(Datagram dg){
-    processSet2(dg.getInteger(0), dg.getBoolean(1));
+  private void processSet2DG(Datagram dg, String clientTag){
+    processSet2(clientTag, dg.getInteger(0), dg.getBoolean(1));
   }
   
   
@@ -687,14 +692,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the specified datagram is turned on or off.
    */
   
-  protected void processSet2(int datagramType, boolean isOn){
+  protected void processSet2(String clientTag, int datagramType, boolean isOn){
     
     // The datagram that marks the end of the change is determined by the order
     // in which the listener is unregistered in ChessclubListenerManager
     switch(datagramType){
-      case Datagram.DG_SEEK_REMOVED: seekDatagramsStateChanged(isOn); break;
-      case Datagram.DG_UNCIRCLE: gameDatagramsStateChanged(isOn); break;
-      case Datagram.DG_MY_NOTIFY_LIST: friendsDatagramsStateChanged(isOn); break;
+      case Datagram.DG_SEEK_REMOVED: seekDatagramsStateChanged(isOn, clientTag); break;
+      case Datagram.DG_UNCIRCLE: gameDatagramsStateChanged(isOn, clientTag); break;
+      case Datagram.DG_MY_NOTIFY_LIST: friendsDatagramsStateChanged(isOn, clientTag); break;
     }
   }
   
@@ -704,8 +709,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends a personal tell to the specified user.
    */
   
-  public void sendPersonalTell(ServerUser user, String message){
-    sendCommand("xtell " + user.getName() + "! " + message);
+  public void sendPersonalTell(ServerUser user, String message, String tag){
+    sendTaggedCommand("xtell " + user.getName() + "! " + message, tag);
   }
   
   
@@ -755,8 +760,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_PERSONAL_TELL.
    */
    
-  private void processPersonalTellDG(Datagram dg){
-    processPersonalTell(dg.getString(0), dg.getString(1), dg.getString(2), dg.getInteger(3));
+  private void processPersonalTellDG(Datagram dg, String clientTag){
+    processPersonalTell(clientTag, dg.getString(0), dg.getString(1), dg.getString(2), dg.getInteger(3));
   }
   
   
@@ -766,7 +771,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processPersonalTell(String playerName, String titles, String message, int tellType){
+  protected void processPersonalTell(String clientTag, String playerName, String titles, String message, int tellType){
     String tellTypeString;
     switch (tellType){
       case ChessclubConstants.REGULAR_TELL: tellTypeString = "tell"; break;
@@ -780,7 +785,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+    ChatEvent evt = new ChatEvent(this, clientTag, tellTypeString, ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
@@ -792,8 +797,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_PERSONAL_QTELL. 
    */
    
-  private void processPersonalQTellDG(Datagram dg){
-    processPersonalQTell(dg.getString(0), dg.getString(1), dg.getString(2));
+  private void processPersonalQTellDG(Datagram dg, String clientTag){
+    processPersonalQTell(clientTag, dg.getString(0), dg.getString(1), dg.getString(2));
   }
    
    
@@ -803,8 +808,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processPersonalQTell(String name, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+  protected void processPersonalQTell(String clientTag, String name, String titles, String message){
+    listenerManager.fireChatEvent(new ChatEvent(this, clientTag, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(name), displayableTitle(titles), -1, message, null));
   }
 
@@ -814,8 +819,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_SHOUT.
    */
    
-  private void processShoutDG(Datagram dg){
-    processShout(dg.getString(0), dg.getString(1), dg.getInteger(2), dg.getString(3));
+  private void processShoutDG(Datagram dg, String clientTag){
+    processShout(clientTag, dg.getString(0), dg.getString(1), dg.getInteger(2), dg.getString(3));
   }
 
 
@@ -825,7 +830,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processShout(String playerName, String titles, int shoutType, String message){
+  protected void processShout(String clientTag, String playerName, String titles, int shoutType, String message){
     String tellTypeString;
     switch (shoutType){
       case ChessclubConstants.REGULAR_SHOUT: tellTypeString = "shout"; break;
@@ -839,9 +844,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String title = displayableTitle(titles);
 
     ChatEvent evt = (shoutType == ChessclubConstants.ANNOUNCEMENT_SHOUT) ? 
-      new ChatEvent(this, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, 
+      new ChatEvent(this, clientTag, tellTypeString, ChatEvent.BROADCAST_CHAT_CATEGORY, 
           userForName(playerName), title, -1, message, null):
-      new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY,
+      new ChatEvent(this, clientTag, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY,
           userForName(playerName), title, -1, message, null);
       
     listenerManager.fireChatEvent(evt);
@@ -853,8 +858,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_CHANNEL_TELL.
    */
   
-  private void processChannelTellDG(Datagram dg){
-    processChannelTell(dg.getInteger(0), dg.getString(1), dg.getString(2),
+  private void processChannelTellDG(Datagram dg, String clientTag){
+    processChannelTell(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2),
       dg.getString(3), dg.getInteger(4));
   }
 
@@ -864,7 +869,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processChannelTell(int channel, String playerName, String titles, String message, int tellType){
+  protected void processChannelTell(String clientTag, int channel, String playerName, 
+      String titles, String message, int tellType){
+    
     String tellTypeString;
     switch (tellType){
       case ChessclubConstants.REGULAR_CHANNEL_TELL: tellTypeString = "channel-tell"; break;
@@ -875,7 +882,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, 
+    ChatEvent evt = new ChatEvent(this, clientTag, tellTypeString, ChatEvent.ROOM_CHAT_CATEGORY, 
       userForName(playerName), title, -1, message, new Integer(channel));
       
     listenerManager.fireChatEvent(evt);
@@ -888,8 +895,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_CHANNEL_QTELL. 
    */
    
-  private void processChannelQTellDG(Datagram dg){
-    processChannelQTell(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
+  private void processChannelQTellDG(Datagram dg, String clientTag){
+    processChannelQTell(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
   }
    
    
@@ -899,8 +906,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processChannelQTell(int channel, String name, String titles, String message){
-    ChatEvent evt = new ChatEvent(this, "channel-qtell", ChatEvent.ROOM_CHAT_CATEGORY,
+  protected void processChannelQTell(String clientTag, int channel, String name, String titles, String message){
+    ChatEvent evt = new ChatEvent(this, clientTag, "channel-qtell", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(name), displayableTitle(titles), -1, message, new Integer(channel));
 
     listenerManager.fireChatEvent(evt);
@@ -912,8 +919,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_KIBITZ. 
    */
    
-  private void processKibitzDG(Datagram dg){
-    processKibitz(dg.getInteger(0), dg.getString(1), dg.getString(2),
+  private void processKibitzDG(Datagram dg, String clientTag){
+    processKibitz(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2),
       dg.getBoolean(3), dg.getString(4));
   }
   
@@ -924,12 +931,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChatListeners.
    */
 
-  protected void processKibitz(int gameNumber, String playerName, String titles, boolean isKibitz, String message){
+  protected void processKibitz(String clientTag, int gameNumber, String playerName, String titles,
+      boolean isKibitz, String message){
+    
     String tellTypeString = isKibitz ? "kibitz" : "whisper";
 
     String title = displayableTitle(titles);
 
-    ChatEvent evt = new ChatEvent(this, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
+    ChatEvent evt = new ChatEvent(this, clientTag, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
         userForName(playerName), title, -1, message, new Integer(gameNumber));
     listenerManager.fireChatEvent(evt);
   }
@@ -943,7 +952,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the state of game-related datagrams changes. 
    */
 
-  private void gameDatagramsStateChanged(boolean isOn){
+  private void gameDatagramsStateChanged(boolean isOn, String clientTag){
     if (!isOn){
       gameNumbersToGameInfo.clear();
       nonStartedGames.clear();
@@ -1196,7 +1205,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MY_GAME_STARTED. 
    */
    
-  private void processMyGameStartedDG(Datagram dg){
+  private void processMyGameStartedDG(Datagram dg, String clientTag){
     int gameNumber = dg.getInteger(0);
     String whiteName = dg.getString(1);
     String blackName = dg.getString(2);
@@ -1219,7 +1228,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean usesPlunkers = dg.getBoolean(19);
     String fancyTimeControls = dg.getString(20);
     
-    processMyGameStarted(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString, isRated,
+    processMyGameStarted(clientTag, gameNumber, whiteName, blackName, wildNumber, ratingCategoryString, isRated,
       whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString, whiteRating,
       blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality, isIrregularSemantics,
       usesPlunkers, fancyTimeControls);
@@ -1231,7 +1240,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Creates the game record for a game played by the user.
    */
 
-  protected void processMyGameStarted(int gameNumber, String whiteName, String blackName,
+  protected void processMyGameStarted(String clientTag, int gameNumber, String whiteName, String blackName,
       int variantNumber, String ratingCategoryString, boolean isRated, int whiteInitial, int whiteIncrement,
       int blackInitial, int blackIncrement, boolean isPlayedGame, String exString,
       int whiteRating, int blackRating, long gameID, String whiteTitles, String blackTitles,
@@ -1257,7 +1266,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_STARTED_OBSERVING.
    */
    
-  private void processStartedObservingDG(Datagram dg){
+  private void processStartedObservingDG(Datagram dg, String clientTag){
     int gameNumber = dg.getInteger(0);
     String whiteName = dg.getString(1);
     String blackName = dg.getString(2);
@@ -1280,7 +1289,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean usesPlunkers = dg.getBoolean(19);
     String fancyTimeControls = dg.getString(20);
     
-    processStartedObserving(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+    processStartedObserving(clientTag, gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
       isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame,
       exString, whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
       isIrregularSemantics, usesPlunkers, fancyTimeControls);
@@ -1291,7 +1300,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Creates the game record for an observed game.
    */
 
-  protected void processStartedObserving(int gameNumber, String whiteName, String blackName,
+  protected void processStartedObserving(String clientTag, int gameNumber, String whiteName, String blackName,
     int variantNumber, String ratingCategoryString, boolean isRated, int whiteInitial,
     int whiteIncrement, int blackInitial, int blackIncrement, boolean isPlayedGame,
     String exString, int whiteRating, int blackRating, long gameID, String whiteTitles,
@@ -1316,7 +1325,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_ISOLATED_BOARD.
    */
    
-  private void processIsolatedBoardDG(Datagram dg){
+  private void processIsolatedBoardDG(Datagram dg, String clientTag){
     int gameNumber = dg.getInteger(0);
     String whiteName = dg.getString(1);
     String blackName = dg.getString(2);
@@ -1339,7 +1348,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean usesPlunkers = dg.getBoolean(19);
     String fancyTimeControls = dg.getString(20);
     
-    processIsolatedBoard(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+    processIsolatedBoard(clientTag, gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
       isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString,
       whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
       isIrregularSemantics, usesPlunkers, fancyTimeControls);
@@ -1351,7 +1360,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Creates the game record for an isolated board.
    */
 
-  protected void processIsolatedBoard(int gameNumber, String whiteName, String blackName,
+  protected void processIsolatedBoard(String clientTag, int gameNumber, String whiteName, String blackName,
       int variantNumber, String ratingCategoryString, boolean isRated, int whiteInitial,
       int whiteIncrement, int blackInitial, int blackIncrement, boolean isPlayedGame,
       String exString, int whiteRating, int blackRating, long gameID, String whiteTitles,
@@ -1377,7 +1386,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MY_GAME_CHANGE.
    */
    
-  private void processMyGameChangeDG(Datagram dg){
+  private void processMyGameChangeDG(Datagram dg, String clientTag){
     int gameNumber = dg.getInteger(0);
     String whiteName = dg.getString(1);
     String blackName = dg.getString(2);
@@ -1400,7 +1409,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean usesPlunkers = dg.getBoolean(19);
     String fancyTimeControls = dg.getString(20);
     
-    processMyGameChange(gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
+    processMyGameChange(clientTag, gameNumber, whiteName, blackName, wildNumber, ratingCategoryString,
       isRated, whiteInitial, whiteIncrement, blackInitial, blackIncrement, isPlayedGame, exString,
       whiteRating, blackRating, gameID, whiteTitles, blackTitles, isIrregularLegality,
       isIrregularSemantics, usesPlunkers, fancyTimeControls);
@@ -1413,7 +1422,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * calls updateGame() with the new game properties.
    */
   
-  protected void processMyGameChange(int gameNumber, String whiteName, String blackName,
+  protected void processMyGameChange(String clientTag, int gameNumber, String whiteName, String blackName,
       int variantNumber, String ratingCategoryString, boolean isRated, int whiteInitial,
       int whiteIncrement, int blackInitial, int blackIncrement, boolean isPlayedGame,
       String exString, int whiteRating, int blackRating, long gameID, String whiteTitles,
@@ -1437,8 +1446,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MY_GAME_RESULT. 
    */
    
-  private void processMyGameResultDG(Datagram dg){
-    processMyGameResult(dg.getInteger(0), dg.getBoolean(1), dg.getString(2), dg.getString(3),
+  private void processMyGameResultDG(Datagram dg, String clientTag){
+    processMyGameResult(clientTag, dg.getInteger(0), dg.getBoolean(1), dg.getString(2), dg.getString(3),
       dg.getString(4));
   }
 
@@ -1452,7 +1461,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * <code>Game</code> object.
    */
 
-  protected void processMyGameResult(int gameNumber, boolean becomesExamined,
+  protected void processMyGameResult(String clientTag, int gameNumber, boolean becomesExamined,
       String gameResultCode, String scoreString, String descriptionString){
 
     try{
@@ -1485,7 +1494,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
         }
         else if (game.getGameType() == Game.ISOLATED_BOARD){
-          fireGameEvent(new GameEndEvent(this, game, result));
+          fireGameEvent(new GameEndEvent(this, clientTag, game, result));
         }
 
 
@@ -1535,8 +1544,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_POSITION_BEGIN. 
    */
    
-  private void processPositionBeginDG(Datagram dg){
-    processPositionBegin(dg.getInteger(0), dg.getString(1), dg.getInteger(2));
+  private void processPositionBeginDG(Datagram dg, String clientTag){
+    processPositionBegin(clientTag, dg.getInteger(0), dg.getString(1), dg.getInteger(2));
   }
 
 
@@ -1545,7 +1554,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a game start event for the game specified by <code>gameNumber</code>.
    */
 
-  protected void processPositionBegin(int gameNumber, String initFEN, int numMovesToFollow){
+  protected void processPositionBegin(String clientTag, int gameNumber, String initFEN, int numMovesToFollow){
     if (existsNonStarted(gameNumber)){
       WildVariant variant = (WildVariant)getPropertyForNonStarted(gameNumber, "Variant");
       Position pos = new Position(variant);
@@ -1556,7 +1565,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       GameInfo gameInfo = new GameInfo(newGame, new Position(pos), numMovesToFollow);
       addGameInfo(gameNumber, gameInfo);
 
-      fireGameEvent(new GameStartEvent(this, newGame));
+      fireGameEvent(new GameStartEvent(this, clientTag, newGame));
     }
     else{ // This can happen during an examined game on a "p@a2", "clearboard" and "loadgame" for example.
       try{
@@ -1572,7 +1581,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         gameInfo.position.copyFrom(game.getInitialPosition());
         gameInfo.numMovesToFollow = numMovesToFollow;
 
-        fireGameEvent(new PositionChangedEvent(this, game, gameInfo.position));
+        fireGameEvent(new PositionChangedEvent(this, clientTag, game, gameInfo.position));
       } catch (NoSuchGameException e){}
     }
 
@@ -1584,8 +1593,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MY_RELATION_TO_GAME.
    */
    
-  private void processMyRelationToGameDG(Datagram dg){
-    processMyRelationToGame(dg.getInteger(0), dg.getString(1));
+  private void processMyRelationToGameDG(Datagram dg, String clientTag){
+    processMyRelationToGame(clientTag, dg.getInteger(0), dg.getString(1));
   }
 
 
@@ -1595,7 +1604,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * fires the appropriate GameEndEvent to all interested GameListeners.
    */
 
-  protected void processMyRelationToGame(int gameNumber, String playerState){
+  protected void processMyRelationToGame(String clientTag, int gameNumber, String playerState){
     if (ChessclubConstants.DOING_NOTHING_PLAYER_STATE.equals(playerState)){
 
       GameInfo gameInfo = removeGameInfo(gameNumber);
@@ -1614,9 +1623,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       if (game.getResult() == Game.GAME_IN_PROGRESS) 
         game.setResult(result);
 
-      clearOffers(gameInfo, Player.WHITE_PLAYER);
-      clearOffers(gameInfo, Player.BLACK_PLAYER);
-      fireGameEvent(new GameEndEvent(this, game, result));
+      clearOffers(clientTag, gameInfo, Player.WHITE_PLAYER);
+      clearOffers(clientTag, gameInfo, Player.BLACK_PLAYER);
+      fireGameEvent(new GameEndEvent(this, clientTag, game, result));
     }
     else{
       int newGameType = ChessclubConstants.OBSERVING_PLAYER_STATE.equals(playerState) ?
@@ -1633,8 +1642,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
           if ((game.isPlayed() != isPlayedGame) || (newGameType != game.getGameType())){
             if (!isPlayedGame){
-              clearOffers(gameInfo, Player.WHITE_PLAYER);
-              clearOffers(gameInfo, Player.BLACK_PLAYER);
+              clearOffers(clientTag, gameInfo, Player.WHITE_PLAYER);
+              clearOffers(clientTag, gameInfo, Player.BLACK_PLAYER);
             }
 
             updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
@@ -1666,7 +1675,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_SEND_MOVES.
    */
    
-  private void processSendMovesDG(Datagram dg){
+  private void processSendMovesDG(Datagram dg, String clientTag){
     int i = 0;
     
     int gameNumber = dg.getInteger(i++);
@@ -1682,7 +1691,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     int variationCode = dg.getInteger(i++);
 
-    processSendMoves(gameNumber, algebraicMove, smithMove, variationCode);
+    processSendMoves(clientTag, gameNumber, algebraicMove, smithMove, variationCode);
   }
 
 
@@ -1691,7 +1700,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate MoveEvent to all interested GameListeners.
    */
 
-  protected void processSendMoves(int gameNumber, String algebraicMove,
+  protected void processSendMoves(String clientTag, int gameNumber, String algebraicMove,
       String smithMove, int variationCode){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
@@ -1705,8 +1714,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       boolean isNewMove = (variationCode != ChessclubConstants.INITIAL_MOVE) &&
                           (variationCode != ChessclubConstants.FORWARD_MOVE);
 
-      clearOffers(gameInfo, move.getPlayer().getOpponent());
-      fireGameEvent(new MoveMadeEvent(this, game, move, isNewMove));
+      clearOffers(clientTag, gameInfo, move.getPlayer().getOpponent());
+      fireGameEvent(new MoveMadeEvent(this, clientTag, game, move, isNewMove));
 
       if (gameInfo.numMovesToFollow > 0){
         gameInfo.numMovesToFollow--;
@@ -1770,11 +1779,11 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
-   * Processes a DG_BACKWARD. 
+   * Processes a DG_BACKWARD.
    */
    
-  private void processBackwardDG(Datagram dg){
-    processBackward(dg.getInteger(0), dg.getInteger(1));
+  private void processBackwardDG(Datagram dg, String clientTag){
+    processBackward(clientTag, dg.getInteger(0), dg.getInteger(1));
   }
 
 
@@ -1783,7 +1792,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a Takeback event.
    */
 
-  protected void processBackward(int gameNumber, int backwardCount){
+  protected void processBackward(String clientTag, int gameNumber, int backwardCount){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -1798,7 +1807,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       for (int i = 0; i < numMadeMoves; i++)
         pos.makeMove((Move)moves.elementAt(i));
 
-      fireGameEvent(new TakebackEvent(this, game, backwardCount));
+      fireGameEvent(new TakebackEvent(this, clientTag, game, backwardCount));
     } catch (NoSuchGameException e){}
   }
   
@@ -1808,8 +1817,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_TAKEBACK.
    */
    
-  private void processTakebackDG(Datagram dg){
-    processTakeback(dg.getInteger(0), dg.getInteger(1));
+  private void processTakebackDG(Datagram dg, String clientTag){
+    processTakeback(clientTag, dg.getInteger(0), dg.getInteger(1));
   }
 
   
@@ -1818,7 +1827,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a Takeback event.
    */
 
-  protected void processTakeback(int gameNumber, int takebackCount){
+  protected void processTakeback(String clientTag, int gameNumber, int takebackCount){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -1833,9 +1842,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       for (int i = 0; i < numMadeMoves; i++)
         pos.makeMove((Move)moves.elementAt(i));
 
-      fireGameEvent(new TakebackEvent(this, game, takebackCount));
-      updateTakebackOffer(gameInfo, Player.WHITE_PLAYER, 0); // The server seems to only clear
-      updateTakebackOffer(gameInfo, Player.BLACK_PLAYER, 0); // takeback offers on a takeback
+      fireGameEvent(new TakebackEvent(this, clientTag, game, takebackCount));
+      updateTakebackOffer(clientTag, gameInfo, Player.WHITE_PLAYER, 0); // The server seems to only clear
+      updateTakebackOffer(clientTag, gameInfo, Player.BLACK_PLAYER, 0); // takeback offers on a takeback
     } catch (NoSuchGameException e){}
   }
   
@@ -1845,7 +1854,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_OFFERS_IN_MY_GAME.
    */
    
-  private void processOffersInMyGameDG(Datagram dg){
+  private void processOffersInMyGameDG(Datagram dg, String clientTag){
     int gameNumber = dg.getInteger(0);
     boolean whiteDraw = dg.getBoolean(1);
     boolean blackDraw = dg.getBoolean(2);
@@ -1856,7 +1865,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     int whiteTakeback = dg.getInteger(7);
     int blackTakeback = dg.getInteger(8);
     
-    processOffersInMyGame(gameNumber, whiteDraw, blackDraw, whiteAdjourn, blackAdjourn,
+    processOffersInMyGame(clientTag, gameNumber, whiteDraw, blackDraw, whiteAdjourn, blackAdjourn,
       whiteAbort, blackAbort, whiteTakeback, blackTakeback);
   }
 
@@ -1866,22 +1875,22 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate OfferEvent.
    */
 
-  protected void processOffersInMyGame(int gameNumber, boolean whiteDraw, boolean blackDraw,
+  protected void processOffersInMyGame(String clientTag, int gameNumber, boolean whiteDraw, boolean blackDraw,
       boolean whiteAdjourn, boolean blackAdjourn, boolean whiteAbort, boolean blackAbort,
       int whiteTakeback, int blackTakeback){
 
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
 
-      updateOffer(gameInfo, OfferEvent.DRAW_OFFER, Player.WHITE_PLAYER, whiteDraw);
-      updateOffer(gameInfo, OfferEvent.DRAW_OFFER, Player.BLACK_PLAYER, blackDraw);
-      updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, Player.WHITE_PLAYER, whiteAdjourn);
-      updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, Player.BLACK_PLAYER, blackAdjourn);
-      updateOffer(gameInfo, OfferEvent.ABORT_OFFER, Player.WHITE_PLAYER, whiteAbort);
-      updateOffer(gameInfo, OfferEvent.ABORT_OFFER, Player.BLACK_PLAYER, blackAbort);
+      updateOffer(clientTag, gameInfo, OfferEvent.DRAW_OFFER, Player.WHITE_PLAYER, whiteDraw);
+      updateOffer(clientTag, gameInfo, OfferEvent.DRAW_OFFER, Player.BLACK_PLAYER, blackDraw);
+      updateOffer(clientTag, gameInfo, OfferEvent.ADJOURN_OFFER, Player.WHITE_PLAYER, whiteAdjourn);
+      updateOffer(clientTag, gameInfo, OfferEvent.ADJOURN_OFFER, Player.BLACK_PLAYER, blackAdjourn);
+      updateOffer(clientTag, gameInfo, OfferEvent.ABORT_OFFER, Player.WHITE_PLAYER, whiteAbort);
+      updateOffer(clientTag, gameInfo, OfferEvent.ABORT_OFFER, Player.BLACK_PLAYER, blackAbort);
 
-      updateTakebackOffer(gameInfo, Player.WHITE_PLAYER, whiteTakeback);
-      updateTakebackOffer(gameInfo, Player.BLACK_PLAYER, blackTakeback);
+      updateTakebackOffer(clientTag, gameInfo, Player.WHITE_PLAYER, whiteTakeback);
+      updateTakebackOffer(clientTag, gameInfo, Player.BLACK_PLAYER, blackTakeback);
     } catch (NoSuchGameException e){}
 
   }
@@ -1892,10 +1901,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Updates the specified offer if necessary.
    */
 
-  private void updateOffer(GameInfo gameInfo, int offerId, Player player, boolean newState){
+  private void updateOffer(String clientTag, GameInfo gameInfo, int offerId, Player player, boolean newState){
     if (newState ^ gameInfo.isOfferred(offerId, player)){
       gameInfo.setOffer(offerId, player, newState);
-      fireGameEvent(new OfferEvent(this, gameInfo.game, offerId, newState, player));
+      fireGameEvent(new OfferEvent(this, clientTag, gameInfo.game, offerId, newState, player));
     }
   }
 
@@ -1905,16 +1914,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Updates a takeback offer, if necessary.
    */
 
-  private void updateTakebackOffer(GameInfo gameInfo, Player player, int takebackCount){
+  private void updateTakebackOffer(String clientTag, GameInfo gameInfo, Player player, int takebackCount){
     int oldTakeback;
     if ((oldTakeback = gameInfo.getTakebackOffer(player)) != takebackCount){
       if (oldTakeback != 0)
-        fireGameEvent(new OfferEvent(this, gameInfo.game, false, player, oldTakeback));
+        fireGameEvent(new OfferEvent(this, clientTag, gameInfo.game, false, player, oldTakeback));
 
       gameInfo.setTakebackOffer(player, takebackCount);
 
       if (takebackCount != 0)
-        fireGameEvent(new OfferEvent(this, gameInfo.game, true, player, takebackCount));
+        fireGameEvent(new OfferEvent(this, clientTag, gameInfo.game, true, player, takebackCount));
     }
   }
 
@@ -1925,12 +1934,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * and fires the appropriate events.
    */
 
-  private void clearOffers(GameInfo gameInfo, Player player){
-    updateOffer(gameInfo, OfferEvent.DRAW_OFFER, player, false);
-    updateOffer(gameInfo, OfferEvent.ADJOURN_OFFER, player, false);
-    updateOffer(gameInfo, OfferEvent.ABORT_OFFER, player, false);
+  private void clearOffers(String clientTag, GameInfo gameInfo, Player player){
+    updateOffer(clientTag, gameInfo, OfferEvent.DRAW_OFFER, player, false);
+    updateOffer(clientTag, gameInfo, OfferEvent.ADJOURN_OFFER, player, false);
+    updateOffer(clientTag, gameInfo, OfferEvent.ABORT_OFFER, player, false);
 
-    updateTakebackOffer(gameInfo, player, 0);
+    updateTakebackOffer(clientTag, gameInfo, player, 0);
   }
   
   
@@ -1939,8 +1948,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_ILLEGAL_MOVE.
    */
    
-  private void processIllegalMoveDG(Datagram dg){
-    processIllegalMove(dg.getInteger(0), dg.getString(1), dg.getInteger(2));
+  private void processIllegalMoveDG(Datagram dg, String clientTag){
+    processIllegalMove(clientTag, dg.getInteger(0), dg.getString(1), dg.getInteger(2));
   }
 
 
@@ -1949,7 +1958,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires an IllegalMoveEvent.
    */
 
-  protected void processIllegalMove(int gameNumber, String moveString, int reasonCode){
+  protected void processIllegalMove(String clientTag, int gameNumber, String moveString, int reasonCode){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -1961,7 +1970,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Move move = (Move)unechoedGameMoves.elementAt(0);
       if (moveToString(game, move).equals(moveString)){ // Our move
         unechoedGameMoves.removeAllElements();
-        fireGameEvent(new IllegalMoveEvent(this, game, move));
+        fireGameEvent(new IllegalMoveEvent(this, clientTag, game, move));
       }
     } catch (NoSuchGameException e){}
   }
@@ -1972,8 +1981,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MSEC.
    */
    
-  private void processMsecDG(Datagram dg){
-    processMsec(dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2),
+  private void processMsecDG(Datagram dg, String clientTag){
+    processMsec(clientTag, dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2),
       dg.getBoolean(3));
   }
 
@@ -1983,7 +1992,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a ClockAdjustmentEvent.
    */
 
-  protected void processMsec(int gameNumber, boolean isWhite, int msec, boolean isRunning){
+  protected void processMsec(String clientTag, int gameNumber, boolean isWhite, int msec, boolean isRunning){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -1994,7 +2003,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         gameInfo.setBlackClock(msec, isRunning);
 
       Player player = (isWhite ? Player.WHITE_PLAYER : Player.BLACK_PLAYER);
-      fireGameEvent(new ClockAdjustmentEvent(this, game, player, msec, isRunning && game.isPlayed()));
+      fireGameEvent(new ClockAdjustmentEvent(this, clientTag, game, player, msec, isRunning && game.isPlayed()));
       // The server always sends isRunning==true, even for examined games where
       // it doesn't make sense.
       
@@ -2007,8 +2016,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MORETIME.
    */
    
-  private void processMoretimeDG(Datagram dg){
-    processMoretime(dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2));
+  private void processMoretimeDG(Datagram dg, String clientTag){
+    processMoretime(clientTag, dg.getInteger(0), dg.getString(1).equals("W"), dg.getInteger(2));
   }
 
 
@@ -2017,7 +2026,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a ClockAdjustmentEvent.
    */
 
-  protected void processMoretime(int gameNumber, boolean isWhite, int seconds){
+  protected void processMoretime(String clientTag, int gameNumber, boolean isWhite, int seconds){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -2029,7 +2038,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
           newTime -= (int)(System.currentTimeMillis() - gameInfo.getWhiteTimestamp());
 
         gameInfo.setWhiteClock(newTime, isRunning);
-        fireGameEvent(new ClockAdjustmentEvent(this, game, Player.WHITE_PLAYER, newTime, isRunning));
+        fireGameEvent(new ClockAdjustmentEvent(this, clientTag, game, Player.WHITE_PLAYER, newTime, isRunning));
       }
       else{
         int newTime = gameInfo.getBlackTime() + seconds * 1000;
@@ -2038,7 +2047,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
           newTime -= (int)(System.currentTimeMillis() - gameInfo.getBlackTimestamp());
 
         gameInfo.setBlackClock(newTime, isRunning);
-        fireGameEvent(new ClockAdjustmentEvent(this, game, Player.BLACK_PLAYER, newTime, isRunning));
+        fireGameEvent(new ClockAdjustmentEvent(this, clientTag, game, Player.BLACK_PLAYER, newTime, isRunning));
       }
     } catch (NoSuchGameException e){}
   }
@@ -2049,8 +2058,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_FLIP. 
    */
    
-  private void processFlipDG(Datagram dg){
-    processFlip(dg.getInteger(0), dg.getBoolean(1));
+  private void processFlipDG(Datagram dg, String clientTag){
+    processFlip(clientTag, dg.getInteger(0), dg.getBoolean(1));
   }
 
 
@@ -2060,7 +2069,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * property of the new Game if not.
    */
 
-  protected void processFlip(int gameNumber, boolean isFlipped){
+  protected void processFlip(String clientTag, int gameNumber, boolean isFlipped){
     if (existsNonStarted(gameNumber)){
       putPropertyForNonStarted(gameNumber, "InitiallyFlipped", isFlipped ? Boolean.TRUE : Boolean.FALSE);
     }
@@ -2070,7 +2079,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         Game game = gameInfo.game;
         gameInfo.isFlipped = isFlipped;
 
-        fireGameEvent(new BoardFlipEvent(this, game, isFlipped));
+        fireGameEvent(new BoardFlipEvent(this, clientTag, game, isFlipped));
       } catch (NoSuchGameException e){}
     }
   }
@@ -2081,8 +2090,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_CIRCLE. 
    */
    
-  private void processCircleDG(Datagram dg){
-    processCircle(dg.getInteger(0), dg.getString(1), dg.getString(2));    
+  private void processCircleDG(Datagram dg, String clientTag){
+    processCircle(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2));    
   }
 
 
@@ -2091,14 +2100,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Gets called when a DG_CIRCLE datagram arrives.
    */
 
-  protected void processCircle(int gameNumber, String examiner, String coordinate){
+  protected void processCircle(String clientTag, int gameNumber, String examiner, String coordinate){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
 
       Square circleSquare = Square.parseSquare(coordinate);
 
-      fireGameEvent(new CircleEvent(this, game, CircleEvent.CIRCLE_ADDED, circleSquare));
+      fireGameEvent(new CircleEvent(this, clientTag, game, CircleEvent.CIRCLE_ADDED, circleSquare));
     } catch (NoSuchGameException e){}
   }
   
@@ -2108,8 +2117,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_UNCIRCLE.
    */
    
-  private void processUncircleDG(Datagram dg){
-    processUncircle(dg.getInteger(0), dg.getString(1), dg.getString(2));
+  private void processUncircleDG(Datagram dg, String clientTag){
+    processUncircle(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2));
   }
   
   
@@ -2118,14 +2127,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Gets called when a DG_UNCIRCLE datagram arrives.
    */
    
-  protected void processUncircle(int gameNumber, String examiner, String coordinate){
+  protected void processUncircle(String clientTag, int gameNumber, String examiner, String coordinate){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
 
       Square circleSquare = Square.parseSquare(coordinate);
 
-      fireGameEvent(new CircleEvent(this, game, CircleEvent.CIRCLE_REMOVED, circleSquare));
+      fireGameEvent(new CircleEvent(this, clientTag, game, CircleEvent.CIRCLE_REMOVED, circleSquare));
     } catch (NoSuchGameException e){}
   }
   
@@ -2135,8 +2144,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_ARROW.
    */
    
-  private void processArrowDG(Datagram dg){
-    processArrow(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
+  private void processArrowDG(Datagram dg, String clientTag){
+    processArrow(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
   }
 
 
@@ -2145,7 +2154,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Gets called when a DG_ARROW datagram arrives.
    */
 
-  protected void processArrow(int gameNumber, String examiner, String origin, String destination){
+  protected void processArrow(String clientTag, int gameNumber, String examiner, String origin, String destination){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -2153,7 +2162,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Square fromSquare = Square.parseSquare(origin);
       Square toSquare = Square.parseSquare(destination);
 
-      fireGameEvent(new ArrowEvent(this, game, ArrowEvent.ARROW_ADDED, fromSquare, toSquare));
+      fireGameEvent(new ArrowEvent(this, clientTag, game, ArrowEvent.ARROW_ADDED, fromSquare, toSquare));
     } catch (NoSuchGameException e){}
   }
   
@@ -2163,8 +2172,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_UNARROW.
    */
    
-  private void processUnarrowDG(Datagram dg){
-    processUnarrow(dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
+  private void processUnarrowDG(Datagram dg, String clientTag){
+    processUnarrow(clientTag, dg.getInteger(0), dg.getString(1), dg.getString(2), dg.getString(3));
   }
 
 
@@ -2173,7 +2182,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Gets called when a DG_UNARROW datagram arrives.
    */
 
-  protected void processUnarrow(int gameNumber, String examiner, String origin, String destination){
+  protected void processUnarrow(String clientTag, int gameNumber, String examiner, String origin, String destination){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -2181,7 +2190,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Square fromSquare = Square.parseSquare(origin);
       Square toSquare = Square.parseSquare(destination);
 
-      fireGameEvent(new ArrowEvent(this, game, ArrowEvent.ARROW_REMOVED, fromSquare, toSquare));
+      fireGameEvent(new ArrowEvent(this, clientTag, game, ArrowEvent.ARROW_REMOVED, fromSquare, toSquare));
     } catch (NoSuchGameException e){}
   }
   
@@ -2532,8 +2541,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends the specified question string to channel 1.
    */
    
-  public void sendHelpQuestion(String question){
-    sendCommand("tell 1 * " + question);    
+  public void sendHelpQuestion(String question, String tag){
+    sendTaggedCommand("xtell 1 * " + question, tag);    
   }
   
   
@@ -2561,7 +2570,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the state of friend-related datagrams changes.
    */
   
-  protected void friendsDatagramsStateChanged(boolean isOn){
+  protected void friendsDatagramsStateChanged(boolean isOn, String clientTag){
     if (!isOn){
       friends.clear();
       onlineFriendStates.clear();
@@ -2591,12 +2600,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_NOTIFY_ARRIVED.
    */
   
-  private void processNotifyArrivedDG(Datagram dg){
+  private void processNotifyArrivedDG(Datagram dg, String clientTag){
     String username = dg.getString(0);
     String stateCode = dg.getString(1);
     int gameNumber = (dg.getFieldCount() > 2) ? dg.getInteger(2) : -1;
 
-    processNotifyArrived(username, stateCode, gameNumber);
+    processNotifyArrived(clientTag, username, stateCode, gameNumber);
   }
   
   
@@ -2605,7 +2614,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the specified user on our notify list arrives.
    */
   
-  protected void processNotifyArrived(String username, String stateCode, int gameNumber){
+  protected void processNotifyArrived(String clientTag, String username, String stateCode, int gameNumber){
     ChessclubUser user = ChessclubUser.get(username);
     
     Integer newState = friendStateForCode(stateCode);
@@ -2613,10 +2622,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     if (existingState == null){ // Really arrived, not a repeat datagram
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_CONNECTED, user, newState.intValue()));
+          new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_CONNECTED, user, newState.intValue()));
     }
     else if (!existingState.equals(newState)){
-      processNotifyState(username, stateCode, gameNumber);
+      processNotifyState(clientTag, username, stateCode, gameNumber);
     }
   }
   
@@ -2626,8 +2635,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_NOTIFY_LEFT.
    */
   
-  private void processNotifyLeftDG(Datagram dg){
-    processNotifyLeft(dg.getString(0));
+  private void processNotifyLeftDG(Datagram dg, String clientTag){
+    processNotifyLeft(clientTag, dg.getString(0));
   }
   
   
@@ -2636,12 +2645,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the specified user on our notify list leaves.
    */
   
-  protected void processNotifyLeft(String username){
+  protected void processNotifyLeft(String clientTag, String username){
     ChessclubUser user = ChessclubUser.get(username);
     
     if (onlineFriendStates.remove(user) != null){
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
+          new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
     }
   }
   
@@ -2651,12 +2660,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_NOTIFY_STATE.
    */
   
-  private void processNotifyStateDG(Datagram dg){
+  private void processNotifyStateDG(Datagram dg, String clientTag){
     String username = dg.getString(0);
     String stateCode = dg.getString(1);
     int gameNumber = dg.getInteger(2);
     
-    processNotifyState(username, stateCode, gameNumber);
+    processNotifyState(clientTag, username, stateCode, gameNumber);
   }
   
   
@@ -2665,7 +2674,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the state of the specified friend changes.
    */
   
-  protected void processNotifyState(String username, String stateCode, int gameNumber){
+  protected void processNotifyState(String clientTag, String username, String stateCode, int gameNumber){
     ServerUser user = ChessclubUser.get(username);
     Integer currentState = (Integer)onlineFriendStates.get(user);
     
@@ -2677,7 +2686,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (!newState.equals(currentState)){
       onlineFriendStates.put(user, newState);
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, FriendsEvent.FRIEND_STATE_CHANGED, user, newState.intValue()));
+          new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, user, newState.intValue()));
     }
   }
   
@@ -2687,8 +2696,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MY_NOTIFY_LIST.
    */
   
-  private void processMyNotifyListDG(Datagram dg){
-    processMyNotifyList(dg.getString(0), dg.getBoolean(1));
+  private void processMyNotifyListDG(Datagram dg, String clientTag){
+    processMyNotifyList(clientTag, dg.getString(0), dg.getBoolean(1));
   }
   
   
@@ -2697,13 +2706,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when a person is added or removed from the notify list.
    */
   
-  protected void processMyNotifyList(String username, boolean isAdded){
+  protected void processMyNotifyList(String clientTag, String username, boolean isAdded){
     ChessclubUser user = ChessclubUser.get(username);
     
     if (isAdded){
       if (friends.add(user))
         listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, FriendsEvent.FRIEND_ADDED, user, 0));
+            new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_ADDED, user, 0));
     }
     else{
       if (friends.remove(user)){
@@ -2715,18 +2724,18 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             if (!friends.contains(u)){
               i.remove();
               listenerManager.fireFriendsEvent(
-                  new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, u, 0));
+                  new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_DISCONNECTED, u, 0));
             }
           }
         }
         else{
           onlineFriendStates.remove(user);
           listenerManager.fireFriendsEvent(
-              new FriendsEvent(this, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
+              new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
         }
         
         listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, FriendsEvent.FRIEND_REMOVED, user, 0));
+            new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_REMOVED, user, 0));
       }
     }
     
@@ -3143,9 +3152,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Invoked when the state of the seek related datagram changes.
    */
 
-  protected void seekDatagramsStateChanged(boolean isOn){
+  protected void seekDatagramsStateChanged(boolean isOn, String clientTag){
     if (!isOn)
-      clearSeeks();
+      clearSeeks(clientTag);
   }
   
   
@@ -3154,14 +3163,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Removes all currently known seeks, notifying any interested listeners.
    */
   
-  private void clearSeeks(){
+  private void clearSeeks(String clientTag){
     Set seekIndices = seeks.keySet();
     for (Iterator i = seekIndices.iterator(); i.hasNext();){
       Integer seekIndex = (Integer)i.next();
       Seek seek = (Seek)seeks.get(seekIndex);
       
       i.remove();
-      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+      listenerManager.fireSeekEvent(new SeekEvent(this, clientTag, SeekEvent.SEEK_REMOVED, seek));
     }
   }
   
@@ -3171,7 +3180,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_SEEK. 
    */
    
-  private void processSeekDG(Datagram dg){
+  private void processSeekDG(Datagram dg, String clientTag){
     int index = dg.getInteger(0);
     String name = dg.getString(1);
     String titles = dg.getString(2);
@@ -3189,7 +3198,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean formula = dg.getBoolean(14);
     String fancyTimeControl = dg.getString(15);
     
-    processSeek(index, name, titles, rating, ratingType, wild, ratingCategoryString, time, inc,
+    processSeek(clientTag, index, name, titles, rating, ratingType, wild, ratingCategoryString, time, inc,
       isRated, colorPreference, minRating, maxRating, autoAccept, formula, fancyTimeControl);
   }
 
@@ -3199,9 +3208,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate SeekEvent indicating a seek was added.
    */
 
-  protected void processSeek(int index, String name, String titles, int rating, int ratingType, int wild,
-      String ratingCategoryString, int time, int inc, boolean isRated, int colorPreferenceCode,
-      int minRating, int maxRating, boolean autoaccept, boolean formula, String fancyTimeControl){
+  protected void processSeek(String clientTag, int index, String name, String titles, int rating,
+      int ratingType, int wild, String ratingCategoryString, int time, int inc, boolean isRated,
+      int colorPreferenceCode, int minRating, int maxRating, boolean autoaccept, boolean formula,
+      String fancyTimeControl){
     
     WildVariant variant = getVariant(wild);
     if (variant == null)
@@ -3223,7 +3233,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     seeks.put(new Integer(index), seek);
 
-    listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
+    listenerManager.fireSeekEvent(new SeekEvent(this, clientTag, SeekEvent.SEEK_ADDED, seek));
   }
 
 
@@ -3232,8 +3242,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_SEEK_REMOVED.
    */
    
-  private void processSeekRemovedDG(Datagram dg){
-    processSeekRemoved(dg.getInteger(0), dg.getInteger(1));
+  private void processSeekRemovedDG(Datagram dg, String clientTag){
+    processSeekRemoved(clientTag, dg.getInteger(0), dg.getInteger(1));
   }
   
   
@@ -3242,13 +3252,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate SeekEvent indicating a seek was removed.
    */
 
-  protected void processSeekRemoved(int index, int reasonCode){
+  protected void processSeekRemoved(String clientTag, int index, int reasonCode){
     Seek seek = (Seek)seeks.remove(new Integer(index));
 
     if (seek == null)
       return;
 
-    listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));    
+    listenerManager.fireSeekEvent(new SeekEvent(this, clientTag, SeekEvent.SEEK_REMOVED, seek));    
   }
   
   
@@ -3345,8 +3355,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_GAMELIST_BEGIN.
    */
    
-  private void processGamelistBeginDG(Datagram dg){
-    processGamelistBegin(dg.getString(0), dg.getString(1), dg.getInteger(2),
+  private void processGamelistBeginDG(Datagram dg, String clientTag){
+    processGamelistBegin(clientTag, dg.getString(0), dg.getString(1), dg.getInteger(2),
           dg.getInteger(3), dg.getInteger(4), dg.getString(5));
   }
 
@@ -3357,8 +3367,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * receiving the list.
    */
 
-  protected void processGamelistBegin(String command, String argsString,  int hitsCount, 
-      int firstIndex, int lastIndex, String summary){
+  protected void processGamelistBegin(String clientTag, String command,
+      String argsString,  int hitsCount, int firstIndex, int lastIndex, String summary){
 
     int id;
 
@@ -3382,7 +3392,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_GAMELIST_ITEM.
    */
    
-  private void processGamelistItemDG(Datagram dg){
+  private void processGamelistItemDG(Datagram dg, String clientTag){
     int index = dg.getInteger(0);
     String id = dg.getString(1);
     String event = dg.getString(2);
@@ -3406,7 +3416,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String note = dg.getString(20);
     boolean isOppHere = dg.getBoolean(21);
     
-    processGamelistItem(index, id, event, date, time, whiteName, whiteRating, blackName,
+    processGamelistItem(clientTag, index, id, event, date, time, whiteName, whiteRating, blackName,
       blackRating, isRated, ratingCategory, wildType, whiteInit, whiteInc,
       blackInit, blackInc, eco, status, isWhite, mode, note, isOppHere);
   }
@@ -3418,7 +3428,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * to registered listeners.
    */
 
-  protected void processGamelistItem(int index, String id, String event, String dateString,
+  protected void processGamelistItem(String clientTag, int index, String id, String event, String dateString,
       String timeString, String whiteName, int whiteRating, String blackName, int blackRating,
       boolean isRated, int ratingCategory, int wildType, int whiteTime, int whiteInc,
       int blackTime, int blackInc, String eco, int status, boolean isWhite, int mode, String note,
@@ -3512,7 +3522,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
     if (curGameListInfo.numItemsLeft==0){
       String title = curGameListInfo.summary+" ("+curGameListInfo.command+" "+curGameListInfo.args+")";
-      GameListEvent evt = new GameListEvent(this, curGameListInfo.gameListEventID, curGameListInfo.gameList, 
+      GameListEvent evt = new GameListEvent(this, clientTag, curGameListInfo.gameListEventID, curGameListInfo.gameList, 
         title, curGameListInfo.totalNumItems, curGameListInfo.firstIndex, curGameListInfo.lastIndex);
       listenerManager.fireGameListEvent(evt);
 
@@ -3703,7 +3713,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_TOURNEY.
    */
    
-  private void processTourneyDG(Datagram dg){
+  private void processTourneyDG(Datagram dg, String clientTag){
     int id = dg.getInteger(0);
     int bitfield = dg.getInteger(1);
     boolean canGuestsJoinWatch = (bitfield & 1) != 0;
@@ -3716,7 +3726,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String [] infoCommands = parseDGTourneyCommandList(dg.getString(5));
     String confirmText = dg.getString(6);
     
-    processTourney(id, canGuestsJoinWatch, makeNewWindowOnJoin, makeNewWindowOnWatch,
+    processTourney(clientTag, id, canGuestsJoinWatch, makeNewWindowOnJoin, makeNewWindowOnWatch,
       makeNewWindowOnInfo, description, joinCommands, watchCommands, infoCommands, confirmText);
   }
 
@@ -3761,18 +3771,19 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChessEvent to any registered listeners.
    */
 
-  protected void processTourney(int id, boolean canGuestsWatchJoin, boolean makeNewWindowOnJoin, boolean makeNewWindowOnWatch,
-    boolean makeNewWindowOnInfo, String description, String [] joinCommands, String [] watchCommands, String [] infoCommands,
-    String confirmText){
+  protected void processTourney(String clientTag, int id, boolean canGuestsWatchJoin, boolean makeNewWindowOnJoin,
+      boolean makeNewWindowOnWatch, boolean makeNewWindowOnInfo, String description, String [] joinCommands,
+      String [] watchCommands, String [] infoCommands, String confirmText){
 
     ChessEvent newEvent = new ChessEvent(id, description, joinCommands.length == 0 ? null : joinCommands, 
       watchCommands.length == 0 ? null : watchCommands, infoCommands.length == 0 ? null : infoCommands, confirmText);
     ChessEvent existingEvent = (ChessEvent)chessEvents.put(new Integer(id), newEvent);
 
     if (existingEvent != null)
-      listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, existingEvent));
+      listenerManager.fireChessEventEvent(
+          new ChessEventEvent(this, clientTag, ChessEventEvent.EVENT_REMOVED, existingEvent));
 
-    listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_ADDED, newEvent));
+    listenerManager.fireChessEventEvent(new ChessEventEvent(this, clientTag, ChessEventEvent.EVENT_ADDED, newEvent));
   }
   
   
@@ -3781,8 +3792,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_REMOVE_TOURNEY.
    */
    
-  private void processRemoveTourneyDG(Datagram dg){
-    processRemoveTourney(dg.getInteger(0));
+  private void processRemoveTourneyDG(Datagram dg, String clientTag){
+    processRemoveTourney(clientTag, dg.getInteger(0));
   }
 
 
@@ -3792,12 +3803,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChessEvent to any registered listeners.
    */
 
-  protected void processRemoveTourney(int id){
+  protected void processRemoveTourney(String clientTag, int id){
     ChessEvent evt = (ChessEvent)chessEvents.get(new Integer(id));
     if (evt == null) // Ignore DG_REMOVE_TOURNEY for events we didn't get a DG_TOURNEY for.
       return;
 
-    listenerManager.fireChessEventEvent(new ChessEventEvent(this, ChessEventEvent.EVENT_REMOVED, evt));
+    listenerManager.fireChessEventEvent(new ChessEventEvent(this, clientTag, ChessEventEvent.EVENT_REMOVED, evt));
   }
   
   
@@ -3826,7 +3837,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MATCH. 
    */
   
-  private void processMatchDG(Datagram dg){
+  private void processMatchDG(Datagram dg, String clientTag){
     String challengerName = dg.getString(0);
     int challengerRating = dg.getInteger(1);
     int challengerProvisionalStatus = dg.getInteger(2);
@@ -3845,7 +3856,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     int receiverInc = dg.getInteger(15);
     int challengerColorPreferenceCode = dg.getInteger(16);
     
-    processMatch(
+    processMatch(clientTag, 
         challengerName, challengerRating, challengerProvisionalStatus, challengerTitles,
         receiverName, receiverRating, receiverProvisionalStatus, receiverTitles,
         wildNumber, ratingCategory, isRated, isAdjourned,
@@ -3859,7 +3870,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate <code>MatchOfferEvent</code>.
    */
   
-  protected void processMatch(
+  protected void processMatch(String clientTag, 
       String challengerName, int challengerRating, int challengerProvisionalStatus, String challengerTitles,
       String receiverName, int receiverRating, int receiverProvisionalStatus, String receiverTitles,
       int variantNumber, String ratingCategory, boolean isRated, boolean isAdjourned,
@@ -3886,7 +3897,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     matchOffers.put(new Pair(challenger, receiver), matchOffer);
     
     getChessclubListenerManager().fireMatchOfferEvent(
-        new MatchOfferEvent(this, MatchOfferEvent.MATCH_OFFER_MADE, matchOffer));
+        new MatchOfferEvent(this, clientTag, MatchOfferEvent.MATCH_OFFER_MADE, matchOffer));
   }
       
   
@@ -3896,12 +3907,12 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a DG_MATCH_REMOVED.
    */
   
-  private void processMatchRemovedDG(Datagram dg){
+  private void processMatchRemovedDG(Datagram dg, String clientTag){
     String challengerName = dg.getString(0);
     String receiverName = dg.getString(1);
     String explanation = dg.getString(2);
     
-    processMatchRemoved(challengerName, receiverName, explanation);
+    processMatchRemoved(clientTag, challengerName, receiverName, explanation);
   }
   
   
@@ -3910,7 +3921,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires the appropriate <code>MatchOfferEvent</code>.
    */
   
-  protected void processMatchRemoved(String challengerName, String receiverName, String explanation){
+  protected void processMatchRemoved(String clientTag, String challengerName, String receiverName, String explanation){
     ServerUser challenger = userForName(challengerName);
     ServerUser receiver = userForName(receiverName);
     
@@ -3919,7 +3930,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       return;
     
     getChessclubListenerManager().fireMatchOfferEvent(
-        new MatchOfferEvent(this, MatchOfferEvent.MATCH_OFFER_WITHDRAWN, matchOffer));
+        new MatchOfferEvent(this, clientTag, MatchOfferEvent.MATCH_OFFER_WITHDRAWN, matchOffer));
   }
   
   

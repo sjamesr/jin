@@ -74,8 +74,8 @@ public class ChessEventEvent extends JinEvent{
    * JinChessclubConnection, id and ChessEvent.
    */
 
-  public ChessEventEvent(JinChessclubConnection conn, int id, ChessEvent chessEvent){
-    super(conn);
+  public ChessEventEvent(JinChessclubConnection conn, String clientTag, int id, ChessEvent chessEvent){
+    super(conn, clientTag);
 
     switch(id){
       case EVENT_ADDED:

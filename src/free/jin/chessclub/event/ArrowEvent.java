@@ -85,8 +85,8 @@ public class ArrowEvent extends GameEvent{
    * the arrow starts and square where the arrow ends.
    */
   
-  public ArrowEvent(JinChessclubConnection conn, Game game, int id, Square fromSquare, Square toSquare){
-    super(conn, game);
+  public ArrowEvent(JinChessclubConnection conn, String clientTag, Game game, int id, Square fromSquare, Square toSquare){
+    super(conn, clientTag, game);
     
     switch (id){
       case ARROW_ADDED:

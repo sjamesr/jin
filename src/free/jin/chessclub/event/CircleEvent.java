@@ -77,8 +77,8 @@ public class CircleEvent extends GameEvent{
    * of the circle.
    */
   
-  public CircleEvent(JinChessclubConnection conn, Game game, int id, Square circleSquare){
-    super(conn, game);
+  public CircleEvent(JinChessclubConnection conn, String clientTag, Game game, int id, Square circleSquare){
+    super(conn, clientTag, game);
     
     switch(id){
       case CIRCLE_ADDED:

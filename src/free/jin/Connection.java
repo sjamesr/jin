@@ -189,13 +189,27 @@ public interface Connection{
 
 
   /**
-   * Sends an arbitrary string to the server. Use this only for server specific
-   * commands or commands issued manually by the user. Using this method for
-   * sending other commands makes your client incompatible with other servers
-   * besides the one you are using.
+   * Sends an arbitrary, server-specific command to the server.
    */
 
   void sendCommand(String command);
+  
+  
+  
+  /**
+   * Sends an arbitrary, server-specific, tagged command to the server.
+   * Tagged commands are a mechanism which allows the client to associate the
+   * server's response to the command which triggered it. If the server supports
+   * tagged commands, the events sent in response to the command will have their
+   * tags (see {@link JinEvent#getClientTag()} set to the value specified here.
+   * If the server does not support tagged commands, it may simply forward the
+   * call to {@link #sendCommand(String)}. The client should not rely on tagged
+   * commands being supported by the server, except in server-specific code.
+   * <code>tag</code> may be <code>null</code>, in which case, the method
+   * behaves exactly like the normal <code>sendCommand</code> method.
+   */
+  
+  void sendTaggedCommand(String command, String tag);
 
 
 
@@ -228,10 +242,11 @@ public interface Connection{
   
   
   /**
-   * Sends the specified personal tell to the specified user.
+   * Sends the specified personal tell to the specified user. For the meaning of
+   * <code>tag</code>, see {@link #sendTaggedCommand(String, String)}.
    */
   
-  void sendPersonalTell(ServerUser user, String message);
+  void sendPersonalTell(ServerUser user, String message, String tag);
   
   
   
@@ -448,9 +463,11 @@ public interface Connection{
   
   /**
    * Sends the specified question string to the server's help channel.
+   * For the meaning of <code>tag</code>, see
+   * {@link #sendTaggedCommand(String, String)}.
    */
    
-  void sendHelpQuestion(String question);
+  void sendHelpQuestion(String question, String tag);
   
 
     
