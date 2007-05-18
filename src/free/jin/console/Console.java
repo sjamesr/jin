@@ -58,6 +58,7 @@ import javax.swing.OverlayLayout;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -389,7 +390,7 @@ public class Console extends JPanel implements KeyListener{
     
     Timer timer = new Timer(300, new ActionListener(){
       public void actionPerformed(ActionEvent e){
-        inputComponent.setBackground(null);
+        inputComponent.setBackground(UIManager.getColor("TextField.background"));
       }
     });
     timer.setRepeats(false);
