@@ -380,39 +380,57 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     /**
      * Invoked when a command is issued by the user with this command type.
      * In turn, the default implementation invokes <code>executeCommand</code>
-     * and, if the <code>doNotEcho</code> flag is unset,
-     * <code>echoCommand</code>.
+     * or <code>sendCommand</code> and, if the <code>doNotEcho</code> flag is
+     * unset, <code>echoCommand</code>. If <code>userText</code> is prefixed
+     * with a forward slash, it is stripped and passed to
+     * <code>sendCommand</code>; otherwise, it is passed as-is to
+     * <code>executeCommand</code>.
      */
     
-    public void issueCommand(String userText, Connection connection, boolean doNotEcho){
-      executeCommand(userText, connection);
+    public void handleCommand(String userText, Connection connection, boolean doNotEcho){
+      if (userText.startsWith("/"))
+        sendCommand(userText.substring(1), connection);
+      else  
+        send(userText, connection);
       
       if (!doNotEcho)
-        echoCommand(userText, connection.getUser());
+        echo(userText, connection.getUser());
     }
     
     
     
     /**
-     * Executes the command specified by the user text. Usually, this meands
-     * sending some command to the server.
+     * Sends the specified command to the server. The default implementation
+     * sends a command tagged with {@link AbstractConsoleDesignation#getTag()}.
+     */
+    
+    protected void sendCommand(String command, Connection connection){
+      connection.sendTaggedCommand(encode(command, connection), getTag());
+    }
+    
+    
+    
+    /**
+     * "Sends" the specified user text. Usually, this meands sending some
+     * command to the server; what exactly, depends on the nature of the
+     * console.
      * 
      * @param userText The text entered by the user.
      * @param connection The connection to the server.
      */
     
-    protected abstract void executeCommand(String userText, Connection connection);
+    protected abstract void send(String userText, Connection connection);
       
     
     
     /**
-     * Echoes the command to the console.
+     * Echoes the text entered by the user to the console.
      * 
      * @param userText The text entered by the user.
      * @param user The user we're logged in with.
      */
     
-    protected abstract void echoCommand(String userText, ServerUser user);
+    protected abstract void echo(String userText, ServerUser user);
       
     
     
