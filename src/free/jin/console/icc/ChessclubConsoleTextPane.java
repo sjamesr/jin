@@ -68,9 +68,9 @@ public class ChessclubConsoleTextPane extends ConsoleTextPane{
         JinChessclubConnection conn = 
           (JinChessclubConnection)ChessclubConsoleTextPane.this.console.getConsoleManager().getConn();
         
-        int height = Math.max(5, Math.min(300, getVisibleRect().height/metrics.getHeight() - 2));
-        // -2 because the console has an extra empty line at the bottom and we want
-        // some extra room at the top, to keep a little context
+        int height = Math.max(5, Math.min(300, getVisibleRect().height/metrics.getHeight()));
+        // We don't subtract anything from heigt/fontHeight because the server seems to
+        // send a few lines less than the actual console height
         
         if (height != currentHeight){
           currentHeight = height;
