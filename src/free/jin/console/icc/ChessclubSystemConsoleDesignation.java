@@ -60,57 +60,14 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
     Object forum = evt.getForum();
     
     if ("qtell".equals(type))
-      return parseQTell(evt);
+      return ChessclubConsoleManager.parseQTell(evt);
     else if ("channel-qtell".equals(type))
-      return parseChannelQTell(evt);
+      return ChessclubConsoleManager.parseChannelQTell(evt);
 
     Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
     
     I18n i18n = I18n.get(ChessclubSystemConsoleDesignation.class);
     return i18n.getFormattedString(type + ".displayPattern", args);
-  }
-  
-  
-  
-  /**
-   * Returns a string that should be displayed for the given ChatEvent when the
-   * ChatEvent contains a qtell.
-   */
-
-  private String parseQTell(ChatEvent evt){
-    String message = evt.getMessage();
-    int index;
-    while ((index = message.indexOf("\\n")) != -1)
-      message = message.substring(0, index) + "\n:" + message.substring(index + 2);
-    while ((index = message.indexOf("\\h")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\H")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\b")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    return ":" + message;
-  }
-  
-  
-  
-  /**
-   * Returns a string that should be displayed for the given ChatEvent when the
-   * ChatEvent contains a channel qtell.
-   */
-
-  private String parseChannelQTell(ChatEvent evt){
-    String message = evt.getMessage();
-    Object forum = evt.getForum();
-    int index;
-    while ((index = message.indexOf("\\n")) != -1)
-      message = message.substring(0, index) + "\n" + forum + ">" + message.substring(index + 2);
-    while ((index = message.indexOf("\\h")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\H")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    while ((index = message.indexOf("\\b")) != -1)
-      message = message.substring(0, index) + message.substring(index + 2);
-    return forum + ">" + message;
   }
   
   
