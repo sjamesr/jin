@@ -61,7 +61,7 @@ consolePopup.15.type = execute
 consolePopup.15.labelKey = executeMenuItemLabel
 
 
-output-link.num-patterns = integer;11
+output-link.num-patterns = integer;12
 
 #Matches "finger <playername>"
 output-link.pattern-0 = (["'])([Ff][Ii][Nn][Gg][Ee][Rr] +[-0-9A-z]{2,15})\1
@@ -110,14 +110,19 @@ output-link.command-8 = $1
 output-link.index-8 = integer;1
 
 #Matches "tell <bot name> help <topic>", or the same with '?'
-output-link.pattern-9 = (["'])([Tt][Ee][Ll][Ll] [-0-9A-z]{2,15} (([Hh][Ee][Ll][Pp])|(\?)) [-_0-9A-z\.]{1,})\1
-output-link.command-9 = $2
+output-link.pattern-9 = (["'])([Tt][Ee][Ll][Ll] ([-0-9A-z]{2,15}) (([Hh][Ee][Ll][Pp])|(\?)) ([-_0-9A-z\.]{1,}))\1
+output-link.command-9 = xtell $3 help $7
 output-link.index-9 = integer;2
 
+#Matches ": Tell <bot name> more to see the rest"
+output-link.pattern-10 = : (Tell ([-0-9A-z]{2,15}) more) to see the rest
+output-link.command-10 = xtell $2 more
+output-link.index-10 = integer;1
+
 #Matches "examine <playername, optional> <history or library number>"
-output-link.pattern-10 = (["'])([Ee][Xx][Aa][Mm][Ii][Nn][Ee] +([-0-9A-z]{2,15} +)?[-%]?[0-9]+)\1
-output-link.command-10 = $2
-output-link.index-10 = integer;2
+output-link.pattern-11 = (["'])([Ee][Xx][Aa][Mm][Ii][Nn][Ee] +([-0-9A-z]{2,15} +)?[-%]?[0-9]+)\1
+output-link.command-11 = $2
+output-link.index-11 = integer;2
 
 font-underlined.link = boolean;true
 foreground.link = color;5080ff
