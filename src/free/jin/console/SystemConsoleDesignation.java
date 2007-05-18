@@ -147,8 +147,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      */
     
     protected void echo(String command, ServerUser user){
-      Console console = getConsole();
-      console.addToOutput(command, console.getUserTextType());
+      echoCommand(command, user);
     }
     
     
