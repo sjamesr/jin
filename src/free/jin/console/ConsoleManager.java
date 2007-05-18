@@ -279,6 +279,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * Creates a console designation for personal chat with the specified user.
+   */
+  
+  protected abstract ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable);
+  
+  
+  
+  /**
    * Creates and displays the plugin's UI.
    */
 
@@ -425,8 +433,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   public void addPersonalChatConsole(ServerUser user, boolean makeActive){
-    addConsole(new PersonalChatConsoleDesignation(user, getEncoding(), true),
-        makeActive);
+    addConsole(createPersonalChatConsoleDesignation(user, true), makeActive);
   }
   
   
@@ -584,7 +591,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   public void chatMessageReceived(ChatEvent evt){
     if ((evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY) && 
         getPrefs().getBool("newConsoleOnPersonalTell", false))
-      addConsole(new PersonalChatConsoleDesignation(evt.getSender(), getEncoding(), true), false);
+      addPersonalChatConsole(evt.getSender(), false);
       
     eventForConsoleReceived(evt);
   }
