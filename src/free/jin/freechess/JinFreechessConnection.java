@@ -312,7 +312,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected void processLine(String line){
-    listenerManager.firePlainTextEvent(new PlainTextEvent(this, line));
+    listenerManager.firePlainTextEvent(new PlainTextEvent(this, null, line));
   }
   
   
@@ -333,13 +333,24 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     return false;
   }
   
-
-
+  
+  
+  /**
+   * Simply forwards to <code>sendCommand</code>, since FICS doesn't support
+   * tagged commands.
+   */
+  
+  public void sendTaggedCommand(String command, String tag){
+    sendCommand(command);
+  }
+  
+  
+  
   /**
    * Sends a personal tell to the specified user.
    */
   
-  public void sendPersonalTell(ServerUser user, String message){
+  public void sendPersonalTell(ServerUser user, String message, String tag){
     sendCommand("$xtell " + user.getName() + "! " + message);
   }
   
@@ -391,7 +402,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processPersonalTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "tell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -404,7 +415,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processSayTell(String username, String titles, int gameNumber, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "say", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "say", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, new Integer(gameNumber)));
 
     return true;
@@ -418,7 +429,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processPTell(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ptell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "ptell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -434,7 +445,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   protected boolean processChannelTell(String username, String titles, int channelNumber, 
       String message){
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "channel-tell", ChatEvent.ROOM_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "channel-tell", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, new Integer(channelNumber)));
 
     return true;
@@ -453,7 +464,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (titles == null)
       titles = "";
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "kibitz", ChatEvent.GAME_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "kibitz", ChatEvent.GAME_CHAT_CATEGORY,
         userForName(username), titles, rating, message, new Integer(gameNumber)));
 
     return true;
@@ -471,7 +482,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (titles == null)
       titles = "";
 
-    listenerManager.fireChatEvent(new ChatEvent(this, "whisper", ChatEvent.GAME_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "whisper", ChatEvent.GAME_CHAT_CATEGORY,
         userForName(username), titles, rating, message, new Integer(gameNumber)));
 
     return true;
@@ -502,11 +513,11 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
         title = "";
       Integer tourneyIndex = new Integer(matcher.group(3));
       message = matcher.group(4);
-      evt = new ChatEvent(this, "qtell.tourney", ChatEvent.TOURNEY_CHAT_CATEGORY,
+      evt = new ChatEvent(this, null, "qtell.tourney", ChatEvent.TOURNEY_CHAT_CATEGORY,
           userForName(sender), title, -1, message, tourneyIndex);
     }
     else{
-      evt = new ChatEvent(this, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
+      evt = new ChatEvent(this, null, "qtell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         null, null, -1, message, null);
     }
 
@@ -523,7 +534,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "shout", ChatEvent.ROOM_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "shout", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -537,7 +548,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processIShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "ishout", ChatEvent.ROOM_CHAT_CATEGORY, 
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "ishout", ChatEvent.ROOM_CHAT_CATEGORY, 
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -551,7 +562,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processTShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "tshout", ChatEvent.TOURNEY_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "tshout", ChatEvent.TOURNEY_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -565,7 +576,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processCShout(String username, String titles, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "cshout", ChatEvent.ROOM_CHAT_CATEGORY,
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "cshout", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
 
     return true;
@@ -579,7 +590,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected boolean processAnnouncement(String username, String message){
-    listenerManager.fireChatEvent(new ChatEvent(this, "announcement", ChatEvent.BROADCAST_CHAT_CATEGORY, 
+    listenerManager.fireChatEvent(new ChatEvent(this, null, "announcement", ChatEvent.BROADCAST_CHAT_CATEGORY, 
         userForName(username), "", -1, message, null));
 
     return true;
@@ -1434,7 +1445,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     ongoingGamesData.put(new Integer(gameInfo.getGameNumber()), gameData);
 
-    listenerManager.fireGameEvent(new GameStartEvent(this, game));
+    listenerManager.fireGameEvent(new GameStartEvent(this, null, game));
 
     // The server doesn't send us seek remove lines during games, so we have
     // no choice but to remove *all* seeks during a game. The seeks are restored
@@ -1515,7 +1526,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       move = variant.createMove(position, fromSquare, toSquare, promotionPiece, moveSAN);
     }
 
-    listenerManager.fireGameEvent(new MoveMadeEvent(this, game, move, true)); 
+    listenerManager.fireGameEvent(new MoveMadeEvent(this, null, game, move, true)); 
       // (isNew == true) because FICS never sends the entire move history
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
@@ -1569,8 +1580,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     boolean whiteRunning = (!isIsolatedBoard) && boardData.isClockRunning() && currentPlayer.isWhite();
     boolean blackRunning = (!isIsolatedBoard) && boardData.isClockRunning() && currentPlayer.isBlack();
     
-    listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.WHITE_PLAYER, whiteTime, whiteRunning));
-    listenerManager.fireGameEvent(new ClockAdjustmentEvent(this, game, Player.BLACK_PLAYER, blackTime, blackRunning));
+    listenerManager.fireGameEvent(
+        new ClockAdjustmentEvent(this, null, game, Player.WHITE_PLAYER, whiteTime, whiteRunning));
+    listenerManager.fireGameEvent(
+        new ClockAdjustmentEvent(this, null, game, Player.BLACK_PLAYER, blackTime, blackRunning));
   }
 
 
@@ -1593,7 +1606,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       Game game = gameData.game;
 
       game.setResult(result);
-      listenerManager.fireGameEvent(new GameEndEvent(this, game, result));
+      listenerManager.fireGameEvent(new GameEndEvent(this, null, game, result));
 
       if ((game.getGameType() == Game.MY_GAME) && getIvarState(Ivar.SEEKINFO))
         setIvarState(Ivar.SEEKINFO, true); // Refresh the seeks
@@ -1609,7 +1622,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   private void flipBoard(InternalGameData gameData, Style12Struct newBoardData){
-    listenerManager.fireGameEvent(new BoardFlipEvent(this, gameData.game, newBoardData.isBoardFlipped()));
+    listenerManager.fireGameEvent(new BoardFlipEvent(this, null, gameData.game, newBoardData.isBoardFlipped()));
   }
 
 
@@ -1639,7 +1652,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
         // Our move, probably
 
         unechoedGameMoves.removeAllElements();
-        listenerManager.fireGameEvent(new IllegalMoveEvent(this, game, move));
+        listenerManager.fireGameEvent(new IllegalMoveEvent(this, null, game, move));
       }
     } catch (NoSuchGameException e){}
   }
@@ -1694,7 +1707,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     Style12Struct oldBoardData = gameData.boardData;
     int takebackCount = oldBoardData.getPlayedPlyCount() - newBoardData.getPlayedPlyCount();
 
-    listenerManager.fireGameEvent(new TakebackEvent(this, gameData.game, takebackCount));
+    listenerManager.fireGameEvent(new TakebackEvent(this, null, gameData.game, takebackCount));
 
     gameData.removeLastMoves(takebackCount);
   }
@@ -1715,7 +1728,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     game.setInitialPosition(newPos);
     game.setPliesSinceStart(newBoardData.getPlayedPlyCount());
 
-    listenerManager.fireGameEvent(new PositionChangedEvent(this, game, newPos));
+    listenerManager.fireGameEvent(new PositionChangedEvent(this, null, game, newPos));
 
     gameData.clearMoves();
 
@@ -1828,10 +1841,10 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
         Seek oldSeek = (Seek)seeks.get(seekIndex);
         if (oldSeek != null)
-          listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, oldSeek));
+          listenerManager.fireSeekEvent(new SeekEvent(this, null, SeekEvent.SEEK_REMOVED, oldSeek));
 
         seeks.put(seekIndex, seek);
-        listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_ADDED, seek));
+        listenerManager.fireSeekEvent(new SeekEvent(this, null, SeekEvent.SEEK_ADDED, seek));
       }
     }
     
@@ -1852,7 +1865,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       if (seek == null) // Happens if the seek is one we didn't fire an event for,
         continue;       // for example if we don't support the variant.
 
-      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+      listenerManager.fireSeekEvent(new SeekEvent(this, null, SeekEvent.SEEK_REMOVED, seek));
 
       seeks.remove(seekIndex);
     }
@@ -1885,7 +1898,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       Seek seek = (Seek)seeks.get(seekIndex);
       
       i.remove();
-      listenerManager.fireSeekEvent(new SeekEvent(this, SeekEvent.SEEK_REMOVED, seek));
+      listenerManager.fireSeekEvent(new SeekEvent(this, null, SeekEvent.SEEK_REMOVED, seek));
     }
   }
   
@@ -1923,7 +1936,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
     
-    sendCommand("unseek " + seek.getID());
+    sendCommand("$unseek " + seek.getID());
   }
   
   
@@ -2267,7 +2280,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
          // an existing offer.
 
       gameData.setOffer(offerId, player, on);
-      listenerManager.fireGameEvent(new OfferEvent(this, game, offerId, on, player));
+      listenerManager.fireGameEvent(new OfferEvent(this, null, game, offerId, on, player));
     }
   }
 
@@ -2284,12 +2297,12 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     int oldTakeback = gameData.getTakebackOffer(player);
     if (oldTakeback != 0)
-      listenerManager.fireGameEvent(new OfferEvent(this, game, false, player, oldTakeback));
+      listenerManager.fireGameEvent(new OfferEvent(this, null, game, false, player, oldTakeback));
 
     gameData.setTakebackOffer(player, takebackCount);
 
     if (takebackCount != 0)
-      listenerManager.fireGameEvent(new OfferEvent(this, game, true, player, takebackCount));
+      listenerManager.fireGameEvent(new OfferEvent(this, null, game, true, player, takebackCount));
   }
 
 
@@ -2648,8 +2661,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends the specified question string to channel 1.
    */
    
-  public void sendHelpQuestion(String question){
-    sendCommand("$tell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question);    
+  public void sendHelpQuestion(String question, String tag){
+    sendCommand("$xtell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question);    
   }
 
 

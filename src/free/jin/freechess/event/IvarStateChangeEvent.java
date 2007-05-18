@@ -56,7 +56,7 @@ public class IvarStateChangeEvent extends JinEvent{
    */
    
   public IvarStateChangeEvent(JinFreechessConnection conn, Ivar ivar, boolean state){
-    super(conn);
+    super(conn, null);
     
     if (ivar == null)
       throw new IllegalArgumentException("Null ivar specified");
