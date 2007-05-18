@@ -126,9 +126,10 @@ public class GameListEvent extends JinEvent{
    * complete one.
    */
 
-  public GameListEvent(Connection conn, int id, GameListItem [] gameList, String listTitle,
-      int totalNumItems, int firstIndex, int lastIndex){
-    super(conn);
+  public GameListEvent(Connection conn, String clientTag, 
+      int id, GameListItem [] gameList, String listTitle, int totalNumItems,
+      int firstIndex, int lastIndex){
+    super(conn, clientTag);
 
     this.id = id;
     this.gameList = (GameListItem [])gameList.clone();

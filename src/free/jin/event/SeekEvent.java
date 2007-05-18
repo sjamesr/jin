@@ -70,8 +70,8 @@ public class SeekEvent extends JinEvent{
    * Creates a new SeekEvent with the given source Connection.
    */
   
-  public SeekEvent(SeekConnection conn, int id, Seek seek){
-    super(conn);
+  public SeekEvent(SeekConnection conn, String clientTag, int id, Seek seek){
+    super(conn, clientTag);
     
     switch(id){
       case SEEK_ADDED:

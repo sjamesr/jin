@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -31,31 +31,51 @@ import free.jin.Connection;
  */
 
 public class JinEvent extends EventObject{
-
-
-
+  
+  
+  
   /**
-   * Creates a new <code>JinEvent</code> with the specified
-   * <code>Connection</code> which created and fired (or will fire) it.
+   * The client tag of this event.
    */
-
-  public JinEvent(Connection conn){
+  
+  private final String clientTag;
+  
+  
+  
+  /**
+   * Creates a new <code>JinEvent</code> with the specified source
+   * <code>Connection</code> and client tag. The client tag may be
+   * <code>null</code>.
+   */
+  
+  public JinEvent(Connection conn, String clientTag){
     super(conn);
+    
+    this.clientTag = clientTag;
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns the <code>Connection</code> which created and fired (or will fire)
    * this <code>JinEvent</code>.
    */
-
+  
   public Connection getConnection(){
     return (Connection)getSource();
   }
-
-
-
+  
+  
+  
+  /**
+   * Returns the client tag of this event; <code>null</code> if none.
+   */
+  
+  public String getClientTag(){
+    return clientTag;
+  }
+  
+  
+  
 }
 

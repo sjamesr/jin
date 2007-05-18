@@ -38,8 +38,8 @@ public class GameStartEvent extends GameEvent{
    * Creates a new GameStartEvent with the given source Connection and Game.
    */
 
-  public GameStartEvent(Connection conn, Game game){
-    super(conn, game);
+  public GameStartEvent(Connection conn, String clientTag, Game game){
+    super(conn, clientTag, game);
 
     if ((conn instanceof PGNConnection) && (game.getVariant() instanceof ChesslikeGenericVariant) &&
         (game.getInitialPosition().getFEN() == null))

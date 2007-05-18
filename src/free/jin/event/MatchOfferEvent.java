@@ -71,8 +71,8 @@ public class MatchOfferEvent extends JinEvent{
    * Creates a new <code>MatchOfferEvent</code> with the specified arguments.
    */
   
-  public MatchOfferEvent(MatchOfferConnection source, int id, MatchOffer matchOffer){
-    super(source);
+  public MatchOfferEvent(MatchOfferConnection source, String clientTag, int id, MatchOffer matchOffer){
+    super(source, clientTag);
     
     switch(id){
       case MATCH_OFFER_MADE:

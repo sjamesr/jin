@@ -47,8 +47,8 @@ public abstract class GameEvent extends JinEvent{
    * Creates a new GameEvent with the given Game and source Connection.
    */
 
-  public GameEvent(Connection conn, Game game){
-    super(conn);
+  public GameEvent(Connection conn, String clientTag, Game game){
+    super(conn, clientTag);
 
     this.game = game;
   }

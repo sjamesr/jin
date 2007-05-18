@@ -49,8 +49,8 @@ public class GameEndEvent extends GameEvent{
    * <code>GAME_IN_PROGRESS</code> is not a valid result, though.
    */
 
-  public GameEndEvent(Connection conn, Game game, int result){
-    super(conn, game);
+  public GameEndEvent(Connection conn, String clientTag, Game game, int result){
+    super(conn, clientTag, game);
 
     if (game.getResult() == Game.GAME_IN_PROGRESS)
       throw new IllegalStateException("The specified game reports it's still in progress");

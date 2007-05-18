@@ -74,8 +74,8 @@ public class ClockAdjustmentEvent extends GameEvent{
    * and whether the clock is running or stopped.
    */
 
-  public ClockAdjustmentEvent(Connection conn, Game game, Player player, int time, boolean running){
-    super(conn, game);
+  public ClockAdjustmentEvent(Connection conn, String clientTag, Game game, Player player, int time, boolean running){
+    super(conn, clientTag, game);
 
     this.player = player;
     this.time = time;

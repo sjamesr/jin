@@ -162,9 +162,10 @@ public class ChatEvent extends JinEvent{
    * <code>OTHER_CHAT_CATEGORY</code>
    */
 
-  public ChatEvent(Connection conn, String type, int category, ServerUser sender,
-      String senderTitle, int senderRating, String message, Object forum){
-    super(conn);
+  public ChatEvent(Connection conn, String clientTag,
+      String type, int category, ServerUser sender, String senderTitle,
+      int senderRating, String message, Object forum){
+    super(conn, clientTag);
 
     if (type == null)
       throw new IllegalArgumentException("ChatEvent type may not be null");

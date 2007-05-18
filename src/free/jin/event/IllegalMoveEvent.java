@@ -49,8 +49,8 @@ public class IllegalMoveEvent extends GameEvent{
    * and the attempted illegal move.
    */
 
-  public IllegalMoveEvent(Connection conn, Game game, Move move){
-    super(conn, game);
+  public IllegalMoveEvent(Connection conn, String clientTag, Game game, Move move){
+    super(conn, clientTag, game);
 
     this.move = move;
   }

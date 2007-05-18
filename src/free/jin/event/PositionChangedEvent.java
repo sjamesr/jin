@@ -52,8 +52,8 @@ public class PositionChangedEvent extends GameEvent{
    * game in which the position changed and the new Position.
    */
 
-  public PositionChangedEvent(Connection conn, Game game, Position position){
-    super(conn, game);
+  public PositionChangedEvent(Connection conn, String clientTag, Game game, Position position){
+    super(conn, clientTag, game);
 
     if ((conn instanceof PGNConnection) && (position.getVariant() instanceof ChesslikeGenericVariant) &&
         (position.getFEN() == null))

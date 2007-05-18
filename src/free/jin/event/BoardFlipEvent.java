@@ -44,8 +44,8 @@ public class BoardFlipEvent extends GameEvent{
    * Creates a new BoardFlipEvent.
    */
 
-  public BoardFlipEvent(Connection conn, Game game, boolean isFlipped){
-    super(conn, game);
+  public BoardFlipEvent(Connection conn, String clientTag, Game game, boolean isFlipped){
+    super(conn, clientTag, game);
 
     this.isFlipped = isFlipped;
   }

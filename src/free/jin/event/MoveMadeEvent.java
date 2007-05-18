@@ -64,8 +64,8 @@ public class MoveMadeEvent extends GameEvent{
    * @param isNew Is this is a "new" move.
    */
 
-  public MoveMadeEvent(Connection conn, Game game, Move move, boolean isNew){
-    super(conn, game);
+  public MoveMadeEvent(Connection conn, String clientTag, Game game, Move move, boolean isNew){
+    super(conn, clientTag, game);
 
     if ((conn instanceof PGNConnection) && (move instanceof ChessMove) && (((ChessMove)move).getSAN() == null))
       throw new IllegalStateException("The source Connection implements PGNConnection, but did not provide a SAN representation of the move");

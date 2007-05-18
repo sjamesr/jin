@@ -44,8 +44,8 @@ public class PlainTextEvent extends JinEvent{
    * Creates a new <code>PlainTextEvent</code> with the given text.
    */
 
-  public PlainTextEvent(Connection conn, String text){
-    super(conn);
+  public PlainTextEvent(Connection conn, String clientTag, String text){
+    super(conn, clientTag);
     
     this.text = text;
   }

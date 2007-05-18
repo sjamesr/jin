@@ -47,8 +47,8 @@ public class TakebackEvent extends GameEvent{
    * the amount of moves taken back.
    */
 
-  public TakebackEvent(Connection conn, Game game, int takebackCount){
-    super(conn, game);
+  public TakebackEvent(Connection conn, String clientTag, Game game, int takebackCount){
+    super(conn, clientTag, game);
 
     this.takebackCount = takebackCount;
   }

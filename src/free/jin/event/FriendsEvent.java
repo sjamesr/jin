@@ -103,8 +103,8 @@ public class FriendsEvent extends JinEvent{
    * <code>FriendsConnection</code> event id, friend and his state.
    */
   
-  public FriendsEvent(FriendsConnection source, int id, ServerUser friend, int friendState){
-    super(source);
+  public FriendsEvent(FriendsConnection source, String clientTag, int id, ServerUser friend, int friendState){
+    super(source, clientTag);
     
     switch (id){
       case FRIEND_CONNECTED:

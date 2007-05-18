@@ -107,8 +107,8 @@ public class OfferEvent extends GameEvent{
    * offers use the other constructor.
    */
 
-  public OfferEvent(Connection conn, Game game, int offerId, boolean isOffered, Player player){
-    super(conn, game);
+  public OfferEvent(Connection conn, String clientTag, Game game, int offerId, boolean isOffered, Player player){
+    super(conn, clientTag, game);
 
     switch (offerId){
       case DRAW_OFFER:
@@ -134,9 +134,9 @@ public class OfferEvent extends GameEvent{
    * Creates a new <code>OfferEvent</code> for a takeback offer.
    */
 
-  public OfferEvent(Connection conn, Game game, boolean isOffered, Player player,
+  public OfferEvent(Connection conn, String clientTag, Game game, boolean isOffered, Player player,
       int takebackCount){
-    super(conn, game);
+    super(conn, clientTag, game);
 
     if (takebackCount <= 0)
       throw new IllegalArgumentException("takebackCount must be positive");
