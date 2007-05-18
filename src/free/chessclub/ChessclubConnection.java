@@ -23,6 +23,7 @@
 package free.chessclub;
 
 import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,12 +33,16 @@ import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import free.chessclub.level1.Packet;
 import free.chessclub.level2.Datagram;
 import free.chessclub.level2.DatagramEvent;
 import free.chessclub.level2.DatagramListener;
 import free.util.Connection;
 import free.util.EventListenerList;
+import free.util.FormatException;
 
 
 /**
@@ -51,6 +56,47 @@ import free.util.EventListenerList;
  */
 
 public class ChessclubConnection extends free.util.Connection{
+  
+  
+  
+  /**
+   * The standard delimiter, used to delimit both level1 and level2.
+   */
+  
+  private static final char STANDARD_DELIMITER = '\u0019';
+  
+  
+  
+  /**
+   * The start-of-level1-packet delimiter.
+   */
+  
+  private static final char PACKET_START_DELIMITER = '[';
+  
+  
+  
+  /**
+   * The end-of-level1-packet delimiter.
+   */
+  
+  private static final char PACKET_END_DELIMITER = ']';
+  
+  
+  
+  /**
+   * The start-of-level2-datagram delimiter.
+   */
+  
+  private static final char DATAGRAM_START_DELIMITER = '('; 
+  
+  
+  
+  /**
+   * The end-of-datagram delimiter.
+   */
+  
+  private static final char DATAGRAM_END_DELIMITER = ')';
+  
   
   
   
@@ -111,6 +157,14 @@ public class ChessclubConnection extends free.util.Connection{
   
   private String interfaceVar = "Java chessclub.com library (http://www.jinchess.com/)";
   
+  
+  
+  
+  /**
+   * The current setting of level1.
+   */
+  
+  private int level1State = 0;
   
   
   
@@ -245,8 +299,8 @@ public class ChessclubConnection extends free.util.Connection{
    * to all registered listeners.
    */
   
-  protected void fireDatagramEvent(Datagram datagram){
-    DatagramEvent evt = new DatagramEvent(this, datagram);
+  protected void fireDatagramEvent(Datagram datagram, String clientTag){
+    DatagramEvent evt = new DatagramEvent(this, datagram, clientTag);
     
     EventListenerList listenerList = datagramListeners[datagram.getId()];
     if (listenerList != null){
@@ -254,6 +308,36 @@ public class ChessclubConnection extends free.util.Connection{
       for (int i = 1; i < listeners.length; i += 2)
         ((DatagramListener)listeners[i]).datagramReceived(evt);
     }
+  }
+  
+  
+  
+  /**
+   * Sets the level1 state. Note that we currently do not support states where
+   * the 2nd lowest bit is set (the one which causes ^Y< and ^Y> delimiters to
+   * be sent).
+   */
+  
+  public final synchronized void setLevel1(int level1State){
+    if ((level1State & 2) != 0)
+      throw new IllegalArgumentException("level1 states with the 2nd lowest bit set are unsupported");
+    
+    this.level1State = level1State;
+    
+    if (isLoggedIn())
+      sendCommand("set level1 " + level1State);
+  }
+  
+  
+  
+  /**
+   * Returns the current level1 state. See
+   * <code>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</code> for
+   * documentation about level1.
+   */
+  
+  public final synchronized int getLevel1(){
+    return level1State;
   }
   
   
@@ -448,6 +532,8 @@ public class ChessclubConnection extends free.util.Connection{
    */
   
   protected void handleConnected(){
+    sendCommand("level1=" + level1State);
+    
     int largestSetDGNumber = level2Settings.size();
     while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
       largestSetDGNumber--;
@@ -497,16 +583,11 @@ public class ChessclubConnection extends free.util.Connection{
   
   
   /**
-   * Passes the message to either {@link #handleDatagram(Datagram)} or {@link #handleLine(String)}.
+   * Handles the specified message.
    */
   
   protected void handleMessage(Object message){
-    if (message instanceof String)
-      handleLine((String)message);
-    else if (message instanceof Datagram)
-      handleDatagram((Datagram)message);
-    else
-      throw new IllegalArgumentException("Unrecognized message type: " + message.getClass().getName());
+    handleMessage(message, null);
   }
   
   
@@ -518,13 +599,14 @@ public class ChessclubConnection extends free.util.Connection{
    */
   
   protected InputStream createInputStream(InputStream in){
-    return new PushbackInputStream(new BufferedInputStream(in));
+    return new PushbackInputStream(new BufferedInputStream(in), 2);
   }
   
   
   
   /**
-   * Reads either a line of plain text or a datagram from the server.
+   * Reads either a line of plain text, a level1 packet or a level2 datagram
+   * from the server.
    */
   
   protected Object readMessage(InputStream in) throws IOException{
@@ -536,16 +618,111 @@ public class ChessclubConnection extends free.util.Connection{
       if (b < 0) // Clean disconnection
         return null;
       
-      pin.unread(b);
-      
-      if (b == Datagram.DG_DELIM) // Datagram
-        return Datagram.readDatagram(pin);
+      if (b == STANDARD_DELIMITER){ // level1 packet or datagram
+        int next = pin.read();
+        if (next < 0)
+          throw new EOFException("EOF after STANDARD_DELIMITER");
+        
+        pin.unread(next);
+        pin.unread(b);
+        
+        if (next == PACKET_START_DELIMITER)
+          return readPacket(pin);
+        if (next == DATAGRAM_START_DELIMITER)
+          return readDatagram(pin);
+      }
       else{
+        pin.unread(b);
         String line = readLine(pin);
         line = filterLine(line);
         if (line != null)
           return line;
       }
+    }
+  }
+  
+  
+  
+  /**
+   * Reads and parses a level1 packet from the specified input stream.
+   * 
+   * @throws IOException if an I/O error occurs while reading the datagram
+   */
+  
+  private Packet readPacket(PushbackInputStream in) throws IOException{
+    StringBuffer header = new StringBuffer();
+    
+    // Read until the newline
+    while (true){
+      int b = in.read();
+      if (b < 0)
+        throw new EOFException("EOF in a packet");
+      
+      if (b == '\n')
+        break;
+      
+      header.append((char)b);
+    }
+    
+    // In contradiction to formats.txt, the servers seems to end the header line with \r\n
+    int len = header.length();
+    if (header.charAt(len - 1) == '\r')
+      header.setLength(len - 1);
+    
+    
+    StringTokenizer tokenizer = new StringTokenizer(header.substring(2), " ");
+    int commandCode = Integer.parseInt(tokenizer.nextToken());
+    String playerName = tokenizer.nextToken();
+    String clientTag = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
+    
+    List items = new LinkedList();
+    // Read until the matching ^Y]
+    while (true){
+      int first = in.read();
+      if (first < 0)
+        throw new EOFException("EOF in a packet");
+      
+      int second = in.read();
+      if (second < 0)
+        throw new EOFException("EOF in a packet");
+      
+      if ((first == STANDARD_DELIMITER) && (second == PACKET_END_DELIMITER))
+        break;
+      
+      in.unread(second);
+      in.unread(first);
+      
+      items.add(readMessage(in));
+    }
+    
+    return new Packet(commandCode, playerName, clientTag, items.toArray(new Object[items.size()]));
+  }
+  
+  
+  /**
+   * Reads and parses a level2 datagram from the specified input stream.
+   * 
+   * @throws IOException if an I/O error occurs while reading the datagram
+   * @throws FormatException if the data read from the input stream can't be parsed as a datagram. 
+   */
+  
+  private Datagram readDatagram(InputStream in) throws IOException{
+    StringBuffer buf = new StringBuffer();
+    
+    int lastChar = -1;
+    
+    // Read until ^Y) is encountered
+    while (true){
+      int b = in.read(); 
+      if (b < 0)
+        throw new EOFException("EOF in a datagram");
+      
+      buf.append((char)b);
+      
+      if ((lastChar == STANDARD_DELIMITER) && (b == DATAGRAM_END_DELIMITER))
+        return Datagram.parseDatagram(buf.substring(2, buf.length() - 2)); // Strip off the delimiters
+      
+      lastChar = b;
     }
   }
   
@@ -577,7 +754,7 @@ public class ChessclubConnection extends free.util.Connection{
       }
       
       // Don't read any datagrams
-      if (b == Datagram.DG_DELIM){
+      if (b == STANDARD_DELIMITER){
         in.unread(b);
         break;
       }
@@ -652,6 +829,25 @@ public class ChessclubConnection extends free.util.Connection{
   
   
   /**
+   * Sends a tagged command to the server. If
+   * <code>(level1 & 5) == level1</code>, the tag will be sent back to us in a
+   * level1 packet triggered by the sent command.
+   */
+  
+  public synchronized void sendTaggedCommand(String command, String tag){
+    int level1 = getLevel1();
+    if ((level1 & 5) != level1)
+      throw new IllegalArgumentException("Wrong level1 (" + level1 + ") for tagged commands");
+    
+    if (tag != null)
+      sendCommand("`" + tag + "`" + command);
+    else
+      sendCommand(command);
+  }
+  
+  
+  
+  /**
    * Sends the given command to the server, optionally logging it to the log stream.
    */
   
@@ -719,14 +915,53 @@ public class ChessclubConnection extends free.util.Connection{
   
   
   /**
+   * Passes the message to one of:
+   * <ul>
+   *   <li>{@link #handlePacket(Packet, String)}
+   *   <li>{@link #handleDatagram(Datagram, String))}
+   *   <li>{@link #handleLine(String, String)}
+   * </ul>
+   */
+  
+  protected void handleMessage(Object message, String clientTag){
+    if (message instanceof String)
+      handleLine((String)message, clientTag);
+    else if (message instanceof Packet)
+      handlePacket((Packet)message, clientTag);
+    else if (message instanceof Datagram)
+      handleDatagram((Datagram)message, clientTag);
+    else
+      throw new IllegalArgumentException("Unrecognized message type: " + message.getClass().getName());
+  }
+  
+  
+  
+  /**
+   * Invoked when a level1 packet arrives from the server.
+   * 
+   * @param packet The packet.
+   * @param clientTag The client tag of the containing packet, if any.
+   */
+  
+  private void handlePacket(Packet packet, String clientTag){
+    for (int i = 0; i < packet.getItemCount(); i++)
+      handleMessage(packet.getItem(i), 
+          clientTag == null ? packet.getClientTag() : clientTag);
+          // Really, though, only the outermost packet may have a client tag
+  }
+  
+  
+  
+  /**
    * This method is called when a new level2 datagram arrives from the server.
    *
    * @param datagram The level2 datagram that was received.
+   * @param clientTag The client tag of the containing packet, if any.
    *
    * @see #processDatagram(Datagram)
    */
   
-  public final void handleDatagram(Datagram datagram){
+  private final void handleDatagram(Datagram datagram, String clientTag){
     if (logStream != null)
       logStream.println(datagram);
     
@@ -754,7 +989,7 @@ public class ChessclubConnection extends free.util.Connection{
         level2Settings.clear(dgType);
     }
     
-    fireDatagramEvent(datagram);
+    fireDatagramEvent(datagram, clientTag);
   }
   
   
@@ -763,27 +998,30 @@ public class ChessclubConnection extends free.util.Connection{
    * This method is called when a new line of plain text arrives from the server.
    *
    * @param line The line that was received, '\n' not included.
+   * @param clientTag The client tag of the containing packet, if any.
    *
    * @see #processLine(String)
    */
   
-  public final void handleLine(String line){
+  private final void handleLine(String line, String clientTag){
     if (logStream != null)
       logStream.println(line);
     
-    processLine(line);
+    processLine(line, clientTag);
   }
   
   
   
   
   /**
-   * This method is called to process a single line of text.
+   * This method is called to process a single line of text. It does nothing and
+   * is intended as a notification method for subclasses.
    *
    * @param line The line that was received, '\n' not included.
+   * @param clientTag The client tag of the containing packet, if any.
    */
   
-  protected void processLine(String line){
+  protected void processLine(String line, String clientTag){
     
   }
   
