@@ -1033,10 +1033,11 @@ public class Console extends JPanel implements KeyListener{
         String linkCommand = linkCommands[i];
 
         int index = -1;
-        while ((index = linkCommand.indexOf("$", index+1))!=-1){
-          if ((index<linkCommand.length()-1)&&(Character.isDigit(linkCommand.charAt(index+1)))){
-            int subexpressionIndex = Character.digit(linkCommand.charAt(index+1),10);
-            linkCommand = linkCommand.substring(0,index) + linkMatcher.group(subexpressionIndex) + linkCommand.substring(index+2);
+        while ((index = linkCommand.indexOf("$", index+1)) != -1){
+          if ((index < linkCommand.length() - 1) && Character.isDigit(linkCommand.charAt(index + 1))){
+            int subexpressionIndex = Character.digit(linkCommand.charAt(index + 1), 10);
+            linkCommand = linkCommand.substring(0, index) + 
+              linkMatcher.group(subexpressionIndex) + linkCommand.substring(index + 2);
           }
         }
 
@@ -1049,7 +1050,7 @@ public class Console extends JPanel implements KeyListener{
 
         Position linkStart = document.createPosition(matchStart + oldTextLength);
         Position linkEnd = document.createPosition(matchEnd + oldTextLength);
-        Link link = new Link(linkStart, linkEnd, new Command(linkCommand,0));
+        Link link = new Link(linkStart, linkEnd, new Command("/" + linkCommand, 0));
         outputComponent.addLink(link);
       }
     }
@@ -1114,7 +1115,7 @@ public class Console extends JPanel implements KeyListener{
       if (!conn.isConnected())
         addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
       else
-        getSelectedCommandType().issueCommand(commandString, consoleManager.getConn(), command.isBlanked());
+        getSelectedCommandType().handleCommand(commandString, consoleManager.getConn(), command.isBlanked());
     }
   }
 
