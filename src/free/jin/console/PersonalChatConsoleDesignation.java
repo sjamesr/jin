@@ -33,7 +33,7 @@ import free.jin.event.JinEvent;
  * A <code>ConsoleDesignation</code> for person-to-person chat.
  */
 
-public final class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
+public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   
@@ -132,23 +132,28 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    */
   
   protected void appendChat(ChatEvent evt){
-    String senderName = evt.getSender().getName();
-    String senderTitle = evt.getSenderTitle();
-    String message = decode(evt.getMessage(), evt.getConnection());
-    
-    String text =
-      senderName +
-      (senderTitle == null ? "" : senderTitle) +
-      ": " +
-      message;
     
     Console console = getConsole();
-    console.addToOutput(text, console.textTypeForEvent(evt));
+    console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
     
     if (!console.isVisible()){
       unseenMessageCount++;
       setName(conversationPartner.getName() + " (" + unseenMessageCount + ")");
     }
+  }
+  
+  
+  
+  /**
+   * Returns the text to append for the specified chat event.
+   */
+  
+  protected String textForChat(ChatEvent evt){
+    String senderName = evt.getSender().getName();
+    String senderTitle = evt.getSenderTitle();
+    String message = decode(evt.getMessage(), evt.getConnection());
+    
+    return senderName + (senderTitle == null ? "" : senderTitle) + ": " + message;
   }
   
   
