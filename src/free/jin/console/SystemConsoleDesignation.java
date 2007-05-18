@@ -26,7 +26,6 @@ import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
-import free.jin.event.PlainTextEvent;
 
 
 
@@ -81,35 +80,12 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
-   * Appends the specified event to the console.
-   */
-  
-  protected void append(JinEvent evt){
-    if (evt instanceof PlainTextEvent)
-      appendPlainText((PlainTextEvent)evt);
-    else if (evt instanceof ChatEvent)
-      appendChat((ChatEvent)evt);
-  }
-  
-  
-  
-  /**
-   * Appends the text of the specified plain text event to the console.
-   */
-  
-  private void appendPlainText(PlainTextEvent evt){
-    getConsole().addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
-  }
-  
-  
-  
-  /**
    * Appends the text for the specified chat event to the console.
    * 
    * @see #textForChat(ChatEvent, String)
    */
   
-  private void appendChat(ChatEvent evt){
+  protected void appendChat(ChatEvent evt){
     Console console = getConsole();
     console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
     if (isPersonalTell(evt))

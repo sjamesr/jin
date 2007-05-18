@@ -123,6 +123,9 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    */
   
   protected boolean accept(JinEvent evt){
+    if (isTaggedByUs(evt))
+      return true;
+    
     if (!(evt instanceof ChatEvent))
       return false;
     
@@ -139,18 +142,15 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Appends the text for the specified chat event to the console.
+   * Appends the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt){
-    // We already know it's a ChatEvent because it passed accept(JinEvent)
-    ChatEvent chatEvent = (ChatEvent)evt;
-    
-    String senderName = chatEvent.getSender().getName();
-    String senderTitle = chatEvent.getSenderTitle();
-    int senderRating = chatEvent.getSenderRating();
-    Object forum = chatEvent.getForum();
-    String message = decode(chatEvent.getMessage(), evt.getConnection());
+  protected void appendChat(ChatEvent evt){
+    String senderName = evt.getSender().getName();
+    String senderTitle = evt.getSenderTitle();
+    int senderRating = evt.getSenderRating();
+    Object forum = evt.getForum();
+    String message = decode(evt.getMessage(), evt.getConnection());
     
     String text = 
       senderName +

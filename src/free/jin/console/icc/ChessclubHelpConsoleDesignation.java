@@ -51,6 +51,9 @@ public class ChessclubHelpConsoleDesignation extends HelpConsoleDesignation{
    */
   
   protected boolean accept(JinEvent evt){
+    if (isTaggedByUs(evt))
+      return true;
+
     if (!(evt instanceof ChatEvent))
       return false;
     

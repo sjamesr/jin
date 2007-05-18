@@ -28,7 +28,9 @@ import java.beans.PropertyChangeSupport;
 
 import free.jin.Connection;
 import free.jin.ServerUser;
+import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
+import free.jin.event.PlainTextEvent;
 import free.util.AbstractNamed;
 import free.util.TextUtilities;
 
@@ -94,6 +96,17 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     this.name = name;
     this.encoding = encoding;
     this.isConsoleCloseable = isConsoleCloseable;
+  }
+  
+  
+  
+  /**
+   * The tag subclasses should use for tagging commands and messages sent to the
+   * server. 
+   */
+  
+  public String getTag(){
+    return Integer.toHexString(System.identityHashCode(this));
   }
   
   
@@ -276,6 +289,19 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * Returns whether the specified event's client tag is the same tag as ours.
+   * 
+   * @see getTag()
+   */
+  
+  protected boolean isTaggedByUs(JinEvent evt){
+    String tag = getTag();
+    return (tag != null) && (tag.equals(evt.getClientTag()));
+  }
+  
+  
+  
+  /**
    * Returns whether the specified event is accepted by this
    * <code>ConsoleDesignation</code>.
    */
@@ -286,10 +312,50 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   /**
    * Appends the specified event to the console, causing it to be displayed
-   * there in some manner. 
+   * there in some manner. The default implementation passes the event to
+   * either {@link #appendChat(ChatEvent)} or
+   * {@link #appendPlainText(PlainTextEvent)}, based on the class of the event.  
    */
   
-  protected abstract void append(JinEvent evt);
+  protected void append(JinEvent evt){
+    if (evt instanceof PlainTextEvent)
+      appendPlainText((PlainTextEvent)evt);
+    else if (evt instanceof ChatEvent)
+      appendChat((ChatEvent)evt);
+  }
+  
+  
+  
+  /**
+   * Appends the specified chat event to the console. The default implementation
+   * appends the simple <code>[username][titles]: [message]</code> string to the
+   * console.
+   */
+  
+  protected void appendChat(ChatEvent evt){
+    ChatEvent chatEvent = (ChatEvent)evt;
+    Console console = getConsole();
+    
+    ServerUser sender = chatEvent.getSender();
+    String title = chatEvent.getSenderTitle();
+    String message = decode(chatEvent.getMessage(), chatEvent.getConnection());
+    
+    String text = sender.getName() + title + ": " + message;
+    String textType = console.textTypeForEvent(chatEvent);
+    
+    console.addToOutput(text, textType);
+  }
+  
+  
+  
+  /**
+   * Appends the text of the specified plain text event to the console.
+   */
+  
+  protected void appendPlainText(PlainTextEvent evt){
+    getConsole().addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
+  }
+
   
   
   

@@ -51,8 +51,8 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
    */
   
   protected boolean accept(JinEvent evt){
-    if (!super.accept(evt))
-      return false;
+    if (isTaggedByUs(evt))
+      return true;
     
     if (!(evt instanceof ChatEvent))
       return false;

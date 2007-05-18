@@ -114,6 +114,9 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    */
   
   protected boolean accept(JinEvent evt){
+    if (isTaggedByUs(evt))
+      return true;
+
     if (!(evt instanceof ChatEvent))
       return false;
     
@@ -128,13 +131,10 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
    * Appends the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt){
-    // We already know it's a ChatEvent because it passed accept(JinEvent)
-    ChatEvent chatEvent = (ChatEvent)evt;
-    
-    String senderName = chatEvent.getSender().getName();
-    String senderTitle = chatEvent.getSenderTitle();
-    String message = decode(chatEvent.getMessage(), chatEvent.getConnection());
+  protected void appendChat(ChatEvent evt){
+    String senderName = evt.getSender().getName();
+    String senderTitle = evt.getSenderTitle();
+    String message = decode(evt.getMessage(), evt.getConnection());
     
     String text =
       senderName +
@@ -205,8 +205,7 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
      */
     
     protected void executeCommand(String message, Connection connection){
-      connection.sendPersonalTell(conversationPartner, 
-          encode(message, connection));
+      connection.sendPersonalTell(conversationPartner, encode(message, connection), getTag());
     }
     
     

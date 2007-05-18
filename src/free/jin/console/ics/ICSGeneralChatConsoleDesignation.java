@@ -27,7 +27,6 @@ import free.jin.ServerUser;
 import free.jin.console.ChatConsoleDesignation;
 import free.jin.console.Console;
 import free.jin.event.ChatEvent;
-import free.jin.event.JinEvent;
 
 
 
@@ -55,14 +54,14 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
     
     addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
       protected void executeCommand(String userText, Connection connection){
-        connection.sendCommand("shout " + userText);
+        connection.sendTaggedCommand("shout " + userText, getTag());
       }
       protected void echoCommand(String userText, ServerUser user){}
     });
 
     addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
       protected void executeCommand(String userText, Connection connection){
-        connection.sendCommand("i " + userText);
+        connection.sendTaggedCommand("i " + userText, getTag());
       }
       protected void echoCommand(String userText, ServerUser user){}
     });
@@ -74,13 +73,12 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
    * Appends the text for the specified chat event to the console.
    */
   
-  protected void append(JinEvent evt){
-    ChatEvent chatEvent = (ChatEvent)evt;
-    if ("shout".equals(chatEvent.getType()))
-      super.append(evt);
+  protected void appendChat(ChatEvent evt){
+    if ("shout".equals(evt.getType()))
+      super.appendChat(evt);
     else{
       Console console = getConsole();
-      console.addToOutput("--> " + chatEvent.getSender().getName() + " " + chatEvent.getMessage(),
+      console.addToOutput("--> " + evt.getSender().getName() + " " + evt.getMessage(),
           console.textTypeForEvent(evt));
     }
   }

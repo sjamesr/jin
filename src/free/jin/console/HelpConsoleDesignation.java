@@ -24,8 +24,6 @@ package free.jin.console;
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.ServerUser;
-import free.jin.event.ChatEvent;
-import free.jin.event.JinEvent;
 
 
 
@@ -69,36 +67,6 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * The default implementation accepts all chat events.
-   */
-  
-  protected boolean accept(JinEvent evt){
-    return evt instanceof ChatEvent;
-  }
-  
-  
-  
-  /**
-   * Appends the specified help message to the console.
-   */
-
-  protected void append(JinEvent evt){
-    ChatEvent chatEvent = (ChatEvent)evt;
-    Console console = getConsole();
-    
-    ServerUser sender = chatEvent.getSender();
-    String title = chatEvent.getSenderTitle();
-    String message = decode(chatEvent.getMessage(), chatEvent.getConnection());
-    
-    String text = sender.getName() + title + ": " + message;
-    String textType = console.textTypeForEvent(chatEvent);
-    
-    console.addToOutput(text, textType);
-  }
-  
-  
-  
-  /**
    * Returns the <code>AskHelpQuestion</code> command type.
    */
   
@@ -131,7 +99,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      */
     
     protected void executeCommand(String userText, Connection connection){
-      connection.sendHelpQuestion(encode(userText, connection));
+      connection.sendHelpQuestion(encode(userText, connection), getTag());
     }
     
     
