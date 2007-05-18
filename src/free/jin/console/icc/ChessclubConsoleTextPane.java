@@ -21,8 +21,14 @@
 
 package free.jin.console.icc;
 
+import java.awt.FontMetrics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
+import free.jin.chessclub.JinChessclubConnection;
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextPane;
+import free.util.GraphicsUtilities;
 
 
 /**
@@ -41,6 +47,38 @@ public class ChessclubConsoleTextPane extends ConsoleTextPane{
 
   public ChessclubConsoleTextPane(Console console){
     super(console);
+    
+    addComponentListener(new ComponentAdapter(){
+      
+      private int currentHeight = -1;
+      
+      public void componentResized(ComponentEvent evt){
+        if (!isShowing())
+          return;
+        
+        adjustHeight();
+      }
+      
+      public void componentShown(ComponentEvent evt){
+        adjustHeight();
+      }
+      
+      private void adjustHeight(){
+        FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
+        JinChessclubConnection conn = 
+          (JinChessclubConnection)ChessclubConsoleTextPane.this.console.getConsoleManager().getConn();
+        
+        int height = Math.max(5, Math.min(300, getVisibleRect().height/metrics.getHeight() - 2));
+        // -2 because the console has an extra empty line at the bottom and we want
+        // some extra room at the top, to keep a little context
+        
+        if (height != currentHeight){
+          currentHeight = height;
+          conn.sendCommandWhenLoggedIn("set-quietly height " + height);
+        }
+      }
+      
+    });
   }
 
 
