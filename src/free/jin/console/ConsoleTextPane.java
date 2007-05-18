@@ -359,7 +359,7 @@ public class ConsoleTextPane extends FixedJTextPane{
       String label = labelKey == null ? null : consoleManagerI18n.getString(labelKey);
       
       if ("serverCommand".equals(itemType)){
-        String command = prefs.getString(itemPrefix + "command");
+        String command = "/" + prefs.getString(itemPrefix + "command");
         popupMenu.add(new IssueCommandMenuItem(label, command));
       }
       else if ("separator".equals(itemType))
@@ -975,7 +975,7 @@ public class ConsoleTextPane extends FixedJTextPane{
      */
     
     protected void fireActionPerformed(ActionEvent evt){
-      console.issueCommand(new Command(getSelectedText(), 0));
+      console.issueCommand(new Command("/" + getSelectedText(), 0));
     }
     
     
