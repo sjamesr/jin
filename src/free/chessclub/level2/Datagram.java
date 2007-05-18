@@ -1,7 +1,7 @@
 /**
  * The chessclub.com connection library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The chessclub.com connection library is free software; you can redistribute
@@ -22,52 +22,34 @@
 
 package free.chessclub.level2;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 import free.util.FormatException;
 
 
 /**
  * Represents a datagram sent by the chessclub.com server in the format 
- * described at <a HREF="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
+ * described at
+ * <code>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</code>.
  * This class defines methods useful for parsing a datagram and retrieving
  * arguments from it.
  */
 
 public class Datagram{
-
-
-
-  /**
-   * The standard delimiter in datagrams. 
-   */
-   
-  public static final char DG_DELIM = '\u0019'; 
-    
-
+  
+  
   
   /**
-   * The start-of-datagram delimiter.
+   * The start of a special string delimiter.
    */
-   
-  private static final char DG_START = '('; 
-
   
+  private final static char SPECIAL_STRING_DELIM_START = '\u0019';
 
-  /**
-   * The end-of-datagram delimiter.
-   */
-   
-  private static final char DG_END = ')';
-    
 
 
 	/**
-	 * Definitions of all the DG type IDs. See their description at 
-	 * <a href="ftp://ftp.chessclub.com/pub/icc/formats/formats.txt">ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</a>
+	 * Definitions of all the DG type IDs.
 	 */
 
   public static final int DG_WHO_AM_I						     = 0;
@@ -299,38 +281,11 @@ public class Datagram{
   
   
   
-  /**
-   * Reads and parses a datagram from the specified input stream.
-   * 
-   * @throws IOException if an I/O error occurs while reading the datagram
-   * @throws FormatException if the data read from the input stream can't be parsed as a datagram. 
-   */
-  
-  public static Datagram readDatagram(InputStream in) throws IOException{
-    int len = 0;
-    StringBuffer buf = new StringBuffer();
-    
-    // Basically read until ^Y) is encountered
-    while (true){
-      int b = in.read(); 
-      if (b < 0)
-        throw new EOFException();
-      
-      if ((b == ')') && (len > 1) && (buf.charAt(len - 1) == DG_DELIM)){
-        buf.append((char)b);
-        return parseDatagram(buf.toString());
-      }
-      
-      buf.append((char)b);
-      len++;
-    }
-  }
-  
-  
 
   /**
    * Parses the specified string and returns a <code>Datagram</code> object
-   * corresponding to the datagram represented by that string.
+   * corresponding to the datagram represented by that string. The string should
+   * be the contents of the datagram, without the surrounding delimiters.
    *
    * @throws FormatException if the specified string cannot be parsed as a
    * datagram because it is not in the proper format.
@@ -338,25 +293,12 @@ public class Datagram{
 
   public static Datagram parseDatagram(String dgString) throws FormatException{
     try{
-      
-      int len = dgString.length();
-      
-      // Check that it starts with DG_START
-      if ((len < 2) || (dgString.charAt(0) != DG_DELIM) || (dgString.charAt(1) != DG_START))
-        throw new FormatException("dgString does not start with \"^Y(\": " + dgString);
-  
-      // Check that it ends with DG_END
-      if ((len < 2) || (dgString.charAt(len - 2) != DG_DELIM) || (dgString.charAt(len - 1) != DG_END))
-        throw new FormatException("dgString does not end with \"^Y)\": " + dgString);
-  
-      // Strip DG_START and DG_END and add an extra space at the end to make it
-      // easier to parse
-      dgString = dgString.substring(2, dgString.length() - 2) + " "; 
-
       int index = dgString.indexOf(' ');
       int id = Integer.parseInt(dgString.substring(0, index));
       
-      Vector fields = new Vector();
+      dgString += " "; // So that each field is suffixed with a space
+      
+      List fields = new LinkedList();
       
       index++;
       int dgLength = dgString.length();
@@ -368,9 +310,9 @@ public class Datagram{
           endIndex = dgString.indexOf('}', startIndex);
           index = endIndex + 2; // "} "
         }
-        else if (firstChar == DG_DELIM){ // The delimiters are ^Y{ and ^Y}
+        else if (firstChar == SPECIAL_STRING_DELIM_START){ // The delimiters are ^Y{ and ^Y}
           startIndex = index + 2;
-          endIndex = dgString.indexOf(DG_DELIM, startIndex);
+          endIndex = dgString.indexOf(SPECIAL_STRING_DELIM_START, startIndex);
           index = endIndex + 3; // "^Y} "
         }
         else{ 
@@ -384,13 +326,10 @@ public class Datagram{
           index = endIndex + 1;
         }
         
-        fields.addElement(dgString.substring(startIndex, endIndex));
+        fields.add(dgString.substring(startIndex, endIndex));
       }
   
-      String [] fieldsArr = new String[fields.size()];
-      fields.copyInto(fieldsArr);
-  
-      return new Datagram(id, fieldsArr);
+      return new Datagram(id, (String[])fields.toArray(new String[fields.size()]));
     } catch (NumberFormatException e){
         throw new FormatException(e);
       }
