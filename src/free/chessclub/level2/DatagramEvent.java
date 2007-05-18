@@ -44,17 +44,28 @@ public class DatagramEvent extends EventObject{
   
   
   /**
+   * The client tag of the containing level1 packet, if any.
+   */
+  
+  private final String clientTag;
+  
+  
+  
+  /**
    * Creates a new <code>DatagramEvent</code> with the specified source
-   * <code>ChessclubConnection</code> and the received <code>Datagram</code>. 
+   * <code>ChessclubConnection</code>, the received <code>Datagram</code> and
+   * the client tag (referred to as "arbitrary-word" in
+   * <code>formats.txt</code>) of the containing level1 packet, if any. 
    */
    
-  public DatagramEvent(ChessclubConnection conn, Datagram datagram){
+  public DatagramEvent(ChessclubConnection conn, Datagram datagram, String clientTag){
     super(conn);
     
     if (datagram == null)
       throw new IllegalArgumentException("null datagram not allowed");
     
     this.datagram = datagram;
+    this.clientTag = clientTag;
   }
   
   
@@ -76,6 +87,18 @@ public class DatagramEvent extends EventObject{
   public Datagram getDatagram(){
     return datagram;
   }
+  
+  
+  
+  /**
+   * Returns the client tag (referred to as "arbitrary-word" in
+   * <code>formats.txt</code>) of the containing level1 packet, if any.
+   */
+  
+  public String getClientTag(){
+    return clientTag;
+  }
+  
   
   
 }
