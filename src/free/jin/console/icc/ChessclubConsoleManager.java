@@ -21,10 +21,12 @@
 
 package free.jin.console.icc;
 
+import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
 import free.jin.console.ics.ICSGeneralChatConsoleDesignation;
+import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -67,6 +69,16 @@ public class ChessclubConsoleManager extends ConsoleManager{
   
   
   /**
+   * Creates an ICC-specific personal chat console designation.
+   */
+  
+  protected ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable){
+    return new ChessclubPersonalChatConsoleDesignation(user, getEncoding(), isCloseable);
+  }
+  
+  
+  
+  /**
    * Creates a <code>ChessclubConsole</code> with the specified designation.
    */
 
@@ -83,6 +95,49 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
   public PreferencesPanel getPreferencesUI(){
     return new ChessclubConsolePrefsPanel(this);
+  }
+  
+  
+  
+  /**
+   * Returns a string that should be displayed for the given ChatEvent when the
+   * ChatEvent contains a qtell.
+   */
+
+  public static String parseQTell(ChatEvent evt){
+    String message = evt.getMessage();
+    int index;
+    while ((index = message.indexOf("\\n")) != -1)
+      message = message.substring(0, index) + "\n:" + message.substring(index + 2);
+    while ((index = message.indexOf("\\h")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\H")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\b")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    return ":" + message;
+  }
+  
+  
+  
+  /**
+   * Returns a string that should be displayed for the given ChatEvent when the
+   * ChatEvent contains a channel qtell.
+   */
+
+  public static String parseChannelQTell(ChatEvent evt){
+    String message = evt.getMessage();
+    Object forum = evt.getForum();
+    int index;
+    while ((index = message.indexOf("\\n")) != -1)
+      message = message.substring(0, index) + "\n" + forum + ">" + message.substring(index + 2);
+    while ((index = message.indexOf("\\h")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\H")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    while ((index = message.indexOf("\\b")) != -1)
+      message = message.substring(0, index) + message.substring(index + 2);
+    return forum + ">" + message;
   }
   
   
