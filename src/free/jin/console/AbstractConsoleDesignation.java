@@ -379,22 +379,26 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     /**
      * Invoked when a command is issued by the user with this command type.
-     * In turn, the default implementation invokes <code>executeCommand</code>
-     * or <code>sendCommand</code> and, if the <code>doNotEcho</code> flag is
-     * unset, <code>echoCommand</code>. If <code>userText</code> is prefixed
-     * with a forward slash, it is stripped and passed to
-     * <code>sendCommand</code>; otherwise, it is passed as-is to
-     * <code>executeCommand</code>.
+     * If <code>userText</code> is prefixed with a forward slash, the slash is
+     * stripped and the remaining command is passed to <code>sendCommand</code>
+     * and, if the <code>doNotEcho</code> flag is unset, to
+     * <code>echoCommand</code>.
+     * Otherwise, it is passed to <code>send</code> and, if the
+     * <code>doNotEcho</code> flag is unset, to <code>echo</code>.
      */
     
     public void handleCommand(String userText, Connection connection, boolean doNotEcho){
-      if (userText.startsWith("/"))
-        sendCommand(userText.substring(1), connection);
-      else  
+      if (userText.startsWith("/")){
+        String command = userText.substring(1);
+        sendCommand(command, connection);
+        if (!doNotEcho)
+          echoCommand(command, connection.getUser());
+      }
+      else{  
         send(userText, connection);
-      
-      if (!doNotEcho)
-        echo(userText, connection.getUser());
+        if (!doNotEcho)
+          echo(userText, connection.getUser());
+      }
     }
     
     
@@ -406,6 +410,18 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     protected void sendCommand(String command, Connection connection){
       connection.sendTaggedCommand(encode(command, connection), getTag());
+    }
+    
+    
+    
+    /**
+     * Echoes the specified command to the console. The default implementation
+     * simply appends the command's text to the console.
+     */
+    
+    protected void echoCommand(String command, ServerUser user){
+      Console console = getConsole();
+      console.addToOutput(command, console.getUserTextType());
     }
     
     
