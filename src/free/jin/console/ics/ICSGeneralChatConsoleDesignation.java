@@ -53,17 +53,17 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
     I18n i18n = I18n.get(ICSGeneralChatConsoleDesignation.class);
     
     addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
-      protected void executeCommand(String userText, Connection connection){
+      protected void send(String userText, Connection connection){
         connection.sendTaggedCommand("shout " + userText, getTag());
       }
-      protected void echoCommand(String userText, ServerUser user){}
+      protected void echo(String userText, ServerUser user){}
     });
 
     addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
-      protected void executeCommand(String userText, Connection connection){
+      protected void send(String userText, Connection connection){
         connection.sendTaggedCommand("i " + userText, getTag());
       }
-      protected void echoCommand(String userText, ServerUser user){}
+      protected void echo(String userText, ServerUser user){}
     });
   }
   

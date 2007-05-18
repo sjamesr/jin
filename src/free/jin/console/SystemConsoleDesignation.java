@@ -136,8 +136,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Issues the specified command.
      */
     
-    protected void executeCommand(String command, Connection connection){
-      connection.sendCommand(encode(command, connection));
+    protected void send(String command, Connection connection){
+      sendCommand(command, connection);
     }
     
     
@@ -146,7 +146,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Echoes the specified command to the console.
      */
     
-    protected void echoCommand(String command, ServerUser user){
+    protected void echo(String command, ServerUser user){
       Console console = getConsole();
       console.addToOutput(command, console.getUserTextType());
     }

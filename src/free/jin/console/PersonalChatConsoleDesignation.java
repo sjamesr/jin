@@ -204,7 +204,7 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
      * Sends the specified personal tell to our conversation partner. 
      */
     
-    protected void executeCommand(String message, Connection connection){
+    protected void send(String message, Connection connection){
       connection.sendPersonalTell(conversationPartner, encode(message, connection), getTag());
     }
     
@@ -214,7 +214,7 @@ public final class PersonalChatConsoleDesignation extends AbstractConsoleDesigna
      * Echoes the message to the console.
      */
     
-    protected void echoCommand(String userText, ServerUser user){
+    protected void echo(String userText, ServerUser user){
       Console console = getConsole();
       console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
     }

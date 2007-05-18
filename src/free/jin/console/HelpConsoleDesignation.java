@@ -98,7 +98,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Asks the specified help question.
      */
     
-    protected void executeCommand(String userText, Connection connection){
+    protected void send(String userText, Connection connection){
       connection.sendHelpQuestion(encode(userText, connection), getTag());
     }
     
@@ -108,7 +108,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Echoes the question to the console.
      */
     
-    protected void echoCommand(String userText, ServerUser user){
+    protected void echo(String userText, ServerUser user){
       Console console = getConsole();
       console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
     }

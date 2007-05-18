@@ -114,7 +114,7 @@ public interface ConsoleDesignation{
      * @param doNotEcho Set if the command should not be echoed to the console.
      */
     
-    public abstract void issueCommand(String userText, Connection connection, boolean doNotEcho);
+    public abstract void handleCommand(String userText, Connection connection, boolean doNotEcho);
     
     
     
