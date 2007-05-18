@@ -74,10 +74,11 @@ public interface ConsoleDesignation{
   
   /**
    * Receives the specified <code>JinEvent</code>, possibly displaying it in
-   * some manner in the specified console.
+   * some manner in the console. Returns whether the console "accepted" the
+   * event (usually means that it did indeed display it in the console).
    */
   
-  void receive(JinEvent evt);
+  boolean receive(JinEvent evt);
   
   
   

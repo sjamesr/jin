@@ -281,9 +281,13 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * it and, if accepted, sending it to the console.
    */
   
-  public void receive(JinEvent evt){
-    if (accept(evt))
+  public boolean receive(JinEvent evt){
+    if (accept(evt)){
       append(evt);
+      return true;
+    }
+    else
+      return false;
   }
   
   
