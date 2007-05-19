@@ -1232,7 +1232,17 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   public void connectionAttempted(Connection conn, String hostname, int port){}
   public void connectionEstablished(Connection conn){}
   public void loginFailed(Connection conn, String reason){}
-  public void loginSucceeded(Connection conn){}
+  
+  
+  
+  /**
+   * If the "examineOnLogin" preference is set, open a new examination board.
+   */
+  
+  public void loginSucceeded(Connection conn){
+    if (getPrefs().getBool("examineOnLogin", false))
+      getConn().examineNewGame();
+  }
   
   
   
