@@ -357,10 +357,18 @@ public class PrefsMenu extends JMenu implements SessionListener{
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
       applyButton.setEnabled(false);
-
-      buttonPanel.add(okButton);
-      buttonPanel.add(cancelButton);
-      buttonPanel.add(applyButton);
+      
+      if (SwingUtils.isMacLnF() || SwingUtils.isGtkLnF()){
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(applyButton);
+        buttonPanel.add(okButton);
+      }
+      else{
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(applyButton);
+      }
+      
       bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
       
       // To prevent overlapping the window resize handle
