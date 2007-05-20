@@ -133,14 +133,20 @@ public class SwingUtils{
   
   
   /**
-   * Configures the specified button to be an icon button.
+   * Configures the specified button to be an icon button. The button is made
+   * unfocusable, non default capable, non painting its border or content area
+   * and marginless. Additionally, unless the specified image is
+   * <code>null</code>, variants of the image to be used as rollover, pressed
+   * and disabled icons are generated and set on the button.
    */
   
-  public static void makeIconButton(AbstractButton button, Image image){
-    button.setIcon(new ImageIcon(image));
-    button.setRolloverIcon(new ImageIcon(IconImageFilters.getRollover(image)));
-    button.setPressedIcon(new ImageIcon(IconImageFilters.getPressed(image)));
-    button.setDisabledIcon(new ImageIcon(IconImageFilters.getDisabled(image)));
+  public static void confIconButton(AbstractButton button, Image image){
+    if (image != null){
+      button.setIcon(new ImageIcon(image));
+      button.setRolloverIcon(new ImageIcon(IconImageFilters.getRollover(image)));
+      button.setPressedIcon(new ImageIcon(IconImageFilters.getPressed(image)));
+      button.setDisabledIcon(new ImageIcon(IconImageFilters.getDisabled(image)));
+    }
     
     button.setFocusable(false);
     button.setBorderPainted(false);
