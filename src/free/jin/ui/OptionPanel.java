@@ -32,6 +32,7 @@ import free.jin.I18n;
 import free.util.TableLayout;
 import free.util.TextUtilities;
 import free.util.Utilities;
+import free.util.swing.SwingUtils;
 
 
 /**
@@ -112,7 +113,9 @@ public class OptionPanel extends DialogPanel{
    * The standard order of the predefined options.
    */
   
-  private static final Object [] OPTION_ORDER = new Object[]{OK, YES, NO, CANCEL};
+  private static final Object [] OPTION_ORDER = SwingUtils.isMacLnF() || SwingUtils.isGtkLnF() ?
+      new Object[]{CANCEL, YES, NO, OK} :
+      new Object[]{OK, YES, NO, CANCEL};
   
   
   
