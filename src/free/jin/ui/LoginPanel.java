@@ -617,6 +617,7 @@ public class LoginPanel extends DialogPanel{
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
           .add(serverLabel).add(serverBox).add(serverWebsiteLink)
         )
+        .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
           .add(accountLabel).add(accountBox)
         )
