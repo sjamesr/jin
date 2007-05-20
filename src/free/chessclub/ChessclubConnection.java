@@ -618,7 +618,7 @@ public class ChessclubConnection extends free.util.Connection{
       if (b < 0) // Clean disconnection
         return null;
       
-      if (b == STANDARD_DELIMITER){ // level1 packet or datagram
+      if (b == STANDARD_DELIMITER){ // May be a level1 packet or datagram (but may also be just a line with this character
         int next = pin.read();
         if (next < 0)
           throw new EOFException("EOF after STANDARD_DELIMITER");
@@ -628,15 +628,13 @@ public class ChessclubConnection extends free.util.Connection{
         
         if (next == PACKET_START_DELIMITER)
           return readPacket(pin);
-        if (next == DATAGRAM_START_DELIMITER)
+        else if (next == DATAGRAM_START_DELIMITER)
           return readDatagram(pin);
       }
       else{
         pin.unread(b);
         String line = readLine(pin);
-        line = filterLine(line);
-        if (line != null)
-          return line;
+        return filterLine(line);
       }
     }
   }
@@ -668,7 +666,6 @@ public class ChessclubConnection extends free.util.Connection{
     int len = header.length();
     if (header.charAt(len - 1) == '\r')
       header.setLength(len - 1);
-    
     
     StringTokenizer tokenizer = new StringTokenizer(header.substring(2), " ");
     int commandCode = Integer.parseInt(tokenizer.nextToken());
@@ -924,6 +921,9 @@ public class ChessclubConnection extends free.util.Connection{
    */
   
   protected void handleMessage(Object message, String clientTag){
+    if (message == null) // It's null if it was filtered (by filterLine, for example) 
+      return;
+    
     if (message instanceof String)
       handleLine((String)message, clientTag);
     else if (message instanceof Packet)
