@@ -271,6 +271,16 @@ public class SwingUtils{
   
   
   /**
+   * Returns whether we're currently running the GKT Look&Feel.
+   */
+  
+  public static boolean isGtkLnF(){
+    return UIManager.getLookAndFeel().getID().equals("GTK");
+  }
+  
+  
+  
+  /**
    * Links the enabled state of the specified component to the selected state of
    * the specified <code>ListSelectionModel</code>.
    */
