@@ -801,7 +801,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     Class loader = BoardPanel.class;
     Image image = Toolkit.getDefaultToolkit().getImage(
         loader.getResource("images/view-fullscreen.png"));
-    SwingUtils.makeIconButton(button, image);
+    SwingUtils.confIconButton(button, image);
     
     ModelUtils.linkSelected(fullscreenPanel.getFullscreenModeModel(), button.getModel());
 
