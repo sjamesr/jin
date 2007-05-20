@@ -22,7 +22,6 @@
 package free.jin.actions;
 
 import java.awt.BorderLayout;
-import java.awt.Image;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,7 +39,7 @@ import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.UIProvider;
 import free.util.TableLayout;
-import free.util.swing.SwingUtils;
+import free.util.swing.IconButton;
 
 
 /**
@@ -144,16 +143,10 @@ public class ActionsPlugin extends Plugin{
     for (int i = 0; i < actions.getSize(); i++){
       JinAction action = (JinAction)actions.getElementAt(i);
       
-      JButton button = new JButton(action);
+      JButton button = new IconButton(action);
       button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-      
-      Image iconImage = (Image)action.getValue(JinAction.ICON_IMAGE);
-      if (iconImage != null){
-        SwingUtils.makeIconButton(button, iconImage);
-        button.setHorizontalTextPosition(SwingConstants.CENTER);
-        button.setVerticalTextPosition(SwingConstants.BOTTOM);
-        button.setFocusable(false);
-      }
+      button.setHorizontalTextPosition(SwingConstants.CENTER);
+      button.setVerticalTextPosition(SwingConstants.BOTTOM);
       
       content.add(button);
     }
