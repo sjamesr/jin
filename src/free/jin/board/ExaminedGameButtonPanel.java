@@ -29,12 +29,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.plugin.Plugin;
+import free.util.swing.IconButton;
 import free.util.swing.SwingUtils;
 import free.workarounds.FixedJPanel;
 
@@ -148,19 +150,14 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
    */
   
   private JButton createButton(String iconName, String tooltipKey, KeyStroke shortcut, ActionListener listener){
-    JButton button = new JButton();
+    Image image = Toolkit.getDefaultToolkit().getImage(
+        ExaminedGameButtonPanel.class.getResource("images/" + iconName + ".png"));
+    JButton button = new IconButton(new ImageIcon(image));
+    
     button.setToolTipText(I18n.get(ExaminedGameButtonPanel.class).getString(tooltipKey));
     button.addActionListener(listener);
     button.registerKeyboardAction(listener, shortcut, WHEN_IN_FOCUSED_WINDOW); 
-    button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
-    
-    Class loader = ExaminedGameButtonPanel.class;
-    Image image = Toolkit.getDefaultToolkit().getImage(
-        loader.getResource("images/" + iconName + ".png"));
 
-    SwingUtils.makeIconButton(button, image);
-    
     return button;
   }
   
