@@ -26,6 +26,8 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import javax.swing.event.SwingPropertyChangeSupport;
+
 import free.jin.Connection;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
@@ -83,7 +85,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Our property change support.
    */
   
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this); 
+  private final PropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this); 
   
   
   
