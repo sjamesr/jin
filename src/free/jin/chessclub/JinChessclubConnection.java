@@ -3946,6 +3946,26 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Accepts the specified match offer.
+   */
+  
+  public void accept(MatchOffer offer){
+    sendCommand("accept " + offer.getChallenger().getName());
+  }
+  
+  
+  
+  /**
+   * Declines the specified match offer.
+   */
+  
+  public void decline(MatchOffer offer){
+    sendCommand("decline " + offer.getChallenger().getName());
+  }
+  
+  
+  
+  /**
    * Issues the specified match offer.
    */
   
@@ -3981,6 +4001,15 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     // TODO: Implement me.
   }
   
+  
+  
+  /**
+   * Adds the specified player to our noplay list.
+   */
+  
+  public void preventMatching(ServerUser user){
+    sendCommand("+noplay " + user.getName());
+  }
   
   
   
