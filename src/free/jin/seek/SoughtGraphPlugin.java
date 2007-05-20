@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Iterator;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -492,7 +493,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * An action which displays/hides our UI.
    */
   
-  private class FindGameAction extends JinAction{
+  private class FindGameAction extends JinAction implements PluginUIListener{
+    
+    
+    
+    /**
+     * Creates a new <code>FindGameAction</code>.
+     */
+    
+    public FindGameAction(){
+      uiContainer.addPluginUIListener(this);
+    }
     
     
     
@@ -516,6 +527,41 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       else
         uiContainer.setActive(true);
     }
+    
+    
+    
+    /**
+     * Invoked when the "find game" UI is shown.
+     */
+    
+    public void pluginUIShown(PluginUIEvent evt){
+      I18n i18n = I18n.get(FindGameAction.class);
+      
+      putValue(Action.NAME, i18n.getString("name.hide"));
+      putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription.hide"));
+    }
+    
+    
+    
+    /**
+     * Invoked when the "find game" UI is hidden.
+     */
+    
+    public void pluginUIHidden(PluginUIEvent evt){
+      I18n i18n = I18n.get(FindGameAction.class);
+      
+      putValue(Action.NAME, i18n.getString("name"));
+      putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription"));
+    }
+    
+    
+    
+    public void pluginUIActivated(PluginUIEvent evt){}
+    public void pluginUIClosing(PluginUIEvent evt){}
+    public void pluginUIDeactivated(PluginUIEvent evt){}
+    public void pluginUIDisposed(PluginUIEvent evt){}
+    public void pluginUITitleChanged(PluginUIEvent evt){}
+    public void pluginUIIconChanged(PluginUIEvent evt){}
     
     
     
