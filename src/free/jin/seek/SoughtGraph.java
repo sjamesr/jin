@@ -292,7 +292,7 @@ public class SoughtGraph extends JComponent{
     legendButton.setMargin(new Insets(0, 0, 0, 0));
     
     // setMargin isn't enough for Ocean or Windows L&Fs
-    Dimension legendButtonSize = new Dimension(legendButtonIcon.getIconWidth() + 2, legendButtonIcon.getIconHeight() + 2);
+    Dimension legendButtonSize = new Dimension(legendButtonIcon.getIconWidth() + 4, legendButtonIcon.getIconHeight() + 4);
     legendButton.setMinimumSize(legendButtonSize);
     legendButton.setPreferredSize(legendButtonSize);
     legendButton.setMaximumSize(legendButtonSize);
