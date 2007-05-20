@@ -22,7 +22,6 @@
 package free.util.swing;
 
 import java.awt.Image;
-import java.awt.Insets;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -81,11 +80,7 @@ public class IconButton extends JButton{
    */
   
   private void init(){
-    setFocusable(false);
-    setDefaultCapable(false);
-    setBorderPainted(false);
-    setContentAreaFilled(false);
-    setMargin(new Insets(0, 0, 0, 0));
+    SwingUtils.confIconButton(this, null);
   }
   
   
