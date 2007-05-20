@@ -21,12 +21,13 @@
 
 package free.jin.action;
 
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -44,14 +45,6 @@ import free.jin.User;
  */
  
 public abstract class JinAction extends AbstractAction{
-  
-  
-  
-  /**
-   * The key for this action's icon image.
-   */
-  
-  public static final String ICON_IMAGE = "iconImage";
   
   
   
@@ -81,22 +74,23 @@ public abstract class JinAction extends AbstractAction{
   
   
   /**
-   * Creates a new <code>JinAction</code> with the specified name (possibly
-   * appending an ellipsis to it) and icon image.
+   * Creates a new <code>JinAction</code> with the specified name, short
+   * description and icon.
    */
   
-  public JinAction(String name, Image iconImage){
+  public JinAction(String name, String description, Icon icon){
     putValue(Action.NAME, name);
-    putValue(ICON_IMAGE, iconImage);
+    putValue(Action.SHORT_DESCRIPTION, description);
+    putValue(Action.SMALL_ICON, icon);
   }
   
   
   
   /**
-   * Creates a new <code>JinAction</code> with its name, short and long
-   * descriptions retrieved from its I18n using
-   * {@link I18n#initAction(Action, String)} and its icon image loaded from a
-   * resource named <code>getId() + ".png"</code> (if such a resource exists).
+   * Creates a new <code>JinAction</code> with its name and short descriptions
+   * retrieved from its I18n using {@link I18n#initAction(Action, String)} and
+   * its icon image loaded from a resource named <code>getId() + ".png"</code>
+   * (if such a resource exists).
    */
   
   public JinAction(){
@@ -104,7 +98,7 @@ public abstract class JinAction extends AbstractAction{
     
     URL iconURL = getClass().getResource(getId() + ".png");
     if (iconURL != null)
-      putValue(ICON_IMAGE, Toolkit.getDefaultToolkit().getImage(iconURL));
+      putValue(Action.SMALL_ICON, new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconURL)));
   }
   
   
