@@ -28,6 +28,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.StringTokenizer;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -225,6 +226,21 @@ public class SwingUtils{
     
     if (!isMacLnF())
       mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+  }
+  
+  
+  
+  /**
+   * Creates a label for each line in the specified string.
+   */
+  
+  public static JLabel [] labelsForLines(String text){
+    StringTokenizer tokenizer = new StringTokenizer(text, "\r\n");
+    JLabel [] labels = new JLabel[tokenizer.countTokens()];
+    for (int i = 0; i < labels.length; i++)
+      labels[i] = new JLabel(tokenizer.nextToken());
+    
+    return labels;
   }
   
   
