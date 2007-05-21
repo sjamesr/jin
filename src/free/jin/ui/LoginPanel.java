@@ -595,7 +595,7 @@ public class LoginPanel extends DialogPanel{
               .add(hostnameBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
               .add(portsField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
             )
-            .addPreferredGap(LayoutStyle.RELATED)
+            .addPreferredGap(LayoutStyle.UNRELATED)
             .add(layout.createParallelGroup(GroupLayout.LEADING, false)
               .add(serverWebsiteLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
               .add(registerLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
