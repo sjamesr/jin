@@ -22,9 +22,13 @@
 package free.jin;
 
 import java.io.IOException;
-import free.jin.event.*;
+import java.net.URL;
+
 import free.chess.Move;
 import free.chess.WildVariant;
+import free.jin.event.ChatEvent;
+import free.jin.event.JinEvent;
+import free.jin.event.ListenerManager;
 
 
 /**
@@ -238,6 +242,16 @@ public interface Connection{
    */
   
   ServerUser userForName(String name);
+  
+  
+  
+  /**
+   * Returns the URL of a picture/avatar of the specified user, or
+   * <code>null</code> if none, or unsupported. It is not guaranteed that there
+   * is an actual image at the URL.
+   */
+  
+  URL getPlayerPictureURL(ServerUser user);
   
   
   

@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -590,6 +592,20 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   public ServerUser userForName(String name){
     return ChessclubUser.get(name);
+  }
+  
+  
+  
+  /**
+   * Returns the ICC mugshot for the specified user.
+   */
+  
+  public URL getPlayerPictureURL(ServerUser user){
+    try{
+      return new URL("http://www.chessclub.com/mugshots/" + user.getName() + ".jpg");
+    } catch (MalformedURLException e){
+        return null;
+      }
   }
 
 
