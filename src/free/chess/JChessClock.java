@@ -27,6 +27,8 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -283,6 +285,9 @@ public class JChessClock extends AbstractChessClock{
    */
   
   public void paintComponent(Graphics g){
+    Graphics2D g2d = (Graphics2D)g;
+    g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    
     String text = createTimeString(getTime());
     int width = getWidth();
     int height = getHeight();
@@ -304,9 +309,25 @@ public class JChessClock extends AbstractChessClock{
     g.setColor(fgColor);
     g.setFont(lastFont);
     int x = 0;
-    int maxAscent = lastFontMetrics.getMaxAscent();
-    int y = maxAscent + (height - maxAscent) / 2;
+    int ascent = lastFontMetrics.getAscent();
+    int y = ascent + (height - ascent) / 2;
+    
     g.drawString(text, x, y);
+  }
+  
+  
+  
+  /**
+   * Returns the preferred width of this <code>JChessClock</code> when displayed
+   * at the specified height.
+   */
+  
+  public int getPreferredWidth(int height){
+    String text = createTimeString(getTime());
+    Font font = getFont();
+    Font prefFont = font.deriveFont((float)height);
+    FontMetrics fm = GraphicsUtilities.getFontMetrics(prefFont);
+    return fm.stringWidth(text);
   }
   
   
