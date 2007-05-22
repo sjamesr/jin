@@ -98,30 +98,6 @@ public class JChessClock extends AbstractChessClock{
   
   
   /**
-   * The size of the JChessClock the last time it was painted.
-   */
-  
-  private final Dimension lastSize = new Dimension();
-  
-  
-  
-  /**
-   * The Font we used the last time this JChessClock was painted.
-   */
-  
-  private Font lastFont = null;
-  
-  
-  
-  /**
-   * The FontMetrics of the font we used the last time this JChessClock was painted.
-   */
-  
-  private FontMetrics lastFontMetrics = null;
-  
-  
-  
-  /**
    * Creates a new JChessClock with the given initial amount of time 
    * (in milliseconds) on it.
    */
@@ -268,19 +244,6 @@ public class JChessClock extends AbstractChessClock{
   
   
   /**
-   * Determines and returns the largest font of the same kind as the given Font
-   * with which the given text can be drawn so that it still fits into the given
-   * width and height.
-   */
-  
-  protected Font findLargestFittingFont(String text, int width, int height, Graphics g, Font font){
-    int maxSize = GraphicsUtilities.getMaxFittingFontSize(g, font, text, new Dimension(width, 6*height/7));
-    return font.deriveFont((float)maxSize);
-  }
-  
-  
-  
-  /**
    * Overrides JComponent.paintComponent(Graphics) to paint this JChessClock.
    */
   
@@ -288,16 +251,8 @@ public class JChessClock extends AbstractChessClock{
     Graphics2D g2d = (Graphics2D)g;
     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     
-    String text = createTimeString(getTime());
     int width = getWidth();
     int height = getHeight();
-    if ((width != lastSize.width) || (height != lastSize.height)){
-      lastSize.width = getWidth();
-      lastSize.height = getHeight();
-      
-      lastFont = findLargestFittingFont(text, lastSize.width, lastSize.height, g, getFont());
-      lastFontMetrics = g.getFontMetrics(lastFont);
-    }
     
     Color bgColor = isActive() ? getActiveBackground() : getInactiveBackground();
     if (bgColor != null){
@@ -307,12 +262,11 @@ public class JChessClock extends AbstractChessClock{
     
     Color fgColor = isActive() ? getActiveForeground() : getInactiveForeground();
     g.setColor(fgColor);
-    g.setFont(lastFont);
-    int x = 0;
-    int ascent = lastFontMetrics.getAscent();
-    int y = ascent + (height - ascent) / 2;
     
-    g.drawString(text, x, y);
+    String text = createTimeString(getTime());
+    g.setFont(getFont().deriveFont((float)height));
+    FontMetrics fm = g.getFontMetrics();
+    g.drawString(text, 0, height/2 + (fm.getAscent() - fm.getDescent())/2);
   }
   
   
