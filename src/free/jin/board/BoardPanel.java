@@ -1272,7 +1272,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       buttonPanel.setBounds(x , y + height - buttonPanelPrefSize.height, width, buttonPanelPrefSize.height);
       height -= buttonPanelPrefSize.height + GAP;
       
-      if (height >= moveListTableScrollPane.getMinimumSize().height)
+      if (height >= 40)
         moveListTableScrollPane.setBounds(x, y, width, height);
       else
         moveListTableScrollPane.setBounds(0, 0, 0, 0);
