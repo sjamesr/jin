@@ -252,6 +252,20 @@ public class AWTUtilities{
     return (size1.width <= size2.width) && (size1.height <= size2.height);
   }
   
+  
+  
+  /**
+   * Adds the specified <code>Insets</code> to the specified
+   * <code>Dimension</code> and returns it. 
+   */
+  
+  public static Dimension augmentSize(Dimension size, Insets insets){
+    size.width += insets.left + insets.right;
+    size.height += insets.top + insets.bottom;
+    
+    return size;
+  }
+  
 
 
 }
