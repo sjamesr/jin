@@ -21,10 +21,7 @@
 
 package free.jin.board;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
@@ -41,8 +38,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Vector;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,7 +49,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -88,12 +82,12 @@ import free.jin.event.OfferEvent;
 import free.jin.event.PositionChangedEvent;
 import free.jin.event.TakebackEvent;
 import free.util.PlatformUtils;
-import free.util.SquareLayout;
 import free.util.Utilities;
 import free.util.models.ModelUtils;
 import free.util.swing.FullscreenPanel;
 import free.util.swing.NonEditableTableModel;
 import free.util.swing.SwingUtils;
+import free.util.swing.WrapLayout;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 
@@ -237,19 +231,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * The AbstractChessClock displaying the time on white's clock.
+   * The JChessClock displaying the time on white's clock.
    */
 
-  protected AbstractChessClock whiteClock;
+  protected JChessClock whiteClock;
 
 
 
 
   /**
-   * The AbstractChessClock displaying the time on black's clock.
+   * The JChessClock displaying the time on black's clock.
    */
 
-  protected AbstractChessClock blackClock;
+  protected JChessClock blackClock;
 
 
 
@@ -404,10 +398,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     this.fullscreenPanel = new FullscreenPanel(contentPanel);
     fullscreenPanel.setAllowExclusiveMode(false); // Too buggy
 
-    init(game);
+    init();
 
-    setLayout(new BorderLayout());
-    add(fullscreenPanel, BorderLayout.CENTER);
+    setLayout(WrapLayout.getInstance());
+    add(fullscreenPanel);
 
     // Fullscreen mode locks up the application under OS X (older versions of Java).
     // Fullscreen mode is broken under Java 1.5.0 when used as an Applet, see
@@ -479,17 +473,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * components and add them.
    */
 
-  protected void init(Game game){
+  protected void init(){
     isFlipped = game.isBoardInitiallyFlipped();
     highlightOwnMoves = boardManager.isHighlightingOwnMoves();
     moveSendingMode = boardManager.getMoveSendingMode();
+    
     createComponents(game);
     
-//    addComponents(game, isFlipped); 
-    // We're not adding them because the layout depends on the size, which is unknown at this point.
-    // See the doLayout() method.
+    addComponents(); 
   }
-  
   
   
   
@@ -538,20 +530,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
 
   /**
-   * This method is meant to create all the sub-components used by the BoardPanel.
-   * The default implementation delegates the creation to the following methods:
-   * <UL>
-   *   <LI> {@link #createBoard(Game)}
-   *   <LI> {@link #createGameLabel(Game)}
-   *   <LI> {@link #createWhiteLabel(Game)}
-   *   <LI> {@link #createBlackLabel(Game)}
-   *   <LI> {@link #createWhiteClock(Game)}
-   *   <LI> {@link #createBlackClock(Game)}
-   *   <LI> {@link #createButtonPanel(Game)}
-   *   <LI> {@link #createMoveListTableModel(Game)}
-   *   <LI> {@link #createMoveListTable(Game, TableModel)}
-   *   <LI> {@link #createPositionScrollBar(Game)}
-   * </UL>
+   * This method is meant to create all the sub-components used by the
+   * BoardPanel.
    */
 
   protected void createComponents(Game game){
@@ -597,6 +577,25 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     positionScrollBar.addAdjustmentListener(this);
 
     updateClockActiveness();
+  }
+  
+  
+  
+  /**
+   * Adds all the components to the content panel.
+   */
+  
+  private void addComponents(){
+    contentPanel.add(board);
+    contentPanel.add(whiteLabel);
+    contentPanel.add(blackLabel);
+    contentPanel.add(whiteClock);
+    contentPanel.add(blackClock);
+    contentPanel.add(gameLabel);
+    contentPanel.add(positionScrollBar);
+    contentPanel.add(moveListTableScrollPane);
+    contentPanel.add(buttonPanel);
+    contentPanel.add(fullscreenButton);
   }
 
 
@@ -713,7 +712,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected JLabel createGameLabel(Game game){
     JLabel gameLabel = new JLabel(createGameLabelText(game));
-    gameLabel.setFont(new Font("SansSerif", Font.PLAIN, 20));
+    gameLabel.setFont(gameLabel.getFont().deriveFont(20f));
     return gameLabel;
   }
 
@@ -746,7 +745,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected JLabel createWhiteLabel(Game game){
     JLabel whiteLabel = new JLabel(createWhiteLabelText(game));
-    whiteLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+    whiteLabel.setFont(whiteLabel.getFont().deriveFont(20f).deriveFont(Font.BOLD));
     return whiteLabel;
   }
 
@@ -770,7 +769,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
 
   protected JLabel createBlackLabel(Game game){
     JLabel blackLabel = new JLabel(createBlackLabelText(game));
-    blackLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+    blackLabel.setFont(whiteLabel.getFont().deriveFont(20f).deriveFont(Font.BOLD));
     return blackLabel;
   }
 
@@ -816,8 +815,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * on white's clock.
    */
 
-  protected AbstractChessClock createWhiteClock(Game game){
-    return new JChessClock(game.getWhiteTime());
+  protected JChessClock createWhiteClock(Game game){
+    JChessClock clock = new JChessClock(game.getWhiteTime());
+    clock.setTimeDependentDisplayModeThresholds(Integer.MAX_VALUE, 10*1000);
+    return clock;
   }
 
 
@@ -828,8 +829,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * on black's clock.
    */
 
-  protected AbstractChessClock createBlackClock(Game game){
-    return new JChessClock(game.getBlackTime());
+  protected JChessClock createBlackClock(Game game){
+    JChessClock clock = new JChessClock(game.getBlackTime());
+    clock.setTimeDependentDisplayModeThresholds(Integer.MAX_VALUE, 10*1000);
+    return clock;
   }
 
 
@@ -1113,262 +1116,350 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * The panel actually containing all the components.
    */
 
-  private class ContentPanel extends FixedJPanel{
-
-
-
+  private class ContentPanel extends JPanel{
+    
+    
+    
     /**
-     * True when we need to re-add all the components.
+     * The gap between the container and components
      */
-
-    private boolean reAddComponents = true;
-
-
-
-
+    
+    private static final int CONTAINER_GAP = 6;
+    
+    
+    
     /**
-     * Are we currently in vertical layout (width < height)? null for when we
-     * don't know yet.
+     * The gap between components.
      */
-
-    private boolean isVerticalLayout;
-
-
-
+    
+    private static final int GAP = 6;
+    
+    
+    
     /**
-     * The panel containing all the components displaying information about the
-     * game (horizontal mode).
+     * Creates a new <code>ContentPanel</code>.
      */
-
-    private JPanel infoBox;
-
-
-
-    /**
-     * The top info panel in vertical mode.
-     */
-
-    private JPanel topInfoBox;
-
-
-
-    /**
-     * The bottom info panel in vertical mode.
-     */
-
-    private JPanel bottomInfoBox;
-
-
-
-
-    /**
-     * Adds all the components created by {@link #createComponents(Game)} to this
-     * BoardPanel. The isFlipped flag specifies if the layout of the components
-     * should be flipped because black should be displayed at the bottom. This method
-     * can be called many times because the user may want to flip the board, so
-     * it shouldn't do any one time initializations.
-     */
-
-    protected void addComponents(Game game, boolean flipped){
-      this.setLayout(null); // See the doLayout() method
-
-      this.add(board);
-
-      if (isVerticalLayout){
-        topInfoBox = new JPanel();
-        topInfoBox.setBorder(new EmptyBorder(5,5,5,5));
-        topInfoBox.setLayout(new BoxLayout(topInfoBox, BoxLayout.X_AXIS));
-
-        bottomInfoBox = new JPanel();
-        bottomInfoBox.setBorder(new EmptyBorder(5,5,5,5));
-        bottomInfoBox.setLayout(new BoxLayout(bottomInfoBox, BoxLayout.X_AXIS));
-
-        whiteClock.setMaximumSize(whiteClock.getPreferredSize());
-        blackClock.setMaximumSize(blackClock.getPreferredSize());
-
-        int labelWidth = Math.max(whiteLabel.getPreferredSize().width,
-                                    blackLabel.getPreferredSize().width);
-        int labelHeight = Math.max(whiteLabel.getPreferredSize().height,
-                                    blackLabel.getPreferredSize().height);
-        whiteLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-        blackLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-        whiteLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
-        blackLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
-
-        fullscreenButton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
-        if (flipped){
-          whiteLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-          whiteClock.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
-          blackLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-          blackClock.setAlignmentY(Component.TOP_ALIGNMENT);
-
-          topInfoBox.add(whiteLabel);
-          topInfoBox.add(Box.createHorizontalStrut(10));
-          topInfoBox.add(fullscreenButton);
-          topInfoBox.add(Box.createHorizontalGlue());
-          topInfoBox.add(whiteClock);
-
-          bottomInfoBox.add(blackLabel);
-          bottomInfoBox.add(Box.createHorizontalGlue());
-          bottomInfoBox.add(blackClock);
-        }
-        else{
-          whiteLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-          whiteClock.setAlignmentY(Component.TOP_ALIGNMENT);
-
-          blackLabel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-          blackClock.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-
-          topInfoBox.add(blackLabel);
-          topInfoBox.add(Box.createHorizontalStrut(10));
-          topInfoBox.add(fullscreenButton);
-          topInfoBox.add(Box.createHorizontalGlue());
-          topInfoBox.add(blackClock);
-
-          bottomInfoBox.add(whiteLabel);
-          bottomInfoBox.add(Box.createHorizontalGlue());
-          bottomInfoBox.add(whiteClock);
-        }
-
-        this.add(topInfoBox);
-        this.add(bottomInfoBox);
-      }
-      else{
-        whiteClock.setMaximumSize(new Dimension(Integer.MAX_VALUE, whiteClock.getPreferredSize().height));
-        blackClock.setMaximumSize(new Dimension(Integer.MAX_VALUE, blackClock.getPreferredSize().height));
-
-        // This could have been changed in vertical layout mode
-        whiteLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-        whiteClock.setAlignmentY(Component.CENTER_ALIGNMENT);
-        blackLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-        blackClock.setAlignmentY(Component.CENTER_ALIGNMENT);
-        fullscreenButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        JComponent whiteLabelBox = new JPanel(new BorderLayout());
-        whiteLabelBox.add(whiteLabel, BorderLayout.CENTER);
-
-        JComponent blackLabelBox = new JPanel(new BorderLayout());
-        blackLabelBox.add(blackLabel, BorderLayout.CENTER);
-        
-        Container fullscreenButtonWrapper = 
-          SquareLayout.createSquareContainer(fullscreenButton);
-
-        if (flipped)
-          whiteLabelBox.add(fullscreenButtonWrapper, BorderLayout.EAST);
-        else
-          blackLabelBox.add(fullscreenButtonWrapper, BorderLayout.EAST);
-
-        Box gameLabelBox = Box.createHorizontalBox();
-        gameLabelBox.add(gameLabel);
-        gameLabelBox.add(Box.createHorizontalGlue());
-
-        JPanel upperBox = new JPanel(null);
-        upperBox.setLayout(new BoxLayout(upperBox, BoxLayout.Y_AXIS));
-        JPanel middleBox = new JPanel(null);
-        middleBox.setLayout(new BoxLayout(middleBox, BoxLayout.Y_AXIS));
-        JPanel bottomBox = new JPanel(null);
-        bottomBox.setLayout(new BoxLayout(bottomBox, BoxLayout.Y_AXIS));
-
-        if (flipped){
-          upperBox.add(whiteLabelBox);
-          upperBox.add(Box.createVerticalStrut(10));
-          upperBox.add(whiteClock);
-          middleBox.add(Box.createVerticalStrut(10));
-          middleBox.add(gameLabelBox);
-          middleBox.add(Box.createVerticalStrut(10));
-          middleBox.add(positionScrollBar);
-          middleBox.add(Box.createVerticalStrut(5));
-          middleBox.add(moveListTableScrollPane);
-          middleBox.add(Box.createVerticalStrut(10));
-          if (buttonPanel != null){
-            middleBox.add(buttonPanel);
-            middleBox.add(Box.createVerticalStrut(10));
-          }
-          bottomBox.add(blackClock);
-          bottomBox.add(Box.createVerticalStrut(10));
-          bottomBox.add(blackLabelBox);
-        }
-        else{
-          upperBox.add(blackLabelBox);
-          upperBox.add(Box.createVerticalStrut(10));
-          upperBox.add(blackClock);
-          middleBox.add(Box.createVerticalStrut(10));
-          middleBox.add(gameLabelBox);
-          middleBox.add(Box.createVerticalStrut(10));
-          middleBox.add(positionScrollBar);
-          middleBox.add(Box.createVerticalStrut(10));
-          middleBox.add(moveListTableScrollPane);
-          middleBox.add(Box.createVerticalStrut(10));
-          if (buttonPanel != null){
-            middleBox.add(buttonPanel);
-            middleBox.add(Box.createVerticalStrut(10));
-          }
-          bottomBox.add(whiteClock);
-          bottomBox.add(Box.createVerticalStrut(10));
-          bottomBox.add(whiteLabelBox);
-        }
-        infoBox = new JPanel(null);
-        infoBox.setBorder(new EmptyBorder(5, 5, 5, 5));
-        infoBox.setLayout(new BorderLayout());
-
-        infoBox.add(upperBox, BorderLayout.NORTH);
-        infoBox.add(middleBox, BorderLayout.CENTER);
-        infoBox.add(bottomBox, BorderLayout.SOUTH);
-
-        this.add(infoBox);
-      }
-
+    
+    public ContentPanel(){
+      setLayout(null);
     }
-
-
-
-    /**
-     * Sets reAddComponents to true.
+    
+    
+    
+    /*
+     * Preferred sizes of our children.
      */
-
-    public void addNotify(){
-      reAddComponents = true;
-
-      super.addNotify();
-    }
-
-
-
+    
+    private Dimension whiteLabelPrefSize = null;
+    private Dimension blackLabelPrefSize = null;
+    private Dimension fullscreenButtonPrefSize = null;
+    private Dimension gameLabelPrefSize = null;
+    private Dimension positionScrollbarPrefSize = null;
+    private Dimension moveListTableScrollPanePrefSize = null;
+    private Dimension buttonPanelPrefSize = null;
+    
+    
+    
     /**
-     * Lays out this BoardPanel.
+     * Determines whether at the current size we should be in horizontal mode.
+     */
+    
+    private boolean isHorizontal(){
+      return (getWidth() - 20 > getHeight()) || (getWidth() == 0) || (getHeight() == 0);
+    }
+    
+    /**
+     * Lays out the panel.
      */
 
     public void doLayout(){
-      Dimension size = this.getSize();
-
-      boolean newIsVerticalLayout = size.width < size.height;
-      if (reAddComponents || (isVerticalLayout != newIsVerticalLayout)){
-        this.removeAll();
-        reAddComponents = false;
-        isVerticalLayout = newIsVerticalLayout;
-        addComponents(game, isFlipped());
-      }
-
-      if (isVerticalLayout){
-        int infoBoxHeight = (size.height - size.width) / 2;
-        topInfoBox.setBounds(0, 0, size.width, infoBoxHeight);
-        board.setBounds(0, infoBoxHeight, size.width, size.width);
-        bottomInfoBox.setBounds(0, size.height - infoBoxHeight, size.width, infoBoxHeight);
+      calcPrefSizes();
+      
+      if (isHorizontal())
+        layoutHorizontal();
+      else
+        layoutVertical();
+    }
+    
+    
+    
+    /**
+     * Queries our children for their preferred sizes.
+     */
+    
+    private void calcPrefSizes(){
+      if (whiteLabelPrefSize == null)
+        whiteLabelPrefSize = whiteLabel.getPreferredSize();
+      if (blackLabelPrefSize == null)
+        blackLabelPrefSize = blackLabel.getPreferredSize();
+      if (fullscreenButtonPrefSize == null)
+        fullscreenButtonPrefSize = fullscreenButton.getPreferredSize();
+      if (gameLabelPrefSize == null)
+        gameLabelPrefSize = gameLabel.getPreferredSize();
+      if (positionScrollbarPrefSize == null)
+        positionScrollbarPrefSize = positionScrollBar.getPreferredSize();
+      if (moveListTableScrollPanePrefSize == null)
+        moveListTableScrollPanePrefSize = moveListTableScrollPane.getPreferredSize();
+      if (buttonPanelPrefSize == null)
+        buttonPanelPrefSize = buttonPanel.getPreferredSize();
+    }
+    
+    
+    
+    /**
+     * Lays out the panel in horizontal mode.
+     */
+    
+    private void layoutHorizontal(){
+      int width = getWidth();
+      int height = getHeight();
+      
+      int boardSize = (height/8)*8;
+      board.setBounds(0, (height - boardSize)/2, boardSize, boardSize);
+      
+      fullscreenButton.setBounds(width - fullscreenButtonPrefSize.width - CONTAINER_GAP, CONTAINER_GAP,
+          fullscreenButtonPrefSize.width, fullscreenButtonPrefSize.height);
+      
+      int x = board.getWidth() + CONTAINER_GAP;
+      int y = board.getY();
+      width -= x + CONTAINER_GAP;
+      height = boardSize;
+      
+      JComponent topLabel, bottomLabel, topClock, bottomClock;
+      Dimension topLabelPrefSize, bottomLabelPrefSize;
+      
+      if (isFlipped){
+        topLabel = whiteLabel;
+        topClock = whiteClock;
+        bottomLabel = blackLabel;
+        bottomClock = blackClock;
+        topLabelPrefSize = whiteLabelPrefSize;
+        bottomLabelPrefSize = blackLabelPrefSize;
       }
       else{
-        board.setBounds(0, 0, size.height, size.height);
-        infoBox.setBounds(size.height, 0, size.width-size.height, size.height);
+        topLabel = blackLabel;
+        topClock = blackClock;
+        bottomLabel = whiteLabel;
+        bottomClock = whiteClock;
+        topLabelPrefSize = blackLabelPrefSize;
+        bottomLabelPrefSize = whiteLabelPrefSize;
+      }
+      
+      int clockHeight = height/10;
+      
+      topLabel.setBounds(x, y, fullscreenButton.getX() - x - GAP, topLabelPrefSize.height);
+      y += topLabel.getHeight() + GAP;
+      height -= topLabel.getHeight() + GAP;
+        
+      topClock.setBounds(x, y, width, clockHeight);
+      y += topClock.getHeight() + GAP;
+      height -= topClock.getHeight() + GAP;
+      
+      gameLabel.setBounds(x, y, width, gameLabelPrefSize.height);
+      y += gameLabel.getHeight() + GAP;
+      height -= gameLabel.getHeight() + GAP;
+      
+      positionScrollBar.setBounds(x, y, width, positionScrollbarPrefSize.height);
+      y += positionScrollBar.getHeight() + GAP;
+      height -= positionScrollBar.getHeight() + GAP;
+      
+      bottomLabel.setBounds(x, y + height - bottomLabelPrefSize.height, width, bottomLabelPrefSize.height);
+      height -= bottomLabel.getHeight() + GAP;
+      
+      bottomClock.setBounds(x, y + height - clockHeight, width, clockHeight);
+      height -= bottomClock.getHeight() + GAP;
+      
+      buttonPanel.setBounds(x , y + height - buttonPanelPrefSize.height, width, buttonPanelPrefSize.height);
+      height -= buttonPanelPrefSize.height + GAP;
+      
+      if (height >= moveListTableScrollPane.getMinimumSize().height)
+        moveListTableScrollPane.setBounds(x, y, width, height);
+      else
+        moveListTableScrollPane.setBounds(0, 0, 0, 0);
+    }
+    
+    
+    
+    /**
+     * Lays out the panel in vertical mode.
+     */
+    
+    private void layoutVertical(){
+      JComponent topLabel, bottomLabel;
+      JChessClock topClock, bottomClock;
+      Dimension topLabelPrefSize, bottomLabelPrefSize;
+      if (isFlipped){
+        topLabel = whiteLabel;
+        topClock = whiteClock;
+        bottomLabel = blackLabel;
+        bottomClock = blackClock;
+        topLabelPrefSize = whiteLabelPrefSize;
+        bottomLabelPrefSize = blackLabelPrefSize;
+      }
+      else{
+        topLabel = blackLabel;
+        topClock = blackClock;
+        bottomLabel = whiteLabel;
+        bottomClock = whiteClock;
+        topLabelPrefSize = blackLabelPrefSize;
+        bottomLabelPrefSize = whiteLabelPrefSize;
+      }
+      
+      buttonPanel.setBounds(0, 0, 0, 0);
+      positionScrollBar.setBounds(0, 0, 0, 0);
+      moveListTableScrollPane.setBounds(0, 0, 0, 0);
+      
+      
+      int x = CONTAINER_GAP;
+      int y = CONTAINER_GAP;
+      int width = getWidth() - 2*CONTAINER_GAP;
+      int height = getHeight() - 2*CONTAINER_GAP;
+      
+      int clockWidth = Math.max(
+          topClock.getPreferredWidth(topLabelPrefSize.height),
+          bottomClock.getPreferredWidth(bottomLabelPrefSize.height));
+      
+      fullscreenButton.setBounds(x + width - CONTAINER_GAP - fullscreenButtonPrefSize.width, CONTAINER_GAP,
+          fullscreenButtonPrefSize.width, fullscreenButtonPrefSize.height);
+      
+      gameLabel.setBounds(x, y, gameLabelPrefSize.width, gameLabelPrefSize.height);
+      y += gameLabel.getHeight() + GAP;
+      height -= gameLabel.getHeight() + GAP;
+      
+      topLabel.setBounds(x, y, topLabelPrefSize.width, topLabelPrefSize.height);
+      topClock.setBounds(x + width - clockWidth, y, clockWidth, topLabelPrefSize.height);
+      y += topLabel.getHeight() + GAP;
+      height -= topLabel.getHeight() + GAP;
+      
+      int boardSize = (Math.min(height - bottomLabelPrefSize.height - 2*GAP - CONTAINER_GAP, width)/8)*8;
+      board.setBounds((getWidth() - boardSize)/2, y, boardSize, boardSize);
+      y += board.getHeight() + GAP;
+      height -= board.getHeight() + GAP;
+      
+      bottomLabel.setBounds(x, y, bottomLabelPrefSize.width, bottomLabelPrefSize.height);
+      bottomClock.setBounds(x + width - clockWidth, y, clockWidth, bottomLabelPrefSize.height);
+      if ((buttonPanelPrefSize.width <= bottomClock.getX() - bottomLabel.getX() - bottomLabel.getWidth() - 2*GAP) &&
+          (height >= buttonPanelPrefSize.height))
+        buttonPanel.setBounds(bottomLabel.getX() + bottomLabel.getWidth() + GAP, y,
+            bottomClock.getX() - bottomLabel.getX() - bottomLabel.getWidth() - 2*GAP, buttonPanelPrefSize.height);
+      y += Math.max(bottomLabel.getHeight(), buttonPanel.getHeight()) + GAP;
+      height -= Math.max(bottomLabel.getHeight(), buttonPanel.getHeight()) + GAP;
+      
+      if ((buttonPanel.getHeight() == 0) && (height - CONTAINER_GAP >= buttonPanelPrefSize.height)){
+        buttonPanel.setBounds(x, y, width, buttonPanelPrefSize.height);
+        y += buttonPanel.getHeight() + GAP;
+        height -= buttonPanel.getHeight() + GAP;
       }
     }
-
-
+    
+    
+    /**
+     * Clears the remembered preferred sizes of the children.
+     */
+    
+    public void invalidate(){
+      super.invalidate();
+      
+      whiteLabelPrefSize = null;
+      blackLabelPrefSize = null;
+      fullscreenButtonPrefSize = null;
+      gameLabelPrefSize = null;
+      positionScrollbarPrefSize = null;
+      moveListTableScrollPanePrefSize = null;
+      buttonPanelPrefSize = null;
+    }
+    
+    
+    
+    /**
+     * Returns our preferred size.
+     */
+    
+    public Dimension getPreferredSize(){
+      calcPrefSizes();
+      
+      if (isHorizontal())
+        return getHorizontalPrefSize();
+      else
+        return getVerticalPrefSize();
+    }
+    
+    
+    
+    /**
+     * Returns our preferred size in horizontal mode.
+     */
+    
+    public Dimension getHorizontalPrefSize(){
+      return new Dimension(
+          320 + Math.max(
+              Math.max(blackLabelPrefSize.width, whiteLabelPrefSize.width) + fullscreenButtonPrefSize.width,
+              buttonPanelPrefSize.width) + 2*CONTAINER_GAP,
+          Math.max(320, blackLabelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
+              moveListTableScrollPanePrefSize.height + buttonPanelPrefSize.height + 30 + whiteLabelPrefSize.height +
+              7*GAP));
+    }
+    
+    
+    
+    /**
+     * Returns our preferred size in vertical mode.
+     */
+    
+    public Dimension getVerticalPrefSize(){
+      return new Dimension(320,
+          320 + blackLabelPrefSize.height + gameLabelPrefSize.height + 
+          Math.max(whiteLabelPrefSize.height, buttonPanelPrefSize.height) + 4*GAP + 2*CONTAINER_GAP);
+    }
+    
+    
+    
+    /**
+     * Returns our minimum size.
+     */
+    
+    public Dimension getMinimumSize(){
+      calcPrefSizes();
+      
+      if (isHorizontal())
+        return getHorizontalMinSize();
+      else
+        return getVerticalMinSize();
+    }
+    
+    
+    
+    /**
+     * Returns our minimum size in horizontal mode.
+     */
+    
+    public Dimension getHorizontalMinSize(){
+      return new Dimension(
+          240 + Math.max(
+              Math.max(blackLabelPrefSize.width, whiteLabelPrefSize.width) + fullscreenButtonPrefSize.width,
+              buttonPanelPrefSize.width) + 2*CONTAINER_GAP,
+          Math.max(240, blackLabelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
+              buttonPanelPrefSize.height + 30 + whiteLabelPrefSize.height +
+              6*GAP));
+    }
+    
+    
+    
+    /**
+     * Returns our minimum size in vertical mode.
+     */
+    
+    public Dimension getVerticalMinSize(){
+      return new Dimension(240,
+          240 + blackLabelPrefSize.height + gameLabelPrefSize.height + whiteLabelPrefSize.height + 3*GAP + 2*CONTAINER_GAP);
+    }
+    
+    
+    
   }
-
-
-
-
+  
+  
+  
   /**
    * Returns true if the BoardPanel is flipped (black at bottom).
    */
@@ -1391,7 +1482,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (isFlipped() != b){
       isFlipped = b;
       board.setFlipped(isFlipped);
-      contentPanel.reAddComponents = true;
       contentPanel.revalidate();
     }
   }
@@ -2055,14 +2145,16 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       else if ("gameType".equals(propertyName) || "played".equals(propertyName)){
         configureBoardFromGame(game, board);
         board.setEditable(isUserTurn() || (moveSendingMode != BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE));
+        
+        contentPanel.remove(buttonPanel);
+        contentPanel.remove(gameLabel);
         buttonPanel = createButtonPanel(game);
         gameLabel = createGameLabel(game);
-        contentPanel.reAddComponents = true;
+        contentPanel.add(buttonPanel);
+        contentPanel.add(gameLabel);
+        
         contentPanel.revalidate();
       }
-      
-        
-      // implement the rest of the properties.
     }
   }
 
