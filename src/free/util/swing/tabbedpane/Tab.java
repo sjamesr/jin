@@ -22,13 +22,13 @@
 package free.util.swing.tabbedpane;
 
 import java.awt.Component;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import javax.swing.Icon;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.SwingPropertyChangeSupport;
+
+import free.util.Utilities;
 
 
 /**
@@ -80,10 +80,10 @@ public class Tab{
   
   
   /**
-   * Our change listeners.
+   * Property change support.
    */
   
-  private final List changeListeners = new LinkedList();
+  private final PropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
   
   
   
@@ -110,35 +110,21 @@ public class Tab{
   
   
   /**
-   * Adds a change listener to this tab.
+   * Adds a property change listener.
    */
   
-  public void addChangeListener(ChangeListener listener){
-    changeListeners.add(listener);
+  public void addPropertyChangeListener(PropertyChangeListener listener){
+    propertyChangeSupport.addPropertyChangeListener(listener);
   }
   
   
   
   /**
-   * Removes a change listener from this tab.
+   * Removes a property change listener.
    */
   
-  public void removeChangeListener(ChangeListener listener){
-    changeListeners.remove(listener);
-  }
-  
-  
-  
-  /**
-   * Fires a state change event.
-   */
-  
-  protected void fireStateChanged(){
-    ChangeEvent evt = new ChangeEvent(this);
-    for (Iterator i = changeListeners.iterator(); i.hasNext();){
-      ChangeListener listener = (ChangeListener)i.next();
-      listener.stateChanged(evt);
-    }
+  public void removePropertyChangeListener(PropertyChangeListener listener){
+    propertyChangeSupport.removePropertyChangeListener(listener);
   }
   
   
@@ -168,8 +154,13 @@ public class Tab{
    */
   
   public void setTitle(String title){
+    if (Utilities.areEqual(this.title, title))
+      return;
+    
+    String oldValue = this.title;
     this.title = title;
-    fireStateChanged();
+    
+    propertyChangeSupport.firePropertyChange("title", oldValue, title);
   }
   
   
@@ -189,8 +180,13 @@ public class Tab{
    */
   
   public void setIcon(Icon icon){
+    if (Utilities.areEqual(this.icon, icon))
+      return;
+    
+    Icon oldValue = this.icon;
     this.icon = icon;
-    fireStateChanged();
+    
+    propertyChangeSupport.firePropertyChange("icon", oldValue, title);
   }
   
   
@@ -210,8 +206,13 @@ public class Tab{
    */
   
   public void setCloseable(boolean isCloseable){
+    if (this.isCloseable == isCloseable)
+      return;
+    
+    boolean oldValue = this.isCloseable;
     this.isCloseable = isCloseable;
-    fireStateChanged();
+    
+    propertyChangeSupport.firePropertyChange("closeable", oldValue, isCloseable);
   }
   
   
@@ -237,7 +238,13 @@ public class Tab{
    */
   
   public void setTabCloseApprover(TabCloseApprover tabCloseApprover){
+    if (Utilities.areEqual(this.tabCloseApprover, tabCloseApprover))
+      return;
+    
+    TabCloseApprover oldValue = this.tabCloseApprover;
     this.tabCloseApprover = tabCloseApprover;
+    
+    propertyChangeSupport.firePropertyChange("tabCloseApprover", oldValue, tabCloseApprover);
   }
   
   
