@@ -39,6 +39,7 @@ import java.util.Vector;
 import javax.swing.SwingConstants;
 
 import free.jin.Connection;
+import free.jin.Game;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.ServerUser;
@@ -47,6 +48,10 @@ import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.ChatEvent;
 import free.jin.event.ChatListener;
 import free.jin.event.ConnectionListener;
+import free.jin.event.GameAdapter;
+import free.jin.event.GameEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.ListenerManager;
 import free.jin.event.PlainTextEvent;
@@ -158,6 +163,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * A game listener which invokes private methods for the events we care about.
+   */
+  
+  private final GameListener gameListener = new GameAdapter(){
+    public void gameStarted(GameStartEvent evt){
+      ConsoleManager.this.gameStarted(evt);
+    }
+  };
+  
+  
+  
+  /**
    * Starts this plugin.
    */
 
@@ -205,7 +222,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   private ConsoleDesignation loadConsoleDesignation(String prefsPrefix){
     Preferences prefs = getPrefs();
-    I18n i18n = getI18n();
 
     String type = prefs.getString(prefsPrefix + "type");
     if ("system".equals(type)){
@@ -220,28 +236,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     else if ("chat".equals(type)){
       boolean isCloseable = prefs.getBool(prefsPrefix + "closeable", true);
       return createGeneralChatConsoleDesignation(isCloseable);
-    }
-    else if ("customchat".equals(type)){
-      String name = prefs.getString(prefsPrefix + "name", null);
-      if (name == null)
-        name = i18n.getString(prefs.getString(prefsPrefix + "nameKey"));
-      
-      ChatConsoleDesignation designation =
-          new ChatConsoleDesignation(name, getEncoding(), false);
-      
-      int acceptedCount = prefs.getInt(prefsPrefix + "accepted.count");
-      for (int j = 0; j < acceptedCount; j++){
-        String acceptedPrefix = prefsPrefix + "accepted." + j + ".";
-        String chatType = prefs.getString(acceptedPrefix + "chatType", null);
-        Object forum = prefs.get(acceptedPrefix + "forum", null);
-        String senderName = prefs.getString(acceptedPrefix + "sender", null);
-        ServerUser sender = senderName == null ? 
-            null : getConn().userForName(senderName);
-        
-        designation.addAccepted(chatType, forum, sender);
-      }
-      
-      return designation;
     }
     else
       throw new IllegalArgumentException("Unrecognized designation type: " + type);
@@ -283,6 +277,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   protected abstract ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable);
+  
+  
+  
+  /**
+   * Creates a console designation for chat at a board.
+   */
+  
+  protected abstract ConsoleDesignation createGameConsoleDesignation(Game game);
   
   
   
@@ -389,9 +391,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       
       designation.addPropertyChangeListener(new PropertyChangeListener(){
         public void propertyChange(PropertyChangeEvent evt){
-          if ("name".equals(evt.getPropertyName())){
+          String propertyName = evt.getPropertyName();
+          if ("name".equals(propertyName))
             tab.setTitle(designation.getName());
-          }
+          else if ("consoleCloseable".equals(propertyName))
+            tab.setCloseable(designation.isConsoleCloseable());
         }
       });
         
@@ -430,10 +434,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * making it the active console. If one already exists, it is merely
    * activated, if <code>makeActive</code> is <code>true</code> (otherwise, no
    * action is taken).
+   * 
+   * @returns the newly created personal chat designation.
    */
   
-  public void addPersonalChatConsole(ServerUser user, boolean makeActive){
-    addConsole(createPersonalChatConsoleDesignation(user, true), makeActive);
+  public ConsoleDesignation addPersonalChatConsole(ServerUser user, boolean makeActive){
+    ConsoleDesignation designation = createPersonalChatConsoleDesignation(user, true);
+    addConsole(designation, makeActive);
+    return designation;
   }
   
   
@@ -541,6 +549,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     listenerManager.addPlainTextListener(this);
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
+    listenerManager.addGameListener(gameListener);
   }
 
 
@@ -557,6 +566,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     listenerManager.removePlainTextListener(this);
     listenerManager.removeChatListener(this);
     listenerManager.removeConnectionListener(this);
+    listenerManager.removeGameListener(gameListener);
   }
 
 
@@ -589,10 +599,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
 
   public void chatMessageReceived(ChatEvent evt){
-    if ((evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY) && 
-        getPrefs().getBool("newConsoleOnPersonalTell", false))
-      addPersonalChatConsole(evt.getSender(), false);
-      
     eventForConsoleReceived(evt);
   }
   
@@ -615,6 +621,17 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       if (designation != systemConsoleDesignation)
         handled |= console.getDesignation().receive(evt);
     }
+    
+    
+    // We open a new personal chat console only if the event wasn't already handled. 
+    if (!handled && (evt instanceof ChatEvent) && 
+        ((((ChatEvent)evt).getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY) && 
+        getPrefs().getBool("newConsoleOnPersonalTell", false))){
+      ChatEvent chatEvent = (ChatEvent)evt;
+      ConsoleDesignation designation = addPersonalChatConsole(chatEvent.getSender(), false);
+      handled |= designation.receive(evt);
+    }
+    
     
     // We treat the system console specially because we want it to only receive
     // events which weren't handled by any of the other consoles.
@@ -735,6 +752,17 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   // The rest of ConnectionListener's methods.
   public void connectingFailed(Connection conn, String reason){}
   public void loginFailed(Connection conn, String reason){}
+  
+  
+  
+  /**
+   * Invoked when a new game has started.
+   */
+  
+  protected void gameStarted(GameEvent evt){
+    if (getPrefs().getBool("newConsoleOnGameStart", false))
+      addConsole(createGameConsoleDesignation(evt.getGame()), false);
+  }
 
 
 
