@@ -58,20 +58,19 @@ public abstract class ICSGameConsoleDesignation extends GameConsoleDesignation{
   
   
   /**
-   * Accepts in-game chat. 
+   * Accepts certain "say" and "tell" chat events, in addition to what the
+   * superclass accepts. 
    */
   
   protected boolean accept(JinEvent evt){
-    if (isTaggedByUs(evt))
+    if (super.accept(evt))
       return true;
-
+    
     if (!(evt instanceof ChatEvent))
       return false;
     
     ChatEvent chatEvent = (ChatEvent)evt;
     String type = chatEvent.getType();
-    if ((game.getID().equals(chatEvent.getForum())) && ("kibitz".equals(type) || "whisper".equals(type)))
-      return true;
     
     ServerUser whitePlayer = connection.userForName(game.getWhiteName());
     ServerUser blackPlayer = connection.userForName(game.getBlackName());
