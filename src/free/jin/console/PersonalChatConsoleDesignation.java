@@ -46,14 +46,6 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Our sole command type.
-   */
-  
-  private final CommandType sendPersonalTell;
-  
-  
-  
-  /**
    * The number of unseen (added when the console is invisible) messages we've
    * received.
    */
@@ -63,16 +55,19 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Creates a new <code>PersonalChatConsoleDesignation</code> with the
-   * specified conversation partner, encoding, and closeable status.
+   * Creates a new <code>PersonalChatConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param conversationPartner The user we're talking to.
+   * @param encoding The encoding to use for the conversation.
+   * @param isConsoleCloseable Whether the console should be closeable.
    */
   
-  public PersonalChatConsoleDesignation(ServerUser conversationPartner, 
+  public PersonalChatConsoleDesignation(Connection connection, ServerUser conversationPartner, 
       String encoding, boolean isConsoleCloseable){
-    super(conversationPartner.getName(), encoding, isConsoleCloseable);
+    super(connection, conversationPartner.getName(), encoding, isConsoleCloseable);
     
     this.conversationPartner = conversationPartner;
-    this.sendPersonalTell = new SendPersonalTell();
   }
   
   
@@ -81,7 +76,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * Joins personal chat with out conversation partner.
    */
   
-  protected void joinForums(Connection connection){
+  protected void joinForums(){
     connection.joinPersonalChat(conversationPartner);
   }
   
@@ -103,8 +98,8 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * partner.
    */
   
-  public CommandType [] getCommandTypes(){
-    return new CommandType[]{sendPersonalTell};
+  public CommandType [] createCommandTypes(){
+    return new CommandType[]{new SendPersonalTell()};
   }
   
   
@@ -151,7 +146,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   protected String textForChat(ChatEvent evt){
     String senderName = evt.getSender().getName();
     String senderTitle = evt.getSenderTitle();
-    String message = decode(evt.getMessage(), evt.getConnection());
+    String message = decode(evt.getMessage());
     
     return senderName + (senderTitle == null ? "" : senderTitle) + ": " + message;
   }
@@ -194,8 +189,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
     
     
     /**
-     * Creates a new <code>SendPersonalTell</code> with the specified
-     * conversation parner.
+     * Creates a new <code>SendPersonalTell</code> command type.
      */
     
     public SendPersonalTell(){
@@ -209,8 +203,8 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
      * Sends the specified personal tell to our conversation partner. 
      */
     
-    protected void send(String message, Connection connection){
-      connection.sendPersonalTell(conversationPartner, encode(message, connection), getTag());
+    protected void send(String message){
+      connection.sendPersonalTell(conversationPartner, encode(message), getTag());
     }
     
     
@@ -219,9 +213,9 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
      * Echoes the message to the console.
      */
     
-    protected void echo(String userText, ServerUser user){
+    protected void echo(String userText){
       Console console = getConsole();
-      console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
+      console.addToOutput(connection.getUser().getName() + ": " + userText, console.getUserTextType());
     }
     
     

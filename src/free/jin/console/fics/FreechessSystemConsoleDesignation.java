@@ -21,6 +21,7 @@
 
 package free.jin.console.fics;
 
+import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.SystemConsoleDesignation;
@@ -37,12 +38,14 @@ public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   /**
-   * Creates a new <code>FreechessSystemConsoleDesignation</code> with the
-   * specified encoding.
+   * Creates a new <code>FreechessSystemConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
    */
   
-  public FreechessSystemConsoleDesignation(String encoding){
-    super(encoding);
+  public FreechessSystemConsoleDesignation(Connection connection, String encoding){
+    super(connection, encoding);
   }
   
   
@@ -57,7 +60,7 @@ public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
     ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
     String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
-    String message = decode(evt.getMessage(), evt.getConnection());
+    String message = decode(evt.getMessage());
     Object forum = evt.getForum();
     
     Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};

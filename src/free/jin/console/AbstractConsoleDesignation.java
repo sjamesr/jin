@@ -35,6 +35,7 @@ import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
 import free.util.AbstractNamed;
 import free.util.TextUtilities;
+import free.util.Utilities;
 
 
 
@@ -45,6 +46,14 @@ import free.util.TextUtilities;
  */
 
 public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
+  
+  
+  
+  /**
+   * The connection to the server.
+   */
+  
+  protected final Connection connection;
   
   
   
@@ -69,7 +78,15 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Whether the console is closeable.
    */
   
-  private final boolean isConsoleCloseable;
+  private boolean isConsoleCloseable;
+  
+  
+  
+  /**
+   * Our command types.
+   */
+  
+  private CommandType [] commandTypes = null;
   
   
   
@@ -90,15 +107,24 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
-   * Creates a new <code>AbstractConsoleDesignation</code> with the specified
-   * name, encoding and closeable status.
+   * Creates a new <code>AbstractConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param name The name of the console.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  public AbstractConsoleDesignation(String name, String encoding, boolean isConsoleCloseable){
+  public AbstractConsoleDesignation(Connection connection, String name, String encoding, boolean isConsoleCloseable){
+    if (connection == null)
+      throw new IllegalArgumentException("connection may not be null");
+    
+    this.connection = connection;
     this.name = name;
     this.encoding = encoding;
     this.isConsoleCloseable = isConsoleCloseable;
   }
+  
   
   
   
@@ -129,7 +155,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
       }
     });
     
-    joinForums(console.getConsoleManager().getConn());
+    joinForums();
   }
   
   
@@ -149,7 +175,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * designation accepts which need to be joined explicitly.
    */
   
-  protected void joinForums(Connection connection){
+  protected void joinForums(){
     
   }
   
@@ -210,6 +236,9 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected void setName(String name){
+    if (Utilities.areEqual(this.name, name))
+      return;
+    
     String oldName = this.name;
     this.name = name;
     
@@ -223,8 +252,8 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * connection's encoding and the encoding of this console designation.
    */
   
-  protected final String encode(String s, Connection conn){
-    return convert(s, encoding, conn.getTextEncoding());
+  protected final String encode(String s){
+    return convert(s, encoding, connection.getTextEncoding());
   }
   
   
@@ -234,8 +263,8 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * connection's encoding and the encoding of this console designation.
    */
   
-  protected final String decode(String s, Connection conn){
-    return convert(s, conn.getTextEncoding(), encoding);
+  protected final String decode(String s){
+    return convert(s, connection.getTextEncoding(), encoding);
   }
   
   
@@ -274,6 +303,22 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   public boolean isConsoleCloseable(){
     return isConsoleCloseable;
+  }
+  
+  
+  
+  /**
+   * Sets the closeable status of the console.
+   */
+  
+  protected void setConsoleCloseable(boolean isConsoleCloseable){
+    if (this.isConsoleCloseable == isConsoleCloseable)
+      return;
+    
+    boolean oldValue = this.isConsoleCloseable;
+    this.isConsoleCloseable = isConsoleCloseable;
+    
+    propertyChangeSupport.firePropertyChange("consoleCloseable", oldValue, isConsoleCloseable);
   }
   
   
@@ -344,7 +389,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     ServerUser sender = chatEvent.getSender();
     String title = chatEvent.getSenderTitle();
-    String message = decode(chatEvent.getMessage(), chatEvent.getConnection());
+    String message = decode(chatEvent.getMessage());
     
     String text = sender.getName() + title + ": " + message;
     String textType = console.textTypeForEvent(chatEvent);
@@ -359,7 +404,31 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected void appendPlainText(PlainTextEvent evt){
-    getConsole().addToOutput(decode(evt.getText(), evt.getConnection()), "plain");
+    getConsole().addToOutput(decode(evt.getText()), "plain");
+  }
+  
+  
+  
+  /**
+   * Creates the command types we're capable of sending. This method will only
+   * be invoked once.
+   */
+  
+  protected abstract CommandType [] createCommandTypes();
+  
+  
+  
+  /**
+   * Returns the command types we're capable of sending. This method invokes
+   * {@link #createCommandTypes()} once, and will return its result on following
+   * invocations.
+   */
+  
+  public final CommandType [] getCommandTypes(){
+    if (commandTypes == null)
+      commandTypes = createCommandTypes();
+    
+    return commandTypes;
   }
 
   
@@ -374,7 +443,8 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     
     /**
-     * Creates a new <code>AbstractCommandType</code> with the specified name.
+     * Creates a new <code>AbstractCommandType</code> with the specified name
+     * and connection to the server.
      */
     
     public AbstractCommandType(String name){
@@ -393,17 +463,17 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * <code>doNotEcho</code> flag is unset, to <code>echo</code>.
      */
     
-    public void handleCommand(String userText, Connection connection, boolean doNotEcho){
+    public void handleCommand(String userText, boolean doNotEcho){
       if (userText.startsWith("/")){
         String command = userText.substring(1);
-        sendCommand(command, connection);
+        sendCommand(command);
         if (!doNotEcho)
-          echoCommand(command, connection.getUser());
+          echoCommand(command);
       }
       else{  
-        send(userText, connection);
+        send(userText);
         if (!doNotEcho)
-          echo(userText, connection.getUser());
+          echo(userText);
       }
     }
     
@@ -414,8 +484,8 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * sends a command tagged with {@link AbstractConsoleDesignation#getTag()}.
      */
     
-    protected void sendCommand(String command, Connection connection){
-      connection.sendTaggedCommand(encode(command, connection), getTag());
+    protected void sendCommand(String command){
+      connection.sendTaggedCommand(encode(command), getTag());
     }
     
     
@@ -425,7 +495,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * simply appends the command's text to the console.
      */
     
-    protected void echoCommand(String command, ServerUser user){
+    protected void echoCommand(String command){
       Console console = getConsole();
       console.addToOutput(command, console.getUserTextType());
     }
@@ -441,7 +511,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * @param connection The connection to the server.
      */
     
-    protected abstract void send(String userText, Connection connection);
+    protected abstract void send(String userText);
       
     
     
@@ -452,7 +522,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * @param user The user we're logged in with.
      */
     
-    protected abstract void echo(String userText, ServerUser user);
+    protected abstract void echo(String userText);
       
     
     

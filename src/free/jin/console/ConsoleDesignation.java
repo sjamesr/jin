@@ -23,7 +23,6 @@ package free.jin.console;
 
 import java.beans.PropertyChangeListener;
 
-import free.jin.Connection;
 import free.jin.event.JinEvent;
 import free.util.Named;
 
@@ -111,11 +110,10 @@ public interface ConsoleDesignation{
      * Invoked when a command is issued by the user with this command type.
      * 
      * @param userText The text entered by the user.
-     * @param connection The connection to the server.
      * @param doNotEcho Set if the command should not be echoed to the console.
      */
     
-    public abstract void handleCommand(String userText, Connection connection, boolean doNotEcho);
+    public abstract void handleCommand(String userText, boolean doNotEcho);
     
     
     

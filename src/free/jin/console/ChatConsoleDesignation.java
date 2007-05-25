@@ -29,6 +29,7 @@ import free.jin.Connection;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
+import free.util.Utilities;
 
 
 
@@ -37,7 +38,31 @@ import free.jin.event.JinEvent;
  * events.
  */
 
-public class ChatConsoleDesignation extends AbstractConsoleDesignation{
+public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation{
+  
+  
+  
+  /**
+   * The chat type object matching any chat type.
+   */
+  
+  public static final String ANY_CHAT_TYPE = null;
+  
+  
+  
+  /**
+   * The forum object matching any forum.
+   */
+  
+  public static final Object ANY_FORUM = new Object();
+  
+  
+  
+  /**
+   * The sender object matching any sender.
+   */
+  
+  public static final ServerUser ANY_SENDER = null;
   
   
   
@@ -50,21 +75,16 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * The list of command types we can execute.
+   * Creates a new <code>ChatConsoleDesignation</code>
+   * 
+   * @param connection The connection to the server.
+   * @param name The name of the console.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  private final List commandTypes = new LinkedList();
-  
-  
-  
-  /**
-   * Creates a new <code>ChatConsoleDesignation</code> with the specified name,
-   * encoding, and closeable status.
-   */
-  
-  public ChatConsoleDesignation(String name, String encoding, 
-      boolean isConsoleCloseable){
-    super(name, encoding, isConsoleCloseable);
+  public ChatConsoleDesignation(Connection connection, String name, String encoding, boolean isConsoleCloseable){
+    super(connection, name, encoding, isConsoleCloseable);
   }
   
   
@@ -73,7 +93,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * Joins all the chat types we're accepting.
    */
   
-  protected void joinForums(Connection connection){
+  protected void joinForums(){
     for (Iterator i = acceptedChatTypes.iterator(); i.hasNext();){
       ChatType chatType = (ChatType)i.next();
       connection.joinChat(chatType.getType(), chatType.getForum());
@@ -83,32 +103,17 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Adds the specified <code>CommandType</code> to the list of of command types
-   * this <code>ChatConsoleDesignation</code> is able to issue.
-   */
-  
-  public void addCommandType(CommandType commandType){
-    commandTypes.add(commandType);
-  }
-  
-  
-  
-  /**
-   * Returns the list of command types this <code>ChatConsoleDesignation</code>
-   * is able to issue.
-   */
-  
-  public CommandType [] getCommandTypes(){
-    return (CommandType [])commandTypes.toArray(new CommandType[0]);
-  }
-  
-  
-  
-  /**
    * Make the specified chat type accepted by this chat console.
    * The combination of <code>type</code>, <code>forum</code> and
    * <code>sender</code> must be one which corresponds to an actual possible
    * chat type on the server.
+   * 
+   * @param type The chat type (as in {@link ChatEvent#getType()} to accept,
+   * or {@link #ANY_CHAT_TYPE} to accept any chat type.
+   * @param forum The forum (as in {@link ChatEvent#getForum()} to accept,
+   * or {@link #ANY_FORUM} to accept any forum.
+   * @param sender The sender (as in {@link ChatEvent#getSender()} to accept,
+   * or {@link #ANY_SENDER} to accept any sender.
    */
   
   public void addAccepted(String type, Object forum, ServerUser sender){
@@ -150,7 +155,7 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
     String senderTitle = evt.getSenderTitle();
     int senderRating = evt.getSenderRating();
     Object forum = evt.getForum();
-    String message = decode(evt.getMessage(), evt.getConnection());
+    String message = decode(evt.getMessage());
     
     String text = 
       senderName +
@@ -221,13 +226,13 @@ public class ChatConsoleDesignation extends AbstractConsoleDesignation{
      */
     
     public boolean accept(ChatEvent evt){
-      if ((type != null) && !type.equals(evt.getType()))
+      if ((type != ANY_CHAT_TYPE) && !Utilities.areEqual(type, evt.getType()))
         return false;
       
-      if ((forum != null) && !forum.equals(evt.getForum()))
+      if ((forum != ANY_FORUM) && !Utilities.areEqual(forum, evt.getForum()))
         return false;
       
-      if ((sender != null) && !sender.equals(evt.getSender()))
+      if ((sender != ANY_SENDER) && !Utilities.areEqual(sender, evt.getSender()))
         return false;
       
       return true;

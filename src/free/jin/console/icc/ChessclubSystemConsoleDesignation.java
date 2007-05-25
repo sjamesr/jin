@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.SystemConsoleDesignation;
@@ -37,12 +38,14 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   /**
-   * Creates a new <code>ChessclubSystemConsoleDesignation</code> with the
-   * specified encoding.
+   * Creates a new <code>ChessclubSystemConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
    */
   
-  public ChessclubSystemConsoleDesignation(String encoding){
-    super(encoding);
+  public ChessclubSystemConsoleDesignation(Connection connection, String encoding){
+    super(connection, encoding);
   }
   
   
@@ -56,7 +59,7 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
     String type = evt.getType();
     ServerUser sender = evt.getSender();
     String title = evt.getSenderTitle();
-    String message = decode(evt.getMessage(), evt.getConnection());
+    String message = decode(evt.getMessage());
     Object forum = evt.getForum();
     
     if ("qtell".equals(type))

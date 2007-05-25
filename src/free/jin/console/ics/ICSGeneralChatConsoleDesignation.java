@@ -23,7 +23,6 @@ package free.jin.console.ics;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.ServerUser;
 import free.jin.console.ChatConsoleDesignation;
 import free.jin.console.Console;
 import free.jin.event.ChatEvent;
@@ -39,32 +38,45 @@ public class ICSGeneralChatConsoleDesignation extends ChatConsoleDesignation{
   
   
   /**
-   * Creates a new <code>ICSGeneralChatConsoleDesignation</code> with
-   * the specified encoding and closeable status.
+   * Creates a new <code>ICSGeneralChatConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  public ICSGeneralChatConsoleDesignation(String encoding, boolean isConsoleCloseable){
-    super(I18n.get(ICSGeneralChatConsoleDesignation.class).getString("name"),
+  public ICSGeneralChatConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
+    super(connection, I18n.get(ICSGeneralChatConsoleDesignation.class).getString("name"),
         encoding, isConsoleCloseable);
     
-    addAccepted("shout", null, null);
-    addAccepted("ishout", null, null);
-    
+    addAccepted("shout", null, ANY_SENDER);
+    addAccepted("ishout", null, ANY_SENDER);
+  }
+  
+  
+  
+  /**
+   * Returns the "shout" and "i" command types.
+   */
+  
+  public CommandType [] createCommandTypes(){
     I18n i18n = I18n.get(ICSGeneralChatConsoleDesignation.class);
     
-    addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
-      protected void send(String userText, Connection connection){
-        connection.sendTaggedCommand("shout " + userText, getTag());
+    return new CommandType[]{
+      new AbstractCommandType(i18n.getString("shoutCommandName")){
+        protected void send(String userText){
+          connection.sendTaggedCommand("shout " + userText, getTag());
+        }
+        protected void echo(String userText){}
+      },
+      
+      new AbstractCommandType(i18n.getString("ishoutCommandName")){
+        protected void send(String userText){
+          connection.sendTaggedCommand("i " + userText, getTag());
+        }
+        protected void echo(String userText){}
       }
-      protected void echo(String userText, ServerUser user){}
-    });
-
-    addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
-      protected void send(String userText, Connection connection){
-        connection.sendTaggedCommand("i " + userText, getTag());
-      }
-      protected void echo(String userText, ServerUser user){}
-    });
+    };
   }
   
   

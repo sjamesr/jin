@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.Game;
 import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
@@ -43,7 +44,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createSystemConsoleDesignation(){
-    return new ChessclubSystemConsoleDesignation(getEncoding());
+    return new ChessclubSystemConsoleDesignation(getConn(), getEncoding());
   }
   
   
@@ -53,7 +54,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable){
-    return new ChessclubHelpConsoleDesignation(getEncoding(), isCloseable);
+    return new ChessclubHelpConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
   
   
@@ -63,7 +64,7 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    return new ICSGeneralChatConsoleDesignation(getEncoding(), isCloseable);
+    return new ICSGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
   
   
@@ -73,7 +74,17 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable){
-    return new ChessclubPersonalChatConsoleDesignation(user, getEncoding(), isCloseable);
+    return new ChessclubPersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
+  }
+  
+  
+  
+  /**
+   * Creates an ICC-specific game chat console designation.
+   */
+  
+  protected ConsoleDesignation createGameConsoleDesignation(Game game){
+    return new ChessclubGameConsoleDesignation(getConn(), game, getEncoding());
   }
   
   

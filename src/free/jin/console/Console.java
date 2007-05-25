@@ -647,6 +647,7 @@ public class Console extends JPanel implements KeyListener{
     Dimension boxPrefSize = box.getPreferredSize();
     
     JLabel label = new JLabel(commandTypes[0].toString());
+    label.putClientProperty("commandType", commandTypes[0]);
     Dimension labelPrefSize = label.getPreferredSize();
     
     int height = Math.max(boxPrefSize.height, labelPrefSize.height);
@@ -678,8 +679,10 @@ public class Console extends JPanel implements KeyListener{
    */
   
   private ConsoleDesignation.CommandType getSelectedCommandType(){
-    if (commandTypeComponent instanceof JLabel)
-      return designation.getCommandTypes()[0];
+    if (commandTypeComponent instanceof JLabel){
+      JLabel label = (JLabel)commandTypeComponent;
+      return (ConsoleDesignation.CommandType)label.getClientProperty("commandType");
+    }
     else{
       JComboBox box = (JComboBox)commandTypeComponent;
       return (ConsoleDesignation.CommandType)box.getSelectedItem();
@@ -1115,7 +1118,7 @@ public class Console extends JPanel implements KeyListener{
       if (!conn.isConnected())
         addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
       else
-        getSelectedCommandType().handleCommand(commandString, consoleManager.getConn(), command.isBlanked());
+        getSelectedCommandType().handleCommand(commandString, command.isBlanked());
     }
   }
 

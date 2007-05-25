@@ -23,7 +23,6 @@ package free.jin.console;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 
@@ -39,21 +38,14 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
-   * Our sole command type.
+   * Creates a new <code>SystemConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
    */
   
-  private final CommandType commandIssuing = new IssueCommand(); 
-  
-  
-  
-  /**
-   * Creates a new <code>SystemConsoleDesignation</code> with the specified
-   * encoding.
-   */
-  
-  public SystemConsoleDesignation(String encoding){
-    super(I18n.get(SystemConsoleDesignation.class).getString("name"), encoding,
-        false);
+  public SystemConsoleDesignation(Connection connection, String encoding){
+    super(connection, I18n.get(SystemConsoleDesignation.class).getString("name"), encoding, false);
   }
   
   
@@ -63,8 +55,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * server.
    */
   
-  public CommandType [] getCommandTypes(){
-    return new CommandType[]{commandIssuing};
+  public CommandType [] createCommandTypes(){
+    return new CommandType[]{new IssueCommand()};
   }
   
   
@@ -136,8 +128,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Issues the specified command.
      */
     
-    protected void send(String command, Connection connection){
-      sendCommand(command, connection);
+    protected void send(String command){
+      sendCommand(command);
     }
     
     
@@ -146,8 +138,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Echoes the specified command to the console.
      */
     
-    protected void echo(String command, ServerUser user){
-      echoCommand(command, user);
+    protected void echo(String command){
+      echoCommand(command);
     }
     
     

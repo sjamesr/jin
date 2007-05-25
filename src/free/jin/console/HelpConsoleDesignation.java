@@ -23,7 +23,6 @@ package free.jin.console;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.ServerUser;
 
 
 
@@ -37,20 +36,15 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * A command type which sends the help question to the server.
+   * Creates a new <code>HelpConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  private final CommandType askHelpQuestion = new AskHelpQuestion();
-  
-  
-  
-  /**
-   * Creates a new <code>HelpConsoleDesignation</code> with the specified
-   * encoding and closeable status.
-   */
-  
-  public HelpConsoleDesignation(String encoding, boolean isCloseable){
-    super(I18n.get(HelpConsoleDesignation.class).getString("name"),
+  public HelpConsoleDesignation(Connection connection, String encoding, boolean isCloseable){
+    super(connection, I18n.get(HelpConsoleDesignation.class).getString("name"),
         encoding, isCloseable);
   }
   
@@ -60,7 +54,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Joins the help forum.
    */
   
-  protected void joinForums(Connection connection){
+  protected void joinForums(){
     connection.joinHelpForum();
   }
   
@@ -70,8 +64,8 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Returns the <code>AskHelpQuestion</code> command type.
    */
   
-  public CommandType[] getCommandTypes(){
-    return new CommandType[]{askHelpQuestion};
+  public CommandType[] createCommandTypes(){
+    return new CommandType[]{new AskHelpQuestion()};
   }
   
   
@@ -98,8 +92,8 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Asks the specified help question.
      */
     
-    protected void send(String userText, Connection connection){
-      connection.sendHelpQuestion(encode(userText, connection), getTag());
+    protected void send(String userText){
+      connection.sendHelpQuestion(encode(userText), getTag());
     }
     
     
@@ -108,9 +102,9 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Echoes the question to the console.
      */
     
-    protected void echo(String userText, ServerUser user){
+    protected void echo(String userText){
       Console console = getConsole();
-      console.addToOutput(user.getName() + ": " + userText, console.getUserTextType());
+      console.addToOutput(connection.getUser().getName() + ": " + userText, console.getUserTextType());
     }
     
     

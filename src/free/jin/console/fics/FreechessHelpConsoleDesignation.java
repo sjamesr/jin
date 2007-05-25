@@ -21,6 +21,7 @@
 
 package free.jin.console.fics;
 
+import free.jin.Connection;
 import free.jin.console.HelpConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
@@ -36,12 +37,15 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
   
   
   /**
-   * Creates a new <code>FreechessHelpConsoleDesignation</code> with the
-   * specified encoding and closeable status.
+   * Creates a new <code>FreechessHelpConsoleDesignation</code>.
+   *
+   * @param connection The connection to the server.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  public FreechessHelpConsoleDesignation(String encoding, boolean isCloseable){
-    super(encoding, isCloseable);
+  public FreechessHelpConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
+    super(connection, encoding, isConsoleCloseable);
   }
   
   

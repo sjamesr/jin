@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.Connection;
 import free.jin.ServerUser;
 import free.jin.console.PersonalChatConsoleDesignation;
 import free.jin.event.ChatEvent;
@@ -37,11 +38,15 @@ public class ChessclubPersonalChatConsoleDesignation extends PersonalChatConsole
   
   /**
    * Creates a new <code>ChessclubPersonalChatConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param conversationPartner The user we're talking to.
+   * @param encoding The encoding to use for encoding/decoding messages.
    */
   
-  public ChessclubPersonalChatConsoleDesignation(ServerUser conversationPartner,
+  public ChessclubPersonalChatConsoleDesignation(Connection connection, ServerUser conversationPartner,
       String encoding, boolean isConsoleCloseable){
-    super(conversationPartner, encoding, isConsoleCloseable);
+    super(connection, conversationPartner, encoding, isConsoleCloseable);
   }
   
   
