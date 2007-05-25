@@ -22,9 +22,10 @@
 package free.jin;
 
 import java.beans.PropertyChangeListener;
+
+import free.chess.Player;
 import free.chess.Position;
 import free.chess.WildVariant;
-import free.chess.Player;
 import free.util.BeanProperties;
 
 
@@ -782,6 +783,31 @@ public class Game{
       return "("+timeString+") ("+(getBlackTime()/(1000*60))+" "+(getBlackInc()/1000)+")";
     else
       return timeString;
+  }
+  
+  
+  
+  /**
+   * Returns a short description of this game, suitable for displaying to the
+   * end-user.
+   */
+  
+  public String getShortDescription(){
+    I18n i18n = I18n.get(Game.class);
+    
+    String white = getWhiteName() + getWhiteTitles();
+    String black = getBlackName() + getBlackTitles();
+    
+    if (getGameType() == Game.MY_GAME){
+      if (isPlayed())
+        return i18n.getFormattedString("playingShortDescription", new Object[]{getUserPlayer().isWhite() ? black : white});
+      else if (getWhiteName().equals(getBlackName()))
+        return i18n.getFormattedString("examinationShortDescription", new Object[]{white, black});
+      else
+        return i18n.getFormattedString("examiningShortDescription", new Object[]{white, black});
+    }
+    else
+      return i18n.getFormattedString("observingShortDescription", new Object[]{white, black});
   }
 
 
