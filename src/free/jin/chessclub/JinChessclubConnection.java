@@ -953,9 +953,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String tellTypeString = isKibitz ? "kibitz" : "whisper";
 
     String title = displayableTitle(titles);
+    
+    Object forum;
+    try{
+      forum = getGameInfo(gameNumber).game;
+    } catch (NoSuchGameException e){
+        forum = new Integer(gameNumber); // This shouldn't happen, but just in case
+      }
 
     ChatEvent evt = new ChatEvent(this, clientTag, tellTypeString, ChatEvent.GAME_CHAT_CATEGORY,
-        userForName(playerName), title, -1, message, new Integer(gameNumber));
+        userForName(playerName), title, -1, message, forum);
     listenerManager.fireChatEvent(evt);
   }
 

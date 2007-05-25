@@ -69,6 +69,7 @@ import free.jin.Seek;
 import free.jin.SeekConnection;
 import free.jin.ServerUser;
 import free.jin.UserSeek;
+import free.jin.chessclub.NoSuchGameException;
 import free.jin.event.BoardFlipEvent;
 import free.jin.event.ChatEvent;
 import free.jin.event.ClockAdjustmentEvent;
@@ -459,14 +460,19 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
-  protected boolean processKibitz(String username, String titles, int rating, int gameNumber,
-      String message){
-
+  protected boolean processKibitz(String username, String titles, int rating, int gameNumber, String message){
     if (titles == null)
       titles = "";
 
+    Object forum;
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(new Integer(gameNumber));
+    if (gameData == null)
+      forum = new Integer(gameNumber); // This shouldn't happen, but just in case
+    else
+      forum = gameData.game;
+
     listenerManager.fireChatEvent(new ChatEvent(this, null, "kibitz", ChatEvent.GAME_CHAT_CATEGORY,
-        userForName(username), titles, rating, message, new Integer(gameNumber)));
+        userForName(username), titles, rating, message, forum));
 
     return true;
   }
@@ -478,13 +484,19 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
-  protected boolean processWhisper(String username, String titles, int rating, int gameNumber,
-      String message){
+  protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){
     if (titles == null)
       titles = "";
 
+    Object forum;
+    InternalGameData gameData = (InternalGameData)ongoingGamesData.get(new Integer(gameNumber));
+    if (gameData == null)
+      forum = new Integer(gameNumber); // This shouldn't happen, but just in case
+    else
+      forum = gameData.game;
+    
     listenerManager.fireChatEvent(new ChatEvent(this, null, "whisper", ChatEvent.GAME_CHAT_CATEGORY,
-        userForName(username), titles, rating, message, new Integer(gameNumber)));
+        userForName(username), titles, rating, message, forum));
 
     return true;
   }

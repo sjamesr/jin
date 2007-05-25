@@ -22,6 +22,7 @@
 package free.jin.console.fics;
 
 import free.jin.Connection;
+import free.jin.Game;
 import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.SystemConsoleDesignation;
@@ -62,6 +63,9 @@ public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
     String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
     String message = decode(evt.getMessage());
     Object forum = evt.getForum();
+    
+    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
+      forum = ((Game)forum).getID();
     
     Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
     

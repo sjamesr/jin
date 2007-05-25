@@ -22,6 +22,7 @@
 package free.jin.console.icc;
 
 import free.jin.Connection;
+import free.jin.Game;
 import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.SystemConsoleDesignation;
@@ -66,6 +67,9 @@ public class ChessclubSystemConsoleDesignation extends SystemConsoleDesignation{
       return ChessclubConsoleManager.parseQTell(evt);
     else if ("channel-qtell".equals(type))
       return ChessclubConsoleManager.parseChannelQTell(evt);
+    
+    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
+      forum = ((Game)forum).getID();
 
     Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
     

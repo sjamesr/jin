@@ -142,10 +142,9 @@ public class ChatEvent extends JinEvent{
   
   
   /**
-   * The forum on which the message was sent. Only applies to
-   * messages that aren't one-on-one or go to everyone. For kibitzes
-   * and whispers this is an Integer specifying the game number for example,
-   * for channel tells, the channel number.
+   * The forum on which the message was sent. The actual type of the forum is
+   * server-dependent, and may even be <code>null</code>, but for events of
+   * category {@link #GAME_CHAT_CATEGORY}, this should be the game object.
    */
 
   private final Object forum;
@@ -258,13 +257,13 @@ public class ChatEvent extends JinEvent{
   
   /**
    * Returns the forum on which the message was sent. The forum identifies a
-   * certain instance of a chat type. For room/channel tells this is a
+   * certain instance of a chat type. For room/channel tells this may be a
    * <code>String/Integer</code> specifying the room/channel name/number.
-   * For kibitzes and whispers, the game number. For chat types with only a
-   * single instance (such as shouts, announcements) or where the instance is
-   * already identified by the sender (personal tells) this is
-   * <code>null</code>. This value is somewhat server specific, it should
-   * probably be handled by server specific code.
+   * For chat types with only a single instance (such as shouts, announcements)
+   * or where the instance is already identified by the sender (personal tells)
+   * it may be <code>null</code>. The actual type is server-specific, except
+   * that for events of category {@link #GAME_CHAT_CATEGORY}, this should be the
+   * game object.
    */
 
   public Object getForum(){
