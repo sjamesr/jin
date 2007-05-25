@@ -45,7 +45,6 @@ import free.chess.JBoard;
 import free.chess.PiecePainter;
 import free.jin.Connection;
 import free.jin.Game;
-import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.action.JinAction;
 import free.jin.board.event.UserMoveEvent;
@@ -1279,27 +1278,11 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   protected String getBoardTitle(BoardPanel boardPanel){
     Game game = boardPanel.getGame();
-    I18n i18n = getI18n();
     
-    Object [] titleArgs = new Object[]{
-        game.getWhiteName() + game.getWhiteTitles(),
-        game.getBlackName() + game.getBlackTitles()
-    };
-    
-    String result;
-    if (game.getGameType() == Game.MY_GAME){
-      if (game.isPlayed())
-        result = i18n.getFormattedString("playingBoardTitle", titleArgs);
-      else
-        result = i18n.getFormattedString("examiningBoardTitle", titleArgs);
-    }
+    if (boardPanel.isActive())
+      return game.getShortDescription();
     else
-      result = i18n.getFormattedString("observingBoardTitle", titleArgs);
-    
-    if (!boardPanel.isActive())
-      result = i18n.getFormattedString("inactiveBoardTitle", new Object[]{result});
-    
-    return result;
+      return getI18n().getFormattedString("inactiveBoardTitle", new Object[]{game.getShortDescription()});
   }
   
   
