@@ -27,8 +27,10 @@ import java.beans.PropertyChangeListener;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
+import free.jin.event.ChatEvent;
 import free.jin.event.GameAdapter;
 import free.jin.event.GameEndEvent;
+import free.jin.event.JinEvent;
 
 
 
@@ -127,6 +129,25 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
   
   public Game getGame(){
     return game;
+  }
+  
+  
+  
+  /**
+   * Accepts chata events of category <code>GAME_CHAT_CATEGORY</code> where the
+   * forum is the game we're covering. 
+   */
+  
+  protected boolean accept(JinEvent evt){
+    if (isTaggedByUs(evt))
+      return true;
+
+    if (!(evt instanceof ChatEvent))
+      return false;
+    
+    ChatEvent chatEvent = (ChatEvent)evt;
+    return (chatEvent.getCategory() == ChatEvent.GAME_CHAT_CATEGORY) &&
+      game.equals(chatEvent.getForum());
   }
   
   
