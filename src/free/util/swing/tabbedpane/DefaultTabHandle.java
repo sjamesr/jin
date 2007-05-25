@@ -30,6 +30,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -37,8 +39,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import free.util.swing.SwingUtils;
 
@@ -158,23 +158,22 @@ public class DefaultTabHandle implements TabHandle{
       }
     });
     
-    
-    // Add label and button to the component
-    component.add(label, BorderLayout.CENTER);
-    if (tab.isCloseable()){
-      if (SwingUtils.isMacLnF())
-        component.add(closeButton, BorderLayout.LINE_START);
-      else
-        component.add(closeButton, BorderLayout.LINE_END);
-    }
-    
+    // Create the UI
+    confComponentFromTab();
     
     TabbedPaneModel model = tabbedPane.getModel();
     setSelected(model.getSelectedIndex() == model.indexOfTab(tab));
     
-    tab.addChangeListener(new ChangeListener(){
-      public void stateChanged(ChangeEvent e){
-        confLabelFromTab();
+    tab.addPropertyChangeListener(new PropertyChangeListener(){
+      public void propertyChange(PropertyChangeEvent evt){
+        String propertyName = evt.getPropertyName();
+        
+        if ("title".equals(propertyName))
+          confLabelFromTab();
+        else if ("icon".equals(propertyName))
+          confLabelFromTab();
+        else if ("closeable".equals(propertyName))
+          confComponentFromTab();
       }
     });
   }
@@ -203,6 +202,27 @@ public class DefaultTabHandle implements TabHandle{
     label.setText(tab.getTitle());
     label.setToolTipText(tab.getTitle());
     label.setIcon(tab.getIcon());
+  }
+  
+  
+  
+  /**
+   * Sets the component's properties from the tab's properties. 
+   */
+  
+  private void confComponentFromTab(){
+    component.removeAll();
+    
+    // Add label and button to the component
+    component.add(label, BorderLayout.CENTER);
+    if (tab.isCloseable()){
+      if (SwingUtils.isMacLnF())
+        component.add(closeButton, BorderLayout.LINE_START);
+      else
+        component.add(closeButton, BorderLayout.LINE_END);
+    }
+    
+    component.revalidate();
   }
   
   
