@@ -119,6 +119,7 @@ public class JChessClock extends AbstractChessClock{
   
   public void setActiveBackground(Color color){
     activeBG = color;
+    repaint();
   }
   
   
@@ -139,6 +140,7 @@ public class JChessClock extends AbstractChessClock{
   
   public void setActiveForeground(Color color){
     activeFG = color;
+    repaint();
   }
   
   
@@ -159,6 +161,7 @@ public class JChessClock extends AbstractChessClock{
   
   public void setInactiveBackground(Color color){
     inactiveBG = color;
+    repaint();
   }
   
   
@@ -179,6 +182,7 @@ public class JChessClock extends AbstractChessClock{
   
   public void setInactiveForeground(Color color){
     inactiveFG = color;
+    repaint();
   }
   
   
