@@ -45,7 +45,7 @@ public class ChessclubHelpConsoleDesignation extends HelpConsoleDesignation{
    */
   
   public ChessclubHelpConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
-    super(connection, encoding, isConsoleCloseable);
+    super(connection, true, encoding, isConsoleCloseable);
   }
   
   
