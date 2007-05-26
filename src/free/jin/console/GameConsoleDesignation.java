@@ -119,6 +119,8 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     gameHasEnded = true;
     setConsoleCloseable(true);
     setName(consoleNameForGame(game, gameHasEnded));
+    
+    getConsole().addToOutput(game.getGameEndReasonDescription(), "gameEndReason");
   }
   
   
