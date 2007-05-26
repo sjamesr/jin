@@ -1004,7 +1004,7 @@ public class Scripter extends Plugin{
     public void gameEnded(GameEndEvent evt){
       Vector varsVector = createVarsVector(evt);
 
-      int gameResult = evt.getResult();
+      int gameResult = evt.getGame().getResultCode();
       Player userPlayer = evt.getGame().getUserPlayer();
       String gameResultString;
       if (userPlayer == null){
