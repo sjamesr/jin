@@ -36,7 +36,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 
@@ -384,7 +383,7 @@ public class LoginPanel extends DialogPanel{
         user = Jin.getInstance().getUser(server, connDetails.getUsername());
       
       if (user == null)
-        usernameBox.setSelectedIndex(0);
+        usernameBox.setSelectedItem("");
       else
         usernameBox.setSelectedIndex(Utilities.indexOf(users, user) + 1);
     }
@@ -564,8 +563,6 @@ public class LoginPanel extends DialogPanel{
       }
     });
 
-    JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
-    
     // Layout
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
@@ -603,7 +600,6 @@ public class LoginPanel extends DialogPanel{
                 )
             )
         )
-        .add(separator)
         .add(layout.createSequentialGroup()
             .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
             .add(moreLessButton)
@@ -617,9 +613,7 @@ public class LoginPanel extends DialogPanel{
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
             .add(serverLabel).add(serverBox).add(serverWebsiteLink)
         )
-        .addPreferredGap(LayoutStyle.UNRELATED)
-        .add(separator)
-        .addPreferredGap(LayoutStyle.UNRELATED)
+        .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
             .add(usernameLabel).add(usernameBox).add(registerLink)
         )
