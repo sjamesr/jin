@@ -374,11 +374,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   /**
    * Adds a console with the specified designation, possibly making it the
    * active console. If a console with the specified designation already exists,
-   * it is merely activated, if <code>makeActive</code> is <code>true</code>
-   * (otherwise, no action is taken).
+   * it is merely made selected, if <code>makeSelected</code> is
+   * <code>true</code> (otherwise, no action is taken).
    */
   
-  public void addConsole(final ConsoleDesignation designation, boolean makeActive){
+  public void addConsole(final ConsoleDesignation designation, boolean makeSelected){
     Console console = getConsole(designation);
     
     if (console == null){
@@ -407,22 +407,31 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       });
     }
     
-    if (makeActive)
-      makeConsoleActive(console);
+    if (makeSelected)
+      makeConsoleSelected(console);
   }
   
   
   
   /**
-   * Makes the specified console active.
+   * Makes the specified console selected, which means that it is the one
+   * displayed in the consoles tabbed pane.
    */
   
-  protected void makeConsoleActive(Console console){
+  protected void makeConsoleSelected(Console console){
     int index = consoles.indexOf(console);
     
     if (index >= 0)
       consolesTabbedPane.getModel().setSelectedIndex(index);
-    
+  }
+  
+  
+  
+  /**
+   * Makes our UI active.
+   */
+  
+  public void makeActive(){
     if (uiContainer != null)
       uiContainer.setActive(true);
   }
@@ -855,8 +864,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
         addConsole(helpConsoleDesignation, true);
         helpConsole = getConsole(helpConsoleDesignation);
       }
-      else
-        makeConsoleActive(helpConsole);
+      else{
+        makeConsoleSelected(helpConsole);
+        makeActive();
+      }
       
       helpConsole.flashInputField();
     }
