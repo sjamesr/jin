@@ -1492,17 +1492,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Game game = gameInfo.game;
 
       try{
-        int result;
-        if ("1-0".equals(scoreString))
-          result = Game.WHITE_WINS;
-        else if ("0-1".equals(scoreString))
-          result = Game.BLACK_WINS;
-        else if ("1/2-1/2".equals(scoreString))
-          result = Game.DRAW;
-        else
-          result = Game.UNKNOWN_RESULT;
-
-        game.setResult(result);
+        setGameResult(game, gameResultCode, scoreString);
 
         if (becomesExamined){
           // For our own games, we will get a DG_MY_RELATION_TO_GAME
@@ -1517,7 +1507,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
         }
         else if (game.getGameType() == Game.ISOLATED_BOARD){
-          fireGameEvent(new GameEndEvent(this, clientTag, game, result));
+          fireGameEvent(new GameEndEvent(this, clientTag, game));
         }
 
 
@@ -1526,6 +1516,87 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         }
     } catch (NoSuchGameException e){}
   }
+  
+  
+  
+  /**
+   * Maps pairs of <gameResultCode, scoreString> to <gameEndReasonCode, actor>.
+   */
+  
+  private static final Map GAME_END_REASONS = new HashMap(); 
+  static{
+    GAME_END_REASONS.put(new Pair("Res", "1-0"), new Pair(Integer.valueOf(Game.RESIGNS), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Res", "0-1"), new Pair(Integer.valueOf(Game.RESIGNS), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Mat", "1-0"), new Pair(Integer.valueOf(Game.CHECKMATED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Mat", "0-1"), new Pair(Integer.valueOf(Game.CHECKMATED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Fla", "1-0"), new Pair(Integer.valueOf(Game.TIME_FORFEITS), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Fla", "0-1"), new Pair(Integer.valueOf(Game.TIME_FORFEITS), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "1-0"), new Pair(Integer.valueOf(Game.ADJUDICATED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "0-1"), new Pair(Integer.valueOf(Game.ADJUDICATED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("BQ", "1-0"), new Pair(Integer.valueOf(Game.DISCONNECTED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WQ", "0-1"), new Pair(Integer.valueOf(Game.DISCONNECTED), Player.WHITE_PLAYER));
+    
+    GAME_END_REASONS.put(new Pair("Agr", "1/2-1/2"), new Pair(Integer.valueOf(Game.DRAW_AGREEMENT), null));
+    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(Integer.valueOf(Game.STALEMATE), null));
+    GAME_END_REASONS.put(new Pair("Rep", "1/2-1/2"), new Pair(Integer.valueOf(Game.REPETITION), null));
+    GAME_END_REASONS.put(new Pair("50", "1/2-1/2"), new Pair(Integer.valueOf(Game.FIFTY_MOVE_RULE), null));
+    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(Integer.valueOf(Game.STALEMATE), null));
+    GAME_END_REASONS.put(new Pair("TM", "1/2-1/2"), new Pair(Integer.valueOf(Game.OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE), null));
+    GAME_END_REASONS.put(new Pair("NM", "1/2-1/2"), new Pair(Integer.valueOf(Game.BOTH_NO_MATERIAL_TO_MATE), null));
+    GAME_END_REASONS.put(new Pair("NT", "1/2-1/2"), new Pair(Integer.valueOf(Game.BOTH_OUT_OF_TIME), null));
+    GAME_END_REASONS.put(new Pair("Adj", "1/2-1/2"), new Pair(Integer.valueOf(Game.ADJUDICATED), null));
+    
+    GAME_END_REASONS.put(new Pair("Agr", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_AGREEMENT), null));
+    GAME_END_REASONS.put(new Pair("BQ", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_DISCONNECTED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WQ", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_DISCONNECTED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("BA", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_COURTESY), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WA", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_COURTESY), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_ADMIN), null));
+    GAME_END_REASONS.put(new Pair("Sho", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_TOO_SHORT), null));
+  }
+  
+  
+  
+  /**
+   * Sets the game's result based on the specified game result code and score string.
+   */
+  
+  private void setGameResult(Game game, String gameResultCode, String scoreString){
+    int resultCode;
+    if ("1-0".equals(scoreString))
+      resultCode = Game.WHITE_WINS;
+    else if ("0-1".equals(scoreString))
+      resultCode = Game.BLACK_WINS;
+    else if ("1/2-1/2".equals(scoreString))
+      resultCode = Game.DRAW;
+    else
+      resultCode = Game.UNKNOWN_RESULT;
+    
+    
+    Pair key = new Pair(gameResultCode, scoreString);
+    Pair value = (Pair)GAME_END_REASONS.get(key);
+    
+    int reasonCode;
+    Player actor;
+    
+    if (value == null){
+      reasonCode = Game.UNKNOWN_REASON;
+      switch (resultCode){
+        case Game.WHITE_WINS: actor = Player.BLACK_PLAYER; break;
+        case Game.BLACK_WINS: actor = Player.WHITE_PLAYER; break;
+        default:
+          actor = null;
+          break;
+      }
+    }
+    else{
+      reasonCode = ((Integer)value.getFirst()).intValue();
+      actor = (Player)value.getSecond();
+    }
+    
+    game.setResult(resultCode, reasonCode, actor);
+  }
+  
 
 
 
@@ -1639,16 +1710,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Game game = gameInfo.game;
       unechoedMoves.remove(game);
 
-      int result = 
-        (game.getResult() == Game.GAME_IN_PROGRESS) ? Game.UNKNOWN_RESULT : game.getResult();
-
       // Make sure the game doesn't stay in progress...
-      if (game.getResult() == Game.GAME_IN_PROGRESS) 
-        game.setResult(result);
+      if (game.getResultCode() == Game.GAME_IN_PROGRESS) 
+        game.setResult(Game.UNKNOWN_RESULT, Game.UNKNOWN_REASON, null);
 
       clearOffers(clientTag, gameInfo, Player.WHITE_PLAYER);
       clearOffers(clientTag, gameInfo, Player.BLACK_PLAYER);
-      fireGameEvent(new GameEndEvent(this, clientTag, game, result));
+      fireGameEvent(new GameEndEvent(this, clientTag, game));
     }
     else{
       int newGameType = ChessclubConstants.OBSERVING_PLAYER_STATE.equals(playerState) ?
