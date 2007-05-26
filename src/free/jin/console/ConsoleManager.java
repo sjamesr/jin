@@ -761,7 +761,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   protected void gameStarted(GameEvent evt){
     if (getPrefs().getBool("newConsoleOnGameStart", false))
-      addConsole(createGameConsoleDesignation(evt.getGame()), false);
+      addConsole(createGameConsoleDesignation(evt.getGame()), true);
   }
 
 
