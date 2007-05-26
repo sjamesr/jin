@@ -46,15 +46,6 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * The number of unseen (added when the console is invisible) messages we've
-   * received.
-   */
-  
-  private int unseenMessageCount = 0;
-
-  
-  
-  /**
    * Creates a new <code>PersonalChatConsoleDesignation</code>.
    * 
    * @param connection The connection to the server.
@@ -65,7 +56,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   public PersonalChatConsoleDesignation(Connection connection, ServerUser conversationPartner, 
       String encoding, boolean isConsoleCloseable){
-    super(connection, conversationPartner.getName(), encoding, isConsoleCloseable);
+    super(connection, true, conversationPartner.getName(), encoding, isConsoleCloseable);
     
     this.conversationPartner = conversationPartner;
   }
@@ -78,17 +69,6 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   protected void joinForums(){
     connection.joinPersonalChat(conversationPartner);
-  }
-  
-  
-  
-  /**
-   * Clears the unseen message count.
-   */
-  
-  protected void consoleShown(){
-    unseenMessageCount = 0;
-    setName(conversationPartner.getName());
   }
   
   
@@ -127,14 +107,8 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    */
   
   protected void appendChat(ChatEvent evt){
-    
     Console console = getConsole();
     console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
-    
-    if (!console.isVisible()){
-      unseenMessageCount++;
-      setName(conversationPartner.getName() + " (" + unseenMessageCount + ")");
-    }
   }
   
   

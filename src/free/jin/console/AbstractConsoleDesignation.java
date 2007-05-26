@@ -41,7 +41,7 @@ import free.util.Utilities;
 
 
 /**
- * A skeleton implementation of <code>ConsoleDesignation</code> wit some useful
+ * A base implementation of <code>ConsoleDesignation</code> with some useful
  * facilities.
  */
 
@@ -54,6 +54,15 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected final Connection connection;
+  
+  
+  
+  /**
+   * Whether to count unseen messages and display their number in the
+   * designation name. 
+   */
+  
+  private final boolean countUnseenMessages;
   
   
   
@@ -99,6 +108,15 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * The number of unseen (added when the console is invisible) messages we've
+   * received.
+   */
+  
+  private int unseenMessageCount = 0;
+
+  
+  
+  /**
    * Our property change support.
    */
   
@@ -116,10 +134,30 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   public AbstractConsoleDesignation(Connection connection, String name, String encoding, boolean isConsoleCloseable){
+    this(connection, false, name, encoding, isConsoleCloseable);
+  }
+  
+  
+  
+  /**
+   * Creates a new <code>AbstractConsoleDesignation</code>.
+   * 
+   * @param connection The connection to the server.
+   * @param countUnseenMessages Whether to count the number of unseen messages
+   * and display it in the designation's name.
+   * @param name The name of the console.
+   * @param encoding The encoding to use for encoding/decoding messages.
+   * @param isConsoleCloseable Whether the console should be closeable. 
+   */
+  
+  public AbstractConsoleDesignation(Connection connection, boolean countUnseenMessages, String name,
+      String encoding, boolean isConsoleCloseable){
+    
     if (connection == null)
       throw new IllegalArgumentException("connection may not be null");
     
     this.connection = connection;
+    this.countUnseenMessages = countUnseenMessages;
     this.name = name;
     this.encoding = encoding;
     this.isConsoleCloseable = isConsoleCloseable;
@@ -182,11 +220,25 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * Sets the number of unseen messages and updates the title accordingly.
+   */
+  
+  protected final void setUnseenMessageCount(int unseenMessageCount){
+    String oldName = getName();
+    this.unseenMessageCount = unseenMessageCount;
+    String newName = getName();
+    propertyChangeSupport.firePropertyChange("name", oldName, newName);
+  }
+  
+  
+  
+  /**
    * Invoked when the console we're responsible for is shown.
    */
   
   protected void consoleShown(){
-    
+    if (countUnseenMessages)
+      setUnseenMessageCount(0);
   }
   
   
@@ -226,23 +278,27 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
 
   public String getName(){
-    return name;
+    if (countUnseenMessages && (unseenMessageCount != 0))
+      return name + " (" + unseenMessageCount + ")";
+    else
+      return name;
   }
   
   
   
   /**
-   * Sets the name of this designation.
+   * Sets the name of this designation. If <code>countUnseenMessages</code> is
+   * set, the specified name is treated only as a base-name.
    */
   
   protected void setName(String name){
     if (Utilities.areEqual(this.name, name))
       return;
     
-    String oldName = this.name;
+    String oldName = getName();
     this.name = name;
     
-    propertyChangeSupport.firePropertyChange("name", oldName, name);
+    propertyChangeSupport.firePropertyChange("name", oldName, getName());
   }
   
   
@@ -331,6 +387,10 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   public boolean receive(JinEvent evt){
     if (accept(evt)){
       append(evt);
+      
+      if (countUnseenMessages && !console.isVisible())
+        setUnseenMessageCount(unseenMessageCount + 1);
+      
       return true;
     }
     else
