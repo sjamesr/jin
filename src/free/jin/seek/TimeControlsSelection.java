@@ -95,11 +95,11 @@ public final class TimeControlsSelection{
     
     this.timeLabel = i18n.createLabel("timeLabel");
     this.time = new JSpinner(new SpinnerNumberModel(initialTime, 0, 600, 1));
-    this.timeUnitsLabel = i18n.createLabel("secondsLabel");
+    this.timeUnitsLabel = i18n.createLabel("timeUnitsLabel");
  
     this.incrementLabel = i18n.createLabel("incrementLabel"); 
     this.increment = new JSpinner(new SpinnerNumberModel(initialIncrement, 0, 300, 1));
-    this.incrementUnitsLabel = i18n.createLabel("minutesLabel");
+    this.incrementUnitsLabel = i18n.createLabel("incrementUnitsLabel");
     
     timeLabel.setLabelFor(time);
     incrementLabel.setLabelFor(increment);
