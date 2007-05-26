@@ -39,12 +39,14 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Creates a new <code>HelpConsoleDesignation</code>.
    * 
    * @param connection The connection to the server.
+   * @param countUnseenMessages Whether to count the number of unseen messages
+   * and display it in the designation's name.
    * @param encoding The encoding to use for encoding/decoding messages.
    * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  public HelpConsoleDesignation(Connection connection, String encoding, boolean isCloseable){
-    super(connection, I18n.get(HelpConsoleDesignation.class).getString("name"),
+  public HelpConsoleDesignation(Connection connection, boolean countUnseenMessages, String encoding, boolean isCloseable){
+    super(connection, countUnseenMessages, I18n.get(HelpConsoleDesignation.class).getString("name"),
         encoding, isCloseable);
   }
   
