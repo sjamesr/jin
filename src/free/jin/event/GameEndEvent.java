@@ -26,8 +26,10 @@ import free.jin.Connection;
 
 
 /**
- * The event fired when a game ends, or the user stopped 
- * playing/examining/observing it.
+ * The event fired when a game ends, or the user stopped
+ * playing/examining/observing it. The game's result may be obtained via
+ * {@link Game#getResultCode()} and {@link Game#getGameEndReasonCode()}, and the
+ * source of the event should set it before firing the event.
  */
 
 public class GameEndEvent extends GameEvent{
@@ -35,41 +37,14 @@ public class GameEndEvent extends GameEvent{
 
 
   /**
-   * The result of the game.
-   */
-
-  private final int result;
-
-
-
-
-  /**
    * Creates a new GameEndEvent with the given Game, source Connection and
-   * result. Possible result values are defined in the <code>Game</code> class.
-   * <code>GAME_IN_PROGRESS</code> is not a valid result, though.
+   * result.
    */
 
-  public GameEndEvent(Connection conn, String clientTag, Game game, int result){
+  public GameEndEvent(Connection conn, String clientTag, Game game){
     super(conn, clientTag, game);
-
-    if (game.getResult() == Game.GAME_IN_PROGRESS)
-      throw new IllegalStateException("The specified game reports it's still in progress");
-
-    if (result != game.getResult())
-      throw new IllegalArgumentException("The specified game result differs from the result returned by Game.getResult()");
-
-    this.result = result;
   }
-
-
-
-  /**
-   * Returns the result of the game. Possible values are defined in the
-   * <code>Game</code> class.
-   */
   
-  public int getResult(){
-    return result;
-  }
-
+  
+  
 }
