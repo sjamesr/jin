@@ -392,15 +392,15 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
         bsh.set("userWhite", game.getUserPlayer() == Player.WHITE_PLAYER);
         bsh.set("userBlack", game.getUserPlayer() == Player.BLACK_PLAYER);
         
-        String result = getResultString(isUserWhite, game.getResult());
+        String result = getResultString(isUserWhite, game.getResultCode());
         bsh.set("result", result);
         bsh.set("win", result.equals("win"));
         bsh.set("loss", result.equals("loss"));
         bsh.set("draw", result.equals("draw"));
         bsh.set("unknownResult", result.equals("unknownResult"));
         
-        bsh.set("whiteWins", game.getResult() == Game.WHITE_WINS);
-        bsh.set("blackWins", game.getResult() == Game.BLACK_WINS);
+        bsh.set("whiteWins", game.getResultCode() == Game.WHITE_WINS);
+        bsh.set("blackWins", game.getResultCode() == Game.BLACK_WINS);
       } catch (EvalError e){
         e.printStackTrace();
         return new String[0];
@@ -499,7 +499,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   private void log(Game game, GameInfo gameInfo, String filename){
     try{
       String resultString;
-      switch (game.getResult()){
+      switch (game.getResultCode()){
         case Game.WHITE_WINS:
           resultString = "1-0";
           break;
