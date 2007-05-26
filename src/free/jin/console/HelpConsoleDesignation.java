@@ -51,6 +51,18 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
+   * Adds the instructions text to the console.
+   */
+  
+  public void setConsole(Console console){
+    super.setConsole(console);
+    
+    console.addToOutput(I18n.get(getClass(), HelpConsoleDesignation.class).getString("instructions"), "info");
+  }
+  
+  
+  
+  /**
    * Joins the help forum.
    */
   
