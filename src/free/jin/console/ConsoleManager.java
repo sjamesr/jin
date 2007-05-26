@@ -722,7 +722,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
   public void connectionEstablished(Connection conn){
     String message = getI18n().getString("connectedMessage");
-    
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
       console.addToOutput(message, "info");
@@ -739,6 +738,12 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     String title = getI18n().getFormattedString("mainConsole.title",
       new Object[]{getConn().getUser().getName(), getServer().getLongName()});
     uiContainer.setTitle(title);
+    
+    String message = getI18n().getString("loggedInMessage");
+    for (int i = 0; i < consoles.size(); i++){
+      Console console = (Console)consoles.get(i);
+      console.addToOutput(message, "info");
+    }
   }
 
 
