@@ -1617,9 +1617,17 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     InternalGameData gameData = (InternalGameData)ongoingGamesData.remove(gameID);
     if (gameData != null){
       Game game = gameData.game;
+      
+      Player actor;
+      switch (result){
+        case Game.WHITE_WINS: actor = Player.BLACK_PLAYER; break;
+        case Game.BLACK_WINS: actor = Player.WHITE_PLAYER; break;
+        default:
+          actor = null; break;
+      }
 
-      game.setResult(result);
-      listenerManager.fireGameEvent(new GameEndEvent(this, null, game, result));
+      game.setResult(result, Game.UNKNOWN_REASON, actor);
+      listenerManager.fireGameEvent(new GameEndEvent(this, null, game));
 
       if ((game.getGameType() == Game.MY_GAME) && getIvarState(Ivar.SEEKINFO))
         setIvarState(Ivar.SEEKINFO, true); // Refresh the seeks
