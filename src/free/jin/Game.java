@@ -104,9 +104,249 @@ public class Game{
    */
 
   public static final int GAME_IN_PROGRESS = 5;
+  
+  
 
-
-
+  /**
+   * Game end reason is unknown.
+   */
+  
+  public static final int UNKNOWN_REASON = -2;
+  
+  
+  
+  /**
+   * Some other game end reason than the ones defined here.
+   */
+  
+  public static final int OTHER_REASON  = -1;
+  
+  
+  
+  /**
+   * Actor resigns.
+   */
+  
+  public static final int RESIGNS = 0;
+  
+  
+  
+  /**
+   * Actor got checkmated.
+   */
+  
+  public static final int CHECKMATED = 1;
+  
+  
+  
+  /**
+   * Actor forfeits on time.
+   */
+  
+  public static final int TIME_FORFEITS = 2;
+  
+  
+  
+  /**
+   * Game adjudicated against actor.
+   */
+  
+  public static final int ADJUDICATED = 3;
+  
+  
+  
+  /**
+   * Actor disconnected and forfeits.
+   */
+  
+  public static final int DISCONNECTED = 4;
+  
+  
+  
+  /**
+   * Actor's partner resigns.
+   */
+  
+  public static final int PARTNER_RESIGNS = 5;
+  
+  
+  
+  /**
+   * Actor's partner got checkmated.
+   */
+  
+  public static final int PARTNER_CHECKMATED = 6;
+  
+  
+  
+  /**
+   * Actor's partner forfeits on time.
+   */
+  
+  public static final int PARTNER_TIME_FORFEITS = 7;
+  
+  
+  
+  /**
+   * Actor's partner disconnected and forfeits on time.
+   */
+  
+  public static final int PARTNER_DISCONNECTED = 8;
+  
+  
+  
+  /**
+   * Drawn by mutual agreement.
+   */
+  
+  public static final int DRAW_AGREEMENT = 101;
+  
+  
+  
+  /**
+   * Actor stalemated.
+   */
+  
+  public static final int STALEMATE = 102;
+  
+  
+  
+  /**
+   * Actor drew the game by repetition.
+   */
+  
+  public static final int REPETITION = 103;
+  
+  
+  
+  /**
+   * Actor drew the game by the 50 move rule.
+   */
+  
+  public static final int FIFTY_MOVE_RULE = 104;
+  
+  
+  
+  /**
+   * Actor out of time and his opponent has no material to mate.
+   */
+  
+  public static final int OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE = 105;
+  
+  
+  
+  /**
+   * Drawn because neither player has material to mate.
+   */
+  
+  public static final int BOTH_NO_MATERIAL_TO_MATE = 106;
+  
+  
+  
+  /**
+   * Drawn because both players are out of time.
+   */
+  
+  public static final int BOTH_OUT_OF_TIME = 107;
+  
+  
+  
+  /**
+   * Drawn because partners agreed to draw.
+   */
+  
+  public static final int PARTNER_DRAW_AGREEMENT = 108;
+  
+  
+  
+  /**
+   * Drawn because both partners are out of time.
+   */
+  
+  public static final int PARTNER_BOTH_OUT_OF_TIME = 109;
+  
+  
+  
+  /**
+   * Adjourned by mutual agreement.
+   */
+  
+  public static final int ADJOURNED_AGREEMENT = 201;
+  
+  
+  
+  /**
+   * Adjourned when actor disconnected.
+   */
+  
+  public static final int ADJOURNED_DISCONNECTED = 202;
+  
+  
+  
+  /**
+   * Courtesy-adjourned by actor.
+   */
+  
+  public static final int ADJOURNED_COURTESY = 203;
+  
+  
+  
+  /**
+   * Adjourned by admin.
+   */
+  
+  public static final int ADJOURNED_ADMIN = 204;
+  
+  
+  
+  /**
+   * Aborted by mutual agreement.
+   */
+  
+  public static final int ABORTED_AGREEMENT = 301;
+  
+  
+  
+  /**
+   * Aborted when actor disconnected.
+   */
+  
+  public static final int ABORTED_DISCONNECTED = 302;
+  
+  
+  
+  /**
+   * Courtesy-aborted by actor.
+   */
+  
+  public static final int ABORTED_COURTESY = 303;
+  
+  
+  
+  /**
+   * Aborted by admin.
+   */
+  
+  public static final int ABORTED_ADMIN = 304;
+  
+  
+  
+  /**
+   * Aborted because game is too short.
+   */
+  
+  public static final int ABORTED_TOO_SHORT = 305;
+  
+  
+  
+  /**
+   * Aborted when black's partner disconnected.
+   */
+  
+  public static final int ABORTED_PARTNER_DISCONNECTED = 306;
+  
+  
+  
   /**
    * The <code>BeanProperties</code> object actually holding the properties.
    */
@@ -735,25 +975,146 @@ public class Game{
    * <code>UNKNOWN_RESULT</code> and <code>GAME_IN_PROGRESS</code>.
    */
 
-  public int getResult(){
-    Integer result = (Integer)props.getProperty("result", null);
+  public int getResultCode(){
+    Integer result = (Integer)props.getProperty("resultCode", null);
     if (result == null)
       return GAME_IN_PROGRESS;
     return result.intValue();
   }
-
-
-
-
+  
+  
+  
   /**
-   * Sets the result of the game to the specified value. Possible values are
-   * <code>WHITE_WINS</code>, <code>BLACK_WINS</code>, <code>DRAW</code> and
-   * <code>UNKNOWN_RESULT</code>. This method may only be called once per Game
-   * object (when the game ends), and the caller is responsible for notifying 
-   * all interested parties that the game ended.
+   * Returns the reason code of the game end. Possible values are one of the
+   * reason codes defined in this class. May only be invoked if the result code
+   * is not <code>GAME_IN_PROGRESS</code>. See also {@link #getGameEndActor()}.
+   */
+  
+  public int getGameEndReasonCode(){
+    if (getResultCode() == GAME_IN_PROGRESS)
+      throw new IllegalStateException("Game not ended yet");
+    
+    return props.getIntegerProperty("gameEndReasonCode");
+  }
+  
+  
+  
+  /**
+   * Returns the player who lost, or acted, in relation to
+   * {@link #getGameEndReasonCode()}; <code>null</code> if inapplicable or
+   * unknown.
+   * May only be invoked if the result code is not
+   * <code>GAME_IN_PROGRESS</code>.
+   */
+  
+  public Player getGameEndActor(){
+    if (getResultCode() == GAME_IN_PROGRESS)
+      throw new IllegalStateException("Game not ended yet");
+    
+    return (Player)props.getProperty("gameEndActor");
+  }
+  
+  
+  
+  /**
+   * Returns a string describing the game end reason, which is suitable to be
+   * displayed to the user.
+   */
+  
+  public String getGameEndReasonDescription(){
+    int resultCode = getResultCode();
+    int reasonCode = getGameEndReasonCode();
+    Player actor = getGameEndActor();
+    
+    String resultKey;
+    switch (resultCode){
+      case WHITE_WINS: resultKey = "whiteWins"; break;
+      case BLACK_WINS: resultKey = "blackWins"; break;
+      case DRAW: resultKey = "draw"; break;
+      case UNKNOWN_RESULT: resultKey = "unknown"; break;
+      default:
+        throw new IllegalStateException("Wrong result code: " + resultCode);
+    }
+    
+    String reasonKey = null;
+    switch (reasonCode){
+      case RESIGNS: reasonKey = "resigns"; break;
+      case CHECKMATED: reasonKey = "checkmated"; break;
+      case TIME_FORFEITS: reasonKey = "timeForfeits"; break;
+      case ADJUDICATED: reasonKey = "adjudicated"; break;
+      case DISCONNECTED: reasonKey = "disconnected"; break;
+      case PARTNER_RESIGNS: reasonKey = "partnerResigns"; break;
+      case PARTNER_CHECKMATED: reasonKey = "partnerCheckmated"; break;
+      case PARTNER_TIME_FORFEITS: reasonKey = "partnerTimeForfeits"; break;
+      case PARTNER_DISCONNECTED: reasonKey = "partnerDisconnected"; break;
+      case DRAW_AGREEMENT: reasonKey = "drawAgreement"; break;
+      case STALEMATE: reasonKey = "stalemate"; break;
+      case REPETITION: reasonKey = "repetition"; break;
+      case FIFTY_MOVE_RULE: reasonKey = "50move"; break;
+      case OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE: reasonKey = "outOfTimeAndOppHasNoMaterial"; break;
+      case BOTH_NO_MATERIAL_TO_MATE: reasonKey = "bothNoMaterial"; break;
+      case BOTH_OUT_OF_TIME: reasonKey = "bothOutOfTime"; break;
+      case PARTNER_DRAW_AGREEMENT: reasonKey = "partnerDrawAgreement"; break;
+      case PARTNER_BOTH_OUT_OF_TIME: reasonKey = "partnerBothOutOfTime"; break;
+      case ADJOURNED_AGREEMENT: reasonKey = "adjournedAgreement"; break;
+      case ADJOURNED_DISCONNECTED: reasonKey = "adjournedDisconnected"; break;
+      case ADJOURNED_COURTESY: reasonKey = "adjournedCourtesy"; break;
+      case ADJOURNED_ADMIN: reasonKey = "adjournedAdmin"; break;
+      case ABORTED_AGREEMENT: reasonKey = "abortedAgreement"; break;
+      case ABORTED_DISCONNECTED: reasonKey = "abortedDisconnected"; break;
+      case ABORTED_COURTESY: reasonKey = "abortedCourtesy"; break;
+      case ABORTED_ADMIN: reasonKey = "abortedAdmin"; break;
+      case ABORTED_TOO_SHORT: reasonKey = "abortedTooShort"; break;
+      case ABORTED_PARTNER_DISCONNECTED: reasonKey = "abortPartnerDisconnected"; break;
+      default:
+        reasonKey = null;
+    }
+    
+    String actorKey;
+    if (actor == null)
+      actorKey = null;
+    else if (actor.isWhite())
+      actorKey = "white";
+    else
+      actorKey = "black";
+    
+    String [] keyParts = new String[]{"gameEndReason", resultKey, reasonKey, actorKey};
+    String [] keys = new String[keyParts.length];
+    keys[0] = keyParts[0];
+    int keyCount = 1;
+    for (int i = 1; i < keyParts.length; i++){
+      if (keyParts[i] == null)
+        break;
+      
+      keys[keyCount] = keys[keyCount - 1] + "." + keyParts[i];
+      keyCount++;
+    }
+    
+    Object [] args = new Object[]{getWhiteName(), getBlackName()};
+    
+    I18n i18n = I18n.get(Game.class);
+    for (int i = keys.length - 1; i >= 1; i--){
+      String description = i18n.getString(keys[i], null);
+      if (description != null)
+        return i18n.getFormattedString(keys[i], args);
+    }
+    
+    return i18n.getFormattedString(keys[0], args);
+  }  
+  
+  
+  /**
+   * Sets the result of the game to the specified value. This method may only be
+   * called once per Game object (when the game ends).
+   * 
+   * @param result The result code: <code>WHITE_WINS</code>,
+   * <code>BLACK_WINS</code>, <code>DRAW</code> or <code>UNKNOWN_RESULT</code>.
+   * @param reason The reason code (many constants, defined in this class).
+   * @param actor The player who lost (in case of a loss) or acted, or
+   * <code>null</code> if inapplicable or unknown.
    */
 
-  public void setResult(int result){
+  public void setResult(int result, int reason, Player actor){
     switch(result){
       case WHITE_WINS:
       case BLACK_WINS:
@@ -764,10 +1125,12 @@ public class Game{
         throw new IllegalArgumentException("Bad value for game result specified: "+result);
     }
 
-    if (getResult() != GAME_IN_PROGRESS)
+    if (getResultCode() != GAME_IN_PROGRESS)
       throw new IllegalStateException("Unable to set the result more than once");
 
-    props.setProperty("result", new Integer(result));
+    props.setIntegerProperty("resultCode", result);
+    props.setIntegerProperty("gameEndReasonCode", reason);
+    props.setProperty("gameEndActor", actor);
   }
 
 
@@ -798,16 +1161,29 @@ public class Game{
     String white = getWhiteName() + getWhiteTitles();
     String black = getBlackName() + getBlackTitles();
     
+    int result = getResultCode();
+    String resultKey;
+    switch (result){
+      case WHITE_WINS: resultKey = "whiteWins"; break;
+      case BLACK_WINS: resultKey = "blackWins"; break;
+      case DRAW: resultKey = "draw"; break;
+      case UNKNOWN_RESULT: resultKey = "unknown"; break;
+      case GAME_IN_PROGRESS: resultKey = "inProgress"; break;
+      default:
+        throw new IllegalStateException("Unknown result code: " + result);
+    }
+    String resultString = i18n.getString("result." + resultKey);
+    
     if (getGameType() == Game.MY_GAME){
       if (isPlayed())
         return i18n.getFormattedString("playingShortDescription", new Object[]{getUserPlayer().isWhite() ? black : white});
       else if (getWhiteName().equals(getBlackName()))
-        return i18n.getFormattedString("examinationShortDescription", new Object[]{white, black});
+        return i18n.getFormattedString("examinationShortDescription", new Object[]{white, black, resultString});
       else
-        return i18n.getFormattedString("examiningShortDescription", new Object[]{white, black});
+        return i18n.getFormattedString("examiningShortDescription", new Object[]{white, black, resultString});
     }
     else
-      return i18n.getFormattedString("observingShortDescription", new Object[]{white, black});
+      return i18n.getFormattedString("observingShortDescription", new Object[]{white, black, resultString});
   }
 
 
