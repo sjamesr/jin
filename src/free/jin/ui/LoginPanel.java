@@ -116,14 +116,6 @@ public class LoginPanel extends DialogPanel{
   
   
   /**
-   * The JComboBox displaying the current account (User).
-   */
-   
-  private final JComboBox accountBox;
-  
-   
-  
-  /**
    * The username label
    */
   
@@ -132,10 +124,10 @@ public class LoginPanel extends DialogPanel{
   
   
   /**
-   * The username field.
+   * The username box.
    */
    
-  private final JTextField usernameField;
+  private final JComboBox usernameBox;
   
   
   
@@ -249,9 +241,8 @@ public class LoginPanel extends DialogPanel{
     this.serverBox = new FixedJComboBox();
     this.serverWebsiteLink = new LinkLabel(i18n.getString("serverWebsiteLink.text"));
     this.serverWebsiteAction = new UrlDisplayingAction(null);
-    this.accountBox = new FixedJComboBox();
     this.usernameLabel = i18n.createLabel("handleLabel");
-    this.usernameField = new FixedJTextField();
+    this.usernameBox = new FixedJComboBox();
     this.passwordLabel = i18n.createLabel("passwordLabel");
     this.passwordField = new FixedJPasswordField();
     this.savePasswordCheckBox = i18n.createCheckBox("savePasswordCheckBox");
@@ -266,12 +257,9 @@ public class LoginPanel extends DialogPanel{
     this.servers = Jin.getInstance().getServers();
     
     serverBox.setEditable(false);
-    accountBox.setEditable(false);
+    usernameBox.setEditable(true);
     
-    usernameField.setColumns(10);
-    passwordField.setColumns(10);
-    
-    usernameLabel.setLabelFor(usernameField);
+    usernameLabel.setLabelFor(usernameBox);
     passwordLabel.setLabelFor(passwordField);
     
     serverWebsiteLink.addActionListener(serverWebsiteAction);
@@ -285,12 +273,25 @@ public class LoginPanel extends DialogPanel{
     connectButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Server server = getServer();
-        String username = usernameField.getText();
-        UsernamePolicy policy = server.getUsernamePolicy();
-        String invalidityReason = policy.invalidityReason(username);
-        if (invalidityReason != null){
-          OptionPanel.error(i18n.getString("invalidUsernameDialog.title"), invalidityReason, LoginPanel.this);
-          return;
+        User user;
+        if (usernameBox.getSelectedItem() instanceof User)
+          user = (User)usernameBox.getSelectedItem();
+        else{
+          String username = (String)usernameBox.getSelectedItem();
+          UsernamePolicy policy = server.getUsernamePolicy();
+          String invalidityReason = policy.invalidityReason(username);
+          if (invalidityReason != null){
+            OptionPanel.error(i18n.getString("invalidUsernameDialog.title"), invalidityReason, LoginPanel.this);
+            return;
+          }
+          
+          user = Jin.getInstance().getUser(server, username);
+          if (user == null){
+            if (policy.isSame(username, policy.getGuestUsername()))
+              user = server.getGuest();
+            else
+              user = new User(server, username);
+          }
         }
 
         int [] ports = parsePorts(portsField.getText());
@@ -305,14 +306,11 @@ public class LoginPanel extends DialogPanel{
 
         boolean savePassword = (savePasswordCheckBox != null) && savePasswordCheckBox.isSelected();
         
-        User user = Jin.getInstance().getUser(server, username);
-        if (user == null)
-          user = new User(server, username);
         
-        ConnectionDetails result = policy.isSame(username, policy.getGuestUsername()) ?
-          ConnectionDetails.createGuest(server, username, (String)hostnameBox.getSelectedItem(),
+        ConnectionDetails result =  user.isGuest() ?
+          ConnectionDetails.createGuest(server, user.getUsername(), (String)hostnameBox.getSelectedItem(),
             ports) :
-          ConnectionDetails.create(server, user, username, password, savePassword,
+          ConnectionDetails.create(server, user, user.getUsername(), password, savePassword,
             (String)hostnameBox.getSelectedItem(), ports);
 
         close(result);
@@ -336,13 +334,23 @@ public class LoginPanel extends DialogPanel{
       }
     });
     
-    accountBox.addActionListener(new ActionListener(){
+    usernameBox.addActionListener(new ActionListener(){
+      private boolean ignoreCalls = false;
       public void actionPerformed(ActionEvent evt){
-        Server server = getServer();
-        int selectedIndex = accountBox.getSelectedIndex();
+        if (ignoreCalls)
+          return;
         
-        if (accountBox.getSelectedIndex() == 0)
+        Server server = getServer();
+        int selectedIndex = usernameBox.getSelectedIndex();
+        
+        if (selectedIndex == -1)
           setData(server, null, false, false);
+        else if (selectedIndex == 0){
+          ignoreCalls = true;
+          usernameBox.setSelectedItem("");
+          ignoreCalls = false;
+          setData(server, null, false, false);
+        }
         else
           setData(server, users[selectedIndex - 1].getPreferredConnDetails(), false, false);
       }
@@ -359,13 +367,13 @@ public class LoginPanel extends DialogPanel{
    * from scratch (only the server is known).
    */
    
-  private void setData(Server server, ConnectionDetails connDetails, boolean updateServer, boolean updateAccounts){
+  private void setData(Server server, ConnectionDetails connDetails, boolean updateServer, boolean updateUsername){
     if (updateServer)
       serverBox.setSelectedIndex(Utilities.indexOf(servers, server));
     
-    if (updateAccounts){
+    if (updateUsername){
       users = getServerUsers(server);
-      accountBox.setModel(createAccountBoxModel());
+      usernameBox.setModel(createAccountBoxModel());
       
       User user;
       if (connDetails == null)
@@ -376,29 +384,25 @@ public class LoginPanel extends DialogPanel{
         user = Jin.getInstance().getUser(server, connDetails.getUsername());
       
       if (user == null)
-        accountBox.setSelectedIndex(0);
+        usernameBox.setSelectedIndex(0);
       else
-        accountBox.setSelectedIndex(Utilities.indexOf(users, user) + 1);
+        usernameBox.setSelectedIndex(Utilities.indexOf(users, user) + 1);
     }
     
     if (connDetails == null){
-      usernameField.setText("");
       passwordField.setText("");
       savePasswordCheckBox.setSelected(false);
     }
     else if (connDetails.isGuest()){
-      usernameField.setText(connDetails.getUsername());
       passwordField.setText("");
       savePasswordCheckBox.setSelected(false);
     }
     else{
-      usernameField.setText(connDetails.getUsername());
       passwordField.setText(connDetails.getPassword());
       savePasswordCheckBox.setSelected(connDetails.isSavePassword());
     }
     
     JComponent [] guestDependentComponents = new JComponent[]{
-        usernameLabel, usernameField,
         passwordLabel, passwordField,
         savePasswordCheckBox, retrievePasswordLink
     };
@@ -426,8 +430,8 @@ public class LoginPanel extends DialogPanel{
     registerLink.setVisible(registrationPageUrl != null);
     
     Component focusedComponent;
-    if ((usernameField.getText().length() == 0) && usernameField.isEnabled())
-      focusedComponent = usernameField;
+    if ("".equals(usernameBox.getSelectedItem()))
+      focusedComponent = usernameBox;
     else if ((passwordField.getPassword().length == 0) && passwordField.isEnabled())
       focusedComponent = passwordField;
     else
@@ -543,9 +547,6 @@ public class LoginPanel extends DialogPanel{
     JLabel serverLabel = i18n.createLabel("serverLabel");
     serverLabel.setLabelFor(serverBox);
     
-    JLabel accountLabel = i18n.createLabel("accountLabel");
-    accountLabel.setLabelFor(accountBox);
-    
     JLabel hostnameLabel = i18n.createLabel("hostnameLabel");
     hostnameLabel.setLabelFor(hostnameBox);
     
@@ -565,94 +566,87 @@ public class LoginPanel extends DialogPanel{
 
     JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
     
-    
     // Layout
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
+    
+    
     layout.setHonorsVisibility(serverWebsiteLink, Boolean.FALSE);
     layout.setHonorsVisibility(registerLink, Boolean.FALSE);
     layout.setHonorsVisibility(retrievePasswordLink, Boolean.FALSE);
     
     layout.setHorizontalGroup(
-      layout.createParallelGroup()
+        layout.createParallelGroup()
         .add(layout.createSequentialGroup()
-          .add(layout.createParallelGroup(GroupLayout.TRAILING, false)
-            .add(serverLabel)
-            .add(accountLabel)
-            .add(usernameLabel)
-            .add(passwordLabel)
-            .add(hostnameLabel)
-            .add(portsLabel)
-          )
-          .addPreferredGap(LayoutStyle.RELATED)
-          .add(layout.createSequentialGroup()
-            .add(layout.createParallelGroup(GroupLayout.LEADING, false)
-              .add(serverBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(accountBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(usernameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(passwordField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(savePasswordCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(hostnameBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-              .add(portsField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+            .add(layout.createParallelGroup(GroupLayout.TRAILING, false)
+                .add(serverLabel)
+                .add(usernameLabel)
+                .add(passwordLabel)
+                .add(hostnameLabel)
+                .add(portsLabel)
             )
-            .addPreferredGap(LayoutStyle.UNRELATED)
-            .add(layout.createParallelGroup(GroupLayout.LEADING, false)
-              .add(serverWebsiteLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-              .add(registerLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-              .add(retrievePasswordLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(LayoutStyle.RELATED)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+                    .add(serverBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                    .add(usernameBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                    .add(passwordField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                    .add(savePasswordCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                    .add(hostnameBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                    .add(portsField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+                )
+                .addPreferredGap(LayoutStyle.UNRELATED)
+                .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+                    .add(serverWebsiteLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .add(registerLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .add(retrievePasswordLink, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                )
             )
-          )
         )
         .add(separator)
         .add(layout.createSequentialGroup()
-          .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
-          .add(moreLessButton)
-          .addPreferredGap(LayoutStyle.RELATED)
-          .add(connectButton)
+            .addPreferredGap(LayoutStyle.RELATED, 1, Integer.MAX_VALUE)
+            .add(moreLessButton)
+            .addPreferredGap(LayoutStyle.RELATED)
+            .add(connectButton)
         )
     );
     
     layout.setVerticalGroup(
-      layout.createSequentialGroup()
+        layout.createSequentialGroup()
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(serverLabel).add(serverBox).add(serverWebsiteLink)
-        )
-        .addPreferredGap(LayoutStyle.RELATED)
-        .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(accountLabel).add(accountBox)
+            .add(serverLabel).add(serverBox).add(serverWebsiteLink)
         )
         .addPreferredGap(LayoutStyle.UNRELATED)
         .add(separator)
         .addPreferredGap(LayoutStyle.UNRELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(usernameLabel).add(usernameField).add(registerLink)
+            .add(usernameLabel).add(usernameBox).add(registerLink)
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(passwordLabel).add(passwordField).add(retrievePasswordLink)
+            .add(passwordLabel).add(passwordField).add(retrievePasswordLink)
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(savePasswordCheckBox)
         .addPreferredGap(LayoutStyle.UNRELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(hostnameLabel).add(hostnameBox)
+            .add(hostnameLabel).add(hostnameBox)
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(portsLabel).add(portsField)
+            .add(portsLabel).add(portsField)
         )
         .addPreferredGap(LayoutStyle.UNRELATED, 20, Integer.MAX_VALUE)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(moreLessButton)
-          .add(connectButton)
+            .add(moreLessButton)
+            .add(connectButton)
         )
     );
-    
-
   }
-
-
-
+  
+  
+  
   /**
    * Parses the specified string as a list of space delimited ports. Returns
    * <code>null</code> if the string is invalid.
