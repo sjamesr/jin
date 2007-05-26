@@ -45,7 +45,7 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
    */
   
   public FreechessHelpConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
-    super(connection, encoding, isConsoleCloseable);
+    super(connection, false, encoding, isConsoleCloseable);
   }
   
   
