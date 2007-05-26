@@ -31,6 +31,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -1610,7 +1611,8 @@ public class JBoard extends JComponent{
   protected void drawArrow(Graphics graphics, Square from, Square to,
       float arrowSize, Color color){
     
-    Graphics2D g = (Graphics2D)graphics;
+    Graphics2D g = (Graphics2D)graphics.create();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     
     Rectangle fromRect = squareToRect(from, null);
     Rectangle toRect = squareToRect(to, null);
