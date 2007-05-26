@@ -139,6 +139,8 @@ background = color;000000
 
 output-text.antialias = boolean;false
 
+font-bold.gameEndReason = boolean;true
+
 foreground.tell = color;ffff00
 foreground.say = color;ffff00
 foreground.ptell = color;ffff00
