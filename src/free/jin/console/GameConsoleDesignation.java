@@ -32,6 +32,7 @@ import free.jin.event.GameAdapter;
 import free.jin.event.GameEndEvent;
 import free.jin.event.IllegalMoveEvent;
 import free.jin.event.JinEvent;
+import free.jin.event.TakebackEvent;
 
 
 
@@ -86,6 +87,10 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
         if (getGame().equals(evt.getGame()))
           GameConsoleDesignation.this.illegalMoveAttempted(evt);
       }
+      public void takebackOccurred(TakebackEvent evt){
+        if (getGame().equals(evt.getGame()))
+          GameConsoleDesignation.this.takebackOccurred(evt);
+      }
     });
     
     game.addPropertyChangeListener(new PropertyChangeListener(){
@@ -134,6 +139,8 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
    */
   
   protected void illegalMoveAttempted(IllegalMoveEvent evt){
+    I18n i18n = I18n.get(GameConsoleDesignation.class);
+    
     String i18nKey;
     switch (evt.getReasonCode()){
       case IllegalMoveEvent.ILLEGAL_MOVE: i18nKey = "illegalMove"; break;
@@ -142,10 +149,26 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
       default:
         throw new IllegalStateException("Bad reason code value: " + evt.getReasonCode());
     }
+    i18nKey = "moveRejectedMessage." + i18nKey;
     
-    i18nKey = "moveRejected." + i18nKey;
     Object [] args = new Object[]{evt.getMove().toString()};
-    getConsole().addToOutput(I18n.get(GameConsoleDesignation.class).getFormattedString(i18nKey, args), "gameInfo");
+    getConsole().addToOutput(i18n.getFormattedString(i18nKey, args), "gameInfo");
+  }
+  
+  
+  
+  /**
+   * Invoked when a takeback occurs in the game.
+   */
+  
+  protected void takebackOccurred(TakebackEvent evt){
+    if (!game.isPlayed())
+      return;
+    
+    I18n i18n = I18n.get(GameConsoleDesignation.class);
+    String i18nKey = "takebackMessage";
+    Object [] args = new Object[]{String.valueOf(evt.getTakebackCount())};
+    getConsole().addToOutput(i18n.getFormattedString(i18nKey, args), "gameInfo");
   }
   
   
