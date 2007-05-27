@@ -679,7 +679,7 @@ public class SoughtGraph extends JComponent{
     // The current seek description string.
     if (curSeek != null){
       String seekString = getSeekString(curSeek);
-      g.drawString(seekString, 1, height - fm.getMaxDescent() - 1);
+      g.drawString(seekString, fm.getHeight()/3, height - fm.getMaxDescent() - 1);
     }
     
     
