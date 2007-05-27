@@ -38,6 +38,8 @@ import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -316,6 +318,13 @@ public class SoughtGraph extends JComponent{
     Class imageLoader = SoughtGraph.class;
     String imageDir = "images/legend/";
     
+    final int vRelatedGap = 3;
+    final int vUnrelatedGap = 10;
+    final int hRelatedGap = 5;
+    final int border = 5;
+    final int indent = 15;
+    
+    
     Icon normalIcon = new ImageIcon(imageLoader.getResource(imageDir + "normal.png"));
     Icon wildIcon = new ImageIcon(imageLoader.getResource(imageDir + "wild.png"));
     Icon humanIcon = new ImageIcon(imageLoader.getResource(imageDir + "human.png"));
@@ -324,7 +333,7 @@ public class SoughtGraph extends JComponent{
     Icon unratedIcon = new ImageIcon(imageLoader.getResource(imageDir + "unrated.png"));
     
     // Normal/Wild
-    JPanel chessTypePanel = new JPanel(new TableLayout(3, 5, 0));
+    JPanel chessTypePanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
     chessTypePanel.setOpaque(false);
     chessTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     chessTypePanel.add(new JLabel(normalIcon));
@@ -335,7 +344,7 @@ public class SoughtGraph extends JComponent{
     chessTypePanel.add(i18n.createLabel("wildChessLabel"));
     
     // Human/Computer
-    JPanel opponentTypePanel = new JPanel(new TableLayout(3, 5, 0));
+    JPanel opponentTypePanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
     opponentTypePanel.setOpaque(false);
     opponentTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     opponentTypePanel.add(new JLabel(humanIcon));
@@ -346,7 +355,7 @@ public class SoughtGraph extends JComponent{
     opponentTypePanel.add(i18n.createLabel("computerLabel"));
     
     // Rated/Unrated row
-    JPanel ratednessPanel = new JPanel(new TableLayout(3, 5, 0));
+    JPanel ratednessPanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
     ratednessPanel.setOpaque(false);
     ratednessPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     ratednessPanel.add(new JLabel(ratedIcon));
@@ -356,13 +365,32 @@ public class SoughtGraph extends JComponent{
     ratednessPanel.add(new JLabel("-"));
     ratednessPanel.add(i18n.createLabel("unratedLabel"));
     
+    // Title labels
+    JLabel insideLabel = i18n.createLabel("insideLabel");
+    JLabel outlineLabel = i18n.createLabel("outlineLabel");
+    JLabel shapeLabel = i18n.createLabel("shapeLabel");
     
-    JPanel legendPanel = new JPanel(new TableLayout(1, 0, 10));
+    JPanel legendPanel = new JPanel(null);
     legendPanel.setOpaque(false);
-    legendPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    legendPanel.setBorder(BorderFactory.createEmptyBorder(border, border, border, border));
+    
+    legendPanel.setLayout(new BoxLayout(legendPanel, BoxLayout.PAGE_AXIS));
+    chessTypePanel.setBorder(BorderFactory.createEmptyBorder(0, indent, 0, 0));
+    opponentTypePanel.setBorder(BorderFactory.createEmptyBorder(0, indent, 0, 0));
+    ratednessPanel.setBorder(BorderFactory.createEmptyBorder(0, indent, 0, 0));
+    
+    legendPanel.add(insideLabel);
+    legendPanel.add(Box.createVerticalStrut(vRelatedGap));
     legendPanel.add(chessTypePanel);
+    legendPanel.add(Box.createVerticalStrut(vUnrelatedGap));
+    legendPanel.add(outlineLabel);
+    legendPanel.add(Box.createVerticalStrut(vRelatedGap));
     legendPanel.add(opponentTypePanel);
+    legendPanel.add(Box.createVerticalStrut(vUnrelatedGap));
+    legendPanel.add(shapeLabel);
+    legendPanel.add(Box.createVerticalStrut(vRelatedGap));
     legendPanel.add(ratednessPanel);
+    
     Dimension legendPanelSize = legendPanel.getPreferredSize();
     
     JToolTip tooltip = new JToolTip();
