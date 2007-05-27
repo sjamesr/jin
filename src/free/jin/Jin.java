@@ -589,7 +589,7 @@ public class Jin{
     I18n i18n = I18n.get(Jin.class);
     
     Object result = askToConfirm ? 
-      i18n.confirm(OptionPanel.OK, "quitConfirmationDialog") : OptionPanel.OK;
+      i18n.confirm(OptionPanel.OK, "quitConfirmationDialog", new Object[]{getAppName()}) : OptionPanel.OK;
     
     if (result == OptionPanel.OK){
       connManager.closeSession();

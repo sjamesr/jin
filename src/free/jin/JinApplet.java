@@ -970,7 +970,7 @@ public class JinApplet extends Applet implements JinContext{
       
       guestButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          setStatus(l10n.getString("startingJinStatus"), Color.black);
+          setStatus(l10n.getFormattedString("startingStatus", new Object[]{Jin.getAppName()}), Color.black);
           loginButton.setEnabled(false);
           guestButton.setEnabled(false);
           startAsGuest();
@@ -1087,7 +1087,7 @@ public class JinApplet extends Applet implements JinContext{
         
         start(prefs, guest, users, username, password);
         
-        setStatus(l10n.getString("stayOnPageStatus"), Color.black);
+        setStatus(l10n.getFormattedString("stayOnPageStatus", new Object[]{Jin.getAppName()}), Color.black);
       } catch (IOException e){
           e.printStackTrace();
           createErrorUI(e);
@@ -1139,11 +1139,11 @@ public class JinApplet extends Applet implements JinContext{
     public SettingsUploadDialog(Frame parent){
       super(parent, "", true);
       
-      setTitle(l10n.getString("prefsUploadDialog.title"));
+      setTitle(l10n.getFormattedString("prefsUploadDialog.title", new Object[]{Jin.getAppName()}));
      
       this.setLayout(new GridLayout(2, 1));
       
-      this.add(new Label(l10n.getString("prefsUploadDialog.message")));
+      this.add(new Label(l10n.getFormattedString("prefsUploadDialog.message", new Object[]{Jin.getAppName()})));
       
       Button button = new Button(l10n.getString("prefsUploadDialog.cancelButton.text"));
       Panel buttonPanel = new Panel(new FlowLayout());
@@ -1185,7 +1185,7 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     public SettingsUploadErrorDialog(Frame parent, String errorMessage){
-      super(parent, l10n.getString("prefsUploadErrorDialog.title"), true);
+      super(parent, l10n.getFormattedString("prefsUploadErrorDialog.title", new Object[]{Jin.getAppName()}), true);
       
       createUI(errorMessage);
     }
@@ -1199,7 +1199,8 @@ public class JinApplet extends Applet implements JinContext{
     private void createUI(String errorMessage){
       this.setLayout(new BorderLayout(5, 5));
       
-      this.add(BorderLayout.NORTH, new Label(l10n.getString("prefsUploadErrorDialog.message")));
+      this.add(BorderLayout.NORTH, 
+    		  new Label(l10n.getFormattedString("prefsUploadErrorDialog.message", new Object[]{Jin.getAppName()})));
       
       TextArea errorArea = new TextArea(errorMessage, 3, 40);
       
@@ -1262,7 +1263,7 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     public PasswordDialog(Frame parent, String errorMessage, String username){
-      super(parent, l10n.getString("passwordPrefsUploadErrorDialog.title"), true);
+      super(parent, l10n.getFormattedString("passwordPrefsUploadErrorDialog.title", new Object[]{Jin.getAppName()}), true);
       
       usernameField = new TextField(username);
       passwordField = new TextField();
@@ -1280,7 +1281,8 @@ public class JinApplet extends Applet implements JinContext{
     private void createUI(String errorMessage){
       this.setLayout(new BorderLayout(5, 5));
       
-      this.add(BorderLayout.NORTH, new Label(l10n.getString("passwordPrefsUploadErrorDialog.message")));
+      this.add(BorderLayout.NORTH, 
+    		  new Label(l10n.getFormattedString("passwordPrefsUploadErrorDialog.message", new Object[]{Jin.getAppName()})));
       
       Panel centerPanel = new Panel(new BorderLayout(5, 5));
       

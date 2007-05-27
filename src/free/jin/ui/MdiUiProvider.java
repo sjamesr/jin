@@ -403,7 +403,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       separatorIndex = getItemCount();
 
       addSeparator();
-      add(exit = i18n.createMenuItem("exitJinMenuItem"));
+      add(exit = i18n.createMenuItem("exitMenuItem"));
       
       exit.setAccelerator(
         KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

@@ -77,7 +77,7 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
   public void applyChanges() throws BadChangesException{
     super.applyChanges();
     
-    Object result = I18n.get(UiPrefsPanel.class).question(OptionPanel.YES, "restartJinDialog", this,
+    Object result = I18n.get(UiPrefsPanel.class).question(OptionPanel.YES, "restartDialog", this,
       new Object[]{Jin.getAppName()});
     
     if (result == OptionPanel.YES)

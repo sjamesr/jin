@@ -352,7 +352,8 @@ public class ConnectionManager{
         
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||
-          OptionPanel.YES == i18n.question(OptionPanel.YES, "rememberAccountDialog", new Object[]{user.getUsername()});
+          OptionPanel.YES == i18n.question(OptionPanel.YES, "rememberAccountDialog", 
+        		  new Object[]{Jin.getAppName(), user.getUsername()});
          
         if (rememberUser){
           Jin.getInstance().addUser(user);
