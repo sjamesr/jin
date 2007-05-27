@@ -21,6 +21,8 @@
 
 package free.util.swing;
 
+import free.util.Localization;
+
 
 
 
@@ -33,10 +35,10 @@ class LocalizationService{
   
   
   /**
-   * The template <code>free.util.Localization</code>.
+   * The template <code>Localization</code> for the entire package.
    */
 
-  private static free.util.Localization templateLocalization = null;
+  private static Localization templateLocalization = null;
   
   
   
@@ -45,10 +47,10 @@ class LocalizationService{
    * specified class.
    */
 
-  public static synchronized free.util.Localization getForClass(Class c){
+  public static synchronized Localization getForClass(Class c){
     // Lazily initialize
     if (templateLocalization == null)
-      templateLocalization = free.util.Localization.load(LocalizationService.class);
+      templateLocalization = Localization.load(LocalizationService.class);
     
     return templateLocalization.getForClass(c);
   }
