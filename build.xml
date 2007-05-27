@@ -194,7 +194,7 @@
 
 		<!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
-			<fileset dir="${source.dir}" excludes="**/*.java **/*.html **/localization*.properties" />
+			<fileset dir="${source.dir}" excludes="**/*.java **/*.html **/*.svg **/localization*.properties" />
 		</copy>
 		
 		<!-- Convert and copy localization files -->
