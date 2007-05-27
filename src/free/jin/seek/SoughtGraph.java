@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -79,13 +79,11 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * The amount of slots dedicated to blitz.
    */
   
   protected static final int BLITZ_SLOTS = 28;
-  
   
   
   
@@ -97,13 +95,11 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * The total amount of rating (vertical) slots.
    */
   
   protected static final int RATING_SLOTS = 32;
-  
   
   
   
@@ -115,13 +111,11 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * The percentage of the height dedicated to the graph itself.
    */
   
   protected static final double GRAPH_HEIGHT_PERCENTAGE = 0.85;
-  
   
   
   
@@ -149,7 +143,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * Maps Seeks to Point objects indicating their locations on the graph.
    */
@@ -166,7 +159,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * The seek currently under the mouse cursor.
    */
@@ -180,7 +172,6 @@ public class SoughtGraph extends JComponent{
    */
   
   protected Point curMouseLocation = null;
-  
   
   
   
@@ -235,7 +226,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * Creates a new SoughtGraph with the give user Plugin.
    */
@@ -275,6 +265,8 @@ public class SoughtGraph extends JComponent{
     
     createUI();
     enableEvents(MouseEvent.MOUSE_MOTION_EVENT_MASK|MouseEvent.MOUSE_EVENT_MASK);
+    
+    setToolTipText(""); // Enables tooltips
   }
   
   
@@ -407,7 +399,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * This method calculates the desired location of the given seek. Note that the
    * seek might end up elsewhere because that location is already taken.
@@ -443,7 +434,6 @@ public class SoughtGraph extends JComponent{
     
     return new Point(x,y);
   }
-  
   
   
   
@@ -502,7 +492,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * Adds the given Seek to this SoughtGraph.
    */
@@ -520,7 +509,6 @@ public class SoughtGraph extends JComponent{
     if (curMouseLocation!=null)
       updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
   }
-  
   
   
   
@@ -544,8 +532,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
-  
   /**
    * Removes all the seeks.
    */
@@ -559,7 +545,6 @@ public class SoughtGraph extends JComponent{
     
     repaint();
   }
-  
   
   
   
@@ -694,7 +679,7 @@ public class SoughtGraph extends JComponent{
     g.drawString(tenString, (graphX - strWidth)/2, (int)(graphY + graphHeight - 6*slotHeight));
     g.drawString(fifteenString, (graphX - strWidth)/2, (int)(graphY + graphHeight - 16*slotHeight));
     g.drawString(twentyString, (graphX - strWidth)/2, (int)(graphY + graphHeight - 26*slotHeight));
-
+    
     
     // The seeks.    
     Rectangle seekBounds = new Rectangle();
@@ -712,8 +697,6 @@ public class SoughtGraph extends JComponent{
       }
     }
   }
-  
-  
   
   
   
@@ -776,6 +759,7 @@ public class SoughtGraph extends JComponent{
   }
   
   
+  
   /**
    * Draws a single seek within the given bounds.
    */
@@ -794,7 +778,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * Returns a string representing the given seek.
    */
@@ -810,11 +793,11 @@ public class SoughtGraph extends JComponent{
     String black = i18n.getString("black");
     String manualAcceptIndicator = i18n.getString("manualAcceptIndicator");
     String formulaIndicator = i18n.getString("formulaIndicator");
+    String computerIndicator = i18n.getString("computerIndicator");
     
     String name = seek.getSeekerName();
     String title = seek.getSeekerTitle();
     int rating = seek.getSeekerRating();
-    String ratingString = seek.isSeekerRated() ? (" "+rating) : "";
     boolean isProvisional = seek.isSeekerProvisional()&&seek.isSeekerRegistered();
     int time = seek.getTime()/(60*1000);
     int inc = seek.getInc()/1000;
@@ -825,30 +808,48 @@ public class SoughtGraph extends JComponent{
     boolean isManualAccept = seek.isManualAccept();
     boolean isFormula = seek.isFormula();
     
-    String seekString = name + title + ratingString + (isProvisional ? " (" + provisional+") " : " ") +
-    time + " " + inc + " " + (isRated ? rated : unrated) + " ";
+    StringBuffer buf = new StringBuffer();
+    
+    buf.append(name).append(title);
+    
+    if (seek.isSeekerRated()){
+      buf.append("(");
+      buf.append(rating);
+      if (isProvisional){
+        buf.append(" ");
+        buf.append(provisional);
+      }
+      buf.append(")");
+    }
+    
+    if (seek.isSeekerComputer())
+      buf.append("(").append(computerIndicator).append(")");
+    
+    buf.append(" ").append(time);
+    buf.append(" ").append(inc);
+    
+    buf.append(" ").append(isRated ? rated : unrated);
     
     if (!(variant instanceof Chess))
-      seekString = seekString + variant.getName() + " ";
+      buf.append(" ").append(variant.getName());
     
-    if (color!=null)
-      seekString = seekString + (color.isWhite() ? white : black) + " ";
+    if (color != null)
+      buf.append(" ").append(color.isWhite() ? white : black);
     
     if (isRatingLimited){
       int minRating = seek.getMinRating();
       int maxRating = seek.getMaxRating();
-      seekString = seekString+minRating + "-" + maxRating + " ";
+      buf.append(" ").append(minRating).append("-").append(maxRating);
     }
     
     if (isManualAccept)
-      seekString = seekString + manualAcceptIndicator + " ";
+      buf.append(" ").append(manualAcceptIndicator);
     
     if (isFormula)
-      seekString = seekString + formulaIndicator + " ";
+      buf.append(" ").append(formulaIndicator);
     
-    return seekString;
+    return buf.toString();
   }
-  
   
   
   
@@ -884,6 +885,15 @@ public class SoughtGraph extends JComponent{
   
   
   
+  /**
+   * Returns the tooltip text to be displayed at the specified coordinate.
+   */
+  
+  public String getToolTipText(MouseEvent evt){
+    Seek seek = seekAtLocation(evt.getX(), evt.getY());
+    return seek == null ? null : getSeekString(seek);
+  }
+  
   
   
   /**
@@ -906,9 +916,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
-  
-  
   /**
    * Changes the current seek under mouse and repaints if necessary.
    */
@@ -921,7 +928,6 @@ public class SoughtGraph extends JComponent{
       curMouseLocation = evt.getPoint();
     }
   }
-  
   
   
   
@@ -951,8 +957,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
-  
   /**
    * Adds the given SeekSelectionListener to the list of listeners receiving
    * notifications when the user selects seeks.
@@ -964,7 +968,6 @@ public class SoughtGraph extends JComponent{
   
   
   
-  
   /**
    * Removes the given SeekSelectionListener from the list of listeners receiving
    * notifications when the user selects seeks.
@@ -973,7 +976,6 @@ public class SoughtGraph extends JComponent{
   public void removeSeekSelectionListener(SeekSelectionListener listener){
     listenerList.remove(SeekSelectionListener.class, listener);
   }
-  
   
   
   
