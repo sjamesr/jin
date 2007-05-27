@@ -57,12 +57,16 @@ public class HelpMenu extends JMenu{
 
 
   /**
-   * Creates the "Jin Website" menu item.
+   * Creates the "<Client> Website" menu item.
    */
 
   private JMenuItem createWebsiteMenuItem(){
-    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("jinWebsiteMenuItem");
-    item.addActionListener(new UrlDisplayingAction("http://www.jinchess.com"));
+    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("websiteMenuItem", new Object[]{Jin.getAppName()});
+    String url = Jin.getAppProperty("app.websiteURL", null);
+    if (url == null)
+    	item.setEnabled(false);
+    else
+    	item.addActionListener(new UrlDisplayingAction(url));
     return item;
   }
 
@@ -90,7 +94,11 @@ public class HelpMenu extends JMenu{
 
   private JMenuItem createBugReportMenuItem(){
     JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("reportBugMenuItem");
-    item.addActionListener(new UrlDisplayingAction("https://sourceforge.net/tracker/?group_id=50386&atid=459537"));
+    String url = Jin.getAppProperty("app.reportBugsURL", null);
+    if (url == null)
+    	item.setEnabled(false);
+    else
+    	item.addActionListener(new UrlDisplayingAction(url));
     return item;
   }
 
@@ -101,8 +109,12 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createFeatureRequestMenuItem(){
-    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("suggestFeatureMenuItem");
-    item.addActionListener(new UrlDisplayingAction("https://sourceforge.net/tracker/?group_id=50386&atid=459540"));
+    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("suggestFeaturesMenuItem");
+    String url = Jin.getAppProperty("app.suggestFeaturesURL", null);
+    if (url == null)
+    	item.setEnabled(false);
+    else
+    	item.addActionListener(new UrlDisplayingAction(url));
     return item;
   }
 
@@ -113,7 +125,7 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createAboutMenuItem(){
-    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("aboutJinMenuItem", new Object[]{Jin.getAppName()});
+    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("aboutMenuItem", new Object[]{Jin.getAppName()});
     item.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         new AboutPanel().display();
