@@ -26,67 +26,21 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
-import free.chess.Chess;
-import free.chess.ChessMove;
-import free.chess.ChessPiece;
-import free.chess.ChesslikeGenericVariant;
-import free.chess.FischerTimeControl;
-import free.chess.Move;
-import free.chess.OddsTimeControl;
-import free.chess.Piece;
-import free.chess.Player;
-import free.chess.Position;
-import free.chess.Square;
-import free.chess.TimeControl;
-import free.chess.WildVariant;
+import free.chess.*;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.suicide.Suicide;
-import free.chessclub.ChessclubConnection;
-import free.freechess.DeltaBoardStruct;
-import free.freechess.FreechessConnection;
-import free.freechess.GameInfoStruct;
-import free.freechess.Ivar;
-import free.freechess.SeekInfoStruct;
-import free.freechess.Style12Struct;
-import free.jin.Connection;
-import free.jin.Game;
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.PGNConnection;
-import free.jin.Seek;
-import free.jin.SeekConnection;
-import free.jin.ServerUser;
-import free.jin.UserSeek;
-import free.jin.chessclub.NoSuchGameException;
-import free.jin.event.BoardFlipEvent;
-import free.jin.event.ChatEvent;
-import free.jin.event.ClockAdjustmentEvent;
-import free.jin.event.GameEndEvent;
-import free.jin.event.GameStartEvent;
-import free.jin.event.IllegalMoveEvent;
-import free.jin.event.ListenerManager;
-import free.jin.event.MoveMadeEvent;
-import free.jin.event.OfferEvent;
-import free.jin.event.PlainTextEvent;
-import free.jin.event.PositionChangedEvent;
-import free.jin.event.SeekEvent;
-import free.jin.event.SeekListenerManager;
-import free.jin.event.TakebackEvent;
+import free.freechess.*;
+import free.jin.*;
+import free.jin.event.*;
 import free.jin.freechess.event.IvarStateChangeEvent;
 import free.util.Pair;
 import free.util.TextUtilities;
@@ -1378,7 +1332,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   protected void warnVariantUnsupported(String variantName){
-    Object [] messageFormatArgs = new Object[]{variantName};
+    Object [] messageFormatArgs = new Object[]{Jin.getAppName(), variantName};
     String message = 
       I18n.get(JinFreechessConnection.class).getFormattedString("unsupportedVariantMessage", messageFormatArgs);
     String [] messageLines = message.split("\n");
@@ -2730,12 +2684,12 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
 
   /**
-   * Overrides ChessclubConnection.execRunnable(Runnable) to execute the
+   * Overrides Connection.execRunnable(Runnable) to execute the
    * runnable on the AWT thread using SwingUtilities.invokeLater(Runnable), 
    * since this class is meant to be used by Jin, a graphical interface using 
    * Swing.
    *
-   * @see ChessclubConnection#execRunnable(Runnable)
+   * @see Connection#execRunnable(Runnable)
    * @see SwingUtilities.invokeLater(Runnable)
    */
 
