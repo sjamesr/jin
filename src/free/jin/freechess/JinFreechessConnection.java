@@ -42,11 +42,14 @@ import free.chess.Chess;
 import free.chess.ChessMove;
 import free.chess.ChessPiece;
 import free.chess.ChesslikeGenericVariant;
+import free.chess.FischerTimeControl;
 import free.chess.Move;
+import free.chess.OddsTimeControl;
 import free.chess.Piece;
 import free.chess.Player;
 import free.chess.Position;
 import free.chess.Square;
+import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.chess.variants.BothSidesCastlingVariant;
 import free.chess.variants.NoCastlingVariant;
@@ -1393,9 +1396,29 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     processLine(border);
   }
   
-
-
-
+  
+  
+  /**
+   * Returns the <code>TimeControl</code> object to be used for the specified
+   * parameters.
+   * 
+   * @param whiteInitial White's initial amount of time, in seconds.
+   * @param whiteIncrement White's increment, in seconds.
+   * @param blackInitial Black's initial amount of time, in seconds.
+   * @param blackIncrement Black's increment, in seconds.
+   */
+  
+  private static TimeControl getTimeControl(int whiteInitial, int whiteIncrement, int blackInitial, int blackIncrement){
+    TimeControl whiteTimeControl = new FischerTimeControl(1000*whiteInitial, 1000*whiteIncrement);
+    TimeControl blackTimeControl = new FischerTimeControl(1000*blackInitial, 1000*blackIncrement);
+    if (whiteTimeControl.equals(blackTimeControl))
+      return whiteTimeControl;
+    else
+      return new OddsTimeControl(whiteTimeControl, blackTimeControl);
+  }
+  
+  
+  
   /**
    * Called when a new game is starting. Responsible for creating the game on
    * the client side and firing appropriate events. Returns an InternalGameData
@@ -1425,11 +1448,9 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     String whiteName = boardData.getWhiteName();
     String blackName = boardData.getBlackName();
-
-    int whiteTime = 1000 * gameInfo.getWhiteTime();
-    int blackTime = 1000 * gameInfo.getBlackTime();
-    int whiteInc = 1000 * gameInfo.getWhiteInc();
-    int blackInc = 1000 * gameInfo.getBlackInc();
+    
+    TimeControl timeControl = getTimeControl(
+        gameInfo.getWhiteTime(), gameInfo.getWhiteInc(), gameInfo.getBlackTime(), gameInfo.getBlackInc());
 
     int whiteRating = gameInfo.isWhiteRegistered() ? -1 : gameInfo.getWhiteRating();
     int blackRating = gameInfo.isBlackRegistered() ? -1 : gameInfo.getBlackRating();
@@ -1451,7 +1472,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       userPlayer = boardData.isMyTurn() ? currentPlayer : currentPlayer.getOpponent();
 
     Game game = new Game(gameType, initPos, boardData.getPlayedPlyCount(), whiteName, blackName,
-      whiteTime, whiteInc, blackTime, blackInc, whiteRating, blackRating, gameID, categoryName,
+      timeControl, whiteRating, blackRating, gameID, categoryName,
       isRated, isPlayed, whiteTitles, blackTitles, initiallyFlipped, userPlayer);
 
     InternalGameData gameData = new InternalGameData(game);
@@ -1489,11 +1510,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 
     game.setWhiteName(boardData.getWhiteName()); // Change white name
     game.setBlackName(boardData.getBlackName()); // Change black name
-    game.setWhiteTime(1000 * boardData.getInitialTime()); // Change white's initial time
-    game.setWhiteInc(1000 * boardData.getIncrement()); // Change white's increment
-    game.setBlackTime(1000 * boardData.getInitialTime()); // Change black's initial time
-    game.setBlackInc(1000 * boardData.getIncrement()); // Change black's increment
-
+    game.setTimeControl(getTimeControl(
+        boardData.getInitialTime(), boardData.getIncrement(), boardData.getInitialTime(), boardData.getIncrement()));
 
     gameData.boardData = boardData;
   }
@@ -1859,12 +1877,14 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
         }
 
         boolean isRatingLimited = ((seekInfo.getOpponentMinRating() > 0) || (seekInfo.getOpponentMaxRating() < 9999));
+        
+        TimeControl timeControl = 
+          new FischerTimeControl(seekInfo.getMatchTime()*60*1000, seekInfo.getMatchIncrement()*1000);
 
         Seek seek = new Seek(seekID, userForName(seekInfo.getSeekerHandle()),
             titlesBuf.toString(), seekInfo.getSeekerRating(), isProvisional,
             isRegistered, isSeekerRated, isComputer, variant,
-            seekInfo.getMatchType(), seekInfo.getMatchTime()*60*1000,
-            seekInfo.getMatchIncrement()*1000, seekInfo.isMatchRated(), color,
+            seekInfo.getMatchType(), timeControl, seekInfo.isMatchRated(), color,
             isRatingLimited, seekInfo.getOpponentMinRating(),
             seekInfo.getOpponentMaxRating(), !seekInfo.isAutomaticAccept(),
             seekInfo.isFormulaUsed());

@@ -850,6 +850,32 @@ public class Scripter extends Plugin{
         default:
           throw new IllegalStateException("Unknown game type: "+gameType);
       }
+      
+      TimeControl timeControl = game.getTimeControl();
+      boolean isTimeOdds = (timeControl instanceof OddsTimeControl) && ((OddsTimeControl)timeControl).isOdds();
+      
+      Integer whiteTime, whiteInc, blackTime, blackInc;
+      whiteTime = whiteInc = blackTime = blackInc = null;
+      if (game.getTimeControl() instanceof FischerTimeControl){
+        FischerTimeControl tc = (FischerTimeControl)game.getTimeControl();
+        whiteTime = Integer.valueOf(tc.getInitial()/(1000*60));
+        whiteInc = Integer.valueOf(tc.getIncrement()/1000);
+        blackTime = whiteTime;
+        blackInc = whiteInc;
+      }
+      else if (timeControl instanceof OddsTimeControl){
+        OddsTimeControl tc = (OddsTimeControl)game.getTimeControl();
+        if ((tc.getWhiteTimeControl() instanceof FischerTimeControl) &&
+            (tc.getBlackTimeControl() instanceof FischerTimeControl)){
+          FischerTimeControl wtc = (FischerTimeControl)tc.getWhiteTimeControl();
+          FischerTimeControl btc = (FischerTimeControl)tc.getBlackTimeControl();
+          
+          whiteTime = Integer.valueOf(wtc.getInitial());
+          whiteInc = Integer.valueOf(wtc.getIncrement());
+          blackTime = Integer.valueOf(btc.getInitial());
+          blackInc = Integer.valueOf(btc.getIncrement());
+        }
+      }
 
       vars.addElement(new Object[]{"gameType", gameTypeString});
       vars.addElement(new Object[]{"initialPosition", game.getInitialPosition()});
@@ -858,10 +884,10 @@ public class Scripter extends Plugin{
       Player userPlayer = game.getUserPlayer();
       vars.addElement(new Object[]{"whiteName", game.getWhiteName()});
       vars.addElement(new Object[]{"blackName", game.getBlackName()});
-      vars.addElement(new Object[]{"whiteTime", new Integer(game.getWhiteTime()/(1000*60))});
-      vars.addElement(new Object[]{"whiteInc", new Integer(game.getWhiteInc()/1000)});
-      vars.addElement(new Object[]{"blackTime", new Integer(game.getBlackTime()/(1000*60))});
-      vars.addElement(new Object[]{"blackInc", new Integer(game.getBlackInc()/1000)});
+      vars.addElement(new Object[]{"whiteTime", whiteTime});
+      vars.addElement(new Object[]{"whiteInc", whiteInc});
+      vars.addElement(new Object[]{"blackTime", blackTime});
+      vars.addElement(new Object[]{"blackInc", blackInc});
       vars.addElement(new Object[]{"whiteRating", new Integer(game.getWhiteRating())});
       vars.addElement(new Object[]{"blackRating", new Integer(game.getBlackRating())});
       vars.addElement(new Object[]{"whiteTitle", game.getWhiteTitles()});
@@ -869,16 +895,16 @@ public class Scripter extends Plugin{
       vars.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
       vars.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
-      vars.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
+      vars.addElement(new Object[]{"isTimeOdds", isTimeOdds ? Boolean.TRUE : Boolean.FALSE});
 
       if (userPlayer != null){
         if (userPlayer.isWhite()){
           vars.addElement(new Object[]{"myName", game.getWhiteName()});
           vars.addElement(new Object[]{"oppName", game.getBlackName()});
-          vars.addElement(new Object[]{"myTime", new Integer(game.getWhiteTime()/(1000*60))});
-          vars.addElement(new Object[]{"myInc", new Integer(game.getWhiteInc()/1000)});
-          vars.addElement(new Object[]{"oppTime", new Integer(game.getBlackTime()/(1000*60))});
-          vars.addElement(new Object[]{"oppInc", new Integer(game.getBlackInc()/1000)});
+          vars.addElement(new Object[]{"myTime", whiteTime});
+          vars.addElement(new Object[]{"myInc", whiteInc});
+          vars.addElement(new Object[]{"oppTime", blackTime});
+          vars.addElement(new Object[]{"oppInc", blackInc});
           vars.addElement(new Object[]{"myRating", new Integer(game.getWhiteRating())});
           vars.addElement(new Object[]{"oppRating", new Integer(game.getBlackRating())});
           vars.addElement(new Object[]{"myTitle", game.getWhiteTitles()});
@@ -887,10 +913,10 @@ public class Scripter extends Plugin{
         else{
           vars.addElement(new Object[]{"oppName", game.getWhiteName()});
           vars.addElement(new Object[]{"myName", game.getBlackName()});
-          vars.addElement(new Object[]{"oppTime", new Integer(game.getWhiteTime()/(1000*60))});
-          vars.addElement(new Object[]{"oppInc", new Integer(game.getWhiteInc()/1000)});
-          vars.addElement(new Object[]{"myTime", new Integer(game.getBlackTime()/(1000*60))});
-          vars.addElement(new Object[]{"myInc", new Integer(game.getBlackInc()/1000)});
+          vars.addElement(new Object[]{"oppTime", whiteTime});
+          vars.addElement(new Object[]{"oppInc", whiteInc});
+          vars.addElement(new Object[]{"myTime", blackTime});
+          vars.addElement(new Object[]{"myInc", blackInc});
           vars.addElement(new Object[]{"oppRating", new Integer(game.getWhiteRating())});
           vars.addElement(new Object[]{"myRating", new Integer(game.getBlackRating())});
           vars.addElement(new Object[]{"oppTitle", game.getWhiteTitles()});
@@ -1051,31 +1077,58 @@ public class Scripter extends Plugin{
 
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       Vector varsVector = new Vector(29);
-      Game game = new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov", 5*60*1000, 2000,
-        5*60*1000, 2000, 1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER);
-
-      varsVector.addElement(new Object[]{"game", game});
-      varsVector.addElement(new Object[]{"gameType", new Integer(game.getGameType())});
+      Game game = new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov",
+        new FischerTimeControl(5*60*1000, 2000),
+        1800, 2852, "blah", "Blitz", true, true, "C", "GM", false, Player.WHITE_PLAYER);
+      
+      
+      int gameType = game.getGameType();
+      String gameTypeString;
+      switch (gameType){
+        case Game.MY_GAME: gameTypeString = "my"; break;
+        case Game.OBSERVED_GAME: gameTypeString = "observed"; break;
+        case Game.ISOLATED_BOARD: gameTypeString = "isolated"; break;
+        default:
+          throw new IllegalStateException("Unknown game type: "+gameType);
+      }
+      
+      TimeControl timeControl = game.getTimeControl();
+      boolean isTimeOdds = (timeControl instanceof OddsTimeControl) && ((OddsTimeControl)timeControl).isOdds();
+      
+      Integer whiteTime, whiteInc, blackTime, blackInc;
+      whiteTime = whiteInc = blackTime = blackInc = null;
+      if (game.getTimeControl() instanceof FischerTimeControl){
+        FischerTimeControl tc = (FischerTimeControl)game.getTimeControl();
+        whiteTime = Integer.valueOf(tc.getInitial()/(1000*60));
+        whiteInc = Integer.valueOf(tc.getIncrement()/1000);
+        blackTime = whiteTime;
+        blackInc = whiteInc;
+      }
+      else if (timeControl instanceof OddsTimeControl){
+        OddsTimeControl tc = (OddsTimeControl)game.getTimeControl();
+        if ((tc.getWhiteTimeControl() instanceof FischerTimeControl) &&
+            (tc.getBlackTimeControl() instanceof FischerTimeControl)){
+          FischerTimeControl wtc = (FischerTimeControl)tc.getWhiteTimeControl();
+          FischerTimeControl btc = (FischerTimeControl)tc.getBlackTimeControl();
+          
+          whiteTime = Integer.valueOf(wtc.getInitial());
+          whiteInc = Integer.valueOf(wtc.getIncrement());
+          blackTime = Integer.valueOf(btc.getInitial());
+          blackInc = Integer.valueOf(btc.getIncrement());
+        }
+      }
+      
+      varsVector.addElement(new Object[]{"gameType", gameTypeString});
       varsVector.addElement(new Object[]{"initialPosition", game.getInitialPosition()});
-      varsVector.addElement(new Object[]{"variant", game.getVariant()});
+      varsVector.addElement(new Object[]{"variant", game.getVariant().getName()});
 
-      varsVector.addElement(new Object[]{"myName", game.getWhiteName()});
-      varsVector.addElement(new Object[]{"oppName", game.getBlackName()});
-      varsVector.addElement(new Object[]{"myTime", new Integer(game.getWhiteTime()/(1000*60))});
-      varsVector.addElement(new Object[]{"myInc", new Integer(game.getWhiteInc()/1000)});
-      varsVector.addElement(new Object[]{"oppTime", new Integer(game.getBlackTime()/(1000*60))});
-      varsVector.addElement(new Object[]{"oppInc", new Integer(game.getBlackInc()/1000)});
-      varsVector.addElement(new Object[]{"myRating", new Integer(game.getWhiteRating())});
-      varsVector.addElement(new Object[]{"oppRating", new Integer(game.getBlackRating())});
-      varsVector.addElement(new Object[]{"myTitle", game.getWhiteTitles()});
-      varsVector.addElement(new Object[]{"oppTitle", game.getBlackTitles()});
-
+      Player userPlayer = game.getUserPlayer();
       varsVector.addElement(new Object[]{"whiteName", game.getWhiteName()});
       varsVector.addElement(new Object[]{"blackName", game.getBlackName()});
-      varsVector.addElement(new Object[]{"whiteTime", new Integer(game.getWhiteTime()/(1000*60))});
-      varsVector.addElement(new Object[]{"whiteInc", new Integer(game.getWhiteInc()/1000)});
-      varsVector.addElement(new Object[]{"blackTime", new Integer(game.getBlackTime()/(1000*60))});
-      varsVector.addElement(new Object[]{"blackInc", new Integer(game.getBlackInc()/1000)});
+      varsVector.addElement(new Object[]{"whiteTime", whiteTime});
+      varsVector.addElement(new Object[]{"whiteInc", whiteInc});
+      varsVector.addElement(new Object[]{"blackTime", blackTime});
+      varsVector.addElement(new Object[]{"blackInc", blackInc});
       varsVector.addElement(new Object[]{"whiteRating", new Integer(game.getWhiteRating())});
       varsVector.addElement(new Object[]{"blackRating", new Integer(game.getBlackRating())});
       varsVector.addElement(new Object[]{"whiteTitle", game.getWhiteTitles()});
@@ -1083,7 +1136,36 @@ public class Scripter extends Plugin{
       varsVector.addElement(new Object[]{"isGameRated", game.isRated() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"ratingCategory", game.getRatingCategoryString()});
       varsVector.addElement(new Object[]{"isPlayed", game.isPlayed() ? Boolean.TRUE : Boolean.FALSE});
-      varsVector.addElement(new Object[]{"isTimeOdds", game.isTimeOdds() ? Boolean.TRUE : Boolean.FALSE});
+      varsVector.addElement(new Object[]{"isTimeOdds", isTimeOdds ? Boolean.TRUE : Boolean.FALSE});
+
+      if (userPlayer != null){
+        if (userPlayer.isWhite()){
+          varsVector.addElement(new Object[]{"myName", game.getWhiteName()});
+          varsVector.addElement(new Object[]{"oppName", game.getBlackName()});
+          varsVector.addElement(new Object[]{"myTime", whiteTime});
+          varsVector.addElement(new Object[]{"myInc", whiteInc});
+          varsVector.addElement(new Object[]{"oppTime", blackTime});
+          varsVector.addElement(new Object[]{"oppInc", blackInc});
+          varsVector.addElement(new Object[]{"myRating", new Integer(game.getWhiteRating())});
+          varsVector.addElement(new Object[]{"oppRating", new Integer(game.getBlackRating())});
+          varsVector.addElement(new Object[]{"myTitle", game.getWhiteTitles()});
+          varsVector.addElement(new Object[]{"oppTitle", game.getBlackTitles()});
+        }
+        else{
+          varsVector.addElement(new Object[]{"oppName", game.getWhiteName()});
+          varsVector.addElement(new Object[]{"myName", game.getBlackName()});
+          varsVector.addElement(new Object[]{"oppTime", whiteTime});
+          varsVector.addElement(new Object[]{"oppInc", whiteInc});
+          varsVector.addElement(new Object[]{"myTime", blackTime});
+          varsVector.addElement(new Object[]{"myInc", blackInc});
+          varsVector.addElement(new Object[]{"oppRating", new Integer(game.getWhiteRating())});
+          varsVector.addElement(new Object[]{"myRating", new Integer(game.getBlackRating())});
+          varsVector.addElement(new Object[]{"oppTitle", game.getWhiteTitles()});
+          varsVector.addElement(new Object[]{"myTitle", game.getBlackTitles()});
+        }
+
+        varsVector.addElement(new Object[]{"userPlayer", game.getUserPlayer().toString().toLowerCase()});
+      }
 
       Move move = new ChessMove(Square.parseSquare("e2"), Square.parseSquare("e4"),
         Player.WHITE_PLAYER, false, false, false, null, 4, null, "e4");
@@ -1166,8 +1248,11 @@ public class Scripter extends Plugin{
       vars.addElement(new Object[]{"isRegistered", seek.isSeekerRegistered() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"isComputer", seek.isSeekerComputer() ? Boolean.TRUE : Boolean.FALSE});
       vars.addElement(new Object[]{"ratingCategory", seek.getRatingCategoryString()});
-      vars.addElement(new Object[]{"time", new Integer(seek.getTime()/(1000*60))});
-      vars.addElement(new Object[]{"inc", new Integer(seek.getInc()/1000)});
+      if (seek.getTimeControl() instanceof FischerTimeControl){
+        FischerTimeControl tc = (FischerTimeControl)seek.getTimeControl();
+        vars.addElement(new Object[]{"time", new Integer(tc.getInitial()/(1000*60))});
+        vars.addElement(new Object[]{"inc", new Integer(tc.getIncrement()/1000)});
+      }
       vars.addElement(new Object[]{"isRated", seek.isRated() ? Boolean.TRUE : Boolean.FALSE});
       String colorString = seek.getSoughtColor() == null ? null :
                           (seek.getSoughtColor().isWhite() ? "white" : "black");
@@ -1204,7 +1289,7 @@ public class Scripter extends Plugin{
       
       Seek seek = new Seek("64", getConn().userForName("AlexTheGreat"), "C",
           1800, false, true, true, true, Chess.getInstance(), "Blitz",
-          5*60*1000, 2000, true, null, true, 1700, 1900, false, false);
+          new FischerTimeControl(5*60*1000, 2000), true, null, true, 1700, 1900, false, false);
 
       varsVector.addElement(new Object[]{"seek", seek});
       varsVector.addElement(new Object[]{"name", seek.getSeekerName()});
@@ -1214,8 +1299,11 @@ public class Scripter extends Plugin{
       varsVector.addElement(new Object[]{"isRegistered", seek.isSeekerRegistered() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"isComputer", seek.isSeekerComputer() ? Boolean.TRUE : Boolean.FALSE});
       varsVector.addElement(new Object[]{"ratingCategory", seek.getRatingCategoryString()});
-      varsVector.addElement(new Object[]{"time", new Integer(seek.getTime()/(1000*60))});
-      varsVector.addElement(new Object[]{"inc", new Integer(seek.getInc()/1000)});
+      if (seek.getTimeControl() instanceof FischerTimeControl){
+        FischerTimeControl tc = (FischerTimeControl)seek.getTimeControl();
+        varsVector.addElement(new Object[]{"time", new Integer(tc.getInitial()/(1000*60))});
+        varsVector.addElement(new Object[]{"inc", new Integer(tc.getIncrement()/1000)});
+      }
       varsVector.addElement(new Object[]{"isRated", seek.isRated() ? Boolean.TRUE : Boolean.FALSE});
       String colorString = seek.getSoughtColor() == null ? null :
                           (seek.getSoughtColor().isWhite() ? "white" : "black");

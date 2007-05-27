@@ -45,10 +45,13 @@ import javax.swing.SwingUtilities;
 import free.chess.Chess;
 import free.chess.ChessMove;
 import free.chess.ChesslikeGenericVariant;
+import free.chess.FischerTimeControl;
 import free.chess.Move;
+import free.chess.OddsTimeControl;
 import free.chess.Player;
 import free.chess.Position;
 import free.chess.Square;
+import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.chess.variants.NoCastlingVariant;
 import free.chess.variants.atomic.Atomic;
@@ -1167,7 +1170,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     Hashtable gameProps = (Hashtable)nonStartedGames.get(new Integer(gameNumber));    
     gameProps.put(propertyName, propertyValue);
   }
-
+  
+  
+  
+  /**
+   * Returns the <code>TimeControl</code> object to be used for the specified
+   * parameters.
+   * 
+   * @param whiteInitial White's initial amount of time, in minutes.
+   * @param whiteIncrement White's increment, in seconds.
+   * @param blackInitial Black's initial amount of time, in minutes.
+   * @param blackIncrement Black's increment, in seconds.
+   */
+  
+  private static TimeControl getTimeControl(int whiteInitial, int whiteIncrement, int blackInitial, int blackIncrement){
+    TimeControl whiteTimeControl = new FischerTimeControl(60*1000*whiteInitial, 1000*whiteIncrement);
+    TimeControl blackTimeControl = new FischerTimeControl(60*1000*blackInitial, 1000*blackIncrement);
+    if (whiteTimeControl.equals(blackTimeControl))
+      return whiteTimeControl;
+    else
+      return new OddsTimeControl(whiteTimeControl, blackTimeControl);
+  }
 
 
 
@@ -1187,10 +1210,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     String blackName = (String)gameProps.get("BlackName");
     String ratingCategoryString = (String)gameProps.get("RatingCategoryString");
     boolean isRated = ((Boolean)gameProps.get("IsRated")).booleanValue();
-    int whiteInitial = 1000*60*((Integer)gameProps.get("WhiteInitial")).intValue();
-    int whiteIncrement = 1000*((Integer)gameProps.get("WhiteIncrement")).intValue();
-    int blackInitial = 1000*60*((Integer)gameProps.get("BlackInitial")).intValue();
-    int blackIncrement = 1000*((Integer)gameProps.get("BlackIncrement")).intValue();
     boolean isPlayedGame = ((Boolean)gameProps.get("IsPlayedGame")).booleanValue();
     int whiteRating = ((Integer)gameProps.get("WhiteRating")).intValue();
     int blackRating = ((Integer)gameProps.get("BlackRating")).intValue();
@@ -1215,11 +1234,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       else
         userPlayer = null;
     }
+    
+    int whiteInitial = ((Integer)gameProps.get("WhiteInitial")).intValue();
+    int whiteIncrement = ((Integer)gameProps.get("WhiteIncrement")).intValue();
+    int blackInitial = ((Integer)gameProps.get("BlackInitial")).intValue();
+    int blackIncrement = ((Integer)gameProps.get("BlackIncrement")).intValue();
+    
+    TimeControl timeControl = getTimeControl(whiteInitial, whiteIncrement, blackInitial, blackIncrement);
 
-    return new Game(gameType, initialPosition, 0, whiteName, blackName, whiteInitial,
-      whiteIncrement, blackInitial, blackIncrement, whiteRating, blackRating,
-      new Integer(gameNumber), ratingCategoryString, isRated, isPlayedGame, whiteTitles,
-      blackTitles, isInitiallyFlipped, userPlayer);
+    return new Game(gameType, initialPosition, 0, whiteName, blackName, timeControl,
+      whiteRating, blackRating, new Integer(gameNumber), ratingCategoryString, isRated,
+      isPlayedGame, whiteTitles, blackTitles, isInitiallyFlipped, userPlayer);
   }
 
 
@@ -1458,7 +1483,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Game game = gameInfo.game;
 
       updateGame(game.getGameType(), gameNumber, whiteName, blackName, ratingCategoryString,
-        isRated, 60*1000*whiteInitial, 1000*whiteIncrement, 60*1000*blackInitial, 1000*blackIncrement,
+        isRated, getTimeControl(whiteInitial, whiteIncrement, blackInitial, blackIncrement),
         isPlayedGame, whiteRating, blackRating, String.valueOf(gameID), whiteTitles, blackTitles);
     } catch (NoSuchGameException e){}
   }
@@ -1499,8 +1524,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
           // where we will change the state of the game to nonplayed.
           if (game.getGameType() == Game.OBSERVED_GAME){
             updateGame(game.getGameType(), gameNumber, game.getWhiteName(), game.getBlackName(),
-              game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
-              game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), false, // <-- the change
+              game.getRatingCategoryString(), game.isRated(), game.getTimeControl(), false, // <-- the change
               game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
               game.getBlackTitles());
           }
@@ -1606,9 +1630,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   protected void updateGame(int gameType, int gameNumber, String whiteName, String blackName,
-      String ratingCategoryString, boolean isRated, int whiteInitial, int whiteIncrement,
-      int blackInitial, int blackIncrement, boolean isPlayedGame, int whiteRating, 
-      int blackRating, Object gameID, String whiteTitles, String blackTitles){
+      String ratingCategoryString, boolean isRated, TimeControl timeControl,
+      boolean isPlayedGame, int whiteRating, int blackRating,
+      Object gameID, String whiteTitles, String blackTitles){
         
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
@@ -1620,10 +1644,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       game.setBlackName(blackName);
       game.setRatingCategoryString(ratingCategoryString);
       game.setRated(isRated);
-      game.setWhiteTime(whiteInitial);
-      game.setWhiteInc(whiteIncrement);
-      game.setBlackTime(blackInitial);
-      game.setBlackInc(blackIncrement);
+      game.setTimeControl(timeControl);
       game.setPlayed(isPlayedGame);
       game.setWhiteRating(whiteRating);
       game.setBlackRating(blackRating);
@@ -1738,8 +1759,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             }
 
             updateGame(newGameType, gameNumber, game.getWhiteName(), game.getBlackName(),
-              game.getRatingCategoryString(), game.isRated(), game.getWhiteTime(),
-              game.getWhiteInc(), game.getBlackTime(), game.getBlackInc(), isPlayedGame,
+              game.getRatingCategoryString(), game.isRated(), game.getTimeControl(), isPlayedGame,
               game.getWhiteRating(), game.getBlackRating(), game.getID(), game.getWhiteTitles(),
               game.getBlackTitles());
           }
@@ -3083,9 +3103,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       this.moves = new Vector();
       this.numMovesToFollow = numMovesToFollow;
       this.isFlipped = game.isBoardInitiallyFlipped();
-
-      setWhiteClock(game.getWhiteTime(), false);
-      setBlackClock(game.getBlackTime(), false);
+      
+      TimeControl timeControl = game.getTimeControl();
+      setWhiteClock(timeControl.getInitialTime(Player.WHITE_PLAYER), false);
+      setBlackClock(timeControl.getInitialTime(Player.BLACK_PLAYER), false);
     }
 
 
@@ -3330,12 +3351,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean isSeekerRated = !isUnrated(titles);
     boolean isComputer = isComputer(titles);
     boolean isRatingLimited = ((minRating != 0) || (maxRating != 9999));
+    
+    TimeControl timeControl = new FischerTimeControl(time*60*1000, inc*1000);
 
     String title = displayableTitle(titles);
 
     Seek seek = new Seek(String.valueOf(index), userForName(name), title,
         rating, isProvisional, isRegistered, isSeekerRated, isComputer, variant,
-        ratingCategoryString, time*60*1000, inc*1000, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
+        ratingCategoryString, timeControl, isRated, player, isRatingLimited, minRating, maxRating, !autoaccept, formula);
     
     seeks.put(new Integer(index), seek);
 
@@ -3993,11 +4016,13 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     boolean isChallengerProvisional = challengerProvisionalStatus != ChessclubConstants.ESTABLISHED_RATING_TYPE;
     boolean isReceiverProvisional = receiverProvisionalStatus != ChessclubConstants.ESTABLISHED_RATING_TYPE;
     
+    TimeControl challengerTimeControl = new FischerTimeControl(challengerTime*1000*60, challengerInc*1000);
+    TimeControl receiverTimeControl = new FischerTimeControl(receiverTime*1000*60, receiverInc*1000);
+    
     MatchOffer matchOffer = new MatchOffer(
         challenger, displayableTitle(challengerTitles), challengerRating, isChallengerProvisional,
         receiver, displayableTitle(receiverTitles), receiverRating, isReceiverProvisional,
-        challengerTime*60*1000, challengerInc*1000, receiverTime*60*1000, receiverInc*1000,
-        isRated, variant, ratingCategory,
+        challengerTimeControl, receiverTimeControl, isRated, variant, ratingCategory,
         colorPreferenceByCode(challengerColorPreferenceCode));
     
     matchOffers.put(new Pair(challenger, receiver), matchOffer);

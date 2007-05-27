@@ -42,9 +42,12 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import free.chess.Chess;
 import free.chess.ChessMove;
+import free.chess.FischerTimeControl;
 import free.chess.Move;
+import free.chess.OddsTimeControl;
 import free.chess.Player;
 import free.chess.Position;
+import free.chess.TimeControl;
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
@@ -377,13 +380,27 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
 
       Interpreter bsh = new Interpreter();
       boolean isUserWhite = game.getUserPlayer().isWhite();
+      TimeControl timeControl = game.getTimeControl();
       try{
         bsh.set("category", game.getRatingCategoryString());
         bsh.set("rating", isUserWhite ? game.getBlackRating() : game.getWhiteRating());
-        bsh.set("time", (isUserWhite ? game.getWhiteTime() : game.getBlackTime())/(1000*60));
-        bsh.set("inc", isUserWhite ? game.getWhiteInc() : game.getBlackInc());
-        bsh.set("etime", isUserWhite ? (game.getWhiteTime() + 2*game.getWhiteInc()/3) : 
-                                       (game.getBlackTime() + 2*game.getBlackInc()/3));
+        
+        if (timeControl instanceof FischerTimeControl){
+          FischerTimeControl tc = (FischerTimeControl)timeControl;
+          bsh.set("time", tc.getInitial()/(60*1000));
+          bsh.set("inc", tc.getIncrement()/1000);
+          bsh.set("etime", tc.getInitial() + tc.getIncrement()*2/3.0);
+        }
+        else if (timeControl instanceof OddsTimeControl){
+          OddsTimeControl otc = (OddsTimeControl)timeControl;
+          if ((otc.getWhiteTimeControl() instanceof FischerTimeControl) && 
+              (otc.getBlackTimeControl() instanceof FischerTimeControl)){
+            FischerTimeControl tc = (FischerTimeControl)(isUserWhite ? otc.getWhiteTimeControl() : otc.getBlackTimeControl());
+            bsh.set("time", tc.getInitial()/(60*1000));
+            bsh.set("inc", tc.getIncrement()/1000);
+            bsh.set("etime", tc.getInitial() + tc.getIncrement()*2/3.0);
+          }
+        }
         bsh.set("rated", game.isRated());
         bsh.set("opponent", (isUserWhite ? game.getBlackName() : game.getWhiteName()));
         bsh.set("title", (isUserWhite ? game.getBlackTitles() : game.getWhiteTitles()));
@@ -518,6 +535,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
       int blackRating = game.getBlackRating();
       String whiteRatingString = (whiteRating < 0) ? "-" : String.valueOf(whiteRating);
       String blackRatingString = (blackRating < 0) ? "-" : String.valueOf(blackRating);
+      TimeControl timeControl = game.getTimeControl();
 
       DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)));
       writeTag(out, "Event", (game.isRated() ? "rated " : "unrated ") + game.getRatingCategoryString() + " game");
@@ -530,8 +548,11 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
       writeTag(out, "BlackElo", blackRatingString);
       writeTag(out, "Result", resultString);
       writeTag(out, "Time", TIME_FORMAT.format(gameInfo.gameStartDate));
-      if (!game.isTimeOdds())
-        writeTag(out, "TimeControl", game.getWhiteTime()/1000+"+"+game.getWhiteInc());
+      
+      if (timeControl instanceof FischerTimeControl){
+        FischerTimeControl tc = (FischerTimeControl)timeControl;
+        writeTag(out, "TimeControl", tc.getInitial()/1000 + "+" + tc.getIncrement()/1000);
+      }
       writeTag(out, "Mode", "ICS");
       if (!gameInfo.initPos.getFEN().equals(Chess.INITIAL_POSITION_FEN)){
         writeTag(out, "SetUp", "1");

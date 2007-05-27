@@ -22,6 +22,7 @@
 package free.jin;
 
 import free.chess.Player;
+import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.util.Struct;
 
@@ -48,14 +49,10 @@ public class MatchOffer extends Struct{
    * @param receiverRating The rating of the player being challenger.
    * @param isReceiverProvisional Whether the rating of the player receiving the
    * challenger is provisional.
-   * @param challengerTime The time of the challenger in the offered game, in
-   * milliseconds.
-   * @param challengerIncrement The increment of the challenger in the offered
-   * game, in milliseconds.
-   * @param receiverTime The time of the receiver in the offered game, in
-   * milliseconds.
-   * @param receivedIncrement The increment of the receiver in the offered game,
-   * in milliseconds. 
+   * @param challengerTimeControl The time control of the challenger in the
+   * offered game. 
+   * @param receiverTimeControl The time control of the receiver in the offered
+   * game. 
    * @param isRated The ratedness of the offered game.
    * @param variant The wild variant of the offered game.
    * @param ratingCategory The name of the rating category to which the offered
@@ -67,8 +64,7 @@ public class MatchOffer extends Struct{
   public MatchOffer(
       ServerUser challenger, String challengerTites, int challengerRating, boolean isChallengerProvisional, 
       ServerUser receiver, String receiverTitles, int receiverRating, boolean isReceiverProvisional,
-      int challengerTime, int challengerIncrement,
-      int receiverTime, int receiverIncrement,
+      TimeControl challengerTimeControl, TimeControl receiverTimeControl,
       boolean isRated, WildVariant variant, String ratingCategory, Player challengerColor){
     
     if (challenger == null)
@@ -88,10 +84,8 @@ public class MatchOffer extends Struct{
     setStringProperty("ReceiverTitles", receiverTitles);
     setIntegerProperty("ReceiverRating", receiverRating);
     setBooleanProperty("IsReceiverProvisional", isReceiverProvisional);
-    setIntegerProperty("ChallengerTime", challengerTime);
-    setIntegerProperty("ChallengerIncrement", challengerIncrement);
-    setIntegerProperty("ReceiverTime", receiverTime);
-    setIntegerProperty("ReceiverIncrement", receiverIncrement);
+    setProperty("ChallengerTimeControl", challengerTimeControl);
+    setProperty("ReceiverTimeControl", receiverTimeControl);
     setBooleanProperty("IsRated", isRated);
     setProperty("Variant", variant);
     setStringProperty("RatingCategory", ratingCategory);
@@ -182,45 +176,21 @@ public class MatchOffer extends Struct{
   
   
   /**
-   * Returns the time on the challenger's clock at the beginning of the game,
-   * in milliseconds.
+   * Returns the time control of the challenger in the offered game.
    */
   
-  public int getChallengerTime(){
-    return getIntegerProperty("ChallengerTime");
+  public TimeControl getChallengerTimeControl(){
+    return (TimeControl)getProperty("ChallengerTimeControl");
   }
   
   
   
   /**
-   * Returns the time added to the challenger's clock after each move in the
-   * offered game, in milliseconds.
+   * Returns the time control of the receiver in the offered game.
    */
   
-  public int getChallengerIncrement(){
-    return getIntegerProperty("ChallengerIncrement");
-  }
-  
-  
-  
-  /**
-   * Returns the time on the challenge receiver's clock at the beginning of the
-   * game, in milliseconds. 
-   */
-  
-  public int getReceiverTime(){
-    return getIntegerProperty("ReceiverTime");
-  }
-  
-  
-  
-  /**
-   * Returns the time added to the challenge receiver's clock after each move in
-   * the offered game, in milliseconds. 
-   */
-  
-  public int getReceiverIncrement(){
-    return getIntegerProperty("ReceiverIncrement");
+  public TimeControl getReceiverTimeControl(){
+    return (TimeControl)getProperty("ReceiverTimeControl");
   }
   
   

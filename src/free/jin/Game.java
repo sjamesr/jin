@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 
 import free.chess.Player;
 import free.chess.Position;
+import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.util.BeanProperties;
 
@@ -366,14 +367,7 @@ public class Game{
    * to the inital position.
    * @param whiteName The name of the player with the white pieces.
    * @param blackName The name of the player with the black pieces.
-   * @param whiteTime The initial amount of time on the white player's clock,
-   * in milliseconds.
-   * @param whiteInc The amount of time the white player's clock is incremented by
-   * after each move he makes, in milliseconds.
-   * @param blackTime The initial amount of time on the black player's clock,
-   * in milliseconds.
-   * @param blackInc The amount of time the black player's clocks is incremented by
-   * after each move he makes, in milliseconds.
+   * @param timeControl The time control of the game.
    * @param whiteRating The rating of the player with the white pieces, or -1 if
    * no rating (guest for example).
    * @param blackRating The rating of the player with the black pieces, or -1 if
@@ -392,7 +386,7 @@ public class Game{
    */
 
   public Game(int gameType, Position initialPosition, int pliesSinceStart, String whiteName,
-      String blackName, int whiteTime, int whiteInc, int blackTime, int blackInc, int whiteRating,
+      String blackName, TimeControl timeControl, int whiteRating,
       int blackRating, Object gameId, String ratingCategoryString, boolean isRated,
       boolean isPlayed, String whiteTitles, String blackTitles, boolean initiallyFlipped,
       Player userPlayer){
@@ -402,10 +396,7 @@ public class Game{
     setPliesSinceStart(pliesSinceStart);
     setWhiteName(whiteName);
     setBlackName(blackName);
-    setWhiteTime(whiteTime);
-    setWhiteInc(whiteInc);
-    setBlackTime(blackTime);
-    setBlackInc(blackInc);
+    setTimeControl(timeControl);
     setWhiteRating(whiteRating);
     setBlackRating(blackRating);
     setRated(isRated);
@@ -417,52 +408,6 @@ public class Game{
     setBoardInitiallyFlipped(initiallyFlipped);
     setUserPlayer(userPlayer);
   }
-
-
-
-
-
-  /**
-   * Creates a new Game with the given game properties. This constructor differs
-   * from the other one in that it doesn't let you specify separate time and
-   * increment for white and black.
-   *
-   * @param initialPosition The initial position in the game.
-   * @param pliesSinceStart The amount of from the actual beginning of the game
-   * to the inital position.
-   * @param whiteName The name of the player with the white pieces.
-   * @param blackName The name of the player with the black pieces.
-   * @param time The initial amount of time on the players' clock, in milliseconds.
-   * @param inc The amount of time the players' clock is incremented by
-   * @param whiteRating The rating of the player with the white pieces, or -1 if
-   * no rating (guest for example).
-   * @param blackRating The rating of the player with the black pieces, or -1 if
-   * no rating (guest for example).
-   * @param isRated Is the game rated?
-   * @param gameID A string identifying the game.
-   * @param ratingCategoryString A string identifying the rating category of the game 
-   * ("Blitz" for example)
-   * @param gameType The type of the game - possible values are {@link #MY_GAME},
-   * {@link #OBSERVED_GAME} and {@link #ISOLATED_BOARD}.
-   * @param isPlayed Is this a real game? <code>false</code> if an examined game.
-   * @param whiteTitles The titles of the player with the white pieces.
-   * @param blackTitles the titles of the player with the black pieces.
-   * @param initiallyFlipped Whether the board should be flipped initially.
-   * @param userPlayer The Player for whom the user plays. It's only meaningful 
-   * if this Game is of type MY_GAME and is a played game, this parameter should
-   * be null for all other cases.
-   */
-
-  public Game(int gameType, Position initialPosition, int pliesSinceStart, String whiteName,
-      String blackName, int time, int inc, int whiteRating, int blackRating, Object gameID,
-      String ratingCategoryString, boolean isRated, boolean isPlayed, String whiteTitles,
-      String blackTitles, boolean initiallyFlipped, Player userPlayer){
-
-    this(gameType, initialPosition, pliesSinceStart, whiteName, blackName, time, inc, time, inc,
-      whiteRating, blackRating, gameID, ratingCategoryString, isRated, isPlayed, whiteTitles,
-      blackTitles, initiallyFlipped, userPlayer);
-  }
-
 
 
 
@@ -622,93 +567,25 @@ public class Game{
 
 
   /**
-   * Sets the initial time on the clock of the player with the white pieces,
-   * in milliseconds.
+   * Sets time control for this game.
    */
 
-  public void setWhiteTime(int time){
-    props.setIntegerProperty("whiteTime", time);
+  public void setTimeControl(TimeControl timeControl){
+    props.setProperty("timeControl", timeControl);
   }
-
-
+  
+  
+  
   /**
-   * Returns the initial time on the clock of the player with the white pieces,
-   * in milliseconds.
+   * Returns the time control for this game.
    */
-
-  public int getWhiteTime(){
-    return props.getIntegerProperty("whiteTime");
+  
+  public TimeControl getTimeControl(){
+    return (TimeControl)props.getProperty("timeControl");
   }
-
-
-
-  /**
-   * Sets the the number of milliseconds by which the clock of the white player
-   * is incremented each time he makes a move. 
-   */
-
-  public void setWhiteInc(int inc){
-    props.setIntegerProperty("whiteInc", inc);
-  }
-
-
-
-  /**
-   * Returns the number of milliseconds by which the clock of the white player
-   * is incremented each time he makes a move.
-   */
-
-  public int getWhiteInc(){
-    return props.getIntegerProperty("whiteInc");
-  }
-
-
-
-  /**
-   * Sets the initial time on the clock of the player with the black pieces,
-   * in milliseconds.
-   */
-
-  public void setBlackTime(int time){
-    props.setIntegerProperty("blackTime", time);
-  }
-
-
-
-  /**
-   * Returns the initial time on the clock of the player with the black pieces,
-   * in milliseconds.
-   */
-
-  public int getBlackTime(){
-    return props.getIntegerProperty("blackTime");
-  }
-
-
-
-
-  /**
-   * Sets the number of milliseconds by which the clock of the black player
-   * is incremented each time he makes a move.
-   */
-
-  public void setBlackInc(int time){
-    props.setIntegerProperty("blackInc", time);
-  }
-
-
-
-  /**
-   * Returns the number of milliseconds by which the clock of the black player
-   * is incremented each time he makes a move.
-   */
-
-  public int getBlackInc(){
-    return props.getIntegerProperty("blackInc");
-  }
-
-
-
+  
+  
+  
   /**
    * Sets the rating of the player with the white pieces.
    */
@@ -886,17 +763,6 @@ public class Game{
 
   public boolean isBoardInitiallyFlipped(){
     return props.getBooleanProperty("boardInitiallyFlipped");
-  }
-
-
-
-
-  /**
-   * Returns true if this is a time-odds game.
-   */
-
-  public boolean isTimeOdds(){
-    return (getWhiteTime() != getBlackTime()) || (getWhiteInc() != getBlackInc());
   }
 
 
@@ -1132,21 +998,6 @@ public class Game{
     props.setIntegerProperty("gameEndReasonCode", reason);
     props.setProperty("gameEndActor", actor);
   }
-
-
-
-
-  /**
-   * Returns a string representing the time control of the game.
-   */
-
-  public String getTCString(){
-    String timeString = ""+(getWhiteTime()/(1000*60))+" "+(getWhiteInc()/1000);
-    if (isTimeOdds())
-      return "("+timeString+") ("+(getBlackTime()/(1000*60))+" "+(getBlackInc()/1000)+")";
-    else
-      return timeString;
-  }
   
   
   
@@ -1194,7 +1045,7 @@ public class Game{
    */
 
   public String toString(){
-    return "#"+getID()+" "+(isRated() ? "Rated" : "Unrated") + " " + getTCString() + " " +getVariant().getName()+" " + getWhiteName()+" vs. "+getBlackName();
+    return "#"+getID()+" "+(isRated() ? "Rated" : "Unrated") + " " + getTimeControl().getLocalizedShortDescription() + " " +getVariant().getName()+" " + getWhiteName()+" vs. "+getBlackName();
   }
 
 

@@ -50,6 +50,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolTip;
 
 import free.chess.Chess;
+import free.chess.FischerTimeControl;
 import free.chess.Player;
 import free.chess.WildVariant;
 import free.jin.I18n;
@@ -400,16 +401,26 @@ public class SoughtGraph extends JComponent{
   
   
   /**
+   * Returns the etime, multiplied by 3.
+   */
+  
+  private static int calcEtimeTimes3(Seek seek){
+    FischerTimeControl tc = (FischerTimeControl)seek.getTimeControl();
+    return 3 * tc.getInitial()/(60*1000) + 2 * tc.getIncrement()/1000;
+  }
+  
+  
+  
+  /**
    * This method calculates the desired location of the given seek. Note that the
    * seek might end up elsewhere because that location is already taken.
    */
   
   protected Point mapSeek(Seek seek){
-    int etimeM3 = 3*seek.getTime()/(60*1000)+2*seek.getInc()/1000;
+    int etimeM3 = calcEtimeTimes3(seek);
     int rating = seek.isSeekerRated() ? seek.getSeekerRating() : 0;
     
     int x,y;
-    
     
     if (etimeM3<9) // Bullet
       x = (etimeM3-2)*BULLET_SLOTS/7; // 7 is the amount of possible etime values for bullet.
@@ -447,7 +458,7 @@ public class SoughtGraph extends JComponent{
     if (seekMatrix[desiredSlot.x][desiredSlot.y]==null)
       return desiredSlot;
     
-    int etimeM3 = 3*seek.getTime()/(60*1000)+2*seek.getInc()/1000;
+    int etimeM3 = calcEtimeTimes3(seek);
     boolean isBullet = etimeM3<9;
     boolean isBlitz = (!isBullet)&&(etimeM3<45);
     boolean isStandard = (etimeM3>=45);
@@ -497,6 +508,9 @@ public class SoughtGraph extends JComponent{
    */
   
   public void addSeek(Seek seek){
+    if (!(seek.getTimeControl() instanceof FischerTimeControl))
+      return;
+    
     Point desiredSlot = mapSeek(seek);
     Point actualSlot = fitSeek(seek, desiredSlot);
     
@@ -519,7 +533,7 @@ public class SoughtGraph extends JComponent{
   public void removeSeek(Seek seek){
     Point location = (Point)seeksToLocations.remove(seek);
     if (location == null)
-      throw new IllegalArgumentException("Unknown seek: " + seek.getID());
+      return;
     
     seekMatrix[location.x][location.y] = null;
     
@@ -801,24 +815,25 @@ public class SoughtGraph extends JComponent{
     String formulaIndicator = i18n.getString("formulaIndicator");
     String computerIndicator = i18n.getString("computerIndicator");
     
+    boolean isComputer = seek.isSeekerComputer();
     String name = seek.getSeekerName();
     String title = seek.getSeekerTitle();
     int rating = seek.getSeekerRating();
     boolean isProvisional = seek.isSeekerProvisional()&&seek.isSeekerRegistered();
-    int time = seek.getTime()/(60*1000);
-    int inc = seek.getInc()/1000;
+    String timeControlString = seek.getTimeControl().getLocalizedMediumDescription();
     boolean isRated = seek.isRated();
     WildVariant variant = seek.getVariant();
     Player color = seek.getSoughtColor();
-    boolean isRatingLimited = seek.isRatingLimited();
     boolean isManualAccept = seek.isManualAccept();
     boolean isFormula = seek.isFormula();
     
     StringBuffer buf = new StringBuffer();
     
-    buf.append(name).append(title);
+    buf.append(name);
+    if (!isComputer)
+      buf.append(title);
     
-    if (seek.isSeekerRated()){
+    if (seek.isSeekerRated() && !(isComputer && !isRated)){
       buf.append("(");
       buf.append(rating);
       if (isProvisional){
@@ -828,11 +843,10 @@ public class SoughtGraph extends JComponent{
       buf.append(")");
     }
     
-    if (seek.isSeekerComputer())
+    if (isComputer)
       buf.append("(").append(computerIndicator).append(")");
     
-    buf.append(" ").append(time);
-    buf.append(" ").append(inc);
+    buf.append(" ").append(timeControlString);
     
     buf.append(" ").append(isRated ? rated : unrated);
     
@@ -842,17 +856,13 @@ public class SoughtGraph extends JComponent{
     if (color != null)
       buf.append(" ").append(color.isWhite() ? white : black);
     
-    if (isRatingLimited){
-      int minRating = seek.getMinRating();
-      int maxRating = seek.getMaxRating();
-      buf.append(" ").append(minRating).append("-").append(maxRating);
+    if (!isComputer){
+      if (isManualAccept)
+        buf.append(" ").append(manualAcceptIndicator);
+      
+      if (isFormula)
+        buf.append(" ").append(formulaIndicator);
     }
-    
-    if (isManualAccept)
-      buf.append(" ").append(manualAcceptIndicator);
-    
-    if (isFormula)
-      buf.append(" ").append(formulaIndicator);
     
     return buf.toString();
   }
