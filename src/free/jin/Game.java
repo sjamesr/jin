@@ -877,7 +877,7 @@ public class Game{
     if (getResultCode() == GAME_IN_PROGRESS)
       throw new IllegalStateException("Game not ended yet");
     
-    return (Player)props.getProperty("gameEndActor");
+    return (Player)props.getProperty("gameEndActor", null);
   }
   
   
