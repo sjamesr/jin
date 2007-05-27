@@ -23,6 +23,7 @@ package free.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -179,6 +180,20 @@ public class Localization{
   
   public String getString(String key){
     return props.getProperty(className + "." + key);
+  }
+  
+  
+  
+  /**
+   * Returns the string obtained by treating the translation for the specified
+   * key as a pattern and inserting <code>args</code> into the appropriate
+   * locations into it. If <code>args</code> is <code>null</code>, the
+   * translation is returned as-is.
+   */
+  
+  public String getFormattedString(String key, Object [] args){
+    String message = getString(key);
+    return args == null ? message : MessageFormat.format(message, args);
   }
   
   
