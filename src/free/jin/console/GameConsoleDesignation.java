@@ -30,6 +30,7 @@ import free.jin.I18n;
 import free.jin.event.ChatEvent;
 import free.jin.event.GameAdapter;
 import free.jin.event.GameEndEvent;
+import free.jin.event.IllegalMoveEvent;
 import free.jin.event.JinEvent;
 
 
@@ -79,7 +80,11 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     connection.getListenerManager().addGameListener(new GameAdapter(){
       public void gameEnded(GameEndEvent evt){
         if (getGame().equals(evt.getGame()))
-          GameConsoleDesignation.this.gameEnded();
+          GameConsoleDesignation.this.gameEnded(evt);
+      }
+      public void illegalMoveAttempted(IllegalMoveEvent evt){
+        if (getGame().equals(evt.getGame()))
+          GameConsoleDesignation.this.illegalMoveAttempted(evt);
       }
     });
     
@@ -111,16 +116,36 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Invoked when the game ends. The default implementation makes the console
-   * closeable.
+   * Invoked when the game ends.
    */
   
-  protected void gameEnded(){
+  protected void gameEnded(GameEndEvent evt){
     gameHasEnded = true;
     setConsoleCloseable(true);
     setName(consoleNameForGame(game, gameHasEnded));
     
-    getConsole().addToOutput(game.getGameEndReasonDescription(), "gameEndReason");
+    getConsole().addToOutput(game.getGameEndReasonDescription(), "gameInfo");
+  }
+  
+  
+  
+  /**
+   * Invoked when an illegal move is attempted in the game.
+   */
+  
+  protected void illegalMoveAttempted(IllegalMoveEvent evt){
+    String i18nKey;
+    switch (evt.getReasonCode()){
+      case IllegalMoveEvent.ILLEGAL_MOVE: i18nKey = "illegalMove"; break;
+      case IllegalMoveEvent.NOT_YOUR_TURN: i18nKey = "notYourTurn"; break;
+      case IllegalMoveEvent.OTHER: i18nKey = "other"; break;
+      default:
+        throw new IllegalStateException("Bad reason code value: " + evt.getReasonCode());
+    }
+    
+    i18nKey = "moveRejected." + i18nKey;
+    Object [] args = new Object[]{evt.getMove().toString()};
+    getConsole().addToOutput(I18n.get(GameConsoleDesignation.class).getFormattedString(i18nKey, args), "gameInfo");
   }
   
   
