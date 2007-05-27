@@ -707,7 +707,6 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   protected JLabel createGameLabel(Game game){
     JLabel gameLabel = new JLabel(createGameLabelText(game));
-    gameLabel.setFont(gameLabel.getFont().deriveFont(20f));
     return gameLabel;
   }
   
@@ -725,7 +724,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         I18n i18n = I18n.get(BoardPanel.class);
         return i18n.getFormattedString("gameLabelFormat", new Object[]{
             game.isRated() ? i18n.getString("rated") : i18n.getString("unrated"),
-                game.getTCString(),
+                game.getTimeControl().getLocalizedShortDescription(),
                 category
         });
   }
@@ -806,7 +805,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   protected JChessClock createWhiteClock(Game game){
-    JChessClock clock = new JChessClock(game.getWhiteTime());
+    JChessClock clock = new JChessClock(game.getTimeControl().getInitialTime(Player.WHITE_PLAYER));
     clock.setTimeDependentDisplayModeThresholds(Integer.MAX_VALUE, 10*1000);
     return clock;
   }
@@ -819,7 +818,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   protected JChessClock createBlackClock(Game game){
-    JChessClock clock = new JChessClock(game.getBlackTime());
+    JChessClock clock = new JChessClock(game.getTimeControl().getInitialTime(Player.BLACK_PLAYER));
     clock.setTimeDependentDisplayModeThresholds(Integer.MAX_VALUE, 10*1000);
     return clock;
   }
