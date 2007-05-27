@@ -773,7 +773,13 @@ public class SoughtGraph extends JComponent{
       return;
     }
     
-    g.drawImage(seekImage, seekBounds.x, seekBounds.y, null);
+    int imageWidth = seekImage.getWidth(null);
+    int imageHeight = seekImage.getHeight(null);
+    
+    g.drawImage(seekImage, 
+        seekBounds.x + (seekBounds.width - imageWidth)/2, 
+        seekBounds.y + (seekBounds.height - imageHeight)/2,
+        null);
   }
   
   
