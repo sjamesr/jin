@@ -774,8 +774,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   protected void gameStarted(GameEvent evt){
-    if (getPrefs().getBool("newConsoleOnGameStart", false))
-      addConsole(createGameConsoleDesignation(evt.getGame()), true);
+    if (getPrefs().getBool("newConsoleOnGameStart", false)){
+      // Ideally, we want to select and make active iff the game was started due
+      // to a direct user action, but we don't know it, and the only case where
+      // it's not true is the examine-on-login game, so we approximate this way
+      boolean makeSelectedAndActive = !(
+          (evt.getGame().getGameType() == Game.MY_GAME) &&
+          !evt.getGame().isPlayed());
+          
+      addConsole(createGameConsoleDesignation(evt.getGame()), makeSelectedAndActive);
+      if (makeSelectedAndActive)
+        makeActive();
+    }
   }
 
 
