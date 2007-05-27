@@ -1546,9 +1546,16 @@ public class FreechessConnection extends Connection{
 
   private static final Pattern ILLEGAL_MOVE_REGEX = 
     Pattern.compile("^Illegal move \\((.*)\\)\\.(.*)");
-
-    
-    
+  
+  
+  
+  /**
+   * The reason code for an attempt to make an illegal move.
+   */
+  
+  public static final int MOVE_REJECTED_ILLEGAL_MOVE = 1;
+  
+  
     
   /**
    * The regular expression matching lines specifying that the user attempted to
@@ -1557,6 +1564,14 @@ public class FreechessConnection extends Connection{
 
   private static final Pattern NOT_YOUR_TURN_REGEX =
     Pattern.compile("^(It is not your move\\.)$");
+  
+  
+  
+  /**
+   * The reason code for an attempt to make a move while it's not your turn.
+   */
+  
+  public static final int MOVE_REJECTED_NOT_YOUR_TURN = 2;
     
     
     
@@ -1567,6 +1582,14 @@ public class FreechessConnection extends Connection{
   
   private static final Pattern MOVED_WHEN_GAME_PAUSED = 
     Pattern.compile("^(The clock is paused, use \"unpause\" to resume\\.)$");
+  
+  
+  
+  /**
+   * The reason code for an attempt to make a move wile the game is paused.
+   */
+  
+  public static final int MOVE_REJECTED_GAME_PAUSED = 3;
 
 
 
@@ -1585,36 +1608,33 @@ public class FreechessConnection extends Connection{
     Matcher illegalMoveMatcher = ILLEGAL_MOVE_REGEX.matcher(line);
     Matcher notYourTurnMatcher = NOT_YOUR_TURN_REGEX.matcher(line);
     Matcher movedWhenGamePausedMatcher = MOVED_WHEN_GAME_PAUSED.matcher(line);
-
+    
+    String moveString;
+    int reasonCode;
+    String reason;
+    
     if (illegalMoveMatcher.matches()){
-      String moveString = illegalMoveMatcher.group(1);
-      String reason = illegalMoveMatcher.group(2);
-
-      if (!processIllegalMove(moveString, reason))
-        processLine(line);
-
-      return true;
+      moveString = illegalMoveMatcher.group(1);
+      reasonCode = MOVE_REJECTED_ILLEGAL_MOVE;
+      reason = illegalMoveMatcher.group(2);
     }
     else if (notYourTurnMatcher.matches()){
-      String moveString = null; // sigh
-      String reason = notYourTurnMatcher.group(1);
-
-      if (!processIllegalMove(moveString, reason))
-        processLine(line);
-
-      return true;
+      moveString = null; // sigh
+      reasonCode = MOVE_REJECTED_NOT_YOUR_TURN;
+      reason = notYourTurnMatcher.group(1);
     }
     else if (movedWhenGamePausedMatcher.matches()){
-      String moveString = null;
-      String reason = movedWhenGamePausedMatcher.group(1);
-      
-      if (!processIllegalMove(moveString, reason))
-        processLine(line);
-      
-      return true;
+      moveString = null;
+      reasonCode = MOVE_REJECTED_GAME_PAUSED;
+      reason = movedWhenGamePausedMatcher.group(1);
     }
-
-    return false;
+    else
+      return false;
+    
+    if (!processIllegalMove(moveString, reasonCode, reason))
+      processLine(line);
+    
+    return true;
   }
 
 
@@ -1624,11 +1644,14 @@ public class FreechessConnection extends Connection{
    * This method is called when a line specifying that an illegal move has been
    * attempted is received. <code>moveString</code> is the move string that was
    * sent to the server, if the server bothers to tells us what it was
-   * (otherwise, it is null). <code>reason</code> specifies the reason the move
-   * is illegal. This, too, may be null.
+   * (otherwise, it is null). <code>reasonCode</code> is one of the
+   * <code>MOVE_REJECTED_</code> constants and specifies the class of rejection.
+   * The list of these constants is not final, so client code should not break
+   * if the value is unexpected. <code>reason</code> specifies the exact reason
+   * why the move is illegal and may also be <code>null</code>.
    */
 
-  protected boolean processIllegalMove(String moveString, String reason){return false;}
+  protected boolean processIllegalMove(String moveString, int reasonCode, String reason){return false;}
 
 
 
