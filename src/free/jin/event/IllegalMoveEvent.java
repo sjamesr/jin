@@ -27,34 +27,75 @@ import free.jin.Connection;
 
 
 /**
- * The event fired when the user tried to make an illegal move and the server
- * reported that it's illegal. 
+ * The event fired when the user tried to make a move and the server rejected
+ * it. 
  */
 
 public class IllegalMoveEvent extends GameEvent{
-
-
-
+  
+  
+  
+  /**
+   * The reason code for the server rejecting the move for some other reason.
+   */
+  
+  public static final int OTHER = -1;
+  
+  
+  
+  /**
+   * The reason code for an attempt to make an illegal move.
+   */
+  
+  public static final int ILLEGAL_MOVE = 1;
+  
+  
+  
+  /**
+   * The reason code for an attempt to make a move when it isn't the user's
+   * turn. 
+   */
+  
+  public static final int NOT_YOUR_TURN = 2;
+  
+  
+  
   /**
    * The attempted illegal move.
    */
 
   private final Move move;
-
-
-
-
+  
+  
+  
+  /**
+   * The reason code. One of the constants defined in this class.
+   */
+  
+  private final int reasonCode;
+  
+  
+  
   /**
    * Creates a new IllegalMoveEvent with the given source Connection, Game 
    * and the attempted illegal move.
    */
 
-  public IllegalMoveEvent(Connection conn, String clientTag, Game game, Move move){
+  public IllegalMoveEvent(Connection conn, String clientTag, Game game, Move move, int reasonCode){
     super(conn, clientTag, game);
-
+    
+    switch (reasonCode){
+      case ILLEGAL_MOVE:
+      case NOT_YOUR_TURN:
+      case OTHER:
+        break;
+      default:
+        throw new IllegalArgumentException("Bad reasonCode value: " + reasonCode);
+    }
+    
     this.move = move;
+    this.reasonCode = reasonCode;
   }
-
 
 
 
@@ -65,5 +106,18 @@ public class IllegalMoveEvent extends GameEvent{
   public Move getMove(){
     return move;
   }
-
+  
+  
+  
+  /**
+   * Returns the reason code for the rejection - one of the constants defined in
+   * this class. 
+   */
+  
+  public int getReasonCode(){
+    return reasonCode;
+  }
+  
+  
+  
 }

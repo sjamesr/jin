@@ -2049,7 +2049,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires an IllegalMoveEvent.
    */
 
-  protected void processIllegalMove(String clientTag, int gameNumber, String moveString, int reasonCode){
+  protected void processIllegalMove(String clientTag, int gameNumber, String moveString, int iccReasonCode){
     try{
       GameInfo gameInfo = getGameInfo(gameNumber);
       Game game = gameInfo.game;
@@ -2057,11 +2057,26 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
       if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) // Not a move we made (probably the user typed it in)
         return;
+      
+      int reasonCode;
+      switch (iccReasonCode){
+        case 2:
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+          reasonCode = IllegalMoveEvent.ILLEGAL_MOVE; break;
+        case 4:
+          reasonCode = IllegalMoveEvent.NOT_YOUR_TURN; break;
+        default:
+          reasonCode = IllegalMoveEvent.OTHER;
+      }
 
       Move move = (Move)unechoedGameMoves.elementAt(0);
       if (moveToString(game, move).equals(moveString)){ // Our move
         unechoedGameMoves.removeAllElements();
-        fireGameEvent(new IllegalMoveEvent(this, clientTag, game, move));
+        fireGameEvent(new IllegalMoveEvent(this, clientTag, game, move, reasonCode));
       }
     } catch (NoSuchGameException e){}
   }

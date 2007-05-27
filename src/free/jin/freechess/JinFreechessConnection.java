@@ -1359,8 +1359,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Invokes <code>illegalMoveAttempted</code>.
    */
 
-  protected boolean processIllegalMove(String moveString, String reason){
-    illegalMoveAttempted(moveString);
+  protected boolean processIllegalMove(String moveString, int reasonCode, String reason){
+    illegalMoveAttempted(moveString, reasonCode, reason);
 
     return false;
   }
@@ -1653,7 +1653,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate IllegalMoveEvent.
    */
 
-  private void illegalMoveAttempted(String moveString){
+  private void illegalMoveAttempted(String moveString, int ficsReasonCode, String reason){
     try{
       InternalGameData gameData = findMyGame(); 
       Game game = gameData.game;
@@ -1663,17 +1663,28 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       // Not a move we made (probably the user typed it in)
       if ((unechoedGameMoves == null) || (unechoedGameMoves.size() == 0)) 
         return;
-
+      
+      int reasonCode;
+      switch (ficsReasonCode){
+        case MOVE_REJECTED_ILLEGAL_MOVE: 
+          reasonCode = IllegalMoveEvent.ILLEGAL_MOVE;
+          break;
+        case MOVE_REJECTED_NOT_YOUR_TURN:
+          reasonCode = IllegalMoveEvent.NOT_YOUR_TURN;
+          break;
+        default:
+          reasonCode = IllegalMoveEvent.OTHER;
+      }
 
       Move move = (Move)unechoedGameMoves.elementAt(0);
-
+      
       // We have no choice but to allow (moveString == null) because the server
       // doesn't always send us the move string (for example if it's not our turn).
       if ((moveString == null) || moveToString(game, move).equals(moveString)){
         // Our move, probably
 
         unechoedGameMoves.removeAllElements();
-        listenerManager.fireGameEvent(new IllegalMoveEvent(this, null, game, move));
+        listenerManager.fireGameEvent(new IllegalMoveEvent(this, null, game, move, reasonCode));
       }
     } catch (NoSuchGameException e){}
   }
