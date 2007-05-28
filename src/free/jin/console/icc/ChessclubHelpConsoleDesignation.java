@@ -66,7 +66,7 @@ public class ChessclubHelpConsoleDesignation extends HelpConsoleDesignation{
     String type = chatEvent.getType();
     Object forum = chatEvent.getForum();
     
-    boolean isChannel1ATell = Integer.valueOf(1).equals(forum) && "channel-atell".equals(type);
+    boolean isChannel1ATell = new Integer(1).equals(forum) && "channel-atell".equals(type);
     boolean isNorelayTell = "atell".equals(type);
     
     return isChannel1ATell || isNorelayTell;

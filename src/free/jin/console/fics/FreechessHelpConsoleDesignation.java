@@ -63,7 +63,7 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
     
     ChatEvent chatEvent = (ChatEvent)evt;
     return "channel-tell".equals(chatEvent.getType()) &&
-      Integer.valueOf(1).equals(chatEvent.getForum());
+      new Integer(1).equals(chatEvent.getForum());
   }
   
   

@@ -858,8 +858,8 @@ public class Scripter extends Plugin{
       whiteTime = whiteInc = blackTime = blackInc = null;
       if (game.getTimeControl() instanceof FischerTimeControl){
         FischerTimeControl tc = (FischerTimeControl)game.getTimeControl();
-        whiteTime = Integer.valueOf(tc.getInitial()/(1000*60));
-        whiteInc = Integer.valueOf(tc.getIncrement()/1000);
+        whiteTime = new Integer(tc.getInitial()/(1000*60));
+        whiteInc = new Integer(tc.getIncrement()/1000);
         blackTime = whiteTime;
         blackInc = whiteInc;
       }
@@ -870,10 +870,10 @@ public class Scripter extends Plugin{
           FischerTimeControl wtc = (FischerTimeControl)tc.getWhiteTimeControl();
           FischerTimeControl btc = (FischerTimeControl)tc.getBlackTimeControl();
           
-          whiteTime = Integer.valueOf(wtc.getInitial());
-          whiteInc = Integer.valueOf(wtc.getIncrement());
-          blackTime = Integer.valueOf(btc.getInitial());
-          blackInc = Integer.valueOf(btc.getIncrement());
+          whiteTime = new Integer(wtc.getInitial());
+          whiteInc = new Integer(wtc.getIncrement());
+          blackTime = new Integer(btc.getInitial());
+          blackInc = new Integer(btc.getIncrement());
         }
       }
 
@@ -1099,8 +1099,8 @@ public class Scripter extends Plugin{
       whiteTime = whiteInc = blackTime = blackInc = null;
       if (game.getTimeControl() instanceof FischerTimeControl){
         FischerTimeControl tc = (FischerTimeControl)game.getTimeControl();
-        whiteTime = Integer.valueOf(tc.getInitial()/(1000*60));
-        whiteInc = Integer.valueOf(tc.getIncrement()/1000);
+        whiteTime = new Integer(tc.getInitial()/(1000*60));
+        whiteInc = new Integer(tc.getIncrement()/1000);
         blackTime = whiteTime;
         blackInc = whiteInc;
       }
@@ -1111,10 +1111,10 @@ public class Scripter extends Plugin{
           FischerTimeControl wtc = (FischerTimeControl)tc.getWhiteTimeControl();
           FischerTimeControl btc = (FischerTimeControl)tc.getBlackTimeControl();
           
-          whiteTime = Integer.valueOf(wtc.getInitial());
-          whiteInc = Integer.valueOf(wtc.getIncrement());
-          blackTime = Integer.valueOf(btc.getInitial());
-          blackInc = Integer.valueOf(btc.getIncrement());
+          whiteTime = new Integer(wtc.getInitial());
+          whiteInc = new Integer(wtc.getIncrement());
+          blackTime = new Integer(btc.getInitial());
+          blackInc = new Integer(btc.getIncrement());
         }
       }
       

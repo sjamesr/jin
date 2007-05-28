@@ -1491,34 +1491,34 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   private static final Map GAME_END_REASONS = new HashMap(); 
   static{
-    GAME_END_REASONS.put(new Pair("Res", "1-0"), new Pair(Integer.valueOf(Game.RESIGNS), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("Res", "0-1"), new Pair(Integer.valueOf(Game.RESIGNS), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("Mat", "1-0"), new Pair(Integer.valueOf(Game.CHECKMATED), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("Mat", "0-1"), new Pair(Integer.valueOf(Game.CHECKMATED), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("Fla", "1-0"), new Pair(Integer.valueOf(Game.TIME_FORFEITS), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("Fla", "0-1"), new Pair(Integer.valueOf(Game.TIME_FORFEITS), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("Adj", "1-0"), new Pair(Integer.valueOf(Game.ADJUDICATED), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("Adj", "0-1"), new Pair(Integer.valueOf(Game.ADJUDICATED), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("BQ", "1-0"), new Pair(Integer.valueOf(Game.DISCONNECTED), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("WQ", "0-1"), new Pair(Integer.valueOf(Game.DISCONNECTED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Res", "1-0"), new Pair(new Integer(Game.RESIGNS), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Res", "0-1"), new Pair(new Integer(Game.RESIGNS), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Mat", "1-0"), new Pair(new Integer(Game.CHECKMATED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Mat", "0-1"), new Pair(new Integer(Game.CHECKMATED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Fla", "1-0"), new Pair(new Integer(Game.TIME_FORFEITS), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Fla", "0-1"), new Pair(new Integer(Game.TIME_FORFEITS), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "1-0"), new Pair(new Integer(Game.ADJUDICATED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "0-1"), new Pair(new Integer(Game.ADJUDICATED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("BQ", "1-0"), new Pair(new Integer(Game.DISCONNECTED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WQ", "0-1"), new Pair(new Integer(Game.DISCONNECTED), Player.WHITE_PLAYER));
     
-    GAME_END_REASONS.put(new Pair("Agr", "1/2-1/2"), new Pair(Integer.valueOf(Game.DRAW_AGREEMENT), null));
-    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(Integer.valueOf(Game.STALEMATE), null));
-    GAME_END_REASONS.put(new Pair("Rep", "1/2-1/2"), new Pair(Integer.valueOf(Game.REPETITION), null));
-    GAME_END_REASONS.put(new Pair("50", "1/2-1/2"), new Pair(Integer.valueOf(Game.FIFTY_MOVE_RULE), null));
-    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(Integer.valueOf(Game.STALEMATE), null));
-    GAME_END_REASONS.put(new Pair("TM", "1/2-1/2"), new Pair(Integer.valueOf(Game.OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE), null));
-    GAME_END_REASONS.put(new Pair("NM", "1/2-1/2"), new Pair(Integer.valueOf(Game.BOTH_NO_MATERIAL_TO_MATE), null));
-    GAME_END_REASONS.put(new Pair("NT", "1/2-1/2"), new Pair(Integer.valueOf(Game.BOTH_OUT_OF_TIME), null));
-    GAME_END_REASONS.put(new Pair("Adj", "1/2-1/2"), new Pair(Integer.valueOf(Game.ADJUDICATED), null));
+    GAME_END_REASONS.put(new Pair("Agr", "1/2-1/2"), new Pair(new Integer(Game.DRAW_AGREEMENT), null));
+    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(new Integer(Game.STALEMATE), null));
+    GAME_END_REASONS.put(new Pair("Rep", "1/2-1/2"), new Pair(new Integer(Game.REPETITION), null));
+    GAME_END_REASONS.put(new Pair("50", "1/2-1/2"), new Pair(new Integer(Game.FIFTY_MOVE_RULE), null));
+    GAME_END_REASONS.put(new Pair("Sta", "1/2-1/2"), new Pair(new Integer(Game.STALEMATE), null));
+    GAME_END_REASONS.put(new Pair("TM", "1/2-1/2"), new Pair(new Integer(Game.OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE), null));
+    GAME_END_REASONS.put(new Pair("NM", "1/2-1/2"), new Pair(new Integer(Game.BOTH_NO_MATERIAL_TO_MATE), null));
+    GAME_END_REASONS.put(new Pair("NT", "1/2-1/2"), new Pair(new Integer(Game.BOTH_OUT_OF_TIME), null));
+    GAME_END_REASONS.put(new Pair("Adj", "1/2-1/2"), new Pair(new Integer(Game.ADJUDICATED), null));
     
-    GAME_END_REASONS.put(new Pair("Agr", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_AGREEMENT), null));
-    GAME_END_REASONS.put(new Pair("BQ", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_DISCONNECTED), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("WQ", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_DISCONNECTED), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("BA", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_COURTESY), Player.BLACK_PLAYER));
-    GAME_END_REASONS.put(new Pair("WA", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_COURTESY), Player.WHITE_PLAYER));
-    GAME_END_REASONS.put(new Pair("Adj", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_ADMIN), null));
-    GAME_END_REASONS.put(new Pair("Sho", "aborted"), new Pair(Integer.valueOf(Game.ABORTED_TOO_SHORT), null));
+    GAME_END_REASONS.put(new Pair("Agr", "aborted"), new Pair(new Integer(Game.ABORTED_AGREEMENT), null));
+    GAME_END_REASONS.put(new Pair("BQ", "aborted"), new Pair(new Integer(Game.ABORTED_DISCONNECTED), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WQ", "aborted"), new Pair(new Integer(Game.ABORTED_DISCONNECTED), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("BA", "aborted"), new Pair(new Integer(Game.ABORTED_COURTESY), Player.BLACK_PLAYER));
+    GAME_END_REASONS.put(new Pair("WA", "aborted"), new Pair(new Integer(Game.ABORTED_COURTESY), Player.WHITE_PLAYER));
+    GAME_END_REASONS.put(new Pair("Adj", "aborted"), new Pair(new Integer(Game.ABORTED_ADMIN), null));
+    GAME_END_REASONS.put(new Pair("Sho", "aborted"), new Pair(new Integer(Game.ABORTED_TOO_SHORT), null));
   }
   
   
@@ -2659,7 +2659,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (!"X".equals(code))
       state |= PLAYING_FRIEND_STATE_MASK;
     
-    return Integer.valueOf(state);
+    return new Integer(state);
   }
   
   

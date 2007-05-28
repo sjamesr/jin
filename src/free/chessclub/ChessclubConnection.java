@@ -630,6 +630,8 @@ public class ChessclubConnection extends free.util.Connection{
           return readPacket(pin);
         else if (next == DATAGRAM_START_DELIMITER)
           return readDatagram(pin);
+        else if (next == PACKET_END_DELIMITER) // This means a clean logout
+          return null;
       }
       else{
         pin.unread(b);
