@@ -160,10 +160,6 @@ public abstract class DialogPanel extends JPanel{
   
   public void show(JDialog dialog, Component hintParent){
     this.dialog = dialog;
-    SwingUtils.registerEscapeCloser(dialog);
-    dialog.setModal(true);
-    dialog.setTitle(getTitle());
-    dialog.setResizable(false);
     
     JPanel content = new JPanel(WrapLayout.getInstance());
     LayoutStyle layoutStyle = LayoutStyle.getSharedInstance();
@@ -172,16 +168,32 @@ public abstract class DialogPanel extends JPanel{
         layoutStyle.getContainerGap(content, SwingConstants.WEST, dialog),
         layoutStyle.getContainerGap(content, SwingConstants.SOUTH, dialog),
         layoutStyle.getContainerGap(content, SwingConstants.EAST, dialog)));
+    
     content.add(this);
     dialog.setContentPane(content);
-    dialog.getRootPane().setDefaultButton(defaultButton);
-    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    
+    configureDialog(dialog);
     
     AWTUtilities.centerWindow(dialog, hintParent);
     
     this.resultSet = false;
     
     dialog.setVisible(true);
+  }
+  
+  
+  
+  /**
+   * Configures the dialog in which we'll be displayed.
+   */
+  
+  protected void configureDialog(JDialog dialog){
+    SwingUtils.registerEscapeCloser(dialog);
+    dialog.setModal(true);
+    dialog.setTitle(getTitle());
+    dialog.setResizable(false);
+    dialog.getRootPane().setDefaultButton(defaultButton);
+    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
   }
   
   
