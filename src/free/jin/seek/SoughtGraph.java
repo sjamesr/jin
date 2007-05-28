@@ -21,33 +21,13 @@
 
 package free.jin.seek;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolTip;
+import javax.swing.*;
 
 import free.chess.Chess;
 import free.chess.FischerTimeControl;
@@ -56,6 +36,7 @@ import free.chess.WildVariant;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.Seek;
+import free.jin.ServerUser;
 import free.jin.plugin.Plugin;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
@@ -224,6 +205,14 @@ public class SoughtGraph extends JComponent{
    */
   
   private final JPopupMenu legendPopup;
+  
+  
+  
+  /**
+   * The <code>ServerUser</code> object for the account we're logged in with.
+   */
+  
+  private ServerUser user;
   
   
   
@@ -752,7 +741,10 @@ public class SoughtGraph extends JComponent{
     
     Hashtable sizeImages = seekImageCache[index];
     
-    boolean isMySeek = seek.getSeeker().equals(plugin.getConn().getUser());
+    if (user == null) // Lazily create
+      user = plugin.getConn().getUser();
+    
+    boolean isMySeek = seek.getSeeker().equals(user);
     String playerType = seek.isSeekerComputer() ? "comp" : "human";
     String ratedString = seek.isRated() ? "rated" : "unrated";
     boolean isWild = !seek.getVariant().equals(Chess.getInstance());
