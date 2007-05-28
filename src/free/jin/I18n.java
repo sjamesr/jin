@@ -274,6 +274,19 @@ public class I18n{
   public JRadioButton createRadioButton(String i18nKey){
     return (JRadioButton)initAbstractButton(new JRadioButton(), i18nKey);
   }
+  
+  
+  
+  /**
+   * Creates a <code>JRadioButton</code> using the specified i18n key and args.
+   * The text and tooltip of the button are treated as a pattern and
+   * <code>args</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
+   */
+  
+  public JRadioButton createRadioButton(String i18nKey, Object [] args){
+    return (JRadioButton)initAbstractButton(new JRadioButton(), i18nKey, args);
+  }
 
   
   
@@ -283,6 +296,19 @@ public class I18n{
   
   public JCheckBox createCheckBox(String i18nKey){
     return (JCheckBox)initAbstractButton(new JCheckBox(), i18nKey);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>JCheckBox</code> using the specified i18n key and args.
+   * The text and tooltip of the button are treated as a pattern and
+   * <code>args</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
+   */
+  
+  public JCheckBox createCheckBox(String i18nKey, Object [] args){
+    return (JCheckBox)initAbstractButton(new JCheckBox(), i18nKey, args);
   }
   
   
@@ -298,11 +324,37 @@ public class I18n{
   
   
   /**
+   * Creates a <code>JButton</code> using the specified i18n key and args.
+   * The text and tooltip of the button are treated as a pattern and
+   * <code>args</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
+   */
+  
+  public JButton createButton(String i18nKey, Object [] args){
+    return (JButton)initAbstractButton(new JButton(), i18nKey, args);
+  }
+  
+  
+  
+  /**
    * Creates a <code>JMenuItem</code> using the specified i18n key.
    */
   
   public JMenuItem createMenuItem(String i18nKey){
     return createMenuItem(i18nKey, null);
+  }
+  
+  
+  
+  /**
+   * Creates a <code>JMenuItem</code> using the specified i18n key.
+   * The text of the menu item is treated as a pattern and
+   * <code>args</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
+   */
+  
+  public JMenuItem createMenuItem(String i18nKey, Object [] args){
+    return (JMenuItem)initAbstractButton(new JMenuItem(), i18nKey, args);
   }
   
   
@@ -316,29 +368,6 @@ public class I18n{
     JMenuItem item = createMenuItem(i18nKey);
     item.setText(item.getText() + PlatformUtils.getEllipsis());
     return item;
-  }
-  
-  
-  
-  /**
-   * Creates a <code>JMenuItem</code> using the specified i18n key.
-   * The text of the menu item is treated as a pattern and
-   * <code>textArgs</code>, if not <code>null</code> are inserted at the
-   * appropriate locations.
-   */
-  
-  public JMenuItem createMenuItem(String i18nKey, Object [] textArgs){
-    JMenuItem menuItem = new JMenuItem();
-    
-    String labelSpec = getString(combineKeys(i18nKey, "text"));
-    
-    labelSpec = formatMessage(labelSpec, textArgs);
-    
-    // This doesn't work right if textArgs contains ampersands
-    SwingUtils.applyLabelSpec(menuItem, labelSpec);
-    
-    return menuItem;
-    
   }
   
   
@@ -360,14 +389,36 @@ public class I18n{
   
   /**
    * Initializes the specified <code>AbstractButton</code> from the specified
-   * i18n key and with the specified initial state.
-   * This method is useful if you have a custom <code>AbstractButton</code>,
-   * and so can't use the <code>create</code> methods.
+   * i18n key.
    */
   
   public AbstractButton initAbstractButton(AbstractButton button, String i18nKey){
-    SwingUtils.applyLabelSpec(button, getString(combineKeys(i18nKey, "text")));
-    button.setToolTipText(getString(combineKeys(i18nKey, "tooltip"), null));
+    return initAbstractButton(button, i18nKey, null);
+  }
+  
+  
+  
+  /**
+   * Initializes the specified <code>AbstractButton</code> from the specified
+   * i18n key.
+   * The text and tooltip of the button are treated as a pattern and
+   * <code>args</code>, if not <code>null</code> are inserted at the
+   * appropriate locations.
+   */
+  
+  public AbstractButton initAbstractButton(AbstractButton button, String i18nKey, Object [] args){
+    String labelSpec = getString(combineKeys(i18nKey, "text"));
+    String tooltipText = getString(combineKeys(i18nKey, "tooltip"), null);
+    
+    labelSpec = formatMessage(labelSpec, args);
+    if (tooltipText != null)
+      tooltipText = formatMessage(tooltipText, args);
+    
+    // This doesn't work right if textArgs contains ampersands
+    SwingUtils.applyLabelSpec(button, labelSpec);
+    
+    if (tooltipText != null)
+      button.setToolTipText(tooltipText);
     
     return button;
   }
