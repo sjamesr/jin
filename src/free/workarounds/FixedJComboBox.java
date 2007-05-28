@@ -101,8 +101,11 @@ public class FixedJComboBox extends JComboBox{
   public void requestFocus(){
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4513773.html
-
-    getEditor().getEditorComponent().requestFocus();
+    
+    if (isEditable())
+      getEditor().getEditorComponent().requestFocus();
+    else
+      super.requestFocus();
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4513773.html
 
