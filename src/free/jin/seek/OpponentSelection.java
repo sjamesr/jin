@@ -37,6 +37,7 @@ import free.jin.I18n;
 import free.jin.ServerUser;
 import free.util.ChangeSupport;
 import free.util.swing.ListWrapperComboBoxModel;
+import free.workarounds.FixedJComboBox;
 
 
 
@@ -80,8 +81,7 @@ public final class OpponentSelection{
   public OpponentSelection(ListModel easyAccessOpponents, ServerUser initialOpponent){
     I18n i18n = I18n.get(OpponentSelection.class);
     
-    this.label = i18n.createLabel("");
-    this.box = new JComboBox(new ListWrapperComboBoxModel(easyAccessOpponents));
+    this.box = new FixedJComboBox(new ListWrapperComboBoxModel(easyAccessOpponents));
     box.setEditable(true);
     box.setSelectedItem(initialOpponent);
     
@@ -107,6 +107,9 @@ public final class OpponentSelection{
           changeSupport.fireStateChanged();
         }
       });
+    
+    this.label = i18n.createLabel("");
+    label.setLabelFor(box);
   }
   
   
