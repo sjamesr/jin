@@ -198,8 +198,11 @@ public class SwingUtils{
   public static void applyLabelSpec(AbstractButton button, String labelSpec){
     button.setText(getLabelText(labelSpec));
     
-    if (!isMacLnF())
-      button.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    if (!isMacLnF()){
+      int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
+      button.setMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
+      button.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
   }
   
   
@@ -211,8 +214,11 @@ public class SwingUtils{
   public static void applyLabelSpec(JLabel label, String labelSpec){
     label.setText(getLabelText(labelSpec));
     
-    if (!isMacLnF())
-      label.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    if (!isMacLnF()){
+      int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
+      label.setDisplayedMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
+      label.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
   }
   
   
@@ -224,8 +230,11 @@ public class SwingUtils{
   public static void applyLabelSpec(Mnemonicable mnemonicable, String labelSpec){
     mnemonicable.setText(getLabelText(labelSpec));
     
-    if (!isMacLnF())
-      mnemonicable.setDisplayedMnemonicIndex(getLabelMnemonicIndex(labelSpec));
+    if (!isMacLnF()){
+      int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
+      mnemonicable.setMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
+      mnemonicable.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
   }
   
   
