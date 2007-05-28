@@ -401,13 +401,7 @@ public class ConnectionManager{
     
     fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSED, tempSession));
     
-    // In invokeLater because this method may be (is, actually) invoked from a confirmation
-    // dialog, which is still "visible" at this point.
-    SwingUtilities.invokeLater(new Runnable(){
-      public void run(){
-        Jin.getInstance().quitIfNoUiVisible();
-      }
-    });
+    Jin.getInstance().quitIfNoUiVisible();
   }
 
 
