@@ -200,8 +200,11 @@ public class SwingUtils{
     
     if (!isMacLnF()){
       int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
-      button.setMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
-      button.setDisplayedMnemonicIndex(mnemonicIndex);
+      if (mnemonicIndex != -1){
+        int mnemonic = Character.toUpperCase(labelSpec.charAt(mnemonicIndex + 1));
+        button.setMnemonic(mnemonic);
+        button.setDisplayedMnemonicIndex(mnemonicIndex);
+      }
     }
   }
   
@@ -216,8 +219,11 @@ public class SwingUtils{
     
     if (!isMacLnF()){
       int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
-      label.setDisplayedMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
-      label.setDisplayedMnemonicIndex(mnemonicIndex);
+      if (mnemonicIndex != -1){
+        int mnemonic = Character.toUpperCase(labelSpec.charAt(mnemonicIndex + 1));
+        label.setDisplayedMnemonic(mnemonic);
+        label.setDisplayedMnemonicIndex(mnemonicIndex);
+      }
     }
   }
   
@@ -232,8 +238,11 @@ public class SwingUtils{
     
     if (!isMacLnF()){
       int mnemonicIndex = getLabelMnemonicIndex(labelSpec);
-      mnemonicable.setMnemonic((int)labelSpec.charAt(mnemonicIndex + 1));
-      mnemonicable.setDisplayedMnemonicIndex(mnemonicIndex);
+      if (mnemonicIndex != -1){
+        int mnemonic = Character.toUpperCase(labelSpec.charAt(mnemonicIndex + 1));
+        mnemonicable.setMnemonic(mnemonic);
+        mnemonicable.setDisplayedMnemonicIndex(mnemonicIndex);
+      }
     }
   }
   
