@@ -276,9 +276,19 @@ public class Session{
     
     new ConnectionInitializer(connDetails.getHost(), connDetails.getPorts()).go();
   }
-
-
-
+  
+  
+  
+  /**
+   * Returns the connection to the server.
+   */
+  
+  public Connection getConnection(){
+    return conn;
+  }
+  
+  
+  
   /**
    * Returns whether we are currently actually connected to the server. Note
    * that we may be disconnected but the session isn't closed yet.
