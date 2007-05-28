@@ -551,8 +551,19 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      */
     
     public void pluginUIActivated(PluginUIEvent evt){
-      issueTabbedPane.getFocusCycleRootAncestor().getFocusTraversalPolicy().
-        getDefaultComponent(issueTabbedPane).requestFocusInWindow();
+      Container focusCycleRoot = issueTabbedPane.getFocusCycleRootAncestor();
+      if (focusCycleRoot == null) // Weird things can happen on shutdown
+        return;
+      
+      FocusTraversalPolicy policy = focusCycleRoot.getFocusTraversalPolicy();
+      if (policy == null)
+        return;
+      
+      Component defaultComponent = policy.getDefaultComponent(issueTabbedPane);
+      if (defaultComponent == null)
+        return;
+      
+      defaultComponent.requestFocusInWindow();
     }
     
     public void pluginUIClosing(PluginUIEvent evt){}
