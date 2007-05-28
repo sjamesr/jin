@@ -34,10 +34,26 @@ public class SessionEvent extends EventObject{
   
   
   /**
-   * The code for when a session is established. 
+   * The code for an event fired just before a session is started.
+   */
+  
+  public static final int SESSION_STARTING = -1;
+  
+  
+  
+  /**
+   * The code for when a session was started. 
    */
   
   public static final int SESSION_ESTABLISHED = 1;
+  
+  
+  
+  /**
+   * The code for an event fired just before the session is being closed.
+   */
+  
+  public static final int SESSION_CLOSING = 2;
   
   
   
@@ -75,6 +91,8 @@ public class SessionEvent extends EventObject{
     switch(id){
       case SESSION_ESTABLISHED:
       case SESSION_CLOSED:
+      case SESSION_STARTING:
+      case SESSION_CLOSING:
         break;
       default:
         throw new IllegalArgumentException("Invalid id: " + id);
@@ -108,12 +126,14 @@ public class SessionEvent extends EventObject{
   
   
   /**
-   * Returns the session that was established or closed.
+   * Returns the session. In the case of a <code>SESSION_STARTING</code> event,
+   * this is <code>null</code>.
    */
   
   public Session getSession(){
     return session;
   }
-
+  
+  
   
 }

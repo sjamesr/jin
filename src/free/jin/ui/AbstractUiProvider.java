@@ -84,6 +84,16 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
+   * SessionListener implementation.
+   */
+  
+  public void sessionStarting(SessionEvent evt){
+    
+  }
+  
+  
+  
+  /**
    * SessionListener implementation. Restores various preferences.
    */
   
@@ -105,7 +115,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * SessionListener implementation. Stores various preferences.
    */
   
-  public void sessionClosed(SessionEvent evt){
+  public void sessionClosing(SessionEvent evt){
     saveSelectedFrame(evt.getSession());
     
     Enumeration pluginContainers = getExistingPluginUIContainers();
@@ -117,6 +127,17 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
     }
     
     removePluginContainers();
+  }
+
+  
+  
+  
+  /**
+   * SessionListener implementation.
+   */
+  
+  public void sessionClosed(SessionEvent evt){
+    
   }
   
   

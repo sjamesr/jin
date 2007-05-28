@@ -165,6 +165,11 @@ public class PrefsMenu extends JMenu implements SessionListener{
     setConnected(false, evt.getSession());
   }
   
+  
+  
+  public void sessionStarting(SessionEvent evt){}
+  public void sessionClosing(SessionEvent evt){}
+  
 
 
 

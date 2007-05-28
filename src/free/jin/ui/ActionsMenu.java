@@ -134,6 +134,9 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     removeAll();
   }
   
+  public void sessionStarting(SessionEvent evt){}
+  public void sessionClosing(SessionEvent evt){}
+  
   
   
   

@@ -34,10 +34,26 @@ public interface SessionListener extends EventListener{
   
   
   /**
+   * Invoked just before a new session is started.
+   */
+  
+  void sessionStarting(SessionEvent evt);
+  
+  
+  
+  /**
    * Gets called when a new session is established. 
    */
   
   void sessionEstablished(SessionEvent session);
+  
+  
+  
+  /**
+   * Invoked just before the session is closed.
+   */
+  
+  void sessionClosing(SessionEvent evt);
   
   
   

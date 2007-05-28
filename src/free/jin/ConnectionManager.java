@@ -81,10 +81,8 @@ public class ConnectionManager{
     User user = findLoginUser(server);
     
     ConnectionDetails connDetails = findConnDetails(server, user);
-    if (connDetails == null){
-      Jin.getInstance().quitIfNoUiVisible();
+    if (connDetails == null)
       return;
-    }
     
     login(connDetails);
   }
@@ -257,10 +255,8 @@ public class ConnectionManager{
     
     ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
       
-    if (connDetails == null){ // user canceled the dialog
-      Jin.getInstance().quitIfNoUiVisible();
+    if (connDetails == null) // user canceled the dialog
       return;
-    }
     
     login(connDetails);
   }
@@ -275,10 +271,8 @@ public class ConnectionManager{
     ConnectionDetails connDetails = 
       new LoginPanel(user.getPreferredConnDetails()).askConnectionDetails();
       
-    if (connDetails == null){ // user canceled the dialog
-      Jin.getInstance().quitIfNoUiVisible();
+    if (connDetails == null) // user canceled the dialog
       return;
-    }
       
     login(connDetails);
   }
@@ -292,6 +286,7 @@ public class ConnectionManager{
    
   private void login(ConnectionDetails connDetails){
     try{
+      fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_STARTING, null));
       session = new Session(connDetails);
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
       session.initiateLogin();
@@ -320,6 +315,7 @@ public class ConnectionManager{
     // Reopen the connection UI
     User user = session.getUser();
     closeSession();
+    
     displayNewConnUI(user);
   }
   
@@ -333,6 +329,8 @@ public class ConnectionManager{
   public void closeSession(){
     if (session == null)
       return;
+    
+    fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSING, session));
 
     // Close the session
     session.close();
@@ -415,8 +413,14 @@ public class ConnectionManager{
       if (listeners[i] == SessionListener.class){
         SessionListener listener = (SessionListener)listeners[i+1];
         switch (evt.getId()){
+          case SessionEvent.SESSION_STARTING:
+            listener.sessionStarting(evt);
+            break;
           case SessionEvent.SESSION_ESTABLISHED:
             listener.sessionEstablished(evt);
+            break;
+          case SessionEvent.SESSION_CLOSING:
+            listener.sessionClosing(evt);
             break;
           case SessionEvent.SESSION_CLOSED:
             listener.sessionClosed(evt);
