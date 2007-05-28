@@ -21,49 +21,28 @@
 
 package free.jin.seek;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Iterator;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 
-import free.jin.Connection;
-import free.jin.I18n;
-import free.jin.MatchOfferConnection;
-import free.jin.Preferences;
-import free.jin.Seek;
-import free.jin.SeekConnection;
-import free.jin.ServerUser;
+import free.jin.*;
 import free.jin.action.JinAction;
 import free.jin.event.ConnectionListener;
 import free.jin.event.SeekEvent;
 import free.jin.event.SeekListener;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginContext;
-import free.jin.plugin.PluginUIContainer;
-import free.jin.plugin.PluginUIEvent;
-import free.jin.plugin.PluginUIListener;
+import free.jin.plugin.*;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
 import free.jin.ui.UIProvider;
 import free.util.swing.WrapLayout;
 import free.util.swing.WrapperComponent;
-import free.util.swing.tabbedpane.Tab;
-import free.util.swing.tabbedpane.TabbedPane;
-import free.util.swing.tabbedpane.TabbedPaneModel;
+import free.util.swing.tabbedpane.*;
 
 
 /**
@@ -218,7 +197,18 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     model.setSelectedIndex(model.indexOfComponent(
         getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
             (Component)issueSeekPanel : (Component)issueMatchPanel));
-
+    
+    model.addTabbedPaneListener(new TabbedPaneListener(){
+      public void tabSelected(TabbedPaneEvent evt){
+        Component component = evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
+        Container parent = component.getFocusCycleRootAncestor();
+        parent.getFocusTraversalPolicy().getDefaultComponent(parent).requestFocusInWindow();
+      }
+      
+      public void tabAdded(TabbedPaneEvent evt){}
+      public void tabDeselected(TabbedPaneEvent evt){}
+      public void tabRemoved(TabbedPaneEvent evt){}
+    });
     
     JLabel issueSeekLabel = null;
     if (issueMatchPanel == null){
@@ -556,7 +546,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     
     
-    public void pluginUIActivated(PluginUIEvent evt){}
+    /**
+     * Invoked when the "find game" UI is made active.
+     */
+    
+    public void pluginUIActivated(PluginUIEvent evt){
+      issueTabbedPane.getFocusCycleRootAncestor().getFocusTraversalPolicy().
+        getDefaultComponent(issueTabbedPane).requestFocusInWindow();
+    }
+    
     public void pluginUIClosing(PluginUIEvent evt){}
     public void pluginUIDeactivated(PluginUIEvent evt){}
     public void pluginUIDisposed(PluginUIEvent evt){}
