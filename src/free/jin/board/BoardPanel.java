@@ -896,7 +896,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     table.getTableHeader().setPreferredSize(new Dimension(150, 18));
     table.getTableHeader().setReorderingAllowed(false);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    table.setRequestFocusEnabled(false);
+    table.setFocusable(false);
     
     return table;
   }
