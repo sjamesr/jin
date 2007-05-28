@@ -1,7 +1,7 @@
 /**
  * The utillib library.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
+ * Copyright (C) 2007 Alexander Maryanovsky.
  * All rights reserved.
  *
  * The utillib library is free software; you can redistribute
@@ -34,13 +34,13 @@ import javax.swing.event.ChangeEvent;
  */
 
 public class ColorChooser extends JComponent implements Mnemonicable{
-
-
-
+  
+  
+  
   /**
    * The button we're using.
    */
-
+  
   private final JButton button;
   
   
@@ -48,15 +48,15 @@ public class ColorChooser extends JComponent implements Mnemonicable{
   /**
    * The label we're using.
    */
-   
+  
   private final JLabel label;
-
-
-
+  
+  
+  
   /**
    * The icon's size.
    */
-
+  
   private static final Dimension ICON_SIZE = new Dimension(25, 10);
   
   
@@ -66,24 +66,24 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    */
   
   private static final Color ICON_BORDER_COLOR = Color.GRAY;
-
-
-
+  
+  
+  
   /**
    * The current color.
    */
-
+  
   private Color color;
-
-
-
+  
+  
+  
   /**
    * The sole ChangeEvent we need.
    */
-
+  
   private final ChangeEvent changeEvent = new ChangeEvent(this);
-
-
+  
+  
   
   /**
    * Creates a new <code>ColorChooser</code> with no text and initial color of black.
@@ -110,18 +110,18 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * Creates a new <code>ColorChooser</code> with no text and the given initial
    * color.
    */
-
+  
   public ColorChooser(Color initialColor){
     this(null, initialColor);
   }
-
-
-
+  
+  
+  
   /**
    * Creates a new <code>ColorChooser</code> with the given text and initial
    * color.
    */
-
+  
   public ColorChooser(String text, Color initialColor){
     label = new JLabel();
     button = new JButton();
@@ -134,7 +134,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
     add(Box.createHorizontalStrut(20));
     add(Box.createHorizontalGlue());
     add(button);
-
+    
     label.setLabelFor(button);
     button.setDefaultCapable(false);
     
@@ -143,9 +143,9 @@ public class ColorChooser extends JComponent implements Mnemonicable{
     else
       button.setMargin(new Insets(3, 3, 3, 3));
     
-
+    
     color = initialColor;
-
+    
     button.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(ColorChooser.this),
@@ -175,9 +175,19 @@ public class ColorChooser extends JComponent implements Mnemonicable{
   public String getText(){
     return label.getText();
   }
-
-
-
+  
+  
+  
+  /**
+   * Sets the mnemonic.
+   */
+  
+  public void setMnemonic(int mnemonic){
+    label.setDisplayedMnemonic(mnemonic);
+  }
+  
+  
+  
   /**
    * Sets the displayed mnemonic index.
    */
@@ -191,43 +201,43 @@ public class ColorChooser extends JComponent implements Mnemonicable{
   /**
    * Sets the enabled state of this color chooser.
    */
-   
+  
   public void setEnabled(boolean enabled){
     label.setEnabled(enabled);
     button.setEnabled(enabled);
     
     super.setEnabled(enabled);
   }
-   
-
-
-
+  
+  
+  
+  
   /**
    * Adds a ChangeListener to the list of listeners receiving notifications when
    * one of the text properties changes.
    */
-
+  
   public void addChangeListener(ChangeListener listener){
     listenerList.add(ChangeListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
    * Removes the given Changelistener from the list of listeners receiving
    * notifications when one of the text properties changes.
    */
-
+  
   public void removeChangeListener(ChangeListener listener){
     listenerList.remove(ChangeListener.class, listener);
   }
-
-
-
+  
+  
+  
   /**
    * Fires a ChangeEvent to all interested listeners.
    */
-
+  
   protected void fireStateChanged(){
     Object [] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2){
@@ -243,17 +253,17 @@ public class ColorChooser extends JComponent implements Mnemonicable{
   /**
    * Returns the currently selected color.
    */
-
+  
   public Color getColor(){
     return color;
   }
-
-
-
+  
+  
+  
   /**
    * Sets the current color.
    */
-
+  
   public void setColor(Color color){
     this.color = color;
     

@@ -19,6 +19,14 @@ public interface Mnemonicable{
   
   
   /**
+   * Sets the mnemonic.
+   */
+  
+  void setMnemonic(int mnemonic);
+  
+  
+  
+  /**
    * Sets the displayed mnemonic index.
    */
   
