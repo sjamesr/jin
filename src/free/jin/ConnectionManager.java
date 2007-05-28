@@ -21,9 +21,17 @@
 
 package free.jin;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.*;
+
+import free.jin.event.ConnectionListener;
 import free.jin.plugin.PluginStartException;
+import free.jin.ui.DialogPanel;
 import free.jin.ui.LoginPanel;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.ServerChoicePanel;
@@ -81,8 +89,10 @@ public class ConnectionManager{
     User user = findLoginUser(server);
     
     ConnectionDetails connDetails = findConnDetails(server, user);
-    if (connDetails == null)
+    if (connDetails == null){
+      Jin.getInstance().quitIfNoUiVisible();
       return;
+    }
     
     login(connDetails);
   }
@@ -255,8 +265,10 @@ public class ConnectionManager{
     
     ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
       
-    if (connDetails == null) // user canceled the dialog
+    if (connDetails == null){ // user canceled the dialog
+      Jin.getInstance().quitIfNoUiVisible();
       return;
+    }
     
     login(connDetails);
   }
@@ -271,8 +283,10 @@ public class ConnectionManager{
     ConnectionDetails connDetails = 
       new LoginPanel(user.getPreferredConnDetails()).askConnectionDetails();
       
-    if (connDetails == null) // user canceled the dialog
+    if (connDetails == null){ // user canceled the dialog
+      Jin.getInstance().quitIfNoUiVisible();
       return;
+    }
       
     login(connDetails);
   }
@@ -289,6 +303,23 @@ public class ConnectionManager{
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_STARTING, null));
       session = new Session(connDetails);
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
+      
+      session.getConnection().getListenerManager().addConnectionListener(new ConnectionListener(){
+        private boolean loggedIn = false;
+        public void loginSucceeded(Connection conn){
+          loggedIn = true;
+        }
+        public void connectionLost(Connection conn){
+          if (loggedIn && (session != null) && (session.getConnection() == conn))
+            Jin.getInstance().getUIProvider().showDialog(new ReconnectDialogPanel(), null);
+        }
+        
+        public void connectingFailed(Connection conn, String reason){}
+        public void connectionAttempted(Connection conn, String hostname, int port){}
+        public void connectionEstablished(Connection conn){}
+        public void loginFailed(Connection conn, String reason){}
+      });
+      
       session.initiateLogin();
     } catch (PluginStartException e){
         e.printStackTrace();
@@ -369,6 +400,14 @@ public class ConnectionManager{
     session = null;
     
     fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSED, tempSession));
+    
+    // In invokeLater because this method may be (is, actually) invoked from a confirmation
+    // dialog, which is still "visible" at this point.
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run(){
+        Jin.getInstance().quitIfNoUiVisible();
+      }
+    });
   }
 
 
@@ -467,6 +506,84 @@ public class ConnectionManager{
     prefs.setString("last-login.serverId", serverId);
     prefs.setString("last-login.username",
         user.isGuest() || !Jin.getInstance().isKnownUser(user) ? null : user.getUsername());
+  }
+  
+  
+  
+  /**
+   * A dialog panel we display to the user when he gets disconnected.
+   */
+  
+  private class ReconnectDialogPanel extends DialogPanel{
+    
+    
+    
+    /**
+     * Creates a new <code>ReconnectDialogPanel</code>.
+     */
+    
+    public ReconnectDialogPanel(){
+      super(I18n.get(ReconnectDialogPanel.class).getString("title"));
+      
+      setLayout(new BorderLayout(10, 10));
+      
+      I18n i18n = I18n.get(ReconnectDialogPanel.class);
+      
+      JButton reconnectButton = i18n.createButton("reconnectButton");
+      JButton quitButton = i18n.createButton("quitButton", new Object[]{Jin.getAppName()});
+      
+      reconnectButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          final ConnectionDetails connDetails = session.getConnDetails();
+          closeSession();
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              login(connDetails);
+            }
+          });
+        }
+      });
+      
+      quitButton.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+          Jin.getInstance().quit(false);
+        }
+      });
+      
+      JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+      buttonPanel.add(reconnectButton);
+      buttonPanel.add(quitButton);
+      
+      add(BorderLayout.WEST, new JLabel(UIManager.getIcon("OptionPane.warningIcon")));
+      add(BorderLayout.CENTER, i18n.createLabel("label"));
+      add(BorderLayout.SOUTH, buttonPanel);
+      
+      
+      addSessionListener(new SessionListener(){
+        public void sessionClosing(SessionEvent evt){
+          removeSessionListener(this);
+          close(null);
+        }
+        public void sessionClosed(SessionEvent evt){}
+        public void sessionEstablished(SessionEvent session){}
+        public void sessionStarting(SessionEvent evt){}
+      });
+    }
+    
+    
+    
+    /**
+     * Configures the dialog not to be modal.
+     */
+    
+    protected void configureDialog(JDialog dialog){
+      super.configureDialog(dialog);
+      
+      dialog.setModal(false);
+    }
+    
+    
+
   }
 
 
