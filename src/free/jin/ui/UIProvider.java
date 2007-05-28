@@ -126,18 +126,6 @@ public interface UIProvider{
   
   
   /**
-   * Returns whether any UI is currently visible to the user. This is used by
-   * certain places in code to quit Jin if no UI is visible. The proper way to
-   * solve this problem is to register shutdown hooks, but that's not available
-   * under Java 1.1 (and Java 1.1 doesn't automatically shut down when no UI is
-   * visible).
-   */
-  
-  boolean isUiVisible();
-
-
-  
-  /**
    * This method is called to notify the <code>UIProvider</code> that Jin is
    * being shut down. The implementation is supposed to save any state it
    * requires into preferences and close any UI elements it owns. 
