@@ -103,17 +103,17 @@ public class SdiUiProvider extends AbstractUiProvider{
 
     JDialog jdialog = new JDialog(parentFrame);
     // Count how many open dialogs we have
-    jdialog.addComponentListener(new ComponentAdapter(){
-      // Can't depend on the system to be consistent about show/hide events
+    jdialog.addWindowListener(new WindowAdapter(){
+      // Can't depend on the system to be consistent about open/close events
       private boolean isOpen = false;
 
-      public void componentShown(ComponentEvent evt){
+      public void windowOpened(WindowEvent evt){
         if (!isOpen){
           isOpen = true;
           openDialogsCount++;
         }
       }
-      public void componentHidden(ComponentEvent evt){
+      public void windowClosed(WindowEvent evt){
         if (isOpen){
           isOpen = false;
           openDialogsCount--;
