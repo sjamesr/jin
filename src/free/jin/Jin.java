@@ -569,18 +569,6 @@ public class Jin{
   
   
   /**
-   * If no UI is currently visible, quits the application.
-   */
-  
-  public void quitIfNoUiVisible(){
-    if (!getUIProvider().isUiVisible())
-      quit(false);
-  }
-  
-  
-  
-  
-  /**
    * Quits the application, possibly asking the user to confirm quitting first.
    * This method doesn't necessarily return.
    */
