@@ -310,6 +310,17 @@ public class MdiUiProvider extends AbstractUiProvider{
   
   
   /**
+   * Returns whether the main frame is visible.
+   */
+  
+  public boolean isUiVisible(){
+    return mainFrame.isVisible();
+  }
+
+  
+  
+  
+  /**
    * Stores our state (such as main window bounds) to preferences and disposes
    * of the main window.
    */

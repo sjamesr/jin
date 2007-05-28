@@ -23,13 +23,13 @@ package free.jin.ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Enumeration;
 
 import javax.swing.*;
 
 import free.jin.I18n;
 import free.jin.Jin;
 import free.jin.Preferences;
-import free.jin.SessionEvent;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
@@ -79,20 +79,6 @@ public class SdiUiProvider extends AbstractUiProvider{
   
   
   /**
-   * In SDI mode, we close Jin once the session is closed.
-   */
-  
-  public void sessionClosed(SessionEvent evt){
-    super.sessionClosed(evt);
-    
-    // Check that we've really connected
-    if (evt.getSession().getPort() != -1)
-      Jin.getInstance().quit(false);
-  }
-
-
-
-  /**
    * Returns a new UIContainer for the specified plugin.
    */
 
@@ -117,17 +103,17 @@ public class SdiUiProvider extends AbstractUiProvider{
 
     JDialog jdialog = new JDialog(parentFrame);
     // Count how many open dialogs we have
-    jdialog.addWindowListener(new WindowAdapter(){
-      // Can't depend on the system to be consistent about open/close events
+    jdialog.addComponentListener(new ComponentAdapter(){
+      // Can't depend on the system to be consistent about show/hide events
       private boolean isOpen = false;
 
-      public void windowOpened(WindowEvent evt){
+      public void componentShown(ComponentEvent evt){
         if (!isOpen){
           isOpen = true;
           openDialogsCount++;
         }
       }
-      public void windowClosed(WindowEvent evt){
+      public void componentHidden(ComponentEvent evt){
         if (isOpen){
           isOpen = false;
           openDialogsCount--;
@@ -136,6 +122,23 @@ public class SdiUiProvider extends AbstractUiProvider{
     });
     
     dialog.show(jdialog, parent);
+  }
+  
+  
+  
+  /**
+   * Returns whether any plugin containers or dialogs are visible.
+   */
+  
+  public boolean isUiVisible(){
+    Enumeration containers = getExistingPluginUIContainers();
+    while (containers.hasMoreElements()){
+      PluginUIContainer c = (PluginUIContainer)containers.nextElement();
+      if (c.isVisible())
+        return true;
+    }
+    
+    return openDialogsCount > 0;
   }
   
   
