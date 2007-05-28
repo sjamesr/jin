@@ -166,11 +166,15 @@ public abstract class Connection{
       });
 
       return true;
-    } catch (IOException e){
+    } catch (final IOException e){
         // This may not be true if the connection was closed while we were
         // sitting in connectImpl, connecting to the server
         if (readerThread == Thread.currentThread())
-          handleConnectingFailed(e);
+          execRunnable(new SafeRunnable(){
+            public void safeRun(){
+              handleConnectingFailed(e);
+            }
+          });
         return false;
       }
   }
