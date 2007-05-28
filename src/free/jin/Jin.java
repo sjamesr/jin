@@ -23,12 +23,7 @@ package free.jin;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -569,7 +564,11 @@ public class Jin{
   
   
   /**
-   * If no UI is currently visible, quits the application.
+   * If no UI is currently visible, quits the application. This was originally
+   * needed because in Java 1.1 the AWT thread didn't quit when all UI was
+   * closed. It is still needed, however, because nowadays (1.5 on Mac OS X,
+   * at least) there's an audio related non-daemon thread, which also doesn't
+   * quit.
    */
   
   public void quitIfNoUiVisible(){
