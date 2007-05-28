@@ -353,11 +353,21 @@ public class ConnectionManager{
   
   
   /**
-   * Closes the current session. The call is ignored if there is no current
-   * session.
+   * Closes the current session, if any.
    */
 
   public void closeSession(){
+    closeSession(false);
+  }
+  
+  
+  
+  /**
+   * Closes the current session, if any, and optionally reconnects using the
+   * connection details of the current session.
+   */
+  
+  public void closeSession(boolean reconnect){
     if (session == null)
       return;
     
@@ -382,7 +392,7 @@ public class ConnectionManager{
         boolean rememberUser =
           !Jin.getInstance().isSavePrefsCapable() ||
           OptionPanel.YES == i18n.question(OptionPanel.YES, "rememberAccountDialog", 
-        		  new Object[]{Jin.getAppName(), user.getUsername()});
+              new Object[]{Jin.getAppName(), user.getUsername()});
          
         if (rememberUser){
           Jin.getInstance().addUser(user);
@@ -401,7 +411,10 @@ public class ConnectionManager{
     
     fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSED, tempSession));
     
-    Jin.getInstance().quitIfNoUiVisible();
+    if (reconnect)
+      login(tempSession.getConnDetails());
+    else
+      Jin.getInstance().quitIfNoUiVisible();
   }
 
 
@@ -528,13 +541,7 @@ public class ConnectionManager{
       
       reconnectButton.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
-          final ConnectionDetails connDetails = session.getConnDetails();
-          closeSession();
-          SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-              login(connDetails);
-            }
-          });
+          closeSession(true);
         }
       });
       
