@@ -109,7 +109,7 @@ public class HelpMenu extends JMenu{
    */
 
   private JMenuItem createFeatureRequestMenuItem(){
-    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("suggestFeaturesMenuItem");
+    JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("suggestFeatureMenuItem");
     String url = Jin.getAppProperty("app.suggestFeaturesURL", null);
     if (url == null)
     	item.setEnabled(false);
