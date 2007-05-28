@@ -85,6 +85,17 @@ public abstract class Preferences{
    */
 
   public abstract Enumeration getPreferenceNames();
+  
+  
+  
+  /**
+   * Returns the list of preference names to be stored. The default
+   * implementation simply delegates to <code>getPreferenceNames()</code>.
+   */
+  
+  protected Enumeration getStoredPreferenceNames(){
+    return getPreferenceNames();
+  }
 
 
 
@@ -513,7 +524,7 @@ public abstract class Preferences{
   public void save(OutputStream out) throws IOException{
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
 
-    Enumeration prefNames = getPreferenceNames();
+    Enumeration prefNames = getStoredPreferenceNames();
     while (prefNames.hasMoreElements()){
       String prefName = (String)prefNames.nextElement();
       Object prefValue = get(prefName);
@@ -1086,6 +1097,12 @@ public abstract class Preferences{
       }
 
       return prefNamesSet.keys();
+    }
+    
+    
+    
+    public Enumeration getStoredPreferenceNames(){
+      return mainDelegate.getPreferenceNames();
     }
 
 
