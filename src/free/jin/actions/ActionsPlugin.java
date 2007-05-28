@@ -22,12 +22,9 @@
 package free.jin.actions;
 
 import java.awt.BorderLayout;
+import java.util.*;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.ListModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -39,6 +36,7 @@ import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.UIProvider;
 import free.util.TableLayout;
+import free.util.TextUtilities;
 import free.util.swing.IconButton;
 
 
@@ -56,6 +54,14 @@ public class ActionsPlugin extends Plugin{
    */
    
   private PluginUIContainer buttonContainer;
+  
+  
+  
+  /**
+   * The order of actions - a list of their IDs.
+   */
+  
+  private List actionsOrder;
   
   
   
@@ -94,6 +100,12 @@ public class ActionsPlugin extends Plugin{
    */
    
   public void start(){
+    String actionsOrderPref = getPrefs().getString("order", null);
+    if (actionsOrderPref != null)
+      actionsOrder = Arrays.asList(TextUtilities.getTokens(actionsOrderPref, " "));
+    else
+      actionsOrder = null;
+    
     buttonContainer = createButtonContainer();
     buttonContainer.addPluginUIListener(new PluginUIAdapter(){
       public void pluginUIShown(PluginUIEvent evt){
@@ -133,15 +145,54 @@ public class ActionsPlugin extends Plugin{
   
   
   /**
+   * Sorts the specified actions according to our "order" property and returns
+   * the resulting list.
+   */
+  
+  private List sort(ListModel model){
+    List list = new ArrayList(model.getSize());
+    for (int i = 0; i < model.getSize(); i++)
+      list.add(model.getElementAt(i));
+
+    if (actionsOrder == null)
+      return list;
+    
+    Collections.sort(list, new Comparator(){
+      public int compare(Object arg0, Object arg1){
+        JinAction action1 = (JinAction)arg0;
+        JinAction action2 = (JinAction)arg1;
+        
+        String id1 = action1.getId();
+        String id2 = action2.getId();
+        
+        int index1 = actionsOrder.indexOf(id1);
+        int index2 = actionsOrder.indexOf(id2);
+        
+        if (index1 == -1)
+          return (index2 == -1) ? 0 : 1;
+        else if (index2 == -1)
+          return (index1 == -1) ? 0 : -1;
+        else
+          return index1 - index2;
+      }
+    });
+    
+    return list;
+  }
+  
+  
+  
+  /**
    * Adds the action buttons into the button container. 
    */
    
   private void updateActionButtons(){
     ListModel actions = getActions();
+    List sortedActions = sort(actions);
     
     JComponent content = new JPanel(new TableLayout(1, 20, 20));
-    for (int i = 0; i < actions.getSize(); i++){
-      JinAction action = (JinAction)actions.getElementAt(i);
+    for (Iterator i = sortedActions.iterator(); i.hasNext();){
+      JinAction action = (JinAction)i.next();
       
       JButton button = new IconButton(action);
       button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
