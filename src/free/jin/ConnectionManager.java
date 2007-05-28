@@ -304,21 +304,7 @@ public class ConnectionManager{
       session = new Session(connDetails);
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
       
-      session.getConnection().getListenerManager().addConnectionListener(new ConnectionListener(){
-        private boolean loggedIn = false;
-        public void loginSucceeded(Connection conn){
-          loggedIn = true;
-        }
-        public void connectionLost(Connection conn){
-          if (loggedIn && (session != null) && (session.getConnection() == conn))
-            Jin.getInstance().getUIProvider().showDialog(new ReconnectDialogPanel(), null);
-        }
-        
-        public void connectingFailed(Connection conn, String reason){}
-        public void connectionAttempted(Connection conn, String hostname, int port){}
-        public void connectionEstablished(Connection conn){}
-        public void loginFailed(Connection conn, String reason){}
-      });
+      session.getConnection().getListenerManager().addConnectionListener(new ReconnectDialogPanel());
       
       session.initiateLogin();
     } catch (PluginStartException e){
@@ -371,11 +357,6 @@ public class ConnectionManager{
     if (session == null)
       return;
     
-    fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSING, session));
-
-    // Close the session
-    session.close();
-
     User user = session.getUser();
     int connPort = session.getPort();
 
@@ -387,26 +368,22 @@ public class ConnectionManager{
 
       // Add the user to the known users list
       if (!user.isGuest() && !Jin.getInstance().isKnownUser(user)){
-        I18n i18n = I18n.get(getClass());
-        
-        boolean rememberUser =
-          !Jin.getInstance().isSavePrefsCapable() ||
-          OptionPanel.YES == i18n.question(OptionPanel.YES, "rememberAccountDialog", 
-              new Object[]{Jin.getAppName(), user.getUsername()});
-         
-        if (rememberUser){
-          Jin.getInstance().addUser(user);
-          saveLastUser(user);
-        }
+        Jin.getInstance().addUser(user);
+        saveLastUser(user);
       }
       else{
         user.markDirty();
         saveLastUser(user);
       }
     }
+    
+    
+    fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSING, session));
+
+    // Close the session
+    session.close();
 
     Session tempSession = session;
-
     session = null;
     
     fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_CLOSED, tempSession));
@@ -521,7 +498,26 @@ public class ConnectionManager{
    * A dialog panel we display to the user when he gets disconnected.
    */
   
-  private class ReconnectDialogPanel extends DialogPanel{
+  private class ReconnectDialogPanel extends DialogPanel implements ConnectionListener{
+    
+    
+    
+    /**
+     * Whether the connection actually ever logged in. If not, we don't show
+     * ourselves.
+     */
+    
+    private boolean loggedIn = false;
+    
+    
+    
+    /**
+     * Whether the session is closing. If a SESSION_CLOSING event is fired
+     * before the CONNECTION_LOST event, it means the connection was lost due
+     * to a user closing the session, so we shouldn't show ourselves.
+     */
+    
+    private boolean sessionClosing = false;
     
     
     
@@ -563,7 +559,10 @@ public class ConnectionManager{
       addSessionListener(new SessionListener(){
         public void sessionClosing(SessionEvent evt){
           removeSessionListener(this);
-          close(null);
+          if (isShowing())
+            close(null);
+          else
+            sessionClosing = true;
         }
         public void sessionClosed(SessionEvent evt){}
         public void sessionEstablished(SessionEvent session){}
@@ -584,7 +583,36 @@ public class ConnectionManager{
     }
     
     
-
+    
+    /**
+     * Remember that the user got logged in, because otherwise we don't show
+     * ourselves.
+     */
+    
+    public void loginSucceeded(Connection conn){
+      loggedIn = true;
+    }
+    
+    
+    
+    /**
+     * If the connection was lost but the session is still open, show ourselves.
+     */
+    
+    public void connectionLost(Connection conn){
+      if (loggedIn && !sessionClosing)
+        Jin.getInstance().getUIProvider().showDialog(new ReconnectDialogPanel(), null);
+    }
+    
+    
+    
+    public void connectingFailed(Connection conn, String reason){}
+    public void connectionAttempted(Connection conn, String hostname, int port){}
+    public void connectionEstablished(Connection conn){}
+    public void loginFailed(Connection conn, String reason){}
+    
+    
+    
   }
 
 
