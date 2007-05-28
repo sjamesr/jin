@@ -24,6 +24,9 @@ package free.jin.ui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -49,10 +52,10 @@ public class SdiUiProvider extends AbstractUiProvider{
   
   
   /**
-   * The number of currently open dialogs.
+   * The list currently open dialogs.
    */
   
-  private int openDialogsCount = 0;
+  private List openDialogs = new LinkedList();
 
 
 
@@ -110,13 +113,13 @@ public class SdiUiProvider extends AbstractUiProvider{
       public void windowOpened(WindowEvent evt){
         if (!isOpen){
           isOpen = true;
-          openDialogsCount++;
+          openDialogs.add(evt.getSource());
         }
       }
       public void windowClosed(WindowEvent evt){
         if (isOpen){
           isOpen = false;
-          openDialogsCount--;
+          openDialogs.remove(evt.getSource());
         }
       }
     });
@@ -138,7 +141,13 @@ public class SdiUiProvider extends AbstractUiProvider{
         return true;
     }
     
-    return openDialogsCount > 0;
+    for (Iterator i = openDialogs.iterator(); i.hasNext();){
+      Component dialog = (Component)i.next();
+      if (dialog.isVisible())
+        return true;
+    }
+    
+    return false;
   }
   
   
