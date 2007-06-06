@@ -46,10 +46,10 @@ public class JChessClock extends AbstractChessClock{
   
   
   /**
-   * The font we use by default.
+   * The special clock font we use (if it exists).
    */
   
-  private static final Font DEFAULT_FONT;
+  private static final Font CLOCK_FONT;
   static{
     Font font = null;
     try{
@@ -60,7 +60,7 @@ public class JChessClock extends AbstractChessClock{
       }
     } catch (FontFormatException e){}
       catch (IOException e){}
-    DEFAULT_FONT = font;
+    CLOCK_FONT = font;
   }
   
   
@@ -105,10 +105,10 @@ public class JChessClock extends AbstractChessClock{
   public JChessClock(int time){
     super(time);
     
-    if (DEFAULT_FONT == null)
-      setFont(new Font("Monospaced", Font.BOLD, 50));
+    if (CLOCK_FONT == null)
+      setFont(new Font("Monospaced", Font.BOLD, 48));
     else
-      setFont(DEFAULT_FONT.deriveFont(50f));
+      setFont(CLOCK_FONT.deriveFont(48f));
   }
   
   
@@ -267,10 +267,20 @@ public class JChessClock extends AbstractChessClock{
     Color fgColor = isActive() ? getActiveForeground() : getInactiveForeground();
     g.setColor(fgColor);
     
+    int fontSize;
+    
+    if ((CLOCK_FONT != null) && g.getFont().getName().equals(CLOCK_FONT.getName())){
+      fontSize = ((9*height/10)/8)*8;
+      if (fontSize == 0)
+        fontSize = Math.max(1, height*3/4);
+    }
+    else
+      fontSize = height;
+    
     String text = createTimeString(getTime());
-    g.setFont(getFont().deriveFont((float)height));
-    FontMetrics fm = g.getFontMetrics();
-    g.drawString(text, 0, height/2 + (fm.getAscent() - fm.getDescent())/2);
+    g.setFont(getFont().deriveFont((float)fontSize));
+    int fontHeight = g.getFontMetrics().getAscent(); 
+    g.drawString(text, (height - fontHeight)/2, (height + fontHeight)/2);
   }
   
   
@@ -298,7 +308,7 @@ public class JChessClock extends AbstractChessClock{
   public Dimension getPreferredSize(){
     String text = createTimeString(getTime());
     Font font = getFont();
-    Font prefFont = font.deriveFont(50f);
+    Font prefFont = font.deriveFont(48f);
     FontMetrics fm = GraphicsUtilities.getFontMetrics(prefFont);
     int fontWidth = fm.stringWidth(text);
     int fontHeight = fm.getAscent() + fm.getDescent();
@@ -315,7 +325,7 @@ public class JChessClock extends AbstractChessClock{
   public Dimension getMinimumSize(){
     String text = createTimeString(getTime());
     Font font = getFont();
-    Font prefFont = font.deriveFont(12f);
+    Font prefFont = font.deriveFont(16f);
     FontMetrics fm = GraphicsUtilities.getFontMetrics(prefFont);
     int fontWidth = fm.stringWidth(text);
     int fontHeight = fm.getAscent() + fm.getDescent();
