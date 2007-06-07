@@ -136,7 +136,37 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public ListenerManager getListenerManager(){
     return getChessclubListenerManager();
   }
-
+  
+  
+  
+  /**
+   * Sends the specified command to the server.
+   */
+  
+  public void sendCommand(String command){
+    sendCommand(command, false, false, null);
+  }
+  
+  
+  
+  /**
+   * If we're logged in, sends the specified command to the server, otherwise
+   * the command is put into a queue and sent on-login.
+   */
+  
+  public void sendCommandWhenLoggedIn(String command){
+    sendCommand(command, true, false, null);
+  }
+  
+  
+  
+  /**
+   * Sends a tagged command to the server.
+   */
+  
+  public void sendTaggedCommand(String command, String tag){
+    sendCommand(command, false, false, tag);
+  }
 
 
 
@@ -183,7 +213,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected void handleLoginSucceeded(){
     super.handleLoginSucceeded();
     
-    sendCommand("set-quietly wrap 0");
+    sendCommand("set-quietly wrap 0", false, true, null);
 
     // Hack, currently, the server has a bug which causes it not to send us
     // the current event list even if we have turned DG_TOURNEY on at the login
@@ -512,16 +542,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
 
 
   /**
-   * Sends the "exit" command to the server.
-   */
-
-  public void exit(){
-    quit();
-  }
-  
-  
-  
-  /**
    * Returns the user with which we are logged in.
    */
   
@@ -691,7 +711,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void joinHelpForum(){
-    sendCommandWhenLoggedIn("+channel 1");
+    sendCommand("+channel 1", true, true, null);
   }
   
   
@@ -702,16 +722,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   public void joinChat(String type, Object forum){
     if ("shout".equals(type))
-      sendCommandWhenLoggedIn("set-quietly shout 1");
+      sendCommand("set-quietly shout 1", true, true, null);
     else if ("sshout".equals(type))
-      sendCommandWhenLoggedIn("set-quietly sshout 1");
+      sendCommand("set-quietly sshout 1", true, true, null);
     else if ("channel-tell".equals(type)){
       Integer channel = (Integer)forum;
-      sendCommandWhenLoggedIn("+channel " + channel.intValue());
+      sendCommand("+channel " + channel.intValue(), true, true, null);
     }
     else if ("kibitz".equals(type)){
       Integer game = (Integer)forum;
-      sendCommandWhenLoggedIn("observe " + game);
+      sendCommand("observe " + game, true, true, null);
     }
   }
 
@@ -2279,7 +2299,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void examineNewGame(){
-    sendCommand("examine");
+    sendCommand("examine", true, true, null);
   }
   
   
@@ -2289,7 +2309,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void observeBoard(ServerUser user){
-    sendCommand("observe " + user.getName());
+    sendCommand("observe " + user.getName(), true, true, null);
   }
   
   
@@ -2306,10 +2326,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         if (game.isPlayed())
           resign(game);
         else
-          sendCommand("unexamine");
+          sendCommand("unexamine", true, true, null);
         break;
       case Game.OBSERVED_GAME:
-        sendCommand("unobserve "+id);
+        sendCommand("unobserve " + id, true, true, null);
         break;
       case Game.ISOLATED_BOARD:
         break;
@@ -2329,9 +2349,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       // It seems that "; goto <gamenum> ; <movestring>" will abort making the
       // move (or whatever other command follows it) if you aren't playing
       // a game with the specified number.
-      sendCommand("; goto " + game.getID() + " ; chessmove " + moveString);
+      sendCommand("multi goto " + game.getID() + " ; chessmove " + moveString, true, true, null);
     else
-      sendCommand("chessmove " + moveString);
+      sendCommand("chessmove " + moveString, true, true, null);
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if (unechoedGameMoves == null){
@@ -2409,9 +2429,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto " + game.getID() + " ; resign");
+      sendCommand("multi goto " + game.getID() + " ; resign", true, true, null);
     else
-      sendCommand("resign");
+      sendCommand("resign", true, true, null);
   }
 
 
@@ -2426,9 +2446,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto " + game.getID() + " ; draw");
+      sendCommand("multi goto " + game.getID() + " ; draw", true, true, null);
     else
-      sendCommand("draw");
+      sendCommand("draw", true, true, null);
   }
 
 
@@ -2454,9 +2474,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto " + game.getID() + " ; abort");
+      sendCommand("multi goto " + game.getID() + " ; abort", true, true, null);
     else
-      sendCommand("abort");
+      sendCommand("abort", true, true, null);
   }
 
 
@@ -2480,9 +2500,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     checkGameMineAndPlayed(game);
 
     if (userGamesCount > 1)
-      sendCommand("; goto " + game.getID() + " ; adjourn");
+      sendCommand("multi goto " + game.getID() + " ; adjourn", true, true, null);
     else
-      sendCommand("adjourn");
+      sendCommand("adjourn", true, true, null);
   }
   
   
@@ -2504,7 +2524,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void requestTakeback(Game game){
     checkGameMineAndPlayed(game);
     
-    sendCommand("takeback 1");
+    sendCommand("takeback 1", true, true, null);
   }
   
   
@@ -2529,7 +2549,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("takeback " + plyCount);
+    sendCommand("takeback " + plyCount, true, true, null);
   }
 
 
@@ -2547,7 +2567,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("backward " + plyCount);
+    sendCommand("backward " + plyCount, true, true, null);
   }
 
 
@@ -2565,7 +2585,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("forward " + plyCount);
+    sendCommand("forward " + plyCount, true, true, null);
   }
 
 
@@ -2578,7 +2598,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void goToBeginning(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("backward 9999");
+    sendCommand("backward 9999", true, true, null);
   }
 
 
@@ -2590,7 +2610,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   public void goToEnd(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("forward 9999");
+    sendCommand("forward 9999", true, true, null);
   }
   
   
@@ -2600,7 +2620,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
    
   public void showServerHelp(){
-    sendCommand("help");
+    sendCommand("help", true, true, null);
   }
   
   
@@ -2834,7 +2854,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   public void addFriend(ServerUser user){
-    sendCommand("+notify " + user.getName());
+    sendCommand("+notify " + user.getName(), true, true, null);
   }
   
   
@@ -2844,7 +2864,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void removeFriend(ServerUser user){
-    sendCommand("-notify " + user.getName());
+    sendCommand("-notify " + user.getName(), true, true, null);
   }
   
   
@@ -3352,7 +3372,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
-    sendCommand("play " + seek.getID());
+    sendCommand("play " + seek.getID(), true, true, null);
   }
   
   
@@ -3365,7 +3385,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
     
-    sendCommand("unseek " + seek.getID());
+    sendCommand("unseek " + seek.getID(), true, true, null);
   }
   
   
@@ -3395,7 +3415,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (seek.isFormula())
       command.append(" ").append("f");
       
-    sendCommand(command.toString());
+    sendCommand(command.toString(), true, true, null);
   }
 
 
@@ -4023,7 +4043,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void accept(MatchOffer offer){
-    sendCommand("accept " + offer.getChallenger().getName());
+    sendCommand("accept " + offer.getChallenger().getName(), true, true, null);
   }
   
   
@@ -4033,7 +4053,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void decline(MatchOffer offer){
-    sendCommand("decline " + offer.getChallenger().getName());
+    sendCommand("decline " + offer.getChallenger().getName(), true, true, null);
   }
   
   
@@ -4058,7 +4078,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     if (color != null)
       command.append(" ").append(color.isWhite() ? "white" : "black");
     
-    sendCommand(command.toString());
+    sendCommand(command.toString(), true, true, null);
   }
   
   
@@ -4081,7 +4101,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   public void preventMatching(ServerUser user){
-    sendCommand("+noplay " + user.getName());
+    sendCommand("+noplay " + user.getName(), true, true, null);
   }
   
   
