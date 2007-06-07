@@ -386,7 +386,7 @@ public class FreechessConnection extends Connection{
   public synchronized void sendCommand(String command, boolean whenLoggedIn, boolean avoidAliasing, boolean avoidUnidling){
     command = makeCommand(command, avoidAliasing, avoidUnidling);
     
-    if (isLoggedIn())
+    if (isLoggedIn() || !whenLoggedIn)
       sendCommandImpl(command, true);
     else
       onLoginCommandQueue.addLast(command);
