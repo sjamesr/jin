@@ -57,7 +57,7 @@ Section "App"
   
   no_delete_start_menu:
     CreateDirectory $SMPROGRAMS\${name}
-    CreateShortCut $SMPROGRAMS\${name}\Jin.lnk $INSTDIR\${name}.exe
+    CreateShortCut $SMPROGRAMS\${name}\${name}.lnk $INSTDIR\${name}.exe
     CreateShortCut $SMPROGRAMS\${name}\Uninstall.lnk $INSTDIR\uninstall.exe
 SectionEnd
 
