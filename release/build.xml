@@ -465,6 +465,7 @@
 			<arg value="/V2" /> <!-- Low verbosity --> 
 			<arg value="/Ddir=${dir-to-inst}${file.separator}" /> <!-- The directory whose contents to install -->
 			<arg value="/Dfile=${exe}" /> <!-- The installer file -->
+			<arg value="/Dname=Jin" /> <!-- The application name -->
 			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
 			<arg value="jet/installer.nsi" />
 		</exec>
