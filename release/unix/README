@@ -18,8 +18,9 @@
 *********** Install Jin ***********
 ***********************************
 
-1. Extract the tar.gz file you downloaded into some directory (if you got this
-   file from the tar.gz file, then you're done :-)).
+1. Extract the tar.gz file you downloaded into some directory (you have most
+   likely already done this, since the file you are reading right now is inside
+   the tar.gz file).
 
 2. Make sure that the "java" binary is in your PATH. If you have one of the
    latest versions of Java installed, that will usually already be the case.
