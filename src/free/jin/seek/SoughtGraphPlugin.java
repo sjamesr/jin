@@ -392,10 +392,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    */
 
   protected void unregisterListeners(){
-    SeekConnection conn = getSeekConn();
-
     soughtGraph.removeSeekSelectionListener(this);
-    conn.getSeekListenerManager().removeSeekListener(this); // Just in case.
     getConn().getListenerManager().removeConnectionListener(this);
   }
   
