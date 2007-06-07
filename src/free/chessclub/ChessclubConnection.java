@@ -325,7 +325,7 @@ public class ChessclubConnection extends free.util.Connection{
     this.level1State = level1State;
     
     if (isLoggedIn())
-      sendCommand("set level1 " + level1State);
+      sendCommand("set level1 " + level1State, false, true, null);
   }
   
   
@@ -382,7 +382,7 @@ public class ChessclubConnection extends free.util.Connection{
     
     if (level2SettingsSent){
       if (isLoggedIn())
-        sendCommand("set-2 "+dgNumber+" "+(state ? "1" : "0"));
+        sendCommand("set-2 " + dgNumber + " " + (state ? "1" : "0"), false, true, null);
       // Otherwise, we will fix it in onLogin(). We don't do it here because it's
       // not a good idea to send anything in the middle of the login procedure.
     }
@@ -416,7 +416,7 @@ public class ChessclubConnection extends free.util.Connection{
     if (!isLoggedIn())
       throw new IllegalStateException("Cannot set on again a datagram when not yet logged in");
     
-    sendCommand("set-2 " + dgNumber + " 1");
+    sendCommand("set-2 " + dgNumber + " 1", false, true, null);
   }
   
   
@@ -455,7 +455,7 @@ public class ChessclubConnection extends free.util.Connection{
     
     this.style = style;
     if (isLoggedIn())
-      sendCommand("set-quietly style " + style);
+      sendCommand("set-quietly style " + style, false, true, null);
     
     return true;
   }
@@ -520,9 +520,9 @@ public class ChessclubConnection extends free.util.Connection{
   
   protected void sendLoginSequence(){
     if ((getPassword() == null) || (getPassword().length() == 0))
-      sendCommand(getRequestedUsername());
+      sendCommandImpl(getRequestedUsername(), true);
     else
-      sendCommand(getRequestedUsername() + " " + getPassword(), false);
+      sendCommandImpl(getRequestedUsername() + " " + getPassword(), false);
   }
   
   
@@ -532,7 +532,7 @@ public class ChessclubConnection extends free.util.Connection{
    */
   
   protected void handleConnected(){
-    sendCommand("level1=" + level1State);
+    sendCommandImpl("level1=" + level1State, true);
     
     int largestSetDGNumber = level2Settings.size();
     while ((largestSetDGNumber >= 0) && !level2Settings.get(largestSetDGNumber))
@@ -542,7 +542,7 @@ public class ChessclubConnection extends free.util.Connection{
       for (int i = 0; i <= largestSetDGNumber; i++){
         buf.append(level2Settings.get(i) ? "1" : "0");
       }
-      sendCommand(buf.toString());
+      sendCommandImpl(buf.toString(), true);
       level2SettingsSent = true;
     }
     
@@ -562,17 +562,17 @@ public class ChessclubConnection extends free.util.Connection{
       for (int i = 0; i < requestedLevel2Settings.size(); i++){
         boolean state = requestedLevel2Settings.get(i);
         if (state != level2Settings.get(i))
-          sendCommand("set-2 "+ i +" " + (state ? "1" : "0"));
+          sendCommand("set-2 "+ i +" " + (state ? "1" : "0"), false, true, null);
       }
       
-      sendCommand("set-quietly prompt 0");
-      sendCommand("set-quietly highlight 0");
-      sendCommand("set-quietly style " + style);
-      sendCommand("set-quietly interface " + interfaceVar);
+      sendCommand("set-quietly prompt 0", false, true, null);
+      sendCommand("set-quietly highlight 0", false, true, null);
+      sendCommand("set-quietly style " + style, false, true, null);
+      sendCommand("set-quietly interface " + interfaceVar, false, true, null);
       
       for (Iterator i = onLoginCommandQueue.iterator(); i.hasNext();){
         String command = (String)i.next();
-        sendCommand(command);
+        sendCommand(command, false, false, null);
       }
       onLoginCommandQueue.clear();
     }
@@ -806,42 +806,55 @@ public class ChessclubConnection extends free.util.Connection{
   
   
   /**
-   * If the connection is currently logged in, sends the "exit" command to the
-   * server. Otherwise the call is simply ignored.
+   * Sends the "exit" command to the server, when logged in.
    */
   
-  public void quit(){
-    if (isLoggedIn())
-      sendCommand("exit");
+  public void exit(){
+    sendCommand("exit", true, true, null);
   }
   
   
   
   /**
-   * Sends the specified command to the server.
+   * Sends a command to the server with the specified options.
+   * 
+   * @param command The command.
+   * @param whenLoggedIn If set and we are not yet logged in, wait until login
+   * and then send the command. If unset, the command is sent immediately.
+   * @param avoidAliasing Avoid triggering any aliases with the command.
+   * @param tag The client tag ("arbitrary-string" in formats.txt) with which
+   * we tag the command; <code>null</code> if none.
    */
   
-  public void sendCommand(String command){
-    sendCommand(command, true);
-  }
-  
-  
-  
-  /**
-   * Sends a tagged command to the server. If
-   * <code>(level1 & 5) == level1</code>, the tag will be sent back to us in a
-   * level1 packet triggered by the sent command.
-   */
-  
-  public synchronized void sendTaggedCommand(String command, String tag){
-    int level1 = getLevel1();
-    if ((level1 & 5) != level1)
-      throw new IllegalArgumentException("Wrong level1 (" + level1 + ") for tagged commands");
+  public synchronized void sendCommand(String command, boolean whenLoggedIn, boolean avoidAliasing, String tag){
+    command = makeCommand(command, avoidAliasing, tag);
     
-    if (tag != null)
-      sendCommand("`" + tag + "`" + command);
+    if (isLoggedIn() || !whenLoggedIn)
+      sendCommandImpl(command, true);
     else
-      sendCommand(command);
+      onLoginCommandQueue.addLast(command);
+  }
+  
+  
+  
+  /**
+   * Creates the actual command to be sent based on the specified options.
+   */
+  
+  private synchronized String makeCommand(String command, boolean avoidAliasing, String tag){
+    if (avoidAliasing && 
+        !(command.startsWith("multi ") || (command.indexOf(';') != -1)))
+      command = "multi " + command;
+    
+    if (tag != null){
+      int level1 = getLevel1();
+      if ((level1 & 5) != level1)
+        throw new IllegalArgumentException("Wrong level1 (" + level1 + ") for tagged commands");
+      
+      command = "`" + tag + "`" + command;
+    }
+    
+    return command;
   }
   
   
@@ -850,7 +863,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Sends the given command to the server, optionally logging it to the log stream.
    */
   
-  public synchronized void sendCommand(String command, boolean log){
+  private synchronized void sendCommandImpl(String command, boolean log){
     if (!isConnected())
       throw new IllegalStateException("Not connected");
     
@@ -865,20 +878,6 @@ public class ChessclubConnection extends free.util.Connection{
     } catch (IOException e){
         connectionInterrupted(e);
       }
-  }
-  
-  
-  
-  /**
-   * If we're logged in, sends the specified command to the server, otherwise
-   * the command is put into a queue and sent on-login.
-   */
-  
-  public synchronized void sendCommandWhenLoggedIn(String command){
-    if (isLoggedIn())
-      sendCommand(command);
-    else
-      onLoginCommandQueue.addLast(command);
   }
   
   
