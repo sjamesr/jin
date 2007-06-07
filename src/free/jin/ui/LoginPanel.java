@@ -325,8 +325,7 @@ public class LoginPanel extends DialogPanel{
         Server server = servers[serverBox.getSelectedIndex()];
         User [] users = getServerUsers(server);
         
-        // If there's only one known account, that's probably what the user wants to use
-        if (users.length == 1)   
+        if ((users.length != 0) && !users[0].isGuest())   
           setData(server, users[0].getPreferredConnDetails(), false, true);
         else
           setData(server, null, false, true);
