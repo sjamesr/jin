@@ -20,7 +20,8 @@
 		</tstamp>
 		<property name="build.dir" value="build" />
 		<property name="build.compiler" value="modern" />
-		<property name="build.target" value="${java.specification.version}" />
+		<property name="build.target" value="1.4" />
+		<property name="build.debug" value="yes" />
 		<property name="build.compress" value="no" />
 		
 		<property name="source.dir" value="src" />
@@ -68,10 +69,10 @@
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
 		       includes="**"
-			    debug="true"
-		       classpathref="compile.class.path">
-			<compilerarg compiler="modern" line="-target ${build.target}" />
-			<compilerarg compiler="modern" line="-source 1.2" />
+			   debug="${build.debug}"
+		       classpathref="compile.class.path"
+		       source="${build.target}"
+		       target="${build.target}">
 		</javac>
 	</target>
 	
@@ -81,9 +82,10 @@
 		<javac srcdir="${res.dir}/pieces/${piece-set-id}"
 		       destdir="${classes.dir}/pieces/${piece-set-id}"
 		       includes="**"
-		       classpath="${classes.dir}">
-			<compilerarg compiler="modern" line="-target ${build.target}" />
-			<compilerarg compiler="modern" line="-source 1.2" />
+			   debug="${build.debug}"
+		       classpath="${classes.dir}"
+		       source="${build.target}"
+		       target="${build.target}">
 		</javac>
 	</target>
 
@@ -494,9 +496,10 @@
 	<target name="doMacOSXStuff" if="buildingForMacOSX">
 		<javac srcdir="resources/os-specific/macosx"
 		       destdir="${classes.dir}"
-		       includes="free/jin/MacOSXSpecific.java">
-			<compilerarg compiler="modern" line="-target ${build.target}" />
-			<compilerarg compiler="modern" line="-source 1.2" />
+		       includes="free/jin/MacOSXSpecific.java"
+		       debug="${build.debug}"
+		       source="${build.target}"
+		       target="${build.target}">
 			<classpath>
 				<pathelement location="resources/os-specific/macosx/ui.jar"/>
 				<pathelement path="${classes.dir}"/>
