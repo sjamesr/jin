@@ -218,8 +218,7 @@ public interface Connection{
 
 
   /**
-   * Sends the command closing the session to the server - this is usually "quit",
-   * or "exit". This method will not be called unless the connection is connected.
+   * Tells the server to end the current session.
    */
 
   void exit();
