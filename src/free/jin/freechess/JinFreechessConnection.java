@@ -156,6 +156,27 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   
   /**
+   * Sends the specified command to the server.
+   */
+   
+  public void sendCommand(String command){
+    sendCommand(command, false, false, false);
+  }
+  
+  
+  
+  /**
+   * If we're logged in, sends the specified command to the server, otherwise
+   * the command is put into a queue and sent on-login.
+   */
+  
+  public void sendCommandWhenLoggedIn(String command){
+    sendCommand(command, true, false, false);
+  }
+  
+  
+  
+  /**
    * Fires an "attempting" connection event and invokes {@link free.util.Connection#initiateConnect(String, int)}.
    */
   
@@ -198,7 +219,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   protected void handleLoginSucceeded(){
     super.handleLoginSucceeded();
     
-    sendCommand("$set bell 0");
+    sendCommand("set bell 0", false, true, false);
     filterLine("Bell off.");
     
     listenerManager.fireLoginSucceeded(this);
@@ -310,7 +331,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
   
   public void sendPersonalTell(ServerUser user, String message, String tag){
-    sendCommand("$xtell " + user.getName() + "! " + message);
+    sendCommand("xtell " + user.getName() + "! " + message, true, true, false);
   }
   
   
@@ -330,7 +351,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
   
   public void joinHelpForum(){
-    sendCommandWhenLoggedIn("+channel 1");
+    sendCommand("+channel 1", true, true, true);
   }
   
   
@@ -341,16 +362,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   public void joinChat(String type, Object forum){
     if ("shout".equals(type))
-      sendCommandWhenLoggedIn("$set shout 1");
+      sendCommand("set shout 1", true, true, true);
     else if ("cshout".equals(type))
-      sendCommandWhenLoggedIn("$set sshout 1");
+      sendCommand("set sshout 1", true, true, true);
     else if ("channel-tell".equals(type)){
       Integer channel = (Integer)forum;
-      sendCommandWhenLoggedIn("+channel " + channel.intValue());
+      sendCommand("+channel " + channel.intValue(), true, true, true);
     }
     else if ("kibitz".equals(type)){
       Integer game = (Integer)forum;
-      sendCommandWhenLoggedIn("$observe " + game);
+      sendCommand("observe " + game, true, true, true);
     }
   }
   
@@ -1929,7 +1950,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
 
-    sendCommand("$play "+seek.getID());
+    sendCommand("play " + seek.getID(), true, true, false);
   }
   
   
@@ -1942,7 +1963,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
     
-    sendCommand("$unseek " + seek.getID());
+    sendCommand("unseek " + seek.getID(), true, true, false);
   }
   
   
@@ -1959,7 +1980,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     
     Player color = seek.getColor();
     
-    String seekCommand = "$seek " + seek.getTime() + " " + seek.getInc() + " " +
+    String seekCommand = "seek " + seek.getTime() + " " + seek.getInc() + " " +
       (seek.isRated() ? "rated" : "unrated") + " " +
       (color == null ? "" : color.isWhite() ? "white " : "black ") +
       wildName + " " +
@@ -1968,7 +1989,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       (seek.getMinRating() == Integer.MIN_VALUE ? "0" : String.valueOf(seek.getMinRating())) + "-" +
       (seek.getMaxRating() == Integer.MAX_VALUE ? "9999" : String.valueOf(seek.getMaxRating())) + " ";
       
-    sendCommand(seekCommand);
+    sendCommand(seekCommand, true, true, false);
   }
 
   
@@ -2318,7 +2339,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
 
   public void exit(){
-    sendCommand("$quit");
+    sendCommand("quit", true, true, false);
   }
   
   
@@ -2358,7 +2379,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
   
   public void examineNewGame(){
-    sendCommand("$examine");
+    sendCommand("examine", true, true, false);
   }
   
   
@@ -2368,7 +2389,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
   
   public void observeBoard(ServerUser user){
-    sendCommand("$observe " + user.getName());
+    sendCommand("observe " + user.getName(), true, true, false);
   }
   
   
@@ -2382,21 +2403,20 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     switch (game.getGameType()){
       case Game.MY_GAME:
         if (game.isPlayed())
-          sendCommand("$resign");
+          sendCommand("resign", true, true, false);
         else
-          sendCommand("$unexamine");
+          sendCommand("unexamine", true, true, false);
         break;
       case Game.OBSERVED_GAME:
-        sendCommand("$unobserve "+id);
+        sendCommand("unobserve " + id, true, true, false);
         break;
       case Game.ISOLATED_BOARD:
         break;
     }
   }
-
-
-
-
+  
+  
+  
   /**
    * Makes the given move in the given game.
    */
@@ -2415,7 +2435,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (!ourGame)
       throw new IllegalArgumentException("The specified Game object was not created by this JinConnection or the game has ended.");
 
-    sendCommand(moveToString(game, move));
+    sendCommand(moveToString(game, move), true, true, false);
 
     Vector unechoedGameMoves = (Vector)unechoedMoves.get(game);
     if (unechoedGameMoves == null){
@@ -2465,7 +2485,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("$resign");
+    sendCommand("resign", true, true, false);
   }
 
 
@@ -2478,7 +2498,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("$draw");
+    sendCommand("draw", true, true, false);
   }
 
 
@@ -2502,7 +2522,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("$abort");
+    sendCommand("abort", true, true, false);
   }
 
 
@@ -2525,7 +2545,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
-    sendCommand("$adjourn");
+    sendCommand("adjourn", true, true, false);
   }
 
   
@@ -2547,7 +2567,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void requestTakeback(Game game){
     checkGameMineAndPlayed(game);
     
-    sendCommand("$takeback 1");
+    sendCommand("takeback 1", true, true, false);
   }
   
   
@@ -2572,7 +2592,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("$takeback " + plyCount);
+    sendCommand("takeback " + plyCount, true, true, false);
   }
   
 
@@ -2589,7 +2609,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("$backward " + plyCount);
+    sendCommand("backward " + plyCount, true, true, false);
   }
 
 
@@ -2607,7 +2627,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     if (plyCount < 1)
       throw new IllegalArgumentException("Illegal ply count: " + plyCount);
     
-    sendCommand("$forward " + plyCount);
+    sendCommand("forward " + plyCount, true, true, false);
   }
 
 
@@ -2620,7 +2640,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void goToBeginning(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("$backward 999");
+    sendCommand("backward 999", true, true, false);
   }
 
 
@@ -2632,7 +2652,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void goToEnd(Game game){
     checkGameMineAndExamined(game);
 
-    sendCommand("$forward 999");
+    sendCommand("forward 999", true, true, false);
   }
 
 
@@ -2667,7 +2687,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void showServerHelp(){
-    sendCommand("$help");
+    sendCommand("help", true, true, false);
   }
   
   
@@ -2677,7 +2697,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    */
    
   public void sendHelpQuestion(String question, String tag){
-    sendCommand("$xtell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question);    
+    sendCommand("xtell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question, true, true, false);    
   }
 
 
@@ -2696,6 +2716,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   public void execRunnable(Runnable runnable){
     SwingUtilities.invokeLater(runnable);
   }
-
-
+  
+  
+  
 }
