@@ -5,15 +5,16 @@
   it. If you have a strong urge to build Jin releases, I suggest a cold shower.
   If nevertheless you decide to ignore this wise advice (and have tried
   the shower solution), here is a partial list of things you need to know:
-
-  1. To build a Windows installer, this buildfile uses the NSIS installer compiler from
-     http://nsis.sourceforge.net/.
-  2. Mac OS X releases can only be built on Mac OS X.
-  3. Building an applet or JET release requires some tasks from the ant-contrib project
-     which you can get from http://sourceforge.net/projects/ant-contrib/.
-  4. Building a JET release requires Excelsior JET 4.1.
-     Note that JET does not support cross compiling, so this buildfile creates
-     a Linux release when run on Linux and a Windows release when run on Windows.
+  
+  * It requires Apache Ant 1.7 or later.
+  * It requires some tasks from the ant-contrib project which you can get from
+    http://sourceforge.net/projects/ant-contrib/.
+  * To build a Windows installer, this buildfile uses the NSIS installer compiler from
+    http://nsis.sourceforge.net/.
+  * Mac OS X releases can only be built on Mac OS X.
+  * Building a JET release requires Excelsior JET 4.1.
+    Note that JET does not support cross compiling, so this buildfile creates
+    a Linux release when run on Linux and a Windows release when run on Windows.
 
 -->
 
@@ -22,16 +23,30 @@
 	<!-- Makes releases for windows, unix, os x and plain source code -->
 	<target name="release" depends="osx, unix, windows, src" description="Build all normal releases"/>
 	
-
 	<target name="init">
-		<dirname property="jin.dir" file="." />
-		<property name="build.dir" value="${jin.dir}/build" />
-		<property name="source.dir" value="${jin.dir}/src" />
+		<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-		<!-- Ask for Jin version -->
-		<input message="Please specify the release version:" addproperty="release.version" />
+		<property name="app.id" value="jin" /> <!-- The id of the application -->
+		<property name="app.name" value="Jin" /> <!-- The name of the application -->
+		<dirname property="app.dir" file="." /> <!-- The directory of the buildfile to run to build the app -->
+		<property name="releasefiles.dir" value="${app.dir}/build" /> <!-- The directory of the files to release -->
+		<property name="result.dir" value="." /> <!-- The directory where to put the result -->
+		<property name="target.servers" value="icc fics" /> <!-- The list of servers to target -->
+		<property name="extra.files.dir" value="." /> <!-- Base dir of extra files -->
+		<property name="extra.files" value="changelog.txt copyright.txt gpl.txt" /> <!-- Added to the release -->
+		<property name="extra.files.unix.dir" value="unix" /> <!-- Base dir of extra unix files -->
+		<property name="extra.files.unix" value="README icon.png" /> <!-- Added to a unix release -->
+		<property name="extra.files.win.dir" value="win" /> <!-- Base dir of extra windows files -->
+		<property name="extra.files.win" value="" /> <!-- Added to a windows release -->
+		<property name="extra.files.osx.dir" value="osx" /> <!-- Base dir of extra OS X files -->
+		<property name="extra.files.osx" value="" /> <!-- Added to an OS X release -->
 		
-		<property name="release.dir" value="jin-${release.version}" />
+		<property name="source.dir" value="${app.dir}/src" /> <!-- The directory of the source -->
+		
+		<!-- Ask for Jin version -->
+		<input message="Please specify the release version:" addproperty="app.version" />
+		
+		<property name="release.dir" value="${result.dir}/${app.id}-${app.version}" />
     
 		<mkdir dir="${release.dir}" />
 	</target>
@@ -39,12 +54,54 @@
 
 	<!-- Rebuilds for a specific platform -->
 	<target name="rebuild">
-		<echo message="Rebuilding Jin for ${release.platform}" />
-		<ant target="clean" dir="${jin.dir}" />
-		<ant target="build" dir="${jin.dir}">
-			<property name="build.target" value="1.4" />
+		<echo message="Rebuilding ${app.name} for ${target.platform}" />
+		<ant target="clean" dir="${app.dir}" inheritall="false" />
+		<ant target="build" dir="${app.dir}" inheritall="false">
+			<property name="app.id" value="${app.id}" />
+			<property name="app.name" value="${app.name}" />
+			<property name="app.version" value="${app.version}" />
+			<property name="target.platform" value="${target.platform}" />
 		</ant>
 	</target>
+	
+	
+	<!-- Helper target for copying the necessary application files.
+	     Takes 3 parameters:
+	     dir - the application files' directory
+	     todir - the directory where to copy the files
+	     exclude - a list of space separated exclusion patterns
+	-->
+	<target name="copyappfiles">
+		<copy todir="${todir}" includeemptydirs="false">
+			<fileset dir="${dir}" includes="*" />
+			<fileset dir="${dir}" includes="libs/*" />
+			<fileset dir="${dir}" includes="actions/*" />
+			<fileset dir="${dir}" includes="plugins/*" />
+			<fileset dir="${dir}" includes="resources/*/*" />
+		</copy>
+		
+		<foreach list="${target.servers}"
+		         target="copyserverfiles"
+		         param="server.id"
+		         delimiter=" "
+		         inheritall="yes"
+		/>
+	</target>
+	
+	
+	
+	<!-- Helper target for the copyappfiles target, which copies the
+	     server-specific files. The id of the server is passed via ${server.id} -->
+	<target name="copyserverfiles">
+		<copy todir="${todir}">
+			<fileset dir="${dir}" includes="libs/${server.id}/**" />
+			<fileset dir="${dir}" includes="actions/${server.id}/**" />
+			<fileset dir="${dir}" includes="plugins/${server.id}/**" />
+			<fileset dir="${dir}" includes="resources/*/${server.id}/**" />
+			<fileset dir="${dir}" includes="servers/${server.id}.jar" />
+		</copy>
+	</target>
+	
 	
 
 	<!-- Unix release. Resulting file is ${unix-archive} -->
@@ -59,25 +116,30 @@
 		<mkdir dir="${release.unix.dir}" />
 		
 		<antcall target="rebuild">
-			<param name="release.platform" value="unix" />
+			<param name="target.platform" value="unix" />
 		</antcall>
 		
 		<property name="unix-dir-to-tar" value="${release.unix.dir}/tmp" />
-		<property name="unix-files-dir" value="${unix-dir-to-tar}/jin-${release.version}" />
+		<property name="unix-files-dir" value="${unix-dir-to-tar}/${app.id}-${app.version}" />
 		<mkdir dir="${unix-dir-to-tar}" />
 		<mkdir dir="${unix-files-dir}" />
+		
+		<antcall target="copyappfiles">
+			<param name="dir" value="${releasefiles.dir}" />
+			<param name="todir" value="${unix-files-dir}" />
+			<param name="exclude" value="lnfs/jgoodies-windows.jar" />
+		</antcall>
 		<copy todir="${unix-files-dir}">
-			<fileset dir="${build.dir}" excludes="lnfs/jgoodies-windows.jar" />
-			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
-			<fileset dir="unix" includes="README icon.png" />
+			<filelist dir="${extra.files.dir}" files="${extra.files}" />
+			<filelist dir="${extra.files.unix.dir}" files="${extra.files.unix}" />
 		</copy>
 		
-		<property name="unix-tar" value="${release.unix.dir}/jin-${release.version}-unix.tar" />
+		<property name="unix-tar" value="${release.unix.dir}/${app.id}-${app.version}-unix.tar" />
 		<property name="unix-gz" value="${unix-tar}.gz" />
 		
 		<tar destfile="${unix-tar}">
-			<tarfileset dir="${unix-dir-to-tar}" excludes="*/jin" />
-			<tarfileset dir="${unix-dir-to-tar}" includes="*/jin" mode="755" />
+			<tarfileset dir="${unix-dir-to-tar}" excludes="*/${app.id}" />
+			<tarfileset dir="${unix-dir-to-tar}" includes="*/${app.id}" mode="755" />
 		</tar>
 		
 		<gzip src="${unix-tar}" zipfile="${unix-gz}" />
@@ -103,24 +165,31 @@
 		<mkdir dir="${release.win.dir}" />
     
 		<antcall target="rebuild">
-			<param name="release.platform" value="windows" />
+			<param name="target.platform" value="windows" />
 		</antcall>
 
 		<property name="dir-to-inst" value="${release.win.dir}/files" />
-		<property name="win-install" value="${release.win.dir}/jin-${release.version}-windows.exe" />
-		<property name="win-archive" value="${release.win.dir}/jin-${release.version}-windows.zip" />
+		<property name="win-install" value="${release.win.dir}/${app.id}-${app.version}-windows.exe" />
+		<property name="win-archive" value="${release.win.dir}/${app.id}-${app.version}-windows.zip" />
 
-		<!-- Build the release -->
 		<mkdir dir="${dir-to-inst}" />
+		
+		<antcall target="copyappfiles">
+			<param name="dir" value="${releasefiles.dir}" />
+			<param name="todir" value="${dir-to-inst}" />
+			<param name="exclude" value="" />
+		</antcall>
 		<copy todir="${dir-to-inst}">
-			<fileset dir="${build.dir}" />
-			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+			<filelist dir="${extra.files.dir}" files="${extra.files}" />
+			<filelist dir="${extra.files.win.dir}" files="${extra.files.win}" />
 		</copy>
+		
 		<antcall target="win-create-install">
 			<param name="target-dir" value="${dir-to-inst}" />
 			<param name="exe" value="${win-install}" />
 			<param name="zip" value="${win-archive}" />
 		</antcall>
+		
 		<delete dir="${dir-to-inst}" />
 
 	</target>
@@ -142,7 +211,8 @@
 			<arg value="${nsis-prefix}V2" /> <!-- Low verbosity --> 
 			<arg value="${nsis-prefix}Ddir=${target-dir}${file.separator}" /> <!-- The directory whose contents to install -->
 			<arg value="${nsis-prefix}Dfile=${exe}" /> <!-- The installer file -->
-			<arg value="${nsis-prefix}Dver=${release.version}" /> <!-- The Jin version -->
+			<arg value="${nsis-prefix}Dname=${app.name}" /> <!-- The application name -->
+			<arg value="${nsis-prefix}Dver=${app.version}" /> <!-- The application version -->
 			<arg value="win${file.separator}installer.nsi" />
 		</exec>
 		<zip destfile="${zip}" basedir="${dir-to-inst}" />
@@ -159,29 +229,39 @@
 		<mkdir dir="${release.osx.dir}" />
 		
 		<antcall target="rebuild">
-			<param name="release.platform" value="macosx" />
+			<param name="target.platform" value="macosx" />
 		</antcall>
-		<property name="app-dir.name" value="Jin.app" />
+		<property name="app-dir.name" value="${app.name}.app" />
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
+		
 		<copy todir="${app-dir}">
-			<fileset dir="." includes="changelog.txt copyright.txt gpl.txt" />
+			<filelist dir="${extra.files.dir}" files="${extra.files}" />
+			<filelist dir="${extra.files.osx.dir}" files="${extra.files.osx}" />
 		</copy>
+		
 		<copy todir="${app-dir}/Contents">
 			<fileset dir="osx" includes="Info.plist PkgInfo" />
 			<filterset>
-				<filter token="VERSION" value="${release.version}" />
+		    	<filter token="APPID" value="${app.id}" />
+		    	<filter token="APPNAME" value="${app.name}" />
+				<filter token="APPVER" value="${app.version}" />
 			</filterset>
 		</copy>
+		
 		<copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
-		<copy todir="${app-dir}/Contents/Resources/Java">
-			<fileset dir="${build.dir}" excludes="lnfs/**" />
-		</copy>
+		
+		<antcall target="copyappfiles">
+			<param name="dir" value="${releasefiles.dir}" />
+			<param name="todir" value="${app-dir}/Contents/Resources/Java" />
+			<param name="exclude" value="lnfs/**" />
+		</antcall>
+
 		<mkdir dir="${app-dir}/Contents/MacOS" />
 		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
 		<chmod file="${app-dir}/Contents/MacOS/JavaApplicationStub" perm="a+x" />
 		
-		<property name="osx-install" value="${release.osx.dir}/jin-${release.version}-macosx.dmg" />
+		<property name="osx-install" value="${release.osx.dir}/${app.id}-${app.version}-macosx.dmg" />
 		<antcall target="osx-package">
 			<param name="targetfile" value="${osx-install}" />
 		</antcall>
@@ -197,8 +277,8 @@
 	<target name="osx-package">
 		<property name="mkdmg" value="${basedir}/osx/mkdmg" />
 		<chmod file="${mkdmg}" perm="u+x" />
-		<exec executable="${basedir}/osx/mkdmg" failonerror="yes">
-			<arg line="${app-dir} Jin-${release.version} ${targetfile}" />
+		<exec executable="${mkdmg}" failonerror="yes">
+			<arg line="${app-dir} ${app.name}-${app.version} ${targetfile}" />
 		</exec>
 	</target>
 	
@@ -207,8 +287,6 @@
 	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
 	<target name="applet" depends="init" description="Builds an applet release (JinApplet)">
 		<echo message="Creating applet release" />
-    
-		<taskdef resource="net/sf/antcontrib/antlib.xml" />
     
 		<property name="release.applet.dir" value="${release.dir}/applet" />
     
@@ -246,31 +324,31 @@
 		
 		<antcall target="rebuild">
 			<param name="release.name" value="Jin Applet" />
-			<param name="release.platform" value="applet" />
+			<param name="target.platform" value="applet" />
 			<param name="build.compress" value="yes" />
 			<param name="manifest.classpath.lf" value="" />
 		</antcall>
   
-		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}" />
+		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.name}" />
 		<mkdir dir="${dir-to-tar}" />
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${build.dir}" includes="*.jar *.php DetectJava.class servers/${server.file}" />
-			<fileset dir="${build.dir}/${server.name}" />
+			<fileset dir="${releasefiles.dir}" includes="*.jar *.php DetectJava.class servers/${server.file}" />
+			<fileset dir="${releasefiles.dir}/${server.name}" />
 		</copy>
 		
 		<mkdir dir="${dir-to-tar}/libs" />
 		<copy todir="${dir-to-tar}/libs">
-			<fileset dir="${build.dir}/libs" includes="${libs}" />
+			<fileset dir="${releasefiles.dir}/libs" includes="${libs}" />
 		</copy>
 		
 		<mkdir dir="${dir-to-tar}/plugins" />
 		<copy todir="${dir-to-tar}/plugins">
-			<fileset dir="${build.dir}/plugins" includes="${plugins}" />
+			<fileset dir="${releasefiles.dir}/plugins" includes="${plugins}" />
 		</copy>
 		
 		<mkdir dir="${dir-to-tar}/actions" />
 		<copy todir="${dir-to-tar}/actions">
-			<fileset dir="${build.dir}/actions" includes="${actions}" />
+			<fileset dir="${releasefiles.dir}/actions" includes="${actions}" />
 		</copy>
 		
 		
@@ -284,7 +362,7 @@
 			<param name="resource.names" value="${pieces}" />
 		</antcall>
     
-		<property name="tar" value="${release.applet.dir}/jin-applet-${release.version}-${server.name}.tar" />
+		<property name="tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.name}.tar" />
 		<property name="gz" value="${tar}.gz" />
 		<tar destfile="${tar}">
 			<tarfileset dir="${dir-to-tar}"/>
@@ -314,7 +392,7 @@
 	<target name="copy-applet-resources">
 		<basename file="${resource.path}" property="resource.name"/>
 		<mkdir dir="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
-		<unzip src="${build.dir}/resources/${resource.type}/${resource.path}.zip"
+		<unzip src="${releasefiles.dir}/resources/${resource.type}/${resource.path}.zip"
     	           dest="${dir-to-tar}/resources/${resource.type}/${resource.name}" />
 	</target>
 	
@@ -330,11 +408,11 @@
 		<mkdir dir="${release.src.dir}" />
 		
 		<property name="src-archive-dir" value="${release.src.dir}/tmp" />
-		<property name="src-archive-files" value="${src-archive-dir}/jin-${release.version}" />
+		<property name="src-archive-files" value="${src-archive-dir}/jin-${app.version}" />
 		<mkdir dir="${src-archive-dir}" />
 		<mkdir dir="${src-archive-files}" />		
 		<copy todir="${src-archive-files}">
-			<fileset dir="${jin.dir}"
+			<fileset dir="${app.dir}"
 			         includes="src/** resources/** build.xml manifest.txt"
 			         excludes="src/**/maya/**"
 			/>
@@ -343,10 +421,10 @@
 		</copy>
 		
  		<propertyfile file="${src-archive-files}/src/free/jin/resources/app.props">
-			<entry key="app.version" value="${release.version}" />
+			<entry key="app.version" value="${app.version}" />
 		</propertyfile>
 		
-		<property name="src-tar" value="${release.src.dir}/jin-${release.version}-source.tar" />
+		<property name="src-tar" value="${release.src.dir}/jin-${app.version}-source.tar" />
 		<property name="src-archive" value="${src-tar}.gz" />
 		<tar destfile="${src-tar}">
 			<tarfileset dir="${src-archive-dir}" />
@@ -378,17 +456,17 @@
 		<mkdir dir="${release.jet.dir}" />
 		
 		<antcall target="rebuild">
-			<param name="release.platform" value="jet-${os}" />
+			<param name="target.platform" value="jet-${os}" />
 		</antcall>
 		
 		<property name="tmpdir" value="${basedir}/jet/tmp" />
 		<mkdir dir="${tmpdir}" />
 		<copy todir="${tmpdir}">
-			<fileset dir="${build.dir}" excludes="plugins/*/*.jar lnfs/**" />
+			<fileset dir="${releasefiles.dir}" excludes="plugins/*/*.jar lnfs/**" />
 		</copy>
 		<property name="efsep" value="\${file.separator}" /> <!-- Escaped File Separator-->
 		<copy todir="${tmpdir}">
-			<fileset dir="${build.dir}" includes="plugins/*/*.jar" />
+			<fileset dir="${releasefiles.dir}" includes="plugins/*/*.jar" />
 			<mapper type="regexp" from="plugins${efsep}(.*)${efsep}(.*)\.jar" to="plugins${efsep}\1${efsep}\1_\2.jar" />
 		</copy>
 		
@@ -402,7 +480,7 @@
 		</foreach>
 
 		<!--
-		<property name="dir-to-inst" value="${release.jet.dir}/jin-${release.version}" />
+		<property name="dir-to-inst" value="${release.jet.dir}/jin-${app.version}" />
 		<mkdir dir="${dir-to-inst}" />
 		
 		<exec executable="${jet.home}/bin/xpack" dir="${tmpdir}" failonerror="yes">
@@ -446,7 +524,7 @@
 
 	<!-- Helper target for "jet" target on Linux. Packages the installable directory into a tar.gz file. -->
 	<target name="jet-package-linux">
-		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${release.version}-jet-linux.tar" />
+		<property name="jet-linux-tar" value="${release.jet.dir}/jin-${app.version}-jet-linux.tar" />
 		<tar destfile="${jet-linux-tar}">
 			<tarfileset dir="${release.jet.dir}" excludes="*/jin" />
 			<tarfileset dir="${release.jet.dir}" includes="*/jin" mode="755"/>
@@ -459,14 +537,14 @@
 	<!-- Helper target for "jet" target" on Windows. Creates an installer. -->
 	<target name="jet-package-windows">
 		<input message="Specify the NSIS executable" addproperty="win.setup.maker" />
-		<property name="exe" value="${release.jet.dir}/jin-${release.version}-jet-windows.exe" />
+		<property name="exe" value="${release.jet.dir}/jin-${app.version}-jet-windows.exe" />
 		<exec dir="." executable="${win.setup.maker}" failonerror="yes">
 			<arg value="/NOCD" /> <!-- Don't change into the .nsi file's directory -->
 			<arg value="/V2" /> <!-- Low verbosity --> 
 			<arg value="/Ddir=${dir-to-inst}${file.separator}" /> <!-- The directory whose contents to install -->
 			<arg value="/Dfile=${exe}" /> <!-- The installer file -->
-			<arg value="/Dname=Jin" /> <!-- The application name -->
-			<arg value="/Dver=${release.version}" /> <!-- The Jin version -->
+			<arg value="/Dname=${app.name}" /> <!-- The application name -->
+			<arg value="/Dver=${app.version}" /> <!-- The Jin version -->
 			<arg value="jet/installer.nsi" />
 		</exec>
 	</target>
