@@ -82,14 +82,6 @@ public class FreechessConnection extends Connection{
 
 
   /**
-   * The current board sending "style".
-   */
-
-  private int style = 1;
-
-
-
-  /**
    * A BitSet keeping the requested state of ivariables. This may be
    * inconsistent with the server's idea of their state as the message might
    * have yet to arrive.
@@ -111,10 +103,13 @@ public class FreechessConnection extends Connection{
 
 
   /**
-   * A Hashtable of Strings specifying lines that need to be filtered out.
+   * A Hashtable of lines that need to be filtered out.
+   * Maps <code>String</code>s to <code>Integer</code>s specified how many of
+   * these lines need to be filtered.
    */
 
   private final Hashtable linesToFilter = new Hashtable();
+  
   
   
   /**
@@ -158,12 +153,15 @@ public class FreechessConnection extends Connection{
   /**
    * Adds the specified String to the list of lines that will be filtered.
    * The next time this string is received (as a line), it will not be sent to
-   * the <code>processLine</code> method. Note that this only works for the
-   * first occurrance of the specified string.
+   * the <code>processLine</code> method.
    */
 
   public void filterLine(String line){
-    linesToFilter.put(line, line);
+    Integer currentValue = (Integer)linesToFilter.get(line);
+    if (currentValue == null)
+      linesToFilter.put(line, new Integer(1));
+    else
+      linesToFilter.put(line, new Integer(currentValue.intValue() + 1));
   }
 
 
@@ -203,16 +201,26 @@ public class FreechessConnection extends Connection{
     // but before we're fully logged in yet, the settings will be fixed in
     // onLogin(). We don't do it here because it's not a good idea to send
     // anything in the middle of the login procedure.
-    if (isLoggedIn()){
-      sendCommand("$$iset "+ivar.getName()+" "+(state ? "1" : "0"));
-      filterLine(ivar.getName()+" "+(state ? "" : "un")+"set.");
-    }
+    if (isLoggedIn())
+      setServerIvarState(ivar, state);
 
     return true;
   }
-
-
-
+  
+  
+  
+  /**
+   * Sends the appropriate command to the server to set the ivar to the
+   * specified state.
+   */
+  
+  private void setServerIvarState(Ivar ivar, boolean state){
+    sendCommand("iset " + ivar.getName() + " " + (state ? "1" : "0"), false, true, true);
+    filterLine(ivar.getName() + " " + (state ? "" : "un") + "set.");
+  }
+  
+  
+  
   /**
    * Returns the current state of the specified ivar as far as data arriving
    * from the server is concerned. Note that calls to
@@ -258,12 +266,8 @@ public class FreechessConnection extends Connection{
    */
 
   public final synchronized void setStyle(int style){
-    this.style = style;
-
-    if (isLoggedIn()){
-      sendCommand("$set style "+style);
-      filterLine("Style "+style+" set.");
-    }
+    sendCommand("set style " + style, true, true, false);
+    filterLine("Style " + style + " set.");
   }
 
 
@@ -289,7 +293,8 @@ public class FreechessConnection extends Connection{
    */
   
   protected void handleConnected(){
-    sendCommand(createLoginIvarsSettingString(requestedIvarStates));
+    sendCommandImpl(createLoginIvarsSettingString(requestedIvarStates), true);
+    filterLine("#Ivars set.");
     ivarStates = (BitSet)requestedIvarStates.clone();
     
     super.handleConnected();
@@ -302,13 +307,13 @@ public class FreechessConnection extends Connection{
    */
 
   protected void sendLoginSequence(){
-    sendCommand(getRequestedUsername());
+    sendCommandImpl(getRequestedUsername(), true);
     if (getPassword() != null)
-      sendCommand(getPassword(), false);
+      sendCommandImpl(getPassword(), false);
   }
-
-
-
+  
+  
+  
   /**
    * Creates the string we send on the login line to set ivars.
    */
@@ -342,45 +347,66 @@ public class FreechessConnection extends Connection{
 
       // Workaround: the server won't send us the full seek list if we set seekinfo
       // on the login line.
-      if (ivarStates.get(Ivar.SEEKINFO.getIndex())){
-        sendCommand("$$iset seekinfo 1");
-        filterLine("seekinfo set.");
-      }
-
+      if (ivarStates.get(Ivar.SEEKINFO.getIndex()))
+        setServerIvarState(Ivar.SEEKINFO, true);
 
       for (int i = 0; i < requestedIvarStates.size(); i++){
         boolean state = requestedIvarStates.get(i);
         Ivar ivar = Ivar.getByIndex(i);
-        if (state != ivarStates.get(i)){
-          sendCommand("$$iset "+ivar.getName()+" "+(state ? "1" : "0"));
-          filterLine(ivar.getName()+" "+(state ? "" : "un")+"set.");
-        }
+        if (state != ivarStates.get(i))
+          setServerIvarState(ivar, state);
       }
 
-      sendCommand("$set style "+style);
-      filterLine("Style "+style+" set.");
+      sendCommand("set interface " + interfaceVar, false, true, false);
 
-      sendCommand("$set interface "+interfaceVar);
-
-      sendCommand("$set ptime 0");
+      sendCommand("set ptime 0", false, true, false);
       filterLine("Your prompt will now not show the time.");
       
       for (Iterator i = onLoginCommandQueue.iterator(); i.hasNext();){
         String command = (String)i.next();
-        sendCommand(command);
+        sendCommandImpl(command, true);
       }
       onLoginCommandQueue.clear();
     }
   }
-
-
+  
+  
   
   /**
-   * Sends the specified command to the server.
+   * Sends a command to the server with the specified options.
+   * 
+   * @param command The command.
+   * @param whenLoggedIn If set and we are not yet logged in, wait until login
+   * and then send the command. If unset, the command is sent immediately.
+   * @param avoidAliasing Avoid triggering any aliases with the command.
+   * @param avoidUnidling Avoid resetting the user's idle time counter with the
+   * command.
    */
-   
-  public void sendCommand(String command){
-    sendCommand(command, true);
+  
+  public synchronized void sendCommand(String command, boolean whenLoggedIn, boolean avoidAliasing, boolean avoidUnidling){
+    command = makeCommand(command, avoidAliasing, avoidUnidling);
+    
+    if (isLoggedIn())
+      sendCommandImpl(command, true);
+    else
+      onLoginCommandQueue.addLast(command);
+  }
+  
+  
+  
+  /**
+   * Creates the actual command to be sent based on the specified options.
+   */
+  
+  private String makeCommand(String command, boolean avoidAliasing, boolean avoidUnidling){
+    if (command.startsWith("+") || (command.startsWith("-"))) // Can't be aliased, and can't be prepended '$' or '$$'
+      return command;
+    if (avoidUnidling)
+      return "$$" + command;
+    else if (avoidAliasing)
+      return "$" + command;
+    else
+      return command;
   }
   
   
@@ -389,7 +415,7 @@ public class FreechessConnection extends Connection{
    * Sends the given command to the server, optionally echoing it to System.out.
    */
 
-  public synchronized void sendCommand(String command, boolean echo){
+  private synchronized void sendCommandImpl(String command, boolean echo){
     if (!isConnected())
       throw new IllegalStateException("Not connected");
 
@@ -404,20 +430,6 @@ public class FreechessConnection extends Connection{
     } catch (IOException e){
         connectionInterrupted(e);
       }
-  }
-  
-  
-  
-  /**
-   * If we're logged in, sends the specified command to the server, otherwise
-   * the command is put into a queue and sent on-login.
-   */
-  
-  public synchronized void sendCommandWhenLoggedIn(String command){
-    if (isLoggedIn())
-      sendCommand(command);
-    else
-      onLoginCommandQueue.addLast(command);
   }
   
   
@@ -582,9 +594,14 @@ public class FreechessConnection extends Connection{
       return;
     if (handlePrimaryGameChanged(line))
       return;
-
-    if (linesToFilter.remove(line) == null)
+    
+    Integer filterCount = (Integer)linesToFilter.get(line);
+    if (filterCount == null)
       processLine(line);
+    else if (filterCount.intValue() == 1)
+      linesToFilter.remove(line);
+    else
+      linesToFilter.put(line, new Integer(filterCount.intValue() - 1));
   }
 
 
@@ -1263,7 +1280,7 @@ public class FreechessConnection extends Connection{
 
   /**
    * This method is called when a gameinfo line is received. To turn gameinfo
-   * lines on, use <code>sendCommand("$iset gameinfo 1")</code>
+   * lines on, send <code>iset gameinfo 1</code>
    */
 
   protected boolean processGameInfo(GameInfoStruct data){return false;}
@@ -1324,7 +1341,7 @@ public class FreechessConnection extends Connection{
 
   /**
    * This method is called when a delta board line is received. To turn delta
-   * board on, use <code>sendCommand("$iset compressmove 1")</code>. Note,
+   * board on, send <code>iset compressmove 1</code>. Note,
    * however, that it will disable the sending of a full board (like a style12
    * board) in some cases.
    */
