@@ -38,8 +38,9 @@
 			These properties allow users (of the buildfile) to create customized
 			versions of Jin.
 		-->
-		<property name="release.name" value="Jin" />
-		<property name="release.version" value="${date}" />
+		<property name="app.id" value="jin" /> <!-- The id of the application -->
+		<property name="app.name" value="Jin" /> <!-- The name of the application -->
+		<property name="app.version" value="${date}" />
 		<property name="app.props.file" value="${source.dir}/free/jin/resources/app.props"/>
 		<property name="manifest.classpath.lf" 
 			value="lnfs/kunststoff.jar \
@@ -142,13 +143,13 @@
 			<or>
 				<and>
 					<not>
-						<isset property="release.platform" />
+						<isset property="target.platform" />
 					</not>
 					<isset property="unix" />
 				</and>
 				<and>
-					<isset property="release.platform" />
-					<equals arg1="unix" arg2="${release.platform}" />
+					<isset property="target.platform" />
+					<equals arg1="unix" arg2="${target.platform}" />
 				</and>
 			</or>
 		</condition>
@@ -157,13 +158,13 @@
 			<or>
 				<and>
 					<not>
-						<isset property="release.platform" />
+						<isset property="target.platform" />
 					</not>
 					<isset property="windows" />
 				</and>
 				<and>
-					<isset property="release.platform" />
-					<equals arg1="windows" arg2="${release.platform}" />
+					<isset property="target.platform" />
+					<equals arg1="windows" arg2="${target.platform}" />
 				</and>
 			</or>
 		</condition>
@@ -172,13 +173,13 @@
 			<or>
 				<and>
 					<not>
-						<isset property="release.platform" />
+						<isset property="target.platform" />
 					</not>
 					<isset property="macosx" />
 				</and>
 				<and>
-					<isset property="release.platform" />
-					<equals arg1="macosx" arg2="${release.platform}" />
+					<isset property="target.platform" />
+					<equals arg1="macosx" arg2="${target.platform}" />
 				</and>
 			</or>
 		</condition>
@@ -187,8 +188,8 @@
 			<or>
 				<isset property="applet" />
 				<and>
-					<isset property="release.platform" />
-					<equals arg1="applet" arg2="${release.platform}" />
+					<isset property="target.platform" />
+					<equals arg1="applet" arg2="${target.platform}" />
 				</and>
 			</or>
 		</condition>
@@ -217,8 +218,8 @@
 		<!-- Set Jin properties -->
 		<copy file="${app.props.file}" todir="${classes.dir}/free/jin/resources" overwrite="true"/>
 		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
-			<entry key="app.name" value="${release.name}" />
-			<entry key="app.version" value="${release.version}" />
+			<entry key="app.name" value="${app.name}" />
+			<entry key="app.version" value="${app.version}" />
 		</propertyfile>
 		
 		
@@ -243,7 +244,7 @@
 
 
 		<!-- Jin classes -->
-		<jar jarfile="${build.dir}/jin.jar"
+		<jar jarfile="${build.dir}/${app.id}.jar"
 		     basedir="${classes.dir}"
 		     includes="free/jin/* free/jin/ui/** free/jin/event/** free/jin/legal/** free/jin/plugin/** free/jin/action/* free/jin/resources/**"
 		     compress="${build.compress}">
@@ -258,7 +259,7 @@
 
 		
 		<!-- Internet Chess Club support -->
-		<jar jarfile="${servers.dir}/chessclub.jar" compress="${build.compress}">
+		<jar jarfile="${servers.dir}/icc.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/chessclub/** free/chessclub/**" 
 			         excludes="free/jin/chessclub/definition" />
@@ -267,7 +268,7 @@
 		</jar>
 		
 		<!-- Free Internet Chess Server support -->
-		<jar jarfile="${servers.dir}/freechess.jar" compress="${build.compress}">
+		<jar jarfile="${servers.dir}/fics.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/freechess/** free/freechess/**"
 			         excludes="free/jin/freechess/definition" />
@@ -453,10 +454,15 @@
 	
 	<!-- If the property buildingForUnix is set, does things required for Unix -->
 	<target name="doUnixStuff" if="buildingForUnix">
-		<copy todir="${build.dir}">
+		<property name="runscript" value="${build.dir}/${app.id}" />
+		<copy tofile="${runscript}">
 			<fileset dir="resources/os-specific/unix" includes="jin" />
+		    <filterset>
+		    	<filter token="APPID" value="${app.id}" />
+		    	<filter token="APPNAME" value="${app.name}" />
+		    </filterset>
 		</copy>
-		<chmod file="${build.dir}/jin" perm="a+x" />
+		<chmod file="${runscript}" perm="a+x" />
 	
 		<!-- Check whether x86 -->
 		<condition property="x86">
@@ -488,6 +494,13 @@
 	<target name="doWindowsStuff" if="buildingForWindows">		
 		<copy todir="${build.dir}">
 			<fileset dir="resources/os-specific/windows" />
+			<globmapper from="jin*" to="${app.name}*"/>
+			<filterset>
+		    	<filter token="TARGETJAR" value="${app.id}.jar" />
+			</filterset>
+		</copy>
+		<copy todir="${build.dir}">
+			<fileset dir="resources/os-specific/windows" excludes="*jin*" />
 		</copy>
 	</target>
 	
