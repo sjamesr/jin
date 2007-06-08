@@ -190,7 +190,7 @@ public class ActionsPlugin extends Plugin{
     ListModel actions = getActions();
     List sortedActions = sort(actions);
     
-    JComponent content = new JPanel(new TableLayout(1, 20, 20));
+    JComponent content = new JPanel(new TableLayout(1, 18, 18));
     for (Iterator i = sortedActions.iterator(); i.hasNext();){
       JinAction action = (JinAction)i.next();
       
