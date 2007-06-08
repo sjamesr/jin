@@ -26,7 +26,8 @@ import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
-import free.jin.console.ics.ICSGeneralChatConsoleDesignation;
+import free.jin.console.ics.ChannelChatConsoleDesignation;
+import free.jin.console.ics.ShoutChatConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
@@ -64,7 +65,10 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    return new ICSGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
+    if (getUser().getServer().getId().equals("wcl"))
+      return new ChannelChatConsoleDesignation(getConn(), 250, getEncoding(), isCloseable);
+    else
+      return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
   
   
