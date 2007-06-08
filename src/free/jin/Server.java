@@ -118,6 +118,15 @@ public interface Server{
    */
 
   String getId();
+  
+  
+  
+  /**
+   * Returns the ID of the protocol of this server. This id is used to find
+   * server specific plugins and actions. 
+   */
+  
+  String getProtocolId();
 
 
 

@@ -208,6 +208,17 @@ public abstract class AbstractServer implements Server{
   public String getId(){
     return props.getProperty("id");
   }
+  
+  
+  
+  /**
+   * Returns the id of this server's protocol. The property name is
+   * <code>protocolId</code>.
+   */
+  
+  public String getProtocolId(){
+    return props.getProperty("protocolId");
+  }
 
 
 
@@ -217,7 +228,7 @@ public abstract class AbstractServer implements Server{
    */
 
   public String getShortName(){
-    return getI18n().getString(props.getProperty("shortNameKey"));
+    return getI18n().getString("shortName");
   }
 
 
@@ -228,7 +239,7 @@ public abstract class AbstractServer implements Server{
    */
 
   public String getLongName(){
-    return getI18n().getString(props.getProperty("longNameKey"));
+    return getI18n().getString("longName");
   }
 
 
