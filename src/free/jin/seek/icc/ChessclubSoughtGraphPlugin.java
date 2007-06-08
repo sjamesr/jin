@@ -44,6 +44,9 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
     
     exportAction(new OneMinuteAction());
     exportAction(new FiveMinuteAction());
+    
+    if (getUser().getServer().getId().equals("wcl"))
+      exportAction(new FifteenMinuteAction());
   }
   
   
@@ -71,7 +74,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      */
     
     public void actionPerformed(ActionEvent e){
-      getConn().sendCommand("1-minute");
+      getConn().sendCommand("multi 1-minute");
     }
     
     
@@ -99,16 +102,49 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
     
     
     /**
-     * Issues the "1-minute" command.
+     * Issues the "5-minute" command.
      */
     
     public void actionPerformed(ActionEvent e){
-      getConn().sendCommand("5-minute");
+      getConn().sendCommand("multi 5-minute");
     }
     
     
     
   }
+  
+  
+  
+  /**
+   * A Jin action which issues the "15-minute" command.
+   */
+  
+  private class FifteenMinuteAction extends JinAction{
+    
+    
+    
+    /**
+     * Returns the string <code>"15-minute"</code>.
+     */
+    
+    public String getId(){
+      return "15-minute";
+    }
+    
+    
+    
+    /**
+     * Issues the "15-minute" command.
+     */
+    
+    public void actionPerformed(ActionEvent e){
+      getConn().sendCommand("multi 15-minute");
+    }
+    
+    
+    
+  }
+
   
   
   
