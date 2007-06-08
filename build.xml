@@ -96,6 +96,8 @@
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${libs.dir}" />
 		<mkdir dir="${servers.dir}" />
+		<mkdir dir="${servers.dir}/icc" />
+		<mkdir dir="${servers.dir}/fics" />
 		<mkdir dir="${plugins.dir}" />
 		<mkdir dir="${plugins.dir}/icc" />
 		<mkdir dir="${plugins.dir}/fics" />
@@ -256,27 +258,47 @@
 		</jar>
 		
 
-
-		
-		<!-- Internet Chess Club support -->
-		<jar jarfile="${servers.dir}/icc.jar" compress="${build.compress}">
+		<!-- ICC protocol support -->
+		<jar jarfile="${servers.dir}/icc/protocol.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/chessclub/** free/chessclub/**" 
-			         excludes="free/jin/chessclub/definition" />
-			<fileset dir="${classes.dir}/free/jin/chessclub"
-			         includes="definition" />
+			         excludes="free/jin/chessclub/servers/**" />
 		</jar>
 		
-		<!-- Free Internet Chess Server support -->
-		<jar jarfile="${servers.dir}/fics.jar" compress="${build.compress}">
+		<!-- FICS protocol support -->
+		<jar jarfile="${servers.dir}/fics/protocol.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
 			         includes="free/jin/freechess/** free/freechess/**"
-			         excludes="free/jin/freechess/definition" />
-			<fileset dir="${classes.dir}/free/jin/freechess"
-			         includes="definition" />
+			         excludes="free/jin/freechess/servers/**" />
 		</jar>
-
-
+		
+		
+		<!-- ICC main server -->
+		<jar jarfile="${servers.dir}/icc/icc.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/chessclub/servers/icc/**"
+			         excludes="free/jin/chessclub/servers/icc/definition"
+			/>
+			<fileset file="${classes.dir}/free/jin/chessclub/servers/icc/definition" />
+		</jar>
+		
+		<!-- ICC WCL server -->
+		<jar jarfile="${servers.dir}/icc/wcl.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/chessclub/servers/wcl/**"
+			         excludes="free/jin/chessclub/servers/wcl/definition"
+			/>
+			<fileset file="${classes.dir}/free/jin/chessclub/servers/wcl/definition" />
+		</jar>
+			
+		<!-- FICS main server -->
+		<jar jarfile="${servers.dir}/fics/fics.jar" compress="${build.compress}">
+			<fileset dir="${classes.dir}"
+			         includes="free/jin/freechess/servers/fics/**"
+			         excludes="free/jin/freechess/servers/fics/definition"
+			/>
+			<fileset file="${classes.dir}/free/jin/freechess/servers/fics/definition" />
+		</jar>
 		
 
 		<!-- Console plugin library -->
