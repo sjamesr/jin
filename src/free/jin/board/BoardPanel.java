@@ -956,7 +956,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   protected Image getPlayerImage(String name){
     Connection conn = boardManager.getConn();
-    URL url = conn.getPlayerPictureURL(conn.userForName(name));
+    URL url = boardManager.getUser().getServer().getPlayerPictureURL(conn.userForName(name));
     return url == null ? null : getToolkit().getImage(url);
   }
   

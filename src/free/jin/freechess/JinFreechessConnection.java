@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -2364,16 +2363,6 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   
   
-  /**
-   * FICS does not currently have official user pictures.
-   */
-  
-  public URL getPlayerPictureURL(ServerUser user){
-    return null;
-  }
-  
-  
-
   /**
    * Starts a new, empty, examination game.
    */
