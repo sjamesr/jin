@@ -488,16 +488,34 @@ public class JinApplication implements JinContext{
 
     File serversDir = new File(JIN_DIR, "servers");
     checkDirectoryExists(serversDir);
+    
+    List servers = new LinkedList();
+    
+    File [] protocolDirs = serversDir.listFiles(new FileFilter(){
+      public boolean accept(File file){
+        return file.isDirectory();
+      }
+    });
+    
+    for (int i = 0; i < protocolDirs.length; i++){
+      File protocolDir = protocolDirs[i];
+      File protocolFile = new File(protocolDir, "protocol.jar");
+      ChildClassLoader protocolLoader = new ZipClassLoader(protocolFile, libsLoader);
+      
+      String [] jars = protocolDir.list(new ExtensionFilenameFilter(".jar"){
+        public boolean accept(File dir, String filename){
+          return super.accept(dir, filename) && !"protocol.jar".equals(filename);
+        }
+      });
 
-    String [] jars = serversDir.list(new ExtensionFilenameFilter(".jar"));
-    if (jars.length == 0)
+      for (int j = 0; j < jars.length; j++)
+        servers.add(loadServer(protocolLoader, new File(protocolDir, jars[j])));
+    }
+    
+    if (servers.size() == 0)
       throw new IllegalStateException("No server specifications found in:\n" + serversDir);
 
-    Server [] servers = new Server[jars.length];
-    for (int i = 0; i < jars.length; i++)
-      servers[i] = loadServer(new File(serversDir, jars[i]));
-
-    return servers;
+    return (Server[])servers.toArray(new Server[servers.size()]);
   }
 
 
@@ -507,19 +525,19 @@ public class JinApplication implements JinContext{
    * <code>loadServers</code>.
    */
 
-  private Server loadServer(File jar) throws IOException,
+  private Server loadServer(ChildClassLoader protocolLoader, File jar) throws IOException,
       ClassNotFoundException, InstantiationException, IllegalAccessException{
 
     if (!jar.isFile())
       throw new FileNotFoundException(jar + " does not exist or is a directory");
 
-    ChildClassLoader loader = new ZipClassLoader(jar, libsLoader);
+    ChildClassLoader loader = new ZipClassLoader(jar, protocolLoader);
 
     InputStream serverDefIn = loader.getResourceAsStream("definition");
     if (serverDefIn == null)
       throw new FileNotFoundException("Unable to find server definition file in " + jar);
     Properties serverDef = IOUtilities.loadPropertiesAndClose(serverDefIn);
-
+    
     String classname = serverDef.getProperty("classname");
     if (classname == null)
       throw new IOException("Server definition file in " + jar + " does not contain a classname property");
@@ -882,7 +900,7 @@ public class JinApplication implements JinContext{
     for (int i = 0; i < servers.length; i++){
       Server server = servers[i];
 
-      File serverSpecificDir = new File(dir, server.getId());
+      File serverSpecificDir = new File(dir, server.getProtocolId());
       if (!serverSpecificDir.isDirectory())
         continue;
 
@@ -1010,7 +1028,7 @@ public class JinApplication implements JinContext{
     for (int i = 0; i < servers.length; i++){
       Server server = servers[i];
 
-      File serverSpecificDir = new File(dir, server.getId());
+      File serverSpecificDir = new File(dir, server.getProtocolId());
       if (!serverSpecificDir.isDirectory())
         continue;
 
