@@ -21,6 +21,8 @@
 
 package free.jin;
 
+import java.net.URL;
+
 
 /**
  * Defines the interface that needs to be implemented in order to support a
@@ -172,9 +174,19 @@ public interface Server{
    */
 
   String getPasswordRetrievalPage();
-
-
-
+  
+  
+  
+  /**
+   * Returns the URL of a picture/avatar of the specified user, or
+   * <code>null</code> if none, or unsupported. It is not guaranteed that there
+   * is an actual image at the URL.
+   */
+  
+  URL getPlayerPictureURL(ServerUser user);
+  
+  
+  
   /**
    * Returns the username policy of this server.
    */

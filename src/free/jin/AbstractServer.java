@@ -21,8 +21,11 @@
 
 package free.jin;
 
-import java.util.Properties;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Properties;
+
 import free.util.IOUtilities;
 import free.util.TextUtilities;
 
@@ -277,6 +280,29 @@ public abstract class AbstractServer implements Server{
 
 
 
+  /**
+   * Returns the URL of a picture/avatar of the specified user, or
+   * <code>null</code> if none, or unsupported. The URL is obtained by replacing
+   * the tokens <code>@PLAYERNAME@ with the name of the player in the
+   * <code>playerPictureURL</code> property.
+   */
+  
+  public URL getPlayerPictureURL(ServerUser user){
+    String pattern = props.getProperty("playerPictureURL");
+    if (pattern == null)
+      return null;
+    
+    String url = pattern.replaceAll("@PLAYERNAME@", user.getName());
+    try{
+      return new URL(url);
+    } catch (MalformedURLException e){
+        e.printStackTrace();
+        return null;
+      }
+  }
+  
+  
+  
   /**
    * Returns a textual representation of this Server.
    */
