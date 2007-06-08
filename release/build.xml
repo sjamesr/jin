@@ -31,7 +31,8 @@
 		<dirname property="app.dir" file="." /> <!-- The directory of the buildfile to run to build the app -->
 		<property name="releasefiles.dir" value="${app.dir}/build" /> <!-- The directory of the files to release -->
 		<property name="result.dir" value="." /> <!-- The directory where to put the result -->
-		<property name="target.servers" value="icc fics" /> <!-- The list of servers to target -->
+		<property name="target.protocols" value="icc fics" /> <!-- The list of protocols to target -->
+		<property name="target.servers" value="icc fics wcl" /> <!-- The list of servers to target -->
 		<property name="extra.files.dir" value="." /> <!-- Base dir of extra files -->
 		<property name="extra.files" value="changelog.txt copyright.txt gpl.txt" /> <!-- Added to the release -->
 		<property name="extra.files.unix.dir" value="unix" /> <!-- Base dir of extra unix files -->
@@ -71,7 +72,7 @@
 	     todir - the directory where to copy the files
 	     exclude - a list of space separated exclusion patterns
 	-->
-	<target name="copyappfiles">
+	<target name="copy-app-files">
 		<copy todir="${todir}" includeemptydirs="false">
 			<fileset dir="${dir}" includes="*" />
 			<fileset dir="${dir}" includes="libs/*" />
@@ -80,8 +81,14 @@
 			<fileset dir="${dir}" includes="resources/*/*" />
 		</copy>
 		
+		<foreach list="${target.protocols}"
+		         target="copy-protocol-files"
+		         param="protocol.id"
+		         delimiter=" "
+		         inheritall="yes"
+		/>
 		<foreach list="${target.servers}"
-		         target="copyserverfiles"
+		         target="copy-server-files"
 		         param="server.id"
 		         delimiter=" "
 		         inheritall="yes"
@@ -90,15 +97,24 @@
 	
 	
 	
-	<!-- Helper target for the copyappfiles target, which copies the
-	     server-specific files. The id of the server is passed via ${server.id} -->
-	<target name="copyserverfiles">
+	<!-- Helper target for the copy-app-files target, which copies the
+	     protocol-specific files. The id of the protocol is passed via ${protocol.id} -->
+	<target name="copy-protocol-files">
 		<copy todir="${todir}">
-			<fileset dir="${dir}" includes="libs/${server.id}/**" />
-			<fileset dir="${dir}" includes="actions/${server.id}/**" />
-			<fileset dir="${dir}" includes="plugins/${server.id}/**" />
-			<fileset dir="${dir}" includes="resources/*/${server.id}/**" />
-			<fileset dir="${dir}" includes="servers/${server.id}.jar" />
+			<fileset dir="${dir}" includes="libs/${protocol.id}/**" />
+			<fileset dir="${dir}" includes="actions/${protocol.id}/**" />
+			<fileset dir="${dir}" includes="plugins/${protocol.id}/**" />
+			<fileset dir="${dir}" includes="servers/${protocol.id}/protocol.jar" />
+		</copy>
+	</target>
+	
+	
+	<!-- Helper target for the copy-app-files target, which copies the
+	     server-specific files. The id of the server is passed via ${server.id} -->
+	<target name="copy-server-files">
+		<copy todir="${todir}">
+			<fileset dir="${dir}" includes="servers/*/${server.id}.jar" />
+			<fileset dir="${dir}" includes="resources/${server.id}/**" />
 		</copy>
 	</target>
 	
@@ -124,7 +140,7 @@
 		<mkdir dir="${unix-dir-to-tar}" />
 		<mkdir dir="${unix-files-dir}" />
 		
-		<antcall target="copyappfiles">
+		<antcall target="copy-app-files">
 			<param name="dir" value="${releasefiles.dir}" />
 			<param name="todir" value="${unix-files-dir}" />
 			<param name="exclude" value="lnfs/jgoodies-windows.jar" />
@@ -174,7 +190,7 @@
 
 		<mkdir dir="${dir-to-inst}" />
 		
-		<antcall target="copyappfiles">
+		<antcall target="copy-app-files">
 			<param name="dir" value="${releasefiles.dir}" />
 			<param name="todir" value="${dir-to-inst}" />
 			<param name="exclude" value="" />
@@ -251,7 +267,7 @@
 		
 		<copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
 		
-		<antcall target="copyappfiles">
+		<antcall target="copy-app-files">
 			<param name="dir" value="${releasefiles.dir}" />
 			<param name="todir" value="${app-dir}/Contents/Resources/Java" />
 			<param name="exclude" value="lnfs/**" />
