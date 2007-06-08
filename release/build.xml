@@ -114,7 +114,7 @@
 	<target name="copy-server-files">
 		<copy todir="${todir}">
 			<fileset dir="${dir}" includes="servers/*/${server.id}.jar" />
-			<fileset dir="${dir}" includes="resources/${server.id}/**" />
+			<fileset dir="${dir}" includes="resources/*/${server.id}/**" />
 		</copy>
 	</target>
 	
