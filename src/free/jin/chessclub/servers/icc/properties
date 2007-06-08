@@ -6,3 +6,4 @@ protocolId = icc
 website = http://www.chessclub.com
 registrationPage = http://www.chessclub.com/register
 passwordRetrievalPage = http://www.chessclub.com/mailpassword
+playerPictureURL = http://www.chessclub.com/mugshots/@PLAYERNAME@.jpg
