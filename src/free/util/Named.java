@@ -43,7 +43,7 @@ public interface Named{
       Named named1 = (Named)arg0;
       Named named2 = (Named)arg1;
       
-      return named1.getName().toLowerCase().compareTo(named2.getName().toLowerCase());
+      return named1.getName().compareToIgnoreCase(named2.getName());
     }
   };
   
