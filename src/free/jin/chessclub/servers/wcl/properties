@@ -1,0 +1,8 @@
+defaultHost = chess.worldchesslive.com
+hosts = chess.worldchesslive.com
+ports = 5000 5050
+id = wcl
+protocolId = icc
+website = http://www.worldchesslive.com
+registrationPage = http://www.worldchesslive.com/register
+passwordRetrievalPage = http://www.worldchesslive.com/mailpassword
