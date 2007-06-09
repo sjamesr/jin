@@ -246,6 +246,29 @@ public abstract class Preferences{
   public int getInt(String prefName){
     return ((Integer)get(prefName)).intValue();
   }
+  
+  
+  
+  /**
+   * Returns the long preference with the specified name or the specified
+   * default value if no such preference exists.
+   */
+
+  public long getLong(String prefName, long defaultValue){
+    return ((Long)get(prefName, new Long(defaultValue))).longValue();
+  }
+
+
+
+  /**
+   * Returns the long preference with the specified name. Throws a
+   * <code>NoSuchElementException</code> if there is no preference with the
+   * specified name.
+   */
+
+  public long getLong(String prefName){
+    return ((Long)get(prefName)).longValue();
+  }
 
 
 
@@ -426,6 +449,16 @@ public abstract class Preferences{
 
   public void setInt(String prefName, int prefValue){
     set(prefName, new Integer(prefValue));
+  }
+  
+  
+  
+  /**
+   * Sets the value of the specified long preference.
+   */
+  
+  public void setLong(String prefName, long prefValue){
+    set(prefName, new Long(prefValue));
   }
 
 
@@ -700,6 +733,8 @@ public abstract class Preferences{
       return Boolean.valueOf(s.substring("boolean;".length()));
     else if (s.startsWith("integer;"))
       return new Integer(s.substring("integer;".length()));
+    else if (s.startsWith("long;"))
+      return new Long(s.substring("long;".length()));
     else if (s.startsWith("double;"))
       return new Double(s.substring("double;".length()));
     else if (s.startsWith("string;"))
@@ -732,6 +767,8 @@ public abstract class Preferences{
       return "boolean;" + prefValue;
     else if (prefValue instanceof Integer)
       return "integer;" + prefValue;
+    else if (prefValue instanceof Long)
+      return "long;" + prefValue;
     else if (prefValue instanceof Double)
       return "double;" + prefValue;
     else if (prefValue instanceof String)
