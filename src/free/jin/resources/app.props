@@ -4,6 +4,7 @@ app.name=
 app.version=
 
 app.websiteURL=http://www.jinchess.com
+app.latestVersionDataURL=http://www.jinchess.com/latestVersion.properties
 app.reportBugsURL=https://sourceforge.net/tracker/?group_id=50386&atid=459537
 app.suggestFeaturesURL=https://sourceforge.net/tracker/?group_id=50386&atid=459540
 
