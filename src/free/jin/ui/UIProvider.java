@@ -80,9 +80,17 @@ public interface UIProvider{
   
   
   /**
-   * This method is called at startup to ask the UIProvider to display its
-   * initial UI. Presumably, the user can then use that UI to connect to the
-   * server.
+   * Invoked to tell the <code>UIProvider</code> to initialize itself.
+   */
+  
+  void init();
+  
+  
+  
+  /**
+   * This method is called at startup to ask the <code>UIProvider</code> to
+   * display its initial UI. Presumably, the user can then use that UI to
+   * connect to the server.
    */
    
   void start();

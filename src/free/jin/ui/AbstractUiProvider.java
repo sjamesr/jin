@@ -74,11 +74,21 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
 
   
   /**
-   * Performs certain initializations. 
+   * {@inheritDoc} 
+   */
+  
+  public void init(){
+    Jin.getInstance().getConnManager().addSessionListener(this);
+  }
+  
+  
+  
+  /**
+   * {@inheridDoc}
    */
   
   public void start(){
-    Jin.getInstance().getConnManager().addSessionListener(this);
+    
   }
   
   

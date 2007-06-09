@@ -117,12 +117,11 @@ public class MdiUiProvider extends AbstractUiProvider{
 
 
   /**
-   * Creates all the UI, makes the main frame visible and then invokes the
-   * <code>start</code> method of the connection manager.
+   * Creates all the UI.
    */
    
-  public void start(){
-    super.start();
+  public void init(){
+    super.init();
     
     I18n i18n = I18n.get(MdiUiProvider.class);
     mainFrame = createMainFrame();
@@ -169,7 +168,19 @@ public class MdiUiProvider extends AbstractUiProvider{
         Jin.getInstance().getConnManager().start();
       }
     });
+  }
+  
+  
+  
+  /**
+   * Makes the main frame visible and then invokes the <code>start</code> method
+   * of the connection manager.
+   */
+  
+  public void start(){
+    super.start();
     
+    // There's a window listener which starts the connection manager when the main frame is displayed
     mainFrame.setVisible(true);
   }
   
