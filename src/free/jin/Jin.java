@@ -22,7 +22,6 @@
 package free.jin;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 import javax.swing.DefaultListModel;
@@ -35,6 +34,7 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.UIProvider;
+import free.util.IOUtilities;
 import free.util.Pair;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
@@ -53,7 +53,7 @@ public class Jin{
    * Application (Jin) properties.
    */
 
-  private final static Preferences appProps;
+  private final static Properties appProps;
   
   
   
@@ -63,9 +63,7 @@ public class Jin{
   
   static{
     try{
-      InputStream propsIn = Jin.class.getResourceAsStream("resources/app.props");
-      appProps = Preferences.load(propsIn);
-      propsIn.close();
+      appProps = IOUtilities.loadPropertiesAndClose(Jin.class.getResourceAsStream("resources/app.props"));
     } catch (IOException e){
         e.printStackTrace();
         throw new IllegalStateException("Unable to load application properties from resources/app.props");
@@ -182,6 +180,10 @@ public class Jin{
    */
 
   public void start(){
+    uiProvider.init();
+    
+    UpgradeManager.start();
+    
     uiProvider.start();
   }
   
@@ -222,8 +224,10 @@ public class Jin{
    */
   
   private UIProvider createUiProvider(){
-    String defaultUiProviderClassname = 
-      (String)appProps.lookup("uiProvider.classname." + PlatformUtils.getOSName());
+    String defaultUiProviderClassname = getAppProperty("uiProvider.classname." + PlatformUtils.getOSName(), null);
+    if (defaultUiProviderClassname == null)
+      defaultUiProviderClassname = getAppProperty("uiProvider.classname", null);
+    
     String uiProviderClassname = 
       getPrefs().getString("uiProvider.classname", defaultUiProviderClassname);
     
@@ -263,7 +267,7 @@ public class Jin{
    */
   
   public static String getAppProperty(String propName, String defaultValue){
-    return appProps.getString(propName, defaultValue);
+    return appProps.getProperty(propName, defaultValue);
   }
   
   
