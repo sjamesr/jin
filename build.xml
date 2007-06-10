@@ -46,8 +46,7 @@
 			value="lnfs/kunststoff.jar \
 			       lnfs/metouia.jar \
 			       lnfs/liquid.jar \
-			       lnfs/jgoodies-plastic.jar \
-			       lnfs/jgoodies-windows.jar"/>
+			       lnfs/looks.jar" />
 		<property name="manifest.classpath.user" value=""/>
 	</target>
 
