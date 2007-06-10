@@ -48,6 +48,8 @@
 			       lnfs/liquid.jar \
 			       lnfs/looks.jar" />
 		<property name="manifest.classpath.user" value=""/>
+		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
+		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
 	</target>
 
 
@@ -200,6 +202,10 @@
 		<copy todir="${classes.dir}">
 			<fileset dir="${source.dir}" excludes="**/*.java **/*.html **/*.svg **/localization*.properties" />
 		</copy>
+		
+		<!-- Copy logoes -->
+		<copy tofile="${classes.dir}/free/jin/resources/logo32.png" file="${logo32}" overwrite="yes" />
+		<copy tofile="${classes.dir}/free/jin/resources/logo48.png" file="${logo48}" overwrite="yes" />
 		
 		<!-- Convert and copy localization files -->
 		<native2ascii src="${source.dir}"
@@ -475,15 +481,6 @@
 	
 	<!-- If the property buildingForUnix is set, does things required for Unix -->
 	<target name="doUnixStuff" if="buildingForUnix">
-		<property name="runscript" value="${build.dir}/${app.id}" />
-		<copy tofile="${runscript}">
-			<fileset dir="resources/os-specific/unix" includes="jin" />
-		    <filterset>
-		    	<filter token="APPID" value="${app.id}" />
-		    	<filter token="APPNAME" value="${app.name}" />
-		    </filterset>
-		</copy>
-		<chmod file="${runscript}" perm="a+x" />
 	
 		<!-- Check whether x86 -->
 		<condition property="x86">
@@ -500,29 +497,14 @@
 	</target>
 
 	<!-- If the property x86 is set, does things required for unix on x86 -->
-	<target name="doUnixOnx86Stuff" if="x86">		
-		<!--
-		<copy todir="${build.dir}">
-			<fileset dir="resources/os-specific/unix/x86" />
-		</copy>
-		<chmod file="${build.dir}/sox" perm="a+x" />
-		<chmod file="${build.dir}/play" perm="a+x" />
-		-->
+	<target name="doUnixOnx86Stuff" if="x86">
+		
 	</target>
 
 
 	<!-- If the property buildingForWindows is set, does things required for Windows -->
-	<target name="doWindowsStuff" if="buildingForWindows">		
-		<copy todir="${build.dir}">
-			<fileset dir="resources/os-specific/windows" />
-			<globmapper from="jin*" to="${app.name}*"/>
-			<filterset>
-		    	<filter token="TARGETJAR" value="${app.id}.jar" />
-			</filterset>
-		</copy>
-		<copy todir="${build.dir}">
-			<fileset dir="resources/os-specific/windows" excludes="*jin*" />
-		</copy>
+	<target name="doWindowsStuff" if="buildingForWindows">
+		
 	</target>
 	
 	
