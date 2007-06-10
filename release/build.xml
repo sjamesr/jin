@@ -36,11 +36,12 @@
 		<property name="extra.files.dir" value="." /> <!-- Base dir of extra files -->
 		<property name="extra.files" value="changelog.txt copyright.txt gpl.txt" /> <!-- Added to the release -->
 		<property name="extra.files.unix.dir" value="unix" /> <!-- Base dir of extra unix files -->
-		<property name="extra.files.unix" value="README icon.png" /> <!-- Added to a unix release -->
+		<property name="extra.files.unix" value="README icon.png jin" /> <!-- Added to a unix release -->
 		<property name="extra.files.win.dir" value="win" /> <!-- Base dir of extra windows files -->
-		<property name="extra.files.win" value="" /> <!-- Added to a windows release -->
+		<property name="extra.files.win" value="jin.exe jin.cfg" /> <!-- Added to a windows release -->
 		<property name="extra.files.osx.dir" value="osx" /> <!-- Base dir of extra OS X files -->
 		<property name="extra.files.osx" value="" /> <!-- Added to an OS X release -->
+		<property name="osx.icon" value="osx/icon.icns" />
 		
 		<property name="source.dir" value="${app.dir}/src" /> <!-- The directory of the source -->
 		
@@ -252,11 +253,6 @@
 		<property name="app-dir" value="${release.osx.dir}/${app-dir.name}" />
 		<mkdir dir="${app-dir}/Contents/Resources/Java" />
 		
-		<copy todir="${app-dir}">
-			<filelist dir="${extra.files.dir}" files="${extra.files}" />
-			<filelist dir="${extra.files.osx.dir}" files="${extra.files.osx}" />
-		</copy>
-		
 		<copy todir="${app-dir}/Contents">
 			<fileset dir="osx" includes="Info.plist PkgInfo" />
 			<filterset>
@@ -266,7 +262,7 @@
 			</filterset>
 		</copy>
 		
-		<copy todir="${app-dir}/Contents/Resources" file="osx/icon.icns" />
+		<copy todir="${app-dir}/Contents/Resources" file="${osx.icon}" />
 		
 		<antcall target="copy-app-files">
 			<param name="dir" value="${releasefiles.dir}" />
@@ -277,6 +273,11 @@
 		<mkdir dir="${app-dir}/Contents/MacOS" />
 		<copy todir="${app-dir}/Contents/MacOS" file="osx/JavaApplicationStub" />
 		<chmod file="${app-dir}/Contents/MacOS/JavaApplicationStub" perm="a+x" />
+		
+		<copy todir="${app-dir}">
+			<filelist dir="${extra.files.dir}" files="${extra.files}" />
+			<filelist dir="${extra.files.osx.dir}" files="${extra.files.osx}" />
+		</copy>
 		
 		<property name="osx-install" value="${release.osx.dir}/${app.id}-${app.version}-macosx.dmg" />
 		<antcall target="osx-package">
