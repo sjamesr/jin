@@ -81,7 +81,7 @@ public class AboutPanel extends DialogPanel{
     
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
-    Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo.gif"));
+    Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo48.png"));
     JLabel jinLabel = new JLabel(Jin.getAppName() + " " 
       + Jin.getAppVersion(), jinIcon, JLabel.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
