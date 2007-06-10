@@ -200,7 +200,10 @@ public class Jin{
     if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf))
       defaultLnf = UIManager.getCrossPlatformLookAndFeelClassName();
     
-    String lfClassName = getPrefs().getString("lookAndFeel.classname", null);
+    Preferences prefs = getCustomizingPrefs() == null ? 
+        getPrefs() : Preferences.createBackedUp(getPrefs(), getCustomizingPrefs());
+    
+    String lfClassName = (String)prefs.lookup("lookAndFeel.classname." + PlatformUtils.getOSName(), null);
     
     try{
       if (lfClassName != null)
