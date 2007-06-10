@@ -194,7 +194,7 @@ public class MdiUiProvider extends AbstractUiProvider{
     JFrame frame = new JFrame();
     
     frame.setTitle(Jin.getAppName());
-    frame.setIconImage(frame.getToolkit().getImage(Jin.class.getResource("resources/icon.gif")));
+    frame.setIconImage(frame.getToolkit().getImage(Jin.class.getResource("resources/logo32.png")));
     frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
       public void windowClosing(WindowEvent evt){
