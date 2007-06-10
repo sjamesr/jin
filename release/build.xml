@@ -74,11 +74,12 @@
 	-->
 	<target name="copy-app-files">
 		<copy todir="${todir}" includeemptydirs="false">
-			<fileset dir="${dir}" includes="*" />
-			<fileset dir="${dir}" includes="libs/*" />
-			<fileset dir="${dir}" includes="actions/*" />
-			<fileset dir="${dir}" includes="plugins/*" />
-			<fileset dir="${dir}" includes="resources/*/*" />
+			<fileset dir="${dir}" includes="*" excludes="${exclude}" />
+			<fileset dir="${dir}" includes="libs/*" excludes="${exclude}" />
+			<fileset dir="${dir}" includes="lnfs/*" excludes="${exclude}" />
+			<fileset dir="${dir}" includes="actions/*" excludes="${exclude}" />
+			<fileset dir="${dir}" includes="plugins/*" excludes="${exclude}" />
+			<fileset dir="${dir}" includes="resources/*/*" excludes="${exclude}" />
 		</copy>
 		
 		<foreach list="${target.protocols}"
@@ -143,7 +144,7 @@
 		<antcall target="copy-app-files">
 			<param name="dir" value="${releasefiles.dir}" />
 			<param name="todir" value="${unix-files-dir}" />
-			<param name="exclude" value="lnfs/jgoodies-windows.jar" />
+			<param name="exclude" value="" />
 		</antcall>
 		<copy todir="${unix-files-dir}">
 			<filelist dir="${extra.files.dir}" files="${extra.files}" />
