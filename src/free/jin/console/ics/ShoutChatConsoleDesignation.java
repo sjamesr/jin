@@ -30,8 +30,7 @@ import free.jin.event.ChatEvent;
 
 
 /**
- * The chat console designation for shouts. This is intended to be used as a
- * "general chat" console designation.
+ * A "general chat" console designation which displays shouts.
  */
 
 public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
@@ -52,6 +51,7 @@ public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
     
     addAccepted("shout", null, ANY_SENDER);
     addAccepted("ishout", null, ANY_SENDER);
+    addAccepted("announcement", null, ANY_SENDER);
   }
   
   
@@ -89,6 +89,17 @@ public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
   protected void appendChat(ChatEvent evt){
     if ("shout".equals(evt.getType()))
       super.appendChat(evt);
+    else if ("announcement".equals(evt.getType())){
+      I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
+      
+      String name = evt.getSender().getName();
+      String message = evt.getMessage();
+      
+      String text = i18n.getFormattedString("announcementPattern", new Object[]{name, message});
+      
+      Console console = getConsole();
+      console.addToOutput(text, console.textTypeForEvent(evt));
+    }
     else{
       Console console = getConsole();
       console.addToOutput("--> " + evt.getSender().getName() + " " + evt.getMessage(),
