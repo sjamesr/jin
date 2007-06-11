@@ -259,7 +259,7 @@ public class LicensePanel extends DialogPanel{
     Object [] appName = new Object[]{Jin.getAppName()};
     
     JPanel jinPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-    jinPanel.add(new JLabel("<html>" + i18n.getFormattedString("jinGpl.text", appName) + "&nbsp</html>"));
+    jinPanel.add(new JLabel("<html>" + i18n.getFormattedString("jinGpl.text", appName) + "&nbsp;</html>"));
     LinkLabel jinGPLLabel = new LinkLabel(i18n.getString("gpl.link"));
     jinGPLLabel.addActionListener(gplActionListener);
     jinPanel.add(jinGPLLabel);
@@ -269,7 +269,7 @@ public class LicensePanel extends DialogPanel{
     
     String websiteURL = Jin.getAppProperty("websiteURL", null);
     JPanel jinWebsitePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-    jinWebsitePanel.add(new JLabel("<html>" + i18n.getFormattedString("jinWebsite.text", appName) + "&nbsp</html>"));
+    jinWebsitePanel.add(new JLabel("<html>" + i18n.getFormattedString("jinWebsite.text", appName) + "&nbsp;</html>"));
     LinkLabel jinWebsiteLabel = new LinkLabel(i18n.getFormattedString("jinWebsite.link", appName));
     jinWebsiteLabel.setToolTipText(websiteURL);
     jinWebsiteLabel.addActionListener(new UrlDisplayingAction(websiteURL));
@@ -282,12 +282,12 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(10));
 
     JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    beanshellPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp</html>"));
+    beanshellPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp;</html>"));
     LinkLabel beanshellWebsiteLabel = new LinkLabel(i18n.getString("beanshell.link"));
     beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
     beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
     beanshellPanel.add(beanshellWebsiteLabel);
-    beanshellPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+    beanshellPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
     LinkLabel beanshellLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
     beanshellLicenseLabel.addActionListener(beanshellActionListener);
     beanshellPanel.add(beanshellLicenseLabel);
@@ -296,40 +296,42 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(5));
     
     JPanel swingLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    swingLayoutPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp</html>"));
+    swingLayoutPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp;</html>"));
     LinkLabel swingLayoutWebsiteLabel = new LinkLabel(i18n.getString("swingLayout.link"));
     swingLayoutWebsiteLabel.setToolTipText("https://swing-layout.dev.java.net/");
     swingLayoutWebsiteLabel.addActionListener(new UrlDisplayingAction("https://swing-layout.dev.java.net/"));
     swingLayoutPanel.add(swingLayoutWebsiteLabel);
-    swingLayoutPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+    swingLayoutPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
     LinkLabel swingLayoutLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
     swingLayoutLicenseLabel.addActionListener(lgplActionListener);
     swingLayoutPanel.add(swingLayoutLicenseLabel);
     swingLayoutPanel.add(new JLabel("<html>.</html>"));
     add(swingLayoutPanel);
     add(Box.createVerticalStrut(5));
-   
-    JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    xboardPanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetFrom.text", appName) + "&nbsp</html>"));
-    LinkLabel xboardWebsiteLabel = new LinkLabel(i18n.getString("xboard.link"));
-    xboardWebsiteLabel.setToolTipText("http://www.tim-mann.org/xboard.html");
-    xboardWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.tim-mann.org/xboard.html"));
-    xboardPanel.add(xboardWebsiteLabel);
-    xboardPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
-    LinkLabel xboardLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
-    xboardLicenseLabel.addActionListener(gplActionListener);
-    xboardPanel.add(xboardLicenseLabel);
-    xboardPanel.add(new JLabel("<html>.</html>"));
-    add(xboardPanel);
-    add(Box.createVerticalStrut(5));
+    
+    if (new Boolean(Jin.getAppProperty("includesXBoardPieceSet", "false")).booleanValue()){
+      JPanel xboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      xboardPanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetFrom.text", appName) + "&nbsp;</html>"));
+      LinkLabel xboardWebsiteLabel = new LinkLabel(i18n.getString("xboard.link"));
+      xboardWebsiteLabel.setToolTipText("http://www.tim-mann.org/xboard.html");
+      xboardWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.tim-mann.org/xboard.html"));
+      xboardPanel.add(xboardWebsiteLabel);
+      xboardPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
+      LinkLabel xboardLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
+      xboardLicenseLabel.addActionListener(gplActionListener);
+      xboardPanel.add(xboardLicenseLabel);
+      xboardPanel.add(new JLabel("<html>.</html>"));
+      add(xboardPanel);
+      add(Box.createVerticalStrut(5));
+    }
 
     JPanel eboardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    eboardPanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetFrom.text", appName) + "&nbsp</html>"));
+    eboardPanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetFrom.text", appName) + "&nbsp;</html>"));
     LinkLabel eboardWebsiteLabel = new LinkLabel(i18n.getString("eboard.link"));
     eboardWebsiteLabel.setToolTipText("http://eboard.sourceforge.net/");
     eboardWebsiteLabel.addActionListener(new UrlDisplayingAction("http://eboard.sourceforge.net/"));
     eboardPanel.add(eboardWebsiteLabel);
-    eboardPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+    eboardPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
     LinkLabel eboardLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
     eboardLicenseLabel.addActionListener(gplActionListener);
     eboardPanel.add(eboardLicenseLabel);
@@ -338,7 +340,7 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(5));
 
     JPanel blitzinPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    blitzinPanel.add(new JLabel("<html>" +i18n.getFormattedString("includesICCStuff.text", appName) + "&nbsp</html>"));
+    blitzinPanel.add(new JLabel("<html>" +i18n.getFormattedString("includesICCStuff.text", appName) + "&nbsp;</html>"));
     LinkLabel blitzinWebsiteLabel = new LinkLabel(i18n.getString("icc.link"));
     blitzinWebsiteLabel.setToolTipText("http://www.chessclub.com");
     blitzinWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.chessclub.com"));
@@ -348,12 +350,12 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(5));
     
     JPanel maurizioMongePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    maurizioMongePanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetsBy.text", appName) + "&nbsp</html>"));
+    maurizioMongePanel.add(new JLabel("<html>" + i18n.getFormattedString("includesPieceSetsBy.text", appName) + "&nbsp;</html>"));
     LinkLabel maurizioMongeWebsiteLabel = new LinkLabel(i18n.getString("maurizioMonge.link"));
     maurizioMongeWebsiteLabel.setToolTipText("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces");
     maurizioMongeWebsiteLabel.addActionListener(new UrlDisplayingAction("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces"));
     maurizioMongePanel.add(maurizioMongeWebsiteLabel);
-    maurizioMongePanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+    maurizioMongePanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
     LinkLabel maurizioMongeLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
     maurizioMongeLicenseLabel.addActionListener(lgplActionListener);
     maurizioMongePanel.add(maurizioMongeLicenseLabel);
@@ -366,12 +368,12 @@ public class LicensePanel extends DialogPanel{
       Class.forName("com.incors.plaf.kunststoff.KunststoffLookAndFeel");
       
       JPanel kunststoffPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-      kunststoffPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp</html>"));
+      kunststoffPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp;</html>"));
       LinkLabel kunststoffWebsiteLabel = new LinkLabel(i18n.getString("kunststoff.link"));
       kunststoffWebsiteLabel.setToolTipText("http://www.incors.org/");
       kunststoffWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.incors.org/"));
       kunststoffPanel.add(kunststoffWebsiteLabel);
-      kunststoffPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+      kunststoffPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
       LinkLabel kunststoffLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
       kunststoffLicenseLabel.addActionListener(lgplActionListener);
       kunststoffPanel.add(kunststoffLicenseLabel);
@@ -385,13 +387,13 @@ public class LicensePanel extends DialogPanel{
       Class.forName("net.sourceforge.mlf.metouia.MetouiaLookAndFeel");
       
       JPanel metouialfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-      metouialfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp</html>"));
+      metouialfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp;</html>"));
       LinkLabel metouialfWebsiteLabel = new LinkLabel(i18n.getString("metouia.link"));
       metouialfWebsiteLabel.setToolTipText("http://mlf.sourceforge.net/");
       metouialfWebsiteLabel.addActionListener(
         new UrlDisplayingAction("http://mlf.sourceforge.net/"));
       metouialfPanel.add(metouialfWebsiteLabel);
-      metouialfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+      metouialfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
       LinkLabel metouialfLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
       metouialfLicenseLabel.addActionListener(lgplActionListener);
       metouialfPanel.add(metouialfLicenseLabel);
@@ -405,13 +407,13 @@ public class LicensePanel extends DialogPanel{
       Class.forName("com.birosoft.liquid.LiquidLookAndFeel");
       
       JPanel liquidlfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-      liquidlfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp</html>"));
+      liquidlfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp;</html>"));
       LinkLabel liquidlfWebsiteLabel = new LinkLabel(i18n.getString("liquid.link"));
       liquidlfWebsiteLabel.setToolTipText("http://liquidlnf.sourceforge.net/");
       liquidlfWebsiteLabel.addActionListener(
         new UrlDisplayingAction("http://liquidlnf.sourceforge.net/"));
       liquidlfPanel.add(liquidlfWebsiteLabel);
-      liquidlfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+      liquidlfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
       LinkLabel liquidlfLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
       liquidlfLicenseLabel.addActionListener(lgplActionListener);
       liquidlfPanel.add(liquidlfLicenseLabel);
@@ -425,13 +427,13 @@ public class LicensePanel extends DialogPanel{
       Class.forName("com.jgoodies.looks.plastic.PlasticLookAndFeel");
       
       JPanel jgoodieslfPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-      jgoodieslfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp</html>"));
+      jgoodieslfPanel.add(new JLabel("<html>" + i18n.getFormattedString("distributedWith.text", appName) + "&nbsp;</html>"));
       LinkLabel jgoodieslfWebsiteLabel = new LinkLabel(i18n.getString("jGoodiesLooks.link"));
       jgoodieslfWebsiteLabel.setToolTipText("http://jgoodies.dev.java.net");
       jgoodieslfWebsiteLabel.addActionListener(
         new UrlDisplayingAction("http://jgoodies.dev.java.net"));
       jgoodieslfPanel.add(jgoodieslfWebsiteLabel);
-      jgoodieslfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+      jgoodieslfPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
       LinkLabel jgoodieslfLicenseLabel = new LinkLabel(i18n.getString("bsd.link"));
       jgoodieslfLicenseLabel.addActionListener(jgoodiesActionListener);
       jgoodieslfPanel.add(jgoodieslfLicenseLabel);
@@ -441,13 +443,13 @@ public class LicensePanel extends DialogPanel{
     } catch (ClassNotFoundException e){}
     
     JPanel tangoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    tangoPanel.add(new JLabel("<html>" + i18n.getFormattedString("usesIconsBy.text", appName) + "&nbsp</html>"));
+    tangoPanel.add(new JLabel("<html>" + i18n.getFormattedString("usesIconsBy.text", appName) + "&nbsp;</html>"));
     LinkLabel tangoWebsiteLabel = new LinkLabel(i18n.getString("tango.link"));
     tangoWebsiteLabel.setToolTipText("http://tango.freedesktop.org/");
     tangoWebsiteLabel.addActionListener(
       new UrlDisplayingAction("http://tango.freedesktop.org/"));
     tangoPanel.add(tangoWebsiteLabel);
-    tangoPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
+    tangoPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
     LinkLabel tangoLicenseLabel = new LinkLabel(i18n.getString("ccsa25.link"));
     tangoLicenseLabel.addActionListener(ccsa25ActionListener);
     tangoPanel.add(tangoLicenseLabel);
@@ -455,19 +457,34 @@ public class LicensePanel extends DialogPanel{
     add(tangoPanel);
     add(Box.createVerticalStrut(5));
     
-    JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    denisDesLauriersPanel.add(new JLabel("<html>" + i18n.getFormattedString("logoDesignedBy", appName) + "&nbsp</html>"));
-    LinkLabel denisDesLauriersWebsiteLabel = new LinkLabel(i18n.getString("denisDesLauriers.link"));
-    denisDesLauriersWebsiteLabel.setToolTipText("http://www.chess-art.com");
-    denisDesLauriersWebsiteLabel.addActionListener(
-      new UrlDisplayingAction("http://www.chess-art.com"));
-    denisDesLauriersPanel.add(denisDesLauriersWebsiteLabel);
-    denisDesLauriersPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp</html>"));
-    LinkLabel logoLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
-    logoLicenseLabel.addActionListener(gplActionListener);
-    denisDesLauriersPanel.add(logoLicenseLabel);
-    denisDesLauriersPanel.add(new JLabel("<html>.</html>"));
-    add(denisDesLauriersPanel);
+    String logoId = Jin.getAppProperty("app.logo.id", "jin"); 
+    if (logoId.equals("jin")){
+      JPanel denisDesLauriersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      denisDesLauriersPanel.add(new JLabel("<html>" + i18n.getFormattedString("logoDesignedBy", appName) + "&nbsp;</html>"));
+      LinkLabel denisDesLauriersWebsiteLabel = new LinkLabel(i18n.getString("denisDesLauriers.link"));
+      denisDesLauriersWebsiteLabel.setToolTipText("http://www.chess-art.com");
+      denisDesLauriersWebsiteLabel.addActionListener(
+        new UrlDisplayingAction("http://www.chess-art.com"));
+      denisDesLauriersPanel.add(denisDesLauriersWebsiteLabel);
+      denisDesLauriersPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
+      LinkLabel logoLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
+      logoLicenseLabel.addActionListener(gplActionListener);
+      denisDesLauriersPanel.add(logoLicenseLabel);
+      denisDesLauriersPanel.add(new JLabel("<html>.</html>"));
+      add(denisDesLauriersPanel);
+    }
+    else if (logoId.equals("sonia")){
+      JPanel logoCreditPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      logoCreditPanel.add(new JLabel("<html>" + i18n.getFormattedString("logoInspiredByMaurizioMonge", appName)
+          + "&nbsp;</html>"));
+      LinkLabel fantasySetWebsiteLabel = new LinkLabel(i18n.getString("fantasySetWebsite.link"));
+      fantasySetWebsiteLabel.setToolTipText("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces#Fantasy");
+      fantasySetWebsiteLabel.addActionListener(
+        new UrlDisplayingAction("http://linuz.sns.it/~monge/wiki/index.php/Chess_pieces#Fantasy"));
+      logoCreditPanel.add(fantasySetWebsiteLabel);
+      logoCreditPanel.add(new JLabel("<html>.</html>"));
+      add(logoCreditPanel);
+    }
     
     add(Box.createVerticalStrut(30));
 
@@ -480,7 +497,7 @@ public class LicensePanel extends DialogPanel{
 
     focusComponent = closeButton;
   }
-
-
-
+  
+  
+  
 }
