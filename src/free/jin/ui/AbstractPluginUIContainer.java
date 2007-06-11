@@ -282,8 +282,10 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
       result = i18n.confirm(OptionPanel.OK, "closeSessionDialog", hintParent);
     }
 
-    if (result == OptionPanel.OK)
+    if (result == OptionPanel.OK){
       Jin.getInstance().getConnManager().closeSession();
+      Jin.getInstance().quitIfNoUiVisible();
+    }
   }
   
   
