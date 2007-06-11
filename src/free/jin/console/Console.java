@@ -576,7 +576,7 @@ public class Console extends JPanel implements KeyListener{
       Dimension viewportSize = getExtentSize();
       JTextComponent view = (JTextComponent)getView();
 
-      if ((viewSize.height <= viewportSize.height) || (viewportSize.height < 0) 
+      if ((viewSize.height <= height) || (viewportSize.height < 0) 
           || settingViewSize || ((width == this.getWidth()) && (height == this.getHeight()))
           || (view.getDocument().getLength() == 0)){
         super.reshape(x, y, width, height);
