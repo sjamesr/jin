@@ -128,7 +128,7 @@ public class ConnectionManager{
     }
     
     // Last logged in user
-    User lastUser = getLastUser();
+    User lastUser = loadLastUser();
     if (lastUser != null)
       return lastUser.getServer();
     
@@ -174,7 +174,7 @@ public class ConnectionManager{
     }
     
     // Last logged in user
-    User lastUser = getLastUser();
+    User lastUser = loadLastUser();
     if ((lastUser != null) && (lastUser.getServer() == server))
       return lastUser;
     
@@ -259,12 +259,24 @@ public class ConnectionManager{
       server = servers[0];
     else{  // Server choice panel
       server = new ServerChoicePanel().askServer();
-      if (server == null)
+      if (server == null){ // user canceled the dialog
+        Jin.getInstance().quitIfNoUiVisible();
         return;
+      }
     }
     
+    displayNewConnUI(server);
+  }
+  
+  
+  
+  /**
+   * Displays UI for connecting to the specified server.
+   */
+  
+  public void displayNewConnUI(Server server){
     ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
-      
+    
     if (connDetails == null){ // user canceled the dialog
       Jin.getInstance().quitIfNoUiVisible();
       return;
@@ -290,7 +302,6 @@ public class ConnectionManager{
       
     login(connDetails);
   }
-  
   
   
   
@@ -390,8 +401,6 @@ public class ConnectionManager{
     
     if (reconnect)
       login(tempSession.getConnDetails());
-    else
-      Jin.getInstance().quitIfNoUiVisible();
   }
 
 
@@ -461,7 +470,7 @@ public class ConnectionManager{
    * Returns <code>null</code> if none.
    */
 
-  private User getLastUser(){
+  private User loadLastUser(){
     Preferences prefs = Jin.getInstance().getPrefs();
     String serverId = prefs.getString("last-login.serverId", null);
     String username = prefs.getString("last-login.username", null);
