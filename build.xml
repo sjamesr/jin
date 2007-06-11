@@ -51,9 +51,8 @@
 		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
 		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
 		<property name="copyrightStatement" value="${source.dir}/free/jin/legal/copyright.txt" />
-		<available property="xboardPieceSetAvailable" file="${res.dir}/pieces/xboard.zip" />
 		<condition property="includesXBoardPieceSet" value="true" else="false">
-			<isset property="xboardPieceSetAvailable" />
+			<available file="${res.dir}/pieces/xboard.zip" />
 		</condition>
 	</target>
 
