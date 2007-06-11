@@ -96,7 +96,7 @@ public class AboutPanel extends DialogPanel{
     try{
       copyright = IOUtilities.loadText(Jin.class.getResourceAsStream("legal/copyright.txt"));
     } catch (java.io.IOException e){
-        add(new JLabel("Unable to load copyright file"));
+        add(i18n.createLabel("unableToLoadCopyright"));
         return;
       }
     StringTokenizer copyrightLines = new StringTokenizer(copyright, "\r\n");
@@ -112,10 +112,10 @@ public class AboutPanel extends DialogPanel{
 
     add(Box.createVerticalStrut(10));
 
-    JLabel loveLabel = new JLabel("This program is dedicated to my Love.", JLabel.CENTER);
-    loveLabel.setAlignmentX(CENTER_ALIGNMENT);
-    add(loveLabel);
-    loveLabel.setFont(font);
+    JLabel dedicationLabel = new JLabel(Jin.getAppProperty("app.dedication", null), JLabel.CENTER);
+    dedicationLabel.setAlignmentX(CENTER_ALIGNMENT);
+    add(dedicationLabel);
+    dedicationLabel.setFont(font);
 
     add(Box.createVerticalStrut(10));
 
