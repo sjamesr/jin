@@ -51,8 +51,10 @@
 		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
 		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
 		<property name="copyrightStatement" value="${source.dir}/free/jin/legal/copyright.txt" />
-		<available property="includesXBoardPieceSet" file="${res.dir}/pieces/xboard.zip" />
-		<property name="includesXBoardPieceSet" value="false" />
+		<available property="xboardPieceSetAvailable" file="${res.dir}/pieces/xboard.zip" />
+		<condition property="includesXBoardPieceSet" value="true" else="false">
+			<isset property="xboardPieceSetAvailable" />
+		</condition>
 	</target>
 
 
@@ -226,7 +228,6 @@
 		<antcall target="doAppletStuff" />
 
 		
-		<echo message="usesXBoardPieceSet: ${includesXBoardPieceSet}" />
 		<!-- Set Jin properties -->
 		<copy file="${app.props.file}" todir="${classes.dir}/free/jin/resources" overwrite="true"/>
 		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
