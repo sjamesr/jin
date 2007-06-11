@@ -19,32 +19,35 @@
 -->
 
 <project name="Jin Release" default="release">
+	
+	
+	<property name="app.id" value="jin" /> <!-- The id of the application -->
+	<property name="app.name" value="Jin" /> <!-- The name of the application -->
+	<dirname property="app.dir" file="." /> <!-- The directory of the buildfile to run to build the app -->
+	<property name="releasefiles.dir" value="${app.dir}/build" /> <!-- The directory of the files to release -->
+	<property name="result.dir" value="." /> <!-- The directory where to put the result -->
+	<property name="target.protocols" value="icc fics" /> <!-- The list of protocols to target -->
+	<property name="target.servers" value="icc fics wcl" /> <!-- The list of servers to target -->
+	<property name="osx.icon" value="osx/icon.icns" />
+	
+	<resources id="extra.files"> <!-- Added to the release -->
+		<filelist dir="." files="changelog.txt" />
+		<filelist dir="${app.dir}/src/free/jin/legal" files="gpl.txt" />
+	</resources>
+	<filelist id="extra.files.unix" dir="unix" files="README icon.png jin" /> <!-- Added to a unix release -->
+	<filelist id="extra.files.win" dir="win" files="jin.exe jin.cfg" /> <!-- Added to a windows release -->
+	<filelist id="extra.files.osx" dir="osx" files="" /> <!-- Added to an OS X release -->
+	
+	<property name="source.dir" value="${app.dir}/src" /> <!-- The directory of the source -->
+
 
 	<!-- Makes releases for windows, unix, os x and plain source code -->
 	<target name="release" depends="osx, unix, windows, src" description="Build all normal releases"/>
 	
+	
 	<target name="init">
 		<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-		<property name="app.id" value="jin" /> <!-- The id of the application -->
-		<property name="app.name" value="Jin" /> <!-- The name of the application -->
-		<dirname property="app.dir" file="." /> <!-- The directory of the buildfile to run to build the app -->
-		<property name="releasefiles.dir" value="${app.dir}/build" /> <!-- The directory of the files to release -->
-		<property name="result.dir" value="." /> <!-- The directory where to put the result -->
-		<property name="target.protocols" value="icc fics" /> <!-- The list of protocols to target -->
-		<property name="target.servers" value="icc fics wcl" /> <!-- The list of servers to target -->
-		<property name="extra.files.dir" value="." /> <!-- Base dir of extra files -->
-		<property name="extra.files" value="changelog.txt copyright.txt gpl.txt" /> <!-- Added to the release -->
-		<property name="extra.files.unix.dir" value="unix" /> <!-- Base dir of extra unix files -->
-		<property name="extra.files.unix" value="README icon.png jin" /> <!-- Added to a unix release -->
-		<property name="extra.files.win.dir" value="win" /> <!-- Base dir of extra windows files -->
-		<property name="extra.files.win" value="jin.exe jin.cfg" /> <!-- Added to a windows release -->
-		<property name="extra.files.osx.dir" value="osx" /> <!-- Base dir of extra OS X files -->
-		<property name="extra.files.osx" value="" /> <!-- Added to an OS X release -->
-		<property name="osx.icon" value="osx/icon.icns" />
-		
-		<property name="source.dir" value="${app.dir}/src" /> <!-- The directory of the source -->
-		
 		<!-- Ask for Jin version -->
 		<input message="Please specify the release version:" addproperty="app.version" />
 		
@@ -148,8 +151,8 @@
 			<param name="exclude" value="" />
 		</antcall>
 		<copy todir="${unix-files-dir}">
-			<filelist dir="${extra.files.dir}" files="${extra.files}" />
-			<filelist dir="${extra.files.unix.dir}" files="${extra.files.unix}" />
+			<resources refid="extra.files" />
+			<resources refid="extra.files.unix" />
 		</copy>
 		
 		<property name="unix-tar" value="${release.unix.dir}/${app.id}-${app.version}-unix.tar" />
@@ -198,8 +201,8 @@
 			<param name="exclude" value="" />
 		</antcall>
 		<copy todir="${dir-to-inst}">
-			<filelist dir="${extra.files.dir}" files="${extra.files}" />
-			<filelist dir="${extra.files.win.dir}" files="${extra.files.win}" />
+			<resources refid="extra.files" />
+			<resources refid="extra.files.win" />
 		</copy>
 		
 		<antcall target="win-create-install">
@@ -275,8 +278,8 @@
 		<chmod file="${app-dir}/Contents/MacOS/JavaApplicationStub" perm="a+x" />
 		
 		<copy todir="${app-dir}">
-			<filelist dir="${extra.files.dir}" files="${extra.files}" />
-			<filelist dir="${extra.files.osx.dir}" files="${extra.files.osx}" />
+			<resources refid="extra.files" />
+			<resources refid="extra.files.osx" />
 		</copy>
 		
 		<property name="osx-install" value="${release.osx.dir}/${app.id}-${app.version}-macosx.dmg" />
