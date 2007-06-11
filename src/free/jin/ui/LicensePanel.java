@@ -332,8 +332,8 @@ public class LicensePanel extends DialogPanel{
     eboardWebsiteLabel.addActionListener(new UrlDisplayingAction("http://eboard.sourceforge.net/"));
     eboardPanel.add(eboardWebsiteLabel);
     eboardPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
-    LinkLabel eboardLicenseLabel = new LinkLabel(i18n.getString("gpl.link"));
-    eboardLicenseLabel.addActionListener(gplActionListener);
+    LinkLabel eboardLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
+    eboardLicenseLabel.addActionListener(lgplActionListener);
     eboardPanel.add(eboardLicenseLabel);
     eboardPanel.add(new JLabel("<html>.</html>"));
     add(eboardPanel);

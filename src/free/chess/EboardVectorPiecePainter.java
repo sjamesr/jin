@@ -19,15 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/*
-  This class is based on artwork created by Felipe Paulo Guazzi Bergo and
-  licensed by him under the GPL license. 
-  Here is his contact information:
-    eboard - chess client
-    http://eboard.sourceforge.net
-    Copyright (C) 2000-2001 Felipe Paulo Guazzi Bergo
-    bergo@seul.org
-*/
 
 
 package free.chess;
@@ -37,9 +28,14 @@ import java.awt.*;
 
 /**
  * An implementation of PiecePainter which draws the vector pieces used in the
- * "eboard" program. The artwork belongs solely to the author(s) of eboard.
- * For information see <A HREF="http://eboard.sourceforge.net/">the eboard
- * website</A>
+ * "eboard" program.
+ * This class is based on artwork created by Felipe Paulo Guazzi Bergo and
+ * licensed by him for use here under the LGPL license. 
+ * Here is his contact information:
+ *  eboard - chess client
+ *  http://eboard.sourceforge.net
+ *  Copyright (C) 2000-2001 Felipe Paulo Guazzi Bergo
+ *  bergo@seul.org
  */
 
 public final class EboardVectorPiecePainter extends VectorPiecePainter{
