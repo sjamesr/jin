@@ -50,6 +50,7 @@
 		<property name="manifest.classpath.user" value=""/>
 		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
 		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
+		<property name="copyrightStatement" value="${source.dir}/free/jin/legal/copyright.txt" />
 	</target>
 
 
@@ -203,9 +204,10 @@
 			<fileset dir="${source.dir}" excludes="**/*.java **/*.html **/*.svg **/localization*.properties" />
 		</copy>
 		
-		<!-- Copy logoes -->
+		<!-- Copy some customizable resources -->
 		<copy tofile="${classes.dir}/free/jin/resources/logo32.png" file="${logo32}" overwrite="yes" />
 		<copy tofile="${classes.dir}/free/jin/resources/logo48.png" file="${logo48}" overwrite="yes" />
+		<copy tofile="${classes.dir}/free/jin/legal/copyright.txt" file="${copyrightStatement}" overwrite="yes" />
 		
 		<!-- Convert and copy localization files -->
 		<native2ascii src="${source.dir}"
