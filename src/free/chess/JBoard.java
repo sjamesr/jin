@@ -92,7 +92,7 @@ public class JBoard extends JComponent{
    * The default color for highlighting possible target squares.
    */
   
-  private static final Color DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR = new Color(255, 255, 255, 64);
+  private static final Color DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR = new Color(255, 255, 255, 96);
    
   
   
