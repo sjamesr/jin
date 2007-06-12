@@ -200,9 +200,10 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     model.addTabbedPaneListener(new TabbedPaneListener(){
       public void tabSelected(TabbedPaneEvent evt){
-        Component component = evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
-        Container parent = component.getFocusCycleRootAncestor();
-        parent.getFocusTraversalPolicy().getDefaultComponent(issueTabbedPane).requestFocusInWindow();
+        Container issuePanel = (Container)evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
+        Component defaultComponent = issuePanel.getFocusTraversalPolicy().getDefaultComponent(issuePanel);
+        if (defaultComponent != null)
+          defaultComponent.requestFocusInWindow();
       }
       
       public void tabAdded(TabbedPaneEvent evt){}
@@ -328,8 +329,8 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     TabbedPaneModel model = issueTabbedPane.getModel();
     model.setSelectedIndex(model.indexOfComponent(issueMatchPanel));
-    issueMatchPanel.prepareFor(opponent);
     uiContainer.setActive(true);
+    issueMatchPanel.prepareFor(opponent);
   }
   
   
