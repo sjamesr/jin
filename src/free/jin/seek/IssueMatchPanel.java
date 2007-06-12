@@ -180,6 +180,16 @@ public class IssueMatchPanel extends JPanel{
   
   
   /**
+   * Returns <code>true</code>.
+   */
+  
+  public boolean isFocusCycleRoot(){
+    return true;
+  }
+  
+  
+  
+  /**
    * Makes the currently selected opponent the specified one, and transfers
    * focus to the panel. 
    */

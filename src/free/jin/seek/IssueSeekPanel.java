@@ -161,6 +161,16 @@ public class IssueSeekPanel extends JPanel{
   
   
   /**
+   * Returns <code>true</code>.
+   */
+  
+  public boolean isFocusCycleRoot(){
+    return true;
+  }
+  
+  
+  
+  /**
    * Returns the <code>I18n</code> for this class.
    */
   
