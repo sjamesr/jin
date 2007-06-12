@@ -21,11 +21,9 @@
 
 package free.jin.ui;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
+import java.awt.*;
+
+import javax.swing.event.EventListenerList;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -74,7 +72,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * A list of our plugin ui listeners.
    */
 
-  private final free.util.EventListenerList listenerList = new free.util.EventListenerList();
+  private final EventListenerList listenerList = new EventListenerList();
   
   
   
