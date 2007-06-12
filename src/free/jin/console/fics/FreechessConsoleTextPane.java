@@ -21,14 +21,8 @@
 
 package free.jin.console.fics;
 
-import java.awt.FontMetrics;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import free.jin.console.Console;
 import free.jin.console.ConsoleTextPane;
-import free.jin.freechess.JinFreechessConnection;
-import free.util.GraphicsUtilities;
 
 
 /**
@@ -48,39 +42,6 @@ public class FreechessConsoleTextPane extends ConsoleTextPane{
 
   public FreechessConsoleTextPane(Console console){
     super(console);
-    
-    addComponentListener(new ComponentAdapter(){
-      
-      private int currentHeight = -1;
-      
-      public void componentResized(ComponentEvent evt){
-        if (!isShowing())
-          return;
-        
-        adjustHeight();
-      }
-      
-      public void componentShown(ComponentEvent evt){
-        adjustHeight();
-      }
-      
-      private void adjustHeight(){
-        FontMetrics metrics = GraphicsUtilities.getFontMetrics(getFont());
-        JinFreechessConnection conn = 
-          (JinFreechessConnection)FreechessConsoleTextPane.this.console.getConsoleManager().getConn();
-        
-        int height = Math.max(5, Math.min(240, getVisibleRect().height/metrics.getHeight() - 2));
-        // -2 because the console has an extra empty line at the bottom and we want
-        // some extra room at the top, to keep a little context
-
-        if (height != currentHeight){
-          currentHeight = height;
-          conn.sendCommandWhenLoggedIn("set height " + height);
-          conn.filterLine("Height set to " + height + ".");
-        }
-      }
-      
-    });
   }
 
 
