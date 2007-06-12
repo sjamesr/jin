@@ -197,6 +197,16 @@ public class TabbedPane extends JComponent{
   
   
   /**
+   * Returns <code>true</code>.
+   */
+  
+  public boolean isFocusCycleRoot(){
+    return true;
+  }
+
+  
+  
+  /**
    * Returns the model of this tabbed pane.
    */
   
@@ -1112,6 +1122,7 @@ public class TabbedPane extends JComponent{
       boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
       
       mainPanel.setLayout(WrapLayout.getInstance());
+      mainPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
       mainPanel.add(tabHandle.getComponent());
       
       JPanel secondaryPanel = new JPanel(WrapLayout.getInstance());
@@ -1140,6 +1151,15 @@ public class TabbedPane extends JComponent{
       
       setOpaque(false);
       setSelected(initiallySelected);
+      
+      mainPanel.setOpaque(true);
+      mainPanel.setBackground(Color.red);
+      
+      smallPanel.setOpaque(true);
+      smallPanel.setBackground(Color.green);
+      
+      setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+      setBackground(Color.yellow);
     }
     
     
