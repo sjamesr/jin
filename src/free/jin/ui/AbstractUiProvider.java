@@ -21,21 +21,13 @@
 
 package free.jin.ui;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
+import java.awt.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
-import free.jin.Jin;
-import free.jin.Preferences;
-import free.jin.Session;
-import free.jin.SessionEvent;
-import free.jin.SessionListener;
-import free.jin.User;
+import javax.swing.event.EventListenerList;
+
+import free.jin.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
@@ -53,8 +45,8 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
-   * Maps Pair<Plugin, String> (the string being plugin container ids) to
-   * the PluginContainers for that plugin and container id.
+   * Maps Pair<String, String> (<pluginId, containerId>) to the
+   * <code>PluginContainers</code> for that plugin and container id.
    */
 
   private final Hashtable pluginContainers = new Hashtable();
@@ -62,14 +54,10 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
-   * The list of <code>PluginContainersMenu<code>s we notify when a new plugin
-   * ui container is created. This should be a proper listener list, but it
-   * seems an overkill for just notifying <code>PluginContainersMenu</code>.
-   * Promote to a proper listener list (with listener interface and event type)
-   * if more code needs to be notified.   
+   * The list of our listeners.   
    */
   
-  private final Vector creationNotifiedMenus = new Vector();
+  private final EventListenerList listenerList = new EventListenerList();
   
 
   
@@ -209,7 +197,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   protected final void addPluginContainer(Plugin plugin, String id, AbstractPluginUIContainer container){
     if (id != null){
-      Object key = new Pair(plugin, id);
+      Object key = new Pair(plugin.getId(), id);
       Object oldContainer = pluginContainers.put(key, container);
       
       if (oldContainer != null){
@@ -218,10 +206,24 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
       }
     }
     
-    for (int i = 0; i < creationNotifiedMenus.size(); i++){
-      PluginContainersMenu menu = (PluginContainersMenu)creationNotifiedMenus.elementAt(i);
-      menu.pluginContainerAdded(container);
+    Object [] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2){
+      if (listeners[i] == PluginUIContainerCreationListener.class){
+        PluginUIContainerCreationListener listener = (PluginUIContainerCreationListener)listeners[i+1];
+        listener.pluginContainerAdded(container);
+      }
     }
+  }
+  
+  
+  
+  /**
+   * Returns the plugin ui container with the specified container id, for the
+   * plugin with the specified id.
+   */
+  
+  protected PluginUIContainer getPluginUIContainer(String pluginId, String containerId){
+    return (PluginUIContainer)pluginContainers.get(new Pair(pluginId, containerId));
   }
   
   
@@ -238,23 +240,23 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
   
   
   /**
-   * Adds a <code>PluginContainersMenu</code> to be notified when a new plugin
-   * ui container is created.
+   * Adds a <code>PluginUIContainerCreationListener</code> to be notified when a new
+   * plugin UI container is created.
    */
   
-  public void addPluginUIContainerCreationListener(PluginContainersMenu menu){
-    creationNotifiedMenus.addElement(menu);
+  public void addPluginUIContainerCreationListener(PluginUIContainerCreationListener listener){
+    listenerList.add(PluginUIContainerCreationListener.class, listener);
   }
   
   
   
   /**
-   * Removes a <code>PluginContainersMenu</code> from being notified when a new
-   * plugin ui container is created.
+   * Removes a <code>PluginUIContainerCreationListener</code> from being notified when a
+   * new plugin UI container is created.
    */
   
-  public void removePluginUIContainerCreationListener(PluginContainersMenu menu){
-    creationNotifiedMenus.removeElement(menu);
+  public void removePluginUIContainerCreationListener(PluginUIContainerCreationListener listener){
+    listenerList.remove(PluginUIContainerCreationListener.class, listener);
   }
   
   
