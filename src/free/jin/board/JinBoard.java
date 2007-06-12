@@ -21,14 +21,17 @@
 
 package free.jin.board;
 
-import free.chess.*;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Vector;
+
+import free.chess.JBoard;
 import free.chess.Position;
 import free.chess.Square;
-import free.util.PaintHook;
 import free.jin.board.event.ArrowCircleListener;
+import free.util.PaintHook;
 
 
 /**
@@ -307,7 +310,18 @@ public class JinBoard extends JBoard implements PaintHook{
       drawSquare(g, circle.getSquare(), circleSize, circle.getColor());
     }
   }
-
+  
+  
+  
+  /**
+   * Computes the containing rectangle of the specified arrow.
+   */
+  
+  private Rectangle arrowRect(Square from, Square to){
+    Rectangle fromRect = squareToRect(from, null);
+    Rectangle toRect = squareToRect(to, null);
+    return fromRect.union(toRect);
+  }
 
 
 
@@ -320,7 +334,7 @@ public class JinBoard extends JBoard implements PaintHook{
     
     fireArrowAdded(arrow);
 
-    repaint();
+    repaint(arrowRect(arrow.getFrom(), arrow.getTo()));
   }
 
 
@@ -340,7 +354,7 @@ public class JinBoard extends JBoard implements PaintHook{
       }
     }
 
-    repaint();
+    repaint(arrowRect(from, to));
   }
   
   
@@ -366,15 +380,22 @@ public class JinBoard extends JBoard implements PaintHook{
    */
 
   public void removeAllArrows(){
+    Rectangle rect = null;
     for (int i = arrows.size() - 1; i >= 0; i--){
       Arrow arrow = (Arrow)arrows.elementAt(i);
       arrows.removeElementAt(i);
       fireArrowRemoved(arrow);
+      
+      Rectangle arrowRect = arrowRect(arrow.getFrom(), arrow.getTo());
+      if (rect == null)
+        rect = arrowRect;
+      else
+        rect = rect.union(arrowRect);
     }
-
-    repaint();
+    
+    if (rect != null)
+      repaint(rect);
   }
-
 
 
 
@@ -386,9 +407,8 @@ public class JinBoard extends JBoard implements PaintHook{
     circles.addElement(circle);
     fireCircleAdded(circle);
 
-    repaint();
+    repaint(squareToRect(circle.getSquare(), null));
   }
-
 
 
 
@@ -407,7 +427,7 @@ public class JinBoard extends JBoard implements PaintHook{
       }
     }
     
-    repaint();
+    repaint(squareToRect(circleSquare, null));
   }
   
   
@@ -433,13 +453,22 @@ public class JinBoard extends JBoard implements PaintHook{
    */
 
   public void removeAllCircles(){
+    Rectangle rect = null;
+    
     for (int i = circles.size() - 1; i >= 0; i--){
       Circle circle = (Circle)circles.elementAt(i);
       circles.removeElementAt(i);
       fireCircleRemoved(circle);
+      
+      Rectangle circleRect = squareToRect(circle.getSquare(), null); 
+      if (rect == null)
+        rect = circleRect;
+      else
+        rect = rect.union(circleRect);
     }
     
-    repaint();
+    if (rect != null)
+      repaint(rect);
   }
 
 
