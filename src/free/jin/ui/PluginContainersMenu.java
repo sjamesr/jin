@@ -41,7 +41,7 @@ import free.util.Utilities;
  * A menu which allows the user to manage the various plugin containers.
  */
 
-public class PluginContainersMenu extends JMenu implements PluginUIListener, ActionListener{
+public class PluginContainersMenu extends JMenu implements PluginUIListener, PluginUIContainerCreationListener, ActionListener{
   
   
   
