@@ -21,18 +21,9 @@
 
 package free.chess;
 
-import java.awt.AWTEvent;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -42,9 +33,12 @@ import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import free.chess.event.MoveEvent;
+import free.chess.event.MoveListener;
 import free.chess.event.MoveProgressEvent;
 import free.chess.event.MoveProgressListener;
 import free.util.MathUtilities;
@@ -92,7 +86,7 @@ public class JBoard extends JComponent{
    * The default color for highlighting possible target squares.
    */
   
-  private static final Color DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR = new Color(255, 255, 255, 96);
+  private static final Color DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR = new Color(255, 255, 255, 80);
    
   
   
@@ -239,14 +233,14 @@ public class JBoard extends JComponent{
    */
 
   private Position position;
-
-
-
+  
+  
+  
   /**
    * A copy of the current position on the board. We keep this so that when the
    * real position changes, we know which squares need repainting.
    */
-
+  
   private Position positionCopy;
   
   
@@ -259,56 +253,131 @@ public class JBoard extends JComponent{
   private boolean isModifyingPosition = false;
   
   /**
-   * The ChangeListener to the Position.
+   * A flag we set when the position was modified because of a move (not just a
+   * general change) so we know to ignore the next change event.
+   */
+  
+  private boolean positionChangedByMove = false;
+  
+  /**
+   * The <code>ChangeListener</code> to the <code>Position</code>.
    */
 
-  private ChangeListener positionChangeListener = new ChangeListener(){
-    
+  private final ChangeListener positionChangeListener = new ChangeListener(){
     public void stateChanged(ChangeEvent evt){
+      if (isModifyingPosition){
+        positionCopy.copyFrom(position); // This we must do anyway, because they need to be synced
+        return;
+      }
+      
+      if (positionChangedByMove){
+        positionChangedByMove = false;
+        return;
+      }
+      
+      updateBoard(positionCopy, position);
+    }
+  };
+  
+  
+  
+  /**
+   * Updates the board from the specified current position to the specified
+   * target position, causing the required areas to be repainted.
+   */
+  
+  private void updateBoard(Position startPosition, Position endPosition){
+    // Repaint only the parts that really need to be repainted by checking
+    // which squares changed.
+    boolean checkMovingPieceSquare = (movedPieceSquare != null);
+    Rectangle tmpRect = new Rectangle();
+
+
+    // Repaint the dragged piece position.
+    if (checkMovingPieceSquare)
+      repaint(tmpRect = getMoveAreaRect(tmpRect));
+
+    for (int file = 0; file < 8; file++){
+      for (int rank = 0; rank < 8; rank++){
+        Piece oldPiece = startPosition.getPieceAt(file, rank);
+        Piece newPiece = endPosition.getPieceAt(file, rank);
+
+        // We don't need to repaint the origin square of the moving piece.
+        if (checkMovingPieceSquare && (file == movedPieceSquare.getFile()) && (rank == movedPieceSquare.getRank())){
+          checkMovingPieceSquare = false;
+          continue;
+        }
+
+        if (!Utilities.areEqual(oldPiece, newPiece))
+          repaint(tmpRect = squareToRect(file, rank, tmpRect));
+      }
+    }
+
+    if (isHighlightMadeMoveSquares() && (movedPieceSquare != null))
+      repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
+
+    if (movedPieceSquare != null){                           // We were dragging a piece
+      if (endPosition.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging 
+        cancelMovingPiece();                                 // is no longer there
+      }
+    }
+    
+    // Clean up after and end any sliding
+    if (slideStartSquare != null){
+      repaint(tmpRect = slideRect(((double)slideTime)/getSlideDuration(), tmpRect));
+      repaint(tmpRect = squareToRect(slideStartSquare, tmpRect));
+      
+      slideStartSquare = null;
+      slideEndSquare = null;
+      slidePiece = null;
+      slideTakenPiece = null;
+      slideTimer.stop();
+    }
+    
+    positionCopy.copyFrom(endPosition);
+  }
+  
+  
+  
+  /**
+   * The <code>MoveListener</code> of the position.
+   */
+  
+  private final MoveListener positionMoveListener = new MoveListener(){
+    public void moveMade(MoveEvent evt){
       if (isModifyingPosition)
         return;
       
-      // Repaint only the parts that really need to be repainted by checking
-      // which squares changed.
-      boolean checkMovingPieceSquare = (movedPieceSquare != null);
-      Rectangle tmpRect = new Rectangle();
-
-
-      // Repaint the dragged piece position.
-      if (checkMovingPieceSquare)
-        repaint(tmpRect = getMoveAreaRect(tmpRect));
-
-      for (int file = 0; file < 8; file++){
-        for (int rank = 0; rank < 8; rank++){
-          Piece oldPiece = positionCopy.getPieceAt(file, rank);
-          Piece newPiece = position.getPieceAt(file, rank);
-
-          // We don't need to repaint the origin square of the moving piece.
-          if (checkMovingPieceSquare && (file == movedPieceSquare.getFile()) && (rank == movedPieceSquare.getRank())){
-            checkMovingPieceSquare = false;
-            continue;
-          }
-
-          if (!Utilities.areEqual(oldPiece, newPiece))
-            repaint(tmpRect = squareToRect(file, rank, tmpRect));
-        }
-      }
-
-      if (isHighlightMadeMoveSquares() && (movedPieceSquare != null))
-        repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
-
-      if (movedPieceSquare != null){                        // We were dragging a piece
-        if (position.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging 
-          cancelMovingPiece();                              // is no longer there
-        }
-      }
-
-      positionCopy.copyFrom(position);
+      if (!(evt.getMove().getClass().equals(ChessMove.class))) // We can't slide for such moves
+        return;
+      
+      if (getSlideDuration() < 0)
+        return;
+      
+      // Finish up the previous animation, if any
+      if (slideStartSquare != null)
+        updateBoard(positionCopy, slideTargetPosition);
+      
+      ChessMove move = (ChessMove)evt.getMove();
+      
+      positionChangedByMove = true;
+      
+      if (slideTargetPosition == null)
+        slideTargetPosition = new Position(position);
+      else
+        slideTargetPosition.copyFrom(position);
+      slideStartSquare = move.getStartingSquare();
+      slideEndSquare = move.getEndingSquare();
+      slidePiece = positionCopy.getPieceAt(slideStartSquare);
+      slideTakenPiece = positionCopy.getPieceAt(slideEndSquare);
+      slideStartTime = System.currentTimeMillis();
+      slideTime = 0;
+      
+      slideTimer.restart();
     }
-
   };
-
-
+  
+  
 
   /**
    * The BoardPainter painting the board.
@@ -461,9 +530,17 @@ public class JBoard extends JComponent{
    */
   
   private Color legalTargetSquaresHighlightColor = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
-
-
-
+  
+  
+  
+  /**
+   * The duration of piece sliding. When negative, no sliding occurs.
+   */
+  
+  private int slideDuration = -1;
+  
+  
+  
   /**
    * The current highlighted move.
    */
@@ -540,9 +617,100 @@ public class JBoard extends JComponent{
    */
   
   private long dragStartTime;
+  
+  
+  
+  /**
+   * The starting square during a piece slide.
+   */
+  
+  private Square slideStartSquare = null;
+  
+  
+  
+  /**
+   * The ending square during a piece slide.
+   */
+  
+  private Square slideEndSquare = null;
+  
+  
+  
+  /**
+   * The sliding piece during a piece slide.
+   */
+  
+  private Piece slidePiece = null;
+  
+  
+  
+  /**
+   * The taken piece during a piece slide.
+   */
+  
+  private Piece slideTakenPiece;
+  
+  
+  
+  /**
+   * The end position for a slide animation.
+   */
+  
+  private Position slideTargetPosition;
+  
+  
+  
+  /**
+   * The time when the sliding started.
+   */
+  
+  private long slideStartTime;
+  
+  
+  
+  /**
+   * How far along are we in sliding. The time passed from
+   * <code>slideStartTime</code> to the time repaint() was called with the
+   * purpose of painting the next slide frame.
+   */
+  
+  private long slideTime;
+  
+  
+  
+  /**
+   * The time which invoked repaint() periodically to animate sliding.
+   */
+  
+  private final Timer slideTimer = new Timer(20, new ActionListener(){
+    private final Rectangle rect = new Rectangle();
+    public void actionPerformed(ActionEvent e){
+      int slideDuration = getSlideDuration();
+      
+      // Repaint the old location
+      repaint(slideRect(((double)slideTime)/slideDuration, rect));
 
-
-
+      slideTime = System.currentTimeMillis() - slideStartTime;
+      if (slideTime > slideDuration){ // we're done sliding
+        // Clear sliding data
+        slideStartSquare = null;
+        slideEndSquare = null;
+        slidePiece = null;
+        slideTakenPiece = null;
+        slideTimer.stop();
+        
+        // We're done animating, so procede as usual
+        positionChangeListener.stateChanged(new ChangeEvent(position));
+      }
+      else{
+        // Repaint the new location
+        repaint(slideRect(((double)slideTime)/slideDuration, rect));
+      }
+    }
+  });
+  
+  
+  
   /**
    * A boolean telling us whether we're currently showing the promotion target
    * selection dialog. This is needed to workaround the bug which keeps sending
@@ -689,10 +857,13 @@ public class JBoard extends JComponent{
       throw new IllegalArgumentException("Null position");
 
     Position oldPosition = position;
-    if (position != null)
+    if (position != null){
       position.removeChangeListener(positionChangeListener);
+      position.removeMoveListener(positionMoveListener);
+    }
     position = newPosition;
     position.addChangeListener(positionChangeListener);
+    position.addMoveListener(positionMoveListener);
 
     if (positionCopy == null)
       positionCopy = new Position(position);
@@ -1257,6 +1428,32 @@ public class JBoard extends JComponent{
   public Color getMadeMoveSquaresHighlightColor(){
     return madeMoveSquaresHighlightColor;
   }
+  
+  
+  
+  /**
+   * Returns the duration of piece slide animation. A negative value indicates
+   * that no sliding occurs.
+   */
+  
+  public int getSlideDuration(){
+    return slideDuration;
+  }
+  
+  
+  
+  /**
+   * Sets the duration of piece slide animation. A negative value indicates that
+   * no sliding should occur.
+   */
+  
+  public void setSlideDuration(int slideDuration){
+    int oldValue = this.slideDuration;
+    
+    this.slideDuration = slideDuration;
+    
+    firePropertyChange("slideDuration", oldValue, slideDuration);
+  }
 
 
 
@@ -1333,7 +1530,7 @@ public class JBoard extends JComponent{
     g.clipRect(rect.x, rect.y, rect.width, rect.height);
     Rectangle clipRect = g.getClipBounds();
 
-    Position position = getPosition();
+    Position displayedPosition = slideStartSquare == null ? getPosition() : positionCopy;
     BoardPainter boardPainter = getBoardPainter();
     PiecePainter piecePainter = getPiecePainter();
 
@@ -1345,7 +1542,7 @@ public class JBoard extends JComponent{
     boardPainter.paintBoard(g, this, rect.x, rect.y, rect.width, rect.height);
 
     // Paint the stationary pieces
-    for (int file = 0; file < 8; file++)
+    for (int file = 0; file < 8; file++){
       for (int rank = 0; rank < 8; rank++){
         Square curSquare = Square.getInstance(file, rank);
 
@@ -1354,8 +1551,11 @@ public class JBoard extends JComponent{
         
         if (isShowShadowPieceInTargetSquare && curSquare.equals(targetSquare))
           continue;
-
-        Piece piece = position.getPieceAt(curSquare);
+        
+        if (curSquare.equals(slideStartSquare))
+          continue;
+        
+        Piece piece = displayedPosition.getPieceAt(curSquare);
         if (piece == null)
           continue;
 
@@ -1365,6 +1565,14 @@ public class JBoard extends JComponent{
 
         piecePainter.paintPiece(piece, g, this, rect, isShaded(curSquare));
       }
+    }
+    
+    // Paint the taken piece during a slide.
+    if (slideTakenPiece != null){
+      squareToRect(slideEndSquare, rect);
+      if (rect.intersects(clipRect))
+        piecePainter.paintPiece(slideTakenPiece, g, this, rect, isShaded(slideEndSquare));
+    }
     
     // Paint possible target squares
     if (isHighlightLegalTargetSquares && (legalTargetSquares != null)){
@@ -1405,14 +1613,21 @@ public class JBoard extends JComponent{
     
     // Allow PaintHooks to paint
     callPaintHooks(g);
-
+    
+    // Paint the sliding piece
+    if (slidePiece != null){
+      double totalSlideTime = getSlideDuration();
+      rect = slideRect(slideTime/totalSlideTime, rect);
+      piecePainter.paintPiece(slidePiece, g, this, rect, false);
+    }
+    
     // Paint stuff drawn during a move
     if (movedPieceSquare != null){
       
       // Paint shadow piece in target square.
       if (isShowShadowPieceInTargetSquare && (targetSquare != null)){
         squareToRect(targetSquare, rect);
-        Piece piece = position.getPieceAt(movedPieceSquare);
+        Piece piece = displayedPosition.getPieceAt(movedPieceSquare);
         piecePainter.paintPiece(piece, g, this, rect, true);
       }
       
@@ -1431,10 +1646,32 @@ public class JBoard extends JComponent{
       // Paint moved piece
       if (isPieceFollowsCursor){
         getMovedPieceGraphicRect(rect);
-        Piece piece = position.getPieceAt(movedPieceSquare);
+        Piece piece = displayedPosition.getPieceAt(movedPieceSquare);
         piecePainter.paintPiece(piece, g, this, rect, false);
       }
     }
+  }
+  
+  
+  
+  /**
+   * Returns the rectangle in which the sliding piece should be drawn at the
+   * specified progress in the sliding (a number between 0 and 1).
+   */
+  
+  private Rectangle slideRect(double progress, Rectangle rect){
+    rect = squareToRect(slideStartSquare, rect);
+    int startX = rect.x;
+    int startY = rect.y;
+    
+    rect = squareToRect(slideEndSquare, rect);
+    int endX = rect.x;
+    int endY = rect.y;
+    
+    rect.x = (int)(startX + (endX - startX) * progress);
+    rect.y = (int)(startY + (endY - startY) * progress);
+    
+    return rect;
   }
   
 
