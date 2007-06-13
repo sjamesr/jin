@@ -369,6 +369,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     setShowShadowPieceInTargetSquare(prefs.getBool("shadow-piece-in-target-square", false));
     setHighlightLegalTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
     setSnapToLegalSquare(prefs.getBool("snap-to-legal-square", true));
+    
+    setSlideDuration(prefs.getInt("slide-duration", 100));
   }
   
   
@@ -937,6 +939,28 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   /**
+   * Sets the duration of the sliding piece animation (in milliseconds).
+   * A negative value indicates that no sliding animation should be performed.
+   */
+  
+  public void setSlideDuration(int slideDuration){
+    props.setIntegerProperty("slideDuration", slideDuration);
+  }
+  
+  
+  
+  /**
+   * Returns the duration of the sliding piece animation (in milliseconds).
+   * A negative value indicates that no sliding animation should be performed.
+   */
+  
+  public int getSlideDuration(){
+    return props.getIntegerProperty("slideDuration");
+  }
+  
+  
+  
+  /**
    * Returns the current piece set.
    */
   
@@ -1475,6 +1499,8 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     prefs.setBool("shadow-piece-in-target-square", isShowShadowPieceInTargetSquare());
     prefs.setBool("highlight-possible-target-squares", isHighlightLegalTargetSquares());
     prefs.setBool("snap-to-legal-square", isSnapToLegalSquare());
+    
+    prefs.setInt("slide-duration", getSlideDuration());
   }
   
   

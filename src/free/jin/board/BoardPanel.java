@@ -21,51 +21,19 @@
 
 package free.jin.board;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Vector;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
+import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import free.chess.AbstractChessClock;
-import free.chess.Chess;
-import free.chess.ChessMove;
-import free.chess.JChessClock;
-import free.chess.Move;
-import free.chess.Player;
-import free.chess.Position;
-import free.chess.WildVariant;
+import free.chess.*;
 import free.chess.event.MoveEvent;
 import free.chess.event.MoveListener;
 import free.jin.Connection;
@@ -73,24 +41,11 @@ import free.jin.Game;
 import free.jin.I18n;
 import free.jin.board.event.UserMoveEvent;
 import free.jin.board.event.UserMoveListener;
-import free.jin.event.BoardFlipEvent;
-import free.jin.event.ClockAdjustmentEvent;
-import free.jin.event.GameEndEvent;
-import free.jin.event.GameListener;
-import free.jin.event.GameStartEvent;
-import free.jin.event.IllegalMoveEvent;
-import free.jin.event.MoveMadeEvent;
-import free.jin.event.OfferEvent;
-import free.jin.event.PositionChangedEvent;
-import free.jin.event.TakebackEvent;
+import free.jin.event.*;
 import free.util.PlatformUtils;
 import free.util.Utilities;
 import free.util.models.ModelUtils;
-import free.util.swing.FullscreenPanel;
-import free.util.swing.ImageComponent;
-import free.util.swing.NonEditableTableModel;
-import free.util.swing.SwingUtils;
-import free.util.swing.WrapLayout;
+import free.util.swing.*;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
 
@@ -678,6 +633,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     board.setShowShadowPieceInTargetSquare(boardManager.isShowShadowPieceInTargetSquare());
     board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
     board.setSnapToLegalSquare(boardManager.isSnapToLegalSquare());
+    board.setSlideDuration(boardManager.getSlideDuration());
   }
   
   
@@ -1689,12 +1645,27 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     // This is not the server echoeing a move made on the board
     // Note that this may still be a move done by the user (from the console).
     if (!isMoveEnRoute()){
-      if (evt.isNew())
-        playAudioClipForMove(move);
+      if (evt.isNew()){
+        if (!shouldUpdateBoard || (board.getSlideDuration() <= 0))
+          playAudioClipForMove(move);
+        else{ // Play it when the slide animation ends
+          final Move audioMove = move;
+          Timer delayedAudioTimer = new Timer(board.getSlideDuration(), new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+              playAudioClipForMove(audioMove);
+            }
+          });
+          delayedAudioTimer.setRepeats(false);
+          delayedAudioTimer.start();
+        }
+      }
       
       if (shouldUpdateBoard){
         isBoardPositionUpdating = true;
-        board.getPosition().copyFrom(realPosition);
+        if (evt.isNew())
+          board.getPosition().makeMove(move);
+        else
+          board.getPosition().copyFrom(realPosition);
         isBoardPositionUpdating = false;
       }
     }
@@ -2166,6 +2137,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         board.setHighlightLegalTargetSquares(boardManager.isHighlightLegalTargetSquares());
       else if ("snapToLegalSquare".equals(propertyName))
         board.setSnapToLegalSquare(boardManager.isSnapToLegalSquare());
+      else if ("slideDuration".equals(propertyName))
+        board.setSlideDuration(boardManager.getSlideDuration());
     }
     else if (src == game){
       gameLabel.setText(createGameLabelText(game));
