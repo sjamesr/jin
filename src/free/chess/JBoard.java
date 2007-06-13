@@ -1771,7 +1771,7 @@ public class JBoard extends JComponent{
     
     FontMetrics fm = g.getFontMetrics(font);
     int fontWidth = fm.stringWidth("a");
-
+    
     int dir = isFlipped() ? 1 : -1;
     
     // Row coordinates
@@ -1971,8 +1971,8 @@ public class JBoard extends JComponent{
     rect.height = getHeight() - insets.top - insets.bottom;
     
     if (getCoordsDisplayStyle() == OUTSIDE_COORDS){
-      int w = rect.width/30;
-      int h = rect.height/30;
+      int w = rect.width/24;
+      int h = rect.height/24;
       
       rect.x += w;
       rect.width -= w;
