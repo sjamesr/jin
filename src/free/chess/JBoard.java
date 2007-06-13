@@ -24,6 +24,7 @@ package free.chess;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -2270,8 +2271,11 @@ public class JBoard extends JComponent{
 
     if (!(isEnabled() && isEditable()))
       return;
-
-    boolean isLeftMouseButton = SwingUtilities.isLeftMouseButton(evt);
+    
+    // A clean left mouse event - no other modifiers
+    boolean isLeftMouseButton = 
+      (evt.getButton() == MouseEvent.BUTTON1) && 
+      ((evt.getModifiersEx() & (~InputEvent.BUTTON1_DOWN_MASK)) == 0);
 
     int evtID = evt.getID();
 
