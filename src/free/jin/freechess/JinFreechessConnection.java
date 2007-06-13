@@ -1968,6 +1968,16 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
   
   
   /**
+   * Withdraws all seeks.
+   */
+  
+  public void withdrawAllSeeks(){
+    sendCommand("unseek", true, true, false);
+  }
+  
+  
+  
+  /**
    * Issues the specified seek.
    */
    
