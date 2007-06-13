@@ -3375,6 +3375,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Withdraws all seeks.
+   */
+  
+  public void withdrawAllSeeks(){
+    sendCommand("unseek", true, true, null);
+  }
+  
+  
+  
+  /**
    * Issues the specified seek.
    */
    
@@ -4076,6 +4086,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       throw new IllegalArgumentException("The specified match offer was not issued by the user");
     
     // TODO: Implement me.
+  }
+  
+  
+  
+  /**
+   * Withdraws all match offers.
+   */
+  
+  public void withdrawAllMatchOffers(){
+    // TODO: fixme ("match" also withdraws all your seeks and withdraws from any pools)
+    sendCommand("match", true, true, null);
   }
   
   
