@@ -90,6 +90,14 @@ public interface MatchOfferConnection extends Connection{
   
   
   /**
+   * Withdraws all match offers.
+   */
+  
+  void withdrawAllMatchOffers();
+  
+  
+  
+  /**
    * Prevents the specified user from matching us again.
    */
   

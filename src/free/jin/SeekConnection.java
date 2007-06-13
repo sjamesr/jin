@@ -76,6 +76,14 @@ public interface SeekConnection extends Connection{
   
   
   /**
+   * Withdraws all seeks.
+   */
+  
+  void withdrawAllSeeks();
+  
+  
+  
+  /**
    * Issues the specified <code>UserSeek</code>.
    */
    
