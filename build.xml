@@ -54,6 +54,9 @@
 		<condition property="includesXBoardPieceSet" value="true" else="false">
 			<available file="${res.dir}/pieces/xboard.zip" />
 		</condition>
+		<condition property="usesBeanshell" value="true" else="false">
+			<available file="${libs.dir}/beanshell.jar" />
+		</condition>
 	</target>
 
 
@@ -233,6 +236,7 @@
 			<entry key="app.name" value="${app.name}" />
 			<entry key="app.version" value="${app.version}" />
 			<entry key="includesXBoardPieceSet" value="${includesXBoardPieceSet}" />
+			<entry key="usesBeanshell" value="${usesBeanshell}" />
 		</propertyfile>
 		
 		
