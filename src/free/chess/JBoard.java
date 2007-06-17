@@ -247,11 +247,10 @@ public class JBoard extends JComponent{
   
   
   /**
-   * A flag we set when we modify the position so that we don't get in our own
-   * way in the position change listener.
+   * A flag we set when we make a move entered by the user, on this board.
    */
   
-  private boolean isModifyingPosition = false;
+  private boolean isMakingUserMove = false;
   
   /**
    * A flag we set when the position was modified because of a move (not just a
@@ -266,11 +265,6 @@ public class JBoard extends JComponent{
 
   private final ChangeListener positionChangeListener = new ChangeListener(){
     public void stateChanged(ChangeEvent evt){
-      if (isModifyingPosition){
-        positionCopy.copyFrom(position); // This we must do anyway, because they need to be synced
-        return;
-      }
-      
       if (positionChangedByMove){
         positionChangedByMove = false;
         return;
@@ -317,7 +311,7 @@ public class JBoard extends JComponent{
     if (isHighlightMadeMoveSquares() && (movedPieceSquare != null))
       repaint(tmpRect = squareToRect(movedPieceSquare, tmpRect));
 
-    if (movedPieceSquare != null){                           // We were dragging a piece
+    if ((movedPieceSquare != null) && !isMakingUserMove){    // We were dragging a piece
       if (endPosition.getPieceAt(movedPieceSquare) == null){ // But the piece we were dragging 
         cancelMovingPiece();                                 // is no longer there
       }
@@ -346,7 +340,7 @@ public class JBoard extends JComponent{
   
   private final MoveListener positionMoveListener = new MoveListener(){
     public void moveMade(MoveEvent evt){
-      if (isModifyingPosition)
+      if (isMakingUserMove)
         return;
       
       if (!(evt.getMove().getClass().equals(ChessMove.class))) // We can't slide for such moves
@@ -2360,9 +2354,9 @@ public class JBoard extends JComponent{
           else
             madeMove = variant.createMove(position, movedPieceSquare, targetSquare, null, null);
           
-          isModifyingPosition = true;
+          isMakingUserMove = true;
           position.makeMove(madeMove);
-          isModifyingPosition = false;
+          isMakingUserMove = false;
         }
         else if ((getMoveInputStyle() == UNIFIED_MOVE_INPUT_STYLE) &&
             (moveGesture == DRAG_N_DROP_MOVE_INPUT_STYLE) && 
