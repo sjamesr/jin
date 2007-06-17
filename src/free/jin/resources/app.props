@@ -15,6 +15,7 @@ uiProvider.classname.macosx=free.jin.ui.SdiUiProvider
 
 # This is set by the buildfile
 includesXBoardPieceSet=
+usesBeanshell=
 
 # This doesn't specify which extra look and feels are actually used - it just
 # tells Jin their names and main classes. They are actually used if they can be
