@@ -25,17 +25,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.ImageObserver;
 
-import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolTip;
-import javax.swing.Timer;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 
 import free.util.AWTUtilities;
 
@@ -87,6 +80,9 @@ public class ImageComponent extends JComponent{
       
       private Point popupLocation = new Point();
       
+      private boolean popupUnderCursor = false;
+      private Point mouseLocationInPopup;
+      
       private final Timer popupTimer = new Timer(ToolTipManager.sharedInstance().getInitialDelay(), new ActionListener(){
         public void actionPerformed(ActionEvent e){
           popup.show(ImageComponent.this, popupLocation.x, popupLocation.y);
@@ -107,9 +103,27 @@ public class ImageComponent extends JComponent{
           popup.setLayout(WrapLayout.getInstance());
           popup.add(tip);
           
+          ic.addMouseMotionListener(new MouseMotionAdapter(){
+            public void mouseMoved(MouseEvent evt){
+              if (!evt.getPoint().equals(mouseLocationInPopup))
+                popup.setVisible(false);
+            }
+          });
+          
+          ic.addMouseListener(new MouseAdapter(){
+            public void mouseEntered(MouseEvent evt){
+              mouseLocationInPopup = new Point(evt.getPoint());
+              popupUnderCursor = true;
+            }
+            public void mouseExited(MouseEvent evt){
+              popup.setVisible(false);
+            }
+          });
+          
           popup.setPreferredSize(AWTUtilities.augmentSize(ic.getPreferredSize(), tip.getInsets()));
         }
         
+        popupUnderCursor = false;
         popupLocation.setLocation(e.getX() + 5, e.getY() + 5);
         popupTimer.setRepeats(false);
         popupTimer.start();
@@ -118,8 +132,17 @@ public class ImageComponent extends JComponent{
       public void mouseExited(MouseEvent e){
         if (popupTimer.isRunning())
           popupTimer.stop();
-        if (popup != null)
-          popup.setVisible(false);
+        if (popup != null){
+          // By doing this in invokeLater, we can make sure that the mouseExit
+          // wasn't because the popup showed underneath the cursor (in which
+          // case we don't want to close it).
+          SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+              if (!popupUnderCursor)
+                popup.setVisible(false);
+            }
+          });
+        }
       }
       
     });
