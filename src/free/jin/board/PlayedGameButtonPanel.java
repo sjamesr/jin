@@ -101,7 +101,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * The size of the state border.
    */
   
-  private static final int STATE_BORDER_SIZE = PlatformUtils.isMacOSX() ? 0 : 3;
+  private static final int STATE_BORDER_SIZE = PlatformUtils.isMacOSX() ? 3 : 6;
   
   
   
