@@ -280,20 +280,22 @@ public class LicensePanel extends DialogPanel{
     add(Box.createVerticalStrut(10));
     add(new JSeparator());
     add(Box.createVerticalStrut(10));
-
-    JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-    beanshellPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp;</html>"));
-    LinkLabel beanshellWebsiteLabel = new LinkLabel(i18n.getString("beanshell.link"));
-    beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
-    beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
-    beanshellPanel.add(beanshellWebsiteLabel);
-    beanshellPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
-    LinkLabel beanshellLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
-    beanshellLicenseLabel.addActionListener(beanshellActionListener);
-    beanshellPanel.add(beanshellLicenseLabel);
-    beanshellPanel.add(new JLabel("<html>.</html>"));
-    add(beanshellPanel);
-    add(Box.createVerticalStrut(5));
+    
+    if (new Boolean(Jin.getAppProperty("usesBeanshell", "false")).booleanValue()){
+      JPanel beanshellPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+      beanshellPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp;</html>"));
+      LinkLabel beanshellWebsiteLabel = new LinkLabel(i18n.getString("beanshell.link"));
+      beanshellWebsiteLabel.setToolTipText("http://www.beanshell.org");
+      beanshellWebsiteLabel.addActionListener(new UrlDisplayingAction("http://www.beanshell.org"));
+      beanshellPanel.add(beanshellWebsiteLabel);
+      beanshellPanel.add(new JLabel("<html>" + i18n.getString("licensedUnder.text") + "&nbsp;</html>"));
+      LinkLabel beanshellLicenseLabel = new LinkLabel(i18n.getString("lgpl.link"));
+      beanshellLicenseLabel.addActionListener(beanshellActionListener);
+      beanshellPanel.add(beanshellLicenseLabel);
+      beanshellPanel.add(new JLabel("<html>.</html>"));
+      add(beanshellPanel);
+      add(Box.createVerticalStrut(5));
+    }
     
     JPanel swingLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     swingLayoutPanel.add(new JLabel("<html>" + i18n.getFormattedString("uses.text", appName) + "&nbsp;</html>"));
