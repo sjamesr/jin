@@ -96,6 +96,9 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     game.addPropertyChangeListener(new PropertyChangeListener(){
       public void propertyChange(PropertyChangeEvent evt){
         setName(consoleNameForGame(GameConsoleDesignation.this.game, gameHasEnded));
+        
+        if ("resultCode".equals(evt.getPropertyName()))
+          getConsole().addToOutput(getGame().getGameEndReasonDescription(), "gameInfo");
       }
     });
   }
@@ -128,8 +131,6 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     gameHasEnded = true;
     setConsoleCloseable(true);
     setName(consoleNameForGame(game, gameHasEnded));
-    
-    getConsole().addToOutput(game.getGameEndReasonDescription(), "gameInfo");
   }
   
   
