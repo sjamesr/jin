@@ -92,7 +92,7 @@ public class FreechessScripter extends Scripter{
 
       varsVector.addElement(new Object[]{"message", evt.getMessage()});
       varsVector.addElement(new Object[]{"tellType", evt.getType()});
-      varsVector.addElement(new Object[]{"sender", evt.getSender()});
+      varsVector.addElement(new Object[]{"sender", evt.getSender().getName()});
       varsVector.addElement(new Object[]{"title", evt.getSenderTitle()});
       if (forumVar != null)
         varsVector.addElement(forumVar);
