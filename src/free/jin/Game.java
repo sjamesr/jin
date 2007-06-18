@@ -969,6 +969,7 @@ public class Game{
   }  
   
   
+  
   /**
    * Sets the result of the game to the specified value. This method may only be
    * called once per Game object (when the game ends).
@@ -994,9 +995,13 @@ public class Game{
     if (getResultCode() != GAME_IN_PROGRESS)
       throw new IllegalStateException("Unable to set the result more than once");
 
-    props.setIntegerProperty("resultCode", result);
     props.setIntegerProperty("gameEndReasonCode", reason);
     props.setProperty("gameEndActor", actor);
+    
+    // This needs to be last because it's the one to depend on to find out when
+    // the game result is known.
+    props.setIntegerProperty("resultCode", result); 
+    
   }
   
   
