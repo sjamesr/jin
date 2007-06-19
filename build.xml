@@ -34,97 +34,6 @@
 		<property name="resources.dir" value="${build.dir}/resources" />	
 		<property name="lnfs.dir" value="${build.dir}/lnfs" />
 		
-		<!-- 
-			These properties allow users (of the buildfile) to create customized
-			versions of Jin.
-		-->
-		<property name="app.id" value="jin" /> <!-- The id of the application -->
-		<property name="app.name" value="Jin" /> <!-- The name of the application -->
-		<property name="app.version" value="${date}" />
-		<property name="app.props.file" value="${source.dir}/free/jin/resources/app.props"/>
-		<property name="manifest.classpath.lf" 
-			value="lnfs/kunststoff.jar \
-			       lnfs/metouia.jar \
-			       lnfs/liquid.jar \
-			       lnfs/looks.jar" />
-		<property name="manifest.classpath.user" value=""/>
-		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
-		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
-		<property name="copyrightStatement" value="${source.dir}/free/jin/legal/copyright.txt" />
-		<condition property="includesXBoardPieceSet" value="true" else="false">
-			<available file="${res.dir}/pieces/xboard.zip" />
-		</condition>
-		<condition property="usesBeanshell" value="true" else="false">
-			<available file="${libs.dir}/beanshell.jar" />
-		</condition>
-	</target>
-
-
-
-	<!-- Removes things done by build -->
-
-	<target name="clean" depends="init">
-		<delete dir="${classes.dir}" />
-		<delete dir="${build.dir}" />
-	</target>
-
-
-
-	<!-- This is just to compile everything, without jarring
-			 or placing things at appropriate locations -->
-	<target name="compile" depends="init">
-		<mkdir dir="${classes.dir}" />
-		<echo message="Compiler: ${build.compiler}" />
-		<javac srcdir="${source.dir}"
-		       destdir="${classes.dir}"
-		       includes="**"
-			   debug="${build.debug}"
-		       classpathref="compile.class.path"
-		       source="${build.target}"
-		       target="${build.target}">
-		</javac>
-	</target>
-	
-	<!-- Compiles a single piece set -->
-	<target name="compilePieceSet">
-		<mkdir dir="${classes.dir}/pieces/${piece-set-id}" />
-		<javac srcdir="${res.dir}/pieces/${piece-set-id}"
-		       destdir="${classes.dir}/pieces/${piece-set-id}"
-		       includes="**"
-			   debug="${build.debug}"
-		       classpath="${classes.dir}"
-		       source="${build.target}"
-		       target="${build.target}">
-		</javac>
-	</target>
-
-	<!-- After compiling, this jars everything properly
-			 and puts it where it belongs. -->
-	<target name="build" depends="init, compile">
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${libs.dir}" />
-		<mkdir dir="${servers.dir}" />
-		<mkdir dir="${servers.dir}/icc" />
-		<mkdir dir="${servers.dir}/fics" />
-		<mkdir dir="${plugins.dir}" />
-		<mkdir dir="${plugins.dir}/icc" />
-		<mkdir dir="${plugins.dir}/fics" />
-		<mkdir dir="${actions.dir}" />
-		<mkdir dir="${actions.dir}/icc" />
-		<mkdir dir="${actions.dir}/fics" />
-		<mkdir dir="${lnfs.dir}" />
-		
-		
-		<!-- Copy libs -->
-		<copy todir="${libs.dir}">
-			<fileset dir="resources/libs" />
-		</copy>
-		
-		<!-- Copy Look and Feels -->
-		<copy todir="${lnfs.dir}">
-			<fileset dir="resources/lnfs" />
-		</copy>
-
 		<!-- Check whether Unix (but not Mac OS X) -->		
 		<condition property="unix">
 			<and>
@@ -203,7 +112,98 @@
 				</and>
 			</or>
 		</condition>
+
 		
+		<!-- 
+			These properties allow users (of the buildfile) to create customized
+			versions of Jin.
+		-->
+		<property name="app.id" value="jin" /> <!-- The id of the application -->
+		<property name="app.name" value="Jin" /> <!-- The name of the application -->
+		<property name="app.version" value="${date}" />
+		<property name="app.props.file" value="${source.dir}/free/jin/resources/app.props"/>
+		<condition property="manifest.classpath.lf" 
+		           value=""
+		           else="lnfs/kunststoff.jar lnfs/metouia.jar lnfs/liquid.jar lnfs/looks.jar">
+			<isset property="buildingApplet" />
+		</condition>
+		<property name="manifest.classpath.user" value=""/>
+		<property name="logo32" value="${source.dir}/free/jin/resources/logo32.png" />
+		<property name="logo48" value="${source.dir}/free/jin/resources/logo48.png" />
+		<property name="copyrightStatement" value="${source.dir}/free/jin/legal/copyright.txt" />
+		<condition property="includesXBoardPieceSet" value="true" else="false">
+			<available file="${res.dir}/pieces/xboard.zip" />
+		</condition>
+		<condition property="usesBeanshell" value="true" else="false">
+			<available file="${libs.dir}/beanshell.jar" />
+		</condition>
+	</target>
+
+
+
+	<!-- Removes things done by build -->
+
+	<target name="clean" depends="init">
+		<delete dir="${classes.dir}" />
+		<delete dir="${build.dir}" />
+	</target>
+
+
+
+	<!-- This is just to compile everything, without jarring
+			 or placing things at appropriate locations -->
+	<target name="compile" depends="init">
+		<mkdir dir="${classes.dir}" />
+		<echo message="Compiler: ${build.compiler}" />
+		<javac srcdir="${source.dir}"
+		       destdir="${classes.dir}"
+		       includes="**"
+			   debug="${build.debug}"
+		       classpathref="compile.class.path"
+		       source="${build.target}"
+		       target="${build.target}">
+		</javac>
+	</target>
+	
+	<!-- Compiles a single piece set -->
+	<target name="compilePieceSet">
+		<mkdir dir="${classes.dir}/pieces/${piece-set-id}" />
+		<javac srcdir="${res.dir}/pieces/${piece-set-id}"
+		       destdir="${classes.dir}/pieces/${piece-set-id}"
+		       includes="**"
+			   debug="${build.debug}"
+		       classpath="${classes.dir}"
+		       source="${build.target}"
+		       target="${build.target}">
+		</javac>
+	</target>
+
+	<!-- After compiling, this jars everything properly
+			 and puts it where it belongs. -->
+	<target name="build" depends="init, compile">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${libs.dir}" />
+		<mkdir dir="${servers.dir}" />
+		<mkdir dir="${servers.dir}/icc" />
+		<mkdir dir="${servers.dir}/fics" />
+		<mkdir dir="${plugins.dir}" />
+		<mkdir dir="${plugins.dir}/icc" />
+		<mkdir dir="${plugins.dir}/fics" />
+		<mkdir dir="${actions.dir}" />
+		<mkdir dir="${actions.dir}/icc" />
+		<mkdir dir="${actions.dir}/fics" />
+		<mkdir dir="${lnfs.dir}" />
+		
+		
+		<!-- Copy libs -->
+		<copy todir="${libs.dir}">
+			<fileset dir="resources/libs" />
+		</copy>
+		
+		<!-- Copy Look and Feels -->
+		<copy todir="${lnfs.dir}">
+			<fileset dir="resources/lnfs" />
+		</copy>
 
 		<!-- Copy Java resources -->
 		<copy todir="${classes.dir}">
@@ -325,13 +325,13 @@
 
 		<!-- Console plugin for ICC -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="icc" />
+			<param name="plugin.server.id" value="icc" />
 			<param name="plugin.id" value="console" />
 		</antcall>
 
 		<!-- Console plugin for FICS -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="fics" />
+			<param name="plugin.server.id" value="fics" />
 			<param name="plugin.id" value="console" />
 		</antcall>
 		
@@ -346,13 +346,13 @@
 
 		<!-- Sound plugin for ICC -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="icc" />
+			<param name="plugin.server.id" value="icc" />
 			<param name="plugin.id" value="sound" />
 		</antcall>
 
 		<!-- Sound plugin for FICS -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="fics" />
+			<param name="plugin.server.id" value="fics" />
 			<param name="plugin.id" value="sound" />
 		</antcall>
 
@@ -367,13 +367,13 @@
 
 		<!-- Seek Graph plugin for ICC -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="icc" />
+			<param name="plugin.server.id" value="icc" />
 			<param name="plugin.id" value="seek" />
 		</antcall>
 
 		<!-- Seek Graph plugin for FICS -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="fics" />
+			<param name="plugin.server.id" value="fics" />
 			<param name="plugin.id" value="seek" />
 		</antcall>
 
@@ -388,13 +388,13 @@
 
 		<!-- Board plugin for ICC -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="icc" />
+			<param name="plugin.server.id" value="icc" />
 			<param name="plugin.id" value="board" />
 		</antcall>
 
 		<!-- Board plugin for FICS -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="fics" />
+			<param name="plugin.server.id" value="fics" />
 			<param name="plugin.id" value="board" />
 		</antcall>
 
@@ -416,13 +416,13 @@
 
 		<!-- Scripter plugin for ICC -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="icc" />
+			<param name="plugin.server.id" value="icc" />
 			<param name="plugin.id" value="scripter" />
 		</antcall>
 
 		<!-- Scripter plugin for FICS -->
 		<antcall target="buildPlugin">
-			<param name="server.id" value="fics" />
+			<param name="plugin.server.id" value="fics" />
 			<param name="plugin.id" value="scripter" />
 		</antcall>
 		
@@ -459,30 +459,30 @@
   
   
 	<!-- Creates a single plugin
-	     Parameters: server.id (optional, for server specific plugins}, plugin.id
+	     Parameters: plugin.server.id (optional, for server specific plugins}, plugin.id
 	-->
 	<target name="buildPlugin">
-		<property name="server.id" value="" />
-		<jar jarfile="${plugins.dir}/${server.id}/${plugin.id}.jar" compress="${build.compress}">
+		<property name="plugin.server.id" value="" />
+		<jar jarfile="${plugins.dir}/${plugin.server.id}/${plugin.id}.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
-			         includes="free/jin/${plugin.id}/${server.id}/**"
-			         excludes="free/jin/${plugin.id}/${server.id}/definition" />
-			<fileset dir="${classes.dir}/free/jin/${plugin.id}/${server.id}"
+			         includes="free/jin/${plugin.id}/${plugin.server.id}/**"
+			         excludes="free/jin/${plugin.id}/${plugin.server.id}/definition" />
+			<fileset dir="${classes.dir}/free/jin/${plugin.id}/${plugin.server.id}"
 			         includes="definition" />
 		</jar>
 	</target>
   
 
 	<!-- Creates a single action.
-	     Parameters: server.id (optional, for server specific actions), action.id
+	     Parameters: plugin.server.id (optional, for server specific actions), action.id
 	-->
 	<target name="buildAction">
-		<property name="server.id" value="" />
-		<jar jarfile="${actions.dir}/${server.id}/${action.id}.jar" compress="${build.compress}">
+		<property name="plugin.server.id" value="" />
+		<jar jarfile="${actions.dir}/${plugin.server.id}/${action.id}.jar" compress="${build.compress}">
 			<fileset dir="${classes.dir}"
-			         includes="free/jin/action/${action.id}/* free/jin/action/${action.id}/${server.id}/**"
-			         excludes="free/jin/action/${action.id}/${server.id}/definition" />
-			<fileset dir="${classes.dir}/free/jin/action/${action.id}/${server.id}"
+			         includes="free/jin/action/${action.id}/* free/jin/action/${action.id}/${plugin.server.id}/**"
+			         excludes="free/jin/action/${action.id}/${plugin.server.id}/definition" />
+			<fileset dir="${classes.dir}/free/jin/action/${action.id}/${plugin.server.id}"
 			         includes="definition" />
 		</jar>
 	</target>
@@ -536,17 +536,6 @@
 
 	<!-- If the property buildingApplet is set, does things required for Applets -->
 	<target name="doAppletStuff" if="buildingApplet">
-		<javac srcdir="resources/os-specific/applet"
-		       destdir="${build.dir}"
-		       includes="DetectJava.java">
-			<compilerarg compiler="modern" line="-target ${build.target}" />
-			<compilerarg compiler="modern" line="-source 1.2" />
-		</javac>
-		
-		<copy todir="${build.dir}">
-			<fileset file="resources/os-specific/applet/**" excludes="**.java"/>
-		</copy>
-		
  		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
 			<entry key="lf.extra.count" value="0" />
 		</propertyfile>
