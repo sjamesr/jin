@@ -285,13 +285,13 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
       String prefNamePrefix, RectDouble defaultFrameBounds){
     
     Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
-    Rectangle realDefaultBounds = 
-        defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
     
     // Restore bounds      
-    Rectangle frameBounds = prefs.getRect(prefNamePrefix + "bounds", realDefaultBounds);
-    frameBounds = windowBoundsOk(screenSize, frameBounds) ? frameBounds : realDefaultBounds;
-    window.setBounds(frameBounds);
+    RectDouble relativeFrameBounds = prefs.getRectDouble(prefNamePrefix + "boundsRelative", defaultFrameBounds);
+    Rectangle realFrameBounds = relativeFrameBounds.scale(screenSize.width, screenSize.height).toRect();
+    if (!windowBoundsOk(screenSize, realFrameBounds))
+      realFrameBounds = defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
+    window.setBounds(realFrameBounds);
 
     if (window instanceof Frame){
       Frame frame = (Frame)window;
@@ -318,11 +318,15 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    */
 
   public static void saveWindowGeometry(Preferences prefs, Window window, String prefNamePrefix){
+    Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     
-    // Save bounds on screen
+    // Save bounds
     Point frameLocation = window.isVisible() ? window.getLocationOnScreen() : window.getLocation();
     Dimension frameSize = window.getSize();
-    prefs.setRect(prefNamePrefix + "bounds", new Rectangle(frameLocation, frameSize));
+    
+    RectDouble frameBounds = new RectDouble(frameLocation.x, frameLocation.y, frameSize.width, frameSize.height);
+    frameBounds.scale(1d/screenSize.width, 1d/screenSize.height);
+    prefs.setRectDouble(prefNamePrefix + "boundsRelative", frameBounds);
     
     if (window instanceof Frame){
       Frame frame = (Frame)window;
