@@ -260,7 +260,11 @@ public class I18n{
   public JLabel createLabel(String i18nKey){
     JLabel label = new JLabel();
     
-    SwingUtils.applyLabelSpec(label, getString(combineKeys(i18nKey, "text")));    
+    SwingUtils.applyLabelSpec(label, getString(combineKeys(i18nKey, "text")));
+    
+    String tooltipText = getString(combineKeys(i18nKey, "tooltip"), null);
+    if (tooltipText != null)
+      label.setToolTipText(tooltipText);
     
     return label;
   }
