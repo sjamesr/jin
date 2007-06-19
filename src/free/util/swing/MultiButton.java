@@ -127,10 +127,14 @@ public class MultiButton extends JComponent{
   
   /**
    * Adds the specified action to this <code>MultiButton</code>.
+   * A <code>null</code> action stands for a separator.
    */
   
   public void add(Action action){
-    menu.add(action);
+    if (action == null)
+      menu.addSeparator();
+    else
+      menu.add(action);
   }
   
   
