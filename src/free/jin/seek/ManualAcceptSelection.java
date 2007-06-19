@@ -53,7 +53,7 @@ public class ManualAcceptSelection{
     I18n i18n = I18n.get(ManualAcceptSelection.class);
     
     this.box = i18n.createCheckBox("");
-    box.setSelected(isManualAccept);
+    box.setSelected(!isManualAccept);
   }
   
   
@@ -74,7 +74,7 @@ public class ManualAcceptSelection{
    */
   
   public boolean isManualAccept(){
-    return box.isSelected();
+    return !box.isSelected();
   }
   
   
