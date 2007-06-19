@@ -22,6 +22,7 @@
 package free.jin.ui;
 
 import java.awt.BorderLayout;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -66,35 +67,33 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
   public LookAndFeelPrefPanel(){
     installExtraLookAndFeels();
     
-    UIManager.LookAndFeelInfo [] installedLnfs = UIManager.getInstalledLookAndFeels(); 
-    LnF [] lnfs = new LnF[installedLnfs.length];
-    for (int i = 0; i < lnfs.length; i++){
-      lnfs[i] = new LnF(installedLnfs[i]);
+    Set installedLnfs = new TreeSet(new Comparator(){
+      public int compare(Object arg0, Object arg1){
+        UIManager.LookAndFeelInfo lnf1 = (UIManager.LookAndFeelInfo)arg0;
+        UIManager.LookAndFeelInfo lnf2 = (UIManager.LookAndFeelInfo)arg1;
+        
+        return lnf1.getName().compareToIgnoreCase(lnf2.getName());
+      }
+    });
+    installedLnfs.addAll(Arrays.asList(UIManager.getInstalledLookAndFeels()));
+    
+    List lnfs = new LinkedList();
+    for (Iterator i = installedLnfs.iterator(); i.hasNext();){
+      UIManager.LookAndFeelInfo lnfInfo = (UIManager.LookAndFeelInfo)i.next();
+      
+      // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
+      // Remove this when Sun fixes it.
+      if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(lnfInfo.getClassName()) &&
+          (System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5"))
+        continue;
+      
+      lnfs.add(new LnF(lnfInfo));
     }
     
-    // WORKAROUND: GTK Look and Feel is broken for now in 1.5.0 with an applet
-    // Remove this when Sun fixes it.
-    if ((System.getSecurityManager() != null) && PlatformUtils.isJavaBetterThan("1.5")){
-      int gtkIndex = -1;
-      for (int i = 0; i < lnfs.length; i++){
-        if (lnfs[i].classname.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")){
-          gtkIndex = i;
-          break;
-        }
-      }
-      if (gtkIndex != -1){
-        LnF [] lnfs2 = new LnF[lnfs.length - 1];
-        for (int i = 0; i < gtkIndex; i++)
-          lnfs2[i] = lnfs[i];
-        for (int i = gtkIndex; i < lnfs2.length; i++)
-          lnfs2[i] = lnfs[i + 1];
-        lnfs = lnfs2;
-      }
-    }    
-    this.lookAndFeels = new JList(lnfs);
+    this.lookAndFeels = new JList(lnfs.toArray());
     
     // Select the right current look and feel
-    String lnfClassName = Jin.getInstance().getPrefs().getString("lookAndFeel.classname");
+    String lnfClassName = UIManager.getLookAndFeel().getClass().getName();
     for (int i = 0; i < lookAndFeels.getModel().getSize(); i++){
       String classname = ((LnF)lookAndFeels.getModel().getElementAt(i)).classname;
       if (lnfClassName.equals(classname)){
@@ -177,7 +176,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
       throw new BadChangesException(i18n.getString("noLookNFeelSelectedErrorMessage"), this);
     }
     
-    Jin.getInstance().getPrefs().setString("lookAndFeel.classname", lnf.classname);
+    Jin.getInstance().getPrefs().setString("lookAndFeel.classname." + PlatformUtils.getOSName(), lnf.classname);
   }
   
   
@@ -189,6 +188,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
    */
    
   private static class LnF{
+    
     
     
     /**
@@ -214,7 +214,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
      
     public LnF(UIManager.LookAndFeelInfo info){
       this.name = info.getName();
-      this.classname = info.getClassName();;
+      this.classname = info.getClassName();
     }
     
     
@@ -226,6 +226,8 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     public String toString(){
       return name;
     }
+    
+    
     
   }
   
