@@ -109,6 +109,14 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
+   * Customizing preferences.
+   */
+  
+  private Preferences customizingPrefs;
+  
+  
+  
+  /**
    * The list of known accounts, created after authenticating the user.
    */
    
@@ -156,6 +164,8 @@ public class JinApplet extends Applet implements JinContext{
       // Load the plugins we'll be running.
       plugins = loadPlugins();
       
+      // Load customizing preferences
+      customizingPrefs = loadCustomizingPrefs();
       
       // Set the background color
       String bgColorString = getParameter("bgcolor");
@@ -306,16 +316,15 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   private ActionInfo [] loadActions() throws IOException, ClassNotFoundException{
-    String actionsCount = getParameter("actions.count");
-    if (actionsCount == null)
-      throw new IllegalStateException("No actions.count parameter specified");
+    String actionClassnames = getParameter("action.classnames");
+    if (actionClassnames == null)
+      throw new IllegalStateException("No action.classnames parameter specified");
+    StringTokenizer actionClassnamesTokenizer = new StringTokenizer(actionClassnames, " ");
     
-    ActionInfo [] actions = new ActionInfo[Integer.parseInt(actionsCount)];
+    ActionInfo [] actions = new ActionInfo[actionClassnamesTokenizer.countTokens()];
     
     for (int i = 0; i < actions.length; i++){
-      String className = getParameter("actions." + i + ".classname");
-      if (className == null)
-        throw new IllegalStateException("Missing classname for action No. " + i);
+      String className = actionClassnamesTokenizer.nextToken();
 
       // See the long comment about the definition file in loadPlugins
       
@@ -340,16 +349,15 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   private PluginInfo [] loadPlugins() throws IOException, ClassNotFoundException{
-    String pluginsCount = getParameter("plugins.count");
-    if (pluginsCount == null)
-      throw new IllegalStateException("No plugins.count parameter specified");
+    String pluginClassnames = getParameter("plugin.classnames");
+    if (pluginClassnames == null)
+      throw new IllegalStateException("No plugin.classnames parameter specified");
+    StringTokenizer pluginClassnamesTokenizer = new StringTokenizer(pluginClassnames, " ");
     
-    PluginInfo [] plugins = new PluginInfo[Integer.parseInt(pluginsCount)];
+    PluginInfo [] plugins = new PluginInfo[pluginClassnamesTokenizer.countTokens()];
     
     for (int i = 0; i < plugins.length; i++){
-      String className = getParameter("plugins." + i + ".classname");
-      if (className == null)
-        throw new IllegalStateException("Missing classname for plugin No. " + i);
+      String className = pluginClassnamesTokenizer.nextToken();
 
       // We should actually read the definition file here.
       // Currently (30.07.2004) the definition file only contains the class name
@@ -410,12 +418,26 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
+   * Loads and returns the application's customizing preferences.
+   */
+  
+  private Preferences loadCustomizingPrefs(){
+    try{
+      URL url = new URL(getCodeBase(), "custom.properties");
+      return Preferences.load(url.openStream());
+    } catch (IOException e){} // It might not exist, which is fine
+    
+    return null;
+  }
+  
+  
+  
+  /**
    * Returns the application's customizing preferences.
    */
   
   public Preferences getCustomizingPrefs(){
-    // TODO: Implement me
-    return null;
+    return customizingPrefs;
   }
   
   
