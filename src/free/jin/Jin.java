@@ -215,9 +215,6 @@ public class Jin{
           JOptionPane.showMessageDialog(null, "Unable to use the specified look and feel: \n" +
               TextUtilities.breakIntoLines(e.getMessage(), 60), "Jin Error", JOptionPane.ERROR_MESSAGE);
       }
-    
-    // lnf selection UI needs to know this, if we're using the default one 
-    getPrefs().setString("lookAndFeel.classname", UIManager.getLookAndFeel().getClass().getName()); 
   }
   
 
