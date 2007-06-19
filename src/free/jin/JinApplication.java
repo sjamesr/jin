@@ -333,7 +333,7 @@ public class JinApplication implements JinContext{
    * Loads and returns the application's customizing preferences.
    */
   
-  public Preferences loadCustomizingPrefs(){
+  private Preferences loadCustomizingPrefs(){
     File file = new File(JIN_DIR, "custom.properties");
     
     try{
