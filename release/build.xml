@@ -304,45 +304,32 @@
 	</target>
 	
 	
-	
-	<!-- Applet release. Resulting files are ${applet-icc-archive} and ${applet-fics-archive}  -->
-	<target name="applet" depends="init" description="Builds an applet release (JinApplet)">
-		<echo message="Creating applet release" />
-    
+	<!-- Initializes applet related stuff -->
+	<target name="applet_init" depends="init">
 		<property name="release.applet.dir" value="${release.dir}/applet" />
     
 		<delete dir="${release.applet.dir}" />
     
 		<mkdir dir="${release.dir}" />
 		<mkdir dir="${release.applet.dir}" />
-		
-		<antcall target="create-applet-archive">
-			<param name="server.name" value="icc" />
-			<param name="server.file" value="chessclub.jar" />
-			<param name="libs" value="icc/timestamping.jar seek.jar board.jar sound.jar console.jar" />
-			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
-			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
-			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3" />
-			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
-		</antcall>
-
-		<antcall target="create-applet-archive">
-			<param name="server.name" value="fics" />
-			<param name="server.file" value="freechess.jar" />
-			<param name="libs" value="fics/timesealing.jar seek.jar board.jar sound.jar console.jar" />
-			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
-			<param name="actions" value="askquestion.jar getserverhelp.jar seek.jar" />
-			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard fics/eboard" />
-			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
-		</antcall>
 	</target>
-  
-  
-  
-	<!-- Helper target for building an applet release. Builds a release for
-	     the server specified by the server.name property -->
-	<target name="create-applet-archive">
-		
+	
+	
+	<!-- Creates an applet release with the specified arguments
+	    protocol.id: The id of the protocol ("icc", "fics" etc.)
+		server.id: The id of the server ("icc", "fics", "wcl" etc.)
+		server.classname: The name of the server class ("free.jin.chessclub.ChessclubServer" etc.)
+		libs: The required libraries.
+		plugins: The required plugin jar files
+		plugin.classnames: The names of the plugin classes
+		actions: The required action jar files
+		action.classnames: The names of the action classes
+		pieces: The required piece set IDs
+		boards: The required board pattern IDs
+	 -->
+	<target name="applet" depends="init, applet_init">
+		<echo message="Creating applet release for ${server.id}" />
+
 		<antcall target="rebuild">
 			<param name="release.name" value="Jin Applet" />
 			<param name="target.platform" value="applet" />
@@ -350,11 +337,19 @@
 			<param name="manifest.classpath.lf" value="" />
 		</antcall>
   
-		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.name}" />
+		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.id}" />
 		<mkdir dir="${dir-to-tar}" />
+		
+		<javac srcdir="applet"
+		       destdir="${dir-to-tar}"
+		       includes="DetectJava.java">
+			<compilerarg compiler="modern" line="-target 1.1" />
+			<compilerarg compiler="modern" line="-source 1.2" />
+		</javac>
+		
 		<copy todir="${dir-to-tar}">
-			<fileset dir="${releasefiles.dir}" includes="*.jar *.php DetectJava.class servers/${server.file}" />
-			<fileset dir="${releasefiles.dir}/${server.name}" />
+			<fileset dir="${releasefiles.dir}" 
+				includes="*.jar servers/${protocol.id}/protocol.jar servers/${protocol.id}/${server.id}.jar" />
 		</copy>
 		
 		<mkdir dir="${dir-to-tar}/libs" />
@@ -372,6 +367,30 @@
 			<fileset dir="${releasefiles.dir}/actions" includes="${actions}" />
 		</copy>
 		
+		<copy todir="${dir-to-tar}">
+			<fileset dir="${releasefiles.dir}" includes="custom.properties" />
+		</copy>
+		
+		<pathconvert property="dir-to-tar.absolute">
+			<path>
+				<pathelement location="${dir-to-tar}"/>
+			</path>
+		</pathconvert>
+		<pathconvert dirsep="/" pathsep="," property="applet.classpath">
+			<fileset dir="${dir-to-tar}" includes="**/*.jar" />
+			<globmapper from="${dir-to-tar.absolute}/*" to="*" />
+		</pathconvert>
+		<copy todir="${dir-to-tar}">
+			<fileset file="applet/*" excludes="*.java"/>
+			<filterset>
+				<filter token="CLASSPATH" value="${applet.classpath}" />
+				<filter token="SERVER.CLASSNAME" value="${server.classname}" />
+				<filter token="PLUGIN.CLASSNAMES" value="${plugin.classnames}" />
+				<filter token="ACTION.CLASSNAMES" value="${action.classnames}" />
+				<filter token="APP.ID" value="${app.id}" />
+				<filter token="SERVER.ID" value="${server.id}" />
+			</filterset>
+		</copy>
 		
 		<antcall target="build-applet-resource-type" inheritall="yes">
 			<param name="resource.type" value="boards" />
@@ -383,7 +402,7 @@
 			<param name="resource.names" value="${pieces}" />
 		</antcall>
     
-		<property name="tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.name}.tar" />
+		<property name="tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.id}.tar" />
 		<property name="gz" value="${tar}.gz" />
 		<tar destfile="${tar}">
 			<tarfileset dir="${dir-to-tar}"/>
@@ -392,9 +411,44 @@
 		<gzip src="${tar}" zipfile="${gz}" />
 		<delete dir="${dir-to-tar}" />
 		<delete file="${tar}" />
-		<property name="applet-${server.name}-archive" value="${gz}" />
+		<property name="applet-${server.id}-archive" value="${gz}" />
 	</target>
 	
+	
+	<!-- Applet release for ICC. Resulting file is ${applet-icc-archive} -->
+	<target name="applet.icc" depends="init" description="Builds an applet release for ICC">
+		<antcall target="applet">
+			<param name="protocol.id" value="icc" />
+			<param name="server.id" value="icc" />
+			<param name="server.classname" value="free.jin.chessclub.servers.icc.ICCServer" />
+			<param name="libs" value="icc/timestamping.jar seek.jar board.jar sound.jar console.jar" />
+			<param name="plugins" value="actions.jar icc/seek.jar icc/board.jar icc/sound.jar icc/console.jar" />
+			<param name="plugin.classnames" value="free.jin.console.icc.ChessclubConsoleManager free.jin.board.icc.ChessclubBoardManager free.jin.seek.icc.ChessclubSoughtGraphPlugin free.jin.sound.icc.ChessclubSoundManager free.jin.actions.ActionsPlugin" />
+			<param name="actions" value="" />
+			<param name="action.classnames" value="" />
+			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard icc/blitzin icc/bookup icc/dyche1 icc/dyche2 icc/dyche3" />
+			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark icc/wooden-light" />
+		</antcall>
+	</target>
+	
+	<!-- Applet release for FICS. Resulting file is ${applet-fics-archive} -->
+	<target name="applet.fics" depends="init" description="Builds an applet release for FICS">
+		<antcall target="create-applet-archive">
+			<param name="protocol.id" value="fics" />
+			<param name="server.id" value="fics" />
+			<param name="server.classname" value="free.jin.freechess.servers.fics.FICSServer" />
+			<param name="libs" value="fics/timesealing.jar seek.jar board.jar sound.jar console.jar" />
+			<param name="plugins" value="actions.jar fics/seek.jar fics/board.jar fics/sound.jar fics/console.jar" />
+			<param name="plugin.classnames" value="free.jin.console.fics.FreechessConsoleManager free.jin.board.fics.FreechessBoardManager free.jin.seek.fics.FreechessSoughtGraphPlugin free.jin.sound.fics.FreechessSoundManager free.jin.actions.ActionsPlugin" />
+			<param name="actions" value="" />
+			<param name="action.classnames" value="" />
+			<param name="pieces" value="adventure alfonso-x alpha berlin condal harlequin kingdom leipzig line lucena magnetic mark marroquin maya medieval merida motif smart usual utrecht xboard fics/eboard" />
+			<param name="boards" value="cold-marble gray-tiles green-marble pale-wood plain red-marble slate winter wooden-dark" />
+		</antcall>
+	</target>
+  
+  
+  
 	<!-- A helper target for building a single resource type for the applet -->
 	<target name="build-applet-resource-type">
 		<foreach list="${resource.names}"
