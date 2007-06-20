@@ -22,8 +22,11 @@
 package free.jin.console;
 
 import free.jin.Connection;
+import free.jin.FriendsConnection;
 import free.jin.I18n;
 import free.jin.event.ChatEvent;
+import free.jin.event.FriendsEvent;
+import free.jin.event.FriendsListener;
 import free.jin.event.JinEvent;
 
 
@@ -33,7 +36,7 @@ import free.jin.event.JinEvent;
  * is meant to be subclassed by server-specific classes.
  */
 
-public abstract class SystemConsoleDesignation extends AbstractConsoleDesignation{
+public abstract class SystemConsoleDesignation extends AbstractConsoleDesignation implements FriendsListener{
   
   
   
@@ -46,6 +49,18 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   public SystemConsoleDesignation(Connection connection, String encoding){
     super(connection, I18n.get(SystemConsoleDesignation.class).getString("name"), encoding, false);
+  }
+  
+  
+  
+  /**
+   * Registers ourselves as <code>FriendsListener</code>, if the connection
+   * implements <code>FriendsConnection</code>.
+   */
+  
+  protected void joinForums(){
+    if (connection instanceof FriendsConnection)
+      ((FriendsConnection)connection).getFriendsListenerManager().addFriendsListener(this);
   }
   
   
@@ -103,6 +118,40 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
     return (evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY);
   }
   
+  
+  
+  /**
+   * Invoked when a friend connects.
+   */
+
+  public void friendConnected(FriendsEvent evt){
+    I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
+    Console console = getConsole();
+    
+    String text = i18n.getFormattedString("friendConnected", new Object[]{evt.getFriend().getName()});
+    console.addToOutput(text, console.textTypeForEvent(evt));
+  }
+  
+  
+  
+  /**
+   * Invoked when a friend disconnects.
+   */
+  
+  public void friendDisconnected(FriendsEvent evt){
+    I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
+    Console console = getConsole();
+    
+    String text = i18n.getFormattedString("friendDisconnected", new Object[]{evt.getFriend().getName()});
+    console.addToOutput(text, console.textTypeForEvent(evt));
+  }
+  
+  
+  
+  public void friendAdded(FriendsEvent evt){}
+  public void friendRemoved(FriendsEvent evt){}
+  public void friendStateChanged(FriendsEvent evt){}
+
   
   
   /**
