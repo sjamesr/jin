@@ -286,8 +286,15 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
     
     Dimension screenSize = AWTUtilities.getUsableScreenBounds().getSize();
     
-    // Restore bounds      
-    RectDouble relativeFrameBounds = prefs.getRectDouble(prefNamePrefix + "boundsRelative", defaultFrameBounds);
+    // Restore bounds
+    RectDouble relativeFrameBounds = prefs.getRectDouble(prefNamePrefix + "boundsRelative", null);
+    Rectangle oldFrameBounds = prefs.getRect(prefNamePrefix + "bounds", null);
+    if (relativeFrameBounds == null){ 
+      if (oldFrameBounds != null) // Compatibility with non-relative bounds
+        relativeFrameBounds = new RectDouble(oldFrameBounds).scale(1d/screenSize.width, 1d/screenSize.height);
+      else
+        relativeFrameBounds = defaultFrameBounds;
+    }
     Rectangle realFrameBounds = relativeFrameBounds.scale(screenSize.width, screenSize.height).toRect();
     if (!windowBoundsOk(screenSize, realFrameBounds))
       realFrameBounds = defaultFrameBounds.scale(screenSize.width, screenSize.height).toRect();
