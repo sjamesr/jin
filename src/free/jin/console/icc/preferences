@@ -213,6 +213,8 @@ foreground.channel-qtell = color;f37849
 foreground.kibitz = color;c0c0c0
 foreground.whisper = color;c0c0c0
 
+foreground.friendsNotification = color;ff9977
+
 
 # Input properties
 input-background = color;ffffff
