@@ -39,7 +39,10 @@ import free.chess.SquareImagesBoardPainter;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
-import free.util.*;
+import free.util.AWTUtilities;
+import free.util.BrowserControl;
+import free.util.IOUtilities;
+import free.util.Localization;
 import free.util.audio.AppletContextAudioPlayer;
 
 
@@ -928,18 +931,24 @@ public class JinApplet extends Applet implements JinContext{
      */
      
     private void createUI(){
-      this.setLayout(new BorderLayout(15, 15));
-      this.add(BorderLayout.NORTH,
-        new Label(l10n.getString("instructionsLabel.text")));
+      this.setLayout(new BorderLayout());
       
-      Panel userInfoPanel = new Panel(new BorderLayout());
+      Panel content = new Panel(new BorderLayout(15, 15));
+      
+      content.add(BorderLayout.NORTH, new Label(l10n.getString("instructionsLabel.text")));
+      
+      Panel userInfoPanel = new Panel(new BorderLayout(10, 10));
       Panel labelsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       Panel textFieldsPanel = new Panel(new GridLayout(2, 1, 10, 10));
       
-      labelsPanel.add(new Label(l10n.getString("usernameLabel.text")));
+      Label usernameLabel = new Label(l10n.getString("usernameLabel.text"));
+      usernameLabel.setAlignment(Label.RIGHT);
+      labelsPanel.add(usernameLabel);
       textFieldsPanel.add(usernameField);
-            
-      labelsPanel.add(new Label(l10n.getString("passwordLabel.text")));
+      
+      Label passwordLabel = new Label(l10n.getString("passwordLabel.text"));
+      passwordLabel.setAlignment(Label.RIGHT);
+      labelsPanel.add(passwordLabel);
       textFieldsPanel.add(passwordField);
       
       userInfoPanel.add(BorderLayout.WEST, labelsPanel);
@@ -948,21 +957,24 @@ public class JinApplet extends Applet implements JinContext{
       textFieldsWrapperPanel.add(BorderLayout.WEST, textFieldsPanel);
       userInfoPanel.add(BorderLayout.CENTER, textFieldsWrapperPanel);
       
-      this.add(BorderLayout.CENTER, userInfoPanel);
+      content.add(BorderLayout.CENTER, userInfoPanel);
       
-      Panel statusAndButtonsPanel = new Panel(new GridLayout(2, 1));
+      Panel statusAndButtonsPanel = new Panel(new BorderLayout(5, 5));  
       
-      statusAndButtonsPanel.add(statusLabel);
+      statusAndButtonsPanel.add(BorderLayout.NORTH, statusLabel);
       
       loginButton = new Button(l10n.getString("loginButton.text"));
       guestButton = new Button(l10n.getString("loginAsGuestButton.text"));
       
-      Panel buttonsPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
+      Panel buttonsPanel = new Panel(new FlowLayout(FlowLayout.CENTER, 5, 0));
       buttonsPanel.add(loginButton);
       buttonsPanel.add(guestButton);
-      statusAndButtonsPanel.add(buttonsPanel);
+      statusAndButtonsPanel.add(BorderLayout.SOUTH, buttonsPanel);
       
-      this.add(BorderLayout.SOUTH, statusAndButtonsPanel);
+      content.add(BorderLayout.SOUTH, statusAndButtonsPanel);
+      
+      this.add(BorderLayout.NORTH, content);
+      this.add(BorderLayout.CENTER, new Panel()); // To take any extra space
       
       ActionListener loginListener = new ActionListener(){
         public void actionPerformed(ActionEvent evt){
