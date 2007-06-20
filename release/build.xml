@@ -292,7 +292,7 @@
 	
 	
 	<!-- 
-		Helper target for the osx target. Builds a .dmg.gz file from the Jin.app directory 
+		Helper target for the osx target. Builds a .dmg.gz file from the .app directory 
 		This is unlikely to work except for under Mac OS X
 	-->
 	<target name="osx-package">
@@ -331,13 +331,12 @@
 		<echo message="Creating applet release for ${server.id}" />
 
 		<antcall target="rebuild">
-			<param name="release.name" value="Jin Applet" />
 			<param name="target.platform" value="applet" />
 			<param name="build.compress" value="yes" />
 			<param name="manifest.classpath.lf" value="" />
 		</antcall>
   
-		<property name="dir-to-tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.id}" />
+		<property name="dir-to-tar" value="${release.applet.dir}/${app.id}-applet-${app.version}-${server.id}" />
 		<mkdir dir="${dir-to-tar}" />
 		
 		<javac srcdir="applet"
@@ -402,7 +401,7 @@
 			<param name="resource.names" value="${pieces}" />
 		</antcall>
     
-		<property name="tar" value="${release.applet.dir}/jin-applet-${app.version}-${server.id}.tar" />
+		<property name="tar" value="${release.applet.dir}/${app.id}-applet-${app.version}-${server.id}.tar" />
 		<property name="gz" value="${tar}.gz" />
 		<tar destfile="${tar}">
 			<tarfileset dir="${dir-to-tar}"/>
