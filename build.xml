@@ -231,10 +231,13 @@
 
 		
 		<!-- Set Jin properties -->
+		<condition property="app.version.actual" value="Applet" else="${app.version}">
+			<isset property="buildingApplet" />
+		</condition>
 		<copy file="${app.props.file}" todir="${classes.dir}/free/jin/resources" overwrite="true"/>
 		<propertyfile file="${classes.dir}/free/jin/resources/app.props">
 			<entry key="app.name" value="${app.name}" />
-			<entry key="app.version" value="${app.version}" />
+			<entry key="app.version" value="${app.version.actual}" />
 			<entry key="includesXBoardPieceSet" value="${includesXBoardPieceSet}" />
 			<entry key="usesBeanshell" value="${usesBeanshell}" />
 		</propertyfile>
