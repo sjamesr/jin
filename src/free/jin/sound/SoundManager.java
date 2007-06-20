@@ -31,26 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import free.jin.Connection;
-import free.jin.Game;
-import free.jin.Preferences;
-import free.jin.ServerUser;
-import free.jin.event.BoardFlipEvent;
-import free.jin.event.ChatEvent;
-import free.jin.event.ChatListener;
-import free.jin.event.ClockAdjustmentEvent;
-import free.jin.event.ConnectionListener;
-import free.jin.event.GameEndEvent;
-import free.jin.event.GameListener;
-import free.jin.event.GameStartEvent;
-import free.jin.event.IllegalMoveEvent;
-import free.jin.event.ListenerManager;
-import free.jin.event.MoveMadeEvent;
-import free.jin.event.OfferEvent;
-import free.jin.event.PlainTextEvent;
-import free.jin.event.PlainTextListener;
-import free.jin.event.PositionChangedEvent;
-import free.jin.event.TakebackEvent;
+import free.jin.*;
+import free.jin.event.*;
 import free.jin.plugin.Plugin;
 import free.util.audio.AudioClip;
 import free.util.models.BooleanModel;
@@ -62,7 +44,7 @@ import free.util.models.Model;
  */
 
 public class SoundManager extends Plugin implements PlainTextListener, ChatListener, ConnectionListener, GameListener,
-    PropertyChangeListener{
+    FriendsListener, PropertyChangeListener{
 
 
   
@@ -192,7 +174,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     loadEventAudioClip("AbortOffer");
     loadEventAudioClip("AdjournOffer");
     loadEventAudioClip("TakebackOffer");
-
+    
+    loadEventAudioClip("FriendConnected");
+    loadEventAudioClip("FriendDisconnected");
   }
 
 
@@ -273,6 +257,9 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
     listenerManager.addChatListener(this);
     listenerManager.addConnectionListener(this);
     listenerManager.addGameListener(this);
+    
+    if (conn instanceof FriendsConnection)
+      ((FriendsConnection)conn).getFriendsListenerManager().addFriendsListener(this);
   }
 
 
@@ -378,6 +365,8 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    *   <LI> IllegalMove - An illegal move was attempted.
    *   <LI> GameStart - A game started.
    *   <LI> GameEnd - A game ended.
+   *   <LI> FriendConnected - A buddy logged in.
+   *   <LI> FriendDisconnected - A buddy logged out.
    * </UL>
    * Returns true if the given event is recognized, false otherwise. Note that
    * for various reasons (like the user disabling sounds), the sound may not
@@ -518,6 +507,33 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
 
 
+  /**
+   * Invoked when a friend connects.
+   */
+
+  public void friendConnected(FriendsEvent evt){
+    System.out.println("FRIEND CONNECTED");
+    playEventSound("FriendConnected");
+  }
+  
+  
+  
+  /**
+   * Invoked when a friend disconnects.
+   */
+  
+  public void friendDisconnected(FriendsEvent evt){
+    playEventSound("FriendDisconnected");
+  }
+  
+  
+  
+  public void friendAdded(FriendsEvent evt){}
+  public void friendRemoved(FriendsEvent evt){}
+  public void friendStateChanged(FriendsEvent evt){}
+
+  
+  
   /**
    * Returns <code>true</code> if the sound is currently on. Returns
    * <code>false</code> otherwise.
