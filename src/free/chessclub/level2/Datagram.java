@@ -294,6 +294,8 @@ public class Datagram{
   public static Datagram parseDatagram(String dgString) throws FormatException{
     try{
       int index = dgString.indexOf(' ');
+      if (index == -1) // No arguments in the datagram
+        index = dgString.length();
       int id = Integer.parseInt(dgString.substring(0, index));
       
       dgString += " "; // So that each field is suffixed with a space
@@ -345,16 +347,18 @@ public class Datagram{
    */
 
   public String toString(){
-    StringBuffer buf = new StringBuffer("[Datagram ID=" + getId() + " Fields: ");
+    StringBuffer buf = new StringBuffer("[Datagram ID=" + getId());
     int fieldCount = getFieldCount();
-
-    for (int i = 0; i < fieldCount - 1; i++){
-      buf.append("{" + getField(i) + "}");
-      buf.append(",");
+    if (fieldCount != 0){
+      buf.append(" Fields: ");
+      for (int i = 0; i < fieldCount; i++){
+        buf.append("{" + getField(i) + "}");
+        if (i != fieldCount - 1)
+          buf.append(",");
+      }
     }
-    buf.append("{" + getField(fieldCount - 1) + "}");
-    
     buf.append("]");
+    
     return buf.toString();
   }
 
