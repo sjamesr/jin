@@ -82,6 +82,7 @@ import free.jin.Jin;
 import free.jin.Preferences;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
+import free.jin.event.FriendsEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
 import free.jin.ui.SdiUiProvider;
@@ -963,6 +964,9 @@ public class Console extends JPanel implements KeyListener{
       return type + "." + 
         (forum == null ? "" : forum.toString()) + "." + 
         (sender == null ? "" : sender.getName());
+    }
+    else if (evt instanceof FriendsEvent){
+      return "friendsNotification";
     }
     else
       throw new IllegalArgumentException("Unsupported event: " + evt);
