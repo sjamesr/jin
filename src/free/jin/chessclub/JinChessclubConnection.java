@@ -68,6 +68,15 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
 
   private final ChessclubListenerManager listenerManager = new ChessclubListenerManager(this);
+  
+  
+  
+  /**
+   * A flag which is set when the login procedure is done (that is, when all
+   * the responses to the actions in <code>handleLoginSucceeded</code> arrive).
+   */
+  
+  private boolean isLoginProcedureEnded = false;
 
 
  
@@ -82,6 +91,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     
     // Needed to know when to clear certain data structures
     addDatagramListener(this, Datagram.DG_SET2);
+    
+    // Needed for setting isLoginProcedureEnded
+    setDGState(Datagram.DG_DUMMY_RESPONSE, true); // Otherwise setDGOnAgain complains
+    addDatagramListener(this, Datagram.DG_DUMMY_RESPONSE);
 
     setInterface(Jin.getAppName() + " " + Jin.getAppVersion() +
       " (" + System.getProperty("java.vendor") + " " + System.getProperty("java.version") +
@@ -205,6 +218,15 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * The tag we apply to a DG_DUMMY_RESPONSE to mark the end of the login
+   * procedure.
+   */
+  
+  private static final String END_OF_LOGIN_PROCEDURE_TAG = "EndOfLoginProcedure";
+  
+  
+  
+  /**
    * Fires a "login succeeded" connection event and performs other on-login tasks.
    */
   
@@ -220,6 +242,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       setDGOnAgain(Datagram.DG_TOURNEY);
 
     listenerManager.fireLoginSucceeded(this);
+    
+    setDGOnAgain(Datagram.DG_DUMMY_RESPONSE, END_OF_LOGIN_PROCEDURE_TAG);
   }
   
   
@@ -585,6 +609,9 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       // Datagram turned on/off
       case Datagram.DG_SET2: processSet2DG(dg, clientTag); break;
       
+      // Dummy response
+      case Datagram.DG_DUMMY_RESPONSE: processDummyResponseDG(dg, clientTag); break;
+      
       // Chat related
       case Datagram.DG_PERSONAL_TELL: processPersonalTellDG(dg, clientTag); break; 
       case Datagram.DG_PERSONAL_QTELL: processPersonalQTellDG(dg, clientTag); break;
@@ -666,6 +693,27 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       case Datagram.DG_UNCIRCLE: gameDatagramsStateChanged(isOn, clientTag); break;
       case Datagram.DG_MY_NOTIFY_LIST: friendsDatagramsStateChanged(isOn, clientTag); break;
     }
+  }
+  
+  
+  
+  /**
+   * Processes a DG_DUMMY_RESPONSE.
+   */
+  
+  private void processDummyResponseDG(Datagram dg, String clientTag){
+    processDummyResponse(clientTag);
+  }
+  
+  
+  
+  /**
+   * Invoked when a DG_DUMMY_RESPONSE arrives.
+   */
+  
+  protected void processDummyResponse(String clientTag){
+    if (END_OF_LOGIN_PROCEDURE_TAG.equals(clientTag))
+      isLoginProcedureEnded = true;
   }
   
   
@@ -2620,6 +2668,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * The client tag for when we set on DG_NOTIFY_ARRIVED on again.
+   */
+  
+  private static final String SYNTHETIC_DG_NOTIFY_ARRIVED_TAG = "SyntheticNotifyArrived";
+  
+  
+  
+  /**
    * The set (of <code>ChessclubUser</code>s) of friends.
    */
   
@@ -2658,7 +2714,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    */
   
   private Integer friendStateForCode(String code){
-    int state = 0;
+    int state = ONLINE_FRIEND_STATE_MASK;
     
     if (!"X".equals(code))
       state |= PLAYING_FRIEND_STATE_MASK;
@@ -2689,16 +2745,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   protected void processNotifyArrived(String clientTag, String username, String stateCode, int gameNumber){
     ChessclubUser user = ChessclubUser.get(username);
     
-    Integer newState = friendStateForCode(stateCode);
-    Integer existingState = (Integer)onlineFriendStates.put(user, newState);
+    Integer existingState = (Integer)onlineFriendStates.get(user);
     
-    if (existingState == null){ // Really arrived, not a repeat datagram
+    // Check whether really arrived, or just we're being told that he's online 
+    if ((existingState == null) && !SYNTHETIC_DG_NOTIFY_ARRIVED_TAG.equals(clientTag) && isLoginProcedureEnded){
+      Integer newState = friendStateForCode(stateCode);
+      onlineFriendStates.put(user, newState);
       listenerManager.fireFriendsEvent(
-          new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_CONNECTED, user, newState.intValue()));
+          new FriendsEvent(this, null, FriendsEvent.FRIEND_CONNECTED, user, newState.intValue()));
     }
-    else if (!existingState.equals(newState)){
+    else
       processNotifyState(clientTag, username, stateCode, gameNumber);
-    }
   }
   
   
@@ -2750,9 +2807,6 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     ServerUser user = ChessclubUser.get(username);
     Integer currentState = (Integer)onlineFriendStates.get(user);
     
-    if (currentState == null) // He isn't even known to be online. I guess this shouldn't happen
-      return;
-    
     Integer newState = friendStateForCode(stateCode);
     
     if (!newState.equals(currentState)){
@@ -2796,14 +2850,14 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             if (!friends.contains(u)){
               i.remove();
               listenerManager.fireFriendsEvent(
-                  new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_DISCONNECTED, u, 0));
+                  new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, user, 0));
             }
           }
         }
         else{
           onlineFriendStates.remove(user);
           listenerManager.fireFriendsEvent(
-              new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_DISCONNECTED, user, 0));
+              new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, user, 0));
         }
         
         listenerManager.fireFriendsEvent(
@@ -2817,7 +2871,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     //   due to other aliases.
     // * When a non-alias is removed, to find out whether he's still in the list
     //   due to an alias
-    setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED);
+    // The only case where we don't do it, is when we're just getting our
+    // notify list for the first time, during login.
+    if (!(isAdded && !isLoginProcedureEnded))
+      setDGOnAgain(Datagram.DG_NOTIFY_ARRIVED, SYNTHETIC_DG_NOTIFY_ARRIVED_TAG);
 //    setDGOnAgain(Datagram.DG_NOTIFY_STATE);
   }
   
