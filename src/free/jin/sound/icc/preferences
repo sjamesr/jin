@@ -34,17 +34,17 @@ text-pattern-2 = ^Notification: [-A-z]{2,15} \(with whom you have an adjourned g
 text-sound-2 = ding.au
 
 
-OnLogin = welcome-icc.au
-OnDisconnect = goodbye.au
+#OnLogin = welcome-icc.au
+#OnDisconnect = goodbye.au
 Move = move-icc.au
 Capture = capture-icc.au
 Castling = castle-icc.au
-Check = check.au
-Checkmate = checkmate.au
-DrawOffer = draw.au
-AbortOffer = abort.au
-AdjournOffer = adjourn.au
-TakebackOffer = takeback.au
+#Check = check.au
+#Checkmate = checkmate.au
+#DrawOffer = draw.au
+#AbortOffer = abort.au
+#AdjournOffer = adjourn.au
+#TakebackOffer = takeback.au
 IllegalMove = buzzer.au
 GameEnd = fitebell.au
 GameStart = fitebell.au

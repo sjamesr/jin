@@ -29,17 +29,17 @@ text-sound-2 = ding.au
 
 
 
-OnLogin = welcome-fics.au
-OnDisconnect = goodbye.au
+#OnLogin = welcome-fics.au
+#OnDisconnect = goodbye.au
 Move = move-fics.au
 Capture = capture-fics.au
 Castling = castle-fics.au
-Check = check.au
-Checkmate = checkmate.au
-DrawOffer = draw.au
-AbortOffer = abort.au
-AdjournOffer = adjourn.au
-TakebackOffer = takeback.au
+#Check = check.au
+#Checkmate = checkmate.au
+#DrawOffer = draw.au
+#AbortOffer = abort.au
+#AdjournOffer = adjourn.au
+#TakebackOffer = takeback.au
 IllegalMove = buzzer.au
 GameEnd = fitebell.au
 GameStart = fitebell.au
