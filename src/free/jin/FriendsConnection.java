@@ -42,10 +42,18 @@ public interface FriendsConnection extends Connection{
   
   
   /**
+   * The mask for specifying whether the friend is online.
+   */
+  
+  public static final int ONLINE_FRIEND_STATE_MASK = 1;
+  
+  
+  
+  /**
    * The mask for player state specifying that a logged in friend is playing.
    */
   
-  public static final int PLAYING_FRIEND_STATE_MASK = 1;
+  public static final int PLAYING_FRIEND_STATE_MASK = 2;
   
   
   
