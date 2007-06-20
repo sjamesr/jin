@@ -410,15 +410,24 @@ public class ChessclubConnection extends free.util.Connection{
    * not logged in yet.
    */
   
-  protected synchronized void setDGOnAgain(int dgNumber){
+  protected synchronized void setDGOnAgain(int dgNumber, String tag){
     if (!isDGOn(dgNumber))
       throw new IllegalStateException("Cannot set on again a datagram which is not on");
     if (!isLoggedIn())
       throw new IllegalStateException("Cannot set on again a datagram when not yet logged in");
     
-    sendCommand("set-2 " + dgNumber + " 1", false, true, null);
+    sendCommand("set-2 " + dgNumber + " 1", false, true, tag);
   }
   
+  
+  
+  /**
+   * Same as <code>setDGOnAgain</code>, but without the tag. 
+   */
+  
+  protected void setDGOnAgain(int dgNumber){
+    setDGOnAgain(dgNumber, null);
+  }
   
   
   
