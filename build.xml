@@ -520,14 +520,14 @@
 	
 	<!-- If the property buildingForMacOSX is set, does things required for Mac OS X -->
 	<target name="doMacOSXStuff" if="buildingForMacOSX">
-		<javac srcdir="resources/os-specific/macosx"
+		<javac srcdir="${res.dir}/os-specific/macosx"
 		       destdir="${classes.dir}"
 		       includes="free/jin/MacOSXSpecific.java"
 		       debug="${build.debug}"
 		       source="${build.target}"
 		       target="${build.target}">
 			<classpath>
-				<pathelement location="resources/os-specific/macosx/ui.jar"/>
+				<pathelement location="${res.dir}/os-specific/macosx/ui.jar"/>
 				<pathelement path="${classes.dir}"/>
 			</classpath>
 		</javac>
