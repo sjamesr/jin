@@ -359,7 +359,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * none exists.
    */
   
-  private Console getConsole(ConsoleDesignation designation){
+  public Console getConsole(ConsoleDesignation designation){
     for (int i = 0; i < consoles.size(); i++){
       Console console = (Console)consoles.get(i);
       if (console.getDesignation().equals(designation))
