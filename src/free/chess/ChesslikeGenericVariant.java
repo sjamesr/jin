@@ -55,7 +55,8 @@ public class ChesslikeGenericVariant implements WildVariant{
    * These are the pieces to which a white pawn can be promoted.
    */
   
-  private static final ChessPiece [] WHITE_PROMOTION_TARGETS = new ChessPiece[]{ChessPiece.WHITE_QUEEN, ChessPiece.WHITE_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT};
+  private static final ChessPiece [] WHITE_PROMOTION_TARGETS = 
+    new ChessPiece[]{ChessPiece.WHITE_QUEEN, ChessPiece.WHITE_ROOK, ChessPiece.WHITE_BISHOP, ChessPiece.WHITE_KNIGHT};
   
   
   
@@ -64,7 +65,8 @@ public class ChesslikeGenericVariant implements WildVariant{
    * These are the pieces to which a black pawn can be promoted.
    */
   
-  private static final ChessPiece [] BLACK_PROMOTION_TARGETS = new ChessPiece[]{ChessPiece.BLACK_QUEEN, ChessPiece.BLACK_ROOK, ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT};
+  private static final ChessPiece [] BLACK_PROMOTION_TARGETS = 
+    new ChessPiece[]{ChessPiece.BLACK_QUEEN, ChessPiece.BLACK_ROOK, ChessPiece.BLACK_BISHOP, ChessPiece.BLACK_KNIGHT};
   
   
   
@@ -150,7 +152,7 @@ public class ChesslikeGenericVariant implements WildVariant{
   public boolean isEnPassant(Position pos, Square startingSquare,
       Square endingSquare, ChessPiece promotionTarget){
     
-    if (promotionTarget!=null)
+    if (promotionTarget != null)
       return false;
     
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
@@ -336,13 +338,13 @@ public class ChesslikeGenericVariant implements WildVariant{
   public int getDoublePawnPushFile(Position pos, Square startingSquare, Square endingSquare){
     Piece piece = pos.getPieceAt(startingSquare);
     if (((piece == ChessPiece.WHITE_PAWN) && 
-        (startingSquare.getRank() == 1) && (endingSquare.getRank() == 3) &&
-        (startingSquare.getFile() == endingSquare.getFile()) &&
-        (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 2)) == null)) ||
+          (startingSquare.getRank() == 1) && (endingSquare.getRank() == 3) &&
+          (startingSquare.getFile() == endingSquare.getFile()) &&
+          (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 2)) == null)) ||
         ((piece == ChessPiece.BLACK_PAWN) &&
-            (startingSquare.getRank() == 6) && (endingSquare.getRank() == 4) &&
-            (startingSquare.getFile() == endingSquare.getFile()) &&
-            (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 5)) == null)))
+          (startingSquare.getRank() == 6) && (endingSquare.getRank() == 4) &&
+          (startingSquare.getFile() == endingSquare.getFile()) &&
+          (pos.getPieceAt(Square.getInstance(endingSquare.getFile(), 5)) == null)))
       return startingSquare.getFile();
     else
       return -1;
@@ -382,12 +384,11 @@ public class ChesslikeGenericVariant implements WildVariant{
   
   
   /**
-   * <P>If the a move created by the given starting square and ending square in
+   * If the a move created by the given starting square and ending square in
    * the given position is a promotion, returns an array containing a knight,
    * bishop, rook and queen of the color of the promoted pawn. Otherwise
    * returns null.
-   *
-   * <P>If you want to use this method from the implementation of some other
+   * If you want to use this method from the implementation of some other
    * wild variant, use the static
    * {@link #getChessPromotionTargets(Position, Square, Square)} method
    * instead - it doesn't check the wild variant of the position.
@@ -410,7 +411,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * and doesn't check the wild variant of the position. This method is useful
    * for other wild variants who have the same promotion targets and don't want
    * to rewrite the functionality. The only constraint is that the piece at the
-   * piece at the starting square has to be a ChessPiece.
+   * starting square has to be a ChessPiece.
    */
   
   public static Piece [] getChessPromotionTargets(Position pos, Square startingSquare, Square endingSquare){
@@ -747,7 +748,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * (king and knight).
    */
   
-  private Collection getJumpingTargetSquares(Position pos, Square square, int [][] offsets){
+  public static Collection getJumpingTargetSquares(Position pos, Square square, int [][] offsets){
     List targetSquares = new LinkedList();
     
     int file = square.getFile();
@@ -775,7 +776,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * (queen, rook, bishop).
    */
   
-  private Collection getSlidingTargetSquares(Position pos, Square square, int [][] directions){
+  public static Collection getSlidingTargetSquares(Position pos, Square square, int [][] directions){
     List targetSquares = new LinkedList();
     
     int file = square.getFile();
@@ -822,7 +823,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a king.
    */
   
-  private Collection getKingTargetSquares(Position pos, Square square){
+  protected Collection getKingTargetSquares(Position pos, Square square){
     Collection targetSquares = getJumpingTargetSquares(pos, square, KING_OFFSETS);
     
     // Attempt castling.
@@ -854,7 +855,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a queen.
    */
   
-  private Collection getQueenTargetSquares(Position pos, Square square){
+  protected Collection getQueenTargetSquares(Position pos, Square square){
     return getSlidingTargetSquares(pos, square, QUEEN_DIRECTIONS);
   }
   
@@ -876,7 +877,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a rook.
    */
   
-  private Collection getRookTargetSquares(Position pos, Square square){
+  protected Collection getRookTargetSquares(Position pos, Square square){
     return getSlidingTargetSquares(pos, square, ROOK_DIRECTIONS);
   }
   
@@ -898,7 +899,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a bishop.
    */
   
-  private Collection getBishopTargetSquares(Position pos, Square square){
+  protected Collection getBishopTargetSquares(Position pos, Square square){
     return getSlidingTargetSquares(pos, square, BISHOP_DIRECTIONS);
   }
   
@@ -922,7 +923,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a knight.
    */
   
-  private Collection getKnightTargetSquares(Position pos, Square square){
+  protected Collection getKnightTargetSquares(Position pos, Square square){
     return getJumpingTargetSquares(pos, square, KNIGHT_OFFSETS);
   }
   
@@ -932,7 +933,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns target squares for a pawn.
    */
   
-  private Collection getPawnTargetSquares(Position pos, Square square){
+  protected Collection getPawnTargetSquares(Position pos, Square square){
     List targetSquares = new LinkedList();
     
     int file = square.getFile();
