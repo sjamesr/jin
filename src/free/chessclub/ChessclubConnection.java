@@ -451,10 +451,11 @@ public class ChessclubConnection extends free.util.Connection{
   
   /**
    * Sets the style. If the ChessclubConnection is already logged in, then
-   * a "set-quietly style <style>" command is send immediately, otherwise, the setting
-   * is saved and sent immediately after logging in. If the <code>getEssentialStyle()</code>
-   * mehod returns a value different than 0 and different from the given style,
-   * this method will throw an IllegalAccessException.
+   * a "set-quietly style <style>" command is send immediately, otherwise,
+   * the setting is saved and sent immediately after logging in. If the 
+   * <code>getEssentialStyle()</code> method returns a nonzero value different
+   * from the specified style, this method will return <code>false</code>;
+   * otherwise, it returns <code>true</code>.
    */
   
   public final synchronized boolean setStyle(int style){
