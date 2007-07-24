@@ -36,6 +36,7 @@ import free.chess.variants.atomic.Atomic;
 import free.chess.variants.fischerrandom.FischerRandom;
 import free.chess.variants.giveaway.Giveaway;
 import free.chess.variants.kriegspiel.Kriegspiel;
+import free.chess.variants.shatranj.Shatranj;
 import free.chess.variants.shuffleboth.ShuffleBoth;
 import free.chessclub.ChessclubConnection;
 import free.chessclub.ChessclubConstants;
@@ -412,7 +413,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       case 27: // Atomic
         return Atomic.getInstance();
       case 28: // Shatranj
-        return null;
+        return Shatranj.getInstance();
 
 
      /*
@@ -511,7 +512,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Knight odds"),
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Rook odds"),
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Queen odds"),
-        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Rood odds a3"),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Rook odds a3"),
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "KBN vs K"),
         Kriegspiel.getInstance(),
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Loser's chess"),
@@ -523,7 +524,8 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
         new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Three checks"),
         Giveaway.getInstance(),
         Atomic.getInstance(),
-        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Random Wild") // This is bad, but there's nothing else to do
+        Shatranj.getInstance(),
+        new ChesslikeGenericVariant(Chess.INITIAL_POSITION_FEN, "Random Wild") //This is bad, but there's nothing else to do
       };
     }
     
