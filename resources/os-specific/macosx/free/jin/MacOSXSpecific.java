@@ -68,10 +68,21 @@ public class MacOSXSpecific{
    
   private static void registerApplicationListener(){
     Application.getApplication().addApplicationListener(new ApplicationAdapter(){
-      public void handleQuit(ApplicationEvent event){
-        event.setHandled(true);
-        Jin.getInstance().quit(false);
+      
+      public void handleQuit(ApplicationEvent evt){
+        evt.setHandled(true);
+        Jin jin = Jin.getInstance();
+        if (jin != null)
+          jin.quit(false);
       }
+      
+      public void handleAbout(ApplicationEvent evt){
+        evt.setHandled(true);
+        Jin jin = Jin.getInstance();
+        if (jin != null)
+          jin.showAboutDialog();
+      }
+      
     });
   }
   
