@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
+import free.jin.ui.AboutPanel;
 import free.jin.ui.OptionPanel;
 import free.jin.ui.UIProvider;
 import free.util.IOUtilities;
@@ -563,6 +564,16 @@ public class Jin{
    
   public boolean isUserExtensible(){
     return context.isUserExtensible();
+  }
+  
+  
+  
+  /**
+   * Causes the "About" dialog to be displayed.
+   */
+  
+  public void showAboutDialog(){
+    new AboutPanel().display();
   }
   
   
