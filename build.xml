@@ -197,12 +197,12 @@
 		
 		<!-- Copy libs -->
 		<copy todir="${libs.dir}">
-			<fileset dir="resources/libs" />
+			<fileset dir="${res.dir}/libs" />
 		</copy>
 		
 		<!-- Copy Look and Feels -->
 		<copy todir="${lnfs.dir}">
-			<fileset dir="resources/lnfs" />
+			<fileset dir="${res.dir}/lnfs" />
 		</copy>
 
 		<!-- Copy Java resources -->
