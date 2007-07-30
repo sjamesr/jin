@@ -37,6 +37,7 @@ import free.jin.ui.OptionPanel;
 import free.jin.ui.ServerChoicePanel;
 import free.util.EventListenerList;
 import free.util.TextUtilities;
+import free.util.swing.SwingUtils;
 
 
 /**
@@ -315,7 +316,7 @@ public class ConnectionManager{
       session = new Session(connDetails);
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_ESTABLISHED, session));
       
-      session.getConnection().getListenerManager().addConnectionListener(new ReconnectDialogPanel());
+      new ReconnectDialogPanel(session);
       
       session.initiateLogin();
     } catch (PluginStartException e){
@@ -512,6 +513,14 @@ public class ConnectionManager{
     
     
     /**
+     * The session we are used for.
+     */
+    
+    private final Session session;
+    
+    
+    
+    /**
      * Whether the connection actually ever logged in. If not, we don't show
      * ourselves.
      */
@@ -531,12 +540,39 @@ public class ConnectionManager{
     
     
     /**
-     * Creates a new <code>ReconnectDialogPanel</code>.
+     * Creates a new <code>ReconnectDialogPanel</code> for the specified
+     * session. The dialog will listen to session events and display itself when
+     * appropriate.
      */
     
-    public ReconnectDialogPanel(){
+    public ReconnectDialogPanel(Session session){
       super(I18n.get(ReconnectDialogPanel.class).getString("title"));
       
+      this.session = session;
+      
+      addSessionListener(new SessionListener(){
+        public void sessionClosing(SessionEvent evt){
+          removeSessionListener(this);
+          if (isShowing())
+            close(null);
+          else
+            sessionClosing = true;
+        }
+        public void sessionClosed(SessionEvent evt){}
+        public void sessionEstablished(SessionEvent session){}
+        public void sessionStarting(SessionEvent evt){}
+      });
+      
+      session.getConnection().getListenerManager().addConnectionListener(this);
+    }
+    
+    
+    
+    /**
+     * Creates the UI of this dialog.
+     */
+    
+    private void createUi(){
       setLayout(new BorderLayout(10, 10));
       
       I18n i18n = I18n.get(ReconnectDialogPanel.class);
@@ -557,26 +593,23 @@ public class ConnectionManager{
       });
       
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-      buttonPanel.add(reconnectButton);
       buttonPanel.add(quitButton);
+      buttonPanel.add(reconnectButton);
+      
+      setDefaultButton(reconnectButton);
+      
+      JComponent labelPanel = Box.createVerticalBox();
+      JLabel [] labels = SwingUtils.labelsForLines(i18n.getFormattedString("message",
+          new Object[]{session.getServer().getLongName(),
+                       session.getConnDetails().getUser().getUsername(),
+                       session.getConnDetails().getHost(),
+                       String.valueOf(session.getPort())}));
+      for (int i = 0; i < labels.length; i++)
+        labelPanel.add(labels[i]);
       
       add(BorderLayout.WEST, new JLabel(UIManager.getIcon("OptionPane.warningIcon")));
-      add(BorderLayout.CENTER, i18n.createLabel("label"));
+      add(BorderLayout.CENTER, labelPanel);
       add(BorderLayout.SOUTH, buttonPanel);
-      
-      
-      addSessionListener(new SessionListener(){
-        public void sessionClosing(SessionEvent evt){
-          removeSessionListener(this);
-          if (isShowing())
-            close(null);
-          else
-            sessionClosing = true;
-        }
-        public void sessionClosed(SessionEvent evt){}
-        public void sessionEstablished(SessionEvent session){}
-        public void sessionStarting(SessionEvent evt){}
-      });
     }
     
     
@@ -600,6 +633,11 @@ public class ConnectionManager{
     
     public void loginSucceeded(Connection conn){
       loggedIn = true;
+      
+      // We create the UI here and not in the constructor because to create
+      // the message we need the port on which we succeeded to log in, which
+      // is not known in the constructor.
+      createUi();
     }
     
     
@@ -610,7 +648,7 @@ public class ConnectionManager{
     
     public void connectionLost(Connection conn){
       if (loggedIn && !sessionClosing)
-        Jin.getInstance().getUIProvider().showDialog(new ReconnectDialogPanel(), null);
+        Jin.getInstance().getUIProvider().showDialog(this, null);
     }
     
     
