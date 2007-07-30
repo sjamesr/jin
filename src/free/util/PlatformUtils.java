@@ -157,15 +157,4 @@ public class PlatformUtils{
   
   
   
-  
-  /**
-   * Returns the string that should be used for an ellipsis. 
-   */
-  
-  public static String getEllipsis(){
-    return "\u2026";
-  }
-  
-  
-   
 }
