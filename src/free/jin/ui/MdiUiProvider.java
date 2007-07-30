@@ -409,7 +409,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       
       i18n.initAbstractButton(this, "connectionMenu");
 
-      add(newConnection = i18n.createMenuItemWithEllipsis("newConnectionMenuItem"));
+      add(newConnection = i18n.createMenuItem("newConnectionMenuItem"));
       add(closeConnection = i18n.createMenuItem("closeConnectionMenuItem"));
       separatorIndex = getItemCount();
 
