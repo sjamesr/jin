@@ -105,7 +105,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
     
     i18n.initAbstractButton(this, "this");
 
-    add(lnfMenu = i18n.createMenuItemWithEllipsis("userInterfaceMenuItem"));
+    add(lnfMenu = i18n.createMenuItem("userInterfaceMenuItem"));
     lnfMenu.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent evt){
         Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this); 
@@ -207,7 +207,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
       if (!plugin.hasPreferencesUI())
         continue;
 
-      JMenuItem menuItem = new JMenuItem(plugins[i].getName() + PlatformUtils.getEllipsis());
+      JMenuItem menuItem = I18n.get(PrefsMenu.class).createMenuItem("pluginPrefsMenuItem", new Object[]{plugin.getName()});
       menuItem.setActionCommand(String.valueOf(i));
       menuItem.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent evt){
