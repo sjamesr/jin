@@ -21,16 +21,29 @@
 
 package free.jin.console.prefs;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
-import free.util.swing.PreferredSizedPanel;
+import free.util.IOUtilities;
+import free.util.NamedWrapper;
+import free.util.TextUtilities;
+import free.util.swing.SwingUtils;
 
 
 
@@ -43,6 +56,45 @@ public class EncodingPrefsPanel extends PreferencesPanel{
   
   
   /**
+   * The category key for all the encodings.
+   */
+  
+  private static final String ALL_CATEGORY_KEY = "all";
+  
+  
+  
+  /**
+   * A map of i18n keys of charset "category" names to the list (expressed as a
+   * <code>ListModel</code>) of charsets in that category.
+   */
+  
+  private static final Map CHARSET_CATEGORIES = new TreeMap();
+  static{
+    try{
+      // The "all" category must be first.
+      CHARSET_CATEGORIES.put(ALL_CATEGORY_KEY, SwingUtils.collectionListModel(Charset.availableCharsets().values()));
+      
+      Properties props = IOUtilities.loadProperties(EncodingPrefsPanel.class.getResourceAsStream("charsets.properties"));
+      for (Iterator categories = props.entrySet().iterator(); categories.hasNext();){
+        Map.Entry entry = (Map.Entry)categories.next();
+        String categoryKey = (String)entry.getKey();
+        String [] aliases = TextUtilities.parseStringList((String)entry.getValue(), ", ");
+        DefaultListModel charsets = new DefaultListModel();
+        for (int i = 0; i < aliases.length; i++){
+          String alias = aliases[i];
+          if (Charset.isSupported(alias))
+            charsets.addElement(Charset.forName(aliases[i]));
+        }
+        CHARSET_CATEGORIES.put(categoryKey, charsets);
+      }
+    } catch (IOException e){
+        e.printStackTrace();
+    }
+  }
+  
+  
+  
+  /**
    * The console manager.
    */
   
@@ -51,10 +103,18 @@ public class EncodingPrefsPanel extends PreferencesPanel{
   
   
   /**
+   * The list of encoding categories.
+   */
+  
+  private final JList encodingCategories;
+  
+  
+  
+  /**
    * The list of encodings.
    */
   
-  private final JList encodingsList;
+  private final JList encodings;
   
   
   
@@ -64,14 +124,64 @@ public class EncodingPrefsPanel extends PreferencesPanel{
 
   public EncodingPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
-    
-    this.encodingsList = new JList(Charset.availableCharsets().values().toArray());
-    
-    encodingsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    encodingsList.addListSelectionListener(proxyListSelectionListener);
+    this.encodingCategories = makeEncodingCategoriesList();
+    this.encodings = makeEncodingsList();
     
     createUI();
+    
+    encodingCategories.addListSelectionListener(new ListSelectionListener(){
+      public void valueChanged(ListSelectionEvent e){
+        if (encodingCategories.getSelectedIndex() == -1)
+          return;
+        
+        String categoryKey = (String)((NamedWrapper)encodingCategories.getSelectedValue()).getTarget();
+        ListModel charsets = (ListModel)CHARSET_CATEGORIES.get(categoryKey);
+        encodings.setModel(charsets);
+      }
+    });
+    
+    encodingCategories.setSelectedIndex(0);
+    if (consoleManager.getEncoding() != null)
+      encodings.setSelectedValue(Charset.forName(consoleManager.getEncoding()), true);
+    else
+      encodings.clearSelection();
   }
+  
+  
+    
+  /**
+   * Creates the list of encoding categories.
+   */
+  
+  private JList makeEncodingCategoriesList(){
+    I18n i18n = I18n.get(EncodingPrefsPanel.class);
+    
+    DefaultListModel model = new DefaultListModel();
+    for (Iterator i = CHARSET_CATEGORIES.keySet().iterator(); i.hasNext();){
+      String categoryKey = (String)i.next();
+      model.addElement(new NamedWrapper(categoryKey, i18n.getString("encodingCategory." + categoryKey)));
+    }
+    
+    JList list = new JList(model);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    return list;
+  }
+  
+  
+  
+  /**
+   * Creates the list of encodings.
+   */
+  
+  private JList makeEncodingsList(){
+    JList list = new JList();
+    
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.addListSelectionListener(proxyListSelectionListener);
+    
+    return list;
+  }
+  
   
   
   
@@ -80,38 +190,61 @@ public class EncodingPrefsPanel extends PreferencesPanel{
    */
   
   private void createUI(){
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    I18n i18n = I18n.get(EncodingPrefsPanel.class);
     
-    encodingsList.setVisibleRowCount(10);
+    encodingCategories.setVisibleRowCount(10);
+    encodings.setVisibleRowCount(10);
     
-    JPanel panel = new PreferredSizedPanel();
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    JScrollPane encodingsScroller = new JScrollPane(encodings);
+    encodingsScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    encodingsScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     
-    JLabel encodingsLabel = I18n.get(EncodingPrefsPanel.class).createLabel("encodingsLabel");
+    JScrollPane encodingCategoriesScroller = new JScrollPane(encodingCategories);
+    encodingCategoriesScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    encodingCategoriesScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    
+    JLabel encodingCategoriesLabel = i18n.createLabel("encodingCategoriesLabel");
+    encodingCategoriesLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    encodingCategoriesLabel.setLabelFor(encodingCategories);
+    
+    JLabel encodingsLabel = i18n.createLabel("encodingsLabel");
     encodingsLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    encodingsLabel.setLabelFor(encodingsList);
+    encodingsLabel.setLabelFor(encodings);
     
-    panel.add(encodingsLabel);
+    GroupLayout layout = new GroupLayout(this);
+    setLayout(layout);
+    layout.setAutocreateContainerGaps(true);
     
-    panel.add(Box.createVerticalStrut(10));
-    
-    JScrollPane scroller = new JScrollPane(encodingsList);
-    scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    
-    if (consoleManager.getEncoding() != null)
-      encodingsList.setSelectedValue(Charset.forName(consoleManager.getEncoding()), true);
-    
-    panel.add(scroller);
-    
-    add(panel);
+    layout.setHorizontalGroup(layout.createSequentialGroup()
+      .add(layout.createParallelGroup(GroupLayout.LEADING)
+        .add(encodingCategoriesLabel)
+        .add(encodingCategoriesScroller)
+      )
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(layout.createParallelGroup(GroupLayout.LEADING)
+        .add(encodingsLabel)
+        .add(encodingsScroller)
+      )
+    );
+      
+    layout.setVerticalGroup(layout.createParallelGroup()
+      .add(layout.createSequentialGroup()
+        .add(encodingCategoriesLabel)
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(encodingCategoriesScroller)
+      )
+      .add(layout.createSequentialGroup()
+        .add(encodingsLabel)
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(encodingsScroller)
+      )
+    );
   }
   
   
 
   public void applyChanges() throws BadChangesException{
-    Charset selected = (Charset)encodingsList.getSelectedValue();
+    Charset selected = (Charset)encodings.getSelectedValue();
     
     try{
       consoleManager.setEncoding(selected.name());
