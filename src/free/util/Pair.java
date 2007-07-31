@@ -87,9 +87,7 @@ public final class Pair{
    */
 
   public int hashCode(){
-    int hash1 = (first == null ? 0 : first.hashCode());
-    int hash2 = (second == null ? 0 : second.hashCode());
-    return hash1^hash2;
+    return Utilities.hashCode(first, second);
   }
 
 
@@ -111,5 +109,7 @@ public final class Pair{
 
     return Utilities.areEqual(pair.first, first) && Utilities.areEqual(pair.second, second);
   }
-
+  
+  
+  
 }
