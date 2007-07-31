@@ -29,7 +29,7 @@ package free.util;
  * Swing container classes (<code>JTables</code> and such).
  */
 
-public class NamedWrapper extends AbstractNamed{
+public final class NamedWrapper extends AbstractNamed{
   
   
   
@@ -59,6 +59,32 @@ public class NamedWrapper extends AbstractNamed{
   
   public Object getTarget(){
     return target;
+  }
+  
+  
+  
+  /**
+   * A <code>NamedWrapper</code> is equal to another iff their names and targets
+   * are equal.
+   */
+  
+  public boolean equals(Object o){
+    if (!(o instanceof NamedWrapper))
+      return false;
+    
+    NamedWrapper other = (NamedWrapper)o;
+    return Utilities.areEqual(this.getName(), other.getName()) &&
+      Utilities.areEqual(this.getTarget(), other.getTarget());
+  }
+  
+  
+  
+  /**
+   * Returns the hash code of this object.
+   */
+  
+  public int hashCode(){
+    return Utilities.hashCode(getName(), getTarget());
   }
   
   
