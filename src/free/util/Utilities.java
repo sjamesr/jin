@@ -314,6 +314,18 @@ public class Utilities{
   
   
   /**
+   * Returns a hash code for the combination of the two specified objects.
+   */
+  
+  public static int hashCode(Object o1, Object o2){
+    int hash1 = (o1 == null ? 0 : o1.hashCode());
+    int hash2 = (o2 == null ? 0 : o2.hashCode());
+    return 37*hash1 + hash2;
+  }
+  
+  
+  
+  /**
    * Returns the name of the package of the specified class.
    */
   
