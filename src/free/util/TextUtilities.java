@@ -178,9 +178,24 @@ public class TextUtilities{
 
     return tokens;
   }
+  
+  
+  
+  /**
+   * Parses the specified list of strings delimited by the specified delimiters.
+   */
+  
+  public static String [] parseStringList(String text, String delimiters){
+    StringTokenizer tokenizer = new StringTokenizer(text, delimiters);
+    String [] tokens = new String[tokenizer.countTokens()];
+    for (int i = 0; i < tokens.length; i++)
+      tokens[i] = tokenizer.nextToken();
 
-
-
+    return tokens;
+  }
+  
+  
+  
   /**
    * Parses the specified list of integers delimited by the specified
    * delimiters.
