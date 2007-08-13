@@ -755,6 +755,11 @@ public class ChesslikeGenericVariant implements WildVariant{
     int rank = square.getRank();
     int color = pos.getPieceAt(square).getColor();
     
+    // Things get quite complicated when the moved piece does not belong to the
+    // player whose turn it currently is. In such a case, we simply allow all
+    // moves by the piece that would be possible on an empty board.
+    boolean isMyTurn = pos.getCurrentPlayer().getPieceColor() == color;
+    
     for (int i = 0; i < offsets.length; i++){
       int [] offset = offsets[i];
       Square targetSquare = Square.getInstanceNonStrict(file + offset[0], rank + offset[1]);
@@ -762,7 +767,7 @@ public class ChesslikeGenericVariant implements WildVariant{
         continue;
       
       Piece piece = pos.getPieceAt(targetSquare);
-      if ((piece == null) || (piece.getColor() != color))
+      if ((piece == null) || (piece.getColor() != color) || !isMyTurn)
         targetSquares.add(targetSquare);
     }
     
@@ -782,7 +787,12 @@ public class ChesslikeGenericVariant implements WildVariant{
     int file = square.getFile();
     int rank = square.getRank();
     int color = pos.getPieceAt(square).getColor();
-    
+
+    // Things get quite complicated when the moved piece does not belong to the
+    // player whose turn it currently is. In such a case, we simply allow all
+    // moves by the piece that would be possible on an empty board.
+    boolean isMyTurn = pos.getCurrentPlayer().getPieceColor() == color;
+
     for (int i = 0; i < directions.length; i++){
       int [] direction = directions[i];
       int fileDirection = direction[0];
@@ -791,10 +801,10 @@ public class ChesslikeGenericVariant implements WildVariant{
       Square targetSquare = Square.getInstanceNonStrict(file + fileDirection, rank + rankDirection);
       while (targetSquare != null){
         Piece piece = pos.getPieceAt(targetSquare);
-        if ((piece == null) || (piece.getColor() != color))
+        if ((piece == null) || (piece.getColor() != color) || !isMyTurn)
           targetSquares.add(targetSquare);
         
-        if (piece != null)
+        if ((piece != null) && isMyTurn)
           break;
         
         targetSquare = Square.getInstanceNonStrict(
@@ -939,8 +949,13 @@ public class ChesslikeGenericVariant implements WildVariant{
     int file = square.getFile();
     int rank = square.getRank();
     int color = pos.getPieceAt(square).getColor();
-    int rankMoveDirection = color == Piece.WHITE ? 1 : -1;
     
+    // Things get quite complicated when the moved piece does not belong to the
+    // player whose turn it currently is. In such a case, we simply allow all
+    // moves by the piece that would be possible on an empty board.
+    boolean isMyTurn = pos.getCurrentPlayer().getPieceColor() == color;
+    
+    int rankMoveDirection = color == Piece.WHITE ? 1 : -1;
     boolean isInitialRank = (rank == (7 + rankMoveDirection) % 7);
     boolean isEnPassantRank = (rank == (7 + 4*rankMoveDirection) % 7); 
     
@@ -948,13 +963,13 @@ public class ChesslikeGenericVariant implements WildVariant{
     
     // Move forward
     targetSquare = Square.getInstanceNonStrict(file, rank + rankMoveDirection);
-    if ((targetSquare != null) && (pos.getPieceAt(targetSquare) == null)){
+    if (((targetSquare != null) && (pos.getPieceAt(targetSquare) == null)) || !isMyTurn){
       targetSquares.add(targetSquare);
       
       // Double pawn push
       if (isInitialRank){
         targetSquare = Square.getInstance(file, rank + 2*rankMoveDirection);
-        if (pos.getPieceAt(targetSquare) == null)
+        if ((pos.getPieceAt(targetSquare) == null) || !isMyTurn)
           targetSquares.add(targetSquare);
       }
     }
@@ -966,7 +981,7 @@ public class ChesslikeGenericVariant implements WildVariant{
       targetSquare = Square.getInstanceNonStrict(file + fileMoveDirection, rank + rankMoveDirection);
       if (targetSquare != null){
         Piece targetPiece = pos.getPieceAt(targetSquare);
-        if ((targetPiece != null) && (targetPiece.getColor() != color))
+        if (((targetPiece != null) && (targetPiece.getColor() != color)) || !isMyTurn)
           targetSquares.add(targetSquare);
         else if (isEnPassantRank && isEnPassant(pos, square, targetSquare, null))
           targetSquares.add(targetSquare);
