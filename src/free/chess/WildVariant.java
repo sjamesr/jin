@@ -162,7 +162,8 @@ public interface WildVariant{
    * Returns the squares to which the piece at the specified square may move.
    * The set is not guaranteed to contain only legal moves, but it is guaranteed
    * that every legal move by the piece has one of the squares as the target
-   * square.
+   * square. When implementing, keep in mind the case where the moving piece is
+   * not of the same color as the player to move (premove or predrag modes).
    */
   
   Collection getTargetSquares(Position position, Square square);
