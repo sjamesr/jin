@@ -28,63 +28,71 @@ package free.chess;
  */
 
 public class Player{
-
-
+  
+  
   /**
    * A constant for the white player.
    */
-
+  
   public static final Player WHITE_PLAYER = new Player();
-
-
-
-
+  
+  
+  
+  
   /**
    * A constant for the black player.
    */
-
+  
   public static final Player BLACK_PLAYER = new Player();
-
-
-
-
+  
+  
+  
+  
   /**
    * Do not allow others to instantiate this class.
    */
-
+  
   private Player(){}
-
-
-
-
+  
+  
+  
   /**
-   * Returns true if this player is the player with the White pieces,
-   * false otherwise.
+   * Returns the color of the pieces this player plays with - either
+   * {@link Piece#WHITE} or {@link Piece#BLACK}.
+   */
+  
+  public int getPieceColor(){
+    return isWhite() ? Piece.WHITE : Piece.BLACK;
+  }
+  
+  
+  
+  /**
+   * Returns whether this player is the player with the white pieces.
    */
   
   public boolean isWhite(){
-    return (this==WHITE_PLAYER);
+    return (this == WHITE_PLAYER);
   }
-
-
-
-
+  
+  
+  
+  
   /**
-   * Returns true if this player is the player with the Black pieces,
-   * false otherwise.
+   * Returns whether this player is the player with the black pieces.
    */
-
+  
   public boolean isBlack(){
-    return (this==BLACK_PLAYER);
+    return (this == BLACK_PLAYER);
   }
-
-
-
-
+  
+  
+  
+  
   /**
    * Returns the opponent of this player. 
    */
-
+  
   public Player getOpponent(){
     if (this.isWhite())
       return BLACK_PLAYER;
@@ -92,20 +100,21 @@ public class Player{
       return WHITE_PLAYER;
   }
   
-
-
-
-
+  
+  
+  
   /**
    * Returns "White" for the player with the white pieces and "Black" for the
    * player with the black pieces.
    */
-
+  
   public String toString(){
     if (this==WHITE_PLAYER)
       return "White";
     else
       return "Black";
   }
-
+  
+  
+  
 }
