@@ -512,7 +512,6 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    */
 
   public void friendConnected(FriendsEvent evt){
-    System.out.println("FRIEND CONNECTED");
     playEventSound("FriendConnected");
   }
   
