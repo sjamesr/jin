@@ -1684,7 +1684,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         if (!checkLegality(realPosition, premove))
           premove = null;
       } catch (IllegalArgumentException e){}
-      if (premove == null){ // Illegal premove
+      if (premove == null){ // Illegal premove - abort it
         isBoardPositionUpdating = true;
         board.getPosition().copyFrom(realPosition);
         isBoardPositionUpdating = false;
@@ -1693,10 +1693,17 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       }
       else{
         UserMoveEvent evt2 = new UserMoveEvent(this, premove);
+        
         isBoardPositionUpdating = true;
-        board.getPosition().copyFrom(realPosition);
-        board.getPosition().makeMove(premove);
+        Position helpPos = new Position(realPosition);
+        helpPos.makeMove(premove);
+        board.getPosition().copyFrom(helpPos);
+        // We do the above instead of the below because if move animation is on,
+        // the code below causes the premove to be "replayed" with animation.
+        //board.getPosition().copyFrom(realPosition);
+        //board.getPosition().makeMove(premove);
         isBoardPositionUpdating = false;
+        
         moveEnRoute = premove;
         setQueuedMove(null);
         fireUserMadeMove(evt2);
