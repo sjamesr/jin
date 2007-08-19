@@ -505,7 +505,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
     JButton button = i18n.createButton(i18nKey);
     button.addActionListener(this);
     button.setDefaultCapable(false);
-    button.setRequestFocusEnabled(false);
+    button.setFocusable(false);
     
     return button;
   }
