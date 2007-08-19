@@ -25,7 +25,7 @@ import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.ServerUser;
-import free.jin.console.SystemConsoleDesignation;
+import free.jin.console.ics.ICSSystemConsoleDesignation;
 import free.jin.event.ChatEvent;
 
 
@@ -34,7 +34,7 @@ import free.jin.event.ChatEvent;
  * The FICS-specific system console designation. 
  */
 
-public class FreechessSystemConsoleDesignation extends SystemConsoleDesignation{
+public class FreechessSystemConsoleDesignation extends ICSSystemConsoleDesignation{
   
   
   
