@@ -114,7 +114,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Returns whether the specified chat event is a personal tell to the user.
    */
   
-  private boolean isPersonalTell(ChatEvent evt){
+  protected boolean isPersonalTell(ChatEvent evt){
     return (evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY);
   }
   
