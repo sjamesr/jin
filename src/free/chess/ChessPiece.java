@@ -105,11 +105,12 @@ public class ChessPiece extends Piece{
 
 
   /**
-   * Creates a ChessPiece of the given color and type.
-   * Possible values for both type and color are defined in this class.
+   * Creates a ChessPiece of the given color and type. 
    * 
-   * @param color The color of the piece, either Piece.WHITE or Piece.BLACK
-   * @param type The type of the piece (Piece.KNIGHT, Piece.BISHOP etc.)
+   * @param color The color of the piece - either {@link Piece#WHITE} or 
+   * {@link Piece#BLACK}.
+   * @param type The type of the piece - one of {@link #PAWN}, {@link #KNIGHT},
+   * {@link #BISHOP}, {@link #ROOK}, {@link #QUEEN} or {@link #KING}.
    */
 
   private ChessPiece(int color, int type){
@@ -120,8 +121,9 @@ public class ChessPiece extends Piece{
 
 
   /**
-   * Returns the ChessPiece corresponding to the given string. The string is expected
-   * to be in the format returned by the {@link #toShortString()} method.
+   * Returns the ChessPiece corresponding to the given string. The string is
+   * expected to be in the format returned by the {@link #toShortColorString()}
+   * method.
    */
 
   public static ChessPiece fromShortString(String piece){
