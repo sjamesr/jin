@@ -1,3 +1,14 @@
+<!--
+	
+	This is the Jin Ant buildfile. The main tasks you should use are build
+	(which is also the default task) and clean. The build task creates a
+	build/ directory with a runnable version of Jin in. The ant task cleans up.
+	
+	To use this buildfile, you need a recent version of Java, Apache Ant
+	and Ant's optional tasks (specifically, the native2ascii task).  
+	
+-->
+
 <project name="Jin" default="build">
 
 	<path id="compile.class.path">
@@ -157,7 +168,7 @@
 		<echo message="Compiler: ${build.compiler}" />
 		<javac srcdir="${source.dir}"
 		       destdir="${classes.dir}"
-		       includes="**"
+		       includes="**/*.java"
 			   debug="${build.debug}"
 		       classpathref="compile.class.path"
 		       source="${build.target}"
