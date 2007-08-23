@@ -61,8 +61,8 @@ public class Square{
    */
   
   private Square(int file, int rank){
-    this.file = (byte)file;
-    this.rank = (byte)rank;
+    this.file = file;
+    this.rank = rank;
   }
   
   
