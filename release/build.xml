@@ -400,11 +400,13 @@
 			<param name="resource.type" value="pieces" />
 			<param name="resource.names" value="${pieces}" />
 		</antcall>
-    
+    	
+		<dirname property="dir-to-tar-parent" file="${dir-to-tar}" />
+		<basename property="dir-to-tar-basename" file="${dir-to-tar}" />
 		<property name="tar" value="${release.applet.dir}/${app.id}-applet-${app.version}-${server.id}.tar" />
 		<property name="gz" value="${tar}.gz" />
 		<tar destfile="${tar}">
-			<tarfileset dir="${dir-to-tar}"/>
+			<tarfileset dir="${dir-to-tar-parent}" includes="${dir-to-tar-basename}/**" />
 		</tar>
     
 		<gzip src="${tar}" zipfile="${gz}" />
