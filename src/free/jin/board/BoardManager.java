@@ -31,12 +31,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import free.chess.BoardPainter;
 import free.chess.ColoredBoardPainter;
@@ -181,6 +176,22 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   
+  /**
+   * The "Change Board" action. 
+   */
+  
+  private JinAction changeBoardAction;
+  
+  
+  
+  /**
+   * The "Change Pieces" action.
+   */
+  
+  private JinAction changePiecesAction;
+  
+  
+  
   
   /**
    * Starts this plugin.
@@ -190,8 +201,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     obtainSoundManager();
     initPreferences();
     registerConnListeners();
-    exportAction(new ChangeBoardAction());
-    exportAction(new ChangePieceSetAction());
+    exportActions();
   }
   
   
@@ -1054,7 +1064,25 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     listenerManager.removeGameListener(this);
     listenerManager.removeConnectionListener(this);
-  } 
+  }
+  
+  
+  
+  /**
+   * Creates and export out actions.
+   */
+  
+  private void exportActions(){
+    this.changeBoardAction = new ChangeBoardAction();
+    this.changePiecesAction = new ChangePieceSetAction();
+    
+    // Only enabled when a board is visible.
+    changeBoardAction.setEnabled(false);
+    changePiecesAction.setEnabled(false);
+    
+    exportAction(changeBoardAction);
+    exportAction(changePiecesAction);
+  }
   
   
   
@@ -1208,6 +1236,20 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   
+  /**
+   * Closes the specified board container.
+   */
+  
+  private void closeBoardContainer(PluginUIContainer boardContainer){
+    boardContainer.setVisible(false);
+    BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.remove(boardContainer);
+    boardPanelsToContainers.remove(boardPanel);
+    
+    boardPanel.done();
+  }
+  
+  
+  
   /*
    * GameListener implementation.
    */
@@ -1346,6 +1388,28 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   /**
+   * Invoked when the last of our boards has been hidden.
+   */
+  
+  private void lastBoardBecameInvisible(){
+    changeBoardAction.setEnabled(false);
+    changePiecesAction.setEnabled(false);
+  }
+  
+  
+  
+  /**
+   * Invoked when a single board container becomes visible.
+   */
+  
+  private void firstBoardBecameVisible(){
+    changeBoardAction.setEnabled(true);
+    changePiecesAction.setEnabled(true);
+  }
+  
+  
+  
+  /**
    * PluginUIListener implementation. Handles proper closing of the frame.
    */
   
@@ -1362,25 +1426,49 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
       
       if (result == OptionPanel.OK){
         getConn().quitGame(game);
-        boardContainer.setVisible(false);
+        closeBoardContainer(boardContainer);
       }
     }
     else
-      boardContainer.setVisible(false);
+      closeBoardContainer(boardContainer);
   }
   
   
   
   /**
-   * Performs any necessary cleanup.
+   * Returns the number of visible board containers.
+   */
+  
+  private int getVisibleBoardContainers(){
+    int count = 0;
+    for (Iterator i = containersToBoardPanels.keySet().iterator(); i.hasNext();){
+      PluginUIContainer boardContainer = (PluginUIContainer)i.next();
+      if (boardContainer.isVisible())
+        count++;
+    }
+    return count;
+  }
+  
+  
+  
+  /**
+   * Invoked when one of our plugin UIs has been hidden.
    */
   
   public void pluginUIHidden(PluginUIEvent evt){
-    PluginUIContainer boardContainer = evt.getPluginUIContainer();
-    BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.remove(boardContainer);
-    boardPanelsToContainers.remove(boardPanel);
-    
-    boardPanel.done();  
+    if (getVisibleBoardContainers() == 0)
+      lastBoardBecameInvisible();
+  }
+  
+  
+  
+  /**
+   * Invoked when one of our plugin UIs has been shown.
+   */
+  
+  public void pluginUIShown(PluginUIEvent evt){
+    if (getVisibleBoardContainers() == 1)
+      firstBoardBecameVisible();
   }
   
   
@@ -1389,7 +1477,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * PluginUIListener implementation.
    */
   
-  public void pluginUIShown(PluginUIEvent evt){}
   public void pluginUIActivated(PluginUIEvent evt){}
   public void pluginUIDeactivated(PluginUIEvent evt){}
   public void pluginUIDisposed(PluginUIEvent evt){}
