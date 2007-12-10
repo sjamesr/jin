@@ -33,10 +33,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
-import free.util.AWTUtilities;
-import free.util.Localization;
-import free.util.Pair;
-import free.util.Utilities;
+import free.util.*;
 import free.util.swing.ColorChooser;
 import free.util.swing.PlainTextDialog;
 import free.util.swing.SwingUtils;
@@ -60,7 +57,15 @@ public class I18n{
    * A cache of <code>I18n</code> objects.
    */
   
-  private static final Map cache = new HashMap(); 
+  private static final Map cache = new HashMap();
+  
+  
+  
+  /**
+   * The name of the OS we're running under.
+   */
+  
+  private static final String osName = PlatformUtils.getOSName();
   
   
   
@@ -185,13 +190,20 @@ public class I18n{
   
   public String getString(String key, String defaultValue){
     String result = null;
-    if (localization != null)
+    if (localization != null){
+      if (osName != null)
+        result = localization.getString(key + "." + osName);
+      
+      if (result != null)
+        return result;
+      
       result = localization.getString(key);
+    }
     
     if (result != null)
       return result;
-    else
-      return parent == null ? defaultValue : parent.getString(key, defaultValue);
+    
+    return parent == null ? defaultValue : parent.getString(key, defaultValue);
   }
   
   
