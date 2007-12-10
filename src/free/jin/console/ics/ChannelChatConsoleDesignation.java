@@ -30,7 +30,7 @@ import free.jin.event.ChatEvent;
 
 
 /**
- * A "general chat" console designation which displays a specified channel.
+ * A chat console designation which displays a specified channel.
  */
 
 public class ChannelChatConsoleDesignation extends ChatConsoleDesignation{
@@ -50,13 +50,13 @@ public class ChannelChatConsoleDesignation extends ChatConsoleDesignation{
    * 
    * @param connection The connection to the server.
    * @param channel The channel number.
+   * @param name The channel/console name.
    * @param encoding The encoding to use for encoding/decoding messages.
    * @param isConsoleCloseable Whether the console should be closeable. 
    */
   
-  public ChannelChatConsoleDesignation(Connection connection, int channel, String encoding, boolean isConsoleCloseable){
-    super(connection, I18n.get(ChannelChatConsoleDesignation.class).getString("name"),
-        encoding, isConsoleCloseable);
+  public ChannelChatConsoleDesignation(Connection connection, int channel, String name, String encoding, boolean isConsoleCloseable){
+    super(connection, name, encoding, isConsoleCloseable);
     
     this.channel = channel;
     
