@@ -66,8 +66,10 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    if (getUser().getServer().getId().equals("wcl"))
-      return new ChannelChatConsoleDesignation(getConn(), 250, getEncoding(), isCloseable);
+    if (getUser().getServer().getId().equals("wcl")){
+      String lobbyChannelName = getI18n().getString("wclLobbyChannelName");
+      return new ChannelChatConsoleDesignation(getConn(), 250, lobbyChannelName, getEncoding(), isCloseable);
+    }
     else
       return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
