@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import free.jin.Preferences;
 import free.jin.action.JinAction;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIAdapter;
@@ -58,10 +59,20 @@ public class ActionsPlugin extends Plugin{
   
   
   /**
-   * The order of actions - a list of their IDs.
+   * The order of actions - a list of their IDs; <code>null</code> if the order
+   * doesn't matter.
    */
   
   private List actionsOrder;
+  
+  
+  
+  /**
+   * The actions to include - a list of their IDs; <code>null</code> if to
+   * include everything. 
+   */
+  
+  private List actionsIncludeFilter;
   
   
   
@@ -100,11 +111,19 @@ public class ActionsPlugin extends Plugin{
    */
    
   public void start(){
-    String actionsOrderPref = getPrefs().getString("order", null);
+    Preferences prefs = getPrefs();
+    
+    String actionsOrderPref = prefs.getString("order", null);
     if (actionsOrderPref != null)
       actionsOrder = Arrays.asList(TextUtilities.getTokens(actionsOrderPref, " "));
     else
       actionsOrder = null;
+    
+    String actionsIncludePref = prefs.getString("filter.include", null);
+    if (actionsIncludePref != null)
+      actionsIncludeFilter = Arrays.asList(TextUtilities.getTokens(actionsIncludePref, " "));
+    else
+      actionsIncludeFilter = null;
     
     buttonContainer = createButtonContainer();
     buttonContainer.addPluginUIListener(new PluginUIAdapter(){
@@ -145,19 +164,49 @@ public class ActionsPlugin extends Plugin{
   
   
   /**
-   * Sorts the specified actions according to our "order" property and returns
-   * the resulting list.
+   * Creates a <code>List</code> from the specified <code>ListModel</code>.
    */
   
-  private List sort(ListModel model){
+  private List makeList(ListModel model){
     List list = new ArrayList(model.getSize());
     for (int i = 0; i < model.getSize(); i++)
       list.add(model.getElementAt(i));
-
-    if (actionsOrder == null)
-      return list;
+    return list;
+  }
+  
+  
+  
+  /**
+   * Filters the specified list of actions according to our filter setting and
+   * returns the resulting list.
+   */
+  
+  private List filter(List actions){
+    if (actionsIncludeFilter == null)
+      return actions;
     
-    Collections.sort(list, new Comparator(){
+    List filteredActions = new LinkedList();
+    for (Iterator i = actions.iterator(); i.hasNext();){
+      JinAction action = (JinAction)i.next();
+      if (actionsIncludeFilter.contains(action.getId()))
+        filteredActions.add(action);
+    }
+    
+    return filteredActions;
+  }
+  
+  
+  
+  /**
+   * Sorts the specified actions according to our "order" setting and returns
+   * the resulting list.
+   */
+  
+  private List sort(List actions){
+    if (actionsOrder == null)
+      return actions;
+    
+    Collections.sort(actions, new Comparator(){
       public int compare(Object arg0, Object arg1){
         JinAction action1 = (JinAction)arg0;
         JinAction action2 = (JinAction)arg1;
@@ -177,7 +226,7 @@ public class ActionsPlugin extends Plugin{
       }
     });
     
-    return list;
+    return actions;
   }
   
   
@@ -187,11 +236,11 @@ public class ActionsPlugin extends Plugin{
    */
    
   private void updateActionButtons(){
-    ListModel actions = getActions();
-    List sortedActions = sort(actions);
+    ListModel actionsListModel = getActions();
+    List actionsList = sort(filter(makeList(actionsListModel)));
     
     JComponent content = new JPanel(new TableLayout(1, 17, 17));
-    for (Iterator i = sortedActions.iterator(); i.hasNext();){
+    for (Iterator i = actionsList.iterator(); i.hasNext();){
       JinAction action = (JinAction)i.next();
       
       JButton button = new IconButton(action);
