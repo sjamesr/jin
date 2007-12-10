@@ -496,7 +496,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     
     /**
-     * Returns the id of this action.
+     * Returns the id of this action - "findgame".
      */
       
     public String getId(){
