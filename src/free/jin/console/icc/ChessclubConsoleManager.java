@@ -21,6 +21,7 @@
 
 package free.jin.console.icc;
 
+import free.jin.Connection;
 import free.jin.Game;
 import free.jin.ServerUser;
 import free.jin.console.Console;
@@ -153,6 +154,20 @@ public class ChessclubConsoleManager extends ConsoleManager{
     while ((index = message.indexOf("\\b")) != -1)
       message = message.substring(0, index) + message.substring(index + 2);
     return forum + ">" + message;
+  }
+  
+  
+  
+  /**
+   * ICC no longer allows users to do almost anything, so we conveniently
+   * display the help channel for guest users on-login.
+   */
+  
+  public void loginSucceeded(Connection conn){
+    super.loginSucceeded(conn);
+    
+    if (getUser().isGuest())
+      activateHelpConsole();
   }
   
   
