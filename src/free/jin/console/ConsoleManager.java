@@ -456,6 +456,33 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * Adds a closeable console for getting help on the server. If such a console
+   * already exists, it is merely activated.
+   */
+  
+  public void activateHelpConsole(){
+    Console helpConsole = null;
+    
+    if (helpConsoleDesignation == null)
+      helpConsoleDesignation = createHelpConsoleDesignation(true);
+    else
+      helpConsole = getConsole(helpConsoleDesignation);
+    
+    if (helpConsole == null){
+      addConsole(helpConsoleDesignation, true);
+      helpConsole = getConsole(helpConsoleDesignation);
+    }
+    else{
+      makeConsoleSelected(helpConsole);
+      makeActive();
+    }
+    
+    helpConsole.flashInputField();
+  }
+  
+  
+  
+  /**
    * Removes the specified console.
    */
   
@@ -868,23 +895,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
      */
     
     public void actionPerformed(ActionEvent e){
-      Console helpConsole = null;
-      
-      if (helpConsoleDesignation == null)
-        helpConsoleDesignation = createHelpConsoleDesignation(true);
-      else
-        helpConsole = getConsole(helpConsoleDesignation);
-      
-      if (helpConsole == null){
-        addConsole(helpConsoleDesignation, true);
-        helpConsole = getConsole(helpConsoleDesignation);
-      }
-      else{
-        makeConsoleSelected(helpConsole);
-        makeActive();
-      }
-      
-      helpConsole.flashInputField();
+      activateHelpConsole();
     }
     
     
