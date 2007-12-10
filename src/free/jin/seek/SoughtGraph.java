@@ -302,7 +302,7 @@ public class SoughtGraph extends JComponent{
     
     final int vRelatedGap = 3;
     final int vUnrelatedGap = 10;
-    final int hRelatedGap = 5;
+    final int hRelatedGap = 10;
     final int border = 5;
     final int indent = 15;
     
@@ -315,36 +315,30 @@ public class SoughtGraph extends JComponent{
     Icon unratedIcon = new ImageIcon(imageLoader.getResource(imageDir + "unrated.png"));
     
     // Normal/Wild
-    JPanel chessTypePanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
+    JPanel chessTypePanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     chessTypePanel.setOpaque(false);
     chessTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     chessTypePanel.add(new JLabel(normalIcon));
-    chessTypePanel.add(new JLabel("-"));
     chessTypePanel.add(i18n.createLabel("normalChessLabel"));
     chessTypePanel.add(new JLabel(wildIcon));
-    chessTypePanel.add(new JLabel("-"));
     chessTypePanel.add(i18n.createLabel("wildChessLabel"));
     
     // Human/Computer
-    JPanel opponentTypePanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
+    JPanel opponentTypePanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     opponentTypePanel.setOpaque(false);
     opponentTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     opponentTypePanel.add(new JLabel(humanIcon));
-    opponentTypePanel.add(new JLabel("-"));
     opponentTypePanel.add(i18n.createLabel("humanLabel"));
     opponentTypePanel.add(new JLabel(computerIcon));
-    opponentTypePanel.add(new JLabel("-"));
     opponentTypePanel.add(i18n.createLabel("computerLabel"));
     
     // Rated/Unrated row
-    JPanel ratednessPanel = new JPanel(new TableLayout(3, hRelatedGap, 0));
+    JPanel ratednessPanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     ratednessPanel.setOpaque(false);
     ratednessPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
     ratednessPanel.add(new JLabel(ratedIcon));
-    ratednessPanel.add(new JLabel("-"));
     ratednessPanel.add(i18n.createLabel("ratedLabel"));
     ratednessPanel.add(new JLabel(unratedIcon));
-    ratednessPanel.add(new JLabel("-"));
     ratednessPanel.add(i18n.createLabel("unratedLabel"));
     
     // Title labels
