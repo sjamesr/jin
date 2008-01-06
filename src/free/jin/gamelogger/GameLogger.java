@@ -764,18 +764,6 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
 
 
   /**
-   * Returns the plugin name.
-   */
-
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-
-
-
-
-
-  /**
    * A small class bundling information about a game.
    */
 

@@ -468,16 +468,6 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
-   * Returns the name of this plugin.
-   */
-
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-  
-  
-  
-  /**
    * An action which displays/hides our UI.
    */
   

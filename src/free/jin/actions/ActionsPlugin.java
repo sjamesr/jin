@@ -87,16 +87,6 @@ public class ActionsPlugin extends Plugin{
 
   
   /**
-   * Returns the name of this plugin.
-   */
-  
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-  
-  
-  
-  /**
    * Returns the id of this plugin - "actions".
    */
    

@@ -840,16 +840,6 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
 
   /**
-   * Returns the name of the plugin.
-   */
-
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-
-
-
-  /**
    * Overrides <code>hasPreverencesUI</code> to return whether the plugin
    * will display a preferences UI (the setting is taken from the
    * <pre>"preferences.show"</pre> property.

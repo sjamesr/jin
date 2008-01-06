@@ -317,10 +317,13 @@ public abstract class Plugin{
 
   /**
    * Returns the plugin's name. This should be something descriptive that can
-   * be shown to the user.
+   * be shown to the user. The default implementation returns
+   * <code>getI18n().getString("pluginName")</code>.
    */
 
-  public abstract String getName();
+  public String getName(){
+    return getI18n().getString("pluginName");
+  }
 
 
   

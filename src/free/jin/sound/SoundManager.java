@@ -545,16 +545,6 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
 
   /**
-   * Returns the name of this plugin.
-   */
-
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-
-
-
-  /**
    * Returns the string "sound".
    */
 

@@ -562,16 +562,6 @@ public class Scripter extends Plugin{
 
 
   /**
-   * Returns the plugin name.
-   */
-
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-
-
-
-  /**
    * An abstract base class for classes responsible for supporting scripting for
    * a certain event type. It allows registering and unregistering scripts and
    * testing whether the event type is supported by a specified

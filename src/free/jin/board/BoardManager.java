@@ -1603,16 +1603,6 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
   
   
   /**
-   * Returns the plugin name.
-   */
-  
-  public String getName(){
-    return getI18n().getString("pluginName");
-  }
-  
-  
-  
-  /**
    * An action which changes the board pattern.
    */
   
