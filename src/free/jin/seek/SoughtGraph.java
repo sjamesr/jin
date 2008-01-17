@@ -40,6 +40,7 @@ import free.jin.ServerUser;
 import free.jin.plugin.Plugin;
 import free.jin.seek.event.SeekSelectionEvent;
 import free.jin.seek.event.SeekSelectionListener;
+import free.jin.ui.InfoButton;
 import free.util.ImageUtilities;
 import free.util.TableLayout;
 import free.util.swing.WrapLayout;
@@ -268,17 +269,7 @@ public class SoughtGraph extends JComponent{
   private void createUI(){
     setLayout(new FlowLayout(FlowLayout.RIGHT));
     
-    Icon legendButtonIcon = new ImageIcon(SoughtGraph.class.getResource("legend.png"));
-    final JButton legendButton = new JButton(legendButtonIcon);
-    
-    legendButton.setFocusable(false);
-    legendButton.setMargin(new Insets(0, 0, 0, 0));
-    
-    // setMargin isn't enough for Ocean or Windows L&Fs
-    Dimension legendButtonSize = new Dimension(legendButtonIcon.getIconWidth() + 4, legendButtonIcon.getIconHeight() + 4);
-    legendButton.setMinimumSize(legendButtonSize);
-    legendButton.setPreferredSize(legendButtonSize);
-    legendButton.setMaximumSize(legendButtonSize);
+    final JButton legendButton = new InfoButton();
     
     legendButton.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
