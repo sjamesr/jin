@@ -57,6 +57,14 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   /**
+   * The ID of this plugin.
+   */
+  
+  public static final String PLUGIN_ID = "seek";
+  
+  
+  
+  /**
    * The panel for issuing seeks.
    */
   
@@ -458,11 +466,11 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
 
 
   /**
-   * Returns the string <code>"seek"</code>.
+   * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
    */
 
   public String getId(){
-    return "seek";
+    return PLUGIN_ID;
   }
 
 

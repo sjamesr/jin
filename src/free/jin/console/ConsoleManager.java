@@ -83,6 +83,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * The id of this plugin.
+   */
+  
+  public static final String PLUGIN_ID = "console"; 
+  
+  
+  
+  /**
    * The constant specifying "embedded" game lists display style.
    */
   
@@ -830,11 +838,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
 
   /**
-   * Returns the string <code>"console"</code>.
+   * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
    */
 
   public String getId(){
-    return "console";
+    return PLUGIN_ID;
   }
 
 
