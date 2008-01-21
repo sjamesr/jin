@@ -3958,6 +3958,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   
   
   /**
+   * Returns the set of current ICC chess events.
+   */
+  
+  public Set getChessEvents(){
+    return Collections.unmodifiableSet(new HashSet(chessEvents.values()));
+  }
+  
+  
+  
+  /**
    * The pending match offers. Maps a pair of (challenger,receiver) to the match
    * offer.
    */
