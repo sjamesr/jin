@@ -171,7 +171,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * server. 
    */
   
-  public String getTag(){
+  protected String getTag(){
     return Integer.toHexString(System.identityHashCode(this));
   }
   
