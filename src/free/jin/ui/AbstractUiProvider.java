@@ -103,7 +103,8 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
       AbstractPluginUIContainer container = 
         (AbstractPluginUIContainer)pluginContainers.nextElement();
       if (container.getMode() == HIDEABLE_CONTAINER_MODE)
-        container.setVisible(container.getPlugin().getPrefs().getBool(container.getPrefsPrefix() + "visible", true));
+        container.setVisible(container.getPlugin().getPrefs().getBool(container.getPrefsPrefix() + "visible",
+            container.isVisibleFirstTime()));
     }
   }
   
