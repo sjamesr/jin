@@ -90,6 +90,14 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
   
   private Image icon;
   
+  
+  
+  /**
+   * Whether this container is visible the very first it is created.
+   */
+  
+  private boolean isVisibleFirstTime;
+  
 
 
   /**
@@ -345,6 +353,26 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    */
   
   protected abstract void setIconImpl(Image icon);
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public void setVisibleFirstTime(boolean isVisibleFirstTime){
+    this.isVisibleFirstTime = isVisibleFirstTime;
+  }
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  public boolean isVisibleFirstTime(){
+    return isVisibleFirstTime;
+  }
 
 
   
