@@ -217,8 +217,8 @@ foreground.friendsNotification = color;ff9977
 
 
 # Input properties
-input-background = color;ffffff
-input-foreground = color;000000
+#input-background = color;ffffff
+#input-foreground = color;000000
 
 # Preferences panel properties
 preferences.show = boolean;true

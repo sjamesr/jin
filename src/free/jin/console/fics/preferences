@@ -164,8 +164,8 @@ foreground.kibitz = color;c0c0c0
 foreground.whisper = color;c0c0c0
 
 # Input properties
-input-background = color;ffffff
-input-foreground = color;000000
+#input-background = color;ffffff
+#input-foreground = color;000000
 
 # Preferences panel properties
 preferences.show = boolean;true
