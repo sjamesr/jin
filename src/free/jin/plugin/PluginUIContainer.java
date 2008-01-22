@@ -173,6 +173,26 @@ public interface PluginUIContainer{
   
   
   /**
+   * Sets whether this container is visible when it is used the very first time
+   * (only relevant for hideable containers). During following uses, its
+   * visibility state will be restored from the previous use. The default value
+   * for this property is <code>true</code>.
+   */
+  
+  void setVisibleFirstTime(boolean isVisibleFirstTime);
+  
+  
+  
+  /**
+   * Returns whether this container is visible when it is created the very first
+   * time.
+   */
+  
+  boolean isVisibleFirstTime();
+  
+  
+  
+  /**
    * Sets the size of this container to its preferred size. If the container is
    * not visible, it is made visible first.
    */
