@@ -171,6 +171,15 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * The number of temporary console's we've added in the lifetime of this
+   * plugin.
+   */
+  
+  private int temporaryConsoleCount = 0;
+  
+  
+  
+  /**
    * A game listener which invokes private methods for the events we care about.
    */
   
@@ -459,6 +468,24 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     ConsoleDesignation designation = createPersonalChatConsoleDesignation(user, true);
     addConsole(designation, makeActive);
     return designation;
+  }
+  
+  
+  
+  /**
+   * Adds a new temporary console which will send the specified commands to the
+   * server and display their output.
+   */
+  
+  public void addTemporaryConsole(String [] commands){
+    int index;
+    synchronized(this){
+      index = ++temporaryConsoleCount;
+    }
+    
+    String consoleName = getI18n().getFormattedString("temporaryConsole.title", new Object[]{String.valueOf(index)});
+    ConsoleDesignation designation = new TemporaryConsoleDesignation(getConn(), consoleName, getEncoding(), true, commands);
+    addConsole(designation, true);
   }
   
   
