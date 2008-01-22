@@ -3860,17 +3860,17 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
   private void processTourneyDG(Datagram dg, String clientTag){
     int id = dg.getInteger(0);
     int bitfield = dg.getInteger(1);
-    boolean canGuestsJoinWatch = (bitfield & 1) != 0;
-    boolean makeNewWindowOnJoin = (bitfield & 2) != 0;
-    boolean makeNewWindowOnWatch = (bitfield & 4) != 0;
-    boolean makeNewWindowOnInfo = (bitfield & 8) != 0;
+    boolean isOpenToGuests = (bitfield & 0x1) != 0;
+    boolean makeNewWindowOnJoin = (bitfield & 0x2) == 0;
+    boolean makeNewWindowOnWatch = (bitfield & 0x4) == 0;
+    boolean makeNewWindowOnInfo = (bitfield & 0x8) == 0;
     String description = dg.getString(2);
     String [] joinCommands = parseDGTourneyCommandList(dg.getString(3));
     String [] watchCommands = parseDGTourneyCommandList(dg.getString(4));
     String [] infoCommands = parseDGTourneyCommandList(dg.getString(5));
     String confirmText = dg.getString(6);
     
-    processTourney(clientTag, id, canGuestsJoinWatch, makeNewWindowOnJoin, makeNewWindowOnWatch,
+    processTourney(clientTag, id, isOpenToGuests, makeNewWindowOnJoin, makeNewWindowOnWatch,
       makeNewWindowOnInfo, description, joinCommands, watchCommands, infoCommands, confirmText);
   }
 
@@ -3915,12 +3915,16 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * ChessEvent to any registered listeners.
    */
 
-  protected void processTourney(String clientTag, int id, boolean canGuestsWatchJoin, boolean makeNewWindowOnJoin,
+  protected void processTourney(String clientTag, int id, boolean isOpenToGuests, boolean makeNewWindowOnJoin,
       boolean makeNewWindowOnWatch, boolean makeNewWindowOnInfo, String description, String [] joinCommands,
       String [] watchCommands, String [] infoCommands, String confirmText){
 
-    ChessEvent newEvent = new ChessEvent(id, description, joinCommands.length == 0 ? null : joinCommands, 
-      watchCommands.length == 0 ? null : watchCommands, infoCommands.length == 0 ? null : infoCommands, confirmText);
+    ChessEvent newEvent = new ChessEvent(id,
+        description, joinCommands.length == 0 ? null : joinCommands, makeNewWindowOnJoin, 
+            watchCommands.length == 0 ? null : watchCommands, makeNewWindowOnWatch, 
+            infoCommands.length == 0 ? null : infoCommands, makeNewWindowOnInfo,
+            confirmText.length() != 0 ? confirmText : null,
+            isOpenToGuests);
     ChessEvent existingEvent = (ChessEvent)chessEvents.put(new Integer(id), newEvent);
 
     if (existingEvent != null)
