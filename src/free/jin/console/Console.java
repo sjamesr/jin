@@ -21,66 +21,25 @@
 
 package free.jin.console;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.LayoutManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JViewport;
-import javax.swing.KeyStroke;
-import javax.swing.OverlayLayout;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 
 import org.jdesktop.layout.Baseline;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
 
-import free.jin.Connection;
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.Preferences;
-import free.jin.ServerUser;
+import free.jin.*;
 import free.jin.event.ChatEvent;
 import free.jin.event.FriendsEvent;
 import free.jin.event.JinEvent;
@@ -307,6 +266,11 @@ public class Console extends JPanel implements KeyListener{
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     
+    if (designation.getCommandTypes().length == 0){
+      inputComponent.setEnabled(false);
+      inputComponent.setEditable(false);
+    }
+    
     setFocusable(false);
     
     init();
@@ -337,20 +301,32 @@ public class Console extends JPanel implements KeyListener{
     GroupLayout bottomPanelLayout = new GroupLayout(bottomPanel);
     bottomPanel.setLayout(bottomPanelLayout);
     
-    bottomPanelLayout.setHorizontalGroup(
-        bottomPanelLayout.createSequentialGroup()
-          .add(commandTypeComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-          .add(colonLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-          .addPreferredGap(LayoutStyle.RELATED)
-          .add(inputComponent, 0, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
-          .addPreferredGap(LayoutStyle.UNRELATED)
-          .add(actionsComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE));
-    bottomPanelLayout.setVerticalGroup(
-        bottomPanelLayout.createParallelGroup(GroupLayout.BASELINE)
-          .add(commandTypeComponent)
-          .add(colonLabel)
-          .add(inputComponent)
-          .add(actionsComponent));
+    GroupLayout.SequentialGroup hGroup = bottomPanelLayout.createSequentialGroup();
+    GroupLayout.ParallelGroup vGroup = bottomPanelLayout.createParallelGroup(GroupLayout.BASELINE);
+    
+    // We add the command type component anyway to make the text field appear at
+    // the same position (vertically) in different tabs.
+    hGroup.add(commandTypeComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
+    if (designation.getCommandTypes().length > 0){
+      hGroup
+        .add(colonLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(LayoutStyle.RELATED);
+    }
+    hGroup
+      .add(inputComponent, 0, GroupLayout.DEFAULT_SIZE, Integer.MAX_VALUE)
+      .addPreferredGap(LayoutStyle.UNRELATED)
+      .add(actionsComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
+    
+    vGroup.add(commandTypeComponent);
+    if (designation.getCommandTypes().length > 0){
+      vGroup.add(colonLabel);
+    }
+    vGroup
+      .add(inputComponent)
+      .add(actionsComponent);
+    
+    bottomPanelLayout.setHorizontalGroup(hGroup);
+    bottomPanelLayout.setVerticalGroup(vGroup);
     
     bottomPanel.setSize(bottomPanel.getPreferredSize());
     bottomPanel.doLayout();
@@ -634,9 +610,8 @@ public class Console extends JPanel implements KeyListener{
   
   
   /**
-   * Creates the command type component, which is either a JLabel (if there is
-   * only one command type in our console designation) or a JComboBox (if there
-   * are multiple command types).
+   * Creates the component which lets the user choose the command type to
+   * execute his command.
    */
   
   private JComponent createCommandTypeComponent(){
@@ -647,17 +622,21 @@ public class Console extends JPanel implements KeyListener{
     box.setFocusable(false);
     Dimension boxPrefSize = box.getPreferredSize();
     
-    JLabel label = new JLabel(commandTypes[0].toString());
-    label.putClientProperty("commandType", commandTypes[0]);
+    JLabel label = (commandTypes.length > 0) ? new JLabel(commandTypes[0].toString()) : new JLabel(" ");
+    if (commandTypes.length > 0)
+      label.putClientProperty("commandType", commandTypes[0]);
     Dimension labelPrefSize = label.getPreferredSize();
     
+    // All the stuff below is to make sure that the various components align
+    // properly and the console's input field doesn't "move" when switching
+    // between tabs
     int height = Math.max(boxPrefSize.height, labelPrefSize.height);
     
     int boxBaseline = Baseline.getBaseline(box, 50, height);
-    int labelBaseline = Baseline.getBaseline(label, 50, height); 
+    int labelBaseline = Baseline.getBaseline(label, 50, height);
     int maxBaseline = Math.max(boxBaseline, labelBaseline);
     
-    if (commandTypes.length == 1){
+    if (commandTypes.length <= 1){
       label.setPreferredSize(new Dimension(labelPrefSize.width, height));
       label.setMinimumSize(label.getPreferredSize());
       if (maxBaseline > labelBaseline)
@@ -676,7 +655,7 @@ public class Console extends JPanel implements KeyListener{
   
   
   /**
-   * Returns the currently selected command type.
+   * Returns the currently selected command type; <code>null</code> if none.
    */
   
   private ConsoleDesignation.CommandType getSelectedCommandType(){
@@ -684,22 +663,24 @@ public class Console extends JPanel implements KeyListener{
       JLabel label = (JLabel)commandTypeComponent;
       return (ConsoleDesignation.CommandType)label.getClientProperty("commandType");
     }
-    else{
+    else if (commandTypeComponent instanceof JComboBox){
       JComboBox box = (JComboBox)commandTypeComponent;
       return (ConsoleDesignation.CommandType)box.getSelectedItem();
     }
+    else
+      return null;
   }
   
   
   
   /**
-   * Creates the JTextField in which the user can input commands to be sent to
-   * the server.
+   * Creates the text field in which the user can input commands to be sent to
+   * the server. This method may be overridden by server-specific subclasses to
+   * return their own version of a console text field.
    */
 
   protected ConsoleTextField createInputComponent(){
-    ConsoleTextField textField = new ConsoleTextField(this);
-    return textField;
+    return new ConsoleTextField(this);
   }
 
 
@@ -1121,8 +1102,13 @@ public class Console extends JPanel implements KeyListener{
       Connection conn = consoleManager.getConn();
       if (!conn.isConnected())
         addToOutput(I18n.get(Console.class).getString("unconnectedWarningMessage"), "info");
-      else
-        getSelectedCommandType().handleCommand(commandString, command.isBlanked());
+      else{
+        ConsoleDesignation.CommandType commandType = getSelectedCommandType();
+        if (commandType != null)
+          commandType.handleCommand(commandString, command.isBlanked());
+        else
+          getToolkit().beep();
+      }
     }
   }
 
