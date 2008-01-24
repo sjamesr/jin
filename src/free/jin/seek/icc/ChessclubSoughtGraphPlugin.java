@@ -44,9 +44,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
     
     exportAction(new OneMinuteAction());
     exportAction(new FiveMinuteAction());
-    
-    if (getUser().getServer().getId().equals("wcl"))
-      exportAction(new FifteenMinuteAction());
+    exportAction(new FifteenMinuteAction());
   }
   
   
