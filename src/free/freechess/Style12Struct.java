@@ -386,8 +386,11 @@ public class Style12Struct extends Struct{
     String enPassantSquare;
     if (getDoublePawnPushFile() == -1)
       enPassantSquare = "-";
-    else
-      enPassantSquare = "" + ('a' + getDoublePawnPushFile()) + (getCurrentPlayer().equals("W") ? "6" : "3");
+    else{
+      char file = (char)('a' + getDoublePawnPushFile());
+      char rank = getCurrentPlayer().equals("W") ? '6' : '3';
+      enPassantSquare = "" + file + rank;
+    }
 
     buf.append(enPassantSquare);
 
