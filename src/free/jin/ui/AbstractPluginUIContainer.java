@@ -96,7 +96,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Whether this container is visible the very first it is created.
    */
   
-  private boolean isVisibleFirstTime;
+  private boolean isVisibleFirstTime = true;
   
 
 
