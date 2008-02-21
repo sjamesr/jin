@@ -155,7 +155,7 @@ public class Jin{
    */
    
   public synchronized static void createInstance(JinContext context){
-    if (instance != null)
+    if (hasInstance())
       throw new IllegalStateException("Jin instance already exists");
     
     instance = new Jin(context);
@@ -168,10 +168,20 @@ public class Jin{
    */
    
   public synchronized static Jin getInstance(){
-    if (instance == null)
+    if (!hasInstance())
       throw new IllegalStateException("Jin instance doesn't yet exist");
     
     return instance;
+  }
+  
+  
+  
+  /**
+   * Returns whether the Jin instance has already been created.
+   */
+  
+  public synchronized static boolean hasInstance(){
+    return instance != null;
   }
   
   
