@@ -185,6 +185,17 @@ public class JinApplet extends Applet implements JinContext{
   
   
   /**
+   * Invoked when the applet shuts down.
+   */
+  
+  public void stop(){
+    if (Jin.hasInstance())
+      Jin.getInstance().quit(false);
+  }
+  
+  
+  
+  /**
    * Restarts JinApplet. This is called when the user closes Jin and is supposed
    * to bring the applet to its initial state - ready to accept a new username
    * and password.
@@ -306,8 +317,13 @@ public class JinApplet extends Applet implements JinContext{
     server.setHost(getDocumentBase().getHost());
       
     String portString = getParameter("port");
-    if (portString != null) 
+    if (portString != null)
       server.setPort(Integer.parseInt(portString));
+    
+    // Required to override possibly out of date user settings 
+    autologinParams.put("login.hostname", getDocumentBase().getHost());
+    if (portString != null)
+      autologinParams.put("login.ports", portString);
     
     return server;
   }
