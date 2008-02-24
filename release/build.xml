@@ -388,6 +388,7 @@
 				<filter token="ACTION.CLASSNAMES" value="${action.classnames}" />
 				<filter token="APP.ID" value="${app.id}" />
 				<filter token="SERVER.ID" value="${server.id}" />
+				<filter token="APP.NAME" value="${app.name}" />
 			</filterset>
 		</copy>
 		
