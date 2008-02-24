@@ -12,7 +12,7 @@
 	
 	// Returns the port to which the applet should connect
 	function getPort(){
-		return 5000;
+		return 5001;
 	}
 	
 	
