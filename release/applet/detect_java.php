@@ -4,6 +4,6 @@
 	<PARAM NAME="goodJavaURL" VALUE="applet.php">
 	<PARAM NAME="badJavaURL" VALUE="bad_java.php">
 	
-	Please enable Java to run Jin
+	Please enable Java to run @APP.NAME@
 </APPLET>
 </CENTER>
