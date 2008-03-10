@@ -39,19 +39,19 @@ import free.jin.event.JinEvent;
  * The game chat console for ICS-like servers.
  */
 
-public abstract class ICSGameConsoleDesignation extends GameConsoleDesignation{
+public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
   
   
   
   /**
-   * Creates a new <code>ICSGameConsoleDesignation</code>.
+   * Creates a new <code>IcsGameConsoleDesignation</code>.
    * 
    * @param connection The connection to the server.
    * @param game The game we're covering.
    * @param encoding The encoding to use for encoding/decoding messages.
    */
   
-  public ICSGameConsoleDesignation(Connection connection, Game game, String encoding){
+  public IcsGameConsoleDesignation(Connection connection, Game game, String encoding){
     super(connection, game, encoding, game.getGameType() == Game.ISOLATED_BOARD);
   }
   

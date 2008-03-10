@@ -12,16 +12,16 @@ import free.jin.event.ChatEvent;
  * @author Maryanovsky Alexander
  */
 
-public abstract class ICSSystemConsoleDesignation extends SystemConsoleDesignation{
+public abstract class IcsSystemConsoleDesignation extends SystemConsoleDesignation{
   
   
   
   /**
-   * Creates a new <code>ICSSystemConsoleDesignation</code> with the specified
+   * Creates a new <code>IcsSystemConsoleDesignation</code> with the specified
    * connection and encoding.
    */
   
-  public ICSSystemConsoleDesignation(Connection connection, String encoding){
+  public IcsSystemConsoleDesignation(Connection connection, String encoding){
     super(connection, encoding);
   }
   
