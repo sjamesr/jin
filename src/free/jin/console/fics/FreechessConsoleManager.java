@@ -21,6 +21,9 @@
 
 package free.jin.console.fics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import free.jin.Game;
 import free.jin.ServerUser;
 import free.jin.console.Console;
@@ -95,6 +98,22 @@ public class FreechessConsoleManager extends ConsoleManager{
 
   protected Console createConsole(ConsoleDesignation designation){
     return new FreechessConsole(this, designation);
+  }
+  
+  
+  
+  /**
+   * Returns the set of FICS channels.
+   */
+  
+  protected Map createChannels(){
+    Map channels = new HashMap();
+    
+    for (int i = 0; i < 256; i++){
+      channels.put(new Integer(i), new FicsChannel(i));
+    }
+    
+    return channels;
   }
   
   

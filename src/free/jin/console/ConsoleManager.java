@@ -32,30 +32,14 @@ import java.beans.PropertyChangeListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.SwingConstants;
 
-import free.jin.Connection;
-import free.jin.Game;
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.ServerUser;
+import free.jin.*;
 import free.jin.action.JinAction;
 import free.jin.console.prefs.ConsolePrefsPanel;
-import free.jin.event.ChatEvent;
-import free.jin.event.ChatListener;
-import free.jin.event.ConnectionListener;
-import free.jin.event.GameAdapter;
-import free.jin.event.GameEvent;
-import free.jin.event.GameListener;
-import free.jin.event.GameStartEvent;
-import free.jin.event.JinEvent;
-import free.jin.event.ListenerManager;
-import free.jin.event.PlainTextEvent;
-import free.jin.event.PlainTextListener;
+import free.jin.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
@@ -63,11 +47,7 @@ import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.TextUtilities;
-import free.util.swing.tabbedpane.Tab;
-import free.util.swing.tabbedpane.TabbedPane;
-import free.util.swing.tabbedpane.TabbedPaneEvent;
-import free.util.swing.tabbedpane.TabbedPaneListener;
-import free.util.swing.tabbedpane.TabbedPaneModel;
+import free.util.swing.tabbedpane.*;
 
 
 /**
@@ -113,6 +93,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   public static final int NO_GAME_LISTS = 2;
 
 
+  
+  /**
+   * (lazily created) map of channel numbers to channels.
+   */
+  
+  private Map channels = null;
+  
+  
   
   /**
    * The consoles.
@@ -849,9 +837,33 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
         makeActive();
     }
   }
-
-
-
+  
+  
+  
+  /**
+   * Returns the channels/rooms available on the server we're logged on to
+   * (a map from channel IDs to {@link Channel} objects). 
+   */
+  
+  public Map getChannels(){
+    if (channels == null)
+      channels = createChannels();
+    
+    return Collections.unmodifiableMap(channels);
+  }
+  
+  
+  
+  /**
+   * Returns the set of channels/rooms for the server we're connecting to (a map
+   * from channel IDs to {@link Channel} objects).
+   * This method is meant to be implemented by server-specific classes.
+   */
+  
+  protected abstract Map createChannels();
+  
+  
+  
   /**
    * Saves the current state into the user file.
    */

@@ -21,13 +21,17 @@
 
 package free.jin.console.icc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.ServerUser;
+import free.jin.console.Channel;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ConsoleManager;
-import free.jin.console.ics.ChannelChatConsoleDesignation;
+import free.jin.console.ics.IcsChannelConsoleDesignation;
 import free.jin.console.ics.ShoutChatConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
@@ -38,6 +42,16 @@ import free.jin.ui.PreferencesPanel;
  */
 
 public class ChessclubConsoleManager extends ConsoleManager{
+  
+  
+  
+  /**
+   * Returns the id of the server we're connected to.
+   */
+  
+  private String getServerId(){
+    return getUser().getServer().getId();
+  }
   
   
   
@@ -66,9 +80,9 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    if (getUser().getServer().getId().equals("wcl")){
-      String lobbyChannelName = getI18n().getString("wclLobbyChannelName");
-      return new ChannelChatConsoleDesignation(getConn(), 250, lobbyChannelName, getEncoding(), isCloseable);
+    if ("wcl".equals(getServerId())){
+      Channel lobby = (Channel)getChannels().get(new Integer(250));
+      return new IcsChannelConsoleDesignation(getConn(), lobby, getEncoding(), isCloseable);
     }
     else
       return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
@@ -102,6 +116,24 @@ public class ChessclubConsoleManager extends ConsoleManager{
 
   protected Console createConsole(ConsoleDesignation designation){
     return new ChessclubConsole(this, designation);
+  }
+  
+  
+  
+  /**
+   * Returns the set of ICC/WCL channels.
+   */
+  
+  protected Map createChannels(){
+    boolean isWcl = "wcl".equals(getServerId());
+    Map channels = new HashMap();
+    
+    for (int i = 0; i < 400; i++){
+      Channel channel = isWcl ? (Channel)(new WclChannel(i)) : (Channel)(new IccChannel(i));
+      channels.put(new Integer(i), channel);
+    }
+    
+    return channels;
   }
   
   
