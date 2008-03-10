@@ -646,7 +646,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
     else if (variant.equals(Chess.getInstance()))
       return "";
     else if (variant.equals(FischerRandom.getInstance()))
-      return "fr";
+      return "wfr";
     else if (variant.equals(Suicide.getInstance()))
       return "suicide";
     else if (variant.equals(Atomic.getInstance()))
