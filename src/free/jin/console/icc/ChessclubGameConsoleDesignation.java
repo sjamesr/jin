@@ -23,7 +23,7 @@ package free.jin.console.icc;
 
 import free.jin.Connection;
 import free.jin.Game;
-import free.jin.console.ics.ICSGameConsoleDesignation;
+import free.jin.console.ics.IcsGameConsoleDesignation;
 
 
 
@@ -31,7 +31,7 @@ import free.jin.console.ics.ICSGameConsoleDesignation;
  * An ICC-specific game console designation.
  */
 
-public class ChessclubGameConsoleDesignation extends ICSGameConsoleDesignation{
+public class ChessclubGameConsoleDesignation extends IcsGameConsoleDesignation{
   
   
   

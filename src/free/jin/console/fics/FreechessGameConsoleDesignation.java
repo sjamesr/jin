@@ -23,7 +23,7 @@ package free.jin.console.fics;
 
 import free.jin.Connection;
 import free.jin.Game;
-import free.jin.console.ics.ICSGameConsoleDesignation;
+import free.jin.console.ics.IcsGameConsoleDesignation;
 
 
 
@@ -31,7 +31,7 @@ import free.jin.console.ics.ICSGameConsoleDesignation;
  * A FICS-specific game console designation.
  */
 
-public class FreechessGameConsoleDesignation extends ICSGameConsoleDesignation{
+public class FreechessGameConsoleDesignation extends IcsGameConsoleDesignation{
   
   
   
