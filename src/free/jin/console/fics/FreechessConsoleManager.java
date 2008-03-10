@@ -109,9 +109,8 @@ public class FreechessConsoleManager extends ConsoleManager{
   protected Map createChannels(){
     Map channels = new HashMap();
     
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++)
       channels.put(new Integer(i), new FicsChannel(i));
-    }
     
     return channels;
   }
