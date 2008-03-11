@@ -24,6 +24,7 @@ package free.jin.ui;
 import java.util.Vector;
 
 import free.jin.BadChangesException;
+import free.jin.I18n;
 
 
 /**
@@ -46,11 +47,30 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    * Adds an underlying preferences panel.
    */
   
-  public final void addPanel(PreferencesPanel panel, String panelName, String panelToolTip){
+  protected final void addPanel(PreferencesPanel panel, String panelTitle, String panelToolTip){
     panels.addElement(panel);
     panel.addChangeListener(proxyChangeListener);
     
-    addPanelToUi(panel, panelName, panelToolTip);
+    addPanelToUi(panel, panelTitle, panelToolTip);
+  }
+  
+  
+  
+  /**
+   * Adds an underlying preferences panel, retrieving its properties (such as
+   * name and tooltip) using the specified key from the <code>I18n</code> object
+   * associated with the actual class of this object (with
+   * <code>CompositePreferencesPanel</code> as the base class).
+   * The following properties are looked up:
+   * <ul>
+   *   <li><code>[key].title</code> for the panel's title.
+   *   <li><code>[key].tooltip</code> for the panel's tooltip.
+   * </ul>
+   */
+  
+  protected final void addPanel(PreferencesPanel panel, String i18nKey){
+    I18n i18n = I18n.get(getClass(), CompositePreferencesPanel.class);
+    addPanel(panel, i18n.getString(i18nKey + ".title"), i18n.getString(i18nKey + ".tooltip"));
   }
   
   

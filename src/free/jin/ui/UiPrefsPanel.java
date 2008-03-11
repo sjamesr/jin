@@ -45,12 +45,10 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
    */
   
   public UiPrefsPanel(){
-    I18n i18n = I18n.get(UiPrefsPanel.class);
-    
     setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     
-    addPanel(new LookAndFeelPrefPanel(), i18n.getString("lookAndFeelPanel.name"), i18n.getString("lookAndFeelPanel.tooltip"));
-    addPanel(new WindowingModePrefPanel(), i18n.getString("windowingModePanel.name"), i18n.getString("windowingModePanel.tooltip"));
+    addPanel(new LookAndFeelPrefPanel(), "lookAndFeelPanel");
+    addPanel(new WindowingModePrefPanel(), "windowingModePanel");
   }
   
   

@@ -27,7 +27,6 @@ import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JTabbedPane;
 
-import free.jin.I18n;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.CompositePreferencesPanel;
 import free.jin.ui.PreferencesPanel;
@@ -48,7 +47,6 @@ public class ConsolePrefsPanel extends CompositePreferencesPanel{
   
   private final JTabbedPane tabs = new JTabbedPane();
 
-  
 
   
   /**
@@ -56,11 +54,10 @@ public class ConsolePrefsPanel extends CompositePreferencesPanel{
    */
   
   public ConsolePrefsPanel(ConsoleManager consoleManager){
-    I18n i18n = I18n.get(getClass(), ConsolePrefsPanel.class);
-    
-    addPanel(createTextPrefsPanel(consoleManager), i18n.getString("textDisplayTab.text"), i18n.getString("textDisplayTab.tooltip"));
+    addPanel(createTextPrefsPanel(consoleManager), "textDisplayTab");
+//    addPanel(createConsolesPrefsPanel(consoleManager), i18n.getString("consolesTab.text"), i18n.g);
     if (consoleManager.getConn().getTextEncoding() != null)
-      addPanel(new EncodingPrefsPanel(consoleManager), i18n.getString("encodingTab.text"), i18n.getString("encodingTab.tooltip"));
+      addPanel(new EncodingPrefsPanel(consoleManager), "encodingTab");
     
     setLayout(new BorderLayout());
     add(tabs, BorderLayout.CENTER);

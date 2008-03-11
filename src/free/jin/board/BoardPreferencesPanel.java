@@ -109,9 +109,9 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     add(tabs, BorderLayout.WEST);
     add(boardPanel, BorderLayout.CENTER);
     
-    addPanel(createBoardLooksPanel(), i18n.getString("boardLooksPanel.title"), i18n.getString("boardLooksPanel.tooltip"));
-    addPanel(createMoveInputPanel(), i18n.getString("moveInputPanel.title"), i18n.getString("moveInputPanel.tooltip"));
-    addPanel(createSquareCoordsPanel(), i18n.getString("coordsPanel.title"), i18n.getString("coordsPanel.tooltip"));
+    addPanel(createBoardLooksPanel(), "boardLooksPanel");
+    addPanel(createMoveInputPanel(), "moveInputPanel");
+    addPanel(createSquareCoordsPanel(), "coordsPanel");
     
     initPreviewBoard();
   }
