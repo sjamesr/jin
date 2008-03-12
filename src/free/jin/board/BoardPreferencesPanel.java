@@ -31,9 +31,11 @@ import javax.swing.*;
 
 import free.chess.Position;
 import free.jin.I18n;
-import free.jin.board.prefs.*;
-import free.jin.ui.CompositePreferencesPanel;
-import free.jin.ui.PreferencesPanel;
+import free.jin.board.prefs.BoardLooksPanel;
+import free.jin.board.prefs.BoardModifyingPrefsPanel;
+import free.jin.board.prefs.MoveInputPanel;
+import free.jin.board.prefs.SquareCoordinatesPanel;
+import free.jin.ui.TabbedPreferencesPanel;
 import free.util.SquareLayout;
 
 
@@ -41,7 +43,7 @@ import free.util.SquareLayout;
  * The preferences panel for the <code>BoardManager</code> plugin.
  */
 
-public class BoardPreferencesPanel extends CompositePreferencesPanel{
+public class BoardPreferencesPanel extends TabbedPreferencesPanel{
 
 
 
@@ -62,10 +64,10 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
   
   
   /**
-   * The tabbed pane.
+   * The panel holding the preview board.
    */
   
-  private final JTabbedPane tabs = new JTabbedPane();
+  private final JComponent boardPanel;
   
   
   
@@ -76,6 +78,7 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
   public BoardPreferencesPanel(BoardManager boardManager){
     this.boardManager = boardManager;
     this.previewBoard = createPreviewBoard();
+    this.boardPanel = new JPanel();
     
     I18n i18n = I18n.get(BoardPreferencesPanel.class);
     
@@ -92,7 +95,6 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
       }
     });
     
-    JPanel boardPanel = new JPanel();
     boardPanel.setLayout(new BoxLayout(boardPanel, BoxLayout.Y_AXIS));
     boardPanel.setBorder(BorderFactory.createCompoundBorder(
       i18n.createTitledBorder("testBoardPanel"),
@@ -105,10 +107,6 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     boardPanel.add(Box.createVerticalStrut(7));
     boardPanel.add(resetPosition);
     
-    setLayout(new BorderLayout(5, 0));
-    add(tabs, BorderLayout.WEST);
-    add(boardPanel, BorderLayout.CENTER);
-    
     addPanel(createBoardLooksPanel(), "boardLooksPanel");
     addPanel(createMoveInputPanel(), "moveInputPanel");
     addPanel(createSquareCoordsPanel(), "coordsPanel");
@@ -116,15 +114,6 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
     initPreviewBoard();
   }
   
-  
-  
-  /**
-   * Adds the specified panel to a new tab.
-   */
-  
-  protected void addPanelToUi(PreferencesPanel panel, String name, String tooltip){
-    tabs.addTab(name, null, panel, tooltip);
-  }
   
   
   /**
@@ -178,7 +167,19 @@ public class BoardPreferencesPanel extends CompositePreferencesPanel{
   protected BoardModifyingPrefsPanel createSquareCoordsPanel(){
     return new SquareCoordinatesPanel(boardManager, previewBoard);
   }
-
   
-
+  
+  
+  /**
+   * Creates the layout of this panel.
+   */
+  
+  protected void createLayout(){
+    setLayout(new BorderLayout(5, 0));
+    add(tabs, BorderLayout.WEST);
+    add(boardPanel, BorderLayout.CENTER);
+  }
+  
+  
+  
 }

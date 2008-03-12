@@ -22,14 +22,8 @@
 
 package free.jin.console.prefs;
 
-import java.awt.BorderLayout;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTabbedPane;
-
 import free.jin.console.ConsoleManager;
-import free.jin.ui.CompositePreferencesPanel;
-import free.jin.ui.PreferencesPanel;
+import free.jin.ui.TabbedPreferencesPanel;
 
 
 
@@ -37,17 +31,9 @@ import free.jin.ui.PreferencesPanel;
  * The main preferences panel for the console plugin. 
  */
 
-public class ConsolePrefsPanel extends CompositePreferencesPanel{
+public class ConsolePrefsPanel extends TabbedPreferencesPanel{
   
   
-  
-  /**
-   * The tabbed pane.
-   */
-  
-  private final JTabbedPane tabs = new JTabbedPane();
-
-
   
   /**
    * Creates a new <code>ConsolePrefsPanel</code>
@@ -55,36 +41,36 @@ public class ConsolePrefsPanel extends CompositePreferencesPanel{
   
   public ConsolePrefsPanel(ConsoleManager consoleManager){
     addPanel(createTextPrefsPanel(consoleManager), "textDisplayTab");
-//    addPanel(createConsolesPrefsPanel(consoleManager), i18n.getString("consolesTab.text"), i18n.g);
+//    addPanel(createMultipleConsolesPrefsPanel(consoleManager), "multipleConsolesTab");
     if (consoleManager.getConn().getTextEncoding() != null)
       addPanel(new EncodingPrefsPanel(consoleManager), "encodingTab");
-    
-    setLayout(new BorderLayout());
-    add(tabs, BorderLayout.CENTER);
-  }
-  
-  
-  
-  /**
-   * Adds the specified panel to a new tab.
-   */
-  
-  protected void addPanelToUi(PreferencesPanel panel, String name, String tooltip){
-    panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-    tabs.addTab(name, null, panel, tooltip);
   }
   
   
   
   /**
    * Creates the <code>TextPrefsPanel</code> to be used in this console prefs
-   * panel. This method returns a plain <code>TextPrefsPanel</code>, but allows
-   * subclasses to return a subclass of it.
+   * panel. The default implementation returns a plain
+   * <code>TextPrefsPanel</code>, but may be overridden by server-specific
+   * classes to return a server-specific text prefs panel.
    */
   
   protected TextPrefsPanel createTextPrefsPanel(ConsoleManager cm){
     return new TextPrefsPanel(cm);
   }
+  
+  
+  
+  /**
+   * Creates the <code>MultipleConsolesPrefsPanel</code> to be used in this
+   * console prefs panel. The default implementation returns a plain
+   * <code>MultipleConsolesPrefsPanel</code>, but may be overridden by
+   * server-specific classes to return a server-specific text prefs panel.
+   */
+  
+//  protected MultipleConsolesPrefsPanel createMultipleConsolesPrefsPanel(ConsoleManager cm){
+//    return new MultipleConsolesPrefsPanel(cm);
+//  }
   
   
   
