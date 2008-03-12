@@ -107,6 +107,20 @@ public class AddRemoveButtons extends JComponent{
   
   
   /**
+   * Creates a new <code>AddRemoveButtons</code> widget.
+   */
+  
+  public AddRemoveButtons(){
+    this.add = new JButton();
+    this.remove = new JButton();
+    
+    configureButtons();
+    createUi();
+  }
+  
+  
+  
+  /**
    * Creates a new <code>AddRemoveButtons</code> widget with the specified
    * actions which are invoked when the buttons are clicked.
    */
@@ -115,6 +129,7 @@ public class AddRemoveButtons extends JComponent{
     this.add = new JButton(addAction);
     this.remove = new JButton(removeAction);
     
+    configureButtons();
     createUi();
   }
   
@@ -132,6 +147,7 @@ public class AddRemoveButtons extends JComponent{
     add.addActionListener(addListener);
     remove.addActionListener(removeListener);
     
+    configureButtons();
     createUi();
   }
   
@@ -158,10 +174,13 @@ public class AddRemoveButtons extends JComponent{
   
   
   /**
-   * Creates the UI of the widget.
+   * Configures the buttons.
    */
   
-  private void createUi(){
+  private void configureButtons(){
+    add.putClientProperty("hideActionText", Boolean.TRUE);
+    remove.putClientProperty("hideActionText", Boolean.TRUE);
+    
     add.setIcon(ADD_ICON);
     add.setDisabledIcon(DISABLED_ADD_ICON);
     
@@ -171,6 +190,17 @@ public class AddRemoveButtons extends JComponent{
     add.setText(null);
     remove.setText(null);
     
+    add.setFocusable(false);
+    remove.setFocusable(false);
+  }
+  
+  
+  
+  /**
+   * Creates the UI of the widget.
+   */
+  
+  private void createUi(){
     add.putClientProperty("JButton.buttonType", "toolbar");
     remove.putClientProperty("JButton.buttonType", "toolbar");
     
@@ -180,9 +210,6 @@ public class AddRemoveButtons extends JComponent{
     // setMargin doesn't seem to be enough for Ocean or Windows L&Fs
     add.setMinimumSize(new Dimension(ADD_IMAGE.getWidth(null), ADD_IMAGE.getHeight(null)));
     remove.setMinimumSize(new Dimension(REMOVE_IMAGE.getWidth(null), REMOVE_IMAGE.getHeight(null)));
-    
-    add.setFocusable(false);
-    remove.setFocusable(false);
     
     setLayout(new GridLayout(1, 2, -1, 0));
     add(add);
