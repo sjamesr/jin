@@ -79,7 +79,7 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    * Adds the specified panel to the UI of this panel.
    */
   
-  protected abstract void addPanelToUi(PreferencesPanel panel, String panelName, String panelToolTip);
+  protected abstract void addPanelToUi(PreferencesPanel panel, String panelTitle, String panelToolTip);
 
   
   
@@ -91,5 +91,7 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
     for (int i = 0; i < panels.size(); i++)
       ((PreferencesPanel)panels.elementAt(i)).applyChanges();
   }
-
+  
+  
+  
 }
