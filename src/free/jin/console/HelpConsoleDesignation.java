@@ -48,6 +48,8 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   public HelpConsoleDesignation(Connection connection, boolean countUnseenMessages, String encoding, boolean isCloseable){
     super(connection, countUnseenMessages, I18n.get(HelpConsoleDesignation.class).getString("name"),
         encoding, isCloseable);
+    
+    addCommandType(new AskHelpQuestion());
   }
   
   
@@ -70,16 +72,6 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
   
   protected void joinForums(){
     connection.joinHelpForum();
-  }
-  
-  
-  
-  /**
-   * Returns the <code>AskHelpQuestion</code> command type.
-   */
-  
-  public CommandType[] createCommandTypes(){
-    return new CommandType[]{new AskHelpQuestion()};
   }
   
   

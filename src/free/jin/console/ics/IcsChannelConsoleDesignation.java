@@ -66,6 +66,9 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
       addAccepted("channel-tell", channels[i].getId(), ANY_SENDER);
     
     addAccepted("announcement", null, ANY_SENDER); // Almost all consoles should display announcements
+    
+    for (int i = 0; i < channels.length; i++)
+      addCommandType(new TellChannelCommandType(this.channels[i]));
   }
   
   
@@ -77,20 +80,6 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
   
   public IcsChannelConsoleDesignation(Connection connection, Channel channel, String encoding, boolean isConsoleCloseable){
     this(connection, new Channel[]{channel}, channel.getShortName(), encoding, isConsoleCloseable);
-  }
-  
-  
-  
-  /**
-   * Returns the "tell <channel> <message>" command type.
-   */
-  
-  protected CommandType[] createCommandTypes(){
-    CommandType [] commandTypes = new CommandType[channels.length];
-    for (int i = 0; i < channels.length; i++)
-      commandTypes[i] = new TellChannelCommandType(channels[i]);
-    
-    return commandTypes;
   }
   
   

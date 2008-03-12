@@ -25,6 +25,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 
@@ -95,7 +98,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Our command types.
    */
   
-  private CommandType [] commandTypes = null;
+  private final List commandTypes = new LinkedList();
   
   
   
@@ -470,27 +473,25 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
-   * Creates the command types we're capable of sending. This method will only
-   * be invoked once.
+   * Adds a command type to the list of command types that can be issued from
+   * this console. Note that this method is only effective before an actual
+   * console with this designation has been set-up, so the preferred place to
+   * invoke it is in the constructor (of the subclass).
    */
   
-  protected abstract CommandType [] createCommandTypes();
+  protected void addCommandType(CommandType commandType){
+    commandTypes.add(commandType);
+  }
   
   
   
   /**
-   * Returns the command types we're capable of sending. This method invokes
-   * {@link #createCommandTypes()} once, and will return its result on following
-   * invocations.
+   * Returns the command types we're capable of sending.
    */
   
-  public final CommandType [] getCommandTypes(){
-    if (commandTypes == null)
-      commandTypes = createCommandTypes();
-    
-    return commandTypes;
+  public final List getCommandTypes(){
+    return Collections.unmodifiableList(commandTypes);
   }
-
   
   
   

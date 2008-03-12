@@ -91,14 +91,4 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
   
   
   
-  /**
-   * Returns an empty array, as we don't support any command types.
-   */
-  
-  protected CommandType[] createCommandTypes(){
-    return new CommandType[0];
-  }
-  
-  
-  
 }

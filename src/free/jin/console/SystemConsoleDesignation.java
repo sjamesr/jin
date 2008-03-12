@@ -49,6 +49,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   public SystemConsoleDesignation(Connection connection, String encoding){
     super(connection, I18n.get(SystemConsoleDesignation.class).getString("name"), encoding, false);
+    
+    addCommandType(new IssueCommand());
   }
   
   
@@ -61,17 +63,6 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   protected void joinForums(){
     if (connection instanceof FriendsConnection)
       ((FriendsConnection)connection).getFriendsListenerManager().addFriendsListener(this);
-  }
-  
-  
-  
-  /**
-   * Returns our sole command type - sending user-typed commands as-is to the
-   * server.
-   */
-  
-  public CommandType [] createCommandTypes(){
-    return new CommandType[]{new IssueCommand()};
   }
   
   

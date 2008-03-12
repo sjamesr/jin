@@ -21,9 +21,6 @@
 
 package free.jin.console.ics;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
@@ -53,6 +50,12 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
   
   public IcsGameConsoleDesignation(Connection connection, Game game, String encoding){
     super(connection, game, encoding, game.getGameType() == Game.ISOLATED_BOARD);
+    
+    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
+      addCommandType(new TellOpponentCommandType());
+    
+    addCommandType(new TellAllCommandType());
+    addCommandType(new TellObserversCommandType());
   }
   
   
@@ -100,24 +103,6 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
    */
   
   protected abstract String getWhisperToCommand();
-  
-  
-  
-  /**
-   * Returns out command types.
-   */
-  
-  public CommandType[] createCommandTypes(){
-    List commandTypes = new LinkedList();
-    
-    if ((game.getGameType() == Game.MY_GAME) && game.isPlayed())
-      commandTypes.add(new TellOpponentCommandType());
-    
-    commandTypes.add(new TellAllCommandType());
-    commandTypes.add(new TellObserversCommandType());
-    
-    return (CommandType [])commandTypes.toArray(new CommandType[commandTypes.size()]);
-  }
   
   
   

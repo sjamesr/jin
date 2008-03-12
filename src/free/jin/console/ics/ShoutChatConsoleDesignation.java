@@ -52,32 +52,22 @@ public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
     addAccepted("shout", null, ANY_SENDER);
     addAccepted("ishout", null, ANY_SENDER);
     addAccepted("announcement", null, ANY_SENDER);
-  }
-  
-  
-  
-  /**
-   * Returns the "shout" and "i" command types.
-   */
-  
-  public CommandType [] createCommandTypes(){
+    
     I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
     
-    return new CommandType[]{
-      new AbstractCommandType(i18n.getString("shoutCommandName")){
-        protected void send(String userText){
-          connection.sendTaggedCommand("shout " + userText, getTag());
-        }
-        protected void echo(String userText){}
-      },
-      
-      new AbstractCommandType(i18n.getString("ishoutCommandName")){
-        protected void send(String userText){
-          connection.sendTaggedCommand("i " + userText, getTag());
-        }
-        protected void echo(String userText){}
+    addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
+      protected void send(String userText){
+        ShoutChatConsoleDesignation.this.connection.sendTaggedCommand("shout " + userText, getTag());
       }
-    };
+      protected void echo(String userText){}
+    });
+      
+    addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
+      protected void send(String userText){
+        ShoutChatConsoleDesignation.this.connection.sendTaggedCommand("i " + userText, getTag());
+      }
+      protected void echo(String userText){}
+    });
   }
   
   

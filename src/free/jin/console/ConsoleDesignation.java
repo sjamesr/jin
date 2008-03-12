@@ -22,6 +22,7 @@
 package free.jin.console;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import free.jin.event.JinEvent;
 import free.util.Named;
@@ -86,7 +87,7 @@ public interface ConsoleDesignation{
    * issue.
    */
   
-  CommandType [] getCommandTypes();
+  List getCommandTypes();
   
   
   

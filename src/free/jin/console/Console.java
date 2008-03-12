@@ -266,7 +266,7 @@ public class Console extends JPanel implements KeyListener{
     outputComponent.addKeyListener(this);
     inputComponent.addKeyListener(this);
     
-    if (designation.getCommandTypes().length == 0){
+    if (designation.getCommandTypes().size() == 0){
       inputComponent.setEnabled(false);
       inputComponent.setEditable(false);
     }
@@ -307,7 +307,7 @@ public class Console extends JPanel implements KeyListener{
     // We add the command type component anyway to make the text field appear at
     // the same position (vertically) in different tabs.
     hGroup.add(commandTypeComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
-    if (designation.getCommandTypes().length > 0){
+    if (designation.getCommandTypes().size() > 0){
       hGroup
         .add(colonLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(LayoutStyle.RELATED);
@@ -318,7 +318,7 @@ public class Console extends JPanel implements KeyListener{
       .add(actionsComponent, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE);
     
     vGroup.add(commandTypeComponent);
-    if (designation.getCommandTypes().length > 0){
+    if (designation.getCommandTypes().size() > 0){
       vGroup.add(colonLabel);
     }
     vGroup
@@ -615,16 +615,16 @@ public class Console extends JPanel implements KeyListener{
    */
   
   private JComponent createCommandTypeComponent(){
-    ConsoleDesignation.CommandType [] commandTypes = designation.getCommandTypes();
+    java.util.List commandTypes = designation.getCommandTypes();
     
-    JComboBox box = new JComboBox(commandTypes);
+    JComboBox box = new JComboBox(commandTypes.toArray());
     box.setEditable(false);
     box.setFocusable(false);
     Dimension boxPrefSize = box.getPreferredSize();
     
-    JLabel label = (commandTypes.length > 0) ? new JLabel(commandTypes[0].toString()) : new JLabel(" ");
-    if (commandTypes.length > 0)
-      label.putClientProperty("commandType", commandTypes[0]);
+    JLabel label = (commandTypes.size() > 0) ? new JLabel(commandTypes.get(0).toString()) : new JLabel(" ");
+    if (commandTypes.size() > 0)
+      label.putClientProperty("commandType", commandTypes.get(0));
     Dimension labelPrefSize = label.getPreferredSize();
     
     // All the stuff below is to make sure that the various components align
@@ -636,7 +636,7 @@ public class Console extends JPanel implements KeyListener{
     int labelBaseline = Baseline.getBaseline(label, 50, height);
     int maxBaseline = Math.max(boxBaseline, labelBaseline);
     
-    if (commandTypes.length <= 1){
+    if (commandTypes.size() <= 1){
       label.setPreferredSize(new Dimension(labelPrefSize.width, height));
       label.setMinimumSize(label.getPreferredSize());
       if (maxBaseline > labelBaseline)

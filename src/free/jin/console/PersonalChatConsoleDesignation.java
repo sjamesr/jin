@@ -59,6 +59,8 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
     super(connection, true, conversationPartner.getName(), encoding, isConsoleCloseable);
     
     this.conversationPartner = conversationPartner;
+    
+    addCommandType(new SendPersonalTell());
   }
   
   
@@ -69,17 +71,6 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   protected void joinForums(){
     connection.joinPersonalChat(conversationPartner);
-  }
-  
-  
-  
-  /**
-   * Returns our sole command type - sending a personal tell to our conversation
-   * partner.
-   */
-  
-  public CommandType [] createCommandTypes(){
-    return new CommandType[]{new SendPersonalTell()};
   }
   
   
