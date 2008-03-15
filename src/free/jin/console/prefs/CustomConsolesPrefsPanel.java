@@ -436,10 +436,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
         if (spec == null)
           return;
 
-        ConsoleManager consoleManager = CustomConsolesPrefsPanel.this.consoleManager;
-        SortedMap channels = new TreeMap(consoleManager.getChannels());
-        channels.values().retainAll(spec.getChannels());
-        Channel [] channelsArr = (Channel[])channels.values().toArray(new Channel[channels.size()]);
+        Channel [] channelsArr = (Channel[])spec.getChannels().toArray(new Channel[0]);
         final ChannelsPopup popup = new ChannelsPopup(channelsArr);
         
         popup.addActionListener(new ActionListener(){
