@@ -570,7 +570,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Returns the encoding with which we decode/encode text received/sent
-   * from/to the server; <code>null</code> if none.
+   * from/to the server.
    */
   
   public String getEncoding(){
