@@ -39,15 +39,7 @@ import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import free.util.BeanProperties;
-import free.util.EventListenerList;
-import free.util.FilteringEnumeration;
-import free.util.FormatException;
-import free.util.IOUtilities;
-import free.util.MappingEnumeration;
-import free.util.RectDouble;
-import free.util.StringEncoder;
-import free.util.StringParser;
+import free.util.*;
 
 
 /**
@@ -1076,7 +1068,7 @@ public abstract class Preferences{
      // Preferences implementation follows
 
     public void set(String prefName, Object prefValue){
-      if (prefValue.equals(get(prefName, null)))
+      if (Utilities.areEqual(prefValue, get(prefName, null)))
         return;
 
       mainDelegate.set(prefName, prefValue);
