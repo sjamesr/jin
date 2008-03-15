@@ -181,8 +181,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
   
   /**
    * This variable is set to <code>true</code> when the selection in the rules
-   * list is being changed programmatically. This is done so that the corresponding
-   * selection listened can act accordingly.
+   * list is being changed programmatically. This is done so that the
+   * corresponding selection listener can act accordingly.
    */
   
   private boolean ignoreRulesListSelectionChange = false;
@@ -369,14 +369,14 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
           try{
             updateRuleFromUI(rulesListSelectedIndex);
           } catch (BadChangesException e){
-            ignoreRulesListSelectionChange = true;
-              loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
-              ignoreRulesListSelectionChange = false;
+              try{
+                ignoreRulesListSelectionChange = true;
+                loggingRulesList.setSelectedIndex(rulesListSelectedIndex);
+              } finally{
+                ignoreRulesListSelectionChange = false;
+              }
               
-              I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
-              OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), GameLoggerPreferencesPanel.this);
-              if (e.getErrorComponent() != null)
-                e.getErrorComponent().requestFocus();
+              badChangeAttempted(e);
               return;
             }
         }
@@ -403,10 +403,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
           try{
             updateRuleFromUI(selectedIndex);
           } catch (BadChangesException e){
-              I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
-              OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), GameLoggerPreferencesPanel.this);
-              if (e.getErrorComponent() != null)
-                e.getErrorComponent().requestFocus();
+              badChangeAttempted(e);
               return;
             }
         }
@@ -615,7 +612,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
     String rulename = rulenameField.getText();
     String filename = filenameField.getText();
-    String ruleString = conditionField.getText();
+    String ruleCondition = conditionField.getText();
 
     String errorMessage = null;
     Component errorComponent = null;
@@ -628,28 +625,31 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       errorMessage = i18n.getString("fileNameUnspecifiedErrorMessage");
       errorComponent = filenameField;
     }
-    else if ((ruleString == null) || (ruleString.length() == 0)){
-      ruleString = "true";
-      conditionField.setText(ruleString);
-    }
     else{
       errorMessage = checkLogFile(filename);
       if (errorMessage != null)
         errorComponent = filenameField;
     }
+    
+    if ((ruleCondition == null) || (ruleCondition.length() == 0)){
+      ruleCondition = "true";
+      conditionField.setText(ruleCondition);
+    }
+
 
     if (errorMessage != null)
       throw new BadChangesException(errorMessage, errorComponent);
 
     try{
+      filename = interpretLoggingTarget(filename);
       if (rule == null){
-        rule = new LoggingRule(rulename, ruleString, filename);
+        rule = new LoggingRule(rulename, ruleCondition, filename);
         rulesModel.setElementAt(rule, ruleIndex);
       }
       else{
         rule.setName(rulename);
-        rule.setFilename(interpretLoggingTarget(filename));
-        rule.setCondition(ruleString);
+        rule.setFilename(filename);
+        rule.setCondition(ruleCondition);
         loggingRulesList.repaint();        
       }
     } catch (EvalError e){
@@ -705,8 +705,9 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     
     return null;
   }
-
-
+  
+  
+  
   /**
    * Applies the changed preferences done by the user.
    */
