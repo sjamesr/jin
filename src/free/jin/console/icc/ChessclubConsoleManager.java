@@ -33,6 +33,7 @@ import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ics.IcsConsoleManager;
 import free.jin.console.ics.IcsCustomConsoleDesignation;
+import free.jin.console.ics.IcsPersonalChatConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
@@ -126,7 +127,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    */
   
   protected ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable){
-    return new ChessclubPersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
+    return new IcsPersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
   }
   
   
