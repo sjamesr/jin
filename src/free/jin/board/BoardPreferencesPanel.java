@@ -135,7 +135,7 @@ public class BoardPreferencesPanel extends TabbedPreferencesPanel{
     pos.setLexigraphic("rn-qkbnrPPP-pppp-------------b---------------------PPPPPRNBQKBNR");
     
     for (int i = 0; i < panels.size(); i++)
-      ((BoardModifyingPrefsPanel)panels.elementAt(i)).initPreviewBoard();
+      ((BoardModifyingPrefsPanel)panels.get(i)).initPreviewBoard();
   }
   
   
