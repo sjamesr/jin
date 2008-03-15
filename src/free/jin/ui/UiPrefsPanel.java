@@ -26,10 +26,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.Jin;
-
 
 
 /**
@@ -68,19 +64,13 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
   
   
   /**
-   * Overrides {@link CompositePreferencesPanel#applyChanges()} to ask the user
-   * about restarting Jin to apply the new settings.
+   * Returns <code>true</code>.
    */
   
-  public void applyChanges() throws BadChangesException{
-    super.applyChanges();
-    
-    Object result = I18n.get(UiPrefsPanel.class).question(OptionPanel.YES, "restartDialog", this,
-      new Object[]{Jin.getAppName()});
-    
-    if (result == OptionPanel.YES)
-      Jin.getInstance().quit(false);
+  public boolean applyRequiresRestart(){
+    return true;
   }
-
-
+  
+  
+  
 }
