@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2007 Alexander Maryanovsky.
+ * Copyright (C) 2008 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -19,49 +19,62 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package free.jin.console.ics;
+package free.jin.console.icc;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.console.ChatConsoleDesignation;
+import free.jin.console.ics.IcsGeneralChatConsoleDesignation;
+import free.jin.event.ChatEvent;
 
 
 
 /**
- * A console designation which displays shouts.
+ * The "general chat" console for ICC's main server. This displays shouts.
+ * 
+ * @author Maryanovsky Alexander
  */
 
-public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
+public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesignation{
   
   
   
   /**
-   * Creates a new <code>ShoutChatConsoleDesignation</code>.
-   * 
-   * @param connection The connection to the server.
-   * @param encoding The encoding to use for encoding/decoding messages.
-   * @param isConsoleCloseable Whether the console should be closeable. 
+   * Creates a new <code>IccGeneralChatConsoleDesignation</code>.
    */
   
-  private ShoutChatConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
-    super(connection, I18n.get(ShoutChatConsoleDesignation.class).getString("name"),
-        encoding, isConsoleCloseable);
+  public IccGeneralChatConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
+    super(connection, encoding, isConsoleCloseable);
     
     addAccepted("shout", null, ANY_SENDER);
     addAccepted("ishout", null, ANY_SENDER);
+    addAccepted("announcement", null, ANY_SENDER);
     
-    I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
-    addCommandType(new AbstractCommandType(i18n.getString("shout.commandName")){
-      protected void send(String userText){
-        sendTaggedCommand("shout " + userText);
-      }
-    });
-    
+    I18n i18n = I18n.get(IccGeneralChatConsoleDesignation.class);
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
       protected void send(String userText){
         sendTaggedCommand("i " + userText);
       }
     });
+  }
+  
+  
+  
+  /**
+   * Returns whether the specified chat event is a shout.
+   */
+
+  protected boolean isStandardChatMessage(ChatEvent evt){
+    return "shout".equals(evt.getType());
+  }
+  
+  
+  
+  /**
+   * Sends the specified text as a shout.
+   */
+  
+  protected void sendStandardChatMessage(String userText){
+    sendTaggedCommand("shout " + userText);
   }
   
   

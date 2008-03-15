@@ -22,11 +22,7 @@
 package free.jin.console.icc;
 
 import free.jin.Connection;
-import free.jin.Game;
-import free.jin.I18n;
-import free.jin.ServerUser;
 import free.jin.console.ics.IcsSystemConsoleDesignation;
-import free.jin.event.ChatEvent;
 
 
 
@@ -47,34 +43,6 @@ public class ChessclubSystemConsoleDesignation extends IcsSystemConsoleDesignati
   
   public ChessclubSystemConsoleDesignation(Connection connection, String encoding){
     super(connection, encoding);
-  }
-  
-  
-  
-  /**
-   * Returns the text which should be added to the console for the specified
-   * chat event.
-   */
-
-  protected String textForChat(ChatEvent evt){
-    String type = evt.getType();
-    ServerUser sender = evt.getSender();
-    String title = evt.getSenderTitle();
-    String message = decode(evt.getMessage());
-    Object forum = evt.getForum();
-    
-    if ("qtell".equals(type))
-      return ChessclubConsoleManager.parseQTell(evt);
-    else if ("channel-qtell".equals(type))
-      return ChessclubConsoleManager.parseChannelQTell(evt);
-    
-    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
-      forum = ((Game)forum).getID();
-
-    Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
-    
-    I18n i18n = I18n.get(ChessclubSystemConsoleDesignation.class);
-    return i18n.getFormattedString(type + ".displayPattern", args);
   }
   
   

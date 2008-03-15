@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2005 Alexander Maryanovsky.
+ * Copyright (C) 2008 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -24,11 +24,12 @@ package free.jin.console.icc;
 import free.jin.console.ConsoleManager;
 import free.jin.console.prefs.ChannelTextPrefsPanel;
 import free.jin.console.prefs.ConsolePrefsPanel;
+import free.jin.console.prefs.CustomConsolesPrefsPanel;
 import free.jin.console.prefs.TextPrefsPanel;
 
 
 /**
- * An ICC specific console preferences panel.
+ * An ICC-specific console preferences panel.
  */
 
 public class ChessclubConsolePrefsPanel extends ConsolePrefsPanel{
@@ -54,7 +55,17 @@ public class ChessclubConsolePrefsPanel extends ConsolePrefsPanel{
   protected TextPrefsPanel createTextPrefsPanel(ConsoleManager cm){
     return new ChannelTextPrefsPanel(cm);
   }
-
+  
+  
+  
+  /**
+   * Creates an ICC-specific custom consoles prefs panel.
+   */
+  
+  protected CustomConsolesPrefsPanel createCustomConsolesPrefsPanel(ConsoleManager cm){
+     return new ChessclubCustomConsolesPrefsPanel(cm);
+  }
+  
   
   
 }

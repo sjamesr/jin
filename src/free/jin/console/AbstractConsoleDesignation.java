@@ -32,12 +32,10 @@ import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 import free.jin.Connection;
-import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
 import free.util.AbstractNamed;
-import free.util.TextUtilities;
 import free.util.Utilities;
 
 
@@ -171,7 +169,9 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   /**
    * The tag subclasses should use for tagging commands and messages sent to the
-   * server. 
+   * server.
+   * 
+   * @see #sendTaggedCommand(String)
    */
   
   protected String getTag(){
@@ -312,7 +312,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected final String encode(String s){
-    return convert(s, encoding, connection.getTextEncoding());
+    return ConsoleManager.convert(s, encoding, connection.getTextEncoding());
   }
   
   
@@ -323,22 +323,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected final String decode(String s){
-    return convert(s, connection.getTextEncoding(), encoding);
-  }
-  
-  
-  
-  /**
-   * Converts the specified string from the between the specified encodings.
-   * If either of the encodings is <code>null</code>, no conversion is
-   * performed.
-   */
-  
-  private static String convert(String s, String fromEncoding, String toEncoding){
-    if ((fromEncoding == null) || (toEncoding == null))
-      return s;
-    else
-      return TextUtilities.convert(s, fromEncoding, toEncoding);
+    return ConsoleManager.convert(s, connection.getTextEncoding(), encoding);
   }
   
   
@@ -352,6 +337,16 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   void setEncoding(String encoding){
     this.encoding = encoding;
+  }
+  
+  
+  
+  /**
+   * Returns this console's encoding.
+   */
+  
+  protected String getEncoding(){
+    return encoding;
   }
   
   
@@ -403,6 +398,17 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * Sends the specified command to the server, tagged with the tag of this
+   * console designation.
+   */
+  
+  protected void sendTaggedCommand(String command){
+    connection.sendTaggedCommand(command, getTag());
+  }
+  
+  
+  
+  /**
    * Returns whether the specified event's client tag is the same tag as ours.
    * 
    * @see getTag()
@@ -441,23 +447,12 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
-   * Appends the specified chat event to the console. The default implementation
-   * appends the simple <code>[username][titles]: [message]</code> string to the
-   * console.
+   * Appends the specified chat event to the console.
    */
   
   protected void appendChat(ChatEvent evt){
-    ChatEvent chatEvent = (ChatEvent)evt;
     Console console = getConsole();
-    
-    ServerUser sender = chatEvent.getSender();
-    String title = chatEvent.getSenderTitle();
-    String message = decode(chatEvent.getMessage());
-    
-    String text = sender.getName() + title + ": " + message;
-    String textType = console.textTypeForEvent(chatEvent);
-    
-    console.addToOutput(text, textType);
+    console.addToOutput(evt, getEncoding());
   }
   
   
@@ -504,8 +499,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     
     /**
-     * Creates a new <code>AbstractCommandType</code> with the specified name
-     * and connection to the server.
+     * Creates a new <code>AbstractCommandType</code> with the specified name.
      */
     
     public AbstractCommandType(String name){
@@ -578,12 +572,15 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     /**
      * Echoes the text entered by the user to the console.
+     * The default implementation does nothing.
      * 
      * @param userText The text entered by the user.
      * @param user The user we're logged in with.
      */
     
-    protected abstract void echo(String userText);
+    protected void echo(String userText){
+      
+    }
       
     
     

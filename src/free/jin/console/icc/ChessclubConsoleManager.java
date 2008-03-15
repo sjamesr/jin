@@ -1,7 +1,7 @@
 /**
  * Jin - a chess client for internet chess servers.
  * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2007 Alexander Maryanovsky.
+ * Copyright (C) 2008 Alexander Maryanovsky.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,18 +21,18 @@
 
 package free.jin.console.icc;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import free.jin.Connection;
 import free.jin.Game;
+import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.Channel;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
-import free.jin.console.ConsoleManager;
-import free.jin.console.ics.IcsChannelConsoleDesignation;
-import free.jin.console.ics.ShoutChatConsoleDesignation;
+import free.jin.console.ics.IcsConsoleManager;
+import free.jin.console.ics.IcsCustomConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
@@ -41,16 +41,43 @@ import free.jin.ui.PreferencesPanel;
  * An extension of the default ConsoleManager for the chessclub.com server.
  */
 
-public class ChessclubConsoleManager extends ConsoleManager{
+public class ChessclubConsoleManager extends IcsConsoleManager{
   
   
   
   /**
-   * Returns the id of the server we're connected to.
+   * {@inheritDoc} 
    */
   
-  private String getServerId(){
-    return getUser().getServer().getId();
+  protected String getDefaultTextForChat(ChatEvent evt, String encoding){
+    String type = evt.getType();
+    ServerUser sender = evt.getSender();
+    String title = evt.getSenderTitle();
+    String message = decode(evt.getMessage(), encoding);
+    Object forum = evt.getForum();
+    
+    if ("qtell".equals(type))
+      return ChessclubConsoleManager.parseQTell(evt);
+    else if ("channel-qtell".equals(type))
+      return ChessclubConsoleManager.parseChannelQTell(evt);
+    
+    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
+      forum = ((Game)forum).getID();
+
+    Object [] args = new Object[]{String.valueOf(sender), title, String.valueOf(forum), message};
+    
+    I18n i18n = I18n.get(ChessclubConsoleManager.class);
+    return i18n.getFormattedString(type + ".displayPattern", args);
+  }
+  
+  
+  
+  /**
+   * Returns whether we're connecting to the WCL server.
+   */
+  
+  public boolean isWcl(){
+    return "wcl".equals(getServer().getId());
   }
   
   
@@ -80,12 +107,16 @@ public class ChessclubConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    if ("wcl".equals(getServerId())){
-      Channel lobby = (Channel)getChannels().get(new Integer(250));
-      return new IcsChannelConsoleDesignation(getConn(), lobby, getEncoding(), isCloseable);
-    }
+    if (isWcl())
+      return new WclGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
     else
-      return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
+      return new IccGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
+//    if (isWcl()){
+//      Channel lobby = (Channel)getChannels().get(new Integer(250));
+//      return new IcsChannelConsoleDesignation(getConn(), lobby, getEncoding(), isCloseable);
+//    }
+//    else
+//      return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
   
   
@@ -121,12 +152,52 @@ public class ChessclubConsoleManager extends ConsoleManager{
   
   
   /**
+   * {@inheritDoc}
+   */
+  
+  protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
+      String title, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts){
+    return new ChessclubCustomConsoleDesignation(getConn(), title, getEncoding(), false,
+        channels, messageRegex, includeShouts, includeCShouts);
+  }
+  
+  
+  
+  /**
    * Returns the set of ICC/WCL channels.
    */
   
-  protected Map createChannels(){
-    boolean isWcl = "wcl".equals(getServerId());
-    Map channels = new HashMap();
+  protected SortedMap createChannels(){
+    int [] channelsOrder = (int [])getPrefs().lookup("channels.order." + getServer().getId());
+    final Map channelsOrderMap = new HashMap();
+    for (int i = 0; i < channelsOrder.length; i++)
+      channelsOrderMap.put(new Integer(channelsOrder[i]), new Integer(i));
+    
+    Comparator channelsComparator = new Comparator(){
+      public int compare(Object arg0, Object arg1){
+        Integer i1 = (Integer)arg0;
+        Integer i2 = (Integer)arg1;
+        
+        Integer position1 = (Integer)channelsOrderMap.get(i1);
+        Integer position2 = (Integer)channelsOrderMap.get(i2);
+        
+        if (position1 == null){
+          if (position2 == null)
+            return i1.intValue() - i2.intValue();
+          else
+            return 1;
+        }
+        else{
+          if (position2 == null)
+            return -1;
+          else
+            return position1.intValue() - position2.intValue();
+        }
+      }
+    };
+    
+    boolean isWcl = isWcl();
+    SortedMap channels = new TreeMap(channelsComparator);
     
     for (int i = 0; i < 400; i++){
       Channel channel = isWcl ? (Channel)(new WclChannel(i)) : (Channel)(new IccChannel(i));

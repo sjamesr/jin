@@ -24,12 +24,13 @@ package free.jin.console.fics;
 import free.jin.console.ConsoleManager;
 import free.jin.console.prefs.ChannelTextPrefsPanel;
 import free.jin.console.prefs.ConsolePrefsPanel;
+import free.jin.console.prefs.CustomConsolesPrefsPanel;
 import free.jin.console.prefs.TextPrefsPanel;
 
 
 
 /**
- * A FICS specific console preferences panel.
+ * A FICS-specific console preferences panel.
  */
 
 public class FreechessConsolePrefsPanel extends ConsolePrefsPanel{
@@ -56,6 +57,16 @@ public class FreechessConsolePrefsPanel extends ConsolePrefsPanel{
     return new ChannelTextPrefsPanel(cm);
   }
   
+  
+  
+  /**
+   * Creates a FICS-specific custom consoles prefs panel.
+   */
+  
+  protected CustomConsolesPrefsPanel createCustomConsolesPrefsPanel(ConsoleManager cm){
+    return new FreechessCustomConsolesPrefsPanel(cm);
+  }
 
+  
   
 }

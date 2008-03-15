@@ -21,16 +21,20 @@
 
 package free.jin.console.fics;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import free.jin.Game;
+import free.jin.I18n;
 import free.jin.ServerUser;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
-import free.jin.console.ConsoleManager;
 import free.jin.console.PersonalChatConsoleDesignation;
-import free.jin.console.ics.ShoutChatConsoleDesignation;
+import free.jin.console.ics.IcsConsoleManager;
+import free.jin.console.ics.IcsCustomConsoleDesignation;
+import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
 
 
@@ -38,7 +42,30 @@ import free.jin.ui.PreferencesPanel;
  * An extension of the default ConsoleManager for the freechess.org server.
  */
 
-public class FreechessConsoleManager extends ConsoleManager{
+public class FreechessConsoleManager extends IcsConsoleManager{
+  
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  
+  protected String getDefaultTextForChat(ChatEvent evt, String encoding){
+    String type = evt.getType();
+    ServerUser sender = evt.getSender();
+    String title = evt.getSenderTitle();
+    String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
+    String message = decode(evt.getMessage(), encoding);
+    Object forum = evt.getForum();
+    
+    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
+      forum = ((Game)forum).getID();
+    
+    Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
+    
+    I18n i18n = I18n.get(FreechessConsoleManager.class);
+    return i18n.getFormattedString(type + ".displayPattern", args);
+  }
   
   
   
@@ -67,7 +94,7 @@ public class FreechessConsoleManager extends ConsoleManager{
    */
   
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
-    return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
+    return new FicsGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
   
   
@@ -103,11 +130,23 @@ public class FreechessConsoleManager extends ConsoleManager{
   
   
   /**
+   * {@inheritDoc}
+   */
+  
+  protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
+      String title, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts){
+    return new FreechessCustomConsoleDesignation(getConn(), title, getEncoding(), false,
+        channels, messageRegex, includeShouts, includeCShouts);
+  }
+  
+  
+  
+  /**
    * Returns the set of FICS channels.
    */
   
-  protected Map createChannels(){
-    Map channels = new HashMap();
+  protected SortedMap createChannels(){
+    SortedMap channels = new TreeMap();
     
     for (int i = 0; i < 256; i++)
       channels.put(new Integer(i), new FicsChannel(i));

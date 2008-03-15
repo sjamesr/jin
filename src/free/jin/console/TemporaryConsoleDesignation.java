@@ -75,7 +75,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
    * Returns our tag.
    */
   
-  protected String getTag(){
+  public String getTag(){
     return "tmp-" + index;
   }
   

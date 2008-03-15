@@ -22,11 +22,7 @@
 package free.jin.console.fics;
 
 import free.jin.Connection;
-import free.jin.Game;
-import free.jin.I18n;
-import free.jin.ServerUser;
 import free.jin.console.ics.IcsSystemConsoleDesignation;
-import free.jin.event.ChatEvent;
 
 
 
@@ -47,30 +43,6 @@ public class FreechessSystemConsoleDesignation extends IcsSystemConsoleDesignati
   
   public FreechessSystemConsoleDesignation(Connection connection, String encoding){
     super(connection, encoding);
-  }
-  
-  
-  
-  /**
-   * Returns the text which should be added to the console for the specified
-   * chat event.
-   */
-
-  protected String textForChat(ChatEvent evt){
-    String type = evt.getType();
-    ServerUser sender = evt.getSender();
-    String title = evt.getSenderTitle();
-    String rating = evt.getSenderRating() == -1 ? "----" : String.valueOf(evt.getSenderRating());
-    String message = decode(evt.getMessage());
-    Object forum = evt.getForum();
-    
-    if (evt.getCategory() == ChatEvent.GAME_CHAT_CATEGORY)
-      forum = ((Game)forum).getID();
-    
-    Object [] args = new Object[]{String.valueOf(sender), title, rating, String.valueOf(forum), message};
-    
-    I18n i18n = I18n.get(FreechessSystemConsoleDesignation.class);
-    return i18n.getFormattedString(type + ".displayPattern", args);
   }
   
   

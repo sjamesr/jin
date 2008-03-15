@@ -19,42 +19,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package free.jin.console.ics;
+package free.jin.console.fics;
 
-import free.jin.Connection;
-import free.jin.console.SystemConsoleDesignation;
-import free.jin.event.ChatEvent;
+import free.jin.console.ConsoleManager;
+import free.jin.console.ics.IcsCustomConsolesPrefsPanel;
 
 
 
 /**
- * A partial system console implementation for ICS-based servers. 
- *
+ * A FICS-specific <code>CustomConsolesPrefsPanel</code>.
+ * 
  * @author Maryanovsky Alexander
  */
 
-public abstract class IcsSystemConsoleDesignation extends SystemConsoleDesignation{
+public class FreechessCustomConsolesPrefsPanel extends IcsCustomConsolesPrefsPanel{
   
   
   
   /**
-   * Creates a new <code>IcsSystemConsoleDesignation</code> with the specified
-   * connection and encoding.
+   * Creates a new <code>FreechessCustomConsolesPrefsPanel</code> for the
+   * specified console manager. 
    */
   
-  public IcsSystemConsoleDesignation(Connection connection, String encoding){
-    super(connection, encoding);
-  }
-  
-  
-  
-  /**
-   * Returns whether the specified chat event is a personal tell to the user.
-   */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    String type = evt.getType();
-    return "tell".equals(type) || "say".equals(type) || "ptell".equals(type);
+  public FreechessCustomConsolesPrefsPanel(ConsoleManager cm){
+    super(cm);
   }
   
   

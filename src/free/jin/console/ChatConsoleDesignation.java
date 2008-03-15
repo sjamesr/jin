@@ -147,32 +147,6 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Appends the specified chat event to the console.
-   */
-  
-  protected void appendChat(ChatEvent evt){
-    String senderName = evt.getSender().getName();
-    String senderTitle = evt.getSenderTitle();
-    int senderRating = evt.getSenderRating();
-    Object forum = evt.getForum();
-    String message = decode(evt.getMessage());
-    
-    String text = 
-      senderName +
-      (senderTitle == null ? "" : senderTitle) +
-      (senderRating == -1 ? "" : "(" + senderRating + ")") +
-      (forum == null ? "" : "[" + forum.toString() + "]") +
-      ": " +
-      message;
-    
-    Console console = getConsole();
-    console.addToOutput(text, console.textTypeForEvent(evt));
-  }
-  
-  
-  
-  
-  /**
    * The representation of a subset of chat types.
    */
   

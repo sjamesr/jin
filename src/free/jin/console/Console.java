@@ -919,6 +919,17 @@ public class Console extends JPanel implements KeyListener{
   
   
   /**
+   * Adds the default representation of the specified <code>ChatEvent</code> to
+   * the console.
+   */
+  
+  public void addToOutput(ChatEvent evt, String encoding){
+    addToOutput(consoleManager.getDefaultTextForChat(evt, encoding), textTypeForEvent(evt));
+  }
+  
+  
+  
+  /**
    * Returns the text type which should be used when adding text for the
    * specified event to the console. The returned text type is a recommendation 
    * - if there is a good reason to use a different type, you may do so.

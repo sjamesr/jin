@@ -23,7 +23,6 @@ package free.jin.console.ics;
 
 import free.jin.Connection;
 import free.jin.I18n;
-import free.jin.console.Channel;
 import free.jin.console.ChatConsoleDesignation;
 import free.jin.console.Console;
 import free.jin.event.ChatEvent;
@@ -31,45 +30,28 @@ import free.jin.event.ChatEvent;
 
 
 /**
- * A chat console designation which displays a single channel.
+ * A base class for general chat designations for ICS-based servers. 
+ * 
+ * @author Maryanovsky Alexander
  */
 
-public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
+public abstract class IcsGeneralChatConsoleDesignation extends ChatConsoleDesignation{
   
   
   
   /**
-   * The channel we're displaying.
+   * Creates a new <code>IccGeneralChatConsoleDesignation</code>.
    */
   
-  private final Channel channel;
-  
-  
-  
-  /**
-   * Creates a new <code>IcsChannelConsoleDesignation</code> for the specified
-   * set of channels.
-   * 
-   * @param connection The connection to the server.
-   * @param channel The channel to display.
-   * @param encoding The encoding to use for encoding/decoding messages.
-   * @param isConsoleCloseable Whether the console should be closeable. 
-   */
-  
-  public IcsChannelConsoleDesignation(Connection connection, Channel channel, String encoding, boolean isConsoleCloseable){
-    super(connection, channel.getShortName(), encoding, isConsoleCloseable);
+  public IcsGeneralChatConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
+    super(connection, 
+        I18n.get(IcsGeneralChatConsoleDesignation.class).getString("name"),
+        encoding, isConsoleCloseable);
     
-    this.channel = channel;
-    
-    addAccepted("channel-tell", channel.getId(), ANY_SENDER);
-    addAccepted("channel-qtell", channel.getId(), ANY_SENDER);
-    addAccepted("announcement", null, ANY_SENDER);
-    
-    String commandName = I18n.get(IcsChannelConsoleDesignation.class).getString("sendChannelTellCommandName");
-    addCommandType(new AbstractCommandType(commandName){
+    I18n i18n = I18n.get(IcsGeneralChatConsoleDesignation.class);
+    addCommandType(new AbstractCommandType(i18n.getString("message.commandName")){
       protected void send(String userText){
-        Channel channel = IcsChannelConsoleDesignation.this.channel;
-        sendTaggedCommand("xtell " + channel.getId() + " " + userText);
+        sendStandardChatMessage(userText);
       }
     });
   }
@@ -77,20 +59,34 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
   
   
   /**
-   * {@inheritDoc}
+   * Sends the specified string as the message to the chat forum.
+   */
+  
+  protected abstract void sendStandardChatMessage(String userText);
+  
+  
+  
+  /**
+   * Returns whether the specified message is a standard chat message.
+   */
+  
+  protected abstract boolean isStandardChatMessage(ChatEvent evt);
+  
+  
+  
+  /**
+   * Displays the specified message in the console in a standard chat format.
    */
   
   protected void appendChat(ChatEvent evt){
-    if ("channel-tell".equals(evt.getType())){
+    if (isStandardChatMessage(evt)){
       String senderName = evt.getSender().getName();
       String senderTitle = evt.getSenderTitle();
-      int senderRating = evt.getSenderRating();
       String message = decode(evt.getMessage());
-
+      
       String text = 
         senderName +
         (senderTitle == null ? "" : senderTitle) +
-        (senderRating == -1 ? "" : "(" + senderRating + ")") +
         ": " +
         message;
       
@@ -100,7 +96,7 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
     else
       super.appendChat(evt);
   }
-  
+ 
   
   
 }

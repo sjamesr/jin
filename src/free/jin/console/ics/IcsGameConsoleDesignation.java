@@ -143,8 +143,8 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
     protected void send(String userText){
       // We don't use "say" because the "say" target might've changed since the
       // game was finished, but we want to keep talking to the same person, and
-      // tell always does that, so it's safer.
-      connection.sendTaggedCommand("xtell " + opponent.getName() + "! " + userText, getTag());
+      // xtell always does that, so it's safer.
+      sendTaggedCommand("xtell " + opponent.getName() + "! " + userText);
     }
     
     
@@ -187,18 +187,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      */
     
     protected void send(String userText){
-      connection.sendTaggedCommand(getKibitzToCommand() + " " + game.getID() + " " + userText, getTag());
-    }
-    
-    
-    
-    /**
-     * Does nothing, since the message will be echoed to us anyway.
-     */
-    
-    protected void echo(String userText){
-      
-      
+      sendTaggedCommand(getKibitzToCommand() + " " + game.getID() + " " + userText);
     }
     
     
@@ -230,7 +219,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      */
     
     protected void send(String userText){
-      connection.sendTaggedCommand(getWhisperToCommand() + " " + game.getID() + " " + userText, getTag());
+      sendTaggedCommand(getWhisperToCommand() + " " + game.getID() + " " + userText);
     }
     
     

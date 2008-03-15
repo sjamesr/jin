@@ -78,26 +78,16 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   /**
-   * Appends the text for the specified chat event to the console.
-   * 
-   * @see #textForChat(ChatEvent, String)
+   * Appends the text for the specified chat event to the console and notifies
+   * the console of any personal tells received..
    */
   
   protected void appendChat(ChatEvent evt){
-    Console console = getConsole();
-    console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
+    super.appendChat(evt);
+    
     if (isPersonalTell(evt))
-      console.personalTellReceived(evt.getSender());
+      getConsole().personalTellReceived(evt.getSender());
   }
-  
-  
-  
-  /**
-   * Returns the text which should be added to the console for the specified
-   * chat event.
-   */
-  
-  protected abstract String textForChat(ChatEvent evt);
   
   
   

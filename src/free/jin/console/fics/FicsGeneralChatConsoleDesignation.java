@@ -19,44 +19,52 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package free.jin.console.ics;
+package free.jin.console.fics;
 
 import free.jin.Connection;
-import free.jin.console.SystemConsoleDesignation;
+import free.jin.console.ics.IcsGeneralChatConsoleDesignation;
 import free.jin.event.ChatEvent;
 
 
 
 /**
- * A partial system console implementation for ICS-based servers. 
- *
+ * A FICS-specific general chat console. This displays shouts.
+ * 
  * @author Maryanovsky Alexander
  */
 
-public abstract class IcsSystemConsoleDesignation extends SystemConsoleDesignation{
+public class FicsGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesignation{
   
   
   
   /**
-   * Creates a new <code>IcsSystemConsoleDesignation</code> with the specified
-   * connection and encoding.
+   * Creates a new <code>FicsGeneralChatConsoleDesignation</code>.
    */
   
-  public IcsSystemConsoleDesignation(Connection connection, String encoding){
-    super(connection, encoding);
+  public FicsGeneralChatConsoleDesignation(Connection connection, String encoding, boolean isConsoleCloseable){
+    super(connection, encoding, isConsoleCloseable);
   }
   
   
   
   /**
-   * Returns whether the specified chat event is a personal tell to the user.
+   * Returns whether the specified chat event is a shout.
    */
-  
-  protected boolean isPersonalTell(ChatEvent evt){
-    String type = evt.getType();
-    return "tell".equals(type) || "say".equals(type) || "ptell".equals(type);
+
+  protected boolean isStandardChatMessage(ChatEvent evt){
+    return "shout".equals(evt.getType());
   }
   
+  
+  
+  /**
+   * Sends the specified text as a shout.
+   */
+  
+  protected void sendStandardChatMessage(String userText){
+    sendTaggedCommand("shout " + userText);
+  }
+
   
   
 }

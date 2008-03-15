@@ -33,12 +33,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingConstants;
 
 import free.jin.*;
 import free.jin.action.JinAction;
-import free.jin.console.prefs.ConsolePrefsPanel;
 import free.jin.event.*;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIAdapter;
@@ -95,10 +95,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
   
   /**
-   * (lazily created) map of channel numbers to channels.
+   * (lazily created) map of channel IDs to channels.
    */
   
-  private Map channels = null;
+  private SortedMap channels = null;
   
   
   
@@ -209,7 +209,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   private void createConsoles(){
     Preferences prefs = getPrefs();
-    int consoleCount = prefs.getInt("consoles.count", 0);
+    int consoleCount = prefs.getInt("consoles.count");
     int activeConsole = prefs.getInt("consoles.selected", consoleCount - 1);
     for (int i = 0; i < consoleCount; i++){
       ConsoleDesignation designation = 
@@ -241,6 +241,17 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     else if ("chat".equals(type)){
       boolean isCloseable = prefs.getBool(prefsPrefix + "closeable", true);
       return createGeneralChatConsoleDesignation(isCloseable);
+    }
+    else if ("custom".equals(type)){
+      String title = prefs.getString(prefsPrefix + "title");
+      
+      Object channelsPref = prefs.get(prefsPrefix + "channels", null);
+      List channels = channelsPref == null ? Collections.EMPTY_LIST : parseConsoleChannelsPref(channelsPref);
+      
+      String messageRegex = prefs.getString(prefsPrefix + "messageRegex", null);
+      Pattern messageRegexPattern = messageRegex == null ? null : Pattern.compile(messageRegex);
+      
+      return loadCustomConsoleDesignation(prefsPrefix, title, channels, messageRegexPattern);
     }
     else
       throw new IllegalArgumentException("Unrecognized designation type: " + type);
@@ -290,6 +301,16 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   protected abstract ConsoleDesignation createGameConsoleDesignation(Game game);
+  
+  
+  
+  /**
+   * Loads a custom console designation from the preferences using the specified
+   * prefix and the already retrieved data.
+   */
+  
+  protected abstract CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix, String title,
+      List channels, Pattern messageRegex);
   
   
   
@@ -584,6 +605,43 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * Encodes the specified string for sending to the server, according to the
+   * connection's encoding and the specified encoding.
+   */
+  
+  protected final String encode(String s, String encoding){
+    return ConsoleManager.convert(s, encoding, getConn().getTextEncoding());
+  }
+  
+  
+  
+  /**
+   * Decodes the specified message received from the server according to the
+   * connection's encoding and the specified encoding.
+   */
+  
+  protected final String decode(String s, String encoding){
+    return ConsoleManager.convert(s, getConn().getTextEncoding(), encoding);
+  }
+  
+  
+  
+  /**
+   * Converts the specified string from the between the specified encodings.
+   * If either of the encodings is <code>null</code>, no conversion is
+   * performed.
+   */
+  
+  public static String convert(String s, String fromEncoding, String toEncoding){
+    if ((fromEncoding == null) || (toEncoding == null))
+      return s;
+    else
+      return TextUtilities.convert(s, fromEncoding, toEncoding);
+  }
+
+  
+  
+  /**
    * Rereads the plugin/user properties and changes settings accordingly.
    * This method should be called when the user changes the preferences.
    */
@@ -736,12 +794,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
 
   /**
-   * Translates the given ChatEvent into a string to be added to the console's
-   * output. This method is intended to be overridden by server specific classes.
-   * The default implementation returns a string useful only for debugging.
+   * Returns the default text to be added to a console when receiving the
+   * specified chat event (decoded to the specified encoding).
    */
 
-  protected String translateChat(ChatEvent evt){
+  protected String getDefaultTextForChat(ChatEvent evt, String encoding){
     return evt.toString();
   }
   
@@ -842,14 +899,16 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Returns the channels/rooms available on the server we're logged on to
-   * (a map from channel IDs to {@link Channel} objects). 
+   * (a map from channel IDs to {@link Channel} objects). The order of the map
+   * is the order in which the channels should be normally displayed to the
+   * user. 
    */
   
-  public Map getChannels(){
+  public SortedMap getChannels(){
     if (channels == null)
       channels = createChannels();
     
-    return Collections.unmodifiableMap(channels);
+    return Collections.unmodifiableSortedMap(channels);
   }
   
   
@@ -860,7 +919,24 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * This method is meant to be implemented by server-specific classes.
    */
   
-  protected abstract Map createChannels();
+  protected abstract SortedMap createChannels();
+  
+  
+  
+  /**
+   * Encodes the specified list of channels into a preference property value.
+   */
+  
+  public abstract Object encodeConsoleChannelsPref(List channels);
+  
+  
+  
+  /**
+   * Parses the value of the preference specifying the list of channels a
+   * console displays.
+   */
+  
+  public abstract List parseConsoleChannelsPref(Object channelsPrefsValue);
   
   
   
@@ -903,9 +979,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Return a PreferencesPanel for changing the console manager's settings.
    */
 
-  public PreferencesPanel getPreferencesUI(){
-    return new ConsolePrefsPanel(this);
-  }
+  public abstract PreferencesPanel getPreferencesUI();
   
   
   

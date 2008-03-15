@@ -31,7 +31,7 @@ import free.jin.ui.TabbedPreferencesPanel;
  * The main preferences panel for the console plugin. 
  */
 
-public class ConsolePrefsPanel extends TabbedPreferencesPanel{
+public abstract class ConsolePrefsPanel extends TabbedPreferencesPanel{
   
   
   
@@ -41,7 +41,7 @@ public class ConsolePrefsPanel extends TabbedPreferencesPanel{
   
   public ConsolePrefsPanel(ConsoleManager consoleManager){
     addPanel(createTextPrefsPanel(consoleManager), "textDisplayTab");
-//    addPanel(createMultipleConsolesPrefsPanel(consoleManager), "multipleConsolesTab");
+    addPanel(createCustomConsolesPrefsPanel(consoleManager), "customConsolesTab");
     if (consoleManager.getConn().getTextEncoding() != null)
       addPanel(new EncodingPrefsPanel(consoleManager), "encodingTab");
   }
@@ -62,15 +62,11 @@ public class ConsolePrefsPanel extends TabbedPreferencesPanel{
   
   
   /**
-   * Creates the <code>MultipleConsolesPrefsPanel</code> to be used in this
-   * console prefs panel. The default implementation returns a plain
-   * <code>MultipleConsolesPrefsPanel</code>, but may be overridden by
-   * server-specific classes to return a server-specific text prefs panel.
+   * Creates the <code>CustomConsolesPrefsPanel</code> to be used in this
+   * console prefs panel.
    */
   
-//  protected MultipleConsolesPrefsPanel createMultipleConsolesPrefsPanel(ConsoleManager cm){
-//    return new MultipleConsolesPrefsPanel(cm);
-//  }
+  protected abstract CustomConsolesPrefsPanel createCustomConsolesPrefsPanel(ConsoleManager cm);
   
   
   
