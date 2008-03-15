@@ -21,7 +21,10 @@
 
 package free.jin.ui;
 
-import java.util.Vector;
+import java.util.*;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
@@ -39,7 +42,15 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    * A list of the underlying panels.
    */
   
-  protected final Vector panels = new Vector();
+  protected final List panels = new LinkedList();
+  
+  
+  
+  /**
+   * Keeps track which panels have changes to apply.
+   */
+  
+  private final Set changedPanels = new HashSet();
   
   
   
@@ -48,8 +59,14 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    */
   
   protected final void addPanel(PreferencesPanel panel, String panelTitle, String panelToolTip){
-    panels.addElement(panel);
-    panel.addChangeListener(proxyChangeListener);
+    panels.add(panel);
+    
+    panel.addChangeListener(new ChangeListener(){
+      public void stateChanged(ChangeEvent e){
+        fireStateChanged();
+        changedPanels.add(e.getSource());
+      }
+    });
     
     addPanelToUi(panel, panelTitle, panelToolTip);
   }
@@ -80,6 +97,22 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    */
   
   protected abstract void addPanelToUi(PreferencesPanel panel, String panelTitle, String panelToolTip);
+  
+  
+  
+  /**
+   * Returns whether any of our changed panels require a restart.
+   */
+  
+  public boolean applyRequiresRestart(){
+    for (Iterator i = changedPanels.iterator(); i.hasNext();){
+      PreferencesPanel panel = (PreferencesPanel)i.next();
+      if (panel.applyRequiresRestart())
+        return true;
+    }
+    
+    return false;
+  }
 
   
   
@@ -88,8 +121,13 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    */
 
   public void applyChanges() throws BadChangesException{
-    for (int i = 0; i < panels.size(); i++)
-      ((PreferencesPanel)panels.elementAt(i)).applyChanges();
+    for (Iterator i = panels.iterator(); i.hasNext();){
+      PreferencesPanel panel = (PreferencesPanel)i.next();
+      if (changedPanels.contains(panel)){
+        panel.applyChanges();
+        changedPanels.remove(panel);
+      }
+    }
   }
   
   
