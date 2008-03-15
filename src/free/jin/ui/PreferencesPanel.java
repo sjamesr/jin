@@ -21,6 +21,7 @@
 
 package free.jin.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,8 +29,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.JTextComponent;
 
 import free.jin.BadChangesException;
+import free.jin.I18n;
 import free.util.swing.PreferredSizedPanel;
 
 
@@ -97,7 +100,17 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
    */
 
   public abstract void applyChanges() throws BadChangesException;
-
+  
+  
+  
+  /**
+   * Returns whether applying the settings on this panel requires restarting
+   * the application. The default implementation returns <code>false</code>.
+   */
+  
+  public boolean applyRequiresRestart(){
+    return false;
+  }
 
 
 
@@ -137,6 +150,24 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
         ChangeListener listener = (ChangeListener)listeners[i+1];
         listener.stateChanged(changeEvent);
       }
+    }
+  }
+  
+  
+  
+  /**
+   * Shows an error dialog and focuses the error component, if any.
+   */
+  
+  public void badChangeAttempted(BadChangesException e){
+    I18n i18n = I18n.get(PreferencesPanel.class);
+    OptionPanel.error(i18n.getString("badChangesDialog.title"), e.getMessage(), PreferencesPanel.this);
+    
+    Component errorComponent = e.getErrorComponent(); 
+    if (errorComponent != null){
+      errorComponent.requestFocusInWindow();
+      if (errorComponent instanceof JTextComponent)
+        ((JTextComponent)errorComponent).selectAll();
     }
   }
   
