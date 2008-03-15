@@ -28,23 +28,12 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.Session;
-import free.jin.SessionEvent;
-import free.jin.SessionListener;
+import free.jin.*;
 import free.jin.plugin.Plugin;
 import free.util.AWTUtilities;
 import free.util.PlatformUtils;
@@ -403,16 +392,28 @@ public class PrefsMenu extends JMenu implements SessionListener{
 
     public void actionPerformed(ActionEvent evt){
       try{
-        if (applyButton.isEnabled())
+        if (applyButton.isEnabled()){
+          // Ask whether requires restart before applying changes, because applying
+          // clears any changes, and the panel no longer knows remembers whether
+          // the settings requiring restart have been changed.
+          boolean requiresRestart = prefsPanel.applyRequiresRestart();
+          
           prefsPanel.applyChanges();
+          
+          if (requiresRestart){
+            Object result = I18n.get(PrefsDialog.class).question(OptionPanel.YES, "restartDialog", this,
+                new Object[]{Jin.getAppName()});
+              
+              if (result == OptionPanel.YES)
+                Jin.getInstance().quit(false);
+          }
+        }
         applyButton.setEnabled(false);
 
         if (evt.getSource() == okButton)
           dispose();
       } catch (BadChangesException e){
-          OptionPanel.error(I18n.get(PrefsMenu.class).getString("badPrefsChangeDialog.title"), e.getMessage(), this);
-          if (e.getErrorComponent() != null)
-            e.getErrorComponent().requestFocus();
+          prefsPanel.badChangeAttempted(e);
         }
     }
 
