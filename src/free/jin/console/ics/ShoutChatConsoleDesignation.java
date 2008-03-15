@@ -24,8 +24,6 @@ package free.jin.console.ics;
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.console.ChatConsoleDesignation;
-import free.jin.console.Console;
-import free.jin.event.ChatEvent;
 
 
 
@@ -51,50 +49,19 @@ public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
     
     addAccepted("shout", null, ANY_SENDER);
     addAccepted("ishout", null, ANY_SENDER);
-    addAccepted("announcement", null, ANY_SENDER);
     
     I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
+    addCommandType(new AbstractCommandType(i18n.getString("shout.commandName")){
+      protected void send(String userText){
+        sendTaggedCommand("shout " + userText);
+      }
+    });
     
-    addCommandType(new AbstractCommandType(i18n.getString("shoutCommandName")){
+    addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
       protected void send(String userText){
-        ShoutChatConsoleDesignation.this.connection.sendTaggedCommand("shout " + userText, getTag());
+        sendTaggedCommand("i " + userText);
       }
-      protected void echo(String userText){}
     });
-      
-    addCommandType(new AbstractCommandType(i18n.getString("ishoutCommandName")){
-      protected void send(String userText){
-        ShoutChatConsoleDesignation.this.connection.sendTaggedCommand("i " + userText, getTag());
-      }
-      protected void echo(String userText){}
-    });
-  }
-  
-  
-  
-  /**
-   * Appends the text for the specified chat event to the console.
-   */
-  
-  protected void appendChat(ChatEvent evt){
-    if ("shout".equals(evt.getType()))
-      super.appendChat(evt);
-    else if ("announcement".equals(evt.getType())){
-      I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
-      
-      String name = evt.getSender().getName();
-      String message = evt.getMessage();
-      
-      String text = i18n.getFormattedString("announcementPattern", new Object[]{name, message});
-      
-      Console console = getConsole();
-      console.addToOutput(text, console.textTypeForEvent(evt));
-    }
-    else{
-      Console console = getConsole();
-      console.addToOutput("--> " + evt.getSender().getName() + " " + evt.getMessage(),
-          console.textTypeForEvent(evt));
-    }
   }
   
   

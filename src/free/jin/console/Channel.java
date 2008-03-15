@@ -78,12 +78,12 @@ public class Channel{
    * Returns the description of the channel. The name is retrieved from
    * the <code>I18n</code> object associated with the class of the object by
    * specifying "[id].description" as the i18n key. If there is no translation
-   * associated with this key, a generic description is returned.
+   * associated with this key, returns <code>null</code>;
    */
   
   public String getDescription(){
     I18n i18n = I18n.get(getClass(), Channel.class);
-    return i18n.getString(id + ".description", i18n.getString("genericChannelDescription"));
+    return i18n.getString(id + ".description", null);
   }
   
   
