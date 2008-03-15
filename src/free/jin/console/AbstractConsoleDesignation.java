@@ -378,6 +378,17 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   
   /**
+   * Sends the specified command, tagged with
+   * {@link AbstractConsoleDesignation#getTag()}, to the server.
+   */
+  
+  protected final void sendCommand(String command){
+    connection.sendTaggedCommand(command, getTag());
+  }
+  
+  
+  
+  /**
    * Splits the reception of an event into two phases - accepting (or declining)
    * it and, if accepted, sending it to the console.
    */
@@ -393,17 +404,6 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     }
     else
       return false;
-  }
-  
-  
-  
-  /**
-   * Sends the specified command to the server, tagged with the tag of this
-   * console designation.
-   */
-  
-  protected void sendTaggedCommand(String command){
-    connection.sendTaggedCommand(command, getTag());
   }
   
   
@@ -499,11 +499,37 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
     
     
     /**
+     * Whether user-text is encoded before passing it to the
+     * {@linkplain #send(String)} method. 
+     */
+    
+    private final boolean encodeUserText;
+    
+    
+    
+    /**
+     * Creates a new <code>AbstractCommandType</code> with the specified name,
+     * which will potentially encode user-text with the designation's encoding
+     * before passing it to the {@linkplain #send(String)} method.
+     */
+    
+    public AbstractCommandType(String name, boolean encodeUserText){
+      super(name);
+      
+      this.encodeUserText = encodeUserText;
+    }
+    
+    
+    
+    /**
      * Creates a new <code>AbstractCommandType</code> with the specified name.
+     * The new <code>AbstractCommandType</code> will automatically encode
+     * user-text with the designation's encoding before passing it to the
+     * {@linkplain #send(String)} method. 
      */
     
     public AbstractCommandType(String name){
-      super(name);
+      this(name, true);
     }
     
     
@@ -518,29 +544,24 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * <code>doNotEcho</code> flag is unset, to <code>echo</code>.
      */
     
-    public void handleCommand(String userText, boolean doNotEcho){
-      if (userText.startsWith("/")){
-        String command = userText.substring(1);
-        sendCommand(command);
+    public final void handleCommand(String userText, boolean doNotEcho){
+      boolean escaped = userText.startsWith("/");
+      if (escaped)
+        userText = userText.substring(1);
+      
+      if (encodeUserText)
+        userText = encode(userText);
+      
+      if (escaped){
+        sendCommand(userText);
         if (!doNotEcho)
-          echoCommand(command);
+          echoCommand(userText);
       }
       else{  
         send(userText);
         if (!doNotEcho)
           echo(userText);
       }
-    }
-    
-    
-    
-    /**
-     * Sends the specified command to the server. The default implementation
-     * sends a command tagged with {@link AbstractConsoleDesignation#getTag()}.
-     */
-    
-    protected void sendCommand(String command){
-      connection.sendTaggedCommand(encode(command), getTag());
     }
     
     
