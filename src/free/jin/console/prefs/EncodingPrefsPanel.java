@@ -85,7 +85,9 @@ public class EncodingPrefsPanel extends PreferencesPanel{
           if (Charset.isSupported(alias))
             charsets.addElement(Charset.forName(aliases[i]));
         }
-        CHARSET_CATEGORIES.put(categoryKey, charsets);
+        
+        if (!charsets.isEmpty())
+          CHARSET_CATEGORIES.put(categoryKey, charsets);
       }
     } catch (IOException e){
         e.printStackTrace();
