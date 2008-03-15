@@ -52,7 +52,7 @@ public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
     I18n i18n = I18n.get(IccGeneralChatConsoleDesignation.class);
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("i " + userText);
+        sendCommand("i " + userText);
       }
     });
   }
@@ -74,7 +74,7 @@ public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    */
   
   protected void sendStandardChatMessage(String userText){
-    sendTaggedCommand("shout " + userText);
+    sendCommand("shout " + userText);
   }
   
   

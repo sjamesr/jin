@@ -69,7 +69,7 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
     addCommandType(new AbstractCommandType(commandName){
       protected void send(String userText){
         Channel channel = IcsChannelConsoleDesignation.this.channel;
-        sendTaggedCommand("xtell " + channel.getId() + " " + userText);
+        sendCommand("xtell " + channel.getId() + " " + userText);
       }
     });
   }

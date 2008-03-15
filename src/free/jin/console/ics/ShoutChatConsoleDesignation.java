@@ -53,13 +53,13 @@ public class ShoutChatConsoleDesignation extends ChatConsoleDesignation{
     I18n i18n = I18n.get(ShoutChatConsoleDesignation.class);
     addCommandType(new AbstractCommandType(i18n.getString("shout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("shout " + userText);
+        sendCommand("shout " + userText);
       }
     });
     
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("i " + userText);
+        sendCommand("i " + userText);
       }
     });
   }

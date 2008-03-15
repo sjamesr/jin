@@ -64,7 +64,7 @@ public class FreechessCustomConsoleDesignation extends IcsCustomConsoleDesignati
     
     addCommandType(new AbstractCommandType(i18n.getString("cshout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("cshout " + userText);
+        sendCommand("cshout " + userText);
       }
     });
   }

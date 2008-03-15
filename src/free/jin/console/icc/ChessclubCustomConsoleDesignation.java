@@ -56,7 +56,7 @@ public class ChessclubCustomConsoleDesignation extends IcsCustomConsoleDesignati
     
     addCommandType(new AbstractCommandType(i18n.getString("sshout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("sshout " + userText);
+        sendCommand("sshout " + userText);
       }
     });
   }

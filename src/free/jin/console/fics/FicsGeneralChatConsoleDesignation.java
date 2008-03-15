@@ -62,7 +62,7 @@ public class FicsGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesi
    */
   
   protected void sendStandardChatMessage(String userText){
-    sendTaggedCommand("shout " + userText);
+    sendCommand("shout " + userText);
   }
 
   

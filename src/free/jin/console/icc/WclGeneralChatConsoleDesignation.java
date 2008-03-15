@@ -75,7 +75,7 @@ public class WclGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    */
   
   protected void sendStandardChatMessage(String userText){
-    sendTaggedCommand("tell " + LOBBY_ID + " " + userText);
+    sendCommand("tell " + LOBBY_ID + " " + userText);
   }
 
     

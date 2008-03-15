@@ -82,13 +82,13 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
     
     addCommandType(new AbstractCommandType(i18n.getString("shout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("shout " + userText);
+        sendCommand("shout " + userText);
       }
     });
       
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
       protected void send(String userText){
-        sendTaggedCommand("i " + userText);
+        sendCommand("i " + userText);
       }
     });
   }
@@ -161,7 +161,7 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
      */
     
     protected void send(String userText){
-      sendTaggedCommand("xtell " + channel.getId() + " " + userText);
+      sendCommand("xtell " + channel.getId() + " " + userText);
     }
     
     
