@@ -94,31 +94,6 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
   
   
   /**
-   * Appends the specified chat event to the console.
-   */
-  
-  protected void appendChat(ChatEvent evt){
-    Console console = getConsole();
-    console.addToOutput(textForChat(evt), console.textTypeForEvent(evt));
-  }
-  
-  
-  
-  /**
-   * Returns the text to append for the specified chat event.
-   */
-  
-  protected String textForChat(ChatEvent evt){
-    String senderName = evt.getSender().getName();
-    String senderTitle = evt.getSenderTitle();
-    String message = decode(evt.getMessage());
-    
-    return senderName + (senderTitle == null ? "" : senderTitle) + ": " + message;
-  }
-  
-  
-  
-  /**
    * Returns whether the specified object is a
    * <code>PersonalChatConsoleDesignation</code> equals to this one. Two
    * <code>PersonalChatConsoleDesignation</code>s are equal if they have the
