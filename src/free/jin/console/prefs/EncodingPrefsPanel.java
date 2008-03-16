@@ -21,13 +21,10 @@
 
 package free.jin.console.prefs;
 
-import java.io.IOException;
+import java.awt.Component;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -40,15 +37,16 @@ import free.jin.BadChangesException;
 import free.jin.I18n;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
-import free.util.IOUtilities;
+import free.util.Encodings;
 import free.util.NamedWrapper;
 import free.util.TextUtilities;
+import free.util.Utilities;
 import free.util.swing.SwingUtils;
 
 
 
 /**
- * Preferences panel for selecting the encoding used by the console.
+ * Preferences panel for selecting the default encoding used by the consoles.
  */
 
 public class EncodingPrefsPanel extends PreferencesPanel{
@@ -56,43 +54,43 @@ public class EncodingPrefsPanel extends PreferencesPanel{
   
   
   /**
-   * The category key for all the encodings.
+   * The name for the fake "all" encodings category.
    */
   
-  private static final String ALL_CATEGORY_KEY = "all";
+  private static final String ALL_ENCODINGS_CATEGORY = "all";
   
   
   
   /**
-   * A map of i18n keys of charset "category" names to the list (expressed as a
-   * <code>ListModel</code>) of charsets in that category.
+   * Maps encoding categories to <code>ListModel</code>s of encodings in that
+   * category.
    */
   
-  private static final Map CHARSET_CATEGORIES = new TreeMap();
+  private static final Map CATEGORIES_TO_ENCODING_LIST_MODELS = new TreeMap();
   static{
-    try{
-      // The "all" category must be first.
-      CHARSET_CATEGORIES.put(ALL_CATEGORY_KEY, SwingUtils.collectionListModel(Charset.availableCharsets().values()));
-      
-      Properties props = IOUtilities.loadProperties(EncodingPrefsPanel.class.getResourceAsStream("charsets.properties"));
-      for (Iterator categories = props.entrySet().iterator(); categories.hasNext();){
-        Map.Entry entry = (Map.Entry)categories.next();
-        String categoryKey = (String)entry.getKey();
-        String [] aliases = TextUtilities.parseStringList((String)entry.getValue(), ", ");
-        DefaultListModel charsets = new DefaultListModel();
-        for (int i = 0; i < aliases.length; i++){
-          String alias = aliases[i];
-          if (Charset.isSupported(alias))
-            charsets.addElement(Charset.forName(aliases[i]));
-        }
-        
-        if (!charsets.isEmpty())
-          CHARSET_CATEGORIES.put(categoryKey, charsets);
-      }
-    } catch (IOException e){
-        e.printStackTrace();
+    Collection allEncodings = new LinkedList();
+    allEncodings.add(null); // No encoding
+    allEncodings.addAll(Charset.availableCharsets().values());
+    CATEGORIES_TO_ENCODING_LIST_MODELS.put(ALL_ENCODINGS_CATEGORY,
+        SwingUtils.collectionListModel(allEncodings));
+    
+    Map categoriesToEncodings = Encodings.categoriesToEncodings();
+    for (Iterator i = Encodings.categories().iterator(); i.hasNext();){
+      String category = (String)i.next();
+      CATEGORIES_TO_ENCODING_LIST_MODELS.put(category, 
+          SwingUtils.collectionListModel((Collection)categoriesToEncodings.get(category)));
     }
   }
+  
+  
+  
+  /**
+   * The displayed name for the "system default" encoding. 
+   */
+  
+  private static final String DEFAULT_ENCODING_NAME = 
+    I18n.get(EncodingPrefsPanel.class).getFormattedString("defaultEncoding.name", 
+        new Object[]{TextUtilities.getDefaultCharsetName()});
   
   
   
@@ -113,10 +111,27 @@ public class EncodingPrefsPanel extends PreferencesPanel{
   
   
   /**
-   * The list of encodings.
+   * The list of encodings in the currently selected category.
    */
   
   private final JList encodings;
+  
+  
+  
+  /**
+   * The currently selected encoding.
+   */
+  
+  private Charset selectedEncoding;
+  
+  
+  
+  /**
+   * A flag we set when changing the encoding selection programmatically such
+   * that the selectedEncoding shouldn't change. 
+   */
+  
+  private boolean ignoreEncodingSelectionChanges = false;
   
   
   
@@ -126,67 +141,87 @@ public class EncodingPrefsPanel extends PreferencesPanel{
 
   public EncodingPrefsPanel(ConsoleManager consoleManager){
     this.consoleManager = consoleManager;
-    this.encodingCategories = makeEncodingCategoriesList();
-    this.encodings = makeEncodingsList();
     
-    createUI();
+    I18n i18n = I18n.get(EncodingPrefsPanel.class);
     
-    encodingCategories.addListSelectionListener(new ListSelectionListener(){
-      public void valueChanged(ListSelectionEvent e){
-        if (encodingCategories.getSelectedIndex() == -1)
-          return;
-        
-        String categoryKey = (String)((NamedWrapper)encodingCategories.getSelectedValue()).getTarget();
-        ListModel charsets = (ListModel)CHARSET_CATEGORIES.get(categoryKey);
-        encodings.setModel(charsets);
+    final Map categoryNames = Encodings.categoriesToNames();
+    DefaultListModel encodingCategoriesModel = new DefaultListModel();
+    encodingCategoriesModel.addElement(
+        new NamedWrapper(ALL_ENCODINGS_CATEGORY, i18n.getString("allEncodings.name")));
+    
+    for (Iterator i = Encodings.categories().iterator(); i.hasNext();){
+      String category = (String)i.next();
+      encodingCategoriesModel.addElement(new NamedWrapper(category, (String)categoryNames.get(category)));
+    }
+    
+    this.encodingCategories = new JList(encodingCategoriesModel);
+    this.encodings = new JList();
+    
+    final ListCellRenderer encodingsCellRenderer = encodings.getCellRenderer();
+    encodings.setCellRenderer(new ListCellRenderer(){
+      public Component getListCellRendererComponent(JList list, Object value,
+          int index, boolean isSelected, boolean cellHasFocus){
+        if (value == null)
+          value = DEFAULT_ENCODING_NAME;
+        return encodingsCellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
       }
     });
     
+    encodingCategories.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    encodings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    
+    encodingCategories.addListSelectionListener(new ListSelectionListener(){
+      public void valueChanged(ListSelectionEvent e){
+        try{
+          ignoreEncodingSelectionChanges = true;
+          
+          NamedWrapper selection = (NamedWrapper)encodingCategories.getSelectedValue();
+          
+          ListModel model;
+          if (selection == null)
+            model = new DefaultListModel();
+          else{
+            String categoryKey = (String)(selection.getTarget());
+            model = (ListModel)CATEGORIES_TO_ENCODING_LIST_MODELS.get(categoryKey);
+          }
+          
+          encodings.setModel(model);
+          
+          boolean isSelectedDefault = TextUtilities.getDefaultCharset().equals(selectedEncoding);
+          
+          int selectedIndex = -1;
+          for (int i = 0; i < model.getSize(); i++){
+            Charset encoding = (Charset)model.getElementAt(i);
+            if (Utilities.areEqual(encoding, selectedEncoding) || (isSelectedDefault && (encoding == null))){
+              selectedIndex = i;
+              break;
+            }
+          }
+          encodings.setSelectedIndex(selectedIndex);
+        } finally {
+          ignoreEncodingSelectionChanges = false;
+        }
+      }
+    });
+    
+    encodings.addListSelectionListener(new ListSelectionListener(){
+      public void valueChanged(ListSelectionEvent e){
+        if (ignoreEncodingSelectionChanges)
+          return;
+        
+        selectedEncoding = (Charset)encodings.getSelectedValue();
+        fireStateChanged();
+      }
+    });
+    
+    selectedEncoding = Charset.forName(consoleManager.getEncoding());
     encodingCategories.setSelectedIndex(0);
-    if (consoleManager.getEncoding() != null)
-      encodings.setSelectedValue(Charset.forName(consoleManager.getEncoding()), true);
-    else
-      encodings.clearSelection();
+    
+    createUI();
   }
   
   
     
-  /**
-   * Creates the list of encoding categories.
-   */
-  
-  private JList makeEncodingCategoriesList(){
-    I18n i18n = I18n.get(EncodingPrefsPanel.class);
-    
-    DefaultListModel model = new DefaultListModel();
-    for (Iterator i = CHARSET_CATEGORIES.keySet().iterator(); i.hasNext();){
-      String categoryKey = (String)i.next();
-      model.addElement(new NamedWrapper(categoryKey, i18n.getString("encodingCategory." + categoryKey)));
-    }
-    
-    JList list = new JList(model);
-    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    return list;
-  }
-  
-  
-  
-  /**
-   * Creates the list of encodings.
-   */
-  
-  private JList makeEncodingsList(){
-    JList list = new JList();
-    
-    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    list.addListSelectionListener(proxyListSelectionListener);
-    
-    return list;
-  }
-  
-  
-  
-  
   /**
    * Creates the user interface of this panel.
    */
@@ -249,7 +284,10 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     Charset selected = (Charset)encodings.getSelectedValue();
     
     try{
-      consoleManager.setEncoding(selected.name());
+      if (selected == null)
+        consoleManager.setEncoding(null);
+      else
+        consoleManager.setEncoding(selected.name());
     } catch (UnsupportedEncodingException e){
         e.printStackTrace(); // This shouldn't happen because we let the user select only from supported charsets
       }
