@@ -22,8 +22,10 @@
 package free.jin.console.prefs;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -38,6 +40,8 @@ import free.jin.Preferences;
 import free.jin.console.Channel;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
+import free.util.Encodings;
+import free.util.Utilities;
 import free.util.swing.AddRemoveButtons;
 
 
@@ -118,6 +122,22 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
   
   
   /**
+   * The <code>ComboBoxModel</code> of the encoding box.
+   */
+  
+  private final DefaultComboBoxModel encodingModel = new DefaultComboBoxModel();
+  
+  
+  
+  /**
+   * The combo box for the console's encoding.
+   */
+  
+  protected final JComboBox encodingBox;
+  
+  
+  
+  /**
    * The text field for the console's channels.
    */
   
@@ -163,6 +183,14 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    */
   
   protected final JLabel consoleTitleLabel;
+  
+  
+  
+  /**
+   * The label for the encoding box.
+   */
+  
+  protected final JLabel encodingLabel;
   
   
   
@@ -231,6 +259,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     this.moveUpButton = i18n.createButton("moveUpButton");
     this.moveDownButton = i18n.createButton("moveDownButton");
     this.consoleTitleField = new JTextField();
+    this.encodingBox = new JComboBox(encodingModel);
     this.consoleChannelsField = new JTextField();
     this.addRemoveChannels = new AddRemoveButtons();
     this.messageRegexField = new JTextField();
@@ -238,6 +267,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     this.consolesListLabel = i18n.createLabel("consolesListLabel");
     this.consolesListScrollPane = new JScrollPane(consolesList);
     this.consoleTitleLabel = i18n.createLabel("consoleTitleLabel");
+    this.encodingLabel = i18n.createLabel("encodingLabel");
     this.consoleChannelsLabel = i18n.createLabel("consoleChannelsLabel");
     this.messageRegexLabel = i18n.createLabel("messageRegexLabel");
     
@@ -401,6 +431,56 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       }
     });
     
+    encodingModel.addElement(null); // Default encoding
+    Map categoriesToEncodings = Encodings.categoriesToEncodings();
+    Map categoriesToNames = Encodings.categoriesToNames();
+    for (Iterator i = Encodings.categories().iterator(); i.hasNext();){
+      String category = (String)i.next();
+      List encodings = (List)categoriesToEncodings.get(category);
+      String categoryName = (String)categoriesToNames.get(category);
+      
+      if (encodings.isEmpty())
+        continue;
+      
+      encodingModel.addElement(categoryName);
+      for (Iterator j = encodings.iterator(); j.hasNext();){
+        Charset encoding = (Charset)j.next();
+        encodingModel.addElement(encoding);
+      }
+    }
+    
+    // Allow selecting only charsets, not category names
+    encodingBox.addActionListener(new ActionListener(){
+      private Charset selectedEncoding;
+      public void actionPerformed(ActionEvent evt){
+        if (isIgnoreConsolePropertiesChange())
+          return;
+        
+        Object item = encodingBox.getSelectedItem();
+        if ((item instanceof Charset) || (item == null)){
+          selectedEncoding = (Charset)item;
+          
+          ConsoleSpec spec = getSelectedConsole();
+          if (spec == null)
+            return;
+          
+          spec.setEncoding(selectedEncoding == null ? null : selectedEncoding.name());
+          fireStateChanged();
+        }
+        else
+          encodingBox.setSelectedItem(selectedEncoding);
+      }
+    });
+    
+    encodingBox.setRenderer(new EncodingBoxCellRenderer(encodingBox.getRenderer()));
+    
+    encodingBox.setEditable(false);
+    if (consoleManager.getConn().getTextEncoding() == null){
+      encodingBox.setVisible(false);
+      encodingLabel.setVisible(false);
+    }
+    
+    
     consoleChannelsField.getDocument().addDocumentListener(changeFiringDocumentListener);
     
     addRemoveChannels.getAddButton().addActionListener(new ActionListener(){
@@ -458,6 +538,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     consolesListLabel.setLabelFor(consolesList);
     consoleTitleLabel.setLabelFor(consoleTitleField);
+    encodingLabel.setLabelFor(encodingBox);
     consoleChannelsLabel.setLabelFor(consoleChannelsField);
     messageRegexLabel.setLabelFor(messageRegexField);
     
@@ -526,6 +607,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       
       ConsoleSpec spec = getSelectedConsole();
       updateConsoleTitleUi(spec);
+      updateEncodingUi(spec);
       updateConsoleChannelsUi(spec);
       updateRegexMatchUi(spec);
     } finally{
@@ -545,6 +627,34 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     consoleTitleField.setText(spec == null ? "" : spec.getTitle());
     consoleTitleField.setEnabled(spec != null);
     consoleTitleField.setEditable(spec != null);
+  }
+  
+  
+  
+  /**
+   * Updates the encoding UI from the specified selected spec (which may be
+   * <code>null</code>, if there is no spec selected).
+   */
+  
+  private void updateEncodingUi(ConsoleSpec spec){
+    encodingLabel.setEnabled(spec != null);
+    encodingBox.setEnabled(spec != null);
+    
+    if (spec == null)
+      encodingBox.setSelectedIndex(-1);
+    else{
+      String encoding = spec.getEncoding();
+      Charset charset = encoding == null ? null : Charset.forName(encoding); 
+      int selectedIndex = -1;
+      ListModel encodingsModel = encodingBox.getModel();
+      for (int i = 0; i < encodingModel.getSize(); i++){
+        if (Utilities.areEqual(charset, encodingsModel.getElementAt(i))){
+          selectedIndex = i;
+          break;
+        }
+      }
+      encodingBox.setSelectedIndex(selectedIndex);
+    }
   }
   
   
@@ -612,6 +722,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     Component errorComponent = null;
     
     String title = consoleTitleField.getText();
+    Charset encoding = (Charset)encodingBox.getSelectedItem();
     List channels = parseChannelsListDisplayString(consoleChannelsField.getText());
     String matchRegex = messageRegexField.getText();
     
@@ -634,6 +745,8 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       throw new BadChangesException(errorMessage, errorComponent); 
       
     spec.setTitle(title);
+    spec.setEncoding(encoding == null ? null : encoding.name());
+    System.out.println("Encoding set to " + encoding);
     spec.setChannels(channels);
     spec.setMessageRegex(matchRegex);
   }
@@ -738,6 +851,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     ConsoleSpec spec = createNewConsoleSpec();
     
     spec.setTitle(prefs.getString(prefix + "title"));
+    spec.setEncoding(prefs.getString(prefix + "encoding", null));
     spec.setChannels(consoleManager.parseConsoleChannelsPref(prefs.get(prefix + "channels", null)));
     spec.setMessageRegex(prefs.getString(prefix + "messageRegex", null));
     
@@ -753,6 +867,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
   
   protected void storeConsoleSpec(Preferences prefs, ConsoleSpec spec, String prefix){
     prefs.setString(prefix + "title", spec.getTitle());
+    prefs.setString(prefix + "encoding", spec.getEncoding());
     prefs.set(prefix + "channels", consoleManager.encodeConsoleChannelsPref(spec.getChannels()));
     prefs.setString(prefix + "messageRegex", spec.getMessageRegex());
   }
@@ -793,6 +908,14 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     
     /**
+     * The console's encoding; <code>null</code> for default.
+     */
+    
+    private String encoding;
+    
+    
+    
+    /**
      * The list of channels the console is showing.
      */
     
@@ -825,6 +948,26 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     public void setTitle(String title){
       this.title = title;
+    }
+    
+    
+    
+    /**
+     * Returns the encoding; <code>null</code> for default.
+     */
+    
+    public String getEncoding(){
+      return encoding;
+    }
+    
+    
+    
+    /**
+     * Sets the encoding. Use <code>null</code> for the default encoding.
+     */
+    
+    public void setEncoding(String encoding){
+      this.encoding = encoding;
     }
     
     
@@ -971,6 +1114,71 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     public Channel getSelectedChannel(){
       int selectedIndex = comboBox.getSelectedIndex();
       return selectedIndex == -1 ? null : channels[selectedIndex];
+    }
+    
+    
+    
+  }
+  
+  
+  
+  /**
+   * The list cell renderer we use to render the encodings combo box.
+   * Note that we subclass JLabel - this is completely unnecessary, except for
+   * swing-layout (AquaBaseline, for example, finds a combo box's baseline
+   * correctly only if the renderer is an instance of JLabel).
+   */
+  
+  private class EncodingBoxCellRenderer extends JLabel implements ListCellRenderer{
+    
+    
+    
+    /**
+     * The delegate renderer (the box's original renderer).
+     */
+    
+    private final ListCellRenderer delegateRenderer;
+    
+    
+    
+    /**
+     * Creates a new {@link EncodingBoxCellRenderer} with the specified box's
+     * original renderer, to whom we'll delegate the actual rendering.
+     */
+    
+    public EncodingBoxCellRenderer(ListCellRenderer delegateRenderer){
+      this.delegateRenderer = delegateRenderer;
+    }
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    
+    public Component getListCellRendererComponent(JList list, Object value,
+        int index, boolean isSelected, boolean cellHasFocus){
+      
+      boolean isDefaultCharset = (value == null);
+      boolean isCharset = (value instanceof Charset) || isDefaultCharset;
+      if (isCharset && !isDefaultCharset && (index != -1)) // -1 means drawing the box itself, not the popup
+        value = "    " + value;
+      
+      if (!isCharset)
+        isSelected = false;
+      
+      if (isDefaultCharset){
+        value = I18n.get(EncodingBoxCellRenderer.class).getFormattedString("defaultEncoding.name", 
+            new Object[]{consoleManager.getEncoding().toString()});
+      }
+      
+      Component renderer = delegateRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      Font font = renderer.getFont();
+      int bold = font.getStyle() | Font.BOLD;
+      int nonBold = font.getStyle() & (~Font.BOLD);
+      renderer.setFont(isCharset ? font.deriveFont(nonBold) : font.deriveFont(bold));
+      
+      return renderer;
     }
     
     

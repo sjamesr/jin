@@ -103,6 +103,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
     layout.setAutocreateContainerGaps(true);
+    layout.setHonorsVisibility(true);
     
     layout.setHorizontalGroup(layout.createParallelGroup()
         .add(consolesListLabel)
@@ -120,12 +121,14 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
             .add(LayoutStyle.getSharedInstance().getPreferredGap(consolesList, consoleTitleLabel, LayoutStyle.INDENT, SwingConstants.SOUTH, this))
             .add(layout.createParallelGroup(GroupLayout.TRAILING)
                 .add(consoleTitleLabel)
+                .add(encodingLabel)
                 .add(consoleChannelsLabel)
                 .add(messageRegexLabel)
             )
             .addPreferredGap(LayoutStyle.RELATED)
             .add(layout.createParallelGroup()
                 .add(consoleTitleField)
+                .add(encodingBox)
                 .add(consoleChannelsField)
                 .add(messageRegexField)
                 .add(layout.createSequentialGroup()
@@ -158,6 +161,11 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
             .add(consoleTitleLabel)
             .add(consoleTitleField)
+        )
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(GroupLayout.BASELINE)
+            .add(encodingLabel)
+            .add(encodingBox)
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)

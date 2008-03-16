@@ -134,8 +134,9 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    */
   
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
-      String title, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts){
-    return new FreechessCustomConsoleDesignation(getConn(), title, getEncoding(), false,
+      String title, String encoding, List channels, Pattern messageRegex,
+      boolean includeShouts, boolean includeCShouts){
+    return new FreechessCustomConsoleDesignation(getConn(), title, encoding, false,
         channels, messageRegex, includeShouts, includeCShouts);
   }
   

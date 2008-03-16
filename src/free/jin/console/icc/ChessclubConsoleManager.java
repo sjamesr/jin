@@ -157,8 +157,9 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    */
   
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
-      String title, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts){
-    return new ChessclubCustomConsoleDesignation(getConn(), title, getEncoding(), false,
+      String title, String encoding, List channels, Pattern messageRegex,
+      boolean includeShouts, boolean includeCShouts){
+    return new ChessclubCustomConsoleDesignation(getConn(), title, encoding, false,
         channels, messageRegex, includeShouts, includeCShouts);
   }
   

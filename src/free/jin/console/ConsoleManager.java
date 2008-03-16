@@ -127,6 +127,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
+   * Our encoding.
+   */
+  
+  private String encoding;
+  
+  
+  
+  /**
    * Are we currently paused?
    */
    
@@ -185,7 +193,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
   public void start(){
     createUI();
-    createConsoles();
+    loadState();
     uiContainer.setVisible(true);
     registerConnListeners();
     exportAction(new AskHelpQuestionAction());
@@ -199,6 +207,29 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
   public void stop(){
     unregisterConnListeners();
+  }
+  
+  
+  
+  /**
+   * Loads the plugin's state from preferences.
+   */
+  
+  private void loadState(){
+    loadEncoding();
+    createConsoles();
+  }
+  
+  
+  
+  /**
+   * Loads the console manager's encoding from preferences.
+   */
+  
+  private void loadEncoding(){
+    String encoding = getPrefs().getString("encoding", TextUtilities.getDefaultCharsetName());
+
+    this.encoding = Charset.isSupported(encoding) ? encoding : null;
   }
 
 
@@ -245,13 +276,15 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     else if ("custom".equals(type)){
       String title = prefs.getString(prefsPrefix + "title");
       
+      String encoding = prefs.getString(prefsPrefix + "encoding");
+      
       Object channelsPref = prefs.get(prefsPrefix + "channels", null);
       List channels = channelsPref == null ? Collections.EMPTY_LIST : parseConsoleChannelsPref(channelsPref);
       
       String messageRegex = prefs.getString(prefsPrefix + "messageRegex", null);
       Pattern messageRegexPattern = messageRegex == null ? null : Pattern.compile(messageRegex);
       
-      return loadCustomConsoleDesignation(prefsPrefix, title, channels, messageRegexPattern);
+      return loadCustomConsoleDesignation(prefsPrefix, title, encoding, channels, messageRegexPattern);
     }
     else
       throw new IllegalArgumentException("Unrecognized designation type: " + type);
@@ -309,8 +342,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * prefix and the already retrieved data.
    */
   
-  protected abstract CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix, String title,
-      List channels, Pattern messageRegex);
+  protected abstract CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix, 
+      String title, String encoding, List channels, Pattern messageRegex);
   
   
   
@@ -569,12 +602,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
-   * Returns the encoding with which we decode/encode text received/sent
-   * from/to the server.
+   * Returns the console manager's encoding.
    */
   
   public String getEncoding(){
-    return getPrefs().getString("encoding", TextUtilities.getDefaultCharsetName());
+    return encoding;
   }
   
   
@@ -583,23 +615,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Sets the encoding with which we decode/encode text received/sent from/to
    * the server. This is only relevant if the connections text encoding is
    * non-null. See {@link free.jin.Connection#getTextEncoding()} for more
-   * information.
+   * information. A <code>null</code> value means the encoding will be re-set
+   * to the system's default encoding.
    */
   
   public void setEncoding(String encoding) throws UnsupportedEncodingException{
+    if (encoding == null)
+      encoding = TextUtilities.getDefaultCharsetName();
+    
     if (!Charset.isSupported(encoding))
       throw new UnsupportedEncodingException(encoding);
     
     getPrefs().setString("encoding", encoding);
-    
-    // Hack - the encoding should be on a per-console basis, and changing it
-    // should replace the designation of the console, not update it
-    for (int i = 0; i < consoles.size(); i++){
-      Console console = (Console)consoles.get(i);
-      ConsoleDesignation designation = console.getDesignation();
-      if (designation instanceof AbstractConsoleDesignation)
-        ((AbstractConsoleDesignation)designation).setEncoding(encoding);
-    }
   }
   
   
@@ -610,7 +637,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   protected final String encode(String s, String encoding){
-    return ConsoleManager.convert(s, encoding, getConn().getTextEncoding());
+    return TextUtilities.convert(s, encoding, getConn().getTextEncoding());
   }
   
   
@@ -621,24 +648,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   protected final String decode(String s, String encoding){
-    return ConsoleManager.convert(s, getConn().getTextEncoding(), encoding);
+    return TextUtilities.convert(s, getConn().getTextEncoding(), encoding);
   }
   
-  
-  
-  /**
-   * Converts the specified string from the between the specified encodings.
-   * If either of the encodings is <code>null</code>, no conversion is
-   * performed.
-   */
-  
-  public static String convert(String s, String fromEncoding, String toEncoding){
-    if ((fromEncoding == null) || (toEncoding == null))
-      return s;
-    else
-      return TextUtilities.convert(s, fromEncoding, toEncoding);
-  }
-
   
   
   /**
@@ -948,6 +960,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     Preferences prefs = getPrefs();
     
     prefs.setInt("consoles.selected", consolesTabbedPane.getModel().getSelectedIndex());
+    prefs.setString("encoding", getEncoding());
   }
 
 

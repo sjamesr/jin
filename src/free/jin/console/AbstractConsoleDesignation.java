@@ -36,6 +36,7 @@ import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
 import free.util.AbstractNamed;
+import free.util.TextUtilities;
 import free.util.Utilities;
 
 
@@ -77,10 +78,11 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   /**
    * The encoding used to encode/decode certain messages sent to/received from
-   * the server.
+   * the server. A <code>null</code> value indicates that the console manager's
+   * encoding should be used.
    */
   
-  private String encoding;
+  private final String encoding;
   
   
   
@@ -312,7 +314,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected final String encode(String s){
-    return ConsoleManager.convert(s, encoding, connection.getTextEncoding());
+    return TextUtilities.convert(s, getActualEncoding(), connection.getTextEncoding());
   }
   
   
@@ -323,30 +325,20 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    */
   
   protected final String decode(String s){
-    return ConsoleManager.convert(s, connection.getTextEncoding(), encoding);
+    return TextUtilities.convert(s, connection.getTextEncoding(), getActualEncoding());
   }
   
   
   
   /**
-   * Sets the encoding. This method is a temporary measure - the encoding should
-   * be a final field when the preferences UI allows it to be adjusted per
-   * console. Modifying the encoding should change the designation of the
-   * console to a new one. 
+   * Returns the encoding actually used by this console designation. If the
+   * designation's encoding is <code>null</code>, this returns the console
+   * manager's encoding. Note that in order for this to work, the console must
+   * have been already set (via {@link #setConsole(Console)}).
    */
   
-  void setEncoding(String encoding){
-    this.encoding = encoding;
-  }
-  
-  
-  
-  /**
-   * Returns this console's encoding.
-   */
-  
-  protected String getEncoding(){
-    return encoding;
+  private String getActualEncoding(){
+    return encoding == null ? console.getConsoleManager().getEncoding() : encoding;
   }
   
   
@@ -452,7 +444,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
   
   protected void appendChat(ChatEvent evt){
     Console console = getConsole();
-    console.addToOutput(evt, getEncoding());
+    console.addToOutput(evt, getActualEncoding());
   }
   
   
@@ -549,16 +541,13 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
       if (escaped)
         userText = userText.substring(1);
       
-      if (encodeUserText)
-        userText = encode(userText);
-      
       if (escaped){
-        sendCommand(userText);
+        sendCommand(encodeUserText ? encode(userText) : userText);
         if (!doNotEcho)
           echoCommand(userText);
       }
       else{  
-        send(userText);
+        send(encodeUserText ? encode(userText) : userText);
         if (!doNotEcho)
           echo(userText);
       }

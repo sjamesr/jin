@@ -48,14 +48,15 @@ public abstract class IcsConsoleManager extends ConsoleManager{
    * {@inheritDoc}
    */
   
-  protected CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix, String title,
-      List channels, Pattern messageRegex){
+  protected CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
+      String title, String encoding, List channels, Pattern messageRegex){
     Preferences prefs = getPrefs();
     
     boolean includeShouts = prefs.getBool(prefsPrefix + "includeShouts", false);
     boolean includeCShouts = prefs.getBool(prefsPrefix + "includeCShouts", false);
     
-    return loadCustomConsoleDesignation(prefsPrefix, title, channels, messageRegex, includeShouts, includeCShouts);
+    return loadCustomConsoleDesignation(prefsPrefix, title, encoding, channels, messageRegex,
+        includeShouts, includeCShouts);
   }
   
   
@@ -66,7 +67,7 @@ public abstract class IcsConsoleManager extends ConsoleManager{
    */
   
   protected abstract IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
-      String title, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts);
+      String title, String encoding, List channels, Pattern messageRegex, boolean includeShouts, boolean includeCShouts);
   
   
   
