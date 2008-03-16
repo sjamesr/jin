@@ -24,6 +24,7 @@ package free.util;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.StringTokenizer;
 
 
@@ -265,10 +266,25 @@ public class TextUtilities{
   
   
   /**
-   * The name of the system's default charset, lazily initialized.
+   * The system's default charset, lazily initialized.
    */
   
-  private static String defaultCharsetName = null;
+  private static Charset defaultCharset = null;
+  
+  
+  
+  /**
+   * Returns the system's default charset. This method is useful under 1.4,
+   * because <code>Charset.defaultCharset()</code> is only available since 1.5.
+   */
+  
+  public synchronized static Charset getDefaultCharset(){
+    if (defaultCharset == null)
+      defaultCharset = Charset.forName( 
+        new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());
+    
+    return defaultCharset;
+  }
   
   
   
@@ -279,11 +295,7 @@ public class TextUtilities{
    */
   
   public static String getDefaultCharsetName(){
-    if (defaultCharsetName == null)
-      defaultCharsetName = 
-        new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding();
-    
-    return defaultCharsetName;
+    return getDefaultCharset().name();
   }
   
   
