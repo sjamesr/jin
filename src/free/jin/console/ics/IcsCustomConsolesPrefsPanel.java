@@ -23,7 +23,10 @@ package free.jin.console.ics;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
@@ -118,18 +121,20 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
             )
         )
         .add(layout.createSequentialGroup()
-            .add(LayoutStyle.getSharedInstance().getPreferredGap(consolesList, consoleTitleLabel, LayoutStyle.INDENT, SwingConstants.SOUTH, this))
+            .add(LayoutStyle.getSharedInstance().getPreferredGap(consolesList, titleLabel, LayoutStyle.INDENT, SwingConstants.SOUTH, this))
             .add(layout.createParallelGroup(GroupLayout.TRAILING)
-                .add(consoleTitleLabel)
+                .add(titleLabel)
+                .add(windowLabel)
                 .add(encodingLabel)
-                .add(consoleChannelsLabel)
+                .add(channelsLabel)
                 .add(messageRegexLabel)
             )
             .addPreferredGap(LayoutStyle.RELATED)
             .add(layout.createParallelGroup()
-                .add(consoleTitleField)
+                .add(titleField)
+                .add(windowBox)
                 .add(encodingBox)
-                .add(consoleChannelsField)
+                .add(channelsField)
                 .add(messageRegexField)
                 .add(layout.createSequentialGroup()
                     .add(shoutsBox)
@@ -159,8 +164,13 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
         )
         .addPreferredGap(LayoutStyle.UNRELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-            .add(consoleTitleLabel)
-            .add(consoleTitleField)
+            .add(titleLabel)
+            .add(titleField)
+        )
+        .addPreferredGap(LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(GroupLayout.BASELINE)
+            .add(windowLabel)
+            .add(windowBox)
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
@@ -169,8 +179,8 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
         )
         .addPreferredGap(LayoutStyle.RELATED)
         .add(layout.createParallelGroup(GroupLayout.BASELINE)
-            .add(consoleChannelsLabel)
-            .add(consoleChannelsField)
+            .add(channelsLabel)
+            .add(channelsField)
             .add(addRemoveChannels)
         )
         .addPreferredGap(LayoutStyle.RELATED)
@@ -322,7 +332,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
       } catch (NumberFormatException e){
         I18n i18n = I18n.get(IcsCustomConsolesPrefsPanel.class);
         throw new BadChangesException(
-            i18n.getFormattedString("badChannelNumber", new Object[]{channelNumbers[i]}), consoleChannelsField);
+            i18n.getFormattedString("badChannelNumber", new Object[]{channelNumbers[i]}), channelsField);
       }
     }
     

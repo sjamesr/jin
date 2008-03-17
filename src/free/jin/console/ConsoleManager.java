@@ -23,6 +23,7 @@ package free.jin.console;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -91,6 +92,14 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   public static final int NO_GAME_LISTS = 2;
+  
+  
+  
+  /**
+   * The id of the main console container.
+   */
+  
+  public static final String MAIN_CONTAINER_ID = "";
 
 
   
@@ -111,18 +120,27 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   /**
-   * Our main container.
+   * Maps console container IDs to console containers.
    */
 
-  private PluginUIContainer uiContainer;
+  private final Map consoleContainers = new HashMap();
   
   
   
   /**
-   * The tabbed pane model of the  in which the consoles sit.
+   * Maps console container IDs to the {@link TabbedPane} inside of each console
+   * container.
    */
   
-  private TabbedPane consolesTabbedPane;
+  private final Map tabbedPanes = new HashMap();
+  
+  
+  
+  /**
+   * Maps console container IDs to lists of consoles in that container. 
+   */
+  
+  private final Map containerIdsToConsoleLists = new HashMap();
   
   
   
@@ -194,7 +212,8 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   public void start(){
     createUI();
     loadState();
-    uiContainer.setVisible(true);
+    for (Iterator i = consoleContainers.values().iterator(); i.hasNext();)
+      ((PluginUIContainer)i.next()).setVisible(true);
     registerConnListeners();
     exportAction(new AskHelpQuestionAction());
   }
@@ -240,12 +259,22 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   private void createConsoles(){
     Preferences prefs = getPrefs();
+    
     int consoleCount = prefs.getInt("consoles.count");
-    int activeConsole = prefs.getInt("consoles.selected", consoleCount - 1);
     for (int i = 0; i < consoleCount; i++){
-      ConsoleDesignation designation = 
-        loadConsoleDesignation("consoles." + i + ".");
-      addConsole(designation, i == activeConsole);
+      String prefix = "consoles." + i + ".";
+      String containerId = prefs.getString(prefix + "container.id", MAIN_CONTAINER_ID);
+      ConsoleDesignation designation = loadConsoleDesignation(prefix);
+      addConsole(designation, containerId, false);
+    }
+    
+    for (Iterator i = tabbedPanes.entrySet().iterator(); i.hasNext();){
+      Map.Entry entry = (Map.Entry)i.next();
+      String containerId = (String)entry.getKey();
+      TabbedPane tabbedPane = (TabbedPane)entry.getValue();
+      int selectedIndex = prefs.getInt("containers." + containerId + ".selectedTab", 0);
+      if (tabbedPane.getModel().getTabCount() > selectedIndex)
+        tabbedPane.getModel().setSelectedIndex(selectedIndex);
     }
   }
   
@@ -276,7 +305,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     else if ("custom".equals(type)){
       String title = prefs.getString(prefsPrefix + "title");
       
-      String encoding = prefs.getString(prefsPrefix + "encoding");
+      String encoding = prefs.getString(prefsPrefix + "encoding", null);
       
       Object channelsPref = prefs.get(prefsPrefix + "channels", null);
       List channels = channelsPref == null ? Collections.EMPTY_LIST : parseConsoleChannelsPref(channelsPref);
@@ -353,64 +382,105 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
 
   private void createUI(){
     I18n i18n = getI18n();
-
-    uiContainer = createContainer("", UIProvider.ESSENTIAL_CONTAINER_MODE);
-    uiContainer.setTitle(i18n.getString("mainConsole.initialTitle"));
-
-    URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
-    if (iconImageURL != null)
-      uiContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
+    Preferences prefs = getPrefs();
     
-    consolesTabbedPane = new TabbedPane(SwingConstants.TOP);
-    consolesTabbedPane.setAlwaysShowTabs(false);
-    consolesTabbedPane.setBorder(null);
-    consolesTabbedPane.getModel().addTabbedPaneListener(new TabbedPaneListener(){
+    URL iconImageURL = ConsoleManager.class.getResource("icon.gif");
+    Image iconImage = iconImageURL == null ? null : Toolkit.getDefaultToolkit().getImage(iconImageURL); 
+    
+    PluginUIContainer mainConsoleContainer = 
+      createContainer(MAIN_CONTAINER_ID, UIProvider.ESSENTIAL_CONTAINER_MODE);
+    mainConsoleContainer.setTitle(i18n.getString("mainConsole.initialTitle"));
+    if (iconImage != null)
+      mainConsoleContainer.setIcon(iconImage);
+    consoleContainers.put(MAIN_CONTAINER_ID, mainConsoleContainer);
+    
+    
+    int customContainersCount = prefs.getInt("containers.custom.count", 0);
+    for (int i = 0; i < customContainersCount; i++){
+      String id = "custom." + i;
+      PluginUIContainer container = createContainer(id, UIProvider.HIDEABLE_CONTAINER_MODE);
+      container.setTitle(prefs.getString("containers." + id + ".title", ""));
+      if (iconImage != null)
+        container.setIcon(iconImage);
+      consoleContainers.put(id, container);
+    }
+    
+    
+    for (Iterator i = consoleContainers.values().iterator(); i.hasNext();){
+      PluginUIContainer container = (PluginUIContainer)i.next();
+      TabbedPane tabbedPane = createTabbedPane(container);
+      
+      Container contentPane = container.getContentPane();
+      contentPane.setLayout(new BorderLayout(0, 0));
+      contentPane.add(tabbedPane, BorderLayout.CENTER);
+      
+      tabbedPanes.put(container.getId(), tabbedPane);
+    }
+    
+    
+    for (Iterator i = consoleContainers.values().iterator(); i.hasNext();){
+      PluginUIContainer container = (PluginUIContainer)i.next();
+      containerIdsToConsoleLists.put(container.getId(), new ArrayList());
+    }
+    
+    
+    for (Iterator i = consoleContainers.values().iterator(); i.hasNext();){
+      final PluginUIContainer container = (PluginUIContainer)i.next();
+      container.addPluginUIListener(new PluginUIAdapter(){
+        public void pluginUIActivated(PluginUIEvent evt){
+          obtainFocus(container);
+        }
+      });
+    }
+  }
+  
+  
+  
+  /**
+   * Creates a tabbed pane for the specified console container.
+   */
+  
+  private TabbedPane createTabbedPane(final PluginUIContainer container){
+    TabbedPane tabbedPane = new TabbedPane(SwingConstants.TOP);
+    tabbedPane.setAlwaysShowTabs(false);
+    tabbedPane.setBorder(null);
+    tabbedPane.getModel().addTabbedPaneListener(new TabbedPaneListener(){
       public void tabRemoved(TabbedPaneEvent evt){
-        consoleTabRemoved(evt);
+        List consolesInContainer = (List)containerIdsToConsoleLists.get(container.getId());
+        Console console = (Console)consolesInContainer.get(evt.getTabIndex());
+        consolesInContainer.remove(evt.getTabIndex());
+        consoles.remove(console);
       }
       public void tabAdded(TabbedPaneEvent evt){}
       public void tabSelected(TabbedPaneEvent evt){}
       public void tabDeselected(TabbedPaneEvent evt){}
     });
     
-    Container content = uiContainer.getContentPane();
-    content.setLayout(new BorderLayout(0, 0));
-    content.add(consolesTabbedPane);
-    
-    uiContainer.addPluginUIListener(new PluginUIAdapter(){
-      public void pluginUIActivated(PluginUIEvent evt){
-        obtainFocus();
-      }
-    });
+    return tabbedPane;
   }
   
   
   
   /**
-   * Transfers the focus to the currently visible console.
+   * Transfers the focus to the currently visible console in the specified
+   * container.
    */
   
-  private void obtainFocus(){
+  private void obtainFocus(PluginUIContainer container){
+    List consolesInContainer = (List)containerIdsToConsoleLists.get(container.getId());
+    
     Console console;
-    if (consoles.size() == 1)
-      console = (Console)consoles.get(0);
-    else
-      console = (Console)(consolesTabbedPane.getModel().getSelectedTab().getComponent());
+    if (consolesInContainer.size() == 1)
+      console = (Console)consolesInContainer.get(0);
+    else{
+      TabbedPane tabbedPane = (TabbedPane)tabbedPanes.get(container.getId());
+      console = (Console)(tabbedPane.getModel().getSelectedTab().getComponent());
+    }
     
     if (console != null)
       console.obtainFocus();
   }
   
-  
-  
-  /**
-   * Invoked when a console tab is removed.
-   */
-  
-  private void consoleTabRemoved(TabbedPaneEvent evt){
-    consoles.remove(evt.getTabIndex());
-  }
-
   
   
   /**
@@ -432,12 +502,13 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Adds a console with the specified designation, possibly making it the
-   * active console. If a console with the specified designation already exists,
-   * it is merely made selected, if <code>makeSelected</code> is
-   * <code>true</code> (otherwise, no action is taken).
+   * active console, to the console container with the specified ID.
+   * If a console with the specified designation already exists,
+   * and <code>makeActive</code> is <code>true</code>, it is merely made
+   * active (otherwise, no action is taken).
    */
   
-  public void addConsole(final ConsoleDesignation designation, boolean makeSelected){
+  public void addConsole(final ConsoleDesignation designation, String containerId, boolean makeActive){
     Console console = getConsole(designation);
     
     if (console == null){
@@ -446,7 +517,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       designation.setConsole(console);
       
       final Tab tab = new Tab(console, designation.getName(), null, designation.isConsoleCloseable());
-      consolesTabbedPane.getModel().addTab(tab);
+      TabbedPane tabbedPane = (TabbedPane)tabbedPanes.get(containerId);
+      tabbedPane.getModel().addTab(tab);
+      
+      List consolesInContainer = (List)containerIdsToConsoleLists.get(containerId);
+      consolesInContainer.add(console);
       
       designation.addPropertyChangeListener(new PropertyChangeListener(){
         public void propertyChange(PropertyChangeEvent evt){
@@ -466,49 +541,72 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       });
     }
     
-    if (makeSelected)
-      makeConsoleSelected(console);
+    if (makeActive){
+      makeConsoleSelected(containerId, console);
+      makeActive(containerId);
+    }
   }
   
   
   
   /**
-   * Makes the specified console selected, which means that it is the one
-   * displayed in the consoles tabbed pane.
+   * Makes the specified console selected inside the container with the
+   * specified ID, making it the one displayed in the tabbed pane.
    */
   
-  protected void makeConsoleSelected(Console console){
-    int index = consoles.indexOf(console);
+  protected void makeConsoleSelected(String containerId, Console console){
+    List consolesInContainer = (List)containerIdsToConsoleLists.get(containerId);
+    TabbedPane tabbedPane = (TabbedPane)tabbedPanes.get(containerId);
     
+    int index = consolesInContainer.indexOf(console);
     if (index >= 0)
-      consolesTabbedPane.getModel().setSelectedIndex(index);
+      tabbedPane.getModel().setSelectedIndex(index);
   }
   
   
   
   /**
-   * Makes our UI active.
+   * Makes the console container with the specified ID active.
    */
   
-  public void makeActive(){
-    if (uiContainer != null)
-      uiContainer.setActive(true);
+  public void makeActive(String containerId){
+    PluginUIContainer container = (PluginUIContainer)consoleContainers.get(containerId);
+    if (container != null)
+      container.setActive(true);
+  }
+  
+  
+  
+  /**
+   * Returns the ID of the currently active container; <code>null</code> if
+   * none.
+   */
+  
+  public String getActiveContainerId(){
+    for (Iterator i = consoleContainers.entrySet().iterator(); i.hasNext();){
+      Map.Entry entry = (Map.Entry)i.next();
+      PluginUIContainer container = (PluginUIContainer)entry.getValue();
+      if (container.isActive())
+        return (String)entry.getKey();
+    }
+    
+    return null;
   }
   
   
   
   /**
    * Adds a closeable console for chatting with the specified user, possibly
-   * making it the active console. If one already exists, it is merely
-   * activated, if <code>makeActive</code> is <code>true</code> (otherwise, no
-   * action is taken).
+   * making it the active console, to the container with the specified ID.
+   * If one already exists, it is merely activated, if <code>makeActive</code>
+   * is <code>true</code> (otherwise, no action is taken).
    * 
    * @returns the newly created personal chat designation.
    */
   
-  public ConsoleDesignation addPersonalChatConsole(ServerUser user, boolean makeActive){
+  public ConsoleDesignation addPersonalChatConsole(ServerUser user, String containerId, boolean makeActive){
     ConsoleDesignation designation = createPersonalChatConsoleDesignation(user, true);
-    addConsole(designation, makeActive);
+    addConsole(designation, containerId, makeActive);
     return designation;
   }
   
@@ -516,10 +614,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   /**
    * Adds a new temporary console which will send the specified commands to the
-   * server and display their output.
+   * server and display their output, to the container with the specified ID.
    */
   
-  public void addTemporaryConsole(String [] commands){
+  public void addTemporaryConsole(String [] commands, String containerId){
     int index;
     synchronized(this){
       index = ++temporaryConsoleCount;
@@ -527,17 +625,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     
     String consoleName = getI18n().getFormattedString("temporaryConsole.title", new Object[]{String.valueOf(index)});
     ConsoleDesignation designation = new TemporaryConsoleDesignation(getConn(), consoleName, getEncoding(), true, commands);
-    addConsole(designation, true);
+    addConsole(designation, containerId, true);
   }
   
   
   
   /**
-   * Adds a closeable console for getting help on the server. If such a console
-   * already exists, it is merely activated.
+   * Adds a closeable console for getting help on the server, into the container
+   * with the specified ID. If such a console already exists, it is merely
+   * activated.
    */
   
-  public void activateHelpConsole(){
+  public void activateHelpConsole(String containerId){
     Console helpConsole = null;
     
     if (helpConsoleDesignation == null)
@@ -546,12 +645,12 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       helpConsole = getConsole(helpConsoleDesignation);
     
     if (helpConsole == null){
-      addConsole(helpConsoleDesignation, true);
+      addConsole(helpConsoleDesignation, containerId, true);
       helpConsole = getConsole(helpConsoleDesignation);
     }
     else{
-      makeConsoleSelected(helpConsole);
-      makeActive();
+      makeConsoleSelected(containerId, helpConsole);
+      makeActive(containerId);
     }
     
     helpConsole.flashInputField();
@@ -564,8 +663,12 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   public void removeConsole(Console console){
-    TabbedPaneModel model = consolesTabbedPane.getModel();
-    model.removeTab(model.indexOfComponent(console));
+    for (Iterator i = tabbedPanes.values().iterator(); i.hasNext();){
+      TabbedPane tabbedPane = (TabbedPane)i.next();
+      TabbedPaneModel model = tabbedPane.getModel();
+      model.removeTab(model.indexOfComponent(console));
+      // Removing the tab fires an event which removes it from other structures too
+    }
   }
   
   
@@ -757,7 +860,12 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
         ((((ChatEvent)evt).getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY) && 
         getPrefs().getBool("newConsoleOnPersonalTell", false))){
       ChatEvent chatEvent = (ChatEvent)evt;
-      ConsoleDesignation designation = addPersonalChatConsole(chatEvent.getSender(), false);
+      
+      String containerId = getActiveContainerId();
+      if (containerId == null)
+        containerId = MAIN_CONTAINER_ID;
+      
+      ConsoleDesignation designation = addPersonalChatConsole(chatEvent.getSender(), containerId, false);
       handled |= designation.receive(evt);
     }
     
@@ -854,9 +962,10 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
 
   public void loginSucceeded(Connection conn){
+    PluginUIContainer mainConsoleContainer = (PluginUIContainer)consoleContainers.get(MAIN_CONTAINER_ID);
     String title = getI18n().getFormattedString("mainConsole.title",
       new Object[]{getConn().getUser().getName(), getServer().getLongName()});
-    uiContainer.setTitle(title);
+    mainConsoleContainer.setTitle(title);
     
     String message = getI18n().getString("loggedInMessage");
     for (int i = 0; i < consoles.size(); i++){
@@ -900,10 +1009,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       boolean makeSelectedAndActive = !(
           (evt.getGame().getGameType() == Game.MY_GAME) &&
           !evt.getGame().isPlayed());
-          
-      addConsole(createGameConsoleDesignation(evt.getGame()), makeSelectedAndActive);
+      
+      String containerId = MAIN_CONTAINER_ID;
+      addConsole(createGameConsoleDesignation(evt.getGame()), containerId, makeSelectedAndActive);
       if (makeSelectedAndActive)
-        makeActive();
+        makeActive(containerId);
     }
   }
   
@@ -959,7 +1069,19 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   public void saveState(){
     Preferences prefs = getPrefs();
     
-    prefs.setInt("consoles.selected", consolesTabbedPane.getModel().getSelectedIndex());
+    for (Iterator i = tabbedPanes.entrySet().iterator(); i.hasNext();){
+      Map.Entry entry = (Map.Entry)i.next();
+      String containerId = (String)entry.getKey();
+      TabbedPane tabbedPane = (TabbedPane)entry.getValue();
+      
+      int selectedIndex = tabbedPane.getModel().getSelectedIndex();
+      String key = "containers." + containerId + ".selectedTab";
+      if (selectedIndex == -1) // Just in case, don't write a bad value
+        prefs.remove(key);
+      else
+        prefs.setInt(key, selectedIndex);
+    }
+    
     prefs.setString("encoding", getEncoding());
   }
 
@@ -1019,7 +1141,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
      */
     
     public void actionPerformed(ActionEvent e){
-      activateHelpConsole();
+      activateHelpConsole(MAIN_CONTAINER_ID);
     }
     
     

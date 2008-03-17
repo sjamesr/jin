@@ -274,7 +274,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
     super.loginSucceeded(conn);
     
     if (getUser().isGuest())
-      activateHelpConsole();
+      activateHelpConsole(MAIN_CONTAINER_ID);
   }
   
   

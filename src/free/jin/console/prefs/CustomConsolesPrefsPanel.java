@@ -33,6 +33,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.text.JTextComponent;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
@@ -54,6 +55,16 @@ import free.util.swing.AddRemoveButtons;
  */
 
 public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
+  
+  
+  
+  /**
+   * The name of the main console window (what we display as the first item) in
+   * the windows combo box.
+   */
+  
+  private static final String MAIN_WINDOW_NAME = 
+    I18n.get(CustomConsolesPrefsPanel.class).getString("mainWindowName");
   
   
   
@@ -117,7 +128,23 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * The textfield for the console's title.
    */
   
-  protected final JTextField consoleTitleField;
+  protected final JTextField titleField;
+  
+  
+  
+  /**
+   * The <code>ComboBoxModel</code> of the window box.
+   */
+  
+  private final DefaultComboBoxModel windowModel = new DefaultComboBoxModel();
+  
+  
+  
+  /**
+   * The combo box for the console's window.
+   */
+  
+  protected final JComboBox windowBox;
   
   
   
@@ -141,7 +168,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * The text field for the console's channels.
    */
   
-  protected final JTextField consoleChannelsField;
+  protected final JTextField channelsField;
   
   
   
@@ -182,7 +209,15 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * The label for the title field.
    */
   
-  protected final JLabel consoleTitleLabel;
+  protected final JLabel titleLabel;
+  
+  
+  
+  /**
+   * The label for the window box.
+   */
+  
+  protected final JLabel windowLabel;
   
   
   
@@ -198,7 +233,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * The label for the channels field.
    */
   
-  protected final JLabel consoleChannelsLabel;
+  protected final JLabel channelsLabel;
   
   
   
@@ -258,17 +293,19 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     this.removeConsoleButton = i18n.createButton("removeConsoleButton");
     this.moveUpButton = i18n.createButton("moveUpButton");
     this.moveDownButton = i18n.createButton("moveDownButton");
-    this.consoleTitleField = new JTextField();
+    this.titleField = new JTextField();
+    this.windowBox = new JComboBox(windowModel);
     this.encodingBox = new JComboBox(encodingModel);
-    this.consoleChannelsField = new JTextField();
+    this.channelsField = new JTextField();
     this.addRemoveChannels = new AddRemoveButtons();
     this.messageRegexField = new JTextField();
     
     this.consolesListLabel = i18n.createLabel("consolesListLabel");
     this.consolesListScrollPane = new JScrollPane(consolesList);
-    this.consoleTitleLabel = i18n.createLabel("consoleTitleLabel");
+    this.titleLabel = i18n.createLabel("titleLabel");
+    this.windowLabel = i18n.createLabel("windowLabel");
     this.encodingLabel = i18n.createLabel("encodingLabel");
-    this.consoleChannelsLabel = i18n.createLabel("consoleChannelsLabel");
+    this.channelsLabel = i18n.createLabel("channelsLabel");
     this.messageRegexLabel = i18n.createLabel("messageRegexLabel");
     
     Preferences prefs = consoleManager.getPrefs();
@@ -351,7 +388,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
         
         updateUiFromSelectedConsole();
         
-        consoleTitleField.requestFocusInWindow();
+        titleField.requestFocusInWindow();
       }
     });
     
@@ -412,8 +449,8 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       }
     });
     
-    consoleTitleField.getDocument().addDocumentListener(changeFiringDocumentListener);
-    consoleTitleField.getDocument().addDocumentListener(new DocumentListener(){
+    titleField.getDocument().addDocumentListener(changeFiringDocumentListener);
+    titleField.getDocument().addDocumentListener(new DocumentListener(){
       public void changedUpdate(DocumentEvent e){updateTitle();}
       public void insertUpdate(DocumentEvent e){updateTitle();}
       public void removeUpdate(DocumentEvent e){updateTitle();}
@@ -422,14 +459,47 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
         if (isIgnoreConsolePropertiesChange())
           return;
         
-        ConsoleSpec spec = (ConsoleSpec)consolesList.getSelectedValue();
+        ConsoleSpec spec = getSelectedConsole();
         if (spec == null)
           return;
         
-        spec.setTitle(consoleTitleField.getText());
+        spec.setTitle(titleField.getText());
         consolesList.repaint();
       }
     });
+    
+    windowModel.addElement(MAIN_WINDOW_NAME);
+    int customWindowsCount = prefs.getInt("containers.custom.count", 0);
+    for (int i = 0; i < customWindowsCount; i++){
+      String title = prefs.getString("containers.custom." + i + ".title", "");
+      windowModel.addElement(title);
+    }
+    windowBox.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e){
+        if (isIgnoreConsolePropertiesChange())
+          return;
+        
+        ConsoleSpec spec = getSelectedConsole();
+        if (spec == null)
+          return;
+        
+        String windowTitle = (String)windowBox.getSelectedItem();
+        spec.setWindow(windowTitle);
+        
+        if (windowModel.getIndexOf(windowTitle) == -1)
+          windowModel.addElement(windowTitle);
+        
+        fireStateChanged();
+      }
+    });
+    
+    Component windowEditorComponent = windowBox.getEditor().getEditorComponent();
+    if (windowEditorComponent instanceof JTextComponent){
+      JTextComponent textComponent = (JTextComponent)windowEditorComponent;
+      textComponent.getDocument().addDocumentListener(changeFiringDocumentListener);
+    }
+    windowBox.setEditable(true);
+    
     
     encodingModel.addElement(null); // Default encoding
     Map categoriesToEncodings = Encodings.categoriesToEncodings();
@@ -481,7 +551,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     }
     
     
-    consoleChannelsField.getDocument().addDocumentListener(changeFiringDocumentListener);
+    channelsField.getDocument().addDocumentListener(changeFiringDocumentListener);
     
     addRemoveChannels.getAddButton().addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e){
@@ -537,9 +607,10 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     messageRegexField.getDocument().addDocumentListener(changeFiringDocumentListener);
     
     consolesListLabel.setLabelFor(consolesList);
-    consoleTitleLabel.setLabelFor(consoleTitleField);
+    titleLabel.setLabelFor(titleField);
+    windowLabel.setLabelFor(windowBox);
     encodingLabel.setLabelFor(encodingBox);
-    consoleChannelsLabel.setLabelFor(consoleChannelsField);
+    channelsLabel.setLabelFor(channelsField);
     messageRegexLabel.setLabelFor(messageRegexField);
     
     consolesListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -607,6 +678,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       
       ConsoleSpec spec = getSelectedConsole();
       updateConsoleTitleUi(spec);
+      updateWindowUi(spec);
       updateEncodingUi(spec);
       updateConsoleChannelsUi(spec);
       updateRegexMatchUi(spec);
@@ -623,10 +695,27 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    */
   
   private void updateConsoleTitleUi(ConsoleSpec spec){
-    consoleTitleLabel.setEnabled(spec != null);
-    consoleTitleField.setText(spec == null ? "" : spec.getTitle());
-    consoleTitleField.setEnabled(spec != null);
-    consoleTitleField.setEditable(spec != null);
+    titleLabel.setEnabled(spec != null);
+    titleField.setText(spec == null ? "" : spec.getTitle());
+    titleField.setEnabled(spec != null);
+    titleField.setEditable(spec != null);
+  }
+  
+  
+  
+  /**
+   * Updates the console window UI from the specified selected spec (which may
+   * be <code>null</code>, if there is no spec selected). 
+   */
+  
+  private void updateWindowUi(ConsoleSpec spec){
+    windowLabel.setEnabled(spec != null);
+    
+    if (spec == null)
+      windowBox.setSelectedIndex(-1);
+    else
+      windowBox.setSelectedItem(spec.getWindow());
+    windowBox.setEnabled(spec != null);
   }
   
   
@@ -665,10 +754,10 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    */
   
   private void updateConsoleChannelsUi(ConsoleSpec spec){
-    consoleChannelsLabel.setEnabled(spec != null);
-    consoleChannelsField.setText(spec == null ? "" : makeChannelListDisplayString(spec.getChannels()));
-    consoleChannelsField.setEnabled(spec != null);
-    consoleChannelsField.setEditable(spec != null);
+    channelsLabel.setEnabled(spec != null);
+    channelsField.setText(spec == null ? "" : makeChannelListDisplayString(spec.getChannels()));
+    channelsField.setEnabled(spec != null);
+    channelsField.setEditable(spec != null);
     
     addRemoveChannels.getAddButton().setEnabled(spec != null);
     addRemoveChannels.getRemoveButton().setEnabled((spec != null) && !spec.getChannels().isEmpty());
@@ -721,14 +810,15 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     String errorMessage = null;
     Component errorComponent = null;
     
-    String title = consoleTitleField.getText();
+    String title = titleField.getText();
+    String window = (String)windowBox.getSelectedItem();
     Charset encoding = (Charset)encodingBox.getSelectedItem();
-    List channels = parseChannelsListDisplayString(consoleChannelsField.getText());
+    List channels = parseChannelsListDisplayString(channelsField.getText());
     String matchRegex = messageRegexField.getText();
     
     if ((title == null) || "".equals(title)){
       errorMessage = i18n.getString("consoleTitleUnspecifiedErrorMessage");
-      errorComponent = consoleTitleField;
+      errorComponent = titleField;
     }
     
     try{
@@ -745,8 +835,8 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       throw new BadChangesException(errorMessage, errorComponent); 
       
     spec.setTitle(title);
+    spec.setWindow(window);
     spec.setEncoding(encoding == null ? null : encoding.name());
-    System.out.println("Encoding set to " + encoding);
     spec.setChannels(channels);
     spec.setMessageRegex(matchRegex);
   }
@@ -810,20 +900,34 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     int selectedIndex = consolesList.getSelectedIndex();
     if (selectedIndex != -1)
       updateConsoleFromUi((ConsoleSpec)consoles.get(selectedIndex));
-      
-    Preferences prefs = consoleManager.getPrefs();
-    int firstCustomIndex = prefs.getInt("consoles.count");
     
+    Preferences prefs = consoleManager.getPrefs();
+    
+    // Store custom windows list 
+    Set customWindows = new TreeSet();
+    for (int i = 0; i < consoles.size(); i++){
+      ConsoleSpec spec = (ConsoleSpec)consoles.get(i);
+      String window = spec.getWindow();
+      if (!MAIN_WINDOW_NAME.equals(window))
+        customWindows.add(window);
+    }
+    List customWindowsList = new ArrayList(customWindows);
+    for (int i = 0; i < customWindowsList.size(); i++){
+      String title = (String)customWindowsList.get(i);
+      prefs.setString("containers.custom." + i + ".title", title);
+    }
+    prefs.setInt("containers.custom.count", customWindows.size());
+    
+    // Store custom consoles
+    int firstCustomIndex = prefs.getInt("consoles.count");
     while ("custom".equals(prefs.getString("consoles." + (firstCustomIndex - 1) + ".type")))
       firstCustomIndex--;
-    
     for (int i = 0; i < consoles.size(); i++){
       String prefix = "consoles." + (i + firstCustomIndex) + ".";
       prefs.setString(prefix + "type", "custom");
       ConsoleSpec spec = (ConsoleSpec)consoles.get(i);
       storeConsoleSpec(prefs, spec, prefix);
     }
-    
     prefs.setInt("consoles.count", firstCustomIndex + consoles.size());
   }
   
@@ -855,6 +959,12 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     spec.setChannels(consoleManager.parseConsoleChannelsPref(prefs.get(prefix + "channels", null)));
     spec.setMessageRegex(prefs.getString(prefix + "messageRegex", null));
     
+    String containerId = prefs.getString(prefix + "container.id", ConsoleManager.MAIN_CONTAINER_ID);
+    if (containerId.equals(ConsoleManager.MAIN_CONTAINER_ID))
+      spec.setWindow(MAIN_WINDOW_NAME);
+    else
+      spec.setWindow(prefs.getString("containers." + containerId + ".title", ""));
+    
     return spec;
   }
   
@@ -870,6 +980,22 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     prefs.setString(prefix + "encoding", spec.getEncoding());
     prefs.set(prefix + "channels", consoleManager.encodeConsoleChannelsPref(spec.getChannels()));
     prefs.setString(prefix + "messageRegex", spec.getMessageRegex());
+    
+    String window = spec.getWindow();
+    if (window.equals(MAIN_WINDOW_NAME))
+      prefs.setString(prefix + "container.id", ConsoleManager.MAIN_CONTAINER_ID);
+    else{
+      int customWindowsCount = prefs.getInt("containers.custom.count", 0);
+      for (int i = 0; i < customWindowsCount; i++){
+        String containerId = "custom." + i;
+        String title = prefs.getString("containers." + containerId + ".title", "");
+        System.out.println("Comparing " + window + " with " + title);
+        if (window.equals(title)){
+          prefs.setString(prefix + "container.id", containerId);
+          break;
+        }
+      }
+    }
   }
   
   
@@ -904,6 +1030,14 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
      */
     
     private String title = "";
+    
+    
+    
+    /**
+     * The console's window.
+     */
+    
+    private String window = MAIN_WINDOW_NAME;
     
     
     
@@ -948,6 +1082,26 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     public void setTitle(String title){
       this.title = title;
+    }
+    
+    
+    
+    /**
+     * Returns the window.
+     */
+    
+    public String getWindow(){
+      return window;
+    }
+    
+    
+    
+    /**
+     * Sets the window.
+     */
+    
+    public void setWindow(String window){
+      this.window = window;
     }
     
     
