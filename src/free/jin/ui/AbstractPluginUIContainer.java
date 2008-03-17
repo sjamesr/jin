@@ -193,6 +193,14 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
     if ("console".equals(pluginId)){
       if ("".equals(id))
         return new RectDouble(0, 0, 0.75, 0.75);
+      else if (id.startsWith("custom.")){
+        try{
+          int customIndex = Integer.parseInt(id.substring("custom.".length()));
+          double dx = 20.0/enclosingSize.getWidth();
+          double dy = 20.0/enclosingSize.getHeight();
+          return new RectDouble(0.25 + dx*customIndex, 0.25 + dy*customIndex, 0.5, 0.5);
+        } catch (NumberFormatException e){}
+      }
     }
     else if ("seek".equals(pluginId)){
       if ("".equals(id))
