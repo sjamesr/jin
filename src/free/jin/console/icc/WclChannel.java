@@ -22,12 +22,11 @@
 package free.jin.console.icc;
 
 import free.jin.console.Channel;
-import free.jin.console.ics.IcsChannel;
 
 
 
 /**
- * A WCL channel. This class is needed not for its functionality,
+ * A WCL channel. This class is needed not (only) for its functionality,
  * but because channel properties (such as name, description) are retrieved
  * via an <code>I18n</code> object corresponding to the actual class of the
  * {@link Channel} object.
@@ -35,7 +34,7 @@ import free.jin.console.ics.IcsChannel;
  * @author Maryanovsky Alexander
  */
 
-public class WclChannel extends IcsChannel{
+public class WclChannel extends ChessclubChannel{
   
   
   

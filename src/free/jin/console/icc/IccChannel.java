@@ -22,20 +22,19 @@
 package free.jin.console.icc;
 
 import free.jin.console.Channel;
-import free.jin.console.ics.IcsChannel;
 
 
 
 /**
- * An ICC (main server) channel. This class is needed not for its functionality,
- * but because channel properties (such as name, description) are retrieved
- * via an <code>I18n</code> object corresponding to the actual class of the
- * {@link Channel} object.
+ * An ICC (main server) channel. This class is needed not (only) for its
+ * functionality, but because channel properties (such as name, description) are
+ * retrieved via an <code>I18n</code> object corresponding to the actual class
+ * of the {@link Channel} object.
  * 
  * @author Maryanovsky Alexander
  */
 
-public class IccChannel extends IcsChannel{
+public class IccChannel extends ChessclubChannel{
   
   
   

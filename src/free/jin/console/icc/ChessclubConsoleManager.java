@@ -28,7 +28,6 @@ import free.jin.Connection;
 import free.jin.Game;
 import free.jin.I18n;
 import free.jin.ServerUser;
-import free.jin.console.Channel;
 import free.jin.console.Console;
 import free.jin.console.ConsoleDesignation;
 import free.jin.console.ics.IcsConsoleManager;
@@ -43,6 +42,18 @@ import free.jin.ui.PreferencesPanel;
  */
 
 public class ChessclubConsoleManager extends IcsConsoleManager{
+  
+  
+  
+  /**
+   * The list of channels enabled on WCL.
+   */
+  
+  private static final int [] WCL_CHANNELS = new int[]{
+    0, 1, 2, 3, 5, 24, 46, 47, 49, 90, 100, 120, 147, 165, 221, 222, 223, 224,
+    225, 228, 230, 250, 272, 274, 300, 302, 306, 309, 345, 348, 388,
+    393, 394, 395, 396, 399
+  };
   
   
   
@@ -201,9 +212,15 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
     boolean isWcl = isWcl();
     SortedMap channels = new TreeMap(channelsComparator);
     
-    for (int i = 0; i < 400; i++){
-      Channel channel = isWcl ? (Channel)(new WclChannel(i)) : (Channel)(new IccChannel(i));
-      channels.put(new Integer(i), channel);
+    if (isWcl){
+      for (int i = 0; i < WCL_CHANNELS.length; i++){
+        int channelNumber = WCL_CHANNELS[i];
+        channels.put(new Integer(channelNumber), new WclChannel(channelNumber));
+      }
+    }
+    else{
+      for (int i = 0; i < 400; i++)
+        channels.put(new Integer(i), new IccChannel(i));
     }
     
     return channels;
