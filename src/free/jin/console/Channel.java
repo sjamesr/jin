@@ -26,7 +26,9 @@ import free.jin.I18n;
 
 
 /**
- * Encapsulates information about a channel (room) on a server.
+ * Encapsulates information about a channel (room) on a server. The translated
+ * properties are retrieved from an {@link I18n} object created with:
+ * <code>I18n.get(getClass(), Channel.class)</code>.
  * 
  * @author Maryanovsky Alexander
  */
@@ -68,15 +70,24 @@ public class Channel{
   
   
   /**
+   * Returns the {@link I18n} object from which we retrieve channel properties.
+   */
+  
+  private I18n getI18n(){
+    return I18n.get(getClass(), Channel.class);
+  }
+  
+  
+  
+  /**
    * Returns the short name of the channel. This is a short (preferably one
    * word) string which will be displayed to the user. The name is retrieved
-   * from the <code>I18n</code> object associated with the class of the object
-   * by specifying "[id].shortName" as the i18n key. If there is no translation
-   * associated with this key, <code>id.toString()</code> is returned.
+   * from the "[id].shortName" i18n key. If there is no translation associated
+   * with this key, <code>id.toString()</code> is returned.
    */
   
   public String getShortName(){
-    return I18n.get(getClass()).getString(id + ".shortName", id.toString());
+    return getI18n().getString(id + ".shortName", id.toString());
   }
   
   
@@ -84,27 +95,24 @@ public class Channel{
   /**
    * Returns the long name of the channel. This is a medium sized (a few words)
    * string which will be displayed to the user. The name is retrieved from the
-   * <code>I18n</code> object associated with the class of the object by
-   * specifying "[id].longName" as the i18n key. If there is no translation
-   * associated with this key, the short name of the channel is returned.
+   * "[id].longName" i18n key. If there is no translation associated with this
+   * key, the short name of the channel is returned.
    */
   
   public String getLongName(){
-    return I18n.get(getClass()).getString(id + ".longName", getShortName());
+    return getI18n().getString(id + ".longName", getShortName());
   }
   
   
   
   /**
    * Returns the description of the channel. The name is retrieved from
-   * the <code>I18n</code> object associated with the class of the object by
-   * specifying "[id].description" as the i18n key. If there is no translation
-   * associated with this key, returns <code>null</code>;
+   * the "[id].description" i18n key. If there is no translation associated with
+   * this key, returns <code>null</code>;
    */
   
   public String getDescription(){
-    I18n i18n = I18n.get(getClass(), Channel.class);
-    return i18n.getString(id + ".description", null);
+    return getI18n().getString(id + ".description", null);
   }
   
   
