@@ -58,7 +58,6 @@ public class InfoButton extends JButton{
     
     setFocusable(false);
     setMargin(new Insets(0, 0, 0, 0));
-    putClientProperty("JButton.buttonType", "toolbar");
     
     // setMargin isn't enough for Ocean or Windows L&Fs
     Dimension legendButtonSize = new Dimension(ICON.getIconWidth() + 4, ICON.getIconHeight() + 4);
