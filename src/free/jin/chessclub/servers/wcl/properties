@@ -5,4 +5,4 @@ id = wcl
 protocolId = icc
 website = http://www.worldchesslive.com
 registrationPage = http://www.worldchesslive.com/register
-passwordRetrievalPage = http://www.worldchesslive.com/mailpassword
+#passwordRetrievalPage = http://www.worldchesslive.com/mailpassword
