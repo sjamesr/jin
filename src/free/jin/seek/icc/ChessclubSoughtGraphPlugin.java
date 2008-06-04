@@ -24,6 +24,7 @@ package free.jin.seek.icc;
 import java.awt.event.ActionEvent;
 
 import free.jin.action.JinAction;
+import free.jin.chessclub.JinChessclubConnection;
 import free.jin.seek.SoughtGraphPlugin;
 
 
@@ -45,6 +46,16 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
     exportAction(new OneMinuteAction());
     exportAction(new FiveMinuteAction());
     exportAction(new FifteenMinuteAction());
+  }
+  
+  
+  
+  /**
+   * Returns the connection, cast to a <code>JinChessclubConnection</code>.
+   */
+  
+  private JinChessclubConnection getChessclubConn(){
+    return (JinChessclubConnection)getConn();
   }
   
   
@@ -72,7 +83,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      */
     
     public void actionPerformed(ActionEvent e){
-      getConn().sendCommand("multi 1-minute");
+      getChessclubConn().sendCommand("1-minute", true, true, null);
     }
     
     
@@ -104,7 +115,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      */
     
     public void actionPerformed(ActionEvent e){
-      getConn().sendCommand("multi 5-minute");
+      getChessclubConn().sendCommand("5-minute", true, true, null);
     }
     
     
@@ -136,7 +147,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      */
     
     public void actionPerformed(ActionEvent e){
-      getConn().sendCommand("multi 15-minute");
+      getChessclubConn().sendCommand("15-minute", true, true, null);
     }
     
     
