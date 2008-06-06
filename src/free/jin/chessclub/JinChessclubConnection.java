@@ -2844,6 +2844,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
     }
     else{
       if (friends.remove(user)){
+        onlineFriendStates.remove(user);
+        listenerManager.fireFriendsEvent(
+            new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_REMOVED, user, 0));
+        
         if (user.isAlias()){
           // Disconnect everyone who is suspect to be online due to the alias
           // and re-request the list.
@@ -2852,18 +2856,10 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
             if (!friends.contains(u)){
               i.remove();
               listenerManager.fireFriendsEvent(
-                  new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, user, 0));
+                  new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, u, 0));
             }
           }
         }
-        else{
-          onlineFriendStates.remove(user);
-          listenerManager.fireFriendsEvent(
-              new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_STATE_CHANGED, user, 0));
-        }
-        
-        listenerManager.fireFriendsEvent(
-            new FriendsEvent(this, clientTag, FriendsEvent.FRIEND_REMOVED, user, 0));
       }
     }
     
