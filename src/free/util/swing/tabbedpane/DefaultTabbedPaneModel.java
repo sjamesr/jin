@@ -75,6 +75,13 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    */
   
   public void addTab(Tab tab, int index){
+    int existingIndex;
+    if ((existingIndex = indexOfTab(tab)) != -1){
+      removeTab(existingIndex);
+      if (index > existingIndex)
+        index--;
+    }
+      
     tabs.add(index, tab);
     fireTabAdded(index);
     
