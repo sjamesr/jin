@@ -3461,8 +3461,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       command.append(" ").append(color.isWhite() ? "white" : "black");
     command.append(" ").append(seek.isManualAccept() ? "manual" : "auto");
     command.append(" ").append(minRating).append("-").append(maxRating);
-    if (seek.isFormula())
-      command.append(" ").append("f");
+    command.append(" ").append(seek.isFormula() ? "formula" : "noformula");
       
     sendCommand(command.toString(), true, true, null);
   }
