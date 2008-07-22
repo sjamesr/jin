@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import free.jin.ui.UpgradeDialog;
 import free.util.IOUtilities;
+import free.util.Utilities;
 
 
 
@@ -43,10 +44,13 @@ public class UpgradeManager{
    */
   
   public static void start(){
+    validateLocalData();
+    
     Preferences prefs =  Jin.getInstance().getPrefs();
     String appVersion = Jin.getAppVersion();
     boolean newerVersionAvailable = prefs.getString("latestVersion", appVersion).compareTo(appVersion) > 0;
     boolean remindUpgrade = prefs.getLong("upgradeRemindTime", System.currentTimeMillis()) <= System.currentTimeMillis();
+    
     if (newerVersionAvailable && remindUpgrade)
       new UpgradeDialog().show();
     else{
@@ -57,6 +61,26 @@ public class UpgradeManager{
       };
       t.setDaemon(true);
       t.start();
+    }
+  }
+  
+  
+  
+  /**
+   * Checks if the latest version data URL is different from the one we
+   * remembered and if so, clears the cached latest data version.
+   */
+  
+  private static void validateLocalData(){
+    Preferences prefs = Jin.getInstance().getPrefs();
+    String oldLatestVersionDataUrl = prefs.getString("latestVersionDataUrl", null);
+    String latestVersionDataUrl = Jin.getAppProperty("app.latestVersionDataURL", null);
+    
+    if (!Utilities.areEqual(oldLatestVersionDataUrl, latestVersionDataUrl)){
+      // The url changed, so clear our remembered values
+      prefs.remove("latestVersion");
+      prefs.remove("upgradeUrl");
+      prefs.setString("latestVersionDataUrl", latestVersionDataUrl);
     }
   }
   
