@@ -272,9 +272,11 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       Map.Entry entry = (Map.Entry)i.next();
       String containerId = (String)entry.getKey();
       TabbedPane tabbedPane = (TabbedPane)entry.getValue();
-      int selectedIndex = prefs.getInt("containers." + containerId + ".selectedTab", 0);
-      if (tabbedPane.getModel().getTabCount() > selectedIndex)
-        tabbedPane.getModel().setSelectedIndex(selectedIndex);
+      int defaultSelectedIndex = prefs.getInt("containers." + containerId + ".defaultSelectedTab", 0);
+      int selectedIndex = prefs.getInt("containers." + containerId + ".selectedTab", defaultSelectedIndex);
+      if (selectedIndex >= tabbedPane.getModel().getTabCount())
+        selectedIndex = defaultSelectedIndex; // The tab selected on-close might not exist on-start.
+      tabbedPane.getModel().setSelectedIndex(selectedIndex);
     }
   }
   
