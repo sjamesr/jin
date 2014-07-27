@@ -59,6 +59,8 @@ import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import com.google.common.io.Resources;
+
 import free.jin.ConnectionManager;
 import free.jin.I18n;
 import free.jin.Jin;
@@ -229,9 +231,8 @@ public class MdiUiProvider extends AbstractUiProvider{
 
   private JFrame createMainFrame(){
     JFrame frame = new JFrame();
-    
     frame.setTitle(Jin.getAppName());
-    frame.setIconImage(frame.getToolkit().getImage(Jin.class.getResource("resources/logo32.png")));
+    frame.setIconImage(frame.getToolkit().getImage(Resources.getResource("logo32.png")));
     frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
       @Override
@@ -779,7 +780,7 @@ public class MdiUiProvider extends AbstractUiProvider{
 
       frame.setVisible(false); // internal frames are initially visible in 1.1
       
-      setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/logo32.png")));
+      setIconImpl(Toolkit.getDefaultToolkit().getImage(Resources.getResource("logo32.png")));
     }
     
     

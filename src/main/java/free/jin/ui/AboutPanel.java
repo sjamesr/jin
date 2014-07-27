@@ -33,6 +33,8 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import com.google.common.io.Resources;
+
 import free.jin.I18n;
 import free.jin.Jin;
 import free.util.IOUtilities;
@@ -89,7 +91,7 @@ public class AboutPanel extends DialogPanel{
     
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     
-    Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo48.png"));
+    Icon jinIcon = new ImageIcon(Resources.getResource("logo48.png"));
     JLabel jinLabel = new JLabel(Jin.getAppName() + " " 
       + Jin.getAppVersion(), jinIcon, SwingConstants.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
