@@ -81,12 +81,14 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
     I18n i18n = I18n.get(IcsCustomConsoleDesignation.class);
     
     addCommandType(new AbstractCommandType(i18n.getString("shout.commandName")){
+      @Override
       protected void send(String userText){
         sendCommand("shout " + userText);
       }
     });
       
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
+      @Override
       protected void send(String userText){
         sendCommand("i " + userText);
       }
@@ -107,6 +109,7 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
    * {@inheritDoc}
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (super.accept(evt))
       return true;
@@ -160,6 +163,7 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
      * Sends a channel tell.
      */
     
+    @Override
     protected void send(String userText){
       sendCommand("xtell " + channel.getId() + " " + userText);
     }

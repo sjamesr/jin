@@ -97,6 +97,7 @@ public class PluginStartException extends Exception{
    * Prints the stack trace of the cause and then of this exception.
    */
    
+  @Override
   public void printStackTrace(){
     if (cause != null)
       cause.printStackTrace();

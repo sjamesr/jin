@@ -188,6 +188,7 @@ public class Square{
    * return "e2".
    */
   
+  @Override
   public String toString(){
     char [] buff = new char[2];
     buff[0] = getFileChar();
@@ -201,6 +202,7 @@ public class Square{
    * Returns the hashCode of this Square.
    */
   
+  @Override
   public int hashCode(){
     return (rank<<3) | file;
   }

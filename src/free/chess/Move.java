@@ -187,6 +187,7 @@ public abstract class Move{
    * the value of getMoveString() is returned.
    */
 
+  @Override
   public String toString(){
     if (getStringRepresentation()==null)
       return getMoveString();

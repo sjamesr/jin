@@ -60,6 +60,7 @@ public class ChessclubBoardManager extends BoardManager{
    * Overrides BoardManager.createBoardPanel() to return a ChessclubBoardPanel.
    */
 
+  @Override
   protected BoardPanel createBoardPanel(Game game){
     BoardPanel boardPanel = new ChessclubBoardPanel(this, game);
 
@@ -72,6 +73,7 @@ public class ChessclubBoardManager extends BoardManager{
    * Overrides the superclass' method to set the primary game properly.
    */
 
+  @Override
   public void pluginUIActivated(PluginUIEvent e){
     Connection conn = getConn();
     if (!conn.isConnected())
@@ -105,6 +107,7 @@ public class ChessclubBoardManager extends BoardManager{
    * Overrides the superclass' method to increment <code>myGamesCount</code>.
    */
 
+  @Override
   public void gameStarted(GameStartEvent evt){
     if (evt.getGame().getGameType() == Game.MY_GAME)
       myGamesCount++;
@@ -118,6 +121,7 @@ public class ChessclubBoardManager extends BoardManager{
    * Overrides the superclass' method to decrement <code>myGamesCount</code>.
    */
 
+  @Override
   public void gameEnded(GameEndEvent evt){
     if (evt.getGame().getGameType() == Game.MY_GAME)
       myGamesCount--;

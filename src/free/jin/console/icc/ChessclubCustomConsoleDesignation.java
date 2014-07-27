@@ -49,12 +49,14 @@ public class ChessclubCustomConsoleDesignation extends IcsCustomConsoleDesignati
    * {@inheritDoc}
    */
   
+  @Override
   protected void addCShouts(){
     addAccepted("sshout", null, ANY_SENDER);
     
     I18n i18n = I18n.get(ChessclubCustomConsoleDesignation.class);
     
     addCommandType(new AbstractCommandType(i18n.getString("sshout.commandName")){
+      @Override
       protected void send(String userText){
         sendCommand("sshout " + userText);
       }

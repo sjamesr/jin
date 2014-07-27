@@ -40,6 +40,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
    * Overrides <code>start</code> to export the 5-min and 1-min actions.
    */
   
+  @Override
   public void start(){
     super.start();
     
@@ -72,6 +73,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Returns the string <code>"1-minute"</code>.
      */
     
+    @Override
     public String getId(){
       return "1-minute";
     }
@@ -82,6 +84,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Issues the "1-minute" command.
      */
     
+    @Override
     public void actionPerformed(ActionEvent e){
       getChessclubConn().sendCommand("1-minute", true, true, null);
     }
@@ -104,6 +107,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Returns the string <code>"5-minute"</code>.
      */
     
+    @Override
     public String getId(){
       return "5-minute";
     }
@@ -114,6 +118,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Issues the "5-minute" command.
      */
     
+    @Override
     public void actionPerformed(ActionEvent e){
       getChessclubConn().sendCommand("5-minute", true, true, null);
     }
@@ -136,6 +141,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Returns the string <code>"15-minute"</code>.
      */
     
+    @Override
     public String getId(){
       return "15-minute";
     }
@@ -146,6 +152,7 @@ public class ChessclubSoughtGraphPlugin extends SoughtGraphPlugin{
      * Issues the "15-minute" command.
      */
     
+    @Override
     public void actionPerformed(ActionEvent e){
       getChessclubConn().sendCommand("15-minute", true, true, null);
     }

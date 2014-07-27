@@ -90,6 +90,7 @@ public abstract class ChildClassLoader extends ClassLoader{
    * classloader can't find the specified class, the parent is asked to load it.
    */
 
+  @Override
   public final synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException{
     Class c = (Class)namesToClasses.get(name);
     if (c != null)
@@ -115,6 +116,7 @@ public abstract class ChildClassLoader extends ClassLoader{
    * is asked to find it.
    */
 
+  @Override
   public final InputStream getResourceAsStream(String name){
     InputStream in = getResourceAsStreamImpl(name);
     return in != null ? in : (parent == null ? null : parent.getResourceAsStream(name));
@@ -128,6 +130,7 @@ public abstract class ChildClassLoader extends ClassLoader{
    * find it.
    */
 
+  @Override
   public final URL getResource(String name){
     URL url = getResourceImpl(name);
     return url != null ? url : (parent == null ? null : parent.getResource(name));

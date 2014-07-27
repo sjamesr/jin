@@ -104,16 +104,17 @@ public class Giveaway extends ChesslikeGenericVariant{
    * returns null.
    */
 
+  @Override
   public Piece [] getPromotionTargets(Position pos, Square startingSquare, Square endingSquare){
     checkPosition(pos);
 
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
 
     if ((endingSquare.getRank()==7)&&(movingPiece==ChessPiece.WHITE_PAWN))
-      return (Piece [])WHITE_PROMOTION_TARGETS.clone();
+      return WHITE_PROMOTION_TARGETS.clone();
 
     if ((endingSquare.getRank()==0)&&(movingPiece==ChessPiece.BLACK_PAWN))
-      return (Piece [])BLACK_PROMOTION_TARGETS.clone();
+      return BLACK_PROMOTION_TARGETS.clone();
 
     return null;
   }

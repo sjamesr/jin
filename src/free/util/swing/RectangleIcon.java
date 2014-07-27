@@ -50,6 +50,7 @@ public class RectangleIcon extends ColoredIcon{
    * Fills the rectangle.
    */
 
+  @Override
   public void paintShape(Component component, Graphics g, int x, int y){
     g.fillRect(x, y, getIconWidth(), getIconHeight());
   }

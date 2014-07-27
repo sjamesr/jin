@@ -297,6 +297,7 @@ public class FreechessConnection extends Connection{
    * Invoked when a connection to the server is established. Sends ivar settings to the server.
    */
   
+  @Override
   protected void handleConnected(){
     sendCommandImpl(createLoginIvarsSettingString(requestedIvarStates), true);
     filterLine("#Ivars set.");
@@ -311,6 +312,7 @@ public class FreechessConnection extends Connection{
    * Sends the login information to the server.
    */
 
+  @Override
   protected void sendLoginSequence(){
     sendCommandImpl(getRequestedUsername(), true);
     if (getPassword() != null)
@@ -343,6 +345,7 @@ public class FreechessConnection extends Connection{
    * Sets the various things we need to set on login.
    */
 
+  @Override
   protected void handleLoginSucceeded(){
     super.handleLoginSucceeded();
 
@@ -463,6 +466,7 @@ public class FreechessConnection extends Connection{
    * and a <code>PushbackInputStream</code>.
    */
   
+  @Override
   protected InputStream createInputStream(InputStream in){
     return new PushbackInputStream(new BufferedInputStream(in));
   }
@@ -473,6 +477,7 @@ public class FreechessConnection extends Connection{
    * Reads a single line from the server.
    */
   
+  @Override
   protected Object readMessage(InputStream inputStream) throws IOException{
     PushbackInputStream pin = (PushbackInputStream)inputStream;
     StringBuffer buf = new StringBuffer();
@@ -523,6 +528,7 @@ public class FreechessConnection extends Connection{
    * information, parsing it and sending it for further processing.
    */
 
+  @Override
   protected void handleMessage(Object lineObj){
     String line = (String)lineObj;
     

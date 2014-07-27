@@ -50,6 +50,7 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
@@ -342,18 +343,24 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     }
     
     DocumentListener changeFiringDocumentListener = new DocumentListener(){
+      @Override
       public void changedUpdate(DocumentEvent e){if (!isIgnoreConsolePropertiesChange()) fireStateChanged();}
+      @Override
       public void insertUpdate(DocumentEvent e){if (!isIgnoreConsolePropertiesChange()) fireStateChanged();}
+      @Override
       public void removeUpdate(DocumentEvent e){if (!isIgnoreConsolePropertiesChange()) fireStateChanged();}
     };
     
     consoles.addListDataListener(new ListDataListener(){
+      @Override
       public void contentsChanged(ListDataEvent e){
         fireStateChanged();
       }
+      @Override
       public void intervalAdded(ListDataEvent e){
         fireStateChanged();
       }
+      @Override
       public void intervalRemoved(ListDataEvent e){
         fireStateChanged();
       }
@@ -361,6 +368,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     consolesList.addListSelectionListener(new ListSelectionListener(){
       private int selectedIndex = -1;
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         if (evt.getValueIsAdjusting())
           return;
@@ -392,6 +400,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     });
     
     consolesList.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent e){
         int selectedIndex = consolesList.getSelectedIndex();
         
@@ -405,6 +414,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     consolesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     
     addConsoleButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         consoles.addElement(createNewConsoleSpec());
         consolesList.setSelectedIndex(consoles.size() - 1);
@@ -417,6 +427,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     });
     
     removeConsoleButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         int selectedIndex = consolesList.getSelectedIndex();
         if (selectedIndex == -1)
@@ -440,6 +451,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     });
     
     moveUpButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         int selectedIndex = consolesList.getSelectedIndex();
         if ((selectedIndex == -1) || (selectedIndex == 0))
@@ -457,6 +469,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     });
     
     moveDownButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         int selectedIndex = consolesList.getSelectedIndex();
         if ((selectedIndex == -1) || (selectedIndex == consoles.size() - 1))
@@ -475,8 +488,11 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     
     titleField.getDocument().addDocumentListener(changeFiringDocumentListener);
     titleField.getDocument().addDocumentListener(new DocumentListener(){
+      @Override
       public void changedUpdate(DocumentEvent e){updateTitle();}
+      @Override
       public void insertUpdate(DocumentEvent e){updateTitle();}
+      @Override
       public void removeUpdate(DocumentEvent e){updateTitle();}
 
       private void updateTitle(){
@@ -499,6 +515,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
       windowModel.addElement(title);
     }
     windowBox.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         if (isIgnoreConsolePropertiesChange())
           return;
@@ -546,6 +563,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     // Allow selecting only charsets, not category names
     encodingBox.addActionListener(new ActionListener(){
       private Charset selectedEncoding;
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (isIgnoreConsolePropertiesChange())
           return;
@@ -578,6 +596,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     channelsField.getDocument().addDocumentListener(changeFiringDocumentListener);
     
     addRemoveChannels.getAddButton().addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         final ConsoleSpec spec = (ConsoleSpec)consolesList.getSelectedValue();
         if (spec == null)
@@ -590,6 +609,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
         final ChannelsPopup popup = new ChannelsPopup(channelsArr);
         
         popup.addActionListener(new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent e){
             popup.hide();
             
@@ -605,6 +625,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     });
     
     addRemoveChannels.getRemoveButton().addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         final ConsoleSpec spec = (ConsoleSpec)consolesList.getSelectedValue();
         if (spec == null)
@@ -614,6 +635,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
         final ChannelsPopup popup = new ChannelsPopup(channelsArr);
         
         popup.addActionListener(new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent e){
             popup.hide();
             
@@ -637,8 +659,8 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
     channelsLabel.setLabelFor(channelsField);
     messageRegexLabel.setLabelFor(messageRegexField);
     
-    consolesListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    consolesListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    consolesListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    consolesListScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
   }
   
   
@@ -647,6 +669,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * Returns <code>true</code>.
    */
   
+  @Override
   public boolean applyRequiresRestart(){
     return true;
   }
@@ -657,6 +680,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * Invokes {@link #createLayout()} the first time we're added anywhere.
    */
   
+  @Override
   public void addNotify(){
     super.addNotify();
     
@@ -920,6 +944,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
    * Applies the changes in the preferences panel, storing the preferences.
    */
   
+  @Override
   public void applyChanges() throws BadChangesException{
     int selectedIndex = consolesList.getSelectedIndex();
     if (selectedIndex != -1)
@@ -1215,6 +1240,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
      * Returns the console's title, or a special string, if it's empty. 
      */
     
+    @Override
     public String toString(){
       String title = getTitle();
       return "".equals(title) ? DEFAULT_TITLE : title;
@@ -1334,6 +1360,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel{
      * {@inheritDoc}
      */
     
+    @Override
     public Component getListCellRendererComponent(JList list, Object value,
         int index, boolean isSelected, boolean cellHasFocus){
       

@@ -53,6 +53,7 @@ public class ChessclubGameConsoleDesignation extends IcsGameConsoleDesignation{
    * Returns <code>"kibitzto"</code>.
    */
   
+  @Override
   protected String getKibitzToCommand(){
     return "kibitzto";
   }
@@ -63,6 +64,7 @@ public class ChessclubGameConsoleDesignation extends IcsGameConsoleDesignation{
    * Returns <code>"whisperto"</code>.
    */
   
+  @Override
   protected String getWhisperToCommand(){
     return "whisperto";
   }

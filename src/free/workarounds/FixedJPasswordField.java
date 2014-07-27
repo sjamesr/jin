@@ -68,6 +68,7 @@ public class FixedJPasswordField extends JPasswordField{
 
 
   
+  @Override
   public void setEditable(boolean editable){
     super.setEditable(editable);
 
@@ -84,6 +85,7 @@ public class FixedJPasswordField extends JPasswordField{
   }
 
 
+  @Override
   protected void processComponentKeyEvent(KeyEvent evt){
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4133908.html

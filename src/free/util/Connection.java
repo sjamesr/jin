@@ -132,6 +132,7 @@ public abstract class Connection{
 
   public synchronized void initiateConnect(final String hostname, final int port){
     readerThread = new Thread("ReaderThread"){
+      @Override
       public void run(){
         try{
           if (connect(hostname, port))
@@ -163,6 +164,7 @@ public abstract class Connection{
       }
       
       execRunnable(new SafeRunnable(){
+        @Override
         public void safeRun(){
           handleConnected();
         }
@@ -174,6 +176,7 @@ public abstract class Connection{
         // sitting in connectImpl, connecting to the server
         if (readerThread == Thread.currentThread())
           execRunnable(new SafeRunnable(){
+            @Override
             public void safeRun(){
               handleConnectingFailed(e);
             }
@@ -298,6 +301,7 @@ public abstract class Connection{
       username = null;
       
       execRunnable(new SafeRunnable(){
+        @Override
         public void safeRun(){
           handleDisconnection(exception);
         }
@@ -549,6 +553,7 @@ public abstract class Connection{
      * Invokes {@link Connection#handleMessage(Object)} with the message.
      */
     
+    @Override
     public void safeRun(){
       handleMessage(message);
     }

@@ -74,18 +74,23 @@ public class FreechessScripter extends Scripter{
       chatTypesToSubtypes.put("qtell", subtypes[9]);
     }                                          
 
+    @Override
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
+    @Override
     public boolean isSupportedBy(Connection conn){return true;}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addChatListener(this);
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removeChatListener(this);
     }
 
+    @Override
     public void chatMessageReceived(ChatEvent evt){
       Vector varsVector = new Vector(5);
 
@@ -121,6 +126,7 @@ public class FreechessScripter extends Scripter{
         return null;
     }
 
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return new Object[][]{
         {"message", "Hello World!"},

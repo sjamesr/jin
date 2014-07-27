@@ -202,6 +202,7 @@ public class JChessClock extends AbstractChessClock{
    * turn.
    */
   
+  @Override
   public void setActive(boolean isActive){
     super.setActive(isActive);
     repaint();
@@ -251,6 +252,7 @@ public class JChessClock extends AbstractChessClock{
    * Overrides JComponent.paintComponent(Graphics) to paint this JChessClock.
    */
   
+  @Override
   public void paintComponent(Graphics g){
     Graphics2D g2d = (Graphics2D)g;
     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -305,6 +307,7 @@ public class JChessClock extends AbstractChessClock{
    * Returns the preferred size of this JChessClock.
    */
   
+  @Override
   public Dimension getPreferredSize(){
     String text = createTimeString(getTime());
     Font font = getFont();
@@ -322,6 +325,7 @@ public class JChessClock extends AbstractChessClock{
    * Returns the minimum size of this JChessClock.
    */
   
+  @Override
   public Dimension getMinimumSize(){
     String text = createTimeString(getTime());
     Font font = getFont();

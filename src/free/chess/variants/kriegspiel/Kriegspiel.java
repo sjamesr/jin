@@ -97,6 +97,7 @@ public class Kriegspiel implements WildVariant{
    * not Kriegspiel.
    */
   
+  @Override
   public void init(Position pos){
     checkPosition(pos);
     
@@ -114,6 +115,7 @@ public class Kriegspiel implements WildVariant{
    * not Kriegspiel.
    */
   
+  @Override
   public Piece [] getPromotionTargets(Position pos, Square startingSquare, Square endingSquare){
     checkPosition(pos);
     
@@ -132,6 +134,7 @@ public class Kriegspiel implements WildVariant{
    * @see KriegspielMove
    */
   
+  @Override
   public Move createMove(Position pos, Square startSquare, Square endSquare, 
       Piece promotionTarget, String stringRepresentation){
     
@@ -144,7 +147,7 @@ public class Kriegspiel implements WildVariant{
       return new KriegspielMove(pos, endSquare, stringRepresentation);
     } 
     else{
-      return Chess.getInstance().createChessMove(pos, startSquare, endSquare, (ChessPiece)promotionTarget, stringRepresentation);
+      return Chess.getInstance().createChessMove(pos, startSquare, endSquare, promotionTarget, stringRepresentation);
     }
   }
   
@@ -155,6 +158,7 @@ public class Kriegspiel implements WildVariant{
    * specified one, but made in the specified position.
    */
   
+  @Override
   public Move createMove(Position pos, Move move){
     checkPosition(pos);
     
@@ -175,6 +179,7 @@ public class Kriegspiel implements WildVariant{
    * position.
    */
   
+  @Override
   public Move createShortCastling(Position pos){
     checkPosition(pos);
     
@@ -192,6 +197,7 @@ public class Kriegspiel implements WildVariant{
    * position.
    */
   
+  @Override
   public Move createLongCastling(Position pos){
     checkPosition(pos);
     
@@ -208,6 +214,7 @@ public class Kriegspiel implements WildVariant{
    * Makes the given KriegspielMove on the given position.
    */
   
+  @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier){
     checkPosition(pos);
     
@@ -239,6 +246,7 @@ public class Kriegspiel implements WildVariant{
    * @throws IllegalArgumentException if the given string is in a bad format.
    */
   
+  @Override
   public Piece parsePiece(String piece){
     return ChesslikeGenericVariant.parseChessPiece(piece);
   }
@@ -251,6 +259,7 @@ public class Kriegspiel implements WildVariant{
    * for more details.
    */
   
+  @Override
   public String pieceToString(Piece piece){
     if (!(piece instanceof ChessPiece))
       throw new IllegalArgumentException("The given Piece must be an instance of ChessPiece.");
@@ -264,6 +273,7 @@ public class Kriegspiel implements WildVariant{
    * Returns an instance of <code>DefaultPiecePainter</code>.
    */
   
+  @Override
   public PiecePainter createDefaultPiecePainter(){
     return new DefaultPiecePainter();
   }
@@ -274,6 +284,7 @@ public class Kriegspiel implements WildVariant{
    * Returns an instance of <code>DefaultBoardPainter</code>.
    */
   
+  @Override
   public BoardPainter createDefaultBoardPainter(){
     return new DefaultBoardPainter();
   }
@@ -284,6 +295,7 @@ public class Kriegspiel implements WildVariant{
    * {@inheritDoc}
    */
   
+  @Override
   public Collection getTargetSquares(Position pos, Square square){
     checkPosition(pos);
     
@@ -296,6 +308,7 @@ public class Kriegspiel implements WildVariant{
    * Returns the string "Kriegspiel".
    */
   
+  @Override
   public String getName(){
     return "Kriegspiel";
   } 
@@ -306,6 +319,7 @@ public class Kriegspiel implements WildVariant{
    * Returns a textual representation of this WildVariant.
    */
   
+  @Override
   public String toString(){
     return getName();
   }

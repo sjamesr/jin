@@ -133,7 +133,7 @@ public class GameListEvent extends JinEvent{
     super(conn, clientTag);
 
     this.id = id;
-    this.gameList = (GameListItem [])gameList.clone();
+    this.gameList = gameList.clone();
     this.listTitle = listTitle;
     this.totalNumItems = totalNumItems;
     this.firstIndex = firstIndex;
@@ -160,7 +160,7 @@ public class GameListEvent extends JinEvent{
    */
 
   public GameListItem [] getGameList(){
-    return (GameListItem [])gameList.clone();
+    return gameList.clone();
   }
 
 

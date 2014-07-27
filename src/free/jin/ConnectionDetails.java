@@ -209,7 +209,7 @@ public class ConnectionDetails extends Struct{
    */
 
   public int [] getPorts(){
-    return (int [])((int [])getProperty("ports")).clone();
+    return ((int [])getProperty("ports")).clone();
   }
 
 

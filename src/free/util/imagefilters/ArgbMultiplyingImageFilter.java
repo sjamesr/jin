@@ -90,6 +90,7 @@ public class ArgbMultiplyingImageFilter extends ArgbImageFilter{
    * Multiplies the components by their respective factors.
    */
 
+  @Override
   public int filterArgb(int x, int y, int a, int r, int g, int b){
     return compose(
         apply(a, af),

@@ -135,10 +135,12 @@ public class IssueSeekPanel extends JPanel{
     });
     
     moreLess.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         if (moreLess.isMore() && container.isVisible()){
           // Need to wait for all delayed layout to finish
           SwingUtilities.invokeLater(new Runnable(){
+            @Override
             public void run(){
               Container contentPane = container.getContentPane();
               if (!AWTUtilities.fitsInto(contentPane.getMinimumSize(), contentPane.getSize()))
@@ -150,6 +152,7 @@ public class IssueSeekPanel extends JPanel{
     });
 
     issueSeek.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         IssueSeekPanel.this.conn.issue(getSeek());
       }
@@ -164,6 +167,7 @@ public class IssueSeekPanel extends JPanel{
    * Returns <code>true</code>.
    */
   
+  @Override
   public boolean isFocusCycleRoot(){
     return true;
   }

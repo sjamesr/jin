@@ -186,13 +186,16 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Sets our console.
    */
   
+  @Override
   public void setConsole(Console console){
     this.console = console;
     
     console.addComponentListener(new ComponentAdapter(){
+      @Override
       public void componentShown(ComponentEvent e){
         consoleShown();
       }
+      @Override
       public void componentHidden(ComponentEvent e){
         consoleHidden();
       }
@@ -262,6 +265,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * {@inheritDoc}
    */
   
+  @Override
   public void addPropertyChangeListener(PropertyChangeListener listener){
     propertyChangeSupport.addPropertyChangeListener(listener);
   }
@@ -272,6 +276,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Removes a property change listener.
    */
   
+  @Override
   public void removePropertyChangeListener(PropertyChangeListener listener){
     propertyChangeSupport.removePropertyChangeListener(listener);
   }
@@ -282,6 +287,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Returns the name of this designation.
    */
 
+  @Override
   public String getName(){
     if (countUnseenMessages && (unseenMessageCount != 0))
       return name + " (" + unseenMessageCount + ")";
@@ -347,6 +353,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Returns whether the console is closeable.
    */
   
+  @Override
   public boolean isConsoleCloseable(){
     return isConsoleCloseable;
   }
@@ -385,6 +392,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * it and, if accepted, sending it to the console.
    */
   
+  @Override
   public boolean receive(JinEvent evt){
     if (accept(evt)){
       append(evt);
@@ -476,6 +484,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
    * Returns the command types we're capable of sending.
    */
   
+  @Override
   public final List getCommandTypes(){
     return Collections.unmodifiableList(commandTypes);
   }
@@ -536,6 +545,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation{
      * <code>doNotEcho</code> flag is unset, to <code>echo</code>.
      */
     
+    @Override
     public final void handleCommand(String userText, boolean doNotEcho){
       boolean escaped = userText.startsWith("/");
       if (escaped)

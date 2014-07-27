@@ -67,6 +67,7 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
     
     String commandName = I18n.get(IcsChannelConsoleDesignation.class).getString("sendChannelTellCommandName");
     addCommandType(new AbstractCommandType(commandName){
+      @Override
       protected void send(String userText){
         Channel channel = IcsChannelConsoleDesignation.this.channel;
         sendCommand("xtell " + channel.getId() + " " + userText);
@@ -80,6 +81,7 @@ public class IcsChannelConsoleDesignation extends ChatConsoleDesignation{
    * {@inheritDoc}
    */
   
+  @Override
   protected void appendChat(ChatEvent evt){
     if ("channel-tell".equals(evt.getType())){
       String senderName = evt.getSender().getName();

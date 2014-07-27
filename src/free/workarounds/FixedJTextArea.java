@@ -71,6 +71,7 @@ public class FixedJTextArea extends JTextArea{
 
 
 
+  @Override
   public void setEditable(boolean editable){
     super.setEditable(editable);
 
@@ -88,6 +89,7 @@ public class FixedJTextArea extends JTextArea{
   
   
   
+  @Override
   public void paste(){
     try{
       super.paste();
@@ -101,6 +103,7 @@ public class FixedJTextArea extends JTextArea{
   
   
   
+  @Override
   public void copy(){
     try{
       super.copy();
@@ -114,6 +117,7 @@ public class FixedJTextArea extends JTextArea{
 
 
   
+  @Override
   public void cut(){
     try{
       super.cut();

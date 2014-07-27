@@ -289,6 +289,7 @@ public class JinBoard extends JBoard implements PaintHook{
    * PaintHook implementation.
    */
 
+  @Override
   public void paint(Component component, Graphics g){
     if (component != this)
       throw new IllegalArgumentException("Can only paint on this");

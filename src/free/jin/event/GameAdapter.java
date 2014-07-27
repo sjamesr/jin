@@ -31,14 +31,23 @@ public class GameAdapter implements GameListener{
 
 
 
+  @Override
   public void gameStarted(GameStartEvent evt){}
+  @Override
   public void moveMade(MoveMadeEvent evt){}
+  @Override
   public void positionChanged(PositionChangedEvent evt){}
+  @Override
   public void takebackOccurred(TakebackEvent evt){}
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){}
+  @Override
   public void clockAdjusted(ClockAdjustmentEvent evt){}
+  @Override
   public void boardFlipped(BoardFlipEvent evt){}
+  @Override
   public void offerUpdated(OfferEvent evt){}
+  @Override
   public void gameEnded(GameEndEvent evt){}
 
 

@@ -74,6 +74,7 @@ public final class MoreLessOptionsButton extends JButton{
    * Invoked when the button is pressed.
    */
   
+  @Override
   protected void fireActionPerformed(ActionEvent evt){
     setMore(!isMore());
     

@@ -90,6 +90,7 @@ public final class Circle{
    * are the same if they are at the same square and have the same color. 
    */
    
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof Circle))
       return false;
@@ -104,6 +105,7 @@ public final class Circle{
    * Returns the hashcode of this circle.
    */
    
+  @Override
   public int hashCode(){
     int result = 17;
     result = 37*result + square.hashCode();

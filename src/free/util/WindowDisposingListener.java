@@ -73,6 +73,7 @@ public class WindowDisposingListener implements ActionListener, WindowListener{
    * Calls <code>dispose()</code> on the target <code>Window</code>.
    */
 
+  @Override
   public void actionPerformed(ActionEvent evt){
     beforeDisposing(evt);
     targetWindow.dispose();
@@ -84,17 +85,24 @@ public class WindowDisposingListener implements ActionListener, WindowListener{
    * Calls <code>dispose()</code> on the target <code>Window</code>.
    */
 
+  @Override
   public void windowClosing(WindowEvent evt){
     beforeDisposing(evt);
     targetWindow.dispose();
   }
 
 
+  @Override
   public void windowOpened(WindowEvent evt){}
+  @Override
   public void windowClosed(WindowEvent evt){}
+  @Override
   public void windowIconified(WindowEvent evt){}
+  @Override
   public void windowDeiconified(WindowEvent evt){}
+  @Override
   public void windowActivated(WindowEvent evt){}
+  @Override
   public void windowDeactivated(WindowEvent evt){}
 
 }

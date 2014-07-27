@@ -98,18 +98,22 @@ public class TabbedPane extends JComponent{
   
   private final TabbedPaneListener proxyModelListener = new TabbedPaneListener(){
 
+    @Override
     public void tabAdded(TabbedPaneEvent evt){
       TabbedPane.this.tabAdded(evt);
     }
 
+    @Override
     public void tabRemoved(TabbedPaneEvent evt){
       TabbedPane.this.tabRemoved(evt);
     }
     
+    @Override
     public void tabSelected(TabbedPaneEvent evt){
       TabbedPane.this.tabSelected(evt);
     }
     
+    @Override
     public void tabDeselected(TabbedPaneEvent evt){
       TabbedPane.this.tabDeselected(evt);
     }
@@ -200,6 +204,7 @@ public class TabbedPane extends JComponent{
    * Returns <code>true</code>.
    */
   
+  @Override
   public boolean isFocusCycleRoot(){
     return true;
   }
@@ -497,10 +502,10 @@ public class TabbedPane extends JComponent{
     
     Object tabRowPosition;
     switch(getTabPlacement()){
-      case  SwingUtilities.TOP: tabRowPosition = BorderLayout.NORTH; break;
-      case  SwingUtilities.BOTTOM: tabRowPosition = BorderLayout.SOUTH; break;
-      case  SwingUtilities.LEFT: tabRowPosition = BorderLayout.WEST; break;
-      case  SwingUtilities.RIGHT: tabRowPosition = BorderLayout.EAST; break;
+      case  SwingConstants.TOP: tabRowPosition = BorderLayout.NORTH; break;
+      case  SwingConstants.BOTTOM: tabRowPosition = BorderLayout.SOUTH; break;
+      case  SwingConstants.LEFT: tabRowPosition = BorderLayout.WEST; break;
+      case  SwingConstants.RIGHT: tabRowPosition = BorderLayout.EAST; break;
       default:
         throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
     }
@@ -517,25 +522,25 @@ public class TabbedPane extends JComponent{
     final int nearOffset = 0; // The offset of the tab panel from the component
     final int farOffset = 2;   // The offset of the tab panel from the side opposite to the component
     switch(tabPlacement){
-      case SwingUtilities.TOP:
+      case SwingConstants.TOP:
         top = farOffset;
         bottom = nearOffset;
         left = startOffset;
         right = endOffset;
         break;
-      case SwingUtilities.BOTTOM:
+      case SwingConstants.BOTTOM:
         top = nearOffset;
         bottom = farOffset;
         left = startOffset;
         right = endOffset;
         break;
-      case SwingUtilities.LEFT:
+      case SwingConstants.LEFT:
         top = startOffset;
         bottom = endOffset;
         left = farOffset;
         right = nearOffset;
         break;
-      case SwingUtilities.RIGHT:
+      case SwingConstants.RIGHT:
         top = startOffset;
         bottom = endOffset;
         left = nearOffset;
@@ -550,16 +555,16 @@ public class TabbedPane extends JComponent{
     final int tabOffset = 3; // The offset of the component to the tabs
     top = left = bottom = right = 0;
     switch (tabPlacement){
-      case SwingUtilities.TOP:
+      case SwingConstants.TOP:
         top = tabOffset;
         break;
-      case SwingUtilities.BOTTOM:
+      case SwingConstants.BOTTOM:
         bottom = tabOffset;
         break;
-      case SwingUtilities.LEFT:
+      case SwingConstants.LEFT:
         left = tabOffset;
         break;
-      case SwingUtilities.RIGHT:
+      case SwingConstants.RIGHT:
         right = tabOffset;
         break;
       default:
@@ -574,6 +579,7 @@ public class TabbedPane extends JComponent{
    * Paints the tabbed pane.
    */
   
+  @Override
   public void paint(Graphics graphics){
     super.paint(graphics);
     
@@ -606,7 +612,7 @@ public class TabbedPane extends JComponent{
     int selectedOffset;
     
     switch (tabPlacement){
-      case  SwingUtilities.TOP:
+      case  SwingConstants.TOP:
         x = tabPanelBounds.x + firstTabBounds.x - 1;
         y = tabPanelBounds.y;
         selectedOffset = firstTabBounds.y;
@@ -615,7 +621,7 @@ public class TabbedPane extends JComponent{
         cx = 1;
         cy = 0;
         break;
-      case  SwingUtilities.BOTTOM:
+      case  SwingConstants.BOTTOM:
         x = tabPanelBounds.x + firstTabBounds.x - 1;
         y = tabPanelBounds.y + tabPanelBounds.height - 1;
         selectedOffset = tabPanelBounds.height - (firstTabBounds.y + firstTabBounds.height);
@@ -624,7 +630,7 @@ public class TabbedPane extends JComponent{
         cx = 1;
         cy = 0;
         break;
-      case  SwingUtilities.LEFT:
+      case  SwingConstants.LEFT:
         x = tabPanelBounds.x;
         y = tabPanelBounds.y + firstTabBounds.y - 1;
         selectedOffset = firstTabBounds.x;
@@ -633,7 +639,7 @@ public class TabbedPane extends JComponent{
         cx = 0;
         cy = 1;
         break;
-      case  SwingUtilities.RIGHT:
+      case  SwingConstants.RIGHT:
         x = tabPanelBounds.x + tabPanelBounds.width - 1;
         y = tabPanelBounds.y + firstTabBounds.y - 1;
         selectedOffset = tabPanelBounds.width - (firstTabBounds.x + firstTabBounds.width);
@@ -743,6 +749,7 @@ public class TabbedPane extends JComponent{
      * (in the constructor) and paint the translucent background ourselves.  
      */
     
+    @Override
     public void paint(Graphics g){
       g.setColor(getBackground());
       g.fillRect(0, 0, getWidth(), getHeight());
@@ -831,12 +838,13 @@ public class TabbedPane extends JComponent{
      * Lays out the tab row.
      */
     
+    @Override
     public void layoutContainer(Container parent){
       if (parent != handlePanel)
         throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
       
       int tabPlacement = getTabPlacement();
-      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
+      boolean isVertical = (tabPlacement == SwingConstants.LEFT) || (tabPlacement == SwingConstants.RIGHT);
 
       Dimension parentSize = parent.getSize();
       Insets insets = parent.getInsets();
@@ -973,7 +981,7 @@ public class TabbedPane extends JComponent{
     
     private Dimension layoutSize(Dimension [] tabSizes){
       int tabPlacement = getTabPlacement();
-      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
+      boolean isVertical = (tabPlacement == SwingConstants.LEFT) || (tabPlacement == SwingConstants.RIGHT);
       
       int mainSize = 0; // The size along the main axis
       int secondarySize = 0; // The size along the secondary axis
@@ -998,6 +1006,7 @@ public class TabbedPane extends JComponent{
      * Returns the minimum size for the tab row.
      */
     
+    @Override
     public Dimension minimumLayoutSize(Container parent){
       if (parent != handlePanel)
         throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
@@ -1011,6 +1020,7 @@ public class TabbedPane extends JComponent{
      * Returns the preferred size for the tab row.
      */
     
+    @Override
     public Dimension preferredLayoutSize(Container parent){
       if (parent != handlePanel)
         throw new IllegalStateException("TabHandlesLayout may only be used to layout handlePanel");
@@ -1024,6 +1034,7 @@ public class TabbedPane extends JComponent{
      * Returns the maximum size for the tab row. 
      */
     
+    @Override
     public Dimension maximumLayoutSize(Container target){
       return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
@@ -1034,18 +1045,21 @@ public class TabbedPane extends JComponent{
      * Deprecated. Throws an exception.
      */
     
+    @Override
     public void addLayoutComponent(String name, Component comp){
       throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
     }
     
     
     
+    @Override
     public void addLayoutComponent(Component comp, Object constraints){
       
     }
     
     
     
+    @Override
     public void removeLayoutComponent(Component comp){
       
     }
@@ -1056,6 +1070,7 @@ public class TabbedPane extends JComponent{
      * Returns our layout alignment along the X axis.
      */
     
+    @Override
     public float getLayoutAlignmentX(Container target){
       return Component.LEFT_ALIGNMENT;
     }
@@ -1066,6 +1081,7 @@ public class TabbedPane extends JComponent{
      * Returns our layout alignment along the Y axis.
      */
     
+    @Override
     public float getLayoutAlignmentY(Container target){
       return Component.CENTER_ALIGNMENT;
     }
@@ -1076,6 +1092,7 @@ public class TabbedPane extends JComponent{
      * Flushes cached size values.
      */
     
+    @Override
     public void invalidateLayout(Container target){
       minSizes = null;
       prefSizes = null; 
@@ -1119,7 +1136,7 @@ public class TabbedPane extends JComponent{
     
     public TabCell(TabHandle tabHandle, boolean initiallySelected){
       int tabPlacement = getTabPlacement();
-      boolean isVertical = (tabPlacement == SwingUtilities.LEFT) || (tabPlacement == SwingUtilities.RIGHT);
+      boolean isVertical = (tabPlacement == SwingConstants.LEFT) || (tabPlacement == SwingConstants.RIGHT);
       
       mainPanel.setLayout(WrapLayout.getInstance());
       mainPanel.add(tabHandle.getComponent());
@@ -1139,10 +1156,10 @@ public class TabbedPane extends JComponent{
       
       Object secondaryPosition;
       switch(tabPlacement){
-        case  SwingUtilities.TOP: secondaryPosition = BorderLayout.NORTH; break;
-        case  SwingUtilities.BOTTOM: secondaryPosition = BorderLayout.SOUTH; break;
-        case  SwingUtilities.LEFT: secondaryPosition = BorderLayout.WEST; break;
-        case  SwingUtilities.RIGHT: secondaryPosition = BorderLayout.EAST; break;
+        case  SwingConstants.TOP: secondaryPosition = BorderLayout.NORTH; break;
+        case  SwingConstants.BOTTOM: secondaryPosition = BorderLayout.SOUTH; break;
+        case  SwingConstants.LEFT: secondaryPosition = BorderLayout.WEST; break;
+        case  SwingConstants.RIGHT: secondaryPosition = BorderLayout.EAST; break;
         default:
           throw new IllegalStateException("Unknown tab placement: " + getTabPlacement());
       }
@@ -1174,7 +1191,7 @@ public class TabbedPane extends JComponent{
     JFrame frame = new JFrame("Test");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
-    TabbedPane tabbedPane = new TabbedPane(SwingUtilities.BOTTOM);
+    TabbedPane tabbedPane = new TabbedPane(SwingConstants.BOTTOM);
     tabbedPane.setBorder(null);
     
     Tab [] tabs = new Tab[]{

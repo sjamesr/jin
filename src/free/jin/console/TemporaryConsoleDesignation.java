@@ -49,7 +49,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
   public TemporaryConsoleDesignation(Connection connection, String name, String encoding, boolean isCloseable, String [] commands){
     super(connection, name, encoding, isCloseable);
     
-    this.commands = (String [])commands.clone();
+    this.commands = commands.clone();
     
     synchronized(TemporaryConsoleDesignation.class){
       index = ++temporaryConsoleCount;
@@ -62,6 +62,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
    * Sends our commands to the server.
    */
   
+  @Override
   public void setConsole(Console console){
     super.setConsole(console);
     
@@ -75,6 +76,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
    * Returns our tag.
    */
   
+  @Override
   public String getTag(){
     return "tmp-" + index;
   }
@@ -85,6 +87,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation{
    * Accepts only events tagged by us.
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     return isTaggedByUs(evt);
   }

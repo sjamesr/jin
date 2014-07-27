@@ -56,6 +56,7 @@ public class ChessclubConsole extends Console{
    * special <code>ConsoleTextField</code> for ICC.
    */
 
+  @Override
   protected ConsoleTextField createInputComponent(){
     return new ChessclubConsoleTextField(this);
   }
@@ -68,6 +69,7 @@ public class ChessclubConsole extends Console{
    * special <code>ConsoleTextPane</code> for ICC.
    */
 
+  @Override
   protected ConsoleTextPane createOutputComponent(){
     return new ChessclubConsoleTextPane(this);
   }
@@ -81,6 +83,7 @@ public class ChessclubConsole extends Console{
    * for more information.
    */
    
+  @Override
   protected void addToOutputImpl(String text, String textType) throws BadLocationException{
     // As of 02.06.2005, the ICC server does the wrapping thing itself 
 //    String delim = "        :";

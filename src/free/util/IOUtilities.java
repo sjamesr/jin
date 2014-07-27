@@ -577,7 +577,7 @@ public class IOUtilities{
   
   public static void loadAsynchronously(URL [] urls, Object id, DataReceiver receiver, boolean allowCache){
     Thread asyncReader = 
-      new Thread(new UrlDataReader((URL[])urls.clone(), id, receiver, allowCache),
+      new Thread(new UrlDataReader(urls.clone(), id, receiver, allowCache),
       "AsyncThread-" + (++UrlDataReader.threadCount));
     asyncReader.setDaemon(true);
     asyncReader.start();
@@ -591,7 +591,7 @@ public class IOUtilities{
    */
   
   public static void loadSynchronously(URL [] urls, Object id, DataReceiver receiver, boolean allowCache){
-    new UrlDataReader((URL[])urls.clone(), id, receiver, allowCache).run();
+    new UrlDataReader(urls.clone(), id, receiver, allowCache).run();
   }
   
   
@@ -704,6 +704,7 @@ public class IOUtilities{
      * Reads the data and reports back to the receiver.
      */
     
+    @Override
     public void run(){
       for (int i = 0; i < urls.length; i++){
         try{

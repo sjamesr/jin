@@ -60,6 +60,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
    * from the d1 and d8 to the b1 and b8 squares (respectively) as well.
    */
 
+  @Override
   public boolean isShortCastling(Position pos, Square startSquare,
       Square endSquare, ChessPiece promotionTarget){
     
@@ -113,6 +114,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
    * (respectively) as well.
    */
 
+  @Override
   public boolean isLongCastling(Position pos, Square startSquare,
       Square endSquare, ChessPiece promotionTarget){
     
@@ -171,6 +173,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
    * Makes the given ChessMove on the given position.
    */
 
+  @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier){
     checkPosition(pos);
 
@@ -210,6 +213,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
    * position.
    */
 
+  @Override
   public Move createShortCastling(Position pos){
     checkPosition(pos);
 
@@ -240,6 +244,7 @@ public class BothSidesCastlingVariant extends ChesslikeGenericVariant{
    * position.
    */
 
+  @Override
   public Move createLongCastling(Position pos){
     checkPosition(pos);
 

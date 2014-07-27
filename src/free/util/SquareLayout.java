@@ -68,6 +68,7 @@ public class SquareLayout implements LayoutManager{
    * Adds the specified component with the specified name to the layout. 
    */
 
+  @Override
   public void addLayoutComponent(String name, Component component){
     
   }
@@ -78,6 +79,7 @@ public class SquareLayout implements LayoutManager{
    * Removes the specified component from the layout. 
    */
 
+  @Override
   public void removeLayoutComponent(Component component){
     
   }
@@ -106,6 +108,7 @@ public class SquareLayout implements LayoutManager{
    * Lays out the container in the specified panel. 
    */
 
+  @Override
   public void layoutContainer(Container container){
     Component child = getChild(container);
     if (child == null)
@@ -132,6 +135,7 @@ public class SquareLayout implements LayoutManager{
    * components in the specified parent container. 
    */
 
+  @Override
   public Dimension minimumLayoutSize(Container container){
     Component child = getChild(container);
     if (child == null)
@@ -154,6 +158,7 @@ public class SquareLayout implements LayoutManager{
    * components in the specified parent container. 
    */
 
+  @Override
   public Dimension preferredLayoutSize(Container container){
     Component child = getChild(container);
     if (child == null)

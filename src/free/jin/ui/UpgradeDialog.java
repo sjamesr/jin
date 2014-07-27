@@ -72,6 +72,7 @@ public class UpgradeDialog{
     JButton remindLaterButton = i18n.createButton("remindLaterButton");
     
     visitWebsiteButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         String website = Jin.getInstance().getPrefs().getString("upgradeURL");
         BrowserControl.displayURL(website);
@@ -80,6 +81,7 @@ public class UpgradeDialog{
     });
     
     remindLaterButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         Jin.getInstance().getPrefs().setLong("upgradeRemindTime",
             System.currentTimeMillis() + 1000L*60/* *60*24*3 */); // Remind in 3 days

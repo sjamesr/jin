@@ -54,6 +54,7 @@ public class DefaultTabHandleFactory implements TabHandleFactory{
    * {@inheritDoc}
    */
   
+  @Override
   public TabHandle createTabHandle(TabbedPane tabbedPane, Tab tab){
     return new DefaultTabHandle(tabbedPane, tab);
   }

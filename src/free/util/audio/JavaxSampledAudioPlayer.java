@@ -66,6 +66,7 @@ public abstract class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    * Returns whether we're running under Java 1.3 or later.
    */
 
+  @Override
   public boolean isSupported(){
     return PlatformUtils.isJavaBetterThan("1.3");
   }
@@ -76,6 +77,7 @@ public abstract class JavaxSampledAudioPlayer implements Runnable, AudioPlayer{
    * Plays the given AudioClip.
    */
 
+  @Override
   public synchronized void play(AudioClip clip) throws java.io.IOException{
     // Lazily initialize player thread.
     if (playerThread == null){

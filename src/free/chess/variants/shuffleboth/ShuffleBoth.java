@@ -80,6 +80,7 @@ public class ShuffleBoth extends BothSidesCastlingVariant{
    * not ShuffleBoth.
    */
 
+  @Override
   public void init(Position pos){
     checkPosition(pos);
 

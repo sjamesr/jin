@@ -108,6 +108,7 @@ public class Player{
    * player with the black pieces.
    */
   
+  @Override
   public String toString(){
     if (this==WHITE_PLAYER)
       return "White";

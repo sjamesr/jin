@@ -130,6 +130,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    * method if we don't have a parent yet.
    */
 
+  @Override
   public void setIcon(boolean iconified) throws PropertyVetoException{
     if ((getParent() == null) && (desktopIcon.getParent() == null)){
       if (speciallyIconified == iconified)
@@ -152,6 +153,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    * Overrides isIcon to remain consistent with setIcon.
    */
 
+  @Override
   public boolean isIcon(){
     return super.isIcon() || speciallyIconified;
   }
@@ -177,6 +179,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    * superclass' method if we don't have a parent yet.
    */
 
+  @Override
   public void setMaximum(boolean maximized) throws PropertyVetoException{
     if (getParent() == null){
       if (speciallyMaximized == maximized)
@@ -199,6 +202,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    * Overrides isMaximum to remain consistent with setMaximum.
    */
 
+  @Override
   public boolean isMaximum(){
     return super.isMaximum() || speciallyMaximized;
   }
@@ -214,6 +218,7 @@ public class FixedJInternalFrame extends JInternalFrame{
    * Make ourselves really iconified/maximized when added to something.
    */
 
+  @Override
   public void addNotify(){
     super.addNotify();
 

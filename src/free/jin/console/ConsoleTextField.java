@@ -21,6 +21,7 @@
 
 package free.jin.console;
 
+import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -128,6 +129,7 @@ public class ConsoleTextField extends FixedJTextField{
   
   private final Action sendAction = 
     new AbstractAction(I18n.get(ConsoleTextField.class).getString("sendAction.name")){
+      @Override
       public void actionPerformed(ActionEvent evt){
         boolean isControlDown = (evt.getModifiers() & ActionEvent.CTRL_MASK) != 0;
         boolean isShiftDown = (evt.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
@@ -161,18 +163,21 @@ public class ConsoleTextField extends FixedJTextField{
   public ConsoleTextField(Console console){
     this.console = console;
 
-    enableEvents(KeyEvent.KEY_EVENT_MASK | FocusEvent.FOCUS_EVENT_MASK | MouseEvent.MOUSE_EVENT_MASK);
+    enableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.FOCUS_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
 
     initFromProperties();
     
     updateSendAction();
     getDocument().addDocumentListener(new DocumentListener(){
+      @Override
       public void changedUpdate(DocumentEvent e){
         updateSendAction();
       }
+      @Override
       public void insertUpdate(DocumentEvent e){
         updateSendAction();
       }
+      @Override
       public void removeUpdate(DocumentEvent e){
         updateSendAction();
       }
@@ -209,7 +214,7 @@ public class ConsoleTextField extends FixedJTextField{
     String tellLastTellerKeyStrokeString =
       (String)prefs.lookup("tell-last-teller-keystroke" + platformSuffix, null);
     String tellNextTellerKeyStrokeString = 
-      (String)prefs.getString("tell-next-teller-keystroke" + platformSuffix, null);
+      prefs.getString("tell-next-teller-keystroke" + platformSuffix, null);
 
     if (tellLastTellerKeyStrokeString != null){
       tellLastTellerKeyStroke = KeyStroke.getKeyStroke(tellLastTellerKeyStrokeString);
@@ -250,6 +255,7 @@ public class ConsoleTextField extends FixedJTextField{
    * Processes the key event.
    */
 
+  @Override
   protected void processKeyEvent(KeyEvent evt){
     int keyCode = evt.getKeyCode();
     boolean isShiftDown = evt.isShiftDown();
@@ -272,6 +278,7 @@ public class ConsoleTextField extends FixedJTextField{
    * Processes the KeyEvent.
    */
 
+  @Override
   protected void processComponentKeyEvent(KeyEvent evt){
     super.processComponentKeyEvent(evt); // We want the listeners to get the 
                                          // event before we clear the text.
@@ -366,6 +373,7 @@ public class ConsoleTextField extends FixedJTextField{
    * Processes the Focus Events of this ConsoleTextField.
    */
 
+  @Override
   protected void processFocusEvent(FocusEvent evt){
     int oldSelectionStart = getSelectionStart();
     int oldSelectionEnd = getSelectionEnd();
@@ -396,6 +404,7 @@ public class ConsoleTextField extends FixedJTextField{
 
   private class TellLastTellerAction implements ActionListener{
 
+    @Override
     public void actionPerformed(ActionEvent evt){
       int traversedTellerCount = console.getTellerRingSize();
 
@@ -419,6 +428,7 @@ public class ConsoleTextField extends FixedJTextField{
 
   private class TellNextTellerAction implements ActionListener{
 
+    @Override
     public void actionPerformed(ActionEvent evt){
       int traversedTellerCount = console.getTellerRingSize();
 
@@ -439,6 +449,7 @@ public class ConsoleTextField extends FixedJTextField{
    * Displays the popup menu on a popup trigger event. 
    */
    
+  @Override
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
     
@@ -499,6 +510,7 @@ public class ConsoleTextField extends FixedJTextField{
     paste = new JMenuItem(i18n.getString("pasteMenuItemLabel"));
     
     ActionListener popupListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Object src = evt.getSource();
         if (src == cut)

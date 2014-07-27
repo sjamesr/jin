@@ -98,6 +98,7 @@ public class FormatException extends RuntimeException{
    * Prints the stack trace of this FormatException to the standard error stream.
    */
 
+  @Override
   public void printStackTrace(){ 
     printStackTrace(System.err);
   }
@@ -110,6 +111,7 @@ public class FormatException extends RuntimeException{
    * @param s <code>PrintStream</code> to use for output
    */
 
+  @Override
   public void printStackTrace(java.io.PrintStream s) { 
     synchronized(s){
       if (realException != null){
@@ -131,6 +133,7 @@ public class FormatException extends RuntimeException{
    * @param s <code>PrintWriter</code> to use for output
    */
 
+  @Override
   public void printStackTrace(java.io.PrintWriter s) { 
     synchronized(s){
       if (realException != null){

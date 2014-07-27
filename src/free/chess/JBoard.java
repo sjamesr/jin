@@ -275,6 +275,7 @@ public class JBoard extends JComponent{
    */
 
   private final ChangeListener positionChangeListener = new ChangeListener(){
+    @Override
     public void stateChanged(ChangeEvent evt){
       if (positionChangedByMove){
         positionChangedByMove = false;
@@ -350,6 +351,7 @@ public class JBoard extends JComponent{
    */
   
   private final MoveListener positionMoveListener = new MoveListener(){
+    @Override
     public void moveMade(MoveEvent evt){
       if (isMakingUserMove)
         return;
@@ -690,6 +692,7 @@ public class JBoard extends JComponent{
   
   private final Timer slideTimer = new Timer(20, new ActionListener(){
     private final Rectangle rect = new Rectangle();
+    @Override
     public void actionPerformed(ActionEvent e){
       int slideDuration = getSlideDuration();
       
@@ -746,8 +749,8 @@ public class JBoard extends JComponent{
     this.piecePainter = piecePainter;
 
     setOpaque(true);
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK |
-                 MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    enableEvents(AWTEvent.MOUSE_EVENT_MASK |
+                 AWTEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
 
@@ -1517,6 +1520,7 @@ public class JBoard extends JComponent{
    * Paints this JBoard on the given Graphics object.
    */
 
+  @Override
   public void paintComponent(Graphics graphics){
     super.paintComponent(graphics);
     
@@ -2182,6 +2186,7 @@ public class JBoard extends JComponent{
    * dialog.
    */
 
+  @Override
   protected void processEvent(AWTEvent evt){
     if (!isShowingModalDialog)
       super.processEvent(evt);
@@ -2271,6 +2276,7 @@ public class JBoard extends JComponent{
    * Processes a mouse event.
    */
 
+  @Override
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
 
@@ -2405,6 +2411,7 @@ public class JBoard extends JComponent{
    * Processes a mouse motion event.
    */
 
+  @Override
   protected void processMouseMotionEvent(MouseEvent evt){
     super.processMouseMotionEvent(evt);
 

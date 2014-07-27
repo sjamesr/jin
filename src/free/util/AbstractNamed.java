@@ -53,6 +53,7 @@ public abstract class AbstractNamed implements Named{
    * Returns the object's name.
    */
   
+  @Override
   public String getName(){
     return name;
   }
@@ -64,6 +65,7 @@ public abstract class AbstractNamed implements Named{
    * is <code>null</code>.
    */
   
+  @Override
   public String toString(){
     return String.valueOf(getName());
   }

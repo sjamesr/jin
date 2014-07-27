@@ -134,12 +134,14 @@ public class PieceChooser extends JComponent implements ActionListener{
     content.add(chooser, BorderLayout.CENTER);
 
     content.registerKeyboardAction(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         dialog.dispose();
       }
     }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
     chooser.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         dialog.dispose();
       }
@@ -170,6 +172,7 @@ public class PieceChooser extends JComponent implements ActionListener{
    * Handles ActionEvents from the piece buttons.
    */
 
+  @Override
   public void actionPerformed(ActionEvent evt){
     chosenPiece = (Piece)buttonsToPieces.get(evt.getSource());
     fireActionPerformed(evt);

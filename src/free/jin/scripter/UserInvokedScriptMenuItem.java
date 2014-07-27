@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -97,6 +98,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
    * Runs the script.
    */
 
+  @Override
   public void actionPerformed(ActionEvent evt){
     VariablesPanel varsPanel = new VariablesPanel();
 
@@ -192,6 +194,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
      * Returns the title of this dialog panel.
      */
 
+    @Override
     public String getTitle(){
       return "Specify Variables for the Script";
     }
@@ -222,8 +225,8 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       table.getTableHeader().setReorderingAllowed(false);
 
       JScrollPane scrollPane = new JScrollPane(table);
-      scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-      scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+      scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       scrollPane.setPreferredSize(new Dimension(350, 120));
 
       JLabel variablesLabel = new JLabel("Variables");
@@ -247,6 +250,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       ListSelectionModel selectionModel = table.getSelectionModel();
       selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       selectionModel.addListSelectionListener(new ListSelectionListener(){
+        @Override
         public void valueChanged(ListSelectionEvent evt){
           if (evt.getValueIsAdjusting())
             return;
@@ -260,12 +264,14 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       });
 
       add.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           tableModel.addRow(new Object[]{varTypes[0], null, null});
         }
       });
 
       remove.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           int selectedRow = table.getSelectedRow();
           if (selectedRow == -1)
@@ -283,6 +289,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       });
 
       runScriptButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           if (table.isEditing()){
             // Makes sure that the editing stops so that table.getValueAt() returns up-to-date values.
@@ -325,6 +332,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       });
 
       cancelButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           close(null);
         }
@@ -356,11 +364,13 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener{
       // So that the default button is activated on ENTER and the dialog closes on ESCAPE
       if (PlatformUtils.isJavaBetterThan("1.3")){
         Action defaultButtonAction = new AbstractAction(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             runScriptButton.doClick();
           }
         };
         Action closeDialogAction = new AbstractAction(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             close(null);
           }

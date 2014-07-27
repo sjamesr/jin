@@ -215,6 +215,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter{
    * <code>this</code>.
    */
   
+  @Override
   public BoardPainter freshInstance(){
     return this;
   }
@@ -238,6 +239,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter{
    * property. 
    */
   
+  @Override
   public void load(URL url) throws IOException{
     if (lightImageUrl != null)
       throw new IllegalStateException("This SquareImagesBoardPainter has already been loaded");
@@ -332,6 +334,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter{
    * the given size.
    */
 
+  @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     if (prepareSquareImages(width, height, component)){
       Rectangle clipRect = g.getClipBounds();
@@ -433,6 +436,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter{
      * Called when the image data has been loaded. Creates the square images.
      */
     
+    @Override
     public void dataRead(URL [] urls, Object id, byte [][] data, IOException [] exceptions){
       // If there are any exceptions, we simply quit - this will cause
       // the painter to keep using the delegate to paint the board.

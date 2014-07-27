@@ -95,6 +95,7 @@ public class BoardPreferencesPanel extends TabbedPreferencesPanel{
     
     JButton resetPosition = i18n.createButton("resetPositionButton");
     resetPosition.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         initPreviewBoard();
       }
@@ -179,6 +180,7 @@ public class BoardPreferencesPanel extends TabbedPreferencesPanel{
    * Creates the layout of this panel.
    */
   
+  @Override
   protected void createLayout(){
     setLayout(new BorderLayout(5, 0));
     add(tabs, BorderLayout.WEST);

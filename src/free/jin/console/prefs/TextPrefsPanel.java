@@ -34,6 +34,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -167,6 +168,7 @@ public class TextPrefsPanel extends PreferencesPanel{
    */
 
   protected final ChangeListener settingsChangeListener = new ChangeListener(){
+    @Override
     public void stateChanged(ChangeEvent evt){
       if (handlingChangeEvent)
         return;
@@ -406,12 +408,13 @@ public class TextPrefsPanel extends PreferencesPanel{
 
     JPanel listPanel = new JPanel(new BorderLayout(2, 2));
     JLabel textTypeLabel = I18n.get(TextPrefsPanel.class).createLabel("textTypeLabel");
-    textTypeLabel.setHorizontalAlignment(JLabel.CENTER);
+    textTypeLabel.setHorizontalAlignment(SwingConstants.CENTER);
     textTypeLabel.setLabelFor(categoryList);
     listPanel.add(textTypeLabel, BorderLayout.NORTH);
     listPanel.add(scrollPane, BorderLayout.CENTER);
 
     categoryList.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         CategoryPanel selectedValue = (CategoryPanel)categoryList.getSelectedValue();
         setCurrentPanel(selectedValue);
@@ -453,6 +456,7 @@ public class TextPrefsPanel extends PreferencesPanel{
    * Applies the changes done by the user.
    */
 
+  @Override
   public void applyChanges(){
     Preferences consolePrefs = consoleManager.getPrefs();
 
@@ -613,7 +617,7 @@ public class TextPrefsPanel extends PreferencesPanel{
      */
 
     public String [] getCategories(){
-      return (String [])categories.clone();
+      return categories.clone();
     }
 
 
@@ -635,6 +639,7 @@ public class TextPrefsPanel extends PreferencesPanel{
      * Returns the name specified in the constructor.
      */
 
+    @Override
     public String toString(){
       return categoryName;
     }

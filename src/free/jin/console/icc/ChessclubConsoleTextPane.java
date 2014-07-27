@@ -51,6 +51,7 @@ public class ChessclubConsoleTextPane extends ConsoleTextPane{
    * may include a dash and we want them to be easily selectable.
    */
 
+  @Override
   protected boolean isWordChar(char c){
     return super.isWordChar(c) || (c == '-');
   }

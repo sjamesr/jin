@@ -40,13 +40,16 @@ public class FreechessServer extends AbstractServer{
    * Creates the username policy.
    */
 
+  @Override
   protected UsernamePolicy createUsernamePolicy(){
     return new UsernamePolicy(){
 
+      @Override
       public boolean isSame(String username1, String username2){
         return username1.equalsIgnoreCase(username2);
       }
 
+      @Override
       public String invalidityReason(String username){
         int usernameLength = username.length();
         if ((usernameLength < 3) || (usernameLength > 17))
@@ -62,6 +65,7 @@ public class FreechessServer extends AbstractServer{
         return null;
       }
 
+      @Override
       public String getGuestUsername(){
         return "guest";
       }
@@ -75,6 +79,7 @@ public class FreechessServer extends AbstractServer{
    * Creates and returns a new <code>JinFreechessConnection</code>.
    */
 
+  @Override
   public Connection createConnection(ConnectionDetails connDetails){
     return new JinFreechessConnection(connDetails.getUsername(), connDetails.getPassword());
   }

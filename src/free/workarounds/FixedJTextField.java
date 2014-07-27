@@ -89,6 +89,7 @@ public class FixedJTextField extends JTextField{
   // http://developer.java.sun.com/developer/bugParade/bugs/4137845.html
   // 
 
+  @Override
   public void scrollRectToVisible(Rectangle r) {
     Insets i = getInsets();
     javax.swing.BoundedRangeModel visibility = getHorizontalVisibility();
@@ -106,6 +107,7 @@ public class FixedJTextField extends JTextField{
 
 
 
+  @Override
   public void setEditable(boolean editable){
     super.setEditable(editable);
 
@@ -130,6 +132,7 @@ public class FixedJTextField extends JTextField{
 
 
 
+  @Override
   public void updateUI(){
     super.updateUI();
 
@@ -158,6 +161,7 @@ public class FixedJTextField extends JTextField{
   }
 
 
+  @Override
   protected void processComponentKeyEvent(KeyEvent evt){
     
     // http://developer.java.sun.com/developer/bugParade/bugs/4133908.html
@@ -177,6 +181,7 @@ public class FixedJTextField extends JTextField{
 
 
 
+  @Override
   public void paste(){
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4145324.html
@@ -216,6 +221,7 @@ public class FixedJTextField extends JTextField{
   
   
   
+  @Override
   public void copy(){
     try{
       super.copy();
@@ -229,6 +235,7 @@ public class FixedJTextField extends JTextField{
 
 
   
+  @Override
   public void cut(){
     try{
       super.cut();

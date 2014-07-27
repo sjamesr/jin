@@ -49,6 +49,7 @@ public class ZipURLStreamHandler extends URLStreamHandler{
    * Returns a ZipURLConnection for the specified URL.
    */
 
+  @Override
   public URLConnection openConnection(URL url) throws IOException{
     String urlFile = url.getFile();
     int barIndex = urlFile.indexOf("|");
@@ -66,6 +67,7 @@ public class ZipURLStreamHandler extends URLStreamHandler{
    * Parses the specified URL string.
    */
 
+  @Override
   protected void parseURL(URL url, String spec, int start, int limit){
     String urlFile = url.getFile();
     int barIndex = urlFile.indexOf("|");

@@ -22,6 +22,7 @@
 package free.jin.board.prefs;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -187,6 +189,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     boardPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     
     pieceSets.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         PieceSet set = (PieceSet)pieceSets.getSelectedValue();
         PiecePainter painter = set.getPiecePainter();
@@ -206,6 +209,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     });
 
     boardPatterns.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         BoardPattern pattern = (BoardPattern)boardPatterns.getSelectedValue();
         BoardPainter painter = pattern.getBoardPainter();
@@ -226,6 +230,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     boardPatterns.setSelectedValue(boardManager.getBoardPattern(), true);
 
     ChangeListener pieceColorChangeListener = new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         ColoredPiecePainter painter =
           (ColoredPiecePainter)(BoardLooksPanel.this.previewBoard.getPiecePainter());
@@ -244,6 +249,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     blackOutline.addChangeListener(pieceColorChangeListener);
     
     ChangeListener boardColorChangeListener = new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         // The controls should be disabled when the painter isn't colored
         ColoredBoardPainter painter =
@@ -267,9 +273,9 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     JPanel boardAndExtraPanel = new JPanel();
     boardAndExtraPanel.setLayout(new BoxLayout(boardAndExtraPanel, BoxLayout.Y_AXIS));
-    boardPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    boardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
     if (downloadExtras != null)
-      downloadExtras.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      downloadExtras.setAlignmentX(Component.CENTER_ALIGNMENT);
     boardAndExtraPanel.add(boardPanel);
     if (downloadExtras != null){
       boardAndExtraPanel.add(Box.createVerticalStrut(15));
@@ -285,8 +291,8 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     JLabel noticeLabel = new JLabel(i18n.getString("colorsNotice"));
     
-    contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    noticeLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    noticeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));    
@@ -331,6 +337,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * Sets the initial properties of the preview board.
    */
    
+  @Override
   public void initPreviewBoard(){
     PieceSet pieceSet = (PieceSet)pieceSets.getSelectedValue();
     if (pieceSet != null){
@@ -375,16 +382,16 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
       
     JLabel pieceSetLabel = i18n.createLabel("pieceSetLabel"); 
     pieceSetLabel.setLabelFor(pieceSets);
-    pieceSetLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    pieceSetLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     
     JScrollPane scrollPane = 
-      new JScrollPane(pieceSets, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      new JScrollPane(pieceSets, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     
     JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(1, 0, 5));
-    colorsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    colorsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     colorsPanel.add(whiteColor);
     colorsPanel.add(blackColor);
     colorsPanel.add(whiteOutline);
@@ -419,16 +426,16 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
     
     JLabel patternLabel = i18n.createLabel("boardPatternLabel");
     patternLabel.setLabelFor(boardPatterns);
-    patternLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    patternLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
     
     JScrollPane scrollPane = 
-      new JScrollPane(boardPatterns, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+      new JScrollPane(boardPatterns, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     
     JPanel colorsPanel = new PreferredSizedPanel(new TableLayout(1, 0, 5));
-    colorsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    colorsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     colorsPanel.add(darkSquares);    
     colorsPanel.add(lightSquares);
 
@@ -449,6 +456,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel{
    * Applies any changes made by the user.
    */
    
+  @Override
   public void applyChanges() throws BadChangesException{
     boardManager.setPieceSet((PieceSet)pieceSets.getSelectedValue());
     boardManager.setBoardPattern((BoardPattern)boardPatterns.getSelectedValue());

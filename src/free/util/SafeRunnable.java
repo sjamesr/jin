@@ -37,6 +37,7 @@ public abstract class SafeRunnable implements Runnable{
    * error stream.
    */
 
+  @Override
   public final void run(){
     try{
       safeRun();

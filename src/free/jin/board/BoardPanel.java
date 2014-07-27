@@ -21,6 +21,7 @@
 
 package free.jin.board;
 
+import java.awt.Adjustable;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -30,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -48,6 +50,7 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -61,6 +64,7 @@ import javax.swing.table.TableModel;
 import free.chess.AbstractChessClock;
 import free.chess.Chess;
 import free.chess.ChessMove;
+import free.chess.JBoard;
 import free.chess.JChessClock;
 import free.chess.Move;
 import free.chess.Player;
@@ -418,6 +422,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       KeyStroke fullscreenKeyStroke = 
         KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
       contentPanel.registerKeyboardAction(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           fullscreenPanel.getFullscreenModeModel().flip();
         }
@@ -492,6 +497,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     private boolean paused = false;
     
     private Timer timer = new Timer(1000, new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         boardManager.setOtherPluginsPaused(false);
         paused = false;
@@ -513,12 +519,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     }
     
     
+    @Override
     public void mouseDragged(MouseEvent e){go();}
+    @Override
     public void mouseMoved(MouseEvent e){go();}
+    @Override
     public void mouseClicked(MouseEvent e){go();}
+    @Override
     public void mouseEntered(MouseEvent e){go();}
+    @Override
     public void mouseExited(MouseEvent e){go();}
+    @Override
     public void mousePressed(MouseEvent e){go();}
+    @Override
     public void mouseReleased(MouseEvent e){go();}
   }
   
@@ -554,6 +567,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     moveListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
       
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         moveListTableSelectionChanged();
       }
@@ -561,10 +575,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     });
     
     moveListTable.getColumnModel().addColumnModelListener(new TableColumnModelListener(){
+      @Override
       public void columnAdded(TableColumnModelEvent e){}
+      @Override
       public void columnMarginChanged(ChangeEvent e){}
+      @Override
       public void columnMoved(TableColumnModelEvent e){}
+      @Override
       public void columnRemoved(TableColumnModelEvent e){}
+      @Override
       public void columnSelectionChanged(ListSelectionEvent e){
         moveListTableSelectionChanged();
       }
@@ -621,6 +640,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     configureBoardFromBoardManager(board);
     
     ActionListener escapeListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         JinBoard board = BoardPanel.this.board;
         if (board.isMovingPiece())
@@ -639,7 +659,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     };
     
     contentPanel.registerKeyboardAction(escapeListener,
-        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, MouseEvent.BUTTON1_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.BUTTON1_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     contentPanel.registerKeyboardAction(escapeListener, 
         KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     
@@ -691,13 +711,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     if (game.getGameType() == Game.MY_GAME)
       if (game.isPlayed())
         if (game.getUserPlayer() == Player.WHITE_PLAYER)
-          return JinBoard.WHITE_PIECES_MOVE;
+          return JBoard.WHITE_PIECES_MOVE;
         else
-          return JinBoard.BLACK_PIECES_MOVE;
+          return JBoard.BLACK_PIECES_MOVE;
       else 
-        return JinBoard.CURRENT_PLAYER_MOVES; 
+        return JBoard.CURRENT_PLAYER_MOVES; 
     else // This counts for both ISOLATED_BOARD and OBSERVED_GAME.
-      return JinBoard.NO_PIECES_MOVE;
+      return JBoard.NO_PIECES_MOVE;
   }
   
   
@@ -910,8 +930,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   protected JScrollPane createMoveListTableScrollPane(Game game, JTable moveListTable){
     JScrollPane scrollPane = new JScrollPane(moveListTable);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     
     return scrollPane;
   }
@@ -969,6 +989,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   private class MoveListScrollBarUpdater implements Runnable{
+    @Override
     public void run(){
       JScrollBar vScroller = moveListTableScrollPane.getVerticalScrollBar();
       int selectedRow = moveListTable.getSelectedRow();
@@ -1129,7 +1150,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   protected JScrollBar createPositionScrollBar(){
-    JScrollBar scrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 1, 0, 1);
+    JScrollBar scrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
     return scrollbar;
   }
   
@@ -1195,6 +1216,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      * Lays out the panel.
      */
     
+    @Override
     public void doLayout(){
       calcPrefSizes();
       
@@ -1411,6 +1433,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      * Clears the remembered preferred sizes of the children.
      */
     
+    @Override
     public void invalidate(){
       super.invalidate();
       
@@ -1429,6 +1452,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      * Returns our preferred size.
      */
     
+    @Override
     public Dimension getPreferredSize(){
       calcPrefSizes();
       
@@ -1472,6 +1496,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      * Returns our minimum size.
      */
     
+    @Override
     public Dimension getMinimumSize(){
       calcPrefSizes();
       
@@ -1657,6 +1682,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * already been dispatched.
    */
   
+  @Override
   public void gameStarted(GameStartEvent evt){}
   
   
@@ -1665,6 +1691,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation. Makes the appropriate move on the board.
    */
   
+  @Override
   public void moveMade(MoveMadeEvent evt){
     if (evt.getGame() != game)
       return;
@@ -1696,6 +1723,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         else{ // Play it when the slide animation ends
           final Move audioMove = move;
           Timer delayedAudioTimer = new Timer(board.getSlideDuration(), new ActionListener(){
+            @Override
             public void actionPerformed(ActionEvent e){
               playAudioClipForMove(audioMove);
             }
@@ -1795,6 +1823,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation. Sets the appropriate position on the board.
    */
   
+  @Override
   public void positionChanged(PositionChangedEvent evt){
     if (evt.getGame() != game)
       return;
@@ -1824,6 +1853,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * that occured on it "the amount of moves taken back" moves ago.
    */
   
+  @Override
   public void takebackOccurred(TakebackEvent evt){
     if (evt.getGame()!=game)
       return;
@@ -1861,6 +1891,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * "real" state.
    */
   
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){
     if (evt.getGame() != game)
       return;
@@ -1892,6 +1923,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation. Adjusts the clock time and activeness.
    */
   
+  @Override
   public void clockAdjusted(ClockAdjustmentEvent evt){
     if (evt.getGame() != game)
       return;
@@ -1913,6 +1945,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation.
    */
   
+  @Override
   public void boardFlipped(BoardFlipEvent evt){
     if (evt.getGame()!=game)
       return;
@@ -1926,6 +1959,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation.
    */
   
+  @Override
   public void offerUpdated(OfferEvent evt){
     
   }
@@ -1936,6 +1970,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * GameListener implementation.
    */
   
+  @Override
   public void gameEnded(GameEndEvent evt){
     if (evt.getGame()!=game)
       return;
@@ -1972,6 +2007,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * This is called when the user makes a move on the board (MoveListener implementation).
    */
   
+  @Override
   public void moveMade(MoveEvent evt){
     if (isBoardPositionUpdating)
       return;
@@ -2103,6 +2139,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * and updates the position on the board accordingly.
    */
   
+  @Override
   public void adjustmentValueChanged(AdjustmentEvent evt){
     Object source = evt.getSource();
     if (source == positionScrollBar){
@@ -2134,6 +2171,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * <code>PropertyChangeListener</code> implementation.
    */
   
+  @Override
   public void propertyChange(PropertyChangeEvent evt){
     Object src = evt.getSource();
     String propertyName = evt.getPropertyName();
@@ -2241,19 +2279,19 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   public void setInactive(){
     this.isActive = false;
     board.getPosition().removeMoveListener(this);
-    board.setMoveInputMode(JinBoard.ALL_PIECES_MOVE);
+    board.setMoveInputMode(JBoard.ALL_PIECES_MOVE);
     board.setEditable(true);
     
     whiteClock.setRunning(false);
     blackClock.setRunning(false);
     
     if (whiteClock instanceof JChessClock){
-      ((JChessClock)whiteClock).setActiveForeground(Color.lightGray);
-      ((JChessClock)whiteClock).setInactiveForeground(Color.gray);
+      whiteClock.setActiveForeground(Color.lightGray);
+      whiteClock.setInactiveForeground(Color.gray);
     }
     if (blackClock instanceof JChessClock){
-      ((JChessClock)blackClock).setActiveForeground(Color.lightGray);
-      ((JChessClock)blackClock).setInactiveForeground(Color.gray);
+      blackClock.setActiveForeground(Color.lightGray);
+      blackClock.setInactiveForeground(Color.gray);
     }
   }
   
@@ -2275,6 +2313,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    * mode.
    */
   
+  @Override
   public void removeNotify(){
     if (fullscreenPanel.getFullscreenModeModel().isOn())
       fullscreenPanel.getFullscreenModeModel().set(false);

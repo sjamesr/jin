@@ -46,6 +46,7 @@ public class DefaultBoardPainter implements BoardPainter{
    * </code>this</code>.
    */
   
+  @Override
   public BoardPainter freshInstance(){
     return new DefaultBoardPainter();
   }
@@ -56,6 +57,7 @@ public class DefaultBoardPainter implements BoardPainter{
    * Paints the board.
    */
   
+  @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     delegate.paintBoard(g, component, x, y, width, height);
   }

@@ -86,6 +86,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
     this.cshoutsBox = I18n.get(getClass(), IcsCustomConsolesPrefsPanel.class).createCheckBox("cshoutsBox");
     
     ItemListener changeFiringItemListener = new ItemListener(){
+      @Override
       public void itemStateChanged(ItemEvent e){
         if (!isIgnoreConsolePropertiesChange())
           fireStateChanged();
@@ -102,6 +103,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected void createLayout(){
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
@@ -202,6 +204,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected ConsoleSpec createNewConsoleSpec(){
     return new IcsConsoleSpec();
   }
@@ -213,6 +216,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected void updateUiFromSelectedConsole(){
     super.updateUiFromSelectedConsole();
     
@@ -257,6 +261,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected void updateConsoleFromUi(ConsoleSpec cSpec) throws BadChangesException{
     super.updateConsoleFromUi(cSpec);
     
@@ -272,6 +277,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected ConsoleSpec loadConsoleSpec(Preferences prefs, String prefix){
     IcsConsoleSpec spec = (IcsConsoleSpec)super.loadConsoleSpec(prefs, prefix);
     
@@ -287,6 +293,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected void storeConsoleSpec(Preferences prefs, ConsoleSpec cSpec, String prefix){
     super.storeConsoleSpec(prefs, cSpec, prefix);
     
@@ -302,6 +309,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected String makeChannelListDisplayString(List channels){
     StringBuffer buffer = new StringBuffer();
     
@@ -322,6 +330,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */
   
+  @Override
   protected List parseChannelsListDisplayString(String channelsString) throws BadChangesException{
     Map allChannels = consoleManager.getChannels();
     List channels = new LinkedList();
@@ -345,6 +354,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel{
    * {@inheritDoc}
    */ 
   
+  @Override
   protected String makeChannelPopupString(Channel channel){
     String id = channel.getId().toString();
     String name = channel.getLongName();

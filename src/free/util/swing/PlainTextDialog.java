@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import free.util.Localization;
@@ -118,7 +119,7 @@ public class PlainTextDialog extends JDialog{
     setContentPane(contentPane);
 
     if (title != null){
-      JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+      JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
       titleLabel.setAlignmentX(CENTER_ALIGNMENT);
       titleLabel.setFont(new Font("Serif", Font.PLAIN, 36)); //$NON-NLS-1$
       contentPane.add(titleLabel);

@@ -66,12 +66,15 @@ public class ListWrapperComboBoxModel extends AbstractListModel implements Combo
     this.listModel = listModel;
     
     listModel.addListDataListener(new ListDataListener(){
+      @Override
       public void contentsChanged(ListDataEvent e){
         fireContentsChanged(this, e.getIndex0(), e.getIndex1());
       }
+      @Override
       public void intervalAdded(ListDataEvent e){
         fireIntervalAdded(this, e.getIndex0(), e.getIndex1());
       }
+      @Override
       public void intervalRemoved(ListDataEvent e){
         fireIntervalRemoved(this, e.getIndex0(), e.getIndex1());
       }
@@ -84,6 +87,7 @@ public class ListWrapperComboBoxModel extends AbstractListModel implements Combo
    * Returns the <code>index</code> element.
    */
   
+  @Override
   public Object getElementAt(int index){
     return listModel.getElementAt(index);
   }
@@ -94,6 +98,7 @@ public class ListWrapperComboBoxModel extends AbstractListModel implements Combo
    * Returns the size of the list.
    */
   
+  @Override
   public int getSize(){
     return listModel.getSize();
   }
@@ -104,6 +109,7 @@ public class ListWrapperComboBoxModel extends AbstractListModel implements Combo
    * Returns the selected object.
    */
   
+  @Override
   public Object getSelectedItem(){
     return selected;
   }
@@ -114,6 +120,7 @@ public class ListWrapperComboBoxModel extends AbstractListModel implements Combo
    * Sets the selected item.
    */
   
+  @Override
   public void setSelectedItem(Object item){
     if (!Utilities.areEqual(selected, item)){
       selected = item;

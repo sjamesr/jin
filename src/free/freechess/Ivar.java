@@ -425,6 +425,7 @@ public class Ivar{
    * Returns a textual representation of this ivar.
    */
 
+  @Override
   public String toString(){
     return getName();
   }

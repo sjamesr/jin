@@ -87,6 +87,7 @@ public abstract class FilteringEnumeration implements Enumeration{
    * Returns whether there are more elements in this <code>Enumeration</code>.
    */
 
+  @Override
   public boolean hasMoreElements(){
     findNext();
 
@@ -100,6 +101,7 @@ public abstract class FilteringEnumeration implements Enumeration{
    * <code>accept</code> method.
    */
 
+  @Override
   public Object nextElement() throws NoSuchElementException{
     findNext();
 

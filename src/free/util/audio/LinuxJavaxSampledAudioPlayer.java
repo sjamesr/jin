@@ -46,6 +46,7 @@ public class LinuxJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
    * Returns whether we're running under Linux.
    */
 
+  @Override
   public boolean isSupported(){
     return super.isSupported() && PlatformUtils.isLinux();
   }
@@ -58,6 +59,7 @@ public class LinuxJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
    * of time.
    */
 
+  @Override
   public void run(){
     SourceDataLine dataLine = null;
     while (true){

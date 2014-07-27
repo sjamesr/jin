@@ -37,6 +37,7 @@ public class TabbedPreferencesPanel extends CompositePreferencesPanel{
    * If {@link #createLayout()} hasn't been called yet, calls it.
    */
   
+  @Override
   public void addNotify(){
     super.addNotify();
     
@@ -63,6 +64,7 @@ public class TabbedPreferencesPanel extends CompositePreferencesPanel{
    * Adds the panel to the tabbed pane. 
    */
   
+  @Override
   protected void addPanelToUi(PreferencesPanel panel, String panelTitle, String panelToolTip){
     tabs.addTab(panelTitle, null, panel, panelToolTip);
   }

@@ -39,6 +39,7 @@ public interface Named{
    */
   
   public static final Comparator ALPHABETIC_NAME_COMPARATOR = new Comparator(){
+    @Override
     public int compare(Object arg0, Object arg1){
       Named named1 = (Named)arg0;
       Named named2 = (Named)arg1;

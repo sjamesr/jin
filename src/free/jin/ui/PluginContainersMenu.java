@@ -163,6 +163,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * created.
    */
   
+  @Override
   public void pluginContainerAdded(PluginUIContainer pc){
     if (pc.getMode() == UIProvider.HIDEABLE_CONTAINER_MODE){
       JCheckBoxMenuItem item = 
@@ -276,6 +277,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * shown.
    */
   
+  @Override
   public void pluginUIShown(PluginUIEvent evt){
     JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem)containersToVisCheckBoxes.get(evt.getSource());
     if (checkBox != null)
@@ -292,6 +294,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * hidden.
    */
   
+  @Override
   public void pluginUIHidden(PluginUIEvent evt){
     JCheckBoxMenuItem item = (JCheckBoxMenuItem)containersToVisCheckBoxes.get(evt.getSource());
     if (item != null)
@@ -307,6 +310,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when the plugin ui becomes "active".
    */
 
+  @Override
   public void pluginUIActivated(PluginUIEvent evt){
     JRadioButtonMenuItem radioButton = (JRadioButtonMenuItem)containersToActiveRadioButtons.get(evt.getSource());
     radioButton.setSelected(true);
@@ -318,6 +322,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when the plugin ui becomes "inactive".
    */
 
+  @Override
   public void pluginUIDeactivated(PluginUIEvent evt){
     JRadioButtonMenuItem radioButton = (JRadioButtonMenuItem)containersToActiveRadioButtons.get(evt.getSource());
     radioButton.setSelected(false);
@@ -329,6 +334,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when the plugin ui is disposed.
    */
   
+  @Override
   public void pluginUIDisposed(PluginUIEvent evt){
     pluginContainerRemoved(evt.getPluginUIContainer());
   }
@@ -339,6 +345,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when the plugin ui title changes.
    */
   
+  @Override
   public void pluginUITitleChanged(PluginUIEvent evt){
     PluginUIContainer pc = evt.getPluginUIContainer();
     JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem)containersToVisCheckBoxes.get(pc);
@@ -356,6 +363,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * one of the current plugin ui containers.
    */
 
+  @Override
   public void pluginUIClosing(PluginUIEvent evt){
     
   }
@@ -366,6 +374,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when the plugin ui icon changes.
    */
   
+  @Override
   public void pluginUIIconChanged(PluginUIEvent evt){
     
   }
@@ -376,6 +385,7 @@ public class PluginContainersMenu extends JMenu implements PluginUIListener, Plu
    * This method is invoked when one of the checkboxes or radio buttons is
    * clicked. 
    */
+  @Override
   public void actionPerformed(ActionEvent evt){
     Object source = evt.getSource();
     if (source instanceof JCheckBoxMenuItem){

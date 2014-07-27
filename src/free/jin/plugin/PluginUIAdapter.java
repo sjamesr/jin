@@ -30,13 +30,21 @@ public class PluginUIAdapter implements PluginUIListener{
 
 
   
+  @Override
   public void pluginUIShown(PluginUIEvent evt){}
+  @Override
   public void pluginUIHidden(PluginUIEvent evt){}
+  @Override
   public void pluginUIClosing(PluginUIEvent evt){}
+  @Override
   public void pluginUIActivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDeactivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDisposed(PluginUIEvent evt){}
+  @Override
   public void pluginUITitleChanged(PluginUIEvent evt){}
+  @Override
   public void pluginUIIconChanged(PluginUIEvent evt){}
 
   

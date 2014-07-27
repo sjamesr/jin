@@ -93,6 +93,7 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * Joins all the chat types we're accepting.
    */
   
+  @Override
   protected void joinForums(){
     for (Iterator i = acceptedChatTypes.iterator(); i.hasNext();){
       ChatType chatType = (ChatType)i.next();
@@ -127,6 +128,7 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation{
    * <code>ChatEvent</code> with one of the accepted types.
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (isTaggedByUs(evt))
       return true;

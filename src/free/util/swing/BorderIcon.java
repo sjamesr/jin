@@ -53,6 +53,7 @@ public class BorderIcon implements Icon{
    * Returns the wrapped icon's height plus the border size.
    */
   
+  @Override
   public int getIconHeight(){
     return wrappedIcon.getIconHeight() + 2;
   }
@@ -63,6 +64,7 @@ public class BorderIcon implements Icon{
    * Returns the wrapped icon's width plus the border size.
    */
 
+  @Override
   public int getIconWidth(){
     return wrappedIcon.getIconWidth() + 2;
   }
@@ -93,6 +95,7 @@ public class BorderIcon implements Icon{
    * Paints the wrapped icon and the border.
    */
 
+  @Override
   public void paintIcon(Component component, Graphics g, int x, int y){
     wrappedIcon.paintIcon(component, g, x + 1, y + 1);
     

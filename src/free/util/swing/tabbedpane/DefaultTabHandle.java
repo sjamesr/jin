@@ -126,6 +126,7 @@ public class DefaultTabHandle implements TabHandle{
     this.tab = tab;
     
     MouseListener pressListener = new MouseAdapter(){
+      @Override
       public void mousePressed(MouseEvent e){
         selectInvoked();
         e.consume();
@@ -135,6 +136,7 @@ public class DefaultTabHandle implements TabHandle{
     
     // Create the component
     this.component = new JPanel(new BorderLayout(2, 2)){
+      @Override
       public Dimension getMinimumSize(){
         return new Dimension(20, super.getMinimumSize().height);
       }
@@ -153,6 +155,7 @@ public class DefaultTabHandle implements TabHandle{
     // Create the close button
     this.closeButton = makeCloseButton();
     closeButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         closeInvoked();
       }
@@ -165,6 +168,7 @@ public class DefaultTabHandle implements TabHandle{
     setSelected(model.getSelectedIndex() == model.indexOfTab(tab));
     
     tab.addPropertyChangeListener(new PropertyChangeListener(){
+      @Override
       public void propertyChange(PropertyChangeEvent evt){
         String propertyName = evt.getPropertyName();
         
@@ -284,6 +288,7 @@ public class DefaultTabHandle implements TabHandle{
    * Returns the tab component.
    */
   
+  @Override
   public Component getComponent(){
     return component;
   }
@@ -294,6 +299,7 @@ public class DefaultTabHandle implements TabHandle{
    * Sets the selected state of the tab component.
    */
   
+  @Override
   public void setSelected(boolean isSelected){
     
   }

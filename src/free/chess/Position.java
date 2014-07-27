@@ -583,6 +583,7 @@ public final class Position{
    * Returns a textual representation of the board.
    */
   
+  @Override
   public String toString(){
     if (getCurrentPlayer().isWhite())
       return "White to move in " + getLexigraphic();
@@ -619,6 +620,7 @@ public final class Position{
    * represents the same position as this one.
    */
   
+  @Override
   public boolean equals(Object obj){
     if (!(obj instanceof Position))
       return false;
@@ -632,6 +634,7 @@ public final class Position{
    * Returns the hashcode of this position.
    */
   
+  @Override
   public int hashCode(){
     int result = 17;
     result = 37*result + variant.hashCode();

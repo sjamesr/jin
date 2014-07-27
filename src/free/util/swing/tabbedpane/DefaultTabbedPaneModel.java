@@ -54,6 +54,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public int getTabCount(){
     return tabs.size();
   }
@@ -64,6 +65,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public Tab getTab(int index){
     return (Tab)tabs.get(index);
   }
@@ -74,6 +76,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void addTab(Tab tab, int index){
     int existingIndex;
     if ((existingIndex = indexOfTab(tab)) != -1){
@@ -96,6 +99,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void removeTab(int index){
     int selected = getSelectedIndex();
     setSelectedIndex(-1); // Deselect it
@@ -115,6 +119,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public int getSelectedIndex(){
     return selectedTabIndex;
   }
@@ -125,6 +130,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void setSelectedIndex(int index){
     if (selectedTabIndex != -1)
       fireTabDeselected(selectedTabIndex);

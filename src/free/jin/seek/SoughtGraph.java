@@ -21,7 +21,9 @@
 
 package free.jin.seek;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -33,6 +35,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 
@@ -274,7 +277,7 @@ public class SoughtGraph extends JComponent{
     legendPopup = createLegendPopup();
     
     createUI();
-    enableEvents(MouseEvent.MOUSE_MOTION_EVENT_MASK|MouseEvent.MOUSE_EVENT_MASK);
+    enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK|AWTEvent.MOUSE_EVENT_MASK);
     
     setToolTipText(""); // Enables tooltips
   }
@@ -291,6 +294,7 @@ public class SoughtGraph extends JComponent{
     final JButton legendButton = new InfoButton();
     
     legendButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         legendPopup.show(legendButton, 0, legendButton.getHeight());
       }
@@ -327,7 +331,7 @@ public class SoughtGraph extends JComponent{
     // Normal/Wild
     JPanel chessTypePanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     chessTypePanel.setOpaque(false);
-    chessTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    chessTypePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     chessTypePanel.add(new JLabel(normalIcon));
     chessTypePanel.add(i18n.createLabel("normalChessLabel"));
     chessTypePanel.add(new JLabel(wildIcon));
@@ -336,7 +340,7 @@ public class SoughtGraph extends JComponent{
     // Human/Computer
     JPanel opponentTypePanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     opponentTypePanel.setOpaque(false);
-    opponentTypePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    opponentTypePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     opponentTypePanel.add(new JLabel(humanIcon));
     opponentTypePanel.add(i18n.createLabel("humanLabel"));
     opponentTypePanel.add(new JLabel(computerIcon));
@@ -345,7 +349,7 @@ public class SoughtGraph extends JComponent{
     // Rated/Unrated row
     JPanel ratednessPanel = new JPanel(new TableLayout(2, hRelatedGap, 0));
     ratednessPanel.setOpaque(false);
-    ratednessPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    ratednessPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     ratednessPanel.add(new JLabel(ratedIcon));
     ratednessPanel.add(i18n.createLabel("ratedLabel"));
     ratednessPanel.add(new JLabel(unratedIcon));
@@ -589,6 +593,7 @@ public class SoughtGraph extends JComponent{
    * Paints this SoughtGraph on the given Graphics.
    */
   
+  @Override
   public void paintComponent(Graphics g){
     Rectangle clipRect = g.getClipBounds();
     
@@ -901,6 +906,7 @@ public class SoughtGraph extends JComponent{
    * Returns the tooltip text to be displayed at the specified coordinate.
    */
   
+  @Override
   public String getToolTipText(MouseEvent evt){
     Seek seek = seekAtLocation(evt.getX(), evt.getY());
     return seek == null ? null : getSeekString(seek);
@@ -932,6 +938,7 @@ public class SoughtGraph extends JComponent{
    * Changes the current seek under mouse and repaints if necessary.
    */
   
+  @Override
   protected void processMouseMotionEvent(MouseEvent evt){
     super.processMouseMotionEvent(evt);
     
@@ -948,6 +955,7 @@ public class SoughtGraph extends JComponent{
    * Also, if the mouse leaves the component, nulls the current seek and repaints.
    */
   
+  @Override
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
     
@@ -960,7 +968,7 @@ public class SoughtGraph extends JComponent{
       curMouseLocation = evt.getPoint();
       setCursor(Cursor.getDefaultCursor());
     }
-    if ((evt.getID() == MouseEvent.MOUSE_CLICKED) && (evt.getModifiers() == MouseEvent.BUTTON1_MASK)){
+    if ((evt.getID() == MouseEvent.MOUSE_CLICKED) && (evt.getModifiers() == InputEvent.BUTTON1_MASK)){
       Seek pressedSeek = seekAtLocation(evt.getX(), evt.getY());
       if (pressedSeek!=null)
         fireSeekSelectionEvent(new SeekSelectionEvent(this, pressedSeek));
@@ -1011,6 +1019,7 @@ public class SoughtGraph extends JComponent{
    * Returns the minimum size of the sought graph.
    */
   
+  @Override
   public Dimension getMinimumSize(){
     int width = (int)(minSeekImageSize * (BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS) / GRAPH_WIDTH_PERCENTAGE);
     int height = (int)(minSeekImageSize * RATING_SLOTS / GRAPH_HEIGHT_PERCENTAGE);
@@ -1023,6 +1032,7 @@ public class SoughtGraph extends JComponent{
    * Returns the preferred size of the sought graph.
    */
   
+  @Override
   public Dimension getPreferredSize(){
     int width = (int)(maxSeekImageSize * (BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS) / GRAPH_WIDTH_PERCENTAGE);
     int height = (int)(maxSeekImageSize * RATING_SLOTS / GRAPH_HEIGHT_PERCENTAGE);
@@ -1035,6 +1045,7 @@ public class SoughtGraph extends JComponent{
    * Returns the maximum size of the sought graph.
    */
   
+  @Override
   public Dimension getMaximumSize(){
     return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
   }

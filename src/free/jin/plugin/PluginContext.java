@@ -112,9 +112,9 @@ public class PluginContext{
     
     this.conn = conn;
     this.user = user;
-    this.plugins = (Plugin[])plugins.clone();
+    this.plugins = plugins.clone();
     this.isPluginActive = new boolean[plugins.length];
-    this.prefs = (Preferences[])prefs.clone();
+    this.prefs = prefs.clone();
     
     for (int i = 0; i < actions.length; i++)
       this.actions.addElement(actions[i]);

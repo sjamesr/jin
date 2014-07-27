@@ -55,6 +55,7 @@ import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.OverlayLayout;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -252,6 +253,7 @@ public class Console extends JPanel implements KeyListener{
   
   private final Action clearAction = 
     new AbstractAction(I18n.get(Console.class).getString("clearAction.name")){
+      @Override
       public void actionPerformed(ActionEvent e){
         clear();
       }
@@ -265,6 +267,7 @@ public class Console extends JPanel implements KeyListener{
   
   private final Action closeAction =
     new AbstractAction(I18n.get(Console.class).getString("closeAction.name")){
+      @Override
       public void actionPerformed(ActionEvent e){
         consoleManager.removeConsole(Console.this);
       }
@@ -407,6 +410,7 @@ public class Console extends JPanel implements KeyListener{
     inputComponent.setBackground(Color.red);
     
     Timer timer = new Timer(300, new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         inputComponent.setBackground(UIManager.getColor("TextField.background"));
       }
@@ -474,15 +478,18 @@ public class Console extends JPanel implements KeyListener{
     // Seriously hack the caret for our own purposes (desired scrolling and selecting).
     Caret caret = new DefaultCaret(){
       
+      @Override
       public void focusGained(FocusEvent evt){
         super.focusGained(evt);
         if (!dragging)
           obtainFocus();
       }
+      @Override
       public void focusLost(FocusEvent e){
         this.setVisible(false);
       }
 
+      @Override
       protected void adjustVisibility(Rectangle nloc){
         if (!dragging)
           return;
@@ -501,16 +508,19 @@ public class Console extends JPanel implements KeyListener{
 
       private boolean dragging = false;
 
+      @Override
       public void mousePressed(MouseEvent e){
         dragging = true;
         super.mousePressed(e);
       }
 
+      @Override
       public void mouseReleased(MouseEvent e){
         dragging = false;
         super.mouseReleased(e);
         if (isCopyOnSelect()){
           SwingUtilities.invokeLater(new Runnable(){
+            @Override
             public void run(){
               obtainFocus();
             }
@@ -519,6 +529,7 @@ public class Console extends JPanel implements KeyListener{
       }
 
 
+      @Override
       protected void moveCaret(MouseEvent e){
         Point pt = new Point(e.getX(), e.getY());
         Position.Bias[] biasRet = new Position.Bias[1];
@@ -538,6 +549,7 @@ public class Console extends JPanel implements KeyListener{
         }
       }
 
+      @Override
       protected void positionCaret(MouseEvent e) {
         Point pt = new Point(e.getX(), e.getY());
         Position.Bias[] biasRet = new Position.Bias[1];
@@ -561,6 +573,7 @@ public class Console extends JPanel implements KeyListener{
     };
 
     caret.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         if (isCopyOnSelect())
           textPane.copy(); // CDE/Motif style copy/paste
@@ -589,6 +602,7 @@ public class Console extends JPanel implements KeyListener{
 
     // This makes sure that when the viewport is resized, the last visible line
     // (or character) remains the same after the resize.
+    @Override
     public void reshape(int x, int y, int width, int height){
       Dimension viewSize = getViewSize();
       Dimension viewportSize = getExtentSize();
@@ -638,7 +652,7 @@ public class Console extends JPanel implements KeyListener{
     JViewport viewport = new OutputComponentViewport();
     viewport.setView(outputComponent);
 
-    JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    JScrollPane scrollPane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setViewport(viewport);
 
     viewport.putClientProperty("EnableWindowBlit", Boolean.TRUE);
@@ -872,6 +886,7 @@ public class Console extends JPanel implements KeyListener{
         this.curNumCalls = curNumCalls;
       }
 
+      @Override
       public void run(){
         if (numAddToOutputCalls == curNumCalls){
           try{
@@ -1278,6 +1293,7 @@ public class Console extends JPanel implements KeyListener{
    * input component.
    */
 
+  @Override
   public void keyPressed(KeyEvent evt){
     int keyCode = evt.getKeyCode();
     if ((evt.getSource() == inputComponent)){
@@ -1334,6 +1350,7 @@ public class Console extends JPanel implements KeyListener{
    * output and to the input component.
    */
 
+  @Override
   public void keyReleased(KeyEvent evt){}
 
 
@@ -1345,6 +1362,7 @@ public class Console extends JPanel implements KeyListener{
    * output and to the input component.
    */
 
+  @Override
   public void keyTyped(KeyEvent evt){}
 
 

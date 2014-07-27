@@ -212,7 +212,7 @@ public class AudioClip{
    */
 
   public byte [] getData(){
-    return (byte [])data.clone();
+    return data.clone();
   }
 
   

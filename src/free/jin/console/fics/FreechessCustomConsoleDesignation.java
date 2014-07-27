@@ -57,12 +57,14 @@ public class FreechessCustomConsoleDesignation extends IcsCustomConsoleDesignati
    * {@inheritDoc}
    */
   
+  @Override
   protected void addCShouts(){
     addAccepted("cshout", null, ANY_SENDER);
     
     I18n i18n = I18n.get(FreechessCustomConsoleDesignation.class);
     
     addCommandType(new AbstractCommandType(i18n.getString("cshout.commandName")){
+      @Override
       protected void send(String userText){
         sendCommand("cshout " + userText);
       }

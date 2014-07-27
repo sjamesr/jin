@@ -557,6 +557,7 @@ public class ConnectionManager{
       this.session = session;
       
       addSessionListener(new SessionListener(){
+        @Override
         public void sessionClosing(SessionEvent evt){
           removeSessionListener(this);
           if (isShowing())
@@ -564,8 +565,11 @@ public class ConnectionManager{
           else
             sessionClosing = true;
         }
+        @Override
         public void sessionClosed(SessionEvent evt){}
+        @Override
         public void sessionEstablished(SessionEvent session){}
+        @Override
         public void sessionStarting(SessionEvent evt){}
       });
       
@@ -587,12 +591,14 @@ public class ConnectionManager{
       JButton quitButton = i18n.createButton("quitButton", new Object[]{Jin.getAppName()});
       
       reconnectButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           closeSession(true);
         }
       });
       
       quitButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           Jin.getInstance().quit(false);
         }
@@ -624,6 +630,7 @@ public class ConnectionManager{
      * Configures the dialog not to be modal.
      */
     
+    @Override
     protected void configureDialog(JDialog dialog){
       super.configureDialog(dialog);
       
@@ -637,6 +644,7 @@ public class ConnectionManager{
      * ourselves.
      */
     
+    @Override
     public void loginSucceeded(Connection conn){
       loggedIn = true;
       
@@ -652,6 +660,7 @@ public class ConnectionManager{
      * If the connection was lost but the session is still open, show ourselves.
      */
     
+    @Override
     public void connectionLost(Connection conn){
       if (loggedIn && !sessionClosing)
         Jin.getInstance().getUIProvider().showDialog(this, null);
@@ -659,9 +668,13 @@ public class ConnectionManager{
     
     
     
+    @Override
     public void connectingFailed(Connection conn, String reason){}
+    @Override
     public void connectionAttempted(Connection conn, String hostname, int port){}
+    @Override
     public void connectionEstablished(Connection conn){}
+    @Override
     public void loginFailed(Connection conn, String reason){}
     
     

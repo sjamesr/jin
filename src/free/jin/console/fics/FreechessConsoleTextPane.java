@@ -54,6 +54,7 @@ public class FreechessConsoleTextPane extends ConsoleTextPane{
    * selectable.
    */
 
+  @Override
   protected boolean isWordChar(char c){
     return super.isWordChar(c) || (c == '_');
   }

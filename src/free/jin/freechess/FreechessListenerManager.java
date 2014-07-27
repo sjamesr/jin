@@ -65,6 +65,7 @@ public class FreechessListenerManager extends BasicListenerManager{
    * of SeekEvents.
    */
 
+  @Override
   public void addSeekListener(SeekListener listener){
     super.addSeekListener(listener);
 
@@ -80,6 +81,7 @@ public class FreechessListenerManager extends BasicListenerManager{
    * notification of SeekEvents.
    */
 
+  @Override
   public void removeSeekListener(SeekListener listener){
     super.removeSeekListener(listener);
 

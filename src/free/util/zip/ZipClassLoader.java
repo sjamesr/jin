@@ -84,6 +84,7 @@ public class ZipClassLoader extends ChildClassLoader{
    * specified name.
    */
 
+  @Override
   protected InputStream getResourceAsStreamImpl(String name){
     try{
       ZipEntry entry = zipFile.getEntry(name);
@@ -102,6 +103,7 @@ public class ZipClassLoader extends ChildClassLoader{
    * name.
    */
 
+  @Override
   protected URL getResourceImpl(String name){
     if (name.endsWith("/"))
       name = name.substring(0, name.length() - 1);

@@ -58,6 +58,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Adds the instructions text to the console.
    */
   
+  @Override
   public void setConsole(Console console){
     super.setConsole(console);
     
@@ -70,6 +71,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
    * Joins the help forum.
    */
   
+  @Override
   protected void joinForums(){
     connection.joinHelpForum();
   }
@@ -98,6 +100,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Asks the specified help question.
      */
     
+    @Override
     protected void send(String userText){
       connection.sendHelpQuestion(encode(userText), getTag());
     }
@@ -108,6 +111,7 @@ public abstract class HelpConsoleDesignation extends AbstractConsoleDesignation{
      * Echoes the question to the console.
      */
     
+    @Override
     protected void echo(String userText){
       Console console = getConsole();
       console.addToOutput(connection.getUser().getName() + ": " + userText, console.getUserTextType());

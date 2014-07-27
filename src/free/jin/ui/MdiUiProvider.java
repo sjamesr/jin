@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
@@ -153,6 +154,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * Creates all the UI.
    */
    
+  @Override
   public void init(){
     super.init();
     
@@ -182,11 +184,12 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     // TODO: Find a way to implement ctrl+TAB without requiring security permissions.
     try{
-      FocusManager.setCurrentManager(new FocusManager());
+      javax.swing.FocusManager.setCurrentManager(new FocusManager());
     } catch (SecurityException e){}
     
     
     mainFrame.addWindowListener(new WindowAdapter(){
+      @Override
       public void windowOpened(WindowEvent evt){
         mainFrame.removeWindowListener(this);
         
@@ -210,6 +213,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * of the connection manager.
    */
   
+  @Override
   public void start(){
     super.start();
     
@@ -228,8 +232,9 @@ public class MdiUiProvider extends AbstractUiProvider{
     
     frame.setTitle(Jin.getAppName());
     frame.setIconImage(frame.getToolkit().getImage(Jin.class.getResource("resources/logo32.png")));
-    frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter(){
+      @Override
       public void windowClosing(WindowEvent evt){
         Jin.getInstance().quit(true);
       }
@@ -286,6 +291,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * {@link DialogPanel#show(JDialog)}.
    */
 
+  @Override
   public void showDialog(DialogPanel dialog, Component parent){
     Frame parentFrame = mainFrame;
     if (parent != null)
@@ -300,6 +306,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * SessionListener implementation. Adjusts the title of the main frame. 
    */
   
+  @Override
   public void sessionEstablished(SessionEvent evt){
     super.sessionEstablished(evt);
     
@@ -322,6 +329,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * SessionListener implementation. Adjusts the title of the main frame.
    */
   
+  @Override
   public void sessionClosed(SessionEvent evt){
     super.sessionClosed(evt);
     
@@ -343,6 +351,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * Returns a new UIContainer for the specified plugin.
    */
 
+  @Override
   public PluginUIContainer createPluginUIContainer(Plugin plugin, String id, int mode){
     AbstractPluginUIContainer container = new InternalFramePluginUIContainer(plugin, id, mode);
     
@@ -357,6 +366,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * Returns whether the main frame is visible.
    */
   
+  @Override
   public boolean isUiVisible(){
     return mainFrame.isVisible();
   }
@@ -369,6 +379,7 @@ public class MdiUiProvider extends AbstractUiProvider{
    * of the main window.
    */
    
+  @Override
   public void stop(){
     saveWindowGeometry(Jin.getInstance().getPrefs(), mainFrame, "frame.");
     mainFrame.dispose();    
@@ -468,6 +479,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Registers us as session listener.
      */
     
+    @Override
     public void addNotify(){
       super.addNotify();
       
@@ -482,6 +494,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Unregisters us as a session listener.
      */
     
+    @Override
     public void removeNotify(){
       super.removeNotify();
       
@@ -495,6 +508,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * <code>setConnected</code>.
      */
     
+    @Override
     public void sessionEstablished(SessionEvent evt){
       setConnected(true, evt.getSession());
     }
@@ -506,13 +520,16 @@ public class MdiUiProvider extends AbstractUiProvider{
      * <code>setConnected</code>.
      */
     
+    @Override
     public void sessionClosed(SessionEvent evt){
       setConnected(false, evt.getSession());
     }
     
     
     
+    @Override
     public void sessionStarting(SessionEvent evt){}
+    @Override
     public void sessionClosing(SessionEvent evt){}
 
 
@@ -546,6 +563,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * various menu items and performs the desired operation.
      */
 
+    @Override
     public void actionPerformed(ActionEvent evt){
       ConnectionManager connManager = Jin.getInstance().getConnManager();
       Object source = evt.getSource();
@@ -687,6 +705,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       add(bgMenuItem);
       
       bgMenuItem.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           Preferences prefs = Jin.getInstance().getPrefs();
           String wallpaperFilename = prefs.getString("desktop.wallpaper.filename", null);
@@ -752,7 +771,7 @@ public class MdiUiProvider extends AbstractUiProvider{
       
       // See http://developer.java.sun.com/developer/bugParade/bugs/4176136.html for the 
       // reason I do this instead of adding an InternalFrameListener like a sane person.
-      frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+      frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       frame.addVetoableChangeListener(this);
       frame.addInternalFrameListener(this);
       
@@ -769,6 +788,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Disposes of this plugin container.
      */
 
+    @Override
     public void disposeImpl(){
       setVisible(false);
       frame.dispose();
@@ -781,6 +801,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * back and selects a different frame.
      */
 
+    @Override
     public void setActive(boolean active){
       try{
         if (active){
@@ -803,6 +824,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Returns whether the frame of this plugin container is currently selected.
      */
 
+    @Override
     public boolean isActive(){
       return frame.isVisible() && frame.isSelected();
     }
@@ -813,6 +835,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Sets the resizable state of this plugin container's frame.
      */
     
+    @Override
     public void setResizable(boolean resizable){
       frame.setResizable(resizable);
     }
@@ -824,6 +847,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * resizable.
      */
     
+    @Override
     public boolean isResizable(){
       return frame.isResizable();
     }
@@ -834,6 +858,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Resizes the frame to its preferred size.
      */
     
+    @Override
     public void pack(){
       setVisible(true);
       
@@ -852,6 +877,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Returns the content pane of the frame.
      */
 
+    @Override
     public JComponent getContentPane(){
       return (JComponent)frame.getContentPane();
     }
@@ -862,6 +888,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Sets the title of the frame.
      */
 
+    @Override
     public void setTitleImpl(String title){
       frame.setTitle(title);
     }
@@ -872,6 +899,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Sets the icon of the frame.
      */
 
+    @Override
     public void setIconImpl(Image image){
       // InternalFrames don't seem to scale their icons properly on their own
       Icon defaultIcon = UIManager.getIcon("InternalFrame.icon");
@@ -891,6 +919,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Adds the frame to the desktop and makes it visible.
      */
 
+    @Override
     public void setVisible(boolean isVisible){
       if (isVisible == isVisible())
         return;
@@ -907,6 +936,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Returns whether the frame is currently visible.
      */
 
+    @Override
     public boolean isVisible(){
       return (frame.getParent() != null) ||
         ((frame.getDesktopIcon() != null) && (frame.getDesktopIcon().getParent() != null));
@@ -961,6 +991,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * the reason this is needed.
      */
 
+    @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
       if (pce.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY) &&
           pce.getOldValue().equals(Boolean.FALSE) && pce.getNewValue().equals(Boolean.TRUE)){
@@ -987,6 +1018,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * Saves the properties of this plugin container into user preferences.
      */
 
+    @Override
     protected void saveState(){
       String id = getId();
       if (id == null)
@@ -1023,6 +1055,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * properly.
      */
 
+    @Override
     protected void loadState(){
       String id = getId();
       Preferences prefs = getPlugin().getPrefs();
@@ -1060,17 +1093,24 @@ public class MdiUiProvider extends AbstractUiProvider{
      * InternalFrameListener implementation.
      */
 
+    @Override
     public void internalFrameActivated(InternalFrameEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ACTIVATED));
     }
+    @Override
     public void internalFrameDeactivated(InternalFrameEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DEACTIVATED));
     }
     
+    @Override
     public void internalFrameOpened(InternalFrameEvent e){}
+    @Override
     public void internalFrameClosed(InternalFrameEvent e){}
+    @Override
     public void internalFrameClosing(InternalFrameEvent e){}
+    @Override
     public void internalFrameDeiconified(InternalFrameEvent e){}
+    @Override
     public void internalFrameIconified(InternalFrameEvent e){}
     
     
@@ -1095,6 +1135,7 @@ public class MdiUiProvider extends AbstractUiProvider{
        * contents.
        */
       
+      @Override
       public Dimension getMinimumSize(){
         Insets insets = getInsets();
         Dimension dim = this.getContentPane().getLayout().minimumLayoutSize(this.getContentPane());
@@ -1128,6 +1169,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * window switching on ctrl+tab.
      */
 
+    @Override
     public void processKeyEvent(Component focusedComponent, KeyEvent evt){
       if (!SwingUtilities.isDescendingFrom(evt.getComponent(), mainFrame.getContentPane())){
         super.processKeyEvent(focusedComponent, evt);
@@ -1190,6 +1232,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * internal frame out of reach.
      */
 
+    @Override
     public void resizeFrame(JComponent f, int newX, int newY, int newWidth, int newHeight){
       Dimension desktopSize = desktop.getSize();
       Rectangle jifBounds = f.getBounds();
@@ -1235,6 +1278,7 @@ public class MdiUiProvider extends AbstractUiProvider{
      * internal frame out of reach.
      */
 
+    @Override
     public void dragFrame(JComponent f, int newX, int newY){
       Dimension desktopSize = desktop.getSize();
       Rectangle jifBounds = f.getBounds();

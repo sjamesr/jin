@@ -60,6 +60,7 @@ public final class PlainBoardPainter extends AbstractColoredBoardPainter{
    * Returns a new <code>PlainBoardPainter</code>.
    */
   
+  @Override
   public BoardPainter freshInstance(){
     return new PlainBoardPainter();
   }
@@ -71,6 +72,7 @@ public final class PlainBoardPainter extends AbstractColoredBoardPainter{
    * the given size.
    */
 
+  @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     int squareWidth = width/8;
     int squareHeight = height/8;

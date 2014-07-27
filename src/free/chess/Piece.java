@@ -221,6 +221,7 @@ public abstract class Piece{
    * the empty piece.
    */
 
+  @Override
   public String toString(){
     return getColorName()+' '+getTypeName();
   }
@@ -232,6 +233,7 @@ public abstract class Piece{
    * Returns the hashcode of this Piece.
    */
 
+  @Override
   public int hashCode(){
     return val;
   }
@@ -246,6 +248,7 @@ public abstract class Piece{
    * reference.
    */
 
+  @Override
   public boolean equals(Object o){
     if (o == null)
       return false;

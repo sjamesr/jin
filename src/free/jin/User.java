@@ -257,6 +257,7 @@ public class User{
    * Returns a description of the user.
    */
    
+  @Override
   public String toString(){
     return getUsername() + "@" + getServer().getShortName();
   }

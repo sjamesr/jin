@@ -52,6 +52,7 @@ public abstract class IcsSystemConsoleDesignation extends SystemConsoleDesignati
    * Returns whether the specified chat event is a personal tell to the user.
    */
   
+  @Override
   protected boolean isPersonalTell(ChatEvent evt){
     String type = evt.getType();
     return "tell".equals(type) || "say".equals(type) || "ptell".equals(type);

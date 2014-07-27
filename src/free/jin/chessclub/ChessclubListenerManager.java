@@ -73,6 +73,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * chat related messages arrive from the server.
    */
   
+  @Override
   public void addChatListener(ChatListener listener){
     super.addChatListener(listener);
     
@@ -94,6 +95,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * messages arrive from the server.
    */
   
+  @Override
   public void removeChatListener(ChatListener listener){
     super.removeChatListener(listener);
     
@@ -117,6 +119,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * regular <code>GameListener</code>s.
    */
   
+  @Override
   public void addGameListener(GameListener listener){
     super.addGameListener(listener);
     
@@ -160,6 +163,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * <code>addGameListener(GameListener)</code> method.
    */
   
+  @Override
   public void removeGameListener(GameListener listener){
     super.removeGameListener(listener);
     
@@ -201,6 +205,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * firing of chessclub.com specific events.
    */
   
+  @Override
   public void fireGameEvent(GameEvent evt){
     if (!isChessclubSpecificEvent(evt))
       super.fireGameEvent(evt);
@@ -258,6 +263,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * receiving notification of <code>SeekEvent</code>s.
    */
   
+  @Override
   public void addSeekListener(SeekListener listener){
     super.addSeekListener(listener);
     
@@ -276,6 +282,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * receiving notification of <code>SeekEvent</code>s.
    */
   
+  @Override
   public void removeSeekListener(SeekListener listener){
     super.removeSeekListener(listener);
     
@@ -294,6 +301,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * of <code>GameListEvent</code>s.
    */
   
+  @Override
   public void addGameListListener(GameListListener listener){
     super.addGameListListener(listener);
     
@@ -310,6 +318,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * receiving notifications of <code>GameListEvent</code>s.
    */
   
+  @Override
   public void removeGameListListener(GameListListener listener){
     super.removeGameListListener(listener);
     
@@ -386,6 +395,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * receiving notifications of <code>FriendsEvent</code>s.
    */
 
+  @Override
   public void addFriendsListener(FriendsListener listener){
     super.addFriendsListener(listener);
 
@@ -406,6 +416,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * listeners receiving notifications of <code>FriendsEvent</code>s.
    */
   
+  @Override
   public void removeFriendsListener(FriendsListener listener){
     super.removeFriendsListener(listener);
 
@@ -426,6 +437,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * of <code>MatchOfferEvent</code>s.
    */
   
+  @Override
   public void addMatchOfferListener(MatchOfferListener listener){
     super.addMatchOfferListener(listener);
     
@@ -442,6 +454,7 @@ public class ChessclubListenerManager extends BasicListenerManager{
    * listeners receiving notifications of <code>MatchOfferEvent</code>s.
    */
   
+  @Override
   public void removeMatchOfferListener(MatchOfferListener listener){
     super.removeMatchOfferListener(listener);
     

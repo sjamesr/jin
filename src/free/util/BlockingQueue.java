@@ -233,6 +233,7 @@ public class BlockingQueue implements Cloneable{
    * Returns a shallow copy of this BlockingQueue.
    */
 
+  @Override
   public synchronized Object clone(){
     BlockingQueue copy = new BlockingQueue();
     Enumeration elems = getElements();

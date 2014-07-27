@@ -198,6 +198,7 @@ public class OfferEvent extends GameEvent{
    * Returns a textual representation of this <code>OfferEvent</code>.
    */
    
+  @Override
   public String toString(){
     StringBuffer buf = new StringBuffer("OfferEvent[");
     switch (getOfferId()){

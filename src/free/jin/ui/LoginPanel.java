@@ -270,6 +270,7 @@ public class LoginPanel extends DialogPanel{
     connectButton.setDefaultCapable(true);
     setDefaultButton(connectButton);
     connectButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Server server = getServer();
         User user;
@@ -321,6 +322,7 @@ public class LoginPanel extends DialogPanel{
     setData(server, connDetails, true, true);
     
     serverBox.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Server server = servers[serverBox.getSelectedIndex()];
         User [] users = getServerUsers(server);
@@ -334,6 +336,7 @@ public class LoginPanel extends DialogPanel{
     
     usernameBox.addActionListener(new ActionListener(){
       private boolean ignoreCalls = false;
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (ignoreCalls)
           return;
@@ -511,6 +514,7 @@ public class LoginPanel extends DialogPanel{
    * Returns the title for this panel.
    */
 
+  @Override
   protected String getTitle(){
     return i18n.getString("title");
   }
@@ -557,6 +561,7 @@ public class LoginPanel extends DialogPanel{
     });
     
     moreLessButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         resizeContainerToFit();
       }
@@ -676,6 +681,7 @@ public class LoginPanel extends DialogPanel{
 
 
   // Hack to set the focus where we want it.
+  @Override
   public void paint(Graphics g){ 
                                  
     if (defaultFocusedComponent != null){

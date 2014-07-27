@@ -69,6 +69,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * Joins personal chat with out conversation partner.
    */
   
+  @Override
   protected void joinForums(){
     connection.joinPersonalChat(conversationPartner);
   }
@@ -79,6 +80,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * Accepts only person-to-person chat events.
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (isTaggedByUs(evt))
       return true;
@@ -100,6 +102,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * same conversation partner.
    */
   
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof PersonalChatConsoleDesignation))
       return false;
@@ -114,6 +117,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
    * Returns the hash code of this <code>PersonalChatConsoleDesignation</code>.
    */
   
+  @Override
   public int hashCode(){
     return conversationPartner.hashCode();
   }
@@ -143,6 +147,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
      * Sends the specified personal tell to our conversation partner. 
      */
     
+    @Override
     protected void send(String message){
       connection.sendPersonalTell(conversationPartner, encode(message), getTag());
     }
@@ -153,6 +158,7 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation{
      * Echoes the message to the console.
      */
     
+    @Override
     protected void echo(String userText){
       Console console = getConsole();
       console.addToOutput(connection.getUser().getName() + ": " + userText, console.getUserTextType());

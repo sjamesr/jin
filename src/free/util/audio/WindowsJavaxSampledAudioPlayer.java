@@ -47,6 +47,7 @@ public class WindowsJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
    * Returns whether we're running under MS Windows.
    */
 
+  @Override
   public boolean isSupported(){
     return super.isSupported() && PlatformUtils.isWindows();
   }
@@ -57,6 +58,7 @@ public class WindowsJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
    * <code>Runnable</code> implementation. Plays the queued clips.
    */
 
+  @Override
   public void run(){
     while (true){
       try{
@@ -71,6 +73,7 @@ public class WindowsJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
         Clip clipLine = (Clip)AudioSystem.getLine(info);
         clipLine.open(format, data, 0, data.length);
         clipLine.addLineListener(new LineListener(){
+          @Override
           public void update(LineEvent evt){
             if (evt.getType() == LineEvent.Type.STOP)
               evt.getLine().close();

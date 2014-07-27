@@ -47,6 +47,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -222,8 +223,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    */
 
   private final DocumentListener changeFiringDocumentListener = new DocumentListener(){
+    @Override
     public void changedUpdate(DocumentEvent e){if (!ignoreRuleFieldsDocumentChange) fireStateChanged();}
+    @Override
     public void insertUpdate(DocumentEvent e){if (!ignoreRuleFieldsDocumentChange) fireStateChanged();}
+    @Override
     public void removeUpdate(DocumentEvent e){if (!ignoreRuleFieldsDocumentChange) fireStateChanged();}
   };
 
@@ -322,6 +326,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     useRulesPanel = new JPanel();
 
     ActionListener loggingModeListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         syncUI();
         fireStateChanged();
@@ -374,6 +379,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     loggingRulesList = new JList(rulesListModel);
     loggingRulesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     loggingRulesList.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         if (evt.getValueIsAdjusting())
           return;
@@ -401,8 +407,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JScrollPane loggingListRulesScrollPane = new JScrollPane(loggingRulesList); loggingListRulesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    loggingListRulesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    JScrollPane loggingListRulesScrollPane = new JScrollPane(loggingRulesList); loggingListRulesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    loggingListRulesScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     loggingListRulesScrollPane.setPreferredSize(new Dimension(80, 80));
 
 
@@ -413,6 +419,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     JButton addRuleButton = i18n.createButton("addGameLoggingRuleButton");
     addRuleButton.setDefaultCapable(false);
     addRuleButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex != -1){
@@ -437,6 +444,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     deleteRuleButton = i18n.createButton("deleteGameLoggingRuleButton");
     deleteRuleButton.setDefaultCapable(false);
     deleteRuleButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = loggingRulesList.getSelectedIndex();
         if (selectedIndex == -1)
@@ -489,8 +497,11 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     conditionField.getDocument().addDocumentListener(changeFiringDocumentListener);
 
     rulenameField.getDocument().addDocumentListener(new DocumentListener(){
+      @Override
       public void changedUpdate(DocumentEvent e){updateRulename();}
+      @Override
       public void insertUpdate(DocumentEvent e){updateRulename();}
+      @Override
       public void removeUpdate(DocumentEvent e){updateRulename();}
 
       private void updateRulename(){
@@ -529,6 +540,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
     helpConditionButton.setDefaultCapable(false);
     helpConditionButton.setPreferredSize(browseLogFileButton.getPreferredSize());
     helpConditionButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
         i18n.showPlainTextDialog("conditionHelpDialog", GameLoggerPreferencesPanel.this);
@@ -728,6 +740,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
    * Applies the changed preferences done by the user.
    */
 
+  @Override
   public void applyChanges() throws BadChangesException{
     I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
     Preferences prefs = gameLogger.getPrefs();
@@ -818,6 +831,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel{
 
 
 
+    @Override
     public void actionPerformed(ActionEvent evt){
       I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
       

@@ -92,6 +92,7 @@ public class ZipURLConnection extends URLConnection{
    * Attempts to open the zip entry.
    */
 
+  @Override
   public void connect() throws IOException{
     this.zipFile = new ZipFile(file);
     this.zipEntry = zipFile.getEntry(zipEntryName);
@@ -106,6 +107,7 @@ public class ZipURLConnection extends URLConnection{
    * Returns the <code>InputStream</code> that reads from this connection.
    */
 
+  @Override
   public InputStream getInputStream() throws IOException{
     if (!connected)
       connect();
@@ -119,6 +121,7 @@ public class ZipURLConnection extends URLConnection{
    * Returns the length of the uncompressed zip entry.
    */
 
+  @Override
   public int getContentLength(){
     if (!connected)
       return -1;

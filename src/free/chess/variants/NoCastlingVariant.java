@@ -54,6 +54,7 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
    * Returns false, as this is a variant which disallows castling.
    */
 
+  @Override
   public boolean isShortCastling(Position pos, Square startingSquare,
       Square endingSquare, ChessPiece promotionTarget){
     
@@ -68,6 +69,7 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
    * Returns false, as this is a variant which disallows castling.
    */
 
+  @Override
   public boolean isLongCastling(Position pos, Square startingSquare,
       Square endingSquare, ChessPiece promotionTarget){
     
@@ -80,6 +82,7 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
    * Always throws <code>UnsupportedOperationException</code>.
    */
 
+  @Override
   public Move createShortCastling(Position pos){
     throw new free.util.UnsupportedOperationException("Can't castle");
   }
@@ -91,6 +94,7 @@ public class NoCastlingVariant extends ChesslikeGenericVariant{
    * Always throws <code>UnsupportedOperationException</code>.
    */
 
+  @Override
   public Move createLongCastling(Position pos){
     throw new free.util.UnsupportedOperationException("Can't castle");
   }

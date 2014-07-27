@@ -61,6 +61,7 @@ public class ExternalAppAudioPlayer implements Runnable, AudioPlayer{
    * Returns <code>true</code>.
    */
 
+  @Override
   public boolean isSupported(){
     try{
       Process testPlayer = createPlayer();
@@ -84,6 +85,7 @@ public class ExternalAppAudioPlayer implements Runnable, AudioPlayer{
    * Plays the given AudioClip.
    */
 
+  @Override
   public synchronized void play(AudioClip clip) throws java.io.IOException{
     // Lazily initialize player thread.
     if (playerThread == null){
@@ -111,6 +113,7 @@ public class ExternalAppAudioPlayer implements Runnable, AudioPlayer{
    * <code>Runnable</code> implementation. Plays the queued clips.
    */
 
+  @Override
   public void run(){
     while (true){
       InputStream err = null;

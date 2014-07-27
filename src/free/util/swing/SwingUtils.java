@@ -326,6 +326,7 @@ public class SwingUtils{
   public static void linkEnabledToSelected(final JComponent component, final ListSelectionModel model){
     component.setEnabled(!model.isSelectionEmpty());
     model.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent e){
         if (!e.getValueIsAdjusting())
           component.setEnabled(!model.isSelectionEmpty());

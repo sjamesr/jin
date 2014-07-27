@@ -53,6 +53,7 @@ public class FreechessGameConsoleDesignation extends IcsGameConsoleDesignation{
    * Returns <code>"xkibitz"</code>.
    */
   
+  @Override
   protected String getKibitzToCommand(){
     return "xkibitz";
   }
@@ -63,6 +64,7 @@ public class FreechessGameConsoleDesignation extends IcsGameConsoleDesignation{
    * Returns <code>"xwhisper"</code>.
    */
   
+  @Override
   protected String getWhisperToCommand(){
     return "xwhisper";
   }

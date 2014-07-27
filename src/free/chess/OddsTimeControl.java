@@ -70,6 +70,7 @@ public class OddsTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public int getInitialTime(Player player){
     return (player.isWhite() ? whiteTimeControl : blackTimeControl).getInitialTime(player);
   }
@@ -110,6 +111,7 @@ public class OddsTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public String getLocalizedShortDescription(){
     return getDescription("shortDescription", 
         whiteTimeControl.getLocalizedShortDescription(), blackTimeControl.getLocalizedShortDescription());
@@ -121,6 +123,7 @@ public class OddsTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public String getLocalizedMediumDescription(){
     return getDescription("mediumDescription", 
         whiteTimeControl.getLocalizedMediumDescription(), blackTimeControl.getLocalizedMediumDescription());
@@ -132,6 +135,7 @@ public class OddsTimeControl extends TimeControl{
    * {@inheritDoc} 
    */
   
+  @Override
   public String getLocalizedLongDescription(){
     return getDescription("longDescription", 
         whiteTimeControl.getLocalizedLongDescription(), blackTimeControl.getLocalizedLongDescription());
@@ -157,6 +161,7 @@ public class OddsTimeControl extends TimeControl{
    * Returns whether the specified object equals to this one.
    */
   
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof OddsTimeControl) || (o == null))
       return false;
@@ -171,6 +176,7 @@ public class OddsTimeControl extends TimeControl{
    * Returns the hash code for this object.
    */
   
+  @Override
   public int hashCode(){
     return whiteTimeControl.hashCode() ^ blackTimeControl.hashCode();
   }

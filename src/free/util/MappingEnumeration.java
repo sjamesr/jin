@@ -59,6 +59,7 @@ public abstract class MappingEnumeration implements Enumeration{
    * Returns whether there are more elements in this <code>Enumeration</code>.
    */
 
+  @Override
   public boolean hasMoreElements(){
     return delegate.hasMoreElements();
   }
@@ -70,6 +71,7 @@ public abstract class MappingEnumeration implements Enumeration{
    * the delegate enumeration.
    */
 
+  @Override
   public Object nextElement() throws NoSuchElementException{
     return map(delegate.nextElement());
   }

@@ -51,6 +51,7 @@ public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
     
     I18n i18n = I18n.get(IccGeneralChatConsoleDesignation.class);
     addCommandType(new AbstractCommandType(i18n.getString("ishout.commandName")){
+      @Override
       protected void send(String userText){
         sendCommand("i " + userText);
       }
@@ -63,6 +64,7 @@ public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    * Returns whether the specified chat event is a shout.
    */
 
+  @Override
   protected boolean isStandardChatMessage(ChatEvent evt){
     return "shout".equals(evt.getType());
   }
@@ -73,6 +75,7 @@ public class IccGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    * Sends the specified text as a shout.
    */
   
+  @Override
   protected void sendStandardChatMessage(String userText){
     sendCommand("shout " + userText);
   }

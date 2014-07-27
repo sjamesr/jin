@@ -38,6 +38,7 @@ public interface ServerUser extends Named{
    * the user (of the client).
    */
   
+  @Override
   String getName();
   
   
@@ -56,6 +57,7 @@ public interface ServerUser extends Named{
    * one.
    */
   
+  @Override
   boolean equals(Object user);
   
   
@@ -64,6 +66,7 @@ public interface ServerUser extends Named{
    * Returns the hash code of this <code>ServerUser</code> object.
    */
   
+  @Override
   int hashCode();
   
   

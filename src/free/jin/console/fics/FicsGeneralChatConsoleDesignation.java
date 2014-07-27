@@ -51,6 +51,7 @@ public class FicsGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesi
    * Returns whether the specified chat event is a shout.
    */
 
+  @Override
   protected boolean isStandardChatMessage(ChatEvent evt){
     return "shout".equals(evt.getType());
   }
@@ -61,6 +62,7 @@ public class FicsGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesi
    * Sends the specified text as a shout.
    */
   
+  @Override
   protected void sendStandardChatMessage(String userText){
     sendCommand("shout " + userText);
   }

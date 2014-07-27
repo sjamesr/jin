@@ -57,6 +57,7 @@ class PipedOutputStream extends OutputStream{
    * Writes a single byte into the sink.
    */
 
+  @Override
   public void write(int b) throws IOException{
     sink.write(b);
   }
@@ -68,6 +69,7 @@ class PipedOutputStream extends OutputStream{
    * the given offset to the sink.
    */
 
+  @Override
   public void write(byte [] arr, int offset, int length) throws IOException{
     sink.write(arr,offset,length);
   }
@@ -79,6 +81,7 @@ class PipedOutputStream extends OutputStream{
    * Closes this PipedOutputStream.
    */
 
+  @Override
   public void close() throws IOException{
     sink.closeWriter();
   }

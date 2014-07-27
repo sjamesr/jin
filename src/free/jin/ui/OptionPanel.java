@@ -351,6 +351,7 @@ public class OptionPanel extends DialogPanel{
    * Returns the {@link #CANCEL} option.
    */
   
+  @Override
   protected Object getCancelResult(){
     return CANCEL;
   }

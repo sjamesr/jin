@@ -339,7 +339,7 @@ public class Jin{
    */
    
   public Server [] getServers(){
-    return (Server [])context.getServers().clone();
+    return context.getServers().clone();
   }
 
 
@@ -350,7 +350,7 @@ public class Jin{
    */
    
   public ActionInfo [] getActions(Server server){
-    return (ActionInfo [])context.getActions(server).clone();
+    return context.getActions(server).clone();
   }
   
   
@@ -361,7 +361,7 @@ public class Jin{
    */
 
   public PluginInfo [] getPlugins(Server server){
-    return (PluginInfo [])context.getPlugins(server).clone();
+    return context.getPlugins(server).clone();
   }
   
   

@@ -116,6 +116,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * and registers all the listeners.
    */
 
+  @Override
   public void start(){
     init();
     loadSounds();
@@ -129,6 +130,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Undoes what the <code>start()</code> method does.
    */
 
+  @Override
   public void stop(){
     unregisterListeners();
     unloadSounds();
@@ -140,6 +142,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Returns a boolean model specifying whether sound is on.
    */
   
+  @Override
   public Model [] getHotPrefs(){
     return new Model[]{soundState};
   }
@@ -166,6 +169,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * is called from the start method of the plugin.
    */
 
+  @Override
   public void saveState(){
     getPrefs().setBool("on", soundState.isOn());
   }
@@ -320,6 +324,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Listens to ChatEvents and makes appropriate sounds.
    */
 
+  @Override
   public void chatMessageReceived(ChatEvent evt){
     if (!isOn())
       return;
@@ -350,6 +355,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Listens to PlainTextEvents and makes appropriate sounds.
    */
 
+  @Override
   public void plainTextReceived(PlainTextEvent evt){
     if (!isOn())
       return;
@@ -412,6 +418,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnConnect" event.
    */
 
+  @Override
   public void connectionEstablished(Connection conn){
     playEventSound("OnConnect");
   }
@@ -423,6 +430,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnLogin" event.
    */
 
+  @Override
   public void loginSucceeded(Connection conn){
     playEventSound("OnLogin");
   }
@@ -433,6 +441,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "OnDisconnect" event.
    */
 
+  @Override
   public void connectionLost(Connection conn){
     playEventSound("OnDisconnect");
   }
@@ -440,8 +449,11 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
 
   
   // The rest of ConnectionListener's methods.
+  @Override
   public void connectingFailed(Connection conn, String reason){}
+  @Override
   public void connectionAttempted(Connection conn, String hostname, int port){}
+  @Override
   public void loginFailed(Connection conn, String reason){}
 
 
@@ -450,6 +462,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "GameStart" event.
    */
 
+  @Override
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
     if ((game.getGameType() == Game.MY_GAME) && game.isPlayed()){
@@ -465,6 +478,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * the sound mapped to the "GameEnd" event.
    */
   
+  @Override
   public void propertyChange(PropertyChangeEvent evt){
     Object src = evt.getSource();
     String propertyName = evt.getPropertyName();
@@ -484,6 +498,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "IllegalMove" event.
    */
 
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){
     playEventSound("IllegalMove");
   }
@@ -495,6 +510,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the sound mapped to the "GameEnd" event.
    */
 
+  @Override
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
     if ((game.getGameType()==Game.MY_GAME) && (game.isPlayed()))
@@ -508,6 +524,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Plays the "DrawOffer", "AbortOffer" or "AdjournOffer" sounds if needed.
    */
 
+  @Override
   public void offerUpdated(OfferEvent evt){
     if (evt.isOffered()){
       switch (evt.getOfferId()){
@@ -520,10 +537,15 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
   }
 
 
+  @Override
   public void moveMade(MoveMadeEvent evt){}
+  @Override
   public void positionChanged(PositionChangedEvent evt){}
+  @Override
   public void takebackOccurred(TakebackEvent evt){}
+  @Override
   public void clockAdjusted(ClockAdjustmentEvent evt){}
+  @Override
   public void boardFlipped(BoardFlipEvent evt){}
 
 
@@ -532,6 +554,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Invoked when a friend connects.
    */
 
+  @Override
   public void friendConnected(FriendsEvent evt){
     playEventSound("FriendConnected");
   }
@@ -542,14 +565,18 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Invoked when a friend disconnects.
    */
   
+  @Override
   public void friendDisconnected(FriendsEvent evt){
     playEventSound("FriendDisconnected");
   }
   
   
   
+  @Override
   public void friendAdded(FriendsEvent evt){}
+  @Override
   public void friendRemoved(FriendsEvent evt){}
+  @Override
   public void friendStateChanged(FriendsEvent evt){}
 
   
@@ -569,6 +596,7 @@ public class SoundManager extends Plugin implements PlainTextListener, ChatListe
    * Returns the string "sound".
    */
 
+  @Override
   public String getId(){
     return "sound";
   }

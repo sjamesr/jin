@@ -22,6 +22,8 @@
 package free.jin.ui;
 
 
+import java.awt.Component;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -53,11 +55,12 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
    * Adds the specified panel to the UI.
    */
   
+  @Override
   protected void addPanelToUi(PreferencesPanel panel, String name, String tooltip){
     panel.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createTitledBorder(name),
         BorderFactory.createEmptyBorder(0, 5, 5, 5)));
-    panel.setAlignmentY(JComponent.TOP_ALIGNMENT);
+    panel.setAlignmentY(Component.TOP_ALIGNMENT);
     add(panel);
   }
   
@@ -67,6 +70,7 @@ public class UiPrefsPanel extends CompositePreferencesPanel{
    * Returns <code>true</code>.
    */
   
+  @Override
   public boolean applyRequiresRestart(){
     return true;
   }

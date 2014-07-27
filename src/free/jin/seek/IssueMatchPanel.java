@@ -147,10 +147,12 @@ public class IssueMatchPanel extends JPanel{
     });
     
     moreLess.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         if (moreLess.isMore() && container.isVisible()){
           // Need to wait for all delayed layout to finish
           SwingUtilities.invokeLater(new Runnable(){
+            @Override
             public void run(){
               Container contentPane = container.getContentPane();
               if (!AWTUtilities.fitsInto(contentPane.getMinimumSize(), contentPane.getSize()))
@@ -163,12 +165,14 @@ public class IssueMatchPanel extends JPanel{
     
     issueMatch.setEnabled(isSelectionValid());
     opponent.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent e){
         issueMatch.setEnabled(isSelectionValid());
       }
     });
     
     issueMatch.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         IssueMatchPanel.this.conn.issue(getMatchOffer());
       }
@@ -183,6 +187,7 @@ public class IssueMatchPanel extends JPanel{
    * Returns <code>true</code>.
    */
   
+  @Override
   public boolean isFocusCycleRoot(){
     return true;
   }
@@ -358,18 +363,23 @@ public class IssueMatchPanel extends JPanel{
       onlineFriends = new LinkedList();
       
       conn.getFriendsListenerManager().addFriendsListener(new FriendsListener(){
+        @Override
         public void friendAdded(FriendsEvent evt){
           update(evt.getFriendsConnection());
         }
+        @Override
         public void friendConnected(FriendsEvent evt){
           update(evt.getFriendsConnection());
         }
+        @Override
         public void friendDisconnected(FriendsEvent evt){
           update(evt.getFriendsConnection());
         }
+        @Override
         public void friendRemoved(FriendsEvent evt){
           update(evt.getFriendsConnection());
         }
+        @Override
         public void friendStateChanged(FriendsEvent evt){
           update(evt.getFriendsConnection());
         }
@@ -397,6 +407,7 @@ public class IssueMatchPanel extends JPanel{
      * Returns the <code>index</code>th online friend.
      */
     
+    @Override
     public Object getElementAt(int index){
       return onlineFriends.get(index).toString();
     }
@@ -407,6 +418,7 @@ public class IssueMatchPanel extends JPanel{
      * Returns the number of friends online.
      */
     
+    @Override
     public int getSize(){
       return onlineFriends.size();
     }

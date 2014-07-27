@@ -57,6 +57,7 @@ public abstract class StrictPlainDocument extends PlainDocument{
    * check whether the change is accepted before applying the change.
    */
 
+  @Override
   public void insertString(int offs, String str, AttributeSet a) throws BadLocationException{
     String oldString = getText(0,getLength());
     String newString = new StringBuffer(oldString).insert(offs,str).toString();

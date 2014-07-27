@@ -305,6 +305,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
   private GameListener gameListener = new GameAdapter(){
     
     
+    @Override
     public void offerUpdated(OfferEvent evt){
       if (evt.getGame() != game)
         return;
@@ -326,6 +327,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
       super.offerUpdated(evt);
     }
     
+    @Override
     public void gameEnded(GameEndEvent evt){
       if (evt.getGame() != game)
         return;
@@ -732,6 +734,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * on the button that was pressed.
    */
   
+  @Override
   public void actionPerformed(ActionEvent evt){
     Object source = evt.getSource();
     
@@ -761,6 +764,7 @@ public class PlayedGameButtonPanel extends FixedJPanel implements ActionListener
    * Overrides getMaximumSize() to return the value of getPreferredSize().
    */
   
+  @Override
   public Dimension getMaximumSize(){
     return getPreferredSize();
   }

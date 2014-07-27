@@ -101,6 +101,7 @@ public class PreferredSizedPanel extends JPanel{
    * <code>getPreferredSize</code>.
    */
    
+  @Override
   public Dimension getMinimumSize(){
     return getPreferredSize();
   }
@@ -112,6 +113,7 @@ public class PreferredSizedPanel extends JPanel{
    * <code>getPreferredSize</code>.
    */
    
+  @Override
   public Dimension getMaximumSize(){
     return getPreferredSize();
   }

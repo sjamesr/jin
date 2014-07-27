@@ -85,6 +85,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * undefined, but it should throw no exceptions.
    */
 
+  @Override
   public boolean isShortCastling(Position pos, Square startingSquare,
       Square endingSquare, ChessPiece promotionTarget){
 
@@ -171,6 +172,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * an illegal move is undefined, but it should throw no exceptions.
    */
 
+  @Override
   public boolean isLongCastling(Position pos, Square startingSquare,
       Square endingSquare, ChessPiece promotionTarget){
 
@@ -261,6 +263,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * position. Short castling must be legal in the specified position.
    */
 
+  @Override
   public Move createShortCastling(Position pos){
     checkPosition(pos);
 
@@ -291,6 +294,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * position. Long castling must be legal in the specified position.
    */
 
+  @Override
   public Move createLongCastling(Position pos){
     checkPosition(pos);
 
@@ -338,6 +342,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * not FischerRandom.
    */
 
+  @Override
   public void init(Position pos){
     checkPosition(pos);
 
@@ -452,6 +457,7 @@ public class FischerRandom extends ChesslikeGenericVariant{
    * Makes the given ChessMove on the given position.
    */
 
+  @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier){
     checkPosition(pos);
 

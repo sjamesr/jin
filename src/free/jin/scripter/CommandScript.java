@@ -82,7 +82,7 @@ public class CommandScript extends Script{
     super(scripter, name, eventType, eventSubtypes);
 
     this.condition = condition;
-    this.commands = (String [])commands.clone();
+    this.commands = commands.clone();
 
     bsh = new Interpreter();
 
@@ -114,6 +114,7 @@ public class CommandScript extends Script{
    * Returns the string "commands".
    */
 
+  @Override
   public String getType(){
     return "commands";
   }
@@ -138,7 +139,7 @@ public class CommandScript extends Script{
    */
 
   public String [] getCommands(){
-    return (String [])(commands.clone());
+    return (commands.clone());
   }
 
 
@@ -152,6 +153,7 @@ public class CommandScript extends Script{
     // Sort by length and replace longer strings first.
     // Without this, something like $gameType will get recognized as ($game)Type
     Collections.sort(Arrays.asList(vars), new Comparator(){
+      @Override
       public int compare(Object v1, Object v2){
         Object [] var1 = (Object [])v1;
         Object [] var2 = (Object [])v2;
@@ -181,6 +183,7 @@ public class CommandScript extends Script{
    * Runs the script.
    */
 
+  @Override
   public void run(JinEvent evt, String eventSubtype, Object [][] vars){
     try{
       bsh.set("event", evt);
@@ -215,6 +218,7 @@ public class CommandScript extends Script{
    * Returns a copy of this Script.
    */
 
+  @Override
   public Script createCopy(){
     try{
       CommandScript script = new CommandScript(scripter, getName(), getEventType(),

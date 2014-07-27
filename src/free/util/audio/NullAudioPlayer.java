@@ -36,6 +36,7 @@ public class NullAudioPlayer implements AudioPlayer{
    * Always supported.
    */
   
+  @Override
   public boolean isSupported(){
     return true;
   }
@@ -46,6 +47,7 @@ public class NullAudioPlayer implements AudioPlayer{
    * Doesn't do anything. 
    */
   
+  @Override
   public void play(AudioClip clip){
     
   }

@@ -85,16 +85,17 @@ public class Shatranj extends NoCastlingVariant{
    * of the color of the promoted pawn. Otherwise returns <code>null</code>.
    */
   
+  @Override
   public Piece[] getPromotionTargets(Position pos, Square startingSquare, Square endingSquare){
     checkPosition(pos);
     
     ChessPiece movingPiece = (ChessPiece) pos.getPieceAt(startingSquare);
     
     if ((endingSquare.getRank() == 7) && (movingPiece == ChessPiece.WHITE_PAWN))
-      return (Piece[])WHITE_PROMOTION_TARGETS.clone();
+      return WHITE_PROMOTION_TARGETS.clone();
     
     if ((endingSquare.getRank() == 0) && (movingPiece == ChessPiece.BLACK_PAWN))
-      return (Piece[])BLACK_PROMOTION_TARGETS.clone();
+      return BLACK_PROMOTION_TARGETS.clone();
     
     return null;
   }
@@ -106,6 +107,7 @@ public class Shatranj extends NoCastlingVariant{
    * <code>false</code>.
    */
   
+  @Override
   public boolean isEnPassant(Position pos, Square startingSquare, Square endingSquare, ChessPiece promotionTarget){
     return false;
   }
@@ -139,6 +141,7 @@ public class Shatranj extends NoCastlingVariant{
    * Overrides to return the shatranj queen (fers) target squares.
    */
   
+  @Override
   protected Collection getQueenTargetSquares(Position pos, Square square){
     checkPosition(pos);
     
@@ -174,6 +177,7 @@ public class Shatranj extends NoCastlingVariant{
    * Overrides to return the shatranj bishop (elephant) target squares.
    */
   
+  @Override
   protected Collection getBishopTargetSquares(Position pos, Square square){
     checkPosition(pos);
     
@@ -216,6 +220,7 @@ public class Shatranj extends NoCastlingVariant{
    * Overrides to return the shatranj pawn target squares.
    */
   
+  @Override
   protected Collection getPawnTargetSquares(Position pos, Square square){
     checkPosition(pos);
     

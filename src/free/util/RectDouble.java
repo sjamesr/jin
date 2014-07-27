@@ -233,6 +233,7 @@ public final class RectDouble{
    * Returns whether this RectDouble is equal to the specified one.
    */
 
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof RectDouble))
       return false;
@@ -248,6 +249,7 @@ public final class RectDouble{
    * Returns the hash code for this <code>RectDouble</code>.
    */
 
+  @Override
   public int hashCode(){
     int res = 37;
     res = 17*res + Utilities.hashCode(x);
@@ -264,6 +266,7 @@ public final class RectDouble{
    * Returns a textual representation of this <code>RectDouble</code>.
    */
 
+  @Override
   public String toString(){
     return "[x=" + x + ", y=" + y + ", w=" + width + ", h=" + height + "]";
   }

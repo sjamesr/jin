@@ -140,6 +140,7 @@ public class AdvancedJDesktopPane extends JDesktopPane{
 
 
 
+  @Override
   public void paintComponent(Graphics g){
     super.paintComponent(g);
 

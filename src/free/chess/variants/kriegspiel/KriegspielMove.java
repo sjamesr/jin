@@ -109,6 +109,7 @@ public class KriegspielMove extends Move{
    * unknown.
    */
 
+  @Override
   public Square getStartingSquare(){
     return null;
   }
@@ -120,6 +121,7 @@ public class KriegspielMove extends Move{
    * the move is completely hidden.
    */
 
+  @Override
   public Square getEndingSquare(){
     if (isCompletelyHidden())
       return null;
@@ -134,6 +136,7 @@ public class KriegspielMove extends Move{
    * Returns a string representation of the move based on the move data.
    */
 
+  @Override
   public String getMoveString(){
     if (isCompletelyHidden())  
       return "?";

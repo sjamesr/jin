@@ -69,6 +69,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * Returns true if the class "sun.audio.AudioPlayer" can be loaded.
    */
 
+  @Override
   public boolean isSupported(){
     try{
       return Class.forName("sun.audio.AudioPlayer") != null;
@@ -90,6 +91,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * silently dropped.
    */
 
+  @Override
   public synchronized void play(AudioClip clip){
     if (clipQueue.size() == MAX_QUEUE_SIZE){
       System.err.println("Queue full, ignoring play request.");
@@ -112,6 +114,7 @@ public class SunAudioPlayer implements AudioPlayer, Runnable{
    * Plays the current <code>clipToPlay</code> when notified.
    */
 
+  @Override
   public void run(){
     try{
 //      int timeToWait = 0;

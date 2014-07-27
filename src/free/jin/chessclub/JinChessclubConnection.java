@@ -182,6 +182,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the encoding of the text for ICC, which is "ISO-8859-1".
    */
   
+  @Override
   public String getTextEncoding(){
     return "ISO-8859-1";
   }
@@ -203,6 +204,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the listener manager.
    */
 
+  @Override
   public ListenerManager getListenerManager(){
     return getChessclubListenerManager();
   }
@@ -213,6 +215,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends the specified command to the server.
    */
   
+  @Override
   public void sendCommand(String command){
     sendCommand(command, false, false, null);
   }
@@ -234,6 +237,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends a tagged command to the server.
    */
   
+  @Override
   public void sendTaggedCommand(String command, String tag){
     sendCommand(command, false, false, tag);
   }
@@ -244,6 +248,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires an "attempting" connection event and invokes {@link free.util.Connection#initiateConnect(String, int)}.
    */
   
+  @Override
   public void initiateConnectAndLogin(String hostname, int port){
     listenerManager.fireConnectionAttempted(this, hostname, port);
 
@@ -256,6 +261,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires an "established" connection event.
    */
   
+  @Override
   protected void handleConnected(){
     listenerManager.fireConnectionEstablished(this);
     
@@ -268,6 +274,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a "failed" connection event.
    */
   
+  @Override
   protected void handleConnectingFailed(IOException e){
     listenerManager.fireConnectingFailed(this, e.getMessage());
     
@@ -289,6 +296,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a "login succeeded" connection event and performs other on-login tasks.
    */
   
+  @Override
   protected void handleLoginSucceeded(){
     super.handleLoginSucceeded();
     
@@ -311,6 +319,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a "login failed" connection event.
    */
   
+  @Override
   protected void handleLoginFailed(String reason){
     listenerManager.fireLoginFailed(this, reason);
     
@@ -323,6 +332,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Fires a "connection lost" connection event.
    */
   
+  @Override
   protected void handleDisconnection(IOException e){
     listenerManager.fireConnectionLost(this);
     
@@ -411,6 +421,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Overrides {@link free.util.Connection#connectImpl(String, int)} to return a timestamping socket.
    */
 
+  @Override
   protected Socket connectImpl(String hostname, int port) throws IOException{
     Socket result = null;
     try{
@@ -554,6 +565,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns a list of support wild variants.
    */
    
+  @Override
   public WildVariant [] getSupportedVariants(){
     if (wildVariants == null){
       wildVariants = new WildVariant[]{
@@ -587,7 +599,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
       };
     }
     
-    return (WildVariant [])wildVariants.clone();
+    return wildVariants.clone();
   }
   
   
@@ -627,6 +639,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the user with which we are logged in.
    */
   
+  @Override
   public ServerUser getUser(){
     return userForName(getUsername());
   }
@@ -637,6 +650,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns a <code>ChessclubUser</code> with the specified name.
    */
   
+  @Override
   public ServerUser userForName(String name){
     return ChessclubUser.get(name);
   }
@@ -647,6 +661,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Processes a single line of plain text.
    */
 
+  @Override
   protected void processLine(String line, String clientTag){
     super.processLine(line, clientTag);
     listenerManager.firePlainTextEvent(new PlainTextEvent(this, clientTag, line));
@@ -661,6 +676,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * handling to the appropriate method.
    */
   
+  @Override
   public void datagramReceived(DatagramEvent evt){
     Datagram dg = evt.getDatagram();
     String clientTag = evt.getClientTag();
@@ -782,6 +798,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends a personal tell to the specified user.
    */
   
+  @Override
   public void sendPersonalTell(ServerUser user, String message, String tag){
     sendTaggedCommand("xtell " + user.getName() + "! " + message, tag);
   }
@@ -792,6 +809,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Does nothing, since nothing needs to be done.
    */
   
+  @Override
   public void joinPersonalChat(ServerUser user){
     
   }
@@ -802,6 +820,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Joins channel 1.
    */
   
+  @Override
   public void joinHelpForum(){
     sendCommand("+channel 1", true, true, null);
   }
@@ -812,6 +831,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Joins the specified chat forum.
    */
   
+  @Override
   public void joinChat(String type, Object forum){
     if ("shout".equals(type))
       sendCommand("set-quietly shout 1", true, true, null);
@@ -2390,6 +2410,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Starts a new, empty, examination game.
    */
   
+  @Override
   public void examineNewGame(){
     sendCommand("examine", true, true, null);
   }
@@ -2400,6 +2421,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Starts observing the specified player.
    */
   
+  @Override
   public void observeBoard(ServerUser user){
     sendCommand("observe " + user.getName(), true, true, null);
   }
@@ -2411,6 +2433,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * "unexamine" or "resign" command.
    */
 
+  @Override
   public void quitGame(Game game){
     Object id = game.getID();
     switch (game.getGameType()){
@@ -2435,6 +2458,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Makes the given move in the given game.
    */
 
+  @Override
   public void makeMove(Game game, Move move){
     String moveString = moveToString(game, move);
     if (userGamesCount > 1)
@@ -2517,6 +2541,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Game.MY_GAME.
    */
 
+  @Override
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2534,6 +2559,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2550,6 +2576,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns true.
    */
 
+  @Override
   public boolean isAbortSupported(){
     return true;
   }
@@ -2562,6 +2589,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2577,6 +2605,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns true.
    */
 
+  @Override
   public boolean isAdjournSupported(){
     return true;
   }
@@ -2588,6 +2617,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2603,6 +2633,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isTakebackSupported(){
     return true;
   }
@@ -2613,6 +2644,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends "takeback 1" to the server.
    */
    
+  @Override
   public void requestTakeback(Game game){
     checkGameMineAndPlayed(game);
     
@@ -2625,6 +2657,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isMultipleTakebackSupported(){
     return true;
   }
@@ -2635,6 +2668,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends "takeback plyCount" to the server.
    */
    
+  @Override
   public void requestTakeback(Game game, int plyCount){
     checkGameMineAndPlayed(game);
     
@@ -2653,6 +2687,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * goes to the beginning of the game.
    */
 
+  @Override
   public void goBackward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
@@ -2671,6 +2706,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * game, goes to the end of the game.
    */
 
+  @Override
   public void goForward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
@@ -2687,6 +2723,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Goes to the beginning of the given game.
    */
 
+  @Override
   public void goToBeginning(Game game){
     checkGameMineAndExamined(game);
 
@@ -2699,6 +2736,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Goes to the end of the given game.
    */
 
+  @Override
   public void goToEnd(Game game){
     checkGameMineAndExamined(game);
 
@@ -2711,6 +2749,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends the "help" command to the server. 
    */
    
+  @Override
   public void showServerHelp(){
     sendCommand("help", true, true, null);
   }
@@ -2721,6 +2760,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Sends the specified question string to channel 1.
    */
    
+  @Override
   public void sendHelpQuestion(String question, String tag){
     sendTaggedCommand("xtell 1 * " + question, tag);    
   }
@@ -2940,6 +2980,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns our listener manager, as a <code>FriendsListenerManager</code>.
    */
   
+  @Override
   public FriendsListenerManager getFriendsListenerManager(){
     return listenerManager;
   }
@@ -2950,6 +2991,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Adds the specified user to the list of friends.
    */
 
+  @Override
   public void addFriend(ServerUser user){
     sendCommand("+notify " + user.getName(), true, true, null);
   }
@@ -2960,6 +3002,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Removes the specified user from the list of friends.
    */
   
+  @Override
   public void removeFriend(ServerUser user){
     sendCommand("-notify " + user.getName(), true, true, null);
   }
@@ -2970,6 +3013,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the current set of friends.
    */
   
+  @Override
   public Collection getFriends(){
     return Collections.unmodifiableCollection(friends);
   }
@@ -2980,6 +3024,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the set of currently online friends.
    */
   
+  @Override
   public Collection getOnlineFriends(){
     return Collections.unmodifiableCollection(onlineFriendStates.keySet());
   }
@@ -2990,6 +3035,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns whether the specified user is a friend.
    */
   
+  @Override
   public boolean isFriend(ServerUser user){
     return friends.contains(user);
   }
@@ -3000,6 +3046,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns whether the specified user is a friend and is online.
    */
   
+  @Override
   public boolean isFriendOnline(ServerUser user){
     return onlineFriendStates.containsKey(user);
   }
@@ -3010,6 +3057,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the state of the friend.
    */
   
+  @Override
   public int getFriendState(ServerUser user){
     Integer state = (Integer)onlineFriendStates.get(user);
     
@@ -3328,6 +3376,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * unregister SeekListeners.
    */
 
+  @Override
   public SeekListenerManager getSeekListenerManager(){
     return getChessclubListenerManager();
   }
@@ -3455,6 +3504,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the current set of seeks.
    */
   
+  @Override
   public Collection getSeeks(){
     return Collections.unmodifiableCollection(seeks.values());
   }
@@ -3465,6 +3515,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Accepts the given seek.
    */
 
+  @Override
   public void accept(Seek seek){
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
@@ -3478,6 +3529,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Withdraws the specified seek, issued by the user.
    */
   
+  @Override
   public void withdraw(Seek seek){
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
@@ -3491,6 +3543,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Withdraws all seeks.
    */
   
+  @Override
   public void withdrawAllSeeks(){
     sendCommand("unseek", true, true, null);
   }
@@ -3501,6 +3554,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Issues the specified seek.
    */
    
+  @Override
   public void issue(UserSeek seek){
     int wildNumber = getWildNumber(seek.getVariant());
     if (wildNumber == -1)
@@ -3542,6 +3596,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * and unregister GameListListeners.
    */
 
+  @Override
   public GameListListenerManager getGameListListenerManager(){
     return getChessclubListenerManager();
   }
@@ -4038,6 +4093,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * register to receive match offer notifications.
    */
   
+  @Override
   public MatchOfferListenerManager getMatchOfferListenerManager(){
     return getChessclubListenerManager();
   }
@@ -4152,6 +4208,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Returns the set of pending match offers.
    */
   
+  @Override
   public Collection getMatchOffers(){
     return Collections.unmodifiableCollection(matchOffers.values());
   }
@@ -4162,6 +4219,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Accepts the specified match offer.
    */
   
+  @Override
   public void accept(MatchOffer offer){
     sendCommand("accept " + offer.getChallenger().getName(), true, true, null);
   }
@@ -4172,6 +4230,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Declines the specified match offer.
    */
   
+  @Override
   public void decline(MatchOffer offer){
     sendCommand("decline " + offer.getChallenger().getName(), true, true, null);
   }
@@ -4182,6 +4241,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Issues the specified match offer.
    */
   
+  @Override
   public void issue(UserMatchOffer offer){
     int wildNumber = getWildNumber(offer.getVariant());
     if (wildNumber == -1)
@@ -4207,6 +4267,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Withdraws the specified match offer, made by the user.
    */
   
+  @Override
   public void withdraw(MatchOffer matchOffer){
     if (!matchOffer.getChallenger().equals(getUser()))
       throw new IllegalArgumentException("The specified match offer was not issued by the user");
@@ -4220,6 +4281,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Withdraws all match offers.
    */
   
+  @Override
   public void withdrawAllMatchOffers(){
     // TODO: fixme ("match" also withdraws all your seeks and withdraws from any pools)
     sendCommand("match", true, true, null);
@@ -4231,6 +4293,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * Adds the specified player to our noplay list.
    */
   
+  @Override
   public void preventMatching(ServerUser user){
     sendCommand("+noplay " + user.getName(), true, true, null);
   }
@@ -4248,6 +4311,7 @@ public class JinChessclubConnection extends ChessclubConnection implements Datag
    * @see SwingUtilities.invokeLater(Runnable)
    */
 
+  @Override
   public void execRunnable(Runnable runnable){
     SwingUtilities.invokeLater(runnable);
   }

@@ -39,6 +39,7 @@ public class AppKiller extends WindowAdapter{
    * Calls <code>System.exit(0)</code>.
    */
 
+  @Override
   public void windowClosing(WindowEvent evt){
     System.exit(0);
   }

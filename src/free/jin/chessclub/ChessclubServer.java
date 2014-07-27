@@ -40,6 +40,7 @@ public class ChessclubServer extends AbstractServer{
    * Creates and teturns the username policy.
    */
 
+  @Override
   protected UsernamePolicy createUsernamePolicy(){
     return new UsernamePolicy(){
       
@@ -51,10 +52,12 @@ public class ChessclubServer extends AbstractServer{
         return (c >= 48) && (c <= 57);
       }
 
+      @Override
       public boolean isSame(String username1, String username2){
         return username1.equalsIgnoreCase(username2);
       }
 
+      @Override
       public String invalidityReason(String username){
         int usernameLength = username.length();
         if ((usernameLength < 2) || (usernameLength > 15))
@@ -86,6 +89,7 @@ public class ChessclubServer extends AbstractServer{
         return null;
       }
 
+      @Override
       public String getGuestUsername(){
         return "guest";
       }
@@ -99,6 +103,7 @@ public class ChessclubServer extends AbstractServer{
    * Creates and returns a new <code>JinChessclubConnection</code>.
    */
 
+  @Override
   public Connection createConnection(ConnectionDetails connDetails){
     return new JinChessclubConnection(connDetails.getUsername(), connDetails.getPassword());
   }

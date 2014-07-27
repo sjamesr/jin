@@ -21,6 +21,7 @@
 
 package free.jin.board.prefs;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -132,11 +133,11 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("squareCoordsPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    none.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    rim.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    outside.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    everySquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    coordsColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    none.setAlignmentX(Component.LEFT_ALIGNMENT);
+    rim.setAlignmentX(Component.LEFT_ALIGNMENT);
+    outside.setAlignmentX(Component.LEFT_ALIGNMENT);
+    everySquare.setAlignmentX(Component.LEFT_ALIGNMENT);
+    coordsColor.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     contentPanel.add(none);
     contentPanel.add(rim);
@@ -145,11 +146,12 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     contentPanel.add(coordsColor);
     contentPanel.add(Box.createVerticalGlue());
     
-    contentPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     add(contentPanel);
     
     ActionListener styleListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         SquareCoordinatesPanel.this.previewBoard.setCoordsDisplayStyle(getCoordsDisplayStyle());
         
@@ -162,6 +164,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
     everySquare.addActionListener(styleListener);
     
     coordsColor.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         SquareCoordinatesPanel.this.previewBoard.setCoordsDisplayColor(coordsColor.getColor());
         
@@ -195,6 +198,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
    * Sets the initial properties of the preview board.
    */
    
+  @Override
   public void initPreviewBoard(){
     previewBoard.setCoordsDisplayStyle(getCoordsDisplayStyle());
     previewBoard.setCoordsDisplayColor(coordsColor.getColor());
@@ -206,6 +210,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel{
    * Applies any changes made by the user.
    */
    
+  @Override
   public void applyChanges() throws BadChangesException{
     boardManager.setCoordsDisplayStyle(getCoordsDisplayStyle());
     boardManager.setCoordsDisplayColor(coordsColor.getColor());

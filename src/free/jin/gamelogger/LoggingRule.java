@@ -177,6 +177,7 @@ class LoggingRule{
    * Returns the name of this logging rule.
    */
 
+  @Override
   public String toString(){
     return getName();
   }

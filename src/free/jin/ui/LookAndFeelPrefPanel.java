@@ -34,6 +34,7 @@ import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -78,6 +79,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     installExtraLookAndFeels();
     
     Set installedLnfs = new TreeSet(new Comparator(){
+      @Override
       public int compare(Object arg0, Object arg1){
         UIManager.LookAndFeelInfo lnf1 = (UIManager.LookAndFeelInfo)arg0;
         UIManager.LookAndFeelInfo lnf2 = (UIManager.LookAndFeelInfo)arg1;
@@ -158,14 +160,15 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
     lookAndFeels.setVisibleRowCount(Math.max(5, Math.min(lookAndFeels.getModel().getSize(), 10)));
 
     JScrollPane scrollPane = new JScrollPane(lookAndFeels);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     setLayout(new BorderLayout());
     add(scrollPane, BorderLayout.CENTER);
     add(Box.createHorizontalStrut(150), BorderLayout.SOUTH);
     
     lookAndFeels.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         fireStateChanged();
       }
@@ -179,6 +182,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
    * specified in the constructor.
    */
    
+  @Override
   public void applyChanges() throws BadChangesException{
     LnF lnf = (LnF)lookAndFeels.getSelectedValue();
     if (lnf == null){
@@ -233,6 +237,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel{
      * Returns the name of the Look and Feel.
      */
      
+    @Override
     public String toString(){
       return name;
     }

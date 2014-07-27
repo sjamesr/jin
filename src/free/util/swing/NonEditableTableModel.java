@@ -111,6 +111,7 @@ public class NonEditableTableModel extends DefaultTableModel{
    * Returns false regardless of the parameters passed.
    */
 
+  @Override
   public boolean isCellEditable(int row, int column){
     return false;
   }

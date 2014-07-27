@@ -92,6 +92,7 @@ public class Atomic extends ChesslikeGenericVariant{
    * <code>ChessMove</code>.
    */
 
+  @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier){
     checkPosition(pos); 
 

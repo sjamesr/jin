@@ -395,6 +395,7 @@ public class Session{
      * Tries to connect on the next port, or, if all ports have been tried, notifies the ConnectionManager.
      */
     
+    @Override
     public void connectingFailed(Connection conn, String reason){
       errorMessages[portIndex] = reason;
       if (portIndex == ports.length - 1){ // All ports failed
@@ -424,6 +425,7 @@ public class Session{
      * Notifies the connection manager that login failed.
      */
 
+    @Override
     public void loginFailed(Connection conn, String reason){
       // Stop plugins
       for (int i = 0; i < plugins.length; i++)
@@ -438,6 +440,7 @@ public class Session{
      * Unregisters us as a connection listener, since connection succeeded.
      */
     
+    @Override
     public void loginSucceeded(Connection conn){
       conn.getListenerManager().removeConnectionListener(this);
     }
@@ -448,6 +451,7 @@ public class Session{
      * Sets the connection port in Session.
      */
     
+    @Override
     public void connectionEstablished(Connection conn){
       synchronized(Session.this){
         Session.this.port = ports[portIndex];
@@ -457,7 +461,9 @@ public class Session{
     
     
     // The rest of ConnectionListener's methods.
+    @Override
     public void connectionAttempted(Connection conn, String hostname, int port){}
+    @Override
     public void connectionLost(Connection conn){}
     
     

@@ -50,6 +50,7 @@ public abstract class IcsGeneralChatConsoleDesignation extends ChatConsoleDesign
     
     I18n i18n = I18n.get(IcsGeneralChatConsoleDesignation.class);
     addCommandType(new AbstractCommandType(i18n.getString("message.commandName")){
+      @Override
       protected void send(String userText){
         sendStandardChatMessage(userText);
       }
@@ -78,6 +79,7 @@ public abstract class IcsGeneralChatConsoleDesignation extends ChatConsoleDesign
    * Displays the specified message in the console in a standard chat format.
    */
   
+  @Override
   protected void appendChat(ChatEvent evt){
     if (isStandardChatMessage(evt)){
       String senderName = evt.getSender().getName();

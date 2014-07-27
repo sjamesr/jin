@@ -76,6 +76,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    * Adds the added <code>JInternalFrame</code> to the list of frames.
    */
 
+  @Override
   public void componentAdded(ContainerEvent evt){
     if (ignoreContainerEvents)
       return;
@@ -94,6 +95,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    * Removes the removed <code>JInternalFrame</code> from the list of frames.
    */
 
+  @Override
   public void componentRemoved(ContainerEvent evt){
     if (ignoreContainerEvents)
       return;
@@ -113,6 +115,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    * Moves the source frame to the top of the frame list.
    */
   
+  @Override
   public void internalFrameActivated(InternalFrameEvent e){
     JInternalFrame f = (JInternalFrame)e.getSource();
     
@@ -123,11 +126,17 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
   
   
   // InternalFrameListener implementation
+  @Override
   public void internalFrameClosed(InternalFrameEvent e){}
+  @Override
   public void internalFrameClosing(InternalFrameEvent e){} 
+  @Override
   public void internalFrameDeactivated(InternalFrameEvent e){} 
+  @Override
   public void internalFrameDeiconified(InternalFrameEvent e){} 
+  @Override
   public void internalFrameIconified(InternalFrameEvent e){}
+  @Override
   public void internalFrameOpened(InternalFrameEvent e){} 
 
  

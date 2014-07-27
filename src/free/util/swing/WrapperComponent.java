@@ -102,6 +102,7 @@ public abstract class WrapperComponent extends JComponent{
    * recursively.
    */
   
+  @Override
   public void setEnabled(boolean isEnabled){
     super.setEnabled(isEnabled);
     AWTUtilities.setContainerEnabled(this, isEnabled);

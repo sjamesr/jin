@@ -223,6 +223,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    */
   
   private final GameListener gameListener = new GameAdapter(){
+    @Override
     public void gameStarted(GameStartEvent evt){
       ConsoleManager.this.gameStarted(evt);
     }
@@ -234,6 +235,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Starts this plugin.
    */
 
+  @Override
   public void start(){
     createUI();
     loadState();
@@ -249,6 +251,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Stops the plugin.
    */
 
+  @Override
   public void stop(){
     unregisterConnListeners();
   }
@@ -454,6 +457,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     for (Iterator i = consoleContainers.values().iterator(); i.hasNext();){
       final PluginUIContainer container = (PluginUIContainer)i.next();
       container.addPluginUIListener(new PluginUIAdapter(){
+        @Override
         public void pluginUIActivated(PluginUIEvent evt){
           obtainFocus(container);
         }
@@ -472,14 +476,18 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
     tabbedPane.setAlwaysShowTabs(false);
     tabbedPane.setBorder(null);
     tabbedPane.getModel().addTabbedPaneListener(new TabbedPaneListener(){
+      @Override
       public void tabRemoved(TabbedPaneEvent evt){
         List consolesInContainer = (List)containerIdsToConsoleLists.get(container.getId());
         Console console = (Console)consolesInContainer.get(evt.getTabIndex());
         consolesInContainer.remove(evt.getTabIndex());
         consoles.remove(console);
       }
+      @Override
       public void tabAdded(TabbedPaneEvent evt){}
+      @Override
       public void tabSelected(TabbedPaneEvent evt){}
+      @Override
       public void tabDeselected(TabbedPaneEvent evt){}
     });
     
@@ -551,6 +559,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       consolesInContainer.add(console);
       
       designation.addPropertyChangeListener(new PropertyChangeListener(){
+        @Override
         public void propertyChange(PropertyChangeEvent evt){
           String propertyName = evt.getPropertyName();
           if ("name".equals(propertyName))
@@ -561,6 +570,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
       });
         
       console.addComponentListener(new ComponentAdapter(){
+        @Override
         public void componentShown(ComponentEvent e){
           Console console = (Console)e.getSource();
           console.obtainFocus();
@@ -847,6 +857,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Listens to plain text events and adds them to the consoles.
    */
 
+  @Override
   public void plainTextReceived(PlainTextEvent evt){
     eventForConsoleReceived(evt);
   }
@@ -857,6 +868,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Listens to ChatEvents and adds appropriate text to the console.
    */
 
+  @Override
   public void chatMessageReceived(ChatEvent evt){
     eventForConsoleReceived(evt);
   }
@@ -909,6 +921,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Sets the pause state of the console manager.
    */
    
+  @Override
   public void setPaused(boolean isPaused){
     this.isPaused = isPaused;
     
@@ -933,6 +946,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Returns whether the console manager is currently paused.
    */
    
+  @Override
   public boolean isPaused(){
     return isPaused;
   }
@@ -955,6 +969,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Gets called when a connection is attempted.
    */
 
+  @Override
   public void connectionAttempted(Connection conn, String hostname, int port){
     // We pass a String instead of an Integer for the port because an Integer is translated
     // according to the locale and then we get something like
@@ -974,6 +989,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Gets called when the connection to the server is established.
    */
 
+  @Override
   public void connectionEstablished(Connection conn){
     String message = getI18n().getString("connectedMessage");
     for (int i = 0; i < consoles.size(); i++){
@@ -988,6 +1004,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Gets called when the login procedure is done.
    */
 
+  @Override
   public void loginSucceeded(Connection conn){
     PluginUIContainer mainConsoleContainer = (PluginUIContainer)consoleContainers.get(MAIN_CONTAINER_ID);
     String title = getI18n().getFormattedString("mainConsole.title",
@@ -1007,6 +1024,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Gets called when the connection to the server is lost.
    */
 
+  @Override
   public void connectionLost(Connection conn){
     String message = getI18n().getString("disconnectedWarning");
     
@@ -1019,7 +1037,9 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
   
   
   // The rest of ConnectionListener's methods.
+  @Override
   public void connectingFailed(Connection conn, String reason){}
+  @Override
   public void loginFailed(Connection conn, String reason){}
   
   
@@ -1093,6 +1113,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Saves the current state into the user file.
    */
 
+  @Override
   public void saveState(){
     Preferences prefs = getPrefs();
     
@@ -1118,6 +1139,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
    */
 
+  @Override
   public String getId(){
     return PLUGIN_ID;
   }
@@ -1130,6 +1152,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * <pre>"preferences.show"</pre> property.
    */
 
+  @Override
   public boolean hasPreferencesUI(){
     return getPrefs().getBool("preferences.show", true);
   }
@@ -1141,6 +1164,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
    * Return a PreferencesPanel for changing the console manager's settings.
    */
 
+  @Override
   public abstract PreferencesPanel getPreferencesUI();
   
   
@@ -1157,6 +1181,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
      * Returns the string <code>"askhelpquestion"</code>.
      */
     
+    @Override
     public String getId(){
       return "askhelpquestion";
     }
@@ -1167,6 +1192,7 @@ public abstract class ConsoleManager extends Plugin implements PlainTextListener
      * Displays the help console and flashes the input field.
      */
     
+    @Override
     public void actionPerformed(ActionEvent e){
       activateHelpConsole(MAIN_CONTAINER_ID);
     }

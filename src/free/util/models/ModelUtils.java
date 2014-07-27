@@ -47,12 +47,14 @@ public class ModelUtils{
       throw new IllegalStateException("Mismatching model states");
     
     booleanModel.addListener(new BooleanListener(){
+      @Override
       public void modelChanged(UnmodifiableBooleanModel model){
         buttonModel.setSelected(model.isOn());
       }
     });
     
     buttonModel.addItemListener(new ItemListener(){
+      @Override
       public void itemStateChanged(ItemEvent evt){
         booleanModel.set(evt.getStateChange() == ItemEvent.SELECTED);
       }

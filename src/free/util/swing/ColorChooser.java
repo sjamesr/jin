@@ -157,6 +157,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
     color = initialColor;
     
     button.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Color newColor = JColorChooser.showDialog(SwingUtilities.windowForComponent(ColorChooser.this),
             LocalizationService.getForClass(ColorChooser.class).getString("dialogTitle"), color); //$NON-NLS-1$
@@ -172,6 +173,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * Sets the text of the label.
    */
   
+  @Override
   public void setText(String text){
     label.setText(text);
   }
@@ -192,6 +194,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * Sets the mnemonic.
    */
   
+  @Override
   public void setMnemonic(int mnemonic){
     label.setDisplayedMnemonic(mnemonic);
   }
@@ -202,6 +205,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * Sets the displayed mnemonic index.
    */
   
+  @Override
   public void setDisplayedMnemonicIndex(int mnemonicIndex){
     label.setDisplayedMnemonicIndex(mnemonicIndex);
   }
@@ -212,6 +216,7 @@ public class ColorChooser extends JComponent implements Mnemonicable{
    * Sets the enabled state of this color chooser.
    */
   
+  @Override
   public void setEnabled(boolean enabled){
     label.setEnabled(enabled);
     button.setEnabled(enabled);

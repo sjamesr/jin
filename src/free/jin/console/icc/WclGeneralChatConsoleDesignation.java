@@ -64,6 +64,7 @@ public class WclGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    * Returns whether the specified chat event is a channel 250 tell.
    */
 
+  @Override
   protected boolean isStandardChatMessage(ChatEvent evt){
     return "channel-tell".equals(evt.getType()) && LOBBY_ID.equals(evt.getForum());
   }
@@ -74,6 +75,7 @@ public class WclGeneralChatConsoleDesignation extends IcsGeneralChatConsoleDesig
    * Sends the specified text as a shout.
    */
   
+  @Override
   protected void sendStandardChatMessage(String userText){
     sendCommand("tell " + LOBBY_ID + " " + userText);
   }

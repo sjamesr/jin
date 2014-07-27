@@ -83,6 +83,7 @@ public class JinApplication implements JinContext{
 
   static{
     URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory(){
+      @Override
       public URLStreamHandler createURLStreamHandler(String protocol){
         if (protocol.equals("zip"))
           return new ZipURLStreamHandler();
@@ -318,6 +319,7 @@ public class JinApplication implements JinContext{
    * Returns the locale for this instance of Jin.
    */
   
+  @Override
   public Locale getLocale(){
     return locale;
   }
@@ -328,6 +330,7 @@ public class JinApplication implements JinContext{
    * Returns value of the specified commandline parameter passed to Jin. 
    */
    
+  @Override
   public String getParameter(String paramName){
     return params.getProperty(paramName);
   }
@@ -352,6 +355,7 @@ public class JinApplication implements JinContext{
    * Returns the application-wide user preferences.
    */
 
+  @Override
   public Preferences getPrefs(){
     return userPrefs;
   }
@@ -381,6 +385,7 @@ public class JinApplication implements JinContext{
    * Returns the application's customizing preferences.
    */
   
+  @Override
   public Preferences getCustomizingPrefs(){
     return customizingPrefs;
   }
@@ -521,6 +526,7 @@ public class JinApplication implements JinContext{
     List servers = new LinkedList();
     
     File [] protocolDirs = serversDir.listFiles(new FileFilter(){
+      @Override
       public boolean accept(File file){
         return file.isDirectory();
       }
@@ -532,6 +538,7 @@ public class JinApplication implements JinContext{
       ChildClassLoader protocolLoader = new ZipClassLoader(protocolFile, libsLoader);
       
       String [] jars = protocolDir.list(new ExtensionFilenameFilter(".jar"){
+        @Override
         public boolean accept(File dir, String filename){
           return super.accept(dir, filename) && !"protocol.jar".equals(filename);
         }
@@ -593,6 +600,7 @@ public class JinApplication implements JinContext{
    * Returns the list of supported servers.
    */
 
+  @Override
   public Server [] getServers(){
     return servers;
   }
@@ -709,6 +717,7 @@ public class JinApplication implements JinContext{
    * Returns the list of known users.
    */
    
+  @Override
   public User [] getUsers(){
     return users;
   }
@@ -720,6 +729,7 @@ public class JinApplication implements JinContext{
    * shutting down.
    */
    
+  @Override
   public void setUsers(User [] users){
     this.users = users; 
   }
@@ -988,6 +998,7 @@ public class JinApplication implements JinContext{
    * Returns the list of actions for the specified server.
    */
    
+  @Override
   public ActionInfo [] getActions(Server server){
     return (ActionInfo [])serversToActions.get(server);
   }
@@ -1117,6 +1128,7 @@ public class JinApplication implements JinContext{
    * Returns the list of plugins for the specified server.
    */
 
+  @Override
   public PluginInfo [] getPlugins(Server server){
     return (PluginInfo [])serversToPlugins.get(server);
   }
@@ -1151,6 +1163,7 @@ public class JinApplication implements JinContext{
    * See {@link JinContext#getResources(String, Plugin)} for more information.
    */
    
+  @Override
   public Map getResources(String resType, Plugin plugin){
     Map resourceMap = new HashMap();
     
@@ -1203,6 +1216,7 @@ public class JinApplication implements JinContext{
    * Returns the resource with the specified type and id.
    */
    
+  @Override
   public Resource getResource(String type, String id, Plugin plugin){
     String serverId = plugin.getServer().getId();
 
@@ -1271,6 +1285,7 @@ public class JinApplication implements JinContext{
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isSavePrefsCapable(){
     return true;
   }
@@ -1282,6 +1297,7 @@ public class JinApplication implements JinContext{
    * confirm it.
    */
    
+  @Override
   public String getPasswordSaveWarning(){
     return l10n.getString("passwordSaveWarning");
   }
@@ -1292,6 +1308,7 @@ public class JinApplication implements JinContext{
    * Returns <code>true</code>. 
    */
   
+  @Override
   public boolean isUserExtensible(){
     return true;
   }
@@ -1303,6 +1320,7 @@ public class JinApplication implements JinContext{
    * Stores all preferences and calls <code>System.exit(0)</code>.
    */
 
+  @Override
   public void shutdown(){
     storeUserPrefs();
     storeUsers();   

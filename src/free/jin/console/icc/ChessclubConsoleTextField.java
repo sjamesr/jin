@@ -52,6 +52,7 @@ public class ChessclubConsoleTextField extends ConsoleTextField{
    * and puts the caret at the end of the text.
    */
 
+  @Override
   protected void setTellPersonState(ServerUser user){
     String text = "tell " + user.getName() + "! ";
     setText(text);

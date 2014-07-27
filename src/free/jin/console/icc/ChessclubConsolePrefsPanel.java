@@ -52,6 +52,7 @@ public class ChessclubConsolePrefsPanel extends ConsolePrefsPanel{
    * <code>TextPrefsPanel</code>.
    */
   
+  @Override
   protected TextPrefsPanel createTextPrefsPanel(ConsoleManager cm){
     return new ChannelTextPrefsPanel(cm);
   }
@@ -62,6 +63,7 @@ public class ChessclubConsolePrefsPanel extends ConsolePrefsPanel{
    * Creates an ICC-specific custom consoles prefs panel.
    */
   
+  @Override
   protected CustomConsolesPrefsPanel createCustomConsolesPrefsPanel(ConsoleManager cm){
      return new ChessclubCustomConsolesPrefsPanel(cm);
   }

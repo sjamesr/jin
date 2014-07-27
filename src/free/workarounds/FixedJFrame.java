@@ -55,6 +55,7 @@ public class FixedJFrame extends JFrame{
    * <code>show()</code>.
    */
   
+  @Override
   public void reshape(int x, int y, int width, int height){
     super.reshape(x, y, width, height);
     expectedBounds = new Rectangle(x, y, width, height);
@@ -66,6 +67,7 @@ public class FixedJFrame extends JFrame{
    * Works around bug 4424690 by resetting the frame's bounds after showing it.
    */
   
+  @Override
   public void show(){
     if (isVisible()){
       super.show();

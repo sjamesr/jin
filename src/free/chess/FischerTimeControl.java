@@ -76,6 +76,7 @@ public final class FischerTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public int getInitialTime(Player player){
     return getInitial();
   }
@@ -106,6 +107,7 @@ public final class FischerTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public String getLocalizedShortDescription(){
     return getDescription("shortDescription");
   }
@@ -116,6 +118,7 @@ public final class FischerTimeControl extends TimeControl{
    * {@inheritDoc}
    */
   
+  @Override
   public String getLocalizedMediumDescription(){
     return getDescription("mediumDescription");
   }
@@ -126,6 +129,7 @@ public final class FischerTimeControl extends TimeControl{
    * {@inheritDoc} 
    */
   
+  @Override
   public String getLocalizedLongDescription(){
     return getDescription("longDescription");
   }
@@ -152,6 +156,7 @@ public final class FischerTimeControl extends TimeControl{
    * Returns whether the specified object equals to this one.
    */
   
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof FischerTimeControl) || (o == null))
       return false;
@@ -166,6 +171,7 @@ public final class FischerTimeControl extends TimeControl{
    * Returns the hash code for this object.
    */
   
+  @Override
   public int hashCode(){
     return initial^increment;
   }

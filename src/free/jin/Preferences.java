@@ -821,30 +821,35 @@ public abstract class Preferences{
 
     // Preferences implementation follows
 
+    @Override
     public void set(String prefName, Object prefValue){
       props.setProperty(prefName, prefValue);
     }
 
 
 
+    @Override
     public Object get(String prefName, Object defaultValue){
       return props.getProperty(prefName, defaultValue);
     }
 
 
 
+    @Override
     public void addChangeListener(PropertyChangeListener listener){
       props.addPropertyChangeListener(listener);
     }
 
 
 
+    @Override
     public void removeChangeListener(PropertyChangeListener listener){
       props.removePropertyChangeListener(listener);
     }
 
 
 
+    @Override
     public Enumeration getPreferenceNames(){
       return props.getPropertyNames();
     }
@@ -922,6 +927,7 @@ public abstract class Preferences{
      * Forwards the event to our own listeners, if necessary.
      */
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt){
       String propertyName = evt.getPropertyName();
       if (!propertyName.startsWith(prefix)) // Not one of ours
@@ -945,18 +951,21 @@ public abstract class Preferences{
 
      // Preferences implementation follows
 
+    @Override
     public void set(String prefName, Object prefValue){
       delegate.set(prefix(prefName), prefValue);
     }
 
 
 
+    @Override
     public Object get(String prefName, Object defaultValue){
       return delegate.get(prefix(prefName), defaultValue);
     }
 
 
 
+    @Override
     public void addChangeListener(PropertyChangeListener listener){
       if (listenerList.getListenerCount(PropertyChangeListener.class) == 0)
         delegate.addChangeListener(this);
@@ -966,6 +975,7 @@ public abstract class Preferences{
 
 
 
+    @Override
     public void removeChangeListener(PropertyChangeListener listener){
       listenerList.remove(PropertyChangeListener.class, listener);
 
@@ -975,14 +985,17 @@ public abstract class Preferences{
 
 
 
+    @Override
     public Enumeration getPreferenceNames(){
       Enumeration filtering = new FilteringEnumeration(delegate.getPreferenceNames()){
+        @Override
         public boolean accept(Object preferenceName){
           return ((String)preferenceName).startsWith(prefix);
         }
       };
 
       return new MappingEnumeration(filtering){
+        @Override
         public Object map(Object o){
           String s = (String)o;
           return s.substring(prefix.length());
@@ -1048,6 +1061,7 @@ public abstract class Preferences{
      * Forwards the event to our own listeners, if necessary.
      */
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt){
       Object source = evt.getSource();
       String propertyName = evt.getPropertyName();
@@ -1076,6 +1090,7 @@ public abstract class Preferences{
 
      // Preferences implementation follows
 
+    @Override
     public void set(String prefName, Object prefValue){
       if (Utilities.areEqual(prefValue, get(prefName, null)))
         return;
@@ -1085,18 +1100,21 @@ public abstract class Preferences{
 
 
 
+    @Override
     public Object get(String prefName, Object defaultValue){
       return mainDelegate.get(prefName, defaultDelegate.get(prefName, defaultValue));
     }
     
     
     
+    @Override
     public Object lookup(String pref, Object defaultValue){
       return mainDelegate.lookup(pref, defaultDelegate.lookup(pref, defaultValue));
     }
 
 
 
+    @Override
     public void addChangeListener(PropertyChangeListener listener){
       if (listenerList.getListenerCount(PropertyChangeListener.class) == 0){
         mainDelegate.addChangeListener(this);
@@ -1108,6 +1126,7 @@ public abstract class Preferences{
 
 
 
+    @Override
     public void removeChangeListener(PropertyChangeListener listener){
       listenerList.remove(PropertyChangeListener.class, listener);
 
@@ -1119,6 +1138,7 @@ public abstract class Preferences{
 
 
 
+    @Override
     public Enumeration getPreferenceNames(){
       Hashtable prefNamesSet = new Hashtable();
 
@@ -1139,6 +1159,7 @@ public abstract class Preferences{
     
     
     
+    @Override
     public Enumeration getStoredPreferenceNames(){
       return mainDelegate.getPreferenceNames();
     }

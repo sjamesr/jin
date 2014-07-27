@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -86,6 +87,7 @@ class CommandsScriptDialog extends ScriptDialog{
    * Creates the user interface for this dialog.
    */
 
+  @Override
   protected Container createScriptTypeSpecificUI(){
     I18n i18n = I18n.get(CommandsScriptDialog.class);
     
@@ -103,8 +105,8 @@ class CommandsScriptDialog extends ScriptDialog{
       commandsArea.append(defaultCommands[i]+"\n");
 
     JScrollPane commandsScrollPane = new JScrollPane(commandsArea);
-    commandsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    commandsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    commandsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    commandsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     JLabel conditionLabel = i18n.createLabel("conditionLabel");
     JLabel commandsLabel = i18n.createLabel("commandsLabel");
@@ -118,6 +120,7 @@ class CommandsScriptDialog extends ScriptDialog{
     JButton commandsHelp = i18n.createButton("commandsHelpButton");
 
     conditionHelp.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
         i18n.showPlainTextDialog("conditionHelpDialog", CommandsScriptDialog.this);
@@ -125,6 +128,7 @@ class CommandsScriptDialog extends ScriptDialog{
     });
 
     commandsHelp.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
         i18n.showPlainTextDialog("commandsHelpDialog", CommandsScriptDialog.this);      }
@@ -154,6 +158,7 @@ class CommandsScriptDialog extends ScriptDialog{
    * Creates and returns a CommandScript from the user specified information.
    */
 
+  @Override
   protected Script createScriptOnOk(String scriptName, String eventType, String [] selectedSubtypes){
     String condition = conditionField.getText();
 

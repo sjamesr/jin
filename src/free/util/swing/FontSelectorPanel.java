@@ -35,6 +35,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -282,6 +283,7 @@ public class FontSelectorPanel extends JPanel{
     createUI(fontOptions);
     
     ListSelectionListener changeListener = new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         fireStateChanged();
       }
@@ -375,7 +377,7 @@ public class FontSelectorPanel extends JPanel{
     
     JLabel fontNameLabel = new JLabel();
     SwingUtils.applyLabelSpec(fontNameLabel, getL10n().getString("fontNameLabel.text")); //$NON-NLS-1$
-    fontNameLabel.setHorizontalAlignment(JLabel.CENTER);
+    fontNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
     
     fontNameLabel.setLabelFor(fontNamesList);
     fontNamePanel.add(fontNameLabel, BorderLayout.NORTH);
@@ -387,7 +389,7 @@ public class FontSelectorPanel extends JPanel{
     
     JLabel fontSizeLabel = new JLabel();
     SwingUtils.applyLabelSpec(fontSizeLabel, getL10n().getString("fontSizeLabel.text")); //$NON-NLS-1$
-    fontSizeLabel.setHorizontalAlignment(JLabel.CENTER);
+    fontSizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
     
     fontSizeLabel.setLabelFor(fontSizesList);
     fontSizePanel.add(fontSizeLabel, BorderLayout.NORTH);
@@ -397,6 +399,7 @@ public class FontSelectorPanel extends JPanel{
     topPanel.add(fontSizePanel, BorderLayout.EAST);
 
     ChangeListener checkBoxChangeListener = new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         AbstractButton checkbox = (AbstractButton)evt.getSource();
         String id = checkbox.getActionCommand();
@@ -585,7 +588,7 @@ public class FontSelectorPanel extends JPanel{
      */
 
     public DefaultPreviewPanel(FontSelectorPanel fontSelectorPanel){
-      super(getL10n().getString("previewText"), JLabel.CENTER); //$NON-NLS-1$
+      super(getL10n().getString("previewText"), SwingConstants.CENTER); //$NON-NLS-1$
 
       this.fontSelectorPanel = fontSelectorPanel;
 
@@ -601,6 +604,7 @@ public class FontSelectorPanel extends JPanel{
      * ChangeListener implementation.
      */
 
+    @Override
     public void stateChanged(ChangeEvent evt){
       setFont(fontSelectorPanel.getSelectedFont());
       repaint();
@@ -612,6 +616,7 @@ public class FontSelectorPanel extends JPanel{
      * Returns the preferred size of this preview panel.
      */
      
+    @Override
     public Dimension getPreferredSize(){
       Dimension prefSize = super.getPreferredSize();
       prefSize.height += 20;

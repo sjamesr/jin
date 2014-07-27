@@ -79,6 +79,7 @@ public class HelpMenu extends JMenu{
   private JMenuItem createCreditsMenuItem(){
     JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("creditsMenuItem");
     item.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         new LicensePanel().display();
       }
@@ -127,6 +128,7 @@ public class HelpMenu extends JMenu{
   private JMenuItem createAboutMenuItem(){
     JMenuItem item = I18n.get(HelpMenu.class).createMenuItem("aboutMenuItem", new Object[]{Jin.getAppName()});
     item.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         new AboutPanel().display();
       }

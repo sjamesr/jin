@@ -126,6 +126,7 @@ public class LicensePanel extends DialogPanel{
    * focus.
    */
 
+  @Override
   public void paint(Graphics g){
     super.paint(g);
 
@@ -151,6 +152,7 @@ public class LicensePanel extends DialogPanel{
    * Returns the title of this <code>DialogPanel</code>.
    */
 
+  @Override
   protected String getTitle(){
     return I18n.get(LicensePanel.class).getFormattedString("title", new Object[]{Jin.getAppName()});
   }
@@ -165,6 +167,7 @@ public class LicensePanel extends DialogPanel{
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     ActionListener gplActionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (gplText == null){
           try{
@@ -183,6 +186,7 @@ public class LicensePanel extends DialogPanel{
     };
 
     ActionListener lgplActionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (lgplText == null){
           try{
@@ -203,6 +207,7 @@ public class LicensePanel extends DialogPanel{
     
     
     ActionListener ccsa25ActionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (ccsa25Text == null){
           try{
@@ -222,6 +227,7 @@ public class LicensePanel extends DialogPanel{
 
     
     ActionListener jgoodiesActionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (jgoodiesCopyrightText == null){
           try{
@@ -241,6 +247,7 @@ public class LicensePanel extends DialogPanel{
     
 
     ActionListener beanshellActionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (beanshellCopyrightText == null){
           try{

@@ -54,6 +54,7 @@ public class FreechessHelpConsoleDesignation extends HelpConsoleDesignation{
    * Returns whether the specified event is a help channel tell.
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (isTaggedByUs(evt))
       return true;

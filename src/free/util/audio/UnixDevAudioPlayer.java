@@ -45,6 +45,7 @@ public class UnixDevAudioPlayer implements AudioPlayer{
    * Returns true if the file "/dev/audio" exists.
    */
 
+  @Override
   public boolean isSupported(){
     return new File("/dev/audio").exists();
   }
@@ -57,6 +58,7 @@ public class UnixDevAudioPlayer implements AudioPlayer{
    * IOException if unsuccessful.
    */
 
+  @Override
   public void play(AudioClip clip) throws IOException{
     OutputStream out = null;
     try{

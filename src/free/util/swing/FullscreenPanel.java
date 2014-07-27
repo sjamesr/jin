@@ -148,6 +148,7 @@ public class FullscreenPanel extends FixedJPanel{
     
     fullscreenModeModel = new BooleanModel(false);
     fullscreenModeModel.addListener(new BooleanListener(){
+      @Override
       public void modelChanged(UnmodifiableBooleanModel model){
         setFullscreen(model.isOn());
       }
@@ -166,14 +167,15 @@ public class FullscreenPanel extends FixedJPanel{
     Localization l10n = LocalizationService.getForClass(FullscreenPanel.class);
     JButton restore = new JButton(l10n.getString("restoreNormalModeButton.text")); //$NON-NLS-1$
     restore.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         getFullscreenModeModel().setOff();
       }
     });
-    restore.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    restore.setAlignmentX(Component.CENTER_ALIGNMENT);
     
     JLabel label = new JLabel(l10n.getString("fullscreenInfoLabel.text")); //$NON-NLS-1$
-    label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+    label.setAlignmentX(Component.CENTER_ALIGNMENT);
     
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -193,6 +195,7 @@ public class FullscreenPanel extends FixedJPanel{
    * Overrides the superclass method to disallow adding any components.
    */
 
+  @Override
   public void add(Component comp, Object constraints, int index){
     if (beingModified)
       super.add(comp, constraints, index);
@@ -206,6 +209,7 @@ public class FullscreenPanel extends FixedJPanel{
    * Overrides the superclass method to disallow removing any components.
    */
 
+  @Override
   public void remove(int index){
     if (beingModified)
       super.remove(index);

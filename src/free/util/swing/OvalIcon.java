@@ -50,6 +50,7 @@ public class OvalIcon extends ColoredIcon{
    * Fills the rectangle.
    */
 
+  @Override
   public void paintShape(Component component, Graphics g, int x, int y){
     g.fillOval(x, y, getIconWidth(), getIconHeight());
   }

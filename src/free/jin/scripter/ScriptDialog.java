@@ -40,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
 import free.jin.I18n;
@@ -171,14 +172,15 @@ abstract class ScriptDialog extends JDialog{
     subtypesHolderPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
     subtypesHolderPanel.add(subtypesPanel, BorderLayout.NORTH);
     JScrollPane subtypesScrollPane = new JScrollPane(subtypesHolderPanel);
-    subtypesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    subtypesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    subtypesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    subtypesScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     subtypesScrollPane.setPreferredSize(new Dimension(300, 115));
     
     if (templateScript != null)
       updateSubtypesPanel(subtypesPanel, defaultEventType, defaultSelectedSubtypes);
 
     eventTypeChoice.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         NamedWrapper selectedItem = (NamedWrapper)eventTypeChoice.getSelectedItem();
         String eventType = (String)selectedItem.getTarget();
@@ -204,6 +206,7 @@ abstract class ScriptDialog extends JDialog{
     eventSubtypesHelp.setDefaultCapable(false);
 
     eventTypeHelp.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(ScriptDialog.class);
         i18n.showPlainTextDialog("eventTypeHelpDialog", ScriptDialog.this);
@@ -211,6 +214,7 @@ abstract class ScriptDialog extends JDialog{
     });
 
     eventSubtypesHelp.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(ScriptDialog.class);
         i18n.showPlainTextDialog("eventSubtypesHelpDialog", ScriptDialog.this);
@@ -246,6 +250,7 @@ abstract class ScriptDialog extends JDialog{
     JButton cancelButton = i18n.createButton("scriptDialogCancelButton");
 
     okButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         String scriptName = scriptNameField.getText();
         NamedWrapper eventTypeSelectedItem = (NamedWrapper)eventTypeChoice.getSelectedItem();
@@ -286,6 +291,7 @@ abstract class ScriptDialog extends JDialog{
     });
 
     cancelButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         script = null;
         dispose();

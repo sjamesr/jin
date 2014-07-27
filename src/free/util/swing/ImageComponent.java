@@ -93,11 +93,13 @@ public class ImageComponent extends JComponent{
       private Point mouseLocationInPopup;
       
       private final Timer popupTimer = new Timer(ToolTipManager.sharedInstance().getInitialDelay(), new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent e){
           popup.show(ImageComponent.this, popupLocation.x, popupLocation.y);
         }
       });
       
+      @Override
       public void mouseEntered(MouseEvent e){
         if (!isPopupImage() || !isImageSizeKnown()) 
           return;
@@ -113,6 +115,7 @@ public class ImageComponent extends JComponent{
           popup.add(tip);
           
           ic.addMouseMotionListener(new MouseMotionAdapter(){
+            @Override
             public void mouseMoved(MouseEvent evt){
               if (!evt.getPoint().equals(mouseLocationInPopup))
                 popup.setVisible(false);
@@ -120,10 +123,12 @@ public class ImageComponent extends JComponent{
           });
           
           ic.addMouseListener(new MouseAdapter(){
+            @Override
             public void mouseEntered(MouseEvent evt){
               mouseLocationInPopup = new Point(evt.getPoint());
               popupUnderCursor = true;
             }
+            @Override
             public void mouseExited(MouseEvent evt){
               popup.setVisible(false);
             }
@@ -138,6 +143,7 @@ public class ImageComponent extends JComponent{
         popupTimer.start();
       }
       
+      @Override
       public void mouseExited(MouseEvent e){
         if (popupTimer.isRunning())
           popupTimer.stop();
@@ -146,6 +152,7 @@ public class ImageComponent extends JComponent{
           // wasn't because the popup showed underneath the cursor (in which
           // case we don't want to close it).
           SwingUtilities.invokeLater(new Runnable(){
+            @Override
             public void run(){
               if (!popupUnderCursor)
                 popup.setVisible(false);
@@ -235,6 +242,7 @@ public class ImageComponent extends JComponent{
    * Paints the component.
    */
   
+  @Override
   public void paintComponent(Graphics g){
     if (image == null)
       return;
@@ -264,6 +272,7 @@ public class ImageComponent extends JComponent{
    * Invoked when the image loading process retrieves more data.
    */
   
+  @Override
   public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height){
     revalidate();
     
@@ -276,6 +285,7 @@ public class ImageComponent extends JComponent{
    * Returns our preferred size.
    */
   
+  @Override
   public Dimension getPreferredSize(){
     if (!isImageSizeKnown())
       return new Dimension(0, 0);
@@ -326,6 +336,7 @@ public class ImageComponent extends JComponent{
    * Returns our minimum size.
    */
   
+  @Override
   public Dimension getMinimumSize(){
     return new Dimension(0, 0);
   }

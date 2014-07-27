@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -36,6 +37,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -90,6 +92,7 @@ public class ServerChoicePanel extends DialogPanel{
    * Returns the title for this panel.
    */
 
+  @Override
   protected String getTitle(){
     return I18n.get(ServerChoicePanel.class).getString("title");
   }
@@ -108,8 +111,8 @@ public class ServerChoicePanel extends DialogPanel{
     list.setVisibleRowCount(Math.max(5, Math.min(serverListModel.getSize(), 10)));
 
     JScrollPane scrollPane = new JScrollPane(list);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     JLabel chooseLabel = i18n.createLabel("chooseServerLabel");
     chooseLabel.setLabelFor(list);
@@ -127,6 +130,7 @@ public class ServerChoicePanel extends DialogPanel{
     buttonPanel.add(showWebsiteButton);
 
     list.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         int selectedIndex = list.getSelectedIndex();
         boolean enabled = (selectedIndex != -1);
@@ -136,14 +140,16 @@ public class ServerChoicePanel extends DialogPanel{
     });
 
     okButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         close(list.getSelectedValue());
       }
     });
 
     list.addMouseListener(new MouseAdapter(){
+      @Override
       public void mouseClicked(MouseEvent evt){
-        if ((evt.getClickCount() == 2) && (evt.getModifiers() == KeyEvent.BUTTON1_MASK)){
+        if ((evt.getClickCount() == 2) && (evt.getModifiers() == InputEvent.BUTTON1_MASK)){
           Object result = list.getSelectedValue();
           if (result != null)
             close(result);
@@ -152,12 +158,14 @@ public class ServerChoicePanel extends DialogPanel{
     });
 
     cancelButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         close(null);
       }
     });
 
     showWebsiteButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Server server = (Server)list.getSelectedValue();
         String url = server.getWebsite();

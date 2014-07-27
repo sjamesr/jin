@@ -93,6 +93,7 @@ public class IntegerStrictPlainDocument extends StrictPlainDocument{
    * parsed using the appropriate radix, returns false otherwise.
    */
 
+  @Override
   public boolean isChangeAccepted(String oldText, String newText){
     if (newText.length() == 0)
       return true;

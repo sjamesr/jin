@@ -67,6 +67,7 @@ public class AppletAudioPlayer implements AudioPlayer, Runnable{
    * Returns true if we're running under Java 1.2 or later.
    */
 
+  @Override
   public boolean isSupported(){
     return PlatformUtils.isJavaBetterThan("1.2");
   }
@@ -78,6 +79,7 @@ public class AppletAudioPlayer implements AudioPlayer, Runnable{
    * Plays the given AudioClip.
    */
 
+  @Override
   public void play(AudioClip clip){
     if (playerThread == null){
       playerThread = new Thread(this, "AppletAudioPlayer");
@@ -94,6 +96,7 @@ public class AppletAudioPlayer implements AudioPlayer, Runnable{
    * An infinite loop playing clips pushed to the clip queue.
    */
    
+  @Override
   public void run(){
     while (true){
       AudioClip audioClip;

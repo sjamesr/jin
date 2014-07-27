@@ -44,6 +44,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -88,6 +89,7 @@ public class SdiUiProvider extends AbstractUiProvider{
    * Simply invokes <code>start</code> on the <code>ConnectionManager</code>.
    */
 
+  @Override
   public void start(){
     super.start();
     
@@ -100,6 +102,7 @@ public class SdiUiProvider extends AbstractUiProvider{
    * Returns a new UIContainer for the specified plugin.
    */
 
+  @Override
   public PluginUIContainer createPluginUIContainer(Plugin plugin, String id, int mode){
     AbstractPluginUIContainer container = new FramePluginUIContainer(plugin, id, mode);
     
@@ -115,6 +118,7 @@ public class SdiUiProvider extends AbstractUiProvider{
    * {@link DialogPanel#show(JDialog)}.
    */
 
+  @Override
   public void showDialog(DialogPanel dialog, Component parent){
     Frame parentFrame = parent == null ? 
         null : AWTUtilities.frameForComponent(parent);
@@ -125,12 +129,14 @@ public class SdiUiProvider extends AbstractUiProvider{
       // Can't depend on the system to be consistent about open/close events
       private boolean isOpen = false;
 
+      @Override
       public void windowOpened(WindowEvent evt){
         if (!isOpen){
           isOpen = true;
           openDialogs.add(evt.getSource());
         }
       }
+      @Override
       public void windowClosed(WindowEvent evt){
         if (isOpen){
           isOpen = false;
@@ -148,6 +154,7 @@ public class SdiUiProvider extends AbstractUiProvider{
    * Returns whether any plugin containers or dialogs are visible.
    */
   
+  @Override
   public boolean isUiVisible(){
     Enumeration containers = getExistingPluginUIContainers();
     while (containers.hasMoreElements()){
@@ -171,6 +178,7 @@ public class SdiUiProvider extends AbstractUiProvider{
    * Nothing for us to do here. 
    */
 
+  @Override
   public void stop(){
 
   }
@@ -212,7 +220,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       
       this.frame = new FixedJFrame("");
       
-      frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       frame.addWindowListener(this);
       
       frame.setContentPane(new JPanel());
@@ -238,6 +246,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       
       JRootPane rootPane = frame.getRootPane();
       ActionListener closer = new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           close();
         }
@@ -253,6 +262,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Disposes of this plugin container.
      */
 
+    @Override
     public void disposeImpl(){
       setVisible(false);
       frame.dispose();
@@ -265,6 +275,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * one.   
      */
     
+    @Override
     public void setActive(boolean active){
       if (active){
         if (!isVisible())
@@ -281,6 +292,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Returns whether the frame of this plugin container is currently selected.
      */
   
+    @Override
     public boolean isActive(){
       return frame.isShowing() && (frame.getFocusOwner() != null);
     }
@@ -291,6 +303,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Sets the resizable state of this plugin container's frame.
      */
     
+    @Override
     public void setResizable(boolean resizable){
       frame.setResizable(resizable);
     }
@@ -302,6 +315,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * resizable.
      */
     
+    @Override
     public boolean isResizable(){
       return frame.isResizable();
     }
@@ -312,6 +326,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Resizes the frame to its preferred size.
      */
     
+    @Override
     public void pack(){
       setVisible(true);
       
@@ -330,6 +345,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Returns the content pane of the frame.
      */
   
+    @Override
     public JComponent getContentPane(){
       return (JComponent)frame.getContentPane();
     }
@@ -340,6 +356,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Sets the title of the frame.
      */
   
+    @Override
     public void setTitleImpl(String title){
       frame.setTitle(title);
     }
@@ -350,6 +367,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Sets the icon of the frame.
      */
   
+    @Override
     public void setIconImpl(Image image){
       frame.setIconImage(image);
     }
@@ -360,6 +378,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Adds the frame to the desktop and makes it visible.
      */
   
+    @Override
     public void setVisible(boolean isVisible){
       if (isVisible == isVisible())
         return;
@@ -376,6 +395,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Returns whether the frame is currently visible.
      */
   
+    @Override
     public boolean isVisible(){
       return frame.isVisible();
     }
@@ -414,6 +434,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * Saves the properties of this plugin container into user preferences.
      */
   
+    @Override
     protected void saveState(){
       String id = getId();
       if (id == null)
@@ -433,6 +454,7 @@ public class SdiUiProvider extends AbstractUiProvider{
      * properly.
      */
   
+    @Override
     protected void loadState(){
       String prefix = getPrefsPrefix();
       
@@ -487,21 +509,28 @@ public class SdiUiProvider extends AbstractUiProvider{
      * WindowListener implementation.
      */
   
+    @Override
     public void windowActivated(WindowEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ACTIVATED));
     }
+    @Override
     public void windowDeactivated(WindowEvent e){
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_DEACTIVATED));
     }
+    @Override
     public void windowClosing(WindowEvent e){
       close();
     }
     
     
     
+    @Override
     public void windowClosed(WindowEvent e){}
+    @Override
     public void windowDeiconified(WindowEvent e){}
+    @Override
     public void windowIconified(WindowEvent e){}
+    @Override
     public void windowOpened(WindowEvent e){}
 
     

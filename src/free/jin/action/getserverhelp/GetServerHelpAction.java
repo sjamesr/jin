@@ -38,6 +38,7 @@ public class GetServerHelpAction extends JinAction{
    * Returns the id of the action - "getserverhelp".
    */
    
+  @Override
   public String getId(){
     return "getserverhelp";
   }
@@ -48,6 +49,7 @@ public class GetServerHelpAction extends JinAction{
    * Causes the server specific help to be shown to the user.
    */
    
+  @Override
   public void actionPerformed(ActionEvent evt){
     getConn().showServerHelp();
   }

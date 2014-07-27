@@ -51,6 +51,7 @@ public class FreechessConsole extends Console{
    * Creates and returns a FreechessConsoleTextField.
    */
 
+  @Override
   protected ConsoleTextField createInputComponent(){
     return new FreechessConsoleTextField(this);
   }
@@ -63,6 +64,7 @@ public class FreechessConsole extends Console{
    * special <code>ConsoleTextPane</code> for FICS.
    */
 
+  @Override
   protected ConsoleTextPane createOutputComponent(){
     return new FreechessConsoleTextPane(this);
   }

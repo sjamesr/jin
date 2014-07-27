@@ -57,6 +57,7 @@ class PipedInputStream extends InputStream{
    * without blocking.
    */
 
+  @Override
   public int available(){
     return source.available();
   }
@@ -71,6 +72,7 @@ class PipedInputStream extends InputStream{
    * detected, or an exception is thrown. 
    */
 
+  @Override
   public int read() throws IOException{
     return source.read();
   }
@@ -84,6 +86,7 @@ class PipedInputStream extends InputStream{
    * a NullPointerException is thrown. 
    */
 
+  @Override
   public int read(byte [] buf, int offset, int length) throws IOException{
     return source.read(buf,offset,length);
   }
@@ -95,6 +98,7 @@ class PipedInputStream extends InputStream{
    * Closes this PipedInputStream.
    */
 
+  @Override
   public void close() throws IOException{
     source.closeReader();
   }

@@ -126,6 +126,7 @@ public class FixedJDialog extends JDialog{
    * Remembers the time the dialog is shown.
    */
   
+  @Override
   public void show(){
     lastShownTime = System.currentTimeMillis();
     
@@ -138,6 +139,7 @@ public class FixedJDialog extends JDialog{
    * Works around bug 5109571, if needed, by delaying hiding the dialog.   
    */
   
+  @Override
   public void hide(){
     if (WORKAROUND_5109571){
       long remainingTimeout = 100 - (System.currentTimeMillis() - lastShownTime); 

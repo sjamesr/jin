@@ -144,6 +144,7 @@ public class MultiButton extends JComponent{
    * (which is not known until we are made displayable).
    */
   
+  @Override
   public void addNotify(){
     super.addNotify();
     

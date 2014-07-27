@@ -58,6 +58,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
    * Initializes the menu, registering any needed listeners.
    */
   
+  @Override
   public void addNotify(){
     super.addNotify();
     
@@ -79,6 +80,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
    * Unregisters any listeners we've registered.
    */
   
+  @Override
   public void removeNotify(){
     super.removeNotify();
     
@@ -116,6 +118,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
    * listeners and updates the menu items accordingly.
    */
   
+  @Override
   public void sessionEstablished(SessionEvent evt){
     Session session = evt.getSession();
 
@@ -125,6 +128,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     updateActionMenuItems(actions);
   }
   
+  @Override
   public void sessionClosed(SessionEvent evt){
     Session session = evt.getSession();
     
@@ -134,7 +138,9 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     removeAll();
   }
   
+  @Override
   public void sessionStarting(SessionEvent evt){}
+  @Override
   public void sessionClosing(SessionEvent evt){}
   
   
@@ -146,14 +152,17 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
    * the list of actions
    */
   
+  @Override
   public void intervalAdded(ListDataEvent evt){
     updateActionMenuItems((ListModel)evt.getSource());
   }
   
+  @Override
   public void intervalRemoved(ListDataEvent evt){
     updateActionMenuItems((ListModel)evt.getSource());
   }
   
+  @Override
   public void contentsChanged(ListDataEvent evt){
     updateActionMenuItems((ListModel)evt.getSource());
   }

@@ -50,6 +50,7 @@ public class FreechessBoardPanel extends BoardPanel{
    * specific version.
    */
 
+  @Override
   protected String createWhiteLabelText(Game game){
     int rating = game.getWhiteRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
@@ -64,6 +65,7 @@ public class FreechessBoardPanel extends BoardPanel{
    * specific version.
    */
 
+  @Override
   protected String createBlackLabelText(Game game){
     int rating = game.getBlackRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";

@@ -1049,6 +1049,7 @@ public class Game{
    * Returns a textual representation of this Game.
    */
 
+  @Override
   public String toString(){
     return "#"+getID()+" "+(isRated() ? "Rated" : "Unrated") + " " + getTimeControl().getLocalizedShortDescription() + " " +getVariant().getName()+" " + getWhiteName()+" vs. "+getBlackName();
   }

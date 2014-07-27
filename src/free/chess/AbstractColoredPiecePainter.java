@@ -142,6 +142,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * @return The color for the white pieces.
    */
 
+  @Override
   public Color getWhiteColor(){
     return whiteColor;
   }
@@ -152,6 +153,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * Sets the color with which white pieces are drawn.
    */
 
+  @Override
   public void setWhiteColor(Color color){
     if (color == null)
       throw new IllegalArgumentException("Null color");
@@ -167,6 +169,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * @return The color for the black pieces.
    */
 
+  @Override
   public Color getBlackColor(){
     return blackColor;
   }
@@ -177,6 +180,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * Sets the color with which black pieces are drawn.
    */
 
+  @Override
   public void setBlackColor(Color color){
     if (color == null)
       throw new IllegalArgumentException("Null color");
@@ -192,6 +196,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * @return The color for the outline of white pieces.
    */
 
+  @Override
   public Color getWhiteOutline(){
     return whiteOutline;
   }
@@ -202,6 +207,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * Sets the color with which the outline of white pieces is drawn.
    */
 
+  @Override
   public void setWhiteOutline(Color color){
     if (color == null)
       throw new IllegalArgumentException("Null color");
@@ -217,6 +223,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * @return The color for the outline of black pieces.
    */
 
+  @Override
   public Color getBlackOutline(){
     return blackOutline;
   }
@@ -227,6 +234,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
    * Sets the color with which the outline of black pieces is drawn.
    */
 
+  @Override
   public void setBlackOutline(Color color){
     if (color == null)
       throw new IllegalArgumentException("Null color");

@@ -103,6 +103,7 @@ public class ArrayEnumeration implements Enumeration{
    * Returns the next element in the enumeration.
    */
 
+  @Override
   public Object nextElement(){
     if (!hasMoreElements())
       throw new NoSuchElementException();
@@ -120,6 +121,7 @@ public class ArrayEnumeration implements Enumeration{
    * Returns true if there are more elements in the enumeration.
    */
 
+  @Override
   public boolean hasMoreElements(){
     return curIndex < offset + count;
   }

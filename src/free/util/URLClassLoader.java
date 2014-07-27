@@ -79,6 +79,7 @@ public class URLClassLoader extends ChildClassLoader{
    * specified name.
    */
 
+  @Override
   protected InputStream getResourceAsStreamImpl(String name){
     try{
       URL resourceURL = new URL(url, name);
@@ -95,6 +96,7 @@ public class URLClassLoader extends ChildClassLoader{
    * name.
    */
 
+  @Override
   protected URL getResourceImpl(String name){
     try{
       return new URL(url, name);

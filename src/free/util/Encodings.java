@@ -101,6 +101,7 @@ public class Encodings{
       }
       
       Collections.sort(CATEGORIES, new Comparator(){
+        @Override
         public int compare(Object arg0, Object arg1){
           String c1 = (String)arg0;
           String c2 = (String)arg1;

@@ -273,14 +273,17 @@ public class MemoryFile{
 
   private class InternalOutputStream extends OutputStream{
 
+    @Override
     public void write(int b){
       MemoryFile.this.write(b);
     }
 
+    @Override
     public void write(byte [] buf, int offset, int length){
       MemoryFile.this.write(buf, offset, length);
     }
 
+    @Override
     public void close() throws IOException{
       MemoryFile.this.closeOutputStream();
     }

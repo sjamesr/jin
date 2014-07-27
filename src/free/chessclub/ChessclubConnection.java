@@ -528,6 +528,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Sends the login information to the server.
    */
   
+  @Override
   protected void sendLoginSequence(){
     if ((getPassword() == null) || (getPassword().length() == 0))
       sendCommandImpl(getRequestedUsername(), true);
@@ -541,6 +542,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Invoked when a connection to the server is established. Sends level2settings information to the server.
    */
   
+  @Override
   protected void handleConnected(){
     sendCommandImpl("level1=" + level1State, true);
     
@@ -565,6 +567,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Sets the various things we need to set on login.
    */
   
+  @Override
   protected void handleLoginSucceeded(){
     synchronized(this){
       // Apply any level2 changes which might have occurred when we were waiting
@@ -596,6 +599,7 @@ public class ChessclubConnection extends free.util.Connection{
    * Handles the specified message.
    */
   
+  @Override
   protected void handleMessage(Object message){
     handleMessage(message, null);
   }
@@ -608,6 +612,7 @@ public class ChessclubConnection extends free.util.Connection{
    * and a <code>PushbackInputStream</code>.
    */
   
+  @Override
   protected InputStream createInputStream(InputStream in){
     return new PushbackInputStream(new BufferedInputStream(in), 2);
   }
@@ -619,6 +624,7 @@ public class ChessclubConnection extends free.util.Connection{
    * from the server.
    */
   
+  @Override
   protected Object readMessage(InputStream in) throws IOException{
     PushbackInputStream pin = (PushbackInputStream)in;
     

@@ -79,6 +79,7 @@ public class WindowingModePrefPanel extends PreferencesPanel{
     bg.add(sdiMode);
     
     ActionListener changeListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         fireStateChanged();
       }
@@ -107,6 +108,7 @@ public class WindowingModePrefPanel extends PreferencesPanel{
 
 
 
+  @Override
   public void applyChanges() throws BadChangesException{
     Jin.getInstance().getPrefs().setString("uiProvider.classname", 
         mdiMode.isSelected() ? MdiUiProvider.class.getName() : SdiUiProvider.class.getName());

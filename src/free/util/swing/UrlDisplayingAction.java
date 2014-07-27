@@ -106,6 +106,7 @@ public class UrlDisplayingAction extends AbstractAction{
    * message to the user if fails.
    */
   
+  @Override
   public void actionPerformed(ActionEvent evt){
     if (url == null)
       return;

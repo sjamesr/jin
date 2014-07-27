@@ -179,6 +179,7 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter{
    * the given Graphics.
    */
 
+  @Override
   public final void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean isShaded){
 

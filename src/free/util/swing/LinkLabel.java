@@ -21,6 +21,7 @@
 
 package free.util.swing;
 
+import java.awt.AWTEvent;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,7 +58,7 @@ public class LinkLabel extends JLabel{
     
     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK);
+    enableEvents(AWTEvent.MOUSE_EVENT_MASK);
   }
   
   
@@ -66,6 +67,7 @@ public class LinkLabel extends JLabel{
    * Sets the enabled status of this <code>LinkLabel</code>.
    */
   
+  @Override
   public void setEnabled(boolean enabled){
     super.setEnabled(enabled);
     
@@ -81,6 +83,7 @@ public class LinkLabel extends JLabel{
    * Sets the text of the label.
    */
   
+  @Override
   public void setText(String text){
     if (isEnabled())
       super.setText("<html><font color=\"#0000CF\"><u>" + text + "</u></font></html>");
@@ -106,6 +109,7 @@ public class LinkLabel extends JLabel{
    * Processes mouse events and responds to clicks.
    */
   
+  @Override
   protected void processMouseEvent(MouseEvent evt){
     super.processMouseEvent(evt);
     

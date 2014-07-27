@@ -65,6 +65,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
    * superclass accepts. 
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (super.accept(evt))
       return true;
@@ -140,6 +141,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      * Sends the message to the opponent.
      */
     
+    @Override
     protected void send(String userText){
       // We don't use "say" because the "say" target might've changed since the
       // game was finished, but we want to keep talking to the same person, and
@@ -153,6 +155,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      * Echoes the command to the console.
      */
     
+    @Override
     protected void echo(String userText){
       Console console = getConsole();
       console.addToOutput(connection.getUser().getName() + ": " + userText, console.getUserTextType());
@@ -186,6 +189,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      * Sends the message to everyone at the board.
      */
     
+    @Override
     protected void send(String userText){
       sendCommand(getKibitzToCommand() + " " + game.getID() + " " + userText);
     }
@@ -218,6 +222,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      * Sends the message to all the game observers.
      */
     
+    @Override
     protected void send(String userText){
       sendCommand(getWhisperToCommand() + " " + game.getID() + " " + userText);
     }
@@ -229,6 +234,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation{
      * (since if we aren't, we'll get it echoed back to us anyway).
      */
     
+    @Override
     protected void echo(String userText){
       ServerUser whitePlayer = connection.userForName(game.getWhiteName());
       ServerUser blackPlayer = connection.userForName(game.getBlackName());

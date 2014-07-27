@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -170,6 +171,7 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     
     final ListCellRenderer encodingsCellRenderer = encodings.getCellRenderer();
     encodings.setCellRenderer(new ListCellRenderer(){
+      @Override
       public Component getListCellRendererComponent(JList list, Object value,
           int index, boolean isSelected, boolean cellHasFocus){
         if (value == null)
@@ -182,6 +184,7 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     encodings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     
     encodingCategories.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent e){
         try{
           ignoreEncodingSelectionChanges = true;
@@ -216,6 +219,7 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     });
     
     encodings.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent e){
         if (ignoreEncodingSelectionChanges)
           return;
@@ -244,19 +248,19 @@ public class EncodingPrefsPanel extends PreferencesPanel{
     encodings.setVisibleRowCount(10);
     
     JScrollPane encodingsScroller = new JScrollPane(encodings);
-    encodingsScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    encodingsScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    encodingsScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    encodingsScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     
     JScrollPane encodingCategoriesScroller = new JScrollPane(encodingCategories);
-    encodingCategoriesScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    encodingCategoriesScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    encodingCategoriesScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    encodingCategoriesScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     
     JLabel encodingCategoriesLabel = i18n.createLabel("encodingCategoriesLabel");
-    encodingCategoriesLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    encodingCategoriesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     encodingCategoriesLabel.setLabelFor(encodingCategories);
     
     JLabel encodingsLabel = i18n.createLabel("encodingsLabel");
-    encodingsLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    encodingsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     encodingsLabel.setLabelFor(encodings);
     
     GroupLayout layout = new GroupLayout(this);
@@ -291,6 +295,7 @@ public class EncodingPrefsPanel extends PreferencesPanel{
   
   
 
+  @Override
   public void applyChanges() throws BadChangesException{
     Charset selected = (Charset)encodings.getSelectedValue();
     

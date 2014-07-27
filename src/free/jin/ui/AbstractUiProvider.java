@@ -74,6 +74,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * {@inheritDoc} 
    */
   
+  @Override
   public void init(){
     Jin.getInstance().getConnManager().addSessionListener(this);
   }
@@ -84,6 +85,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * {@inheridDoc}
    */
   
+  @Override
   public void start(){
     
   }
@@ -94,6 +96,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * SessionListener implementation.
    */
   
+  @Override
   public void sessionStarting(SessionEvent evt){
     
   }
@@ -104,6 +107,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * SessionListener implementation. Restores various preferences.
    */
   
+  @Override
   public void sessionEstablished(SessionEvent evt){
     loadSelectedFrame(evt.getSession());
     
@@ -123,6 +127,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * SessionListener implementation. Stores various preferences.
    */
   
+  @Override
   public void sessionClosing(SessionEvent evt){
     saveSelectedFrame(evt.getSession());
     
@@ -144,6 +149,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener{
    * SessionListener implementation.
    */
   
+  @Override
   public void sessionClosed(SessionEvent evt){
     
   }

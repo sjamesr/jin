@@ -253,6 +253,7 @@ public class BrowserControl{
 
     Button okButton = new Button("OK");
     okButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         dialog.dispose();
       }
@@ -284,6 +285,7 @@ public class BrowserControl{
 
     Button okButton = new Button("OK");
     okButton.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         dialog.dispose();
       }
@@ -324,6 +326,7 @@ public class BrowserControl{
     f.add(p, BorderLayout.CENTER);
     Button b = new Button("Open URL");
     ActionListener actionListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         displayURL(tf.getText());
       }
@@ -341,6 +344,7 @@ public class BrowserControl{
     f.setVisible(true);
     
     f.addWindowListener(new WindowAdapter(){
+      @Override
       public void windowClosing(WindowEvent evt){
         System.exit(0);
       }

@@ -173,6 +173,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * not an instance of <code>PGNConnection</code>.
    */
 
+  @Override
   public boolean setContext(PluginContext context){
     if (!(context.getConnection() instanceof PGNConnection))
       return false;
@@ -229,6 +230,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Initializes the plugin.
    */
 
+  @Override
   public void start(){
     registerListeners();
     loadLoggingConditions();
@@ -242,6 +244,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Stops the plugin.
    */
 
+  @Override
   public void stop(){
     unregisterListeners();
   }
@@ -635,6 +638,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Starts logging the moves.
    */
 
+  @Override
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
     Position initPos = game.getInitialPosition();
@@ -651,6 +655,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Saves the ended game.
    */
 
+  @Override
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
     if (canLog(game) && game.isPlayed())
@@ -665,6 +670,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Observes changes in the game which we care about.
    */
   
+  @Override
   public void propertyChange(PropertyChangeEvent evt){
     Game game = (Game)evt.getSource();
     if (canLog(game)){
@@ -680,6 +686,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Saves the move.
    */
 
+  @Override
   public void moveMade(MoveMadeEvent evt){
     Game game = evt.getGame();
     Move move = evt.getMove();
@@ -694,6 +701,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Clears the move list.
    */
 
+  @Override
   public void positionChanged(PositionChangedEvent evt){
     Game game = evt.getGame();
     GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
@@ -706,6 +714,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Removes the undone moves from the move list.
    */
 
+  @Override
   public void takebackOccurred(TakebackEvent evt){
     Game game = evt.getGame();
     GameInfo gameInfo = (GameInfo)gamesToGameInfo.get(game);
@@ -723,9 +732,13 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * GameListener implementation.
    */
 
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){}
+  @Override
   public void clockAdjusted(ClockAdjustmentEvent evt){}
+  @Override
   public void boardFlipped(BoardFlipEvent evt){}
+  @Override
   public void offerUpdated(OfferEvent evt){}
 
 
@@ -735,6 +748,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Return a PreferencesPanel for changing GameLogger's settings.
    */
 
+  @Override
   public PreferencesPanel getPreferencesUI(){
     return new GameLoggerPreferencesPanel(this);
   }
@@ -747,6 +761,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * panel.
    */
 
+  @Override
   public boolean hasPreferencesUI(){
     return true;
   }
@@ -757,6 +772,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
    * Returns the string "gamelogger".
    */
 
+  @Override
   public String getId(){
     return "gamelogger";
   }
@@ -852,6 +868,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      * Returns the string <code>saveGame</code>.
      */
 
+    @Override
     public String getId(){
       return "savegame";
     }
@@ -875,6 +892,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
      * Lets the user select a file and then logs the game into it.
      */
     
+    @Override
     public void actionPerformed(ActionEvent evt){
       Component hintParent = (evt.getSource() instanceof Component) ?
           SwingUtils.frameForComponent((Component)evt.getSource()) : null;

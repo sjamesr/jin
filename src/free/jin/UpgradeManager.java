@@ -55,6 +55,7 @@ public class UpgradeManager{
       new UpgradeDialog().show();
     else{
       Thread t = new Thread("NewVersionChecker"){
+        @Override
         public void run(){
           checkNewVersion();
         }

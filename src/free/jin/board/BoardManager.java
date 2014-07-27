@@ -203,6 +203,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Starts this plugin.
    */
   
+  @Override
   public void start() throws PluginStartException{
     obtainSoundManager();
     initPreferences();
@@ -216,6 +217,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Stops this plugin.
    */
   
+  @Override
   public void stop(){
     unregisterConnListeners();
   }
@@ -1107,6 +1109,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Gets called when a game starts.
    */
   
+  @Override
   public void gameStarted(GameStartEvent evt){
     createNewBoardPanel(evt.getGame());
   }
@@ -1123,6 +1126,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     initBoardPanel(game, boardPanel);
     
     game.addPropertyChangeListener(new PropertyChangeListener(){
+      @Override
       public void propertyChange(PropertyChangeEvent evt){
         Game game = (Game)evt.getSource();
         BoardPanel boardPanel = (BoardPanel)gamesToBoardPanels.get(game);        
@@ -1260,12 +1264,19 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * GameListener implementation.
    */
   
+  @Override
   public void moveMade(MoveMadeEvent evt){}
+  @Override
   public void positionChanged(PositionChangedEvent evt){}
+  @Override
   public void takebackOccurred(TakebackEvent evt){}
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){}
+  @Override
   public void clockAdjusted(ClockAdjustmentEvent evt){}
+  @Override
   public void boardFlipped(BoardFlipEvent evt){}
+  @Override
   public void offerUpdated(OfferEvent evt){}
   
   
@@ -1275,6 +1286,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Cleanup the game.
    */
   
+  @Override
   public void gameEnded(GameEndEvent evt){
     gameEndCleanup(evt.getGame());
   }
@@ -1285,9 +1297,13 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * ConnectionListener implementation.
    */
   
+  @Override
   public void connectingFailed(Connection conn, String reason){}
+  @Override
   public void connectionAttempted(Connection conn, String hostname, int port){}
+  @Override
   public void connectionEstablished(Connection conn){}
+  @Override
   public void loginFailed(Connection conn, String reason){}
   
   
@@ -1296,6 +1312,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * If the "examineOnLogin" preference is set, open a new examination board.
    */
   
+  @Override
   public void loginSucceeded(Connection conn){
     if (getPrefs().getBool("examineOnLogin", false))
       getConn().examineNewGame();
@@ -1308,6 +1325,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * dandy, and so may the user.   
    */
   
+  @Override
   public void connectionLost(Connection conn){
     // We need to copy them to a Vector because you can't use an Enumeration
     // while modifying its HashTable, and gameEndCleanup modifies the HashTable
@@ -1381,6 +1399,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Gets called when the user makes a move on the board.
    */
   
+  @Override
   public void userMadeMove(UserMoveEvent evt){
     Object src = evt.getSource();
     
@@ -1419,6 +1438,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * PluginUIListener implementation. Handles proper closing of the frame.
    */
   
+  @Override
   public void pluginUIClosing(PluginUIEvent evt){
     PluginUIContainer boardContainer = evt.getPluginUIContainer();
     BoardPanel boardPanel = (BoardPanel)containersToBoardPanels.get(boardContainer);
@@ -1461,6 +1481,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Invoked when one of our plugin UIs has been hidden.
    */
   
+  @Override
   public void pluginUIHidden(PluginUIEvent evt){
     if (getVisibleBoardContainers() == 0)
       lastBoardBecameInvisible();
@@ -1472,6 +1493,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Invoked when one of our plugin UIs has been shown.
    */
   
+  @Override
   public void pluginUIShown(PluginUIEvent evt){
     if (getVisibleBoardContainers() == 1)
       firstBoardBecameVisible();
@@ -1483,10 +1505,15 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * PluginUIListener implementation.
    */
   
+  @Override
   public void pluginUIActivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDeactivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDisposed(PluginUIEvent evt){}
+  @Override
   public void pluginUITitleChanged(PluginUIEvent evt){}
+  @Override
   public void pluginUIIconChanged(PluginUIEvent evt){}
   
   
@@ -1497,6 +1524,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * <code>true</code>.
    */
   
+  @Override
   public boolean hasPreferencesUI(){
     return true;
   }
@@ -1509,6 +1537,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * some of this plugin's settings.
    */
   
+  @Override
   public PreferencesPanel getPreferencesUI(){
     return new BoardPreferencesPanel(this);
   }
@@ -1520,6 +1549,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Saves the user preferences.
    */
   
+  @Override
   public void saveState(){
     Preferences prefs = getPrefs();
     
@@ -1602,6 +1632,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
    * Returns the string "board".
    */
   
+  @Override
   public String getId(){
     return "board";
   }
@@ -1620,6 +1651,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
      * Returns the id of this action - "changeboard".
      */
     
+    @Override
     public String getId(){
       return "changeboard";
     }
@@ -1630,6 +1662,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
      * Changes the board pattern to the next one.
      */
     
+    @Override
     public void actionPerformed(ActionEvent evt){
       int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1; 
       
@@ -1664,6 +1697,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
      * Returns the id of this action - "changepieces".
      */
     
+    @Override
     public String getId(){
       return "changepieces";
     }
@@ -1674,6 +1708,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
      * Changes the piece set to the next one.
      */
     
+    @Override
     public void actionPerformed(ActionEvent evt){
       int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1; 
       

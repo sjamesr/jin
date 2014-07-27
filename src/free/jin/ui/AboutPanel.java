@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -60,6 +61,7 @@ public class AboutPanel extends DialogPanel{
    * Returns the title of this <code>DialogPanel</code>.
    */
 
+  @Override
   protected String getTitle(){
     I18n i18n = I18n.get(AboutPanel.class);
     String appName = Jin.getAppName();
@@ -89,7 +91,7 @@ public class AboutPanel extends DialogPanel{
     
     Icon jinIcon = new ImageIcon(Jin.class.getResource("resources/logo48.png"));
     JLabel jinLabel = new JLabel(Jin.getAppName() + " " 
-      + Jin.getAppVersion(), jinIcon, JLabel.CENTER);
+      + Jin.getAppVersion(), jinIcon, SwingConstants.CENTER);
     jinLabel.setFont(new Font("Serif", Font.PLAIN, 36));
     jinLabel.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -110,7 +112,7 @@ public class AboutPanel extends DialogPanel{
     Font font = new Font("SansSerif", Font.PLAIN, 12);
     while (copyrightLines.hasMoreTokens()){
       String line = copyrightLines.nextToken();
-      JLabel label = new JLabel(line.trim(), JLabel.CENTER);
+      JLabel label = new JLabel(line.trim(), SwingConstants.CENTER);
       label.setAlignmentX(CENTER_ALIGNMENT);
       label.setFont(font);
       add(label);
@@ -118,7 +120,7 @@ public class AboutPanel extends DialogPanel{
 
     add(Box.createVerticalStrut(10));
 
-    JLabel dedicationLabel = new JLabel(Jin.getAppProperty("app.dedication", null), JLabel.CENTER);
+    JLabel dedicationLabel = new JLabel(Jin.getAppProperty("app.dedication", null), SwingConstants.CENTER);
     dedicationLabel.setAlignmentX(CENTER_ALIGNMENT);
     add(dedicationLabel);
     dedicationLabel.setFont(font);

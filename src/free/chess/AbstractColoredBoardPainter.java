@@ -80,6 +80,7 @@ public abstract class AbstractColoredBoardPainter implements ColoredBoardPainter
    * Returns the color with which light squares are drawn.
    */
    
+  @Override
   public Color getLightColor(){
     return lightColor;
   }
@@ -90,6 +91,7 @@ public abstract class AbstractColoredBoardPainter implements ColoredBoardPainter
    * Sets the color with which light squares are drawn;
    */
    
+  @Override
   public void setLightColor(Color lightColor){
     if (lightColor == null)
       throw new IllegalArgumentException("Null color");
@@ -103,6 +105,7 @@ public abstract class AbstractColoredBoardPainter implements ColoredBoardPainter
    * Returns the color with which dark squares are drawn.
    */
    
+  @Override
   public Color getDarkColor(){
     return darkColor;
   }
@@ -113,6 +116,7 @@ public abstract class AbstractColoredBoardPainter implements ColoredBoardPainter
    * Sets the color with which dark squares are drawn;
    */
    
+  @Override
   public void setDarkColor(Color darkColor){
     if (darkColor == null)
       throw new IllegalArgumentException("Null color");

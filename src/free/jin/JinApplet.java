@@ -171,6 +171,7 @@ public class JinApplet extends Applet implements JinContext{
    * Initializes the applet. 
    */
    
+  @Override
   public void init(){
     try{
       // Determine the locale
@@ -212,6 +213,7 @@ public class JinApplet extends Applet implements JinContext{
    * Invoked when the applet shuts down.
    */
   
+  @Override
   public void stop(){
     if (Jin.hasInstance())
       Jin.getInstance().quit(false);
@@ -431,6 +433,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the locale for this instance of Jin.
    */
   
+  @Override
   public Locale getLocale(){
     return locale;
   }
@@ -442,6 +445,7 @@ public class JinApplet extends Applet implements JinContext{
    * parameters, via the props Properties object.
    */
    
+  @Override
   public String getParameter(String paramName){
     String paramValue = autologinParams.getProperty(paramName);
     
@@ -454,6 +458,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the application-wide preferences.
    */
    
+  @Override
   public Preferences getPrefs(){
     return prefs;
   }
@@ -479,6 +484,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the application's customizing preferences.
    */
   
+  @Override
   public Preferences getCustomizingPrefs(){
     return customizingPrefs;
   }
@@ -490,6 +496,7 @@ public class JinApplet extends Applet implements JinContext{
    * See {@link JinContext#getResources(String, Plugin)} for more information.
    */
 
+  @Override
   public Map getResources(String resourceType, Plugin plugin){
     Map resourceMap = new HashMap();
     
@@ -526,6 +533,7 @@ public class JinApplet extends Applet implements JinContext{
    * if the resource can't be loaded.
    */
    
+  @Override
   public Resource getResource(String type, String id, Plugin plugin){
     try{
       URL resourceURL = new URL(getCodeBase(), "resources/" + type + "/" + id + "/");
@@ -591,10 +599,12 @@ public class JinApplet extends Applet implements JinContext{
    * go again.
    */
    
+  @Override
   public void shutdown(){
     if (username != null){ // Not logged in as guest
       
       settingsUploadThread = new Thread(){
+        @Override
         public void run(){
           try{
             String result = null;
@@ -653,11 +663,13 @@ public class JinApplet extends Applet implements JinContext{
       };
       
       settingsUploadDialog = new SettingsUploadDialog(AWTUtilities.frameForComponent(this)){
+        @Override
         public void addNotify(){
           super.addNotify();
           if ((settingsUploadThread != null) && !settingsUploadThread.isAlive())
             settingsUploadThread.start();
         }
+        @Override
         public void canceled(){
           synchronized(JinApplet.this){
             this.dispose();
@@ -740,6 +752,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns an array containing the server we're connecting to.
    */
    
+  @Override
   public Server [] getServers(){
     return new Server[]{server};
   }
@@ -750,6 +763,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the list of known user's accounts on the server.  
    */
    
+  @Override
   public User [] getUsers(){
     return users;
   }
@@ -761,6 +775,7 @@ public class JinApplet extends Applet implements JinContext{
    * part of the preferences.
    */
    
+  @Override
   public void setUsers(User [] users){
     this.users = users;
   }
@@ -771,6 +786,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the descriptions of actions for the specified server.
    */
    
+  @Override
   public ActionInfo [] getActions(Server server){
     if (server != this.server)
       throw new IllegalArgumentException("Unknown server: " + server);
@@ -784,6 +800,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns the descriptions of plugins for the specified server.
    */
    
+  @Override
   public PluginInfo [] getPlugins(Server server){
     if (server != this.server)
       throw new IllegalArgumentException("Unknown server: " + server);
@@ -797,6 +814,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isSavePrefsCapable(){
     return true;
   }
@@ -808,6 +826,7 @@ public class JinApplet extends Applet implements JinContext{
    * confirm it.
    */
    
+  @Override
   public String getPasswordSaveWarning(){
     try{
       boolean isSecure = getPrefsDownloadUrl().getProtocol().equals("https") &&
@@ -829,6 +848,7 @@ public class JinApplet extends Applet implements JinContext{
    * Returns <code>false</code>. 
    */
   
+  @Override
   public boolean isUserExtensible(){
     return false;
   }
@@ -1017,6 +1037,7 @@ public class JinApplet extends Applet implements JinContext{
       this.add(BorderLayout.CENTER, new Panel()); // To take any extra space
       
       ActionListener loginListener = new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           String username = usernameField.getText();
           String password = passwordField.getText();
@@ -1043,6 +1064,7 @@ public class JinApplet extends Applet implements JinContext{
       passwordField.addActionListener(loginListener);
       
       guestButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           setStatus(l10n.getFormattedString("startingStatus", new Object[]{Jin.getAppName()}), Color.black);
           loginButton.setEnabled(false);
@@ -1067,6 +1089,7 @@ public class JinApplet extends Applet implements JinContext{
      * Set focus to the username field on the first paint.
      */
      
+    @Override
     public void paint(Graphics g){
       super.paint(g);
       
@@ -1095,6 +1118,7 @@ public class JinApplet extends Applet implements JinContext{
      * Connects to the server and retrieves the preferences. 
      */
      
+    @Override
     public void run(){
       try{
         String username = usernameField.getText();
@@ -1225,6 +1249,7 @@ public class JinApplet extends Applet implements JinContext{
       this.add(buttonPanel);
       
       button.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           canceled();
         }
@@ -1287,6 +1312,7 @@ public class JinApplet extends Applet implements JinContext{
       this.add(BorderLayout.SOUTH, buttonPanel);
       
       closeButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           dispose(); 
         }
@@ -1389,6 +1415,7 @@ public class JinApplet extends Applet implements JinContext{
       this.add(BorderLayout.SOUTH, buttonPanel);
       
       retryButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           shouldRetry = true;
           dispose();
@@ -1396,6 +1423,7 @@ public class JinApplet extends Applet implements JinContext{
       });
       
       closeButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           shouldRetry = false;
           dispose(); 

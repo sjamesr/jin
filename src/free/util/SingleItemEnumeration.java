@@ -66,6 +66,7 @@ public class SingleItemEnumeration implements Enumeration{
    * Returns the sole item or throws a <code>NoSuchElementException</code>.
    */
 
+  @Override
   public Object nextElement(){
     if (!hasMoreElements())
       throw new NoSuchElementException();
@@ -83,6 +84,7 @@ public class SingleItemEnumeration implements Enumeration{
    * Returns true if there are more elements in the enumeration.
    */
 
+  @Override
   public boolean hasMoreElements(){
     return !done;
   }

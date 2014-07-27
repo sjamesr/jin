@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
@@ -129,6 +130,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
   private void registerKeyboardActions(){
     // Forward 10 plies
     registerKeyboardAction(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         plugin.getConn().goForward(game, 10);
       }
@@ -136,6 +138,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     
     // Backward 10 plies
     registerKeyboardAction(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         plugin.getConn().goBackward(game, 10);
       }
@@ -170,9 +173,9 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
   
   private static int getButtonKeyModifier(){
     if (SwingUtils.isMacLnF())
-      return KeyEvent.CTRL_DOWN_MASK;
+      return InputEvent.CTRL_DOWN_MASK;
     else
-      return KeyEvent.ALT_DOWN_MASK;
+      return InputEvent.ALT_DOWN_MASK;
   }
   
   
@@ -185,6 +188,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     return createButton("go-first", "gameStartButton.tooltip", 
         KeyStroke.getKeyStroke(KeyEvent.VK_HOME, getButtonKeyModifier()),
         new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             plugin.getConn().goToBeginning(game);
           }
@@ -202,6 +206,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     return createButton("go-last", "gameEndButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_END, getButtonKeyModifier()),
         new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             plugin.getConn().goToEnd(game);
           }
@@ -219,6 +224,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     return createButton("go-previous", "backwardButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, getButtonKeyModifier()),
         new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent arg0){
             plugin.getConn().goBackward(game, 1);
           }
@@ -235,6 +241,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
     return createButton("go-next", "forwardButton.tooltip",
         KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, getButtonKeyModifier()),
         new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent arg0){
             plugin.getConn().goForward(game, 1);
           }
@@ -263,6 +270,7 @@ public final class ExaminedGameButtonPanel extends FixedJPanel{
    * Overrides getMaximumSize() to return the value of getPreferredSize().
    */
 
+  @Override
   public Dimension getMaximumSize(){
     return getPreferredSize();
   }

@@ -66,6 +66,7 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
     panels.add(panel);
     
     panel.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent e){
         fireStateChanged();
         changedPanels.add(e.getSource());
@@ -108,6 +109,7 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    * Returns whether any of our changed panels require a restart.
    */
   
+  @Override
   public boolean applyRequiresRestart(){
     for (Iterator i = changedPanels.iterator(); i.hasNext();){
       PreferencesPanel panel = (PreferencesPanel)i.next();
@@ -124,6 +126,7 @@ public abstract class CompositePreferencesPanel extends PreferencesPanel{
    * Applies changes to all the underlying panels.
    */
 
+  @Override
   public void applyChanges() throws BadChangesException{
     for (Iterator i = panels.iterator(); i.hasNext();){
       PreferencesPanel panel = (PreferencesPanel)i.next();

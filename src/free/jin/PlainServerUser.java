@@ -76,6 +76,7 @@ public class PlainServerUser implements ServerUser{
    * Returns the name/handle/nickname of the user.
    */
 
+  @Override
   public String getName(){
     return name;
   }
@@ -86,6 +87,7 @@ public class PlainServerUser implements ServerUser{
    * Returns the value of <code>isAlias</code> passed to the constructor.
    */
   
+  @Override
   public boolean isAlias(){
     return isAlias;
   }
@@ -97,6 +99,7 @@ public class PlainServerUser implements ServerUser{
    * its name matches the name of this user.
    */
   
+  @Override
   public boolean equals(Object o){
     if (o == null)
       return false;
@@ -121,6 +124,7 @@ public class PlainServerUser implements ServerUser{
    * Returns the hash code of this <code>PlainServerUser</code>.
    */
   
+  @Override
   public int hashCode(){
     if (isCaseSensitive)
       return name.hashCode();
@@ -134,6 +138,7 @@ public class PlainServerUser implements ServerUser{
    * Returns the user's name/handle/nickname.
    */
   
+  @Override
   public String toString(){
     return getName();
   }

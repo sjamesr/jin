@@ -21,6 +21,7 @@
 
 package free.jin.console;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -155,7 +156,7 @@ public class ConsoleTextPane extends FixedJTextPane{
     keymap.addActionForKeyStroke(
         KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), copyAction);
     
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK | MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     
     setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
   }
@@ -194,6 +195,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * perhaps other expensive rendering hints.
    */
   
+  @Override
   protected void paintComponent(Graphics g){
     Graphics2D g2d = (Graphics2D)g;
     
@@ -232,6 +234,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * for details.
    */
   
+  @Override
   public void reshape(int x, int y, int width, int height){
     if ((height > Short.MAX_VALUE) && SHOULD_USE_16_BIT_GRAPHICS_HACK){
       try{
@@ -275,6 +278,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * more details.
    */
   
+  @Override
   protected void processComponentKeyEvent(KeyEvent evt){
     if ((!isEditable()) && (getKeymap().getAction(KeyStroke.getKeyStrokeForEvent(evt)) == null)){
       evt.consume(); // Otherwise the parent scrollpane gets it and starts doing
@@ -587,6 +591,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Processes the given MouseEvent.
    */
   
+  @Override
   protected void processMouseEvent(MouseEvent evt){
     updateClickCount(evt);
     
@@ -677,6 +682,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Processes the given Mouse(Motion)Event.
    */
   
+  @Override
   protected void processMouseMotionEvent(MouseEvent evt){
     updateClickCount(evt);
     
@@ -795,6 +801,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Returns the tooltip to display.
    */
   
+  @Override
   public String getToolTipText(MouseEvent evt){
     Link link = getLink(evt.getX(), evt.getY());
     if (link != null){
@@ -825,6 +832,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Overrides setCursor to save information about the regular cursor.
    */
   
+  @Override
   public void setCursor(Cursor cursor){
     setCursor(cursor, true);
   }
@@ -849,6 +857,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Returns the block scroll amount.
    */
   
+  @Override
   public int getScrollableBlockIncrement(Rectangle viewRect, int orientation, int direction){
     if (orientation == SwingConstants.HORIZONTAL)
       return super.getScrollableBlockIncrement(viewRect, orientation, direction);
@@ -863,6 +872,7 @@ public class ConsoleTextPane extends FixedJTextPane{
    * Returns the unit scroll amount.
    */
   
+  @Override
   public int getScrollableUnitIncrement(Rectangle viewRect, int orientation, int direction){
     if (orientation == SwingConstants.HORIZONTAL)
       return super.getScrollableUnitIncrement(viewRect, orientation, direction);
@@ -908,6 +918,7 @@ public class ConsoleTextPane extends FixedJTextPane{
      * Sends the command to the server.
      */
     
+    @Override
     protected void fireActionPerformed(ActionEvent evt){
       console.issueCommand(new Command(serverCommand + " " + getSelectedText(), 0));
     }
@@ -941,6 +952,7 @@ public class ConsoleTextPane extends FixedJTextPane{
      * Copies the currently selected text in the console to the clipboard.
      */
     
+    @Override
     protected void fireActionPerformed(ActionEvent evt){
       copy();
     }
@@ -974,6 +986,7 @@ public class ConsoleTextPane extends FixedJTextPane{
      * Sends the current console selection to the server, as a command.
      */
     
+    @Override
     protected void fireActionPerformed(ActionEvent evt){
       console.issueCommand(new Command("/" + getSelectedText(), 0));
     }
@@ -1007,6 +1020,7 @@ public class ConsoleTextPane extends FixedJTextPane{
      * Expurgates the current selection.
      */
     
+    @Override
     protected void fireActionPerformed(ActionEvent evt){
       expurgateSelection();
     }

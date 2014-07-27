@@ -53,6 +53,7 @@ public class FreechessConsolePrefsPanel extends ConsolePrefsPanel{
    * <code>TextPrefsPanel</code>.
    */
   
+  @Override
   protected TextPrefsPanel createTextPrefsPanel(ConsoleManager cm){
     return new ChannelTextPrefsPanel(cm);
   }
@@ -63,6 +64,7 @@ public class FreechessConsolePrefsPanel extends ConsolePrefsPanel{
    * Creates a FICS-specific custom consoles prefs panel.
    */
   
+  @Override
   protected CustomConsolesPrefsPanel createCustomConsolesPrefsPanel(ConsoleManager cm){
     return new FreechessCustomConsolesPrefsPanel(cm);
   }

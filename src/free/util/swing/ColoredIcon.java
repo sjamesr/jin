@@ -77,6 +77,7 @@ public abstract class ColoredIcon implements Icon{
    * Returns the width of the icon.
    */
 
+  @Override
   public int getIconWidth(){
     return size.width;
   }
@@ -88,6 +89,7 @@ public abstract class ColoredIcon implements Icon{
    * Returns the height of the icon.
    */
 
+  @Override
   public int getIconHeight(){
     return size.height;
   }
@@ -110,6 +112,7 @@ public abstract class ColoredIcon implements Icon{
    * Paints a solid rectangle at the given coordinates.
    */
 
+  @Override
   public void paintIcon(Component component, Graphics g, int x, int y){
     g.setColor(color);
     paintShape(component, g, x, y);

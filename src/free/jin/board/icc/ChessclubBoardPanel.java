@@ -75,6 +75,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * <code>ChessclubJBoard</code>.
    */
 
+  @Override
   protected JinBoard createBoard(Game game){
     return new ChessclubJBoard(game.getInitialPosition());
   }
@@ -86,6 +87,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * an <code>ArrowCircleListener</code> to the board.
    */
 
+  @Override
   protected void configureBoardFromGame(Game game, JinBoard board){
     super.configureBoardFromGame(game, board);
 
@@ -104,6 +106,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * arrows/circles.
    */
 
+  @Override
   public void moveMade(MoveMadeEvent evt){
     super.moveMade(evt);
 
@@ -122,6 +125,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * arrows/circles.
    */
 
+  @Override
   public void positionChanged(PositionChangedEvent evt){
     super.positionChanged(evt);
 
@@ -141,6 +145,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * arrows/circles.
    */
 
+  @Override
   public void takebackOccurred(TakebackEvent evt){
     super.takebackOccurred(evt);
 
@@ -160,6 +165,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * arrows/circles.
    */
 
+  @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt){
     super.illegalMoveAttempted(evt);
 
@@ -177,6 +183,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * specific version.
    */
 
+  @Override
   protected String createWhiteLabelText(Game game){
     int rating = game.getWhiteRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
@@ -191,6 +198,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * specific version.
    */
 
+  @Override
   protected String createBlackLabelText(Game game){
     int rating = game.getBlackRating();
     String ratingString = (rating > 0) ? (" "+rating) : "";
@@ -203,6 +211,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when an arrow is added to the board (by the server).
    */
 
+  @Override
   public void arrowAdded(ArrowEvent evt){
     if (evt.getGame() != game)
       return;
@@ -221,6 +230,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when an arrow is removed from the board (by the server).
    */
    
+  @Override
   public void arrowRemoved(ArrowEvent evt){
     if (evt.getGame() != game)
       return;
@@ -237,6 +247,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is added to the board (by the server).
    */
 
+  @Override
   public void circleAdded(CircleEvent evt){
     if (evt.getGame() != game)
       return;
@@ -254,6 +265,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is removed from the board (by the server).
    */
    
+  @Override
   public void circleRemoved(CircleEvent evt){
     if (evt.getGame() != game)
       return;
@@ -270,6 +282,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when an arrow is added on the board (on the client, not server). 
    */
 
+  @Override
   public void arrowAdded(JinBoard board, Arrow arrow){
     if (handlingArrowCircleEvent)
       return;
@@ -284,6 +297,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * server.
    */
 
+  @Override
   public void arrowRemoved(JinBoard board, Arrow arrow){
     if (handlingArrowCircleEvent)
       return;
@@ -297,6 +311,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is added (on the client, not the server).
    */
 
+  @Override
   public void circleAdded(JinBoard board, Circle circle){
     if (handlingArrowCircleEvent)
       return;
@@ -310,6 +325,7 @@ public class ChessclubBoardPanel extends BoardPanel implements ChessclubGameList
    * Gets called when a circle is removed (on the client, not the server).
    */
 
+  @Override
   public void circleRemoved(JinBoard board, Circle circle){
     if (handlingArrowCircleEvent)
       return;

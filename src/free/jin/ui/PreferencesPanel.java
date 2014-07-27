@@ -51,6 +51,7 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
    */
   
   protected final ActionListener proxyActionListener = new ActionListener(){
+    @Override
     public void actionPerformed(ActionEvent evt){
       fireStateChanged();
     }
@@ -65,6 +66,7 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
    */
   
   protected final ChangeListener proxyChangeListener = new ChangeListener(){
+    @Override
     public void stateChanged(ChangeEvent evt){
       fireStateChanged();
     }
@@ -78,6 +80,7 @@ public abstract class PreferencesPanel extends PreferredSizedPanel{
    */
   
   protected final ListSelectionListener proxyListSelectionListener = new ListSelectionListener(){
+    @Override
     public void valueChanged(ListSelectionEvent evt){
       fireStateChanged();
     }

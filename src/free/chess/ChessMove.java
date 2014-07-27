@@ -328,6 +328,7 @@ public class ChessMove extends Move{
    * Returns a textual representation of this ChessMove based on the move data.
    */
 
+  @Override
   public String getMoveString(){
     if (isShortCastling())
       return "O-O";

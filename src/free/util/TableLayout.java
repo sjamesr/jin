@@ -115,6 +115,7 @@ public class TableLayout implements LayoutManager2{
    * Adds the specified component to the layout.
    */
 
+  @Override
   public void addLayoutComponent(Component component, Object constraints){
     synchronized(component.getTreeLock()){
       int rowCount = rows.size();
@@ -140,6 +141,7 @@ public class TableLayout implements LayoutManager2{
    * Throws an exception.
    */
 
+  @Override
   public void addLayoutComponent(String name, Component component){
     throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
   }
@@ -151,6 +153,7 @@ public class TableLayout implements LayoutManager2{
    * Removes the specified component from the layout.
    */
 
+  @Override
   public void removeLayoutComponent(Component component){
     synchronized(component.getTreeLock()){
       int rowCount = rows.size();
@@ -253,6 +256,7 @@ public class TableLayout implements LayoutManager2{
    * specified Container.
    */
 
+  @Override
   public void layoutContainer(Container parent){
     synchronized(parent.getTreeLock()){
       int rowCount = rows.size();
@@ -319,6 +323,7 @@ public class TableLayout implements LayoutManager2{
    * We're not caching anything yet, so this call is ignored.
    */
 
+  @Override
   public void invalidateLayout(Container parent){
 
   }
@@ -329,6 +334,7 @@ public class TableLayout implements LayoutManager2{
    * Returns the preferred layout for the specified parent container.
    */
 
+  @Override
   public Dimension preferredLayoutSize(Container parent){
     synchronized(parent.getTreeLock()){
       Dimension [][] prefSizes = getPreferredSizes(parent);
@@ -375,6 +381,7 @@ public class TableLayout implements LayoutManager2{
    * Returns the same as <code>preferredLayoutSize</code>.
    */
 
+  @Override
   public Dimension minimumLayoutSize(Container parent){
     return preferredLayoutSize(parent);
   }
@@ -386,6 +393,7 @@ public class TableLayout implements LayoutManager2{
    * Returns a dimension with maximum possible values.
    */
 
+  @Override
   public Dimension maximumLayoutSize(Container parent){
     return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
   }
@@ -396,6 +404,7 @@ public class TableLayout implements LayoutManager2{
    * Returns <code>CENTER_ALIGNMENT</code>;
    */
 
+  @Override
   public float getLayoutAlignmentX(Container parent) {
     return Component.CENTER_ALIGNMENT;
   }
@@ -406,6 +415,7 @@ public class TableLayout implements LayoutManager2{
    * Returns <code>CENTER_ALIGNMENT</code>;
    */
 
+  @Override
   public float getLayoutAlignmentY(Container parent) {
     return Component.CENTER_ALIGNMENT;
   }

@@ -21,6 +21,7 @@
 
 package free.jin.board.prefs;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -247,6 +248,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     moveInputGroup.add(clicknclick);
     
     ActionListener moveInputListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setMoveInputStyle(getMoveInputStyle());
         fireStateChanged();
@@ -259,6 +261,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     autoPromote = i18n.createCheckBox("autoPromoteCheckBox");
     autoPromote.setSelected(boardManager.isAutoPromote());
     autoPromote.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setManualPromote(!autoPromote.isSelected());
         fireStateChanged();
@@ -268,6 +271,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     pieceFollowsCursor = i18n.createCheckBox("pieceFollowsCursorCheckBox");
     pieceFollowsCursor.setSelected(boardManager.isPieceFollowsCursor());
     pieceFollowsCursor.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
         fireStateChanged();
@@ -277,6 +281,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     showPieceInTargetSquare = i18n.createCheckBox("showPieceInTargetSquareCheckBox");
     showPieceInTargetSquare.setSelected(boardManager.isShowShadowPieceInTargetSquare());
     showPieceInTargetSquare.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setShowShadowPieceInTargetSquare(showPieceInTargetSquare.isSelected());
         fireStateChanged();
@@ -286,6 +291,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightMadeMoveSquares = i18n.createCheckBox("highlightMadeMoveSquaresCheckBox");
     highlightMadeMoveSquares.setSelected(boardManager.isHighlightMadeMoveSquares());
     highlightMadeMoveSquares.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         boolean selected = highlightMadeMoveSquares.isSelected();
         MoveInputPanel.this.previewBoard.setHighlightMadeMoveSquares(selected);
@@ -298,6 +304,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     madeMoveSquaresHighlightColor.setColor(boardManager.getMadeMoveSquaresHighlightColor());
     madeMoveSquaresHighlightColor.setEnabled(highlightMadeMoveSquares.isSelected());
     madeMoveSquaresHighlightColor.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setMadeMoveSquaresHighlightColor(madeMoveSquaresHighlightColor.getColor());
         fireStateChanged();
@@ -318,6 +325,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     movingInAdvanceButtonGroup.add(immediateSendMove);
     movingInAdvanceButtonGroup.add(premove);
     ActionListener movingInAdvanceListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         BoardManager boardManager = MoveInputPanel.this.boardManager;
         if (boardManager.isUserPlaying()){
@@ -365,6 +373,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     group.add(arrow);
     
     ActionListener styleListener = new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         MoveInputPanel.this.previewBoard.setMoveHighlightingStyle(getMoveHighlightingStyle());
         
@@ -380,6 +389,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     arrow.addActionListener(styleListener);
     
     highlightOwnMoves.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         if (lastMove.getPlayer().isWhite())
           MoveInputPanel.this.previewBoard.setHighlightedMove(highlightOwnMoves.isSelected() ? lastMove : null);
@@ -388,6 +398,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     });
     
     highlightColor.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         MoveInputPanel.this.previewBoard.setMoveHighlightingColor(highlightColor.getColor());
         fireStateChanged();
@@ -396,6 +407,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     
     
     previewBoard.getPosition().addMoveListener(new MoveListener(){
+      @Override
       public void moveMade(MoveEvent evt){
         Move move = evt.getMove();
         if (move.getPlayer().isBlack() || highlightOwnMoves.isSelected())
@@ -410,6 +422,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     highlightLegalTargetSquares = i18n.createCheckBox("highlightLegalTargetSquaresCheckBox");
     highlightLegalTargetSquares.setSelected(boardManager.isHighlightLegalTargetSquares());
     highlightLegalTargetSquares.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         MoveInputPanel.this.previewBoard.setHighlightLegalTargetSquares(highlightLegalTargetSquares.isSelected());
         fireStateChanged();
@@ -419,6 +432,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
     snapToLegalTargetSquares = i18n.createCheckBox("snapToLegalSquaresCheckBox");
     snapToLegalTargetSquares.setSelected(boardManager.isSnapToLegalSquare());
     snapToLegalTargetSquares.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent e){
         MoveInputPanel.this.previewBoard.setSnapToLegalSquare(snapToLegalTargetSquares.isSelected());
         fireStateChanged();
@@ -503,6 +517,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * Sets the initial properties of the preview board.
    */
    
+  @Override
   public void initPreviewBoard(){
     previewBoard.setMoveInputStyle(getMoveInputStyle());
     previewBoard.setPieceFollowsCursor(pieceFollowsCursor.isSelected());
@@ -540,9 +555,9 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("moveInputPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    unified.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    dragndrop.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    clicknclick.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    unified.setAlignmentX(Component.LEFT_ALIGNMENT);
+    dragndrop.setAlignmentX(Component.LEFT_ALIGNMENT);
+    clicknclick.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(unified);
     panel.add(dragndrop);
@@ -567,7 +582,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("promotionPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    autoPromote.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    autoPromote.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(autoPromote);
     panel.add(Box.createGlue());
@@ -590,10 +605,10 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("moveVisualizationPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
 
-    pieceFollowsCursor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    showPieceInTargetSquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightMadeMoveSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    madeMoveSquaresHighlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    pieceFollowsCursor.setAlignmentX(Component.LEFT_ALIGNMENT);
+    showPieceInTargetSquare.setAlignmentX(Component.LEFT_ALIGNMENT);
+    highlightMadeMoveSquares.setAlignmentX(Component.LEFT_ALIGNMENT);
+    madeMoveSquaresHighlightColor.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(pieceFollowsCursor);
     panel.add(showPieceInTargetSquare);
@@ -619,9 +634,9 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("movingInAdvancePanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    disallowMoveInAdvance.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    immediateSendMove.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    premove.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    disallowMoveInAdvance.setAlignmentX(Component.LEFT_ALIGNMENT);
+    immediateSendMove.setAlignmentX(Component.LEFT_ALIGNMENT);
+    premove.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(disallowMoveInAdvance);
     panel.add(immediateSendMove);
@@ -655,12 +670,12 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("moveHighlightPanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    none.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    targetSquare.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    bothSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    arrow.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightOwnMoves.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-    highlightColor.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    none.setAlignmentX(Component.LEFT_ALIGNMENT);
+    targetSquare.setAlignmentX(Component.LEFT_ALIGNMENT);
+    bothSquares.setAlignmentX(Component.LEFT_ALIGNMENT);
+    arrow.setAlignmentX(Component.LEFT_ALIGNMENT);
+    highlightOwnMoves.setAlignmentX(Component.LEFT_ALIGNMENT);
+    highlightColor.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(none);
     panel.add(targetSquare);
@@ -688,7 +703,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
       i18n.createTitledBorder("moveAssistancePanel"),
       BorderFactory.createEmptyBorder(0, 5, 5, 5)));
     
-    highlightLegalTargetSquares.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+    highlightLegalTargetSquares.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     panel.add(highlightLegalTargetSquares);
     panel.add(snapToLegalTargetSquares);
@@ -703,6 +718,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel{
    * Applies any changes made by the user.
    */
    
+  @Override
   public void applyChanges() throws BadChangesException{
     boardManager.setMoveInputStyle(getMoveInputStyle());
     boardManager.setAutoPromote(autoPromote.isSelected());

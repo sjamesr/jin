@@ -137,7 +137,7 @@ public abstract class Script{
    */
 
   public String [] getEventSubtypes(){
-    return (String [])(eventSubtypes.clone());
+    return (eventSubtypes.clone());
   }
 
 
@@ -198,6 +198,7 @@ public abstract class Script{
    * Returns the name of the script.
    */
 
+  @Override
   public String toString(){
     return getName();
   }

@@ -79,14 +79,17 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     this.game = game;
     
     connection.getListenerManager().addGameListener(new GameAdapter(){
+      @Override
       public void gameEnded(GameEndEvent evt){
         if (getGame().equals(evt.getGame()))
           GameConsoleDesignation.this.gameEnded(evt);
       }
+      @Override
       public void illegalMoveAttempted(IllegalMoveEvent evt){
         if (getGame().equals(evt.getGame()))
           GameConsoleDesignation.this.illegalMoveAttempted(evt);
       }
+      @Override
       public void takebackOccurred(TakebackEvent evt){
         if (getGame().equals(evt.getGame()))
           GameConsoleDesignation.this.takebackOccurred(evt);
@@ -94,6 +97,7 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
     });
     
     game.addPropertyChangeListener(new PropertyChangeListener(){
+      @Override
       public void propertyChange(PropertyChangeEvent evt){
         setName(consoleNameForGame(GameConsoleDesignation.this.game, gameHasEnded));
         
@@ -189,6 +193,7 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation{
    * forum is the game we're covering. 
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     if (isTaggedByUs(evt))
       return true;

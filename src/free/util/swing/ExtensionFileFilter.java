@@ -116,6 +116,7 @@ public class ExtensionFileFilter extends FileFilter implements FilenameFilter{
    * file's name ends with one of the strings specified in the constructor.
    */
 
+  @Override
   public boolean accept(File file){
     if (file.isDirectory())
       return true;
@@ -143,6 +144,7 @@ public class ExtensionFileFilter extends FileFilter implements FilenameFilter{
    * file's name ends with one of the strings specified in the constructor.
    */
   
+  @Override
   public boolean accept(File dir, String name){
     return accept(new File(dir, name));
   }
@@ -153,6 +155,7 @@ public class ExtensionFileFilter extends FileFilter implements FilenameFilter{
    * Returns a description of this FileFilter.
    */
 
+  @Override
   public String getDescription(){
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < endStrings.length; i++)

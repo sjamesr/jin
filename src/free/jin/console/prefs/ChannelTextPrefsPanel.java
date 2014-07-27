@@ -30,6 +30,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -96,6 +97,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
    */
 
 
+  @Override
   protected CategoryPanel createCustomCategoryPanel(String id){
     if (id.endsWith("channels-panel")){
       // We need this one because the categories (and thus the localization)
@@ -174,12 +176,15 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
       channelNumberField = new free.workarounds.FixedJTextField(new IntegerStrictPlainDocument(0, channelsCount), 
         "", String.valueOf(channelsCount).length() + 1);
       channelNumberField.getDocument().addDocumentListener(new DocumentListener(){
+        @Override
         public void changedUpdate(DocumentEvent e){
           setChannel(channelNumberField.getText());
         }
+        @Override
         public void insertUpdate(DocumentEvent e){
           setChannel(channelNumberField.getText());
         }
+        @Override
         public void removeUpdate(DocumentEvent e){
           setChannel(channelNumberField.getText());
         }
@@ -191,7 +196,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
       chNumberPanel.add(channelNumberField);
       JPanel chNumberAndSeparatorPanel = new JPanel(new BorderLayout(5, 5));
       chNumberAndSeparatorPanel.add(chNumberPanel, BorderLayout.NORTH);
-      chNumberAndSeparatorPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.CENTER);
+      chNumberAndSeparatorPanel.add(new JSeparator(SwingConstants.HORIZONTAL), BorderLayout.CENTER);
       this.add(chNumberAndSeparatorPanel, BorderLayout.NORTH);
       this.add(textStyleChooser, BorderLayout.CENTER);
     }
@@ -242,6 +247,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel{
      * depending on the currently specified channel.
      */
 
+    @Override
     public String [] getCategories(){
       String [] categories = super.getCategories();
       String channel = getChannel();

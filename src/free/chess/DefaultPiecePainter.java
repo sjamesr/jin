@@ -53,6 +53,7 @@ public class DefaultPiecePainter implements PiecePainter{
    * </code>this</code>.
    */
   
+  @Override
   public PiecePainter freshInstance(){
     return this;
   }
@@ -63,6 +64,7 @@ public class DefaultPiecePainter implements PiecePainter{
    * Paints the piece.
    */
 
+  @Override
   public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect, boolean shaded){
     delegate.paintPiece(piece, g, component, rect, shaded);
   }

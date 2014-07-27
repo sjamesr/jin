@@ -193,6 +193,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
    * <code>this</code>.
    */
   
+  @Override
   public PiecePainter freshInstance(){
     return this;
   }
@@ -221,6 +222,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
    * must have the correct size.
    */
    
+  @Override
   public void load(URL baseUrl) throws IOException{
     if (pieceImages != null)
       throw new IllegalStateException("This ImagePiecePainter has already been loaded");
@@ -347,6 +349,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
    * Graphics object scaled to the given size.
    */
 
+  @Override
   public void paintPiece(Piece piece, Graphics g, Component component, Rectangle rect,
       boolean shaded){
 
@@ -379,6 +382,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
 
   private static class ShadingFilter extends RGBImageFilter{
 
+    @Override
     public int filterRGB(int x, int y, int rgb){
       int alpha = (rgb >> 24) & 0xff;
       int r = (rgb >> 16) & 0xff;
@@ -467,6 +471,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter{
      * images.
      */
     
+    @Override
     public void dataRead(URL [] urls, Object id, byte [][] data, IOException[] exceptions){
       // If there are any exceptions, we simply quit - this will cause
       // the painter to keep using the delegate to paint pieces.

@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -161,7 +162,7 @@ public class BackgroundChooser extends JDialog{
 
     createUI();
 
-    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
     SwingUtils.registerEscapeCloser(this);
   }
@@ -248,10 +249,12 @@ public class BackgroundChooser extends JDialog{
 
     pickColor.addActionListener(new ActionListener(){
 
+      @Override
       public void actionPerformed(ActionEvent evt){
         final JColorChooser colorChooser = createColorChooser();
 
         ActionListener okListener = new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             Color clr = colorChooser.getColor();
             
@@ -266,6 +269,7 @@ public class BackgroundChooser extends JDialog{
         };
         
         ActionListener cancelListener = new ActionListener(){
+          @Override
           public void actionPerformed(ActionEvent evt){
             if (color == null)
               desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
@@ -287,6 +291,7 @@ public class BackgroundChooser extends JDialog{
   
       pickImage.addActionListener(new ActionListener(){
   
+        @Override
         public void actionPerformed(ActionEvent evt){
           int val = fileChooser.showOpenDialog(BackgroundChooser.this);
           File pic = (val == JFileChooser.APPROVE_OPTION) ?
@@ -306,6 +311,7 @@ public class BackgroundChooser extends JDialog{
   
       useDefault.addActionListener(new ActionListener(){
   
+        @Override
         public void actionPerformed(ActionEvent evt){
           color = defaultColor;
           imageFile = defaultImageFile;
@@ -335,6 +341,7 @@ public class BackgroundChooser extends JDialog{
   
       ActionListener imageLayoutListener = new ActionListener(){
   
+        @Override
         public void actionPerformed(ActionEvent evt){
           Object src = evt.getSource();
           if (src == tileButton)
@@ -356,6 +363,7 @@ public class BackgroundChooser extends JDialog{
 
     closeButton.addActionListener(new ActionListener(){
 
+      @Override
       public void actionPerformed(ActionEvent evt){
         dispose();
       }
@@ -394,6 +402,7 @@ public class BackgroundChooser extends JDialog{
     chooser.setPreviewPanel(new JPanel());
     chooser.getSelectionModel().addChangeListener(new ChangeListener(){
 
+      @Override
       public void stateChanged(ChangeEvent evt){
         Color color = chooser.getColor();
         if (color != null)
@@ -427,6 +436,7 @@ public class BackgroundChooser extends JDialog{
     fileChooser.setMultiSelectionEnabled(false);
     
     fileChooser.addPropertyChangeListener(new PropertyChangeListener(){
+      @Override
       public void propertyChange(PropertyChangeEvent evt){
         String prop = evt.getPropertyName();
         if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(prop)){
@@ -448,6 +458,7 @@ public class BackgroundChooser extends JDialog{
    * Overrides setVisible(boolean) to center the dialog before showing it.
    */
 
+  @Override
   public void setVisible(boolean visible){
     if (visible)
       AWTUtilities.centerWindow(this, getParent());

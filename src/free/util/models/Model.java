@@ -83,6 +83,7 @@ public abstract class Model{
    * Returns the name of this model, if it has one.
    */
   
+  @Override
   public String toString(){
     return getName();
   }

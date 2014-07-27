@@ -309,6 +309,7 @@ public class ChessEvent{
    * Returns a textual representation of this ChessEvent.
    */
   
+  @Override
   public String toString(){
     return getDescription();
   }

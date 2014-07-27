@@ -137,6 +137,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * not an instance of <code>SeekConnection</code>.
    */
 
+  @Override
   public boolean setContext(PluginContext context){
     if (!(context.getConnection() instanceof SeekConnection))
       return false;
@@ -161,6 +162,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Starts this plugin.
    */
 
+  @Override
   public void start(){
     createUI();
     registerListeners();
@@ -173,6 +175,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Stops this plugin.
    */
 
+  @Override
   public void stop(){
     unregisterListeners();
     savePrefs();
@@ -232,6 +235,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
             (Component)issueSeekPanel : (Component)issueMatchPanel));
     
     model.addTabbedPaneListener(new TabbedPaneListener(){
+      @Override
       public void tabSelected(TabbedPaneEvent evt){
         Container issuePanel = (Container)evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
         Component defaultComponent = issuePanel.getFocusTraversalPolicy().getDefaultComponent(issuePanel);
@@ -239,8 +243,11 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
           defaultComponent.requestFocusInWindow();
       }
       
+      @Override
       public void tabAdded(TabbedPaneEvent evt){}
+      @Override
       public void tabDeselected(TabbedPaneEvent evt){}
+      @Override
       public void tabRemoved(TabbedPaneEvent evt){}
     });
     
@@ -252,6 +259,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     
     
     JComponent soughtGraphWrapper = new WrapperComponent(){
+      @Override
       public Dimension getPreferredSize(){
         // The sought graph doesn't really have a preferred size, as much as a
         // preferred width:height ratio
@@ -372,6 +380,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Gets called when the seek graph container is made visible.
    */
 
+  @Override
   public void pluginUIShown(PluginUIEvent evt){
     SeekConnection conn = getSeekConn();
     
@@ -389,6 +398,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Gets called when the seek graph container is made invisible.
    */
 
+  @Override
   public void pluginUIHidden(PluginUIEvent evt){
     soughtGraph.removeAllSeeks();
 
@@ -398,11 +408,17 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   
+  @Override
   public void pluginUIClosing(PluginUIEvent evt){}
+  @Override
   public void pluginUIActivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDeactivated(PluginUIEvent evt){}
+  @Override
   public void pluginUIDisposed(PluginUIEvent evt){}
+  @Override
   public void pluginUITitleChanged(PluginUIEvent evt){}
+  @Override
   public void pluginUIIconChanged(PluginUIEvent evt){}
   
 
@@ -436,6 +452,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * SeekListener implementation. Gets called when a seek is added.
    */
 
+  @Override
   public void seekAdded(SeekEvent evt){
     soughtGraph.addSeek(evt.getSeek());
   }
@@ -446,6 +463,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * SeekListener implementation. Gets called when a seek is removed.
    */
 
+  @Override
   public void seekRemoved(SeekEvent evt){
     soughtGraph.removeSeek(evt.getSeek());
   }
@@ -457,6 +475,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Seek. This method asks the SeekConnection to accept the selected seek.
    */
 
+  @Override
   public void seekSelected(SeekSelectionEvent evt){
     Seek seek = evt.getSeek();
     SeekConnection conn = getSeekConn();
@@ -475,6 +494,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * leaving them on.   
    */
   
+  @Override
   public void connectionLost(Connection conn){
     soughtGraph.removeAllSeeks();
   }
@@ -482,10 +502,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
   
   
   // The rest of ConnectionListener's methods.
+  @Override
   public void connectingFailed(Connection conn, String reason){}
+  @Override
   public void connectionAttempted(Connection conn, String hostname, int port){}
+  @Override
   public void connectionEstablished(Connection conn){}
+  @Override
   public void loginFailed(Connection conn, String reason){}
+  @Override
   public void loginSucceeded(Connection conn){}
 
 
@@ -494,6 +519,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
    * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
    */
 
+  @Override
   public String getId(){
     return PLUGIN_ID;
   }
@@ -522,6 +548,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      * Returns the id of this action - "findgame".
      */
       
+    @Override
     public String getId(){
       return "findgame";
     }
@@ -532,6 +559,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      * Displays or hides the UI.
      */
     
+    @Override
     public void actionPerformed(ActionEvent evt){
       if (uiContainer.isVisible())
         uiContainer.setVisible(false);
@@ -545,6 +573,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      * Invoked when the "find game" UI is shown.
      */
     
+    @Override
     public void pluginUIShown(PluginUIEvent evt){
       I18n i18n = I18n.get(FindGameAction.class);
       
@@ -558,6 +587,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      * Invoked when the "find game" UI is hidden.
      */
     
+    @Override
     public void pluginUIHidden(PluginUIEvent evt){
       I18n i18n = I18n.get(FindGameAction.class);
       
@@ -571,6 +601,7 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
      * Invoked when the "find game" UI is made active.
      */
     
+    @Override
     public void pluginUIActivated(PluginUIEvent evt){
       Container focusCycleRoot = issueTabbedPane.getFocusCycleRootAncestor();
       if (focusCycleRoot == null) // Weird things can happen on shutdown
@@ -587,10 +618,15 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
       defaultComponent.requestFocusInWindow();
     }
     
+    @Override
     public void pluginUIClosing(PluginUIEvent evt){}
+    @Override
     public void pluginUIDeactivated(PluginUIEvent evt){}
+    @Override
     public void pluginUIDisposed(PluginUIEvent evt){}
+    @Override
     public void pluginUITitleChanged(PluginUIEvent evt){}
+    @Override
     public void pluginUIIconChanged(PluginUIEvent evt){}
     
     

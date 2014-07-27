@@ -81,6 +81,7 @@ public class PieceIcon implements Icon{
    * Returns the width of the icon.
    */
 
+  @Override
   public int getIconWidth(){
     return width;
   }
@@ -91,6 +92,7 @@ public class PieceIcon implements Icon{
    * Returns the height of the icon.
    */
 
+  @Override
   public int getIconHeight(){
     return height;
   }
@@ -101,6 +103,7 @@ public class PieceIcon implements Icon{
    * Paints the icon on the given Graphics, at the given location.
    */
 
+  @Override
   public void paintIcon(Component component, Graphics g, int x, int y){
     piecePainter.paintPiece(piece, g, component, new Rectangle(x, y, width, height), false);
   }

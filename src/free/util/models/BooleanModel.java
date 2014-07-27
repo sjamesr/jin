@@ -82,6 +82,7 @@ public class BooleanModel extends Model implements UnmodifiableBooleanModel{
    * Returns the current state.
    */
   
+  @Override
   public boolean get(){
     return state;
   }
@@ -121,6 +122,7 @@ public class BooleanModel extends Model implements UnmodifiableBooleanModel{
    * Returns whether the model's state is currently "on" (<code>true</code>). 
    */
   
+  @Override
   public boolean isOn(){
     return state;
   }
@@ -131,6 +133,7 @@ public class BooleanModel extends Model implements UnmodifiableBooleanModel{
    * Returns whether the model's state is currently "off" (<code>false</code>).
    */
   
+  @Override
   public boolean isOff(){
     return !state;
   }
@@ -141,6 +144,7 @@ public class BooleanModel extends Model implements UnmodifiableBooleanModel{
    * Adds a listener to changes in this model.
    */
   
+  @Override
   public void addListener(BooleanListener l){
     listenerList.add(BooleanListener.class, l);
   }
@@ -151,6 +155,7 @@ public class BooleanModel extends Model implements UnmodifiableBooleanModel{
    * Removes a listener to changes in this model.
    */
   
+  @Override
   public void removeListener(BooleanListener l){
     listenerList.remove(BooleanListener.class, l);
   }

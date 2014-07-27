@@ -29,6 +29,7 @@ import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,6 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -211,8 +213,9 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     final JList list = new JList(scriptsListModel);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(new MouseAdapter(){
+      @Override
       public void mouseClicked(MouseEvent evt){
-        if ((evt.getClickCount() == 2) && (evt.getModifiers() == KeyEvent.BUTTON1_MASK)){
+        if ((evt.getClickCount() == 2) && (evt.getModifiers() == InputEvent.BUTTON1_MASK)){
           int selectedIndex = list.getSelectedIndex();
           if (selectedIndex != -1)
             editScript((Script)scriptsListModel.getElementAt(selectedIndex));
@@ -220,7 +223,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       }
     });
 
-    JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,  ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setPreferredSize(new Dimension(200, 70));
 
     JLabel listLabel = i18n.createLabel("scriptsLabel");
@@ -236,6 +239,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     enabled.setEnabled(false);
 
     list.addListSelectionListener(new ListSelectionListener(){
+      @Override
       public void valueChanged(ListSelectionEvent evt){
         if (evt.getValueIsAdjusting())
           return;
@@ -257,12 +261,14 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     });
 
     add.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         addScript();
       }
     });
 
     edit.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = list.getSelectedIndex();
         editScript((Script)scriptsListModel.getElementAt(selectedIndex));
@@ -270,6 +276,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     });
 
     remove.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = list.getSelectedIndex();
         deleteScript((Script)scriptsListModel.getElementAt(selectedIndex));
@@ -287,6 +294,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
     });
 
     enabled.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         int selectedIndex = list.getSelectedIndex();
         Script script = (Script)scriptsListModel.getElementAt(selectedIndex);
@@ -326,6 +334,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
    * Applies the changes made by the user.
    */
 
+  @Override
   public void applyChanges() throws BadChangesException{
     Script [] oldScripts = scripter.getScripts();
     Script [] newScripts = new Script[scriptsListModel.getSize()];
@@ -371,6 +380,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
      */
 
      WindowDisposingListener closer = new WindowDisposingListener(this){
+      @Override
       public void beforeDisposing(EventObject evt){
         scriptType = null;
       }
@@ -426,10 +436,12 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
 
       final JTextArea typeExplanationTextArea = new FixedJTextArea(){
         
+        @Override
         public boolean isFocusTraversable(){return false;}
         
         private Dimension prefSize = null;
         
+        @Override
         public Dimension getPreferredSize(){
           if (prefSize == null)
             prefSize = calculatePreferredSize();
@@ -464,6 +476,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel{
       typeExplanationTextArea.setOpaque(false);
 
       ActionListener selectionListener = new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           ButtonModel selectedModel = buttonGroup.getSelection();
           scriptType = selectedModel.getActionCommand();

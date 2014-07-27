@@ -99,6 +99,7 @@ public class DelegatingClassLoader extends ChildClassLoader{
    * Loads and optionally resolves the specified class.
    */
 
+  @Override
   protected Class loadClassImpl(String name, boolean resolve){
     if (beingLoaded.containsKey(name)) // Avoid endless recursion
       return null;
@@ -126,6 +127,7 @@ public class DelegatingClassLoader extends ChildClassLoader{
    * specified name.
    */
 
+  @Override
   protected InputStream getResourceAsStreamImpl(String name){
     if (beingLoaded.containsKey(name)) // Avoid endless recursion
       return null;
@@ -151,6 +153,7 @@ public class DelegatingClassLoader extends ChildClassLoader{
    * name.
    */
 
+  @Override
   protected URL getResourceImpl(String name){
     if (beingLoaded.containsKey(name)) // Avoid endless recursion
       return null;

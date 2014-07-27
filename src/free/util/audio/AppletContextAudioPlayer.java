@@ -64,6 +64,7 @@ public class AppletContextAudioPlayer implements AudioPlayer, Runnable{
    * Returns <code>true</code> if our applet context has been set. 
    */
    
+  @Override
   public boolean isSupported(){
     return getAppletContext() != null;
   }
@@ -97,6 +98,7 @@ public class AppletContextAudioPlayer implements AudioPlayer, Runnable{
    * Plays the specified <code>AudioClip</code>. 
    */
   
+  @Override
   public synchronized void play(AudioClip clip){
     // Lazily initialize the player thread.
     if (playerThread == null){
@@ -115,6 +117,7 @@ public class AppletContextAudioPlayer implements AudioPlayer, Runnable{
    * them.
    */
    
+  @Override
   public void run(){
     while (true){
       try{

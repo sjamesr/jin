@@ -40,6 +40,7 @@ public class GenericJavaxSampledAudioPlayer extends JavaxSampledAudioPlayer{
    * of time.
    */
 
+  @Override
   public void run(){
     SourceDataLine dataLine = null;
     while (true){

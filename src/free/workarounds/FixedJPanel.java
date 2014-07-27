@@ -21,6 +21,7 @@
 
 package free.workarounds;
 
+import java.awt.AWTEvent;
 import java.awt.LayoutManager;
 import java.awt.event.MouseEvent;
 
@@ -72,7 +73,7 @@ public class FixedJPanel extends JPanel{
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4221132.html //
 
-    enableEvents(MouseEvent.MOUSE_EVENT_MASK|MouseEvent.MOUSE_MOTION_EVENT_MASK);
+    enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK);
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4221132.html //
   }

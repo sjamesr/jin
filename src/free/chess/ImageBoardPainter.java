@@ -53,6 +53,7 @@ public final class ImageBoardPainter implements ResourceBoardPainter{
    * <code>this</code>.
    */
   
+  @Override
   public BoardPainter freshInstance(){
     return this;
   }
@@ -75,6 +76,7 @@ public final class ImageBoardPainter implements ResourceBoardPainter{
    * a {@link BoardImageBoardPainter} or a {@link SquareImagesBoardPainter}.
    */
    
+  @Override
   public void load(URL url) throws IOException{
     if (delegate != null)
       throw new IllegalStateException("This ImageBoardPainter has already been loaded");
@@ -101,6 +103,7 @@ public final class ImageBoardPainter implements ResourceBoardPainter{
    * Merely delegates the drawing to the actual board painter.
    */
 
+  @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     delegate.paintBoard(g, component, x, y, width, height);
   } 

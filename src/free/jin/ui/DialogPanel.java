@@ -286,6 +286,7 @@ public abstract class DialogPanel extends JPanel{
      * constructor.
      */
     
+    @Override
     public void actionPerformed(ActionEvent evt){
       close(result);
     }

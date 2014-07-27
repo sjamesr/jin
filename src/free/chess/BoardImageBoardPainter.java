@@ -139,6 +139,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter{
    * <code>this</code>.
    */
   
+  @Override
   public BoardPainter freshInstance(){
     return this;
   }
@@ -158,6 +159,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter{
    * where "ext" is the value of the <code>ext</code> property. 
    */
   
+  @Override
   public void load(URL url) throws IOException{
     if (boardImageUrl != null)
       throw new IllegalStateException("This BoardImageBoardPainter has already been loaded");
@@ -234,6 +236,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter{
    * the given size.
    */
 
+  @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height){
     if (prepareBoardImage(width, height, component))
       g.drawImage(scaledBoardImage, x, y, component);
@@ -286,6 +289,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter{
      * Called when the image data has been loaded. Creates the board image.
      */
     
+    @Override
     public void dataRead(URL [] urls, Object id, byte [][] data, IOException [] exceptions){
       // If there are any exceptions, we simply quit - this will cause
       // the painter to keep using the delegate to paint the board.

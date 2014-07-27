@@ -54,6 +54,7 @@ public class IcsPersonalChatConsoleDesignation extends PersonalChatConsoleDesign
    * Appends the specified chat event to the console.
    */
   
+  @Override
   protected void appendChat(ChatEvent evt){
     String type = evt.getType();
     

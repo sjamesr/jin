@@ -99,6 +99,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Returns a copy of this <code>EboardVectorPiecePainter</code>.
    */
   
+  @Override
   public PiecePainter freshInstance(){
     return new EboardVectorPiecePainter();
   }
@@ -109,6 +110,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a king.
    */
 
+  @Override
   protected Polygon createKingPolygon(int width, int height){
     Polygon kingPolygon = new Polygon();
 
@@ -189,6 +191,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * outline color using the given Graphics.
    */
 
+  @Override
   protected void drawKingImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
     super.drawKingImage(g, width, height, pieceColor, outlineColor);
 
@@ -210,6 +213,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a queen.
    */
 
+  @Override
   protected Polygon createQueenPolygon(int width, int height){
     Polygon queenPolygon = new Polygon();
 
@@ -302,6 +306,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * outline color using the given Graphics.
    */
 
+  @Override
   protected void drawQueenImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
     super.drawQueenImage(g, width, height, pieceColor, outlineColor);
 
@@ -320,6 +325,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a rook.
    */
 
+  @Override
   protected Polygon createRookPolygon(int width, int height){
     Polygon rookPolygon = new Polygon();
 
@@ -365,6 +371,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * outline color using the given Graphics.
    */
 
+  @Override
   protected void drawRookImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
     super.drawRookImage(g, width, height, pieceColor, outlineColor);
 
@@ -384,6 +391,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a bishop.
    */
 
+  @Override
   protected Polygon createBishopPolygon(int width, int height){
     Polygon bishopPolygon = new Polygon();
 
@@ -489,6 +497,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * outline color using the given Graphics.
    */
 
+  @Override
   protected void drawBishopImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
     super.drawBishopImage(g, width, height, pieceColor, outlineColor);
 
@@ -511,6 +520,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a knight.
    */
 
+  @Override
   protected Polygon createKnightPolygon(int width, int height){
     Polygon knightPolygon = new Polygon();
 
@@ -594,6 +604,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * outline color using the given Graphics.
    */
 
+  @Override
   protected void drawKnightImage(Graphics g, int width, int height, Color pieceColor, Color outlineColor){
     super.drawKnightImage(g, width, height, pieceColor, outlineColor);
 
@@ -614,6 +625,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter{
    * Creates and returns a Polygon for drawing a pawn.
    */
 
+  @Override
   protected Polygon createPawnPolygon(int width, int height){
     Polygon pawnPolygon = new Polygon();
 

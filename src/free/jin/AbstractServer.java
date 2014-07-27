@@ -118,6 +118,7 @@ public abstract class AbstractServer implements Server{
    * Returns the username policy of this server.
    */
 
+  @Override
   public final UsernamePolicy getUsernamePolicy(){
     return usernamePolicy;
   }
@@ -128,6 +129,7 @@ public abstract class AbstractServer implements Server{
    * Sets the guest account.
    */
 
+  @Override
   public synchronized void setGuestUser(User user){
     if (guest != null)
       throw new IllegalStateException("Guest already created");
@@ -142,6 +144,7 @@ public abstract class AbstractServer implements Server{
    * Returns the guest account.
    */
 
+  @Override
   public User getGuest(){
     return guest;
   }
@@ -153,6 +156,7 @@ public abstract class AbstractServer implements Server{
    * is <code>defaultHost</code>.
    */
 
+  @Override
   public String getDefaultHost(){
     return props.getProperty("defaultHost");
   }
@@ -165,6 +169,7 @@ public abstract class AbstractServer implements Server{
    * list of hostnames.
    */
 
+  @Override
   public String [] getHosts(){
     return TextUtilities.getTokens(props.getProperty("hosts"), " ");
   }
@@ -175,6 +180,7 @@ public abstract class AbstractServer implements Server{
    * Sets the host to connect to.
    */
    
+  @Override
   public void setHost(String host){
     props.put("defaultHost", host);
     props.put("hosts", host);
@@ -188,6 +194,7 @@ public abstract class AbstractServer implements Server{
    * of valid port values.
    */
 
+  @Override
   public int [] getPorts(){
     return TextUtilities.parseIntList(props.getProperty("ports"), " ");
   }
@@ -198,6 +205,7 @@ public abstract class AbstractServer implements Server{
    * Sets the port to connect on.
    */
    
+  @Override
   public void setPort(int port){
     props.put("ports", String.valueOf(port));
   }
@@ -208,6 +216,7 @@ public abstract class AbstractServer implements Server{
    * Returns the id of this server. The property name is <code>id</code>.
    */
 
+  @Override
   public String getId(){
     return props.getProperty("id");
   }
@@ -219,6 +228,7 @@ public abstract class AbstractServer implements Server{
    * <code>protocolId</code>.
    */
   
+  @Override
   public String getProtocolId(){
     return props.getProperty("protocolId");
   }
@@ -230,6 +240,7 @@ public abstract class AbstractServer implements Server{
    * <code>shortName</code>.
    */
 
+  @Override
   public String getShortName(){
     return getI18n().getString("shortName");
   }
@@ -241,6 +252,7 @@ public abstract class AbstractServer implements Server{
    * <code>longName</code>.
    */
 
+  @Override
   public String getLongName(){
     return getI18n().getString("longName");
   }
@@ -252,6 +264,7 @@ public abstract class AbstractServer implements Server{
    * <code>website</code>.
    */
 
+  @Override
   public String getWebsite(){
     return props.getProperty("website");
   }
@@ -263,6 +276,7 @@ public abstract class AbstractServer implements Server{
    * <code>registrationPage</code>.
    */
 
+  @Override
   public String getRegistrationPage(){
     return props.getProperty("registrationPage");
   }
@@ -274,6 +288,7 @@ public abstract class AbstractServer implements Server{
    * <code>passwordRetrievalPage</code>.
    */
 
+  @Override
   public String getPasswordRetrievalPage(){
     return props.getProperty("passwordRetrievalPage");
   }
@@ -287,6 +302,7 @@ public abstract class AbstractServer implements Server{
    * <code>playerPictureURL</code> property.
    */
   
+  @Override
   public URL getPlayerPictureURL(ServerUser user){
     String pattern = props.getProperty("playerPictureURL");
     if (pattern == null)
@@ -307,6 +323,7 @@ public abstract class AbstractServer implements Server{
    * Returns a textual representation of this Server.
    */
 
+  @Override
   public String toString(){
     return getLongName()+" ("+getWebsite()+")";
   }

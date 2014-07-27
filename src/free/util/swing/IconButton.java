@@ -91,6 +91,7 @@ public class IconButton extends JButton{
    * disabled icons.
    */
   
+  @Override
   public void setIcon(Icon icon){
     if (icon instanceof ImageIcon){
       Image image = ((ImageIcon)icon).getImage();

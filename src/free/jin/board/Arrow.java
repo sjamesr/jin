@@ -108,6 +108,7 @@ public final class Arrow{
    * the same if they have the same "from" and "to" squares and the same color.
    */
    
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof Arrow))
       return false;
@@ -122,6 +123,7 @@ public final class Arrow{
    * Returns the hashcode of this arrow.
    */
    
+  @Override
   public int hashCode(){
     int result = 17;
     result = 37*result + from.hashCode();

@@ -215,6 +215,7 @@ public class ImageUtilities{
      * false, otherwise simply returns true.
      */
 
+    @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height){
       synchronized(lock){
         if ((infoflags & ALLBITS)!=0){

@@ -70,6 +70,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
   
   public FreechessBoardManager(){
     addPropertyChangeListener(new PropertyChangeListener(){
+      @Override
       public void propertyChange(PropertyChangeEvent evt){
         if ("moveSendingMode".equals(evt.getPropertyName())){
           Integer oldValue = (Integer)evt.getOldValue();
@@ -93,6 +94,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * Registers our own listeners.
    */
   
+  @Override
   protected void registerConnListeners(){
     super.registerConnListeners();
     
@@ -109,6 +111,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * <code>registerConnListeners</code>.
    */
   
+  @Override
   protected void unregisterConnListeners(){
     super.unregisterConnListeners();
     
@@ -124,6 +127,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * Overrides BoardManager.createBoardPanel() to return a FreechessBoardPanel.
    */
   
+  @Override
   protected BoardPanel createBoardPanel(Game game){
     BoardPanel boardPanel = new FreechessBoardPanel(this, game);
     
@@ -137,6 +141,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * Overrides the superclass' method to set the primary game properly.
    */
   
+  @Override
   public void pluginUIActivated(PluginUIEvent e){
     Connection conn = getConn();
     if (!conn.isConnected())
@@ -175,6 +180,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * and <code>primaryPlayedGameID</code> properly.
    */
   
+  @Override
   public void gameStarted(GameStartEvent evt){
     Game game = evt.getGame();
     int gameType = game.getGameType();
@@ -195,6 +201,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * and <code>primaryPlayedGameID</code> properly.
    */
   
+  @Override
   public void gameEnded(GameEndEvent evt){
     Game game = evt.getGame();
     int gameType = game.getGameType();
@@ -214,6 +221,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * <code>IvarStateChangeListener</code> implementation.
    */
   
+  @Override
   public void ivarStateChanged(IvarStateChangeEvent evt){
     // Did the user try to set iv_premove manually to false?
     if ((evt.getIvar() == Ivar.PREMOVE) && (evt.getState() == false) &&
@@ -231,6 +239,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
    * but since FICS refuses to do the reasonable thing, we must.
    */
   
+  @Override
   public void loginSucceeded(Connection conn){
     super.loginSucceeded(conn);
     

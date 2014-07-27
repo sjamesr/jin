@@ -30,6 +30,7 @@ public class ArrowIcon extends ColoredIcon{
    * Draws the "arrow".
    */
 
+  @Override
   public void paintShape(Component c, Graphics g, int x, int y){
     int halfSize = getIconWidth()/2;
     int yOffset = (halfSize+1)/2;

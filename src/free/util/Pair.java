@@ -86,6 +86,7 @@ public final class Pair{
    * Returns a hashcode combined from the hashcodes of the two target objects.
    */
 
+  @Override
   public int hashCode(){
     return Utilities.hashCode(first, second);
   }
@@ -98,6 +99,7 @@ public final class Pair{
    * same as this one's (comparison done via <code>Utilities.areEqual</code>)
    */
 
+  @Override
   public boolean equals(Object o){
     if (o == this)
       return true;

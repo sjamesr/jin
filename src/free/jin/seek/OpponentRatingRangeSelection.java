@@ -121,6 +121,7 @@ public final class OpponentRatingRangeSelection{
     maximumSpinner.setEnabled(maximumLimitedBox.isSelected());
     
     minimumModel.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent e){
         if (minimumModel.getNumber().intValue() > maximumModel.getNumber().intValue())
           maximumModel.setValue(minimumModel.getNumber());
@@ -128,6 +129,7 @@ public final class OpponentRatingRangeSelection{
     });
     
     maximumModel.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent e){
         if (minimumModel.getNumber().intValue() > maximumModel.getNumber().intValue())
           minimumModel.setValue(maximumModel.getNumber());
@@ -135,12 +137,14 @@ public final class OpponentRatingRangeSelection{
     });
     
     minimumLimitedBox.addItemListener(new ItemListener(){
+      @Override
       public void itemStateChanged(ItemEvent evt){
         minimumSpinner.setEnabled(minimumLimitedBox.isSelected());
       }
     });
 
     maximumLimitedBox.addItemListener(new ItemListener(){
+      @Override
       public void itemStateChanged(ItemEvent evt){
         maximumSpinner.setEnabled(maximumLimitedBox.isSelected());
       }

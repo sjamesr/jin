@@ -201,6 +201,7 @@ public class Scripter extends Plugin{
    * Gets things going :-)
    */
 
+  @Override
   public void start(){
     loadScripts();
   }
@@ -212,6 +213,7 @@ public class Scripter extends Plugin{
    * Calls <code>saveScripts</code>.
    */
 
+  @Override
   public void saveState(){
     saveScripts();
   }
@@ -286,6 +288,7 @@ public class Scripter extends Plugin{
    * Returns <code>true</code> to indicate that we have a preferences UI.
    */
 
+  @Override
   public boolean hasPreferencesUI(){
     return true;
   }
@@ -296,6 +299,7 @@ public class Scripter extends Plugin{
    * Returns the Scripter's preferences UI panel.
    */
 
+  @Override
   public PreferencesPanel getPreferencesUI(){
     return new ScripterPreferencesPanel(this);
   }
@@ -593,6 +597,7 @@ public class Scripter extends Plugin{
    * Returns the string "scripter".
    */
 
+  @Override
   public String getId(){
     return "scripter";
   }
@@ -776,28 +781,39 @@ public class Scripter extends Plugin{
   private class ConnectionScriptDispatcher extends ScriptDispatcher implements ConnectionListener{
 
     private final String [] subtypes = new String[]{"attempt", "connect", "login", "disconnect"};
+    @Override
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
+    @Override
     public boolean isSupportedBy(Connection conn){return true;}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addConnectionListener(this);      
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removeConnectionListener(this);
     }
 
+    @Override
     public void connectionAttempted(Connection conn, String hostname, int port){runScripts(null, subtypes[0], null);}
+    @Override
     public void connectionEstablished(Connection conn){runScripts(null, subtypes[1], null);}
+    @Override
     public void loginSucceeded(Connection conn){runScripts(null, subtypes[2], null);}
+    @Override
     public void connectionLost(Connection conn){runScripts(null, subtypes[3], null);}
     
     // The rest of ConnectionListener's methods
+    @Override
     public void connectingFailed(Connection conn, String reason){}
+    @Override
     public void loginFailed(Connection conn, String reason){}
 
     
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return null;
     }
@@ -812,22 +828,28 @@ public class Scripter extends Plugin{
 
   private class PlainTextScriptDispatcher extends ScriptDispatcher implements PlainTextListener{
 
+    @Override
     protected String [] getEventSubtypesImpl(){return null;}
 
+    @Override
     public boolean isSupportedBy(Connection conn){return true;}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addPlainTextListener(this);      
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removePlainTextListener(this);
     }
 
+    @Override
     public void plainTextReceived(PlainTextEvent evt){
       runScripts(evt, null, new Object[][]{{"text", evt.getText()}});
     }
 
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return new Object[][]{{"text", "hello!"}};
     }
@@ -845,15 +867,19 @@ public class Scripter extends Plugin{
   private class GameScriptDispatcher extends ScriptDispatcher implements GameListener{
     
     private final String [] subtypes = new String[]{"gameStart", "move", "takebackOrBackward", "boardFlip", "illegalMoveAttempt", "clockUpdate", "otherPositionChange", "offers", "gameEnd"};
+    @Override
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
 
+    @Override
     public boolean isSupportedBy(Connection conn){return true;}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       listenerManager.addGameListener(this);      
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       listenerManager.removeGameListener(this);
     }
@@ -957,6 +983,7 @@ public class Scripter extends Plugin{
       return vars;
     }
 
+    @Override
     public void gameStarted(GameStartEvent evt){
       Vector varsVector = createVarsVector(evt);
       Object [][] vars = new Object[varsVector.size()][];
@@ -965,6 +992,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[0], vars);
     }
 
+    @Override
     public void moveMade(MoveMadeEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"move", evt.getMove()});
@@ -978,6 +1006,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[1], vars);
     }
 
+    @Override
     public void positionChanged(PositionChangedEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"newPosition", evt.getPosition()});
@@ -988,6 +1017,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[6], vars);
     }
 
+    @Override
     public void takebackOccurred(TakebackEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"takebackCount", new Integer(evt.getTakebackCount())});
@@ -998,6 +1028,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[2], vars);
     }
 
+    @Override
     public void illegalMoveAttempted(IllegalMoveEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"illegalMove", evt.getMove()});
@@ -1008,6 +1039,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[4], vars);
     }
 
+    @Override
     public void clockAdjusted(ClockAdjustmentEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"player", evt.getPlayer().toString().toLowerCase()});
@@ -1020,6 +1052,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[5], vars);
     }
 
+    @Override
     public void boardFlipped(BoardFlipEvent evt){
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[]{"isFlipped", evt.isFlipped() ? Boolean.TRUE : Boolean.FALSE});
@@ -1031,6 +1064,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[3], vars);
     }
 
+    @Override
     public void offerUpdated(OfferEvent evt){
       String offerType;
       switch (evt.getOfferId()){
@@ -1055,6 +1089,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[7], vars);
     }
 
+    @Override
     public void gameEnded(GameEndEvent evt){
       Vector varsVector = createVarsVector(evt);
 
@@ -1103,6 +1138,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[8], vars);
     }
 
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       Vector varsVector = new Vector(29);
       Game game = new Game(Game.MY_GAME, new Position(), 0, "AlexTheGreat", "Kasparov",
@@ -1247,14 +1283,18 @@ public class Scripter extends Plugin{
   private class SeekScriptDispatcher extends ScriptDispatcher implements SeekListener{
 
     private final String [] subtypes = new String[]{"post", "withdraw"};
+    @Override
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
+    @Override
     public boolean isSupportedBy(Connection conn){return (conn instanceof SeekConnection);}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       ((SeekListenerManager)listenerManager).addSeekListener(this);
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       ((SeekListenerManager)listenerManager).removeSeekListener(this);
     }
@@ -1295,6 +1335,7 @@ public class Scripter extends Plugin{
     }
 
 
+    @Override
     public void seekAdded(SeekEvent evt){
       Vector varsVector = createVarsVector(evt);
       Object [][] vars = new Object[varsVector.size()][];
@@ -1303,6 +1344,7 @@ public class Scripter extends Plugin{
       runScripts(evt, subtypes[0], vars);
     }
 
+    @Override
     public void seekRemoved(SeekEvent evt){
       Vector varsVector = createVarsVector(evt);
       Object [][] vars = new Object[varsVector.size()][];
@@ -1312,6 +1354,7 @@ public class Scripter extends Plugin{
     }
 
 
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       Vector varsVector = new Vector(25);
       
@@ -1359,38 +1402,48 @@ public class Scripter extends Plugin{
   private class FriendsScriptDispatcher extends ScriptDispatcher implements FriendsListener{
 
     private final String [] subtypes = new String[]{"stateChanged", "connected", "disconnected", "added", "removed"};
+    @Override
     protected String [] getEventSubtypesImpl(){return subtypes;}
 
+    @Override
     public boolean isSupportedBy(Connection conn){return (conn instanceof FriendsConnection);}
 
+    @Override
     public void registerForEvent(ListenerManager listenerManager){
       ((FriendsListenerManager)listenerManager).addFriendsListener(this);
     }
 
+    @Override
     public void unregisterForEvent(ListenerManager listenerManager){
       ((FriendsListenerManager)listenerManager).removeFriendsListener(this);
     }
 
+    @Override
     public void friendStateChanged(FriendsEvent evt){
       runScripts(evt, subtypes[0], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
+    @Override
     public void friendConnected(FriendsEvent evt){
       runScripts(evt, subtypes[1], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
+    @Override
     public void friendDisconnected(FriendsEvent evt){
       runScripts(evt, subtypes[2], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
+    @Override
     public void friendAdded(FriendsEvent evt){
       runScripts(evt, subtypes[3], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
+    @Override
     public void friendRemoved(FriendsEvent evt){
       runScripts(evt, subtypes[4], new Object[][]{{"name", evt.getFriend().getName()}});
     }
 
+    @Override
     protected Object [][] getAvailableVars(String [] eventSubtypes){
       return new Object[][]{{"name", "AlexTheGreat"}};
     }

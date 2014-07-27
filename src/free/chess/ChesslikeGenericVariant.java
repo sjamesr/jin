@@ -375,6 +375,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * this WildVariant as defined by {@link #checkPosition(Position)}
    */
   
+  @Override
   public void init(Position pos){
     checkPosition(pos);
     
@@ -397,6 +398,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * this WildVariant as defined by {@link #checkPosition(Position)}
    */
   
+  @Override
   public Piece [] getPromotionTargets(Position pos, Square startingSquare, Square endingSquare){
     checkPosition(pos);
     
@@ -418,10 +420,10 @@ public class ChesslikeGenericVariant implements WildVariant{
     ChessPiece movingPiece = (ChessPiece)pos.getPieceAt(startingSquare);
     
     if ((endingSquare.getRank()==7)&&(movingPiece==ChessPiece.WHITE_PAWN))
-      return (Piece [])WHITE_PROMOTION_TARGETS.clone();
+      return WHITE_PROMOTION_TARGETS.clone();
     
     if ((endingSquare.getRank()==0)&&(movingPiece==ChessPiece.BLACK_PAWN))
-      return (Piece [])BLACK_PROMOTION_TARGETS.clone();
+      return BLACK_PROMOTION_TARGETS.clone();
     
     return null;
   }
@@ -447,6 +449,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * square.
    */
   
+  @Override
   public Move createMove(Position pos, Square startingSquare, Square endingSquare,
       Piece promotionTarget, String moveSAN){
     
@@ -505,6 +508,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * specified one, but made in the specified position.
    */
   
+  @Override
   public Move createMove(Position pos, Move move){
     checkPosition(pos);
     
@@ -523,6 +527,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * position.
    */
   
+  @Override
   public Move createShortCastling(Position pos){
     checkPosition(pos);
     
@@ -540,6 +545,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * position.
    */
   
+  @Override
   public Move createLongCastling(Position pos){
     checkPosition(pos);
     
@@ -569,6 +575,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * <code>ChessMove</code>.
    */
   
+  @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier){
     checkPosition(pos); // Practically redundant as (almost) nobody can call this
     // method except a method in the Position class, which will
@@ -644,6 +651,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
   
+  @Override
   public Piece parsePiece(String piece){
     return parseChessPiece(piece);
   }
@@ -677,6 +685,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
   
+  @Override
   public String pieceToString(Piece piece){
     if (!(piece instanceof ChessPiece))
       throw new IllegalArgumentException("The piece must be an instance of ChessPiece.");
@@ -701,6 +710,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * {@inheritDoc} 
    */
   
+  @Override
   public Collection getTargetSquares(Position pos, Square square){
     checkPosition(pos);
     
@@ -997,6 +1007,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns an instance of DefaultPiecePainter.
    */
   
+  @Override
   public PiecePainter createDefaultPiecePainter(){
     return new DefaultPiecePainter();
   }
@@ -1007,6 +1018,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns an instance of DefaultBoardPainter.
    */
   
+  @Override
   public BoardPainter createDefaultBoardPainter(){
     return new DefaultBoardPainter();
   }
@@ -1017,6 +1029,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns the name of this wild variant.
    */
   
+  @Override
   public String getName(){
     return variantName;
   }
@@ -1027,6 +1040,7 @@ public class ChesslikeGenericVariant implements WildVariant{
    * Returns a textual representation of this wild variant.
    */
   
+  @Override
   public String toString(){
     return getName();
   }

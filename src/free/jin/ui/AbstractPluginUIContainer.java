@@ -120,6 +120,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Disposes of this plugin container.
    */
 
+  @Override
   public final void dispose(){
     disposeImpl();
     
@@ -159,6 +160,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Returns the plugin to which we belong.
    */
   
+  @Override
   public Plugin getPlugin(){
     return plugin;
   }
@@ -169,6 +171,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Returns the id of this plugin ui container.
    */
   
+  @Override
   public final String getId(){
     return id;
   }
@@ -179,6 +182,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Returns the mode of this plugin ui container.
    */
   
+  @Override
   public final int getMode(){
     return mode;
   }
@@ -254,6 +258,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Adds a <code>PluginUIListener</code>.
    */
 
+  @Override
   public void addPluginUIListener(PluginUIListener listener){
     listenerList.add(PluginUIListener.class, listener);
   }
@@ -264,6 +269,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Removes a <code>PluginUIListener</code>.
    */
 
+  @Override
   public void removePluginUIListener(PluginUIListener listener){
     listenerList.remove(PluginUIListener.class, listener);
   }
@@ -276,7 +282,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
 
   protected void firePluginUIEvent(PluginUIEvent evt){
     PluginUIListener [] listeners =
-      (PluginUIListener [])listenerList.getListeners(PluginUIListener.class);
+      listenerList.getListeners(PluginUIListener.class);
     for (int i = 0; i < listeners.length; i++){
       PluginUIListener listener = listeners[i];
       evt.dispatch(listener);
@@ -312,6 +318,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Sets the title of this plugin ui container.
    */
   
+  @Override
   public final void setTitle(String title){
     setTitleImpl(title);
     this.title = title;
@@ -324,6 +331,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Returns the current title of this plugin ui container.
    */
   
+  @Override
   public final String getTitle(){
     return title;
   }
@@ -342,6 +350,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Sets the icon of this plugin ui container.
    */
   
+  @Override
   public final void setIcon(Image icon){
     setIconImpl(icon);
     this.icon = icon;
@@ -354,6 +363,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * Returns the current icon of this plugin ui container.
    */
   
+  @Override
   public final Image getIcon(){
     return icon;
   }
@@ -372,6 +382,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * {@inheritDoc}
    */
   
+  @Override
   public void setVisibleFirstTime(boolean isVisibleFirstTime){
     this.isVisibleFirstTime = isVisibleFirstTime;
   }
@@ -382,6 +393,7 @@ public abstract class AbstractPluginUIContainer implements PluginUIContainer{
    * {@inheritDoc}
    */
   
+  @Override
   public boolean isVisibleFirstTime(){
     return isVisibleFirstTime;
   }

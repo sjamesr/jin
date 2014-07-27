@@ -380,6 +380,7 @@ public abstract class Plugin{
    * Returns whatever <code>getName</code> does.
    */
 
+  @Override
   public String toString(){
     return getName();
   }

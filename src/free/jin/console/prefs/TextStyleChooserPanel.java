@@ -135,6 +135,7 @@ public class TextStyleChooserPanel extends JPanel{
     createUI();
 
     ChangeListener colorChangeListener = new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         fontSelector.getPreviewPanel().setForeground(foregroundChooser.getColor());
         if (backgroundChooser != null)
@@ -149,6 +150,7 @@ public class TextStyleChooserPanel extends JPanel{
       backgroundChooser.addChangeListener(colorChangeListener);
 
     fontSelector.addChangeListener(new ChangeListener(){
+      @Override
       public void stateChanged(ChangeEvent evt){
         fireStateChanged();
       }
@@ -379,6 +381,7 @@ public class TextStyleChooserPanel extends JPanel{
      * Enables/Disables antialiasing on the specified <code>Graphics</code> object.
      */
 
+    @Override
     public void paintComponent(Graphics g){
       if (antialiasingSupported){
         try{

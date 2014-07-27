@@ -68,6 +68,7 @@ public final class NamedWrapper extends AbstractNamed{
    * are equal.
    */
   
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof NamedWrapper))
       return false;
@@ -83,6 +84,7 @@ public final class NamedWrapper extends AbstractNamed{
    * Returns the hash code of this object.
    */
   
+  @Override
   public int hashCode(){
     return Utilities.hashCode(getName(), getTarget());
   }

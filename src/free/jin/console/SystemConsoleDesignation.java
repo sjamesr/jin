@@ -60,6 +60,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * implements <code>FriendsConnection</code>.
    */
   
+  @Override
   protected void joinForums(){
     if (connection instanceof FriendsConnection)
       ((FriendsConnection)connection).getFriendsListenerManager().addFriendsListener(this);
@@ -71,6 +72,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * The system console displays all events.
    */
   
+  @Override
   protected boolean accept(JinEvent evt){
     return true;
   }
@@ -82,6 +84,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * the console of any personal tells received..
    */
   
+  @Override
   protected void appendChat(ChatEvent evt){
     super.appendChat(evt);
     
@@ -105,6 +108,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Invoked when a friend connects.
    */
 
+  @Override
   public void friendConnected(FriendsEvent evt){
     I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
     Console console = getConsole();
@@ -119,6 +123,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
    * Invoked when a friend disconnects.
    */
   
+  @Override
   public void friendDisconnected(FriendsEvent evt){
     I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
     Console console = getConsole();
@@ -129,8 +134,11 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   
   
   
+  @Override
   public void friendAdded(FriendsEvent evt){}
+  @Override
   public void friendRemoved(FriendsEvent evt){}
+  @Override
   public void friendStateChanged(FriendsEvent evt){}
 
   
@@ -158,6 +166,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Issues the specified command.
      */
     
+    @Override
     protected void send(String command){
       sendCommand(command);
     }
@@ -168,6 +177,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
      * Echoes the specified command to the console.
      */
     
+    @Override
     protected void echo(String command){
       echoCommand(command);
     }

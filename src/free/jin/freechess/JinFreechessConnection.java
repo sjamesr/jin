@@ -152,6 +152,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * characters.
    */
   
+  @Override
   public String getTextEncoding(){
     return null;
   }
@@ -181,6 +182,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns our ListenerManager.
    */
 
+  @Override
   public ListenerManager getListenerManager(){
     return getFreechessListenerManager();
   }
@@ -202,6 +204,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends the specified command to the server.
    */
    
+  @Override
   public void sendCommand(String command){
     sendCommand(command, false, false, false);
   }
@@ -223,6 +226,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an "attempting" connection event and invokes {@link free.util.Connection#initiateConnect(String, int)}.
    */
   
+  @Override
   public void initiateConnectAndLogin(String hostname, int port){
     listenerManager.fireConnectionAttempted(this, hostname, port);
 
@@ -235,6 +239,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an "established" connection event.
    */
   
+  @Override
   protected void handleConnected(){
     listenerManager.fireConnectionEstablished(this);
     
@@ -247,6 +252,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires a "failed" connection event.
    */
   
+  @Override
   protected void handleConnectingFailed(IOException e){
     listenerManager.fireConnectingFailed(this, e.getMessage());
     
@@ -259,6 +265,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires a "login succeeded" connection event and performs other on-login tasks.
    */
   
+  @Override
   protected void handleLoginSucceeded(){
     super.handleLoginSucceeded();
     
@@ -274,6 +281,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires a "login failed" connection event.
    */
   
+  @Override
   protected void handleLoginFailed(String reason){
     listenerManager.fireLoginFailed(this, reason);
     
@@ -286,6 +294,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires a "connection lost" connection event.
    */
   
+  @Override
   protected void handleDisconnection(IOException e){
     listenerManager.fireConnectionLost(this);
     
@@ -298,6 +307,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Overrides {@link free.util.Connection#connectImpl(String, int)} to return a timesealing socket.
    */
 
+  @Override
   protected Socket connectImpl(String hostname, int port) throws IOException{
     Socket result = null;
     try{
@@ -334,6 +344,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * unidentified text.
    */
 
+  @Override
   protected void processLine(String line){
     listenerManager.firePlainTextEvent(new PlainTextEvent(this, null, line));
   }
@@ -345,6 +356,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * ivar.
    */
    
+  @Override
   protected boolean processIvarStateChanged(Ivar ivar, boolean state){
     if (ivar == Ivar.SEEKINFO)
       seekInfoChanged(state);
@@ -363,6 +375,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * tagged commands.
    */
   
+  @Override
   public void sendTaggedCommand(String command, String tag){
     sendCommand(command);
   }
@@ -373,6 +386,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends a personal tell to the specified user.
    */
   
+  @Override
   public void sendPersonalTell(ServerUser user, String message, String tag){
     sendCommand("xtell " + user.getName() + "! " + message, true, true, false);
   }
@@ -383,6 +397,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Does nothing, since nothing needs to be done.
    */
   
+  @Override
   public void joinPersonalChat(ServerUser user){
     
   }
@@ -393,6 +408,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Joins channel 1.
    */
   
+  @Override
   public void joinHelpForum(){
     sendCommand("+channel 1", true, true, true);
   }
@@ -403,6 +419,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Joins the specified chat forum.
    */
   
+  @Override
   public void joinChat(String type, Object forum){
     if ("shout".equals(type))
       sendCommand("set shout 1", true, true, true);
@@ -424,6 +441,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processPersonalTell(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "tell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -437,6 +455,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processSayTell(String username, String titles, int gameNumber, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "say", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, new Integer(gameNumber)));
@@ -451,6 +470,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processPTell(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "ptell", ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -465,6 +485,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processChannelTell(String username, String titles, int channelNumber, 
       String message){
 
@@ -481,6 +502,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processKibitz(String username, String titles, int rating, int gameNumber, String message){
     if (titles == null)
       titles = "";
@@ -505,6 +527,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processWhisper(String username, String titles, int rating, int gameNumber, String message){
     if (titles == null)
       titles = "";
@@ -537,6 +560,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processQTell(String message){
     ChatEvent evt;
     Matcher matcher = TOURNEY_TELL_REGEX.matcher(message);
@@ -567,6 +591,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processShout(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "shout", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -581,6 +606,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processIShout(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "ishout", ChatEvent.ROOM_CHAT_CATEGORY, 
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -595,6 +621,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processTShout(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "tshout", ChatEvent.TOURNEY_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -609,6 +636,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processCShout(String username, String titles, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "cshout", ChatEvent.ROOM_CHAT_CATEGORY,
         userForName(username), (titles == null ? "" : titles), -1, message, null));
@@ -623,6 +651,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate ChatEvent.
    */
 
+  @Override
   protected boolean processAnnouncement(String username, String message){
     listenerManager.fireChatEvent(new ChatEvent(this, null, "announcement", ChatEvent.BROADCAST_CHAT_CATEGORY, 
         userForName(username), "", -1, message, null));
@@ -715,6 +744,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns a list of support wild variants.
    */
    
+  @Override
   public WildVariant [] getSupportedVariants(){
     if (wildVariants == null){
       wildVariants = new WildVariant[]{
@@ -733,7 +763,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
       };
     }
     
-    return (WildVariant [])wildVariants.clone();
+    return wildVariants.clone();
   }
 
   
@@ -876,6 +906,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * GameStartEvent.
    */
 
+  @Override
   protected boolean processGameInfo(GameInfoStruct data){
     unstartedGamesData.put(new Integer(data.getGameNumber()), data);
 
@@ -888,6 +919,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires an appropriate GameEvent depending on the situation.
    */
 
+  @Override
   protected boolean processStyle12(Style12Struct boardData){
     Integer gameNumber = new Integer(boardData.getGameNumber());
     InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
@@ -955,6 +987,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * <code>processStyle12</code> to handle it.
    */
    
+  @Override
   protected boolean processDeltaBoard(DeltaBoardStruct data){
     Integer gameNumber = new Integer(data.getGameNumber());
     InternalGameData gameData = (InternalGameData)ongoingGamesData.get(gameNumber);
@@ -1088,6 +1121,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Changes the bsetup state of the game.
    */
 
+  @Override
   protected boolean processBSetupMode(boolean entered){
     try{
       findMyGame().isBSetup = entered;
@@ -1303,6 +1337,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Changes the primary played game.
    */
 
+  @Override
   protected boolean processSimulCurrentBoardChanged(int gameNumber, String oppName){
     primaryPlayedGame = gameNumber;
 
@@ -1315,6 +1350,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Changes the primary observed game.
    */
 
+  @Override
   protected boolean processPrimaryGameChanged(int gameNumber){
     primaryObservedGame = gameNumber;
 
@@ -1329,6 +1365,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Invokes <code>closeGame(int)</code>.
    */
 
+  @Override
   protected boolean processGameEnd(int gameNumber, String whiteName, String blackName,
       String reason, String result){
 
@@ -1354,6 +1391,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Invokes <code>closeGame(int)</code>.
    */
 
+  @Override
   protected boolean processStoppedObserving(int gameNumber){
     closeGame(gameNumber, Game.UNKNOWN_RESULT);
 
@@ -1367,6 +1405,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Invokes <code>closeGame(int)</code>.
    */
 
+  @Override
   protected boolean processStoppedExamining(int gameNumber){
     closeGame(gameNumber, Game.UNKNOWN_RESULT);
 
@@ -1380,6 +1419,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Invokes <code>illegalMoveAttempted</code>.
    */
 
+  @Override
   protected boolean processIllegalMove(String moveString, int reasonCode, String reason){
     illegalMoveAttempted(moveString, reasonCode, reason);
 
@@ -1824,6 +1864,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * SeekListeners.
    */
 
+  @Override
   public SeekListenerManager getSeekListenerManager(){
     return getFreechessListenerManager();
   }
@@ -1846,6 +1887,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Creates an appropriate Seek object and fires a SeekEvent.
    */
 
+  @Override
   protected boolean processSeekAdded(SeekInfoStruct seekInfo){
     // We may get seeks after setting seekinfo to false because the server
     // already sent them when we sent it the request to set seekInfo to false.
@@ -1928,6 +1970,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Issues the appropriate SeekEvents and removes the seeks.
    */
 
+  @Override
   protected boolean processSeeksRemoved(int [] removedSeeks){
     for (int i = 0; i < removedSeeks.length; i++){
       Integer seekIndex = new Integer(removedSeeks[i]);
@@ -1950,6 +1993,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Issues the appropriate SeeksEvents and removes the seeks.
    */
 
+  @Override
   protected boolean processSeeksCleared(){
     clearSeeks();
     return true;
@@ -1978,6 +2022,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns the current set of seeks.
    */
   
+  @Override
   public Collection getSeeks(){
     return Collections.unmodifiableCollection(seeks.values());
   }
@@ -1989,6 +2034,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * by this SeekJinConnection and it must be in the current sought list.
    */
 
+  @Override
   public void accept(Seek seek){
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
@@ -2002,6 +2048,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Withdraws the specified seek, issued by the user.
    */
   
+  @Override
   public void withdraw(Seek seek){
     if (!seeks.contains(seek))
       throw new IllegalArgumentException("The specified seek is not on the seek list");
@@ -2015,6 +2062,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Withdraws all seeks.
    */
   
+  @Override
   public void withdrawAllSeeks(){
     sendCommand("unseek", true, true, false);
   }
@@ -2025,6 +2073,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Issues the specified seek.
    */
    
+  @Override
   public void issue(UserSeek seek){
     WildVariant variant = seek.getVariant();
     String wildName = getWildName(variant);
@@ -2063,7 +2112,8 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
 	 */
 		
 
-	protected boolean processOffer(boolean toUser, String offerType, int offerIndex,
+	@Override
+  protected boolean processOffer(boolean toUser, String offerType, int offerIndex,
 		String oppName, String offerParams){
 
 		super.processOffer(toUser, offerType, offerIndex, oppName, offerParams);
@@ -2076,6 +2126,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Overrides the superclass' method only to return true.
    */
 
+  @Override
   protected boolean processMatchOffered(boolean toUser, int offerIndex, String oppName,
       String matchDetails){
     super.processMatchOffered(toUser, offerIndex, oppName, matchDetails);
@@ -2089,6 +2140,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processTakebackOffered(boolean toUser, int offerIndex, String oppName,
       int takebackCount){
     super.processTakebackOffered(toUser, offerIndex, oppName, takebackCount);
@@ -2114,6 +2166,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processDrawOffered(boolean toUser, int offerIndex, String oppName){
     super.processDrawOffered(toUser, offerIndex, oppName);
 
@@ -2128,6 +2181,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processAbortOffered(boolean toUser, int offerIndex, String oppName){
     super.processAbortOffered(toUser, offerIndex, oppName);
 
@@ -2143,6 +2197,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processAdjournOffered(boolean toUser, int offerIndex, String oppName){
     super.processAdjournOffered(toUser, offerIndex, oppName);
 
@@ -2178,6 +2233,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processOfferRemoved(int offerIndex){
     super.processOfferRemoved(offerIndex);
 
@@ -2212,6 +2268,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processPlayerCounteredTakebackOffer(int gameNum, String playerName,
       int takebackCount){
     super.processPlayerCounteredTakebackOffer(gameNum, playerName, takebackCount);
@@ -2234,6 +2291,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processPlayerOffered(int gameNum, String playerName, String offerName){
     super.processPlayerOffered(gameNum, playerName, offerName);
 
@@ -2256,6 +2314,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processPlayerDeclined(int gameNum, String playerName, String offerName){
     super.processPlayerDeclined(gameNum, playerName, offerName);
 
@@ -2278,6 +2337,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processPlayerWithdrew(int gameNum, String playerName, String offerName){
     super.processPlayerWithdrew(gameNum, playerName, offerName);
 
@@ -2300,6 +2360,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Fires the appropriate OfferEvent(s).
    */
 
+  @Override
   protected boolean processPlayerOfferedTakeback(int gameNum, String playerName, int takebackCount){
     super.processPlayerOfferedTakeback(gameNum, playerName, takebackCount);
 
@@ -2391,6 +2452,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends the "exit" command to the server.
    */
 
+  @Override
   public void exit(){
     sendCommand("quit", true, true, false);
   }
@@ -2401,6 +2463,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns the user with which we are logged in.
    */
   
+  @Override
   public ServerUser getUser(){
     return userForName(getUsername());
   }
@@ -2411,6 +2474,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns a <code>FreechessUser</code> with the specified name.
    */
   
+  @Override
   public ServerUser userForName(String name){
     return FreechessUser.get(name);
   }
@@ -2421,6 +2485,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Starts a new, empty, examination game.
    */
   
+  @Override
   public void examineNewGame(){
     sendCommand("examine", true, true, false);
   }
@@ -2431,6 +2496,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Starts observing the specified player.
    */
   
+  @Override
   public void observeBoard(ServerUser user){
     sendCommand("observe " + user.getName(), true, true, false);
   }
@@ -2441,6 +2507,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Quits the specified game.
    */
 
+  @Override
   public void quitGame(Game game){
     Object id = game.getID();
     switch (game.getGameType()){
@@ -2464,6 +2531,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Makes the given move in the given game.
    */
 
+  @Override
   public void makeMove(Game game, Move move){
     Enumeration gamesDataEnum = ongoingGamesData.elements();
     boolean ourGame = false;
@@ -2525,6 +2593,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Game.MY_GAME.
    */
 
+  @Override
   public void resign(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2538,6 +2607,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestDraw(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2551,6 +2621,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns <code>true</code>.
    */
 
+  @Override
   public boolean isAbortSupported(){
     return true;
   }
@@ -2562,6 +2633,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestAbort(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2574,6 +2646,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns <code>true</code>.
    */
 
+  @Override
   public boolean isAdjournSupported(){
     return true;
   }
@@ -2585,6 +2658,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * game and of type Game.MY_GAME.
    */
 
+  @Override
   public void requestAdjourn(Game game){
     checkGameMineAndPlayed(game);
 
@@ -2597,6 +2671,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isTakebackSupported(){
     return true;
   }
@@ -2607,6 +2682,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends "takeback 1" to the server.
    */
    
+  @Override
   public void requestTakeback(Game game){
     checkGameMineAndPlayed(game);
     
@@ -2619,6 +2695,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Returns <code>true</code>.
    */
    
+  @Override
   public boolean isMultipleTakebackSupported(){
     return true;
   }
@@ -2629,6 +2706,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends "takeback plyCount" to the server.
    */
    
+  @Override
   public void requestTakeback(Game game, int plyCount){
     checkGameMineAndPlayed(game);
     
@@ -2646,6 +2724,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * goes to the beginning of the game.
    */
 
+  @Override
   public void goBackward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
@@ -2664,6 +2743,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * game, goes to the end of the game.
    */
 
+  @Override
   public void goForward(Game game, int plyCount){
     checkGameMineAndExamined(game);
 
@@ -2680,6 +2760,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Goes to the beginning of the given game.
    */
 
+  @Override
   public void goToBeginning(Game game){
     checkGameMineAndExamined(game);
 
@@ -2692,6 +2773,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Goes to the end of the given game.
    */
 
+  @Override
   public void goToEnd(Game game){
     checkGameMineAndExamined(game);
 
@@ -2729,6 +2811,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends the "help" command to the server. 
    */
    
+  @Override
   public void showServerHelp(){
     sendCommand("help", true, true, false);
   }
@@ -2739,6 +2822,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * Sends the specified question string to channel 1.
    */
    
+  @Override
   public void sendHelpQuestion(String question, String tag){
     sendCommand("xtell 1 [" + Jin.getAppName() + " " + Jin.getAppVersion() + "] "+ question, true, true, false);    
   }
@@ -2756,6 +2840,7 @@ public class JinFreechessConnection extends FreechessConnection implements Conne
    * @see SwingUtilities.invokeLater(Runnable)
    */
 
+  @Override
   public void execRunnable(Runnable runnable){
     SwingUtilities.invokeLater(runnable);
   }

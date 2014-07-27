@@ -105,6 +105,7 @@ public final class PieceSet implements Resource, Comparable{
    * <code>PieceSet</code> can be used for drawing piece sets.
    */
    
+  @Override
   public boolean load(URL url, Plugin plugin) throws IOException{
     Properties definition = IOUtilities.loadProperties(new URL(url, "definition"), true);
     
@@ -176,6 +177,7 @@ public final class PieceSet implements Resource, Comparable{
    * Returns the id of this piece set.
    */
    
+  @Override
   public String getId(){
     return id;
   }
@@ -214,6 +216,7 @@ public final class PieceSet implements Resource, Comparable{
    * Returns the name of the piece set.
    */
   
+  @Override
   public String toString(){
     return getName();
   }
@@ -224,6 +227,7 @@ public final class PieceSet implements Resource, Comparable{
    * Two <code>PieceSet</code>s are equal if they have the same id and type.
    */
    
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof PieceSet))
       return false;
@@ -239,6 +243,7 @@ public final class PieceSet implements Resource, Comparable{
    * Returns the hashcode of this piece set.
    */
    
+  @Override
   public int hashCode(){
     return getId().hashCode();
   }
@@ -251,6 +256,7 @@ public final class PieceSet implements Resource, Comparable{
    */
   
   
+  @Override
   public int compareTo(Object o){
     if (!(o instanceof PieceSet))
       throw new ClassCastException(o.getClass().getName());

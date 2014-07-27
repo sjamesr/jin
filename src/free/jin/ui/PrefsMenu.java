@@ -35,6 +35,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -107,6 +109,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
 
     add(lnfMenu = i18n.createMenuItem("userInterfaceMenuItem"));
     lnfMenu.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         Frame parentFrame = AWTUtilities.frameForComponent(PrefsMenu.this); 
         JDialog dialog = new PrefsDialog(parentFrame, 
@@ -123,6 +126,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
    * Registers us as session listener.
    */
   
+  @Override
   public void addNotify(){
     super.addNotify();
     
@@ -137,6 +141,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
    * Unregisters us as a session listener.
    */
   
+  @Override
   public void removeNotify(){
     super.removeNotify();
     
@@ -150,6 +155,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
    * <code>setConnected</code>.
    */
   
+  @Override
   public void sessionEstablished(SessionEvent evt){
     setConnected(true, evt.getSession());
   }
@@ -161,13 +167,16 @@ public class PrefsMenu extends JMenu implements SessionListener{
    * <code>setConnected</code>.
    */
   
+  @Override
   public void sessionClosed(SessionEvent evt){
     setConnected(false, evt.getSession());
   }
   
   
   
+  @Override
   public void sessionStarting(SessionEvent evt){}
+  @Override
   public void sessionClosing(SessionEvent evt){}
   
 
@@ -210,6 +219,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
       JMenuItem menuItem = I18n.get(PrefsMenu.class).createMenuItem("pluginPrefsMenuItem", new Object[]{plugin.getName()});
       menuItem.setActionCommand(String.valueOf(i));
       menuItem.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent evt){
           int pluginIndex = Integer.parseInt(evt.getActionCommand());
           Plugin plugin = plugins[pluginIndex];
@@ -333,7 +343,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
 
       createUI();
 
-      setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       SwingUtils.registerEscapeCloser(this);
 
       okButton.addActionListener(this);
@@ -358,7 +368,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
       content.add(prefWrapperPanel, BorderLayout.CENTER);
 
       JPanel bottomPanel = new JPanel(new BorderLayout());
-      bottomPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.CENTER);
+      bottomPanel.add(new JSeparator(SwingConstants.HORIZONTAL), BorderLayout.CENTER);
       JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
       applyButton.setEnabled(false);
@@ -391,6 +401,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
      * enables the apply button when invoked.
      */
 
+    @Override
     public void stateChanged(ChangeEvent evt){
       applyButton.setEnabled(true);
     }
@@ -401,6 +412,7 @@ public class PrefsMenu extends JMenu implements SessionListener{
      * ActionListener implementation. Registered with the ok and apply buttons.
      */
 
+    @Override
     public void actionPerformed(ActionEvent evt){
       try{
         if (applyButton.isEnabled()){

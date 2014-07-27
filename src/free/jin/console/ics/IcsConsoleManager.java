@@ -48,6 +48,7 @@ public abstract class IcsConsoleManager extends ConsoleManager{
    * {@inheritDoc}
    */
   
+  @Override
   protected CustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
       String title, String encoding, List channels, Pattern messageRegex){
     Preferences prefs = getPrefs();
@@ -75,6 +76,7 @@ public abstract class IcsConsoleManager extends ConsoleManager{
    * {@inheritDoc} 
    */
   
+  @Override
   public Object encodeConsoleChannelsPref(List channels){
     int [] channelNumbers = new int[channels.size()];
     for (int i = 0; i < channels.size(); i++){
@@ -90,6 +92,7 @@ public abstract class IcsConsoleManager extends ConsoleManager{
    * {@inheritDoc}
    */
   
+  @Override
   public List parseConsoleChannelsPref(Object channelsPrefsValue){
     if (channelsPrefsValue == null)
       return Collections.EMPTY_LIST;

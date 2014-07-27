@@ -153,6 +153,7 @@ public class BeanShellScript extends Script{
    * Returns the string "beanshell".
    */
 
+  @Override
   public String getType(){
     return "beanshell";
   }
@@ -173,6 +174,7 @@ public class BeanShellScript extends Script{
    * Runs the code.
    */
 
+  @Override
   public void run(JinEvent event, String eventSubtype, Object [][] vars){
     try{
       bsh.set("event", event);
@@ -219,6 +221,7 @@ public class BeanShellScript extends Script{
    * Returns a copy of this Script.
    */
 
+  @Override
   public Script createCopy(){
     try{
       BeanShellScript script = new BeanShellScript(scripter, getName(), getEventType(),

@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 import bsh.EvalError;
 import free.jin.I18n;
@@ -73,6 +74,7 @@ class BeanShellScriptDialog extends ScriptDialog{
    * Creates the user interface for this dialog.
    */
 
+  @Override
   protected Container createScriptTypeSpecificUI(){
     I18n i18n = I18n.get(BeanShellScriptDialog.class);
     
@@ -85,8 +87,8 @@ class BeanShellScriptDialog extends ScriptDialog{
     codeArea.setTabSize(2);
 
     JScrollPane codeScrollPane = new JScrollPane(codeArea);
-    codeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    codeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    codeScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    codeScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     JLabel codeLabel = i18n.createLabel("codeLabel");
 
@@ -97,6 +99,7 @@ class BeanShellScriptDialog extends ScriptDialog{
     codeHelp.setDefaultCapable(false);
 
     codeHelp.addActionListener(new ActionListener(){
+      @Override
       public void actionPerformed(ActionEvent evt){
         I18n i18n = I18n.get(BeanShellScriptDialog.class);
         i18n.showPlainTextDialog("helpDialog", BeanShellScriptDialog.this);
@@ -119,6 +122,7 @@ class BeanShellScriptDialog extends ScriptDialog{
    * Creates and returns a BeanShellScript from the user specified information.
    */
 
+  @Override
   protected Script createScriptOnOk(String scriptName, String eventType, String [] selectedSubtypes){
     String code = codeArea.getText();
 

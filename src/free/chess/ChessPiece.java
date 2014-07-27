@@ -263,6 +263,7 @@ public class ChessPiece extends Piece{
    * @see #fromShortString(String)
    */
 
+  @Override
   public String toShortString(){
     if (isPawn())
       return "P";
@@ -289,6 +290,7 @@ public class ChessPiece extends Piece{
    * knight for example).
    */
 
+  @Override
   public String getTypeName(){
     if (isPawn())
       return "Pawn";

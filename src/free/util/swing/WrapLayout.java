@@ -63,6 +63,7 @@ public class WrapLayout implements LayoutManager2{
    * Lays out the specified container.
    */
   
+  @Override
   public void layoutContainer(Container parent){
     Dimension size = parent.getSize();
     Insets insets = parent.getInsets();
@@ -95,6 +96,7 @@ public class WrapLayout implements LayoutManager2{
    * Returns the minimum size of the specified container, when laid out by us.
    */
   
+  @Override
   public Dimension minimumLayoutSize(Container parent){
     Dimension size = new Dimension(0, 0);
     
@@ -116,6 +118,7 @@ public class WrapLayout implements LayoutManager2{
    * Returns the preferred size of the specified container, when laid out by us.
    */
   
+  @Override
   public Dimension preferredLayoutSize(Container parent){
     Dimension size = new Dimension(0, 0);
     
@@ -137,6 +140,7 @@ public class WrapLayout implements LayoutManager2{
    * Returns the maximum size of the specified container, when laid out by us.
    */
   
+  @Override
   public Dimension maximumLayoutSize(Container parent){
     Dimension size = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     
@@ -158,6 +162,7 @@ public class WrapLayout implements LayoutManager2{
    * Throws an exception.
    */
   
+  @Override
   public void addLayoutComponent(String name, Component comp){
     throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
   }
@@ -168,6 +173,7 @@ public class WrapLayout implements LayoutManager2{
    * Adds the specified component to the layout.
    */
   
+  @Override
   public void addLayoutComponent(Component comp, Object constraints){
     
   }
@@ -178,6 +184,7 @@ public class WrapLayout implements LayoutManager2{
    * Removes the specified component from the layout.
    */
   
+  @Override
   public void removeLayoutComponent(Component comp){
     
   }
@@ -188,6 +195,7 @@ public class WrapLayout implements LayoutManager2{
    * Returns the x-axis layout alignment of the specified container.
    */
   
+  @Override
   public float getLayoutAlignmentX(Container target){
     return Component.CENTER_ALIGNMENT;
   }
@@ -198,6 +206,7 @@ public class WrapLayout implements LayoutManager2{
    * Returns the y-axis layout alignment of the specified container.
    */
   
+  @Override
   public float getLayoutAlignmentY(Container target){
     return Component.CENTER_ALIGNMENT;
   }
@@ -208,6 +217,7 @@ public class WrapLayout implements LayoutManager2{
    * Invalidates the layout, dropping any cached values.
    */
   
+  @Override
   public void invalidateLayout(Container target){
     
   }

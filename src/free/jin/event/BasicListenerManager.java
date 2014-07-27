@@ -73,6 +73,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * related events.
    */
   
+  @Override
   public void addConnectionListener(ConnectionListener listener){
     listenerList.add(ConnectionListener.class, listener);
   }
@@ -84,6 +85,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * events.
    */
   
+  @Override
   public void removeConnectionListener(ConnectionListener listener){
     listenerList.remove(ConnectionListener.class, listener);
   }
@@ -221,6 +223,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * otherwise unidentified text arrives from the server.
    */
   
+  @Override
   public void addPlainTextListener(PlainTextListener listener){
     listenerList.add(PlainTextListener.class, listener);
   }
@@ -233,6 +236,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * the server.
    */
   
+  @Override
   public void removePlainTextListener(PlainTextListener listener){
     listenerList.remove(PlainTextListener.class, listener);
   }
@@ -264,6 +268,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * chat related messages arrive from the server.
    */
   
+  @Override
   public void addChatListener(ChatListener listener){
     listenerList.add(ChatListener.class, listener);
   }
@@ -276,6 +281,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * messages arrive from the server.
    */
   
+  @Override
   public void removeChatListener(ChatListener listener){
     listenerList.remove(ChatListener.class, listener);
   }
@@ -308,6 +314,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * receiving notifications of <code>GameEvent</code>s.
    */
   
+  @Override
   public void addGameListener(GameListener listener){
     listenerList.add(GameListener.class, listener);
   }
@@ -319,6 +326,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * receiving notifications of <code>GameEvent</code>s.
    */
   
+  @Override
   public void removeGameListener(GameListener listener){
     listenerList.remove(GameListener.class, listener);
   }
@@ -370,6 +378,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * receiving notification of <code>SeekEvent</code>s.
    */
   
+  @Override
   public void addSeekListener(SeekListener listener){
     if (!(source instanceof SeekConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
@@ -384,6 +393,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * receiving notification of <code>SeekEvent</code>s.
    */
   
+  @Override
   public void removeSeekListener(SeekListener listener){
     if (!(source instanceof SeekConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of SeekConnection");
@@ -431,6 +441,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * of <code>GameListEvent</code>s.
    */
   
+  @Override
   public void addGameListListener(GameListListener listener){
     if (!(source instanceof GameListConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
@@ -445,6 +456,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * listeners receiving notifications of <code>GameListEvent</code>s.
    */
   
+  @Override
   public void removeGameListListener(GameListListener listener){
     if (!(source instanceof GameListConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of GameListConnection");
@@ -483,6 +495,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * receiving notifications of <code>FriendsEvent</code>s.
    */
   
+  @Override
   public void addFriendsListener(FriendsListener listener){
     if (!(source instanceof FriendsConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
@@ -497,6 +510,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * listeners receiving notifications of <code>FriendsEvent</code>s.
    */
   
+  @Override
   public void removeFriendsListener(FriendsListener listener){
     if (!(source instanceof FriendsConnection))
       throw new UnsupportedOperationException("The source Connection is not an instance of FriendsConnection");
@@ -550,6 +564,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * of <code>MatchOfferEvent</code>s.
    */
   
+  @Override
   public void addMatchOfferListener(MatchOfferListener listener){
     if (!(source instanceof MatchOfferConnection))
       throw new UnsupportedOperationException("The source connection is not an instance of MatchOfferConnection");
@@ -564,6 +579,7 @@ public class BasicListenerManager implements ListenerManager, SeekListenerManage
    * listeners receiving notifications of <code>MatchOfferEvent</code>s.
    */
   
+  @Override
   public void removeMatchOfferListener(MatchOfferListener listener){
     if (!(source instanceof MatchOfferConnection))
       throw new UnsupportedOperationException("The source connection is not an instance of MatchOfferConnection");

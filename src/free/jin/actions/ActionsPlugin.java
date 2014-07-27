@@ -22,6 +22,7 @@
 package free.jin.actions;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -100,6 +101,7 @@ public class ActionsPlugin extends Plugin{
    * Returns the id of this plugin - "actions".
    */
    
+  @Override
   public String getId(){
     return "actions";
   }
@@ -110,6 +112,7 @@ public class ActionsPlugin extends Plugin{
    * Starts the plugin.
    */
    
+  @Override
   public void start(){
     Preferences prefs = getPrefs();
     
@@ -127,6 +130,7 @@ public class ActionsPlugin extends Plugin{
     
     buttonContainer = createButtonContainer();
     buttonContainer.addPluginUIListener(new PluginUIAdapter(){
+      @Override
       public void pluginUIShown(PluginUIEvent evt){
         buttonContainer.pack();
       }
@@ -135,12 +139,15 @@ public class ActionsPlugin extends Plugin{
     updateActionButtons();
     
     getActions().addListDataListener(new ListDataListener(){
+      @Override
       public void contentsChanged(ListDataEvent e){
         updateActionButtons();
       }
+      @Override
       public void intervalAdded(ListDataEvent e){
         updateActionButtons();
       }
+      @Override
       public void intervalRemoved(ListDataEvent e){
         updateActionButtons();
       }
@@ -207,6 +214,7 @@ public class ActionsPlugin extends Plugin{
       return actions;
     
     Collections.sort(actions, new Comparator(){
+      @Override
       public int compare(Object arg0, Object arg1){
         JinAction action1 = (JinAction)arg0;
         JinAction action2 = (JinAction)arg1;
@@ -244,7 +252,7 @@ public class ActionsPlugin extends Plugin{
       JinAction action = (JinAction)i.next();
       
       JButton button = new IconButton(action);
-      button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      button.setAlignmentX(Component.CENTER_ALIGNMENT);
       button.setHorizontalTextPosition(SwingConstants.CENTER);
       button.setVerticalTextPosition(SwingConstants.BOTTOM);
       
@@ -252,7 +260,7 @@ public class ActionsPlugin extends Plugin{
     }
     
     content.setBorder(new EmptyBorder(10, 10, 10, 10));
-    content.setAlignmentY(JComponent.TOP_ALIGNMENT);
+    content.setAlignmentY(Component.TOP_ALIGNMENT);
     
     buttonContainer.getContentPane().removeAll();
     buttonContainer.getContentPane().setLayout(new BorderLayout());

@@ -103,7 +103,8 @@ public abstract class AbstractChessClock extends JComponent{
    */
    
   private final Timer repaintTimer = new Timer(100, new ActionListener(){
-     public void actionPerformed(ActionEvent evt){
+     @Override
+    public void actionPerformed(ActionEvent evt){
        repaint();
      }
   });

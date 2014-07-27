@@ -49,6 +49,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void addTab(Tab tab){
     addTab(tab, getTabCount());
   }
@@ -59,6 +60,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void clearTabs(){
     for (int i = getTabCount() - 1; i >= 0; i--)
       removeTab(i);
@@ -70,6 +72,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public int indexOfTab(Tab tab){
     int tabCount = getTabCount();
     for (int i = 0; i < tabCount; i++)
@@ -84,6 +87,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public int indexOfComponent(Component component){
     int tabCount = getTabCount();
     for (int i = 0; i < tabCount; i++)
@@ -98,6 +102,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public Tab getSelectedTab(){
     int selectedIndex = getSelectedIndex();
     return selectedIndex < 0 ? null : getTab(selectedIndex);
@@ -109,6 +114,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc}
    */
   
+  @Override
   public void addTabbedPaneListener(TabbedPaneListener listener){
     listeners.add(listener);
   }
@@ -119,6 +125,7 @@ public abstract class AbstractTabbedPaneModel implements TabbedPaneModel{
    * {@inheritDoc} 
    */
   
+  @Override
   public void removeTabbedPaneListener(TabbedPaneListener listener){
     listeners.remove(listener);
   }

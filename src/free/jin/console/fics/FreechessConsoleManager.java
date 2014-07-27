@@ -50,6 +50,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * {@inheritDoc}
    */
   
+  @Override
   protected String getDefaultTextForChat(ChatEvent evt, String encoding){
     String type = evt.getType();
     ServerUser sender = evt.getSender();
@@ -73,6 +74,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Returns a FICS-specific system console designation.
    */
   
+  @Override
   protected ConsoleDesignation createSystemConsoleDesignation(){
     return new FreechessSystemConsoleDesignation(getConn(), getEncoding());
   }
@@ -83,6 +85,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Returns a FICS-specific help console designation.
    */
   
+  @Override
   protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable){
     return new FreechessHelpConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
@@ -93,6 +96,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Returns a FICS-specific general chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
     return new FicsGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
@@ -103,6 +107,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Returns a FICS-specific personal chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable){
     return new PersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
   }
@@ -113,6 +118,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Creates an ICC-specific game chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createGameConsoleDesignation(Game game){
     return new FreechessGameConsoleDesignation(getConn(), game, getEncoding());
   }
@@ -123,6 +129,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Creates a <code>FreechessConsole</code> with the specified designation.
    */
 
+  @Override
   protected Console createConsole(ConsoleDesignation designation){
     return new FreechessConsole(this, designation);
   }
@@ -133,6 +140,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * {@inheritDoc}
    */
   
+  @Override
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
       String title, String encoding, List channels, Pattern messageRegex,
       boolean includeShouts, boolean includeCShouts){
@@ -146,6 +154,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Returns the set of FICS channels.
    */
   
+  @Override
   protected SortedMap createChannels(){
     SortedMap channels = new TreeMap();
     
@@ -161,6 +170,7 @@ public class FreechessConsoleManager extends IcsConsoleManager{
    * Return a PreferencesPanel for changing the console manager's settings.
    */
 
+  @Override
   public PreferencesPanel getPreferencesUI(){
     return new FreechessConsolePrefsPanel(this);
   }

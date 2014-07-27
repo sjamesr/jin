@@ -84,6 +84,7 @@ public class MultiOutputStream extends OutputStream{
    * Closes all the underlying <code>OutputStreams</code>.
    */
 
+  @Override
   public void close() throws IOException{
     for (int i = 0; i < streams.length; i++)
       streams[i].close();
@@ -95,6 +96,7 @@ public class MultiOutputStream extends OutputStream{
    * Flushes all the underlying <code>OutputStreams</code>.
    */
 
+  @Override
   public void flush() throws IOException{
     for (int i = 0; i < streams.length; i++)
       streams[i].flush();
@@ -108,6 +110,7 @@ public class MultiOutputStream extends OutputStream{
    * <code>OutputStreams</code>.
    */
   
+  @Override
   public void write(int b) throws IOException{
     for (int i = 0; i < streams.length; i++)
       streams[i].write(b);
@@ -121,6 +124,7 @@ public class MultiOutputStream extends OutputStream{
    * at the specified offset to the underlying <code>OutputStreams</code>.
    */
 
+  @Override
   public void write(byte [] arr, int offset, int length) throws IOException{
     for (int i = 0; i < streams.length; i++)
       streams[i].write(arr, offset, length);

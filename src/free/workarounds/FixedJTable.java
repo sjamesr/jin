@@ -124,6 +124,7 @@ public class FixedJTable extends JTable{
    * Fixes bug 4276838 by using FixedTableColumn instead of TableColumn.
    */
 
+  @Override
   public void createDefaultColumnsFromModel() {
     TableModel m = getModel();
     if (m != null) {
@@ -152,6 +153,7 @@ public class FixedJTable extends JTable{
    * as the preferredScrollableViewportSize is null.
    */
 
+  @Override
   protected void initializeLocalVars(){
     super.initializeLocalVars();
     preferredViewportSize = null;
@@ -166,6 +168,7 @@ public class FixedJTable extends JTable{
    * <code>initializeLocalVars()</code> method.
    */
 
+  @Override
   public Dimension getPreferredScrollableViewportSize(){
     if (preferredViewportSize==null)
       return getPreferredSize();

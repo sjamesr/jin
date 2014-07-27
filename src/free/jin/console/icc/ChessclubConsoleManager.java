@@ -66,6 +66,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * {@inheritDoc} 
    */
   
+  @Override
   protected String getDefaultTextForChat(ChatEvent evt, String encoding){
     String type = evt.getType();
     ServerUser sender = evt.getSender();
@@ -103,6 +104,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Returns an ICC-specific system console designation.
    */
   
+  @Override
   protected ConsoleDesignation createSystemConsoleDesignation(){
     return new ChessclubSystemConsoleDesignation(getConn(), getEncoding());
   }
@@ -113,6 +115,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Returns an ICC-specific help console designation.
    */
   
+  @Override
   protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable){
     return new ChessclubHelpConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
@@ -123,6 +126,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Returns an ICC-specific general chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable){
     if (isWcl())
       return new WclGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
@@ -142,6 +146,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Creates an ICC-specific personal chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createPersonalChatConsoleDesignation(ServerUser user, boolean isCloseable){
     return new IcsPersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
   }
@@ -152,6 +157,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Creates an ICC-specific game chat console designation.
    */
   
+  @Override
   protected ConsoleDesignation createGameConsoleDesignation(Game game){
     return new ChessclubGameConsoleDesignation(getConn(), game, getEncoding());
   }
@@ -162,6 +168,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Creates a <code>ChessclubConsole</code> with the specified designation.
    */
 
+  @Override
   protected Console createConsole(ConsoleDesignation designation){
     return new ChessclubConsole(this, designation);
   }
@@ -172,6 +179,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * {@inheritDoc}
    */
   
+  @Override
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(String prefsPrefix,
       String title, String encoding, List channels, Pattern messageRegex,
       boolean includeShouts, boolean includeCShouts){
@@ -185,6 +193,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * Returns the set of ICC/WCL channels.
    */
   
+  @Override
   protected SortedMap createChannels(){
     int [] channelsOrder = (int [])getPrefs().lookup("channels.order." + getServer().getId());
     final Map channelsOrderMap = new HashMap();
@@ -192,6 +201,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
       channelsOrderMap.put(new Integer(channelsOrder[i]), new Integer(i));
     
     Comparator channelsComparator = new Comparator(){
+      @Override
       public int compare(Object arg0, Object arg1){
         Integer i1 = (Integer)arg0;
         Integer i2 = (Integer)arg1;
@@ -238,6 +248,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * manager's settings.
    */
 
+  @Override
   public PreferencesPanel getPreferencesUI(){
     return new ChessclubConsolePrefsPanel(this);
   }
@@ -292,6 +303,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager{
    * display the help channel for guest users on-login.
    */
   
+  @Override
   public void loginSucceeded(Connection conn){
     super.loginSucceeded(conn);
     

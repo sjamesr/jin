@@ -112,7 +112,9 @@ public class Utilities{
    */
   
   public static final Enumeration EMPTY_ENUM = new Enumeration(){
+    @Override
     public boolean hasMoreElements(){return false;}
+    @Override
     public Object nextElement(){throw new NoSuchElementException();}
   };
   
@@ -134,6 +136,7 @@ public class Utilities{
      * {@link Comparator#compare(Object, Object)}'s contract.
      */
     
+    @Override
     public int compare(Object o1, Object o2){
       if ((o1 == null) || (o2 == null))
         throw new NullPointerException();

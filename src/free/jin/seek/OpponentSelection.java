@@ -86,6 +86,7 @@ public final class OpponentSelection{
     box.setSelectedItem(initialOpponent);
     
     box.addItemListener(new ItemListener(){
+      @Override
       public void itemStateChanged(ItemEvent e){
         changeSupport.fireStateChanged();
       }
@@ -97,12 +98,15 @@ public final class OpponentSelection{
     Component editor = box.getEditor().getEditorComponent();
     if (editor instanceof JTextComponent)
       ((JTextComponent)editor).getDocument().addDocumentListener(new DocumentListener(){
+        @Override
         public void changedUpdate(DocumentEvent e){
           changeSupport.fireStateChanged();
         }
+        @Override
         public void insertUpdate(DocumentEvent e){
           changeSupport.fireStateChanged();
         }
+        @Override
         public void removeUpdate(DocumentEvent e){
           changeSupport.fireStateChanged();
         }

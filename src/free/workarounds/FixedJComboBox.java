@@ -67,6 +67,7 @@ public class FixedJComboBox extends JComboBox{
 
 
 
+  @Override
   public void addNotify(){
     super.addNotify();
 
@@ -82,6 +83,7 @@ public class FixedJComboBox extends JComboBox{
 
 
 
+  @Override
   public void setEditable(boolean editable){
     super.setEditable(editable);
 
@@ -101,6 +103,7 @@ public class FixedJComboBox extends JComboBox{
 
 
 
+  @Override
   public void requestFocus(){
 
     // http://developer.java.sun.com/developer/bugParade/bugs/4513773.html

@@ -276,6 +276,7 @@ public class ChatEvent extends JinEvent{
    * Returns a textual representation of this ChatEvent.
    */
 
+  @Override
   public String toString(){
     return getClass().getName()+"[Sender="+getSender()+";Title="+getSenderTitle()+";Forum="+getForum()+";Message="+getMessage()+"]";
   } 
