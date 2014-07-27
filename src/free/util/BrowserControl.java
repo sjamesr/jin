@@ -30,6 +30,7 @@ import java.applet.AppletContext;
 import java.io.IOException; 
 import java.io.InputStream; 
 import java.io.InterruptedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -80,6 +81,9 @@ public class BrowserControl{
     try{
       if (appletContext != null){ // Running in an applet.
         appletContext.showDocument(new URL(url), "_blank");
+      } else if (Desktop.isDesktopSupported()) {
+        Desktop.getDesktop().browse(new URL(url).toURI());
+        return true;
       }
       else if (PlatformUtils.isWindows()){
         if (url.endsWith(".html")||url.endsWith(".htm")){
@@ -138,9 +142,9 @@ public class BrowserControl{
           commandline = browser+" "+url;
         Runtime.getRuntime().exec(commandline);
       }
-    } catch (IOException e){
-        return false;
-      }
+    } catch (IOException | URISyntaxException e) {
+      return false;
+    }
 
     return true;
   }
