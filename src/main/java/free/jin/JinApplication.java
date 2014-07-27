@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 
 import org.reflections.Reflections;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -1057,7 +1058,8 @@ public class JinApplication implements JinContext{
     String serverId = plugin.getServer().getId();
     
     File userResDir = new File(new File(prefsDir, "resources"), resType);
-    File jinResDir = new File(new File(JIN_DIR, "resources"), resType);
+    File jinResDir = new File(new File(JIN_DIR, Joiner.on(File.separator).join("src", "main",
+        "resources")), resType);
     File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), resType), serverId);
                             
     loadResources(jinResDir, resourceMap, plugin);
