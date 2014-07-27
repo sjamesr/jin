@@ -7,16 +7,16 @@ on=boolean;true
 num-chat-patterns = integer;4
 
 chat-pattern-0 = ^tell\..*
-chat-sound-0 = whistle.au
+chat-sound-0 = whistle.wav
 
 chat-pattern-1 = ^say\..*
-chat-sound-1 = whistle.au
+chat-sound-1 = whistle.wav
 
 chat-pattern-2 = ^atell\..*
-chat-sound-2 = alert.au
+chat-sound-2 = alert.wav
 
 chat-pattern-3 = ^channel-atell\..*
-chat-sound-3 = alert.au
+chat-sound-3 = alert.wav
 
 
 # Text patterns on which sounds are generated. The match is done against the
@@ -25,28 +25,28 @@ chat-sound-3 = alert.au
 num-text-patterns = integer;3
 
 text-pattern-0 = ^Notification: [-A-z]{2,15} has arrived\.$
-text-sound-0 = ding.au
+text-sound-0 = ding.wav
 
 text-pattern-1 = ^Notification: [-A-z]{2,15} has departed\.$
-text-sound-1 = cork.au
+text-sound-1 = cork.wav
 
 text-pattern-2 = ^Notification: [-A-z]{2,15} \(with whom you have an adjourned game\) has arrived\.$
-text-sound-2 = ding.au
+text-sound-2 = ding.wav
 
 
-#OnLogin = welcome-icc.au
-#OnDisconnect = goodbye.au
-Move = move-icc.au
-Capture = capture-icc.au
-Castling = castle-icc.au
-#Check = check.au
-#Checkmate = checkmate.au
-#DrawOffer = draw.au
-#AbortOffer = abort.au
-#AdjournOffer = adjourn.au
-#TakebackOffer = takeback.au
-IllegalMove = buzzer.au
-GameEnd = fitebell.au
-GameStart = fitebell.au
-FriendConnected = ding.au
-FriendDisconnected = cork.au
+#OnLogin = welcome-icc.wav
+#OnDisconnect = goodbye.wav
+Move = move-icc.wav
+Capture = capture-icc.wav
+Castling = castle-icc.wav
+#Check = check.wav
+#Checkmate = checkmate.wav
+#DrawOffer = draw.wav
+#AbortOffer = abort.wav
+#AdjournOffer = adjourn.wav
+#TakebackOffer = takeback.wav
+IllegalMove = buzzer.wav
+GameEnd = fitebell.wav
+GameStart = fitebell.wav
+FriendConnected = ding.wav
+FriendDisconnected = cork.wav
