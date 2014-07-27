@@ -37,6 +37,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.UIManager;
 
+import com.google.common.io.Resources;
+
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -69,14 +71,14 @@ public class Jin{
   /**
    * Loads and returns the application properties.
    */
-  
   static{
-    try{
-      appProps = IOUtilities.loadPropertiesAndClose(Jin.class.getResourceAsStream("resources/app.props"));
-    } catch (IOException e){
-        e.printStackTrace();
-        throw new IllegalStateException("Unable to load application properties from resources/app.props");
-      }
+    try {
+      appProps = IOUtilities
+          .loadPropertiesAndClose(Resources.getResource("app.props").openStream());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Unable to load application properties from app.props");
+    }
   }
 
   
