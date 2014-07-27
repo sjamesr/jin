@@ -39,6 +39,7 @@ import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,7 +54,9 @@ import javax.swing.JOptionPane;
 
 import org.reflections.Reflections;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
@@ -263,7 +266,7 @@ public class JinApplication implements JinContext{
    * instances describing plugins for that server.
    */
 
-  private final Hashtable serversToPlugins;
+  private final Multimap<Server, PluginInfo> serversToPlugins;
 
 
 
@@ -527,54 +530,16 @@ public class JinApplication implements JinContext{
     Set<Server> result = new HashSet<>();
     for (Class<? extends Server> serverClass : reflections.getSubTypesOf(Server.class)) {
       if (!Modifier.isAbstract(serverClass.getModifiers())) {
-        result.add(serverClass.newInstance());
+        Server server = serverClass.newInstance();
+        result.add(server);
+        File guestDir = new File(new File(new File(prefsDir, "accounts"), server.getId()), server
+            .getUsernamePolicy().getGuestUsername());
+        server.setGuestUser(loadUser(guestDir, server));
       }
     }
     return result;
   }
 
-
-
-  /**
-   * Loads a <code>Server</code> from the specified jar. Helper method for
-   * <code>loadServers</code>.
-   */
-
-  private Server loadServer(ChildClassLoader protocolLoader, File jar) throws IOException,
-      ClassNotFoundException, InstantiationException, IllegalAccessException{
-
-    if (!jar.isFile())
-      throw new FileNotFoundException(jar + " does not exist or is a directory");
-
-    ChildClassLoader loader = new ZipClassLoader(jar, protocolLoader);
-
-    InputStream serverDefIn = loader.getResourceAsStream("definition");
-    if (serverDefIn == null)
-      throw new FileNotFoundException("Unable to find server definition file in " + jar);
-    Properties serverDef = IOUtilities.loadPropertiesAndClose(serverDefIn);
-    
-    String classname = serverDef.getProperty("classname");
-    if (classname == null)
-      throw new IOException("Server definition file in " + jar + " does not contain a classname property");
-
-    Class serverClass;
-    if (dynamicLoad){
-      serverClass = loader.loadClass(classname);
-      mainLoader.addDelegate(loader);
-    }
-    else
-      serverClass = Class.forName(classname);
-    
-    Server server = (Server)serverClass.newInstance();
-    
-    File guestDir = new File(new File(new File(prefsDir, "accounts"), server.getId()),
-      server.getUsernamePolicy().getGuestUsername());
-    server.setGuestUser(loadUser(guestDir, server));
-    return server;
-  }
-  
-  
-  
   /**
    * Returns the list of supported servers.
    */
@@ -980,81 +945,32 @@ public class JinApplication implements JinContext{
 
 
 
+  private String getLastPackagePathElement(Package thePackage) {
+    String packageName = thePackage.getName();
+    return packageName.substring(Math.max(packageName.lastIndexOf('.'), 0));
+  }
   /**
    * Loads the plugin classes for all servers. Returns a hashtable that maps
    * <code>Server</code> objects to arrays of PluginInfo objects describing
    * the plugins for that server.
    */
-
-  private Hashtable loadPlugins() throws IOException, ClassNotFoundException{
-    Hashtable plugins = new Hashtable();
-    for (Server server : getServers())
-      plugins.put(server, new Vector());
-
-    // plugins that are shared between all users - usually the ones that come with Jin
-    loadPlugins(plugins, new File(JIN_DIR, "plugins")); 
-
-    // user specific plugins, from his own preferences directory
-    loadPlugins(plugins, new File(prefsDir, "plugins"));
-
-
-    // Convert the Server->Vector map to Server->PluginInfo[] map
-    Hashtable result = new Hashtable();
-    for (Server server : getServers()){
-      Vector pluginsVector = (Vector)plugins.get(server);
-      PluginInfo [] pluginsArray = new PluginInfo[pluginsVector.size()];
-      pluginsVector.copyInto(pluginsArray);
-
-      result.put(server, pluginsArray);
+  private Multimap<Server, PluginInfo> loadPlugins() throws IOException, ClassNotFoundException{
+    Multimap<Server, PluginInfo> pluginInfos = HashMultimap.create();
+    Set<Class<? extends Plugin>> pluginClasses = new Reflections("free.jin").getSubTypesOf(Plugin.class);
+    Multimap<String, Class<? extends Plugin>> pluginPackages = HashMultimap.create();
+    for (Class<? extends Plugin> pluginClass : pluginClasses) {
+      pluginPackages.put(getLastPackagePathElement(pluginClass.getPackage()), pluginClass);
     }
 
-    return result;
-  }
-
-
-
-  /**
-   * Loads plugins from the specified directory into the specified hashtable.
-   * Helper method for <code>loadPlugins()</code>.
-   */
-
-  private void loadPlugins(Hashtable plugins, File dir) throws IOException, ClassNotFoundException{
-    if (!dir.isDirectory())
-      return;
-
-    String [] jars;
-    FilenameFilter jarsFilter = new ExtensionFilenameFilter(".jar");
-
-    // Load plugins that are for all servers
-    jars = dir.list(jarsFilter);
-    for (int i = 0; i < jars.length; i++){
-      PluginInfo pluginInfo = loadPluginInfo(new File(dir, jars[i]));
-      if (pluginInfo == null)
-        continue;
-
-      for (Server server : getServers())
-        ((Vector)plugins.get(server)).addElement(pluginInfo);
-    }
-
-
-    // Load server specific plugins
-    for (Server server : getServers()){
-      File serverSpecificDir = new File(dir, server.getProtocolId());
-      if (!serverSpecificDir.isDirectory())
-        continue;
-
-      jars = serverSpecificDir.list(jarsFilter);
-      for (int j = 0; j < jars.length; j++){
-        PluginInfo pluginInfo = loadPluginInfo(new File(serverSpecificDir, jars[j]));
-        if (pluginInfo == null)
-          continue;
-
-        ((Vector)plugins.get(server)).addElement(pluginInfo);
+    for (Server server : servers) {
+      for (Class<? extends Plugin> plugin : pluginPackages.get(getLastPackagePathElement(server
+          .getClass().getPackage()))) {
+        pluginInfos.put(server,
+            new PluginInfo(plugin, Preferences.load(plugin.getResourceAsStream("preferences"))));
       }
     }
+    return pluginInfos;
   }
-
-
 
   /**
    * Loads a single plugin description from the specified jar. Returns 
@@ -1100,8 +1016,8 @@ public class JinApplication implements JinContext{
    */
 
   @Override
-  public PluginInfo [] getPlugins(Server server){
-    return (PluginInfo [])serversToPlugins.get(server);
+  public Collection<PluginInfo> getPlugins(Server server){
+    return serversToPlugins.get(server);
   }
 
 

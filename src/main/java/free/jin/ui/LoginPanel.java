@@ -373,7 +373,7 @@ public class LoginPanel extends DialogPanel{
    
   private void setData(Server server, ConnectionDetails connDetails, boolean updateServer, boolean updateUsername){
     if (updateServer)
-      serverBox.setSelectedIndex(servers.indexOf(updateServer));
+      serverBox.setSelectedIndex(servers.indexOf(server));
     
     if (updateUsername){
       users = getServerUsers(server);

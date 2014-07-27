@@ -19,12 +19,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package free.jin.freechess;
+package free.jin.freechess.servers.fics;
 
 import free.jin.AbstractServer;
 import free.jin.Connection;
 import free.jin.ConnectionDetails;
 import free.jin.UsernamePolicy;
+import free.jin.freechess.JinFreechessConnection;
 
 
 /**

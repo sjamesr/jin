@@ -22,7 +22,10 @@
 package free.jin;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
+
+import com.google.common.collect.ImmutableList;
 
 import free.jin.action.ActionContext;
 import free.jin.action.ActionInfo;
@@ -168,16 +171,16 @@ public class Session{
    */
 
   private Plugin [] createPlugins() throws PluginStartException{
-    PluginInfo [] pluginsInfo = Jin.getInstance().getPlugins(getServer());
-    Plugin [] plugins = new Plugin[pluginsInfo.length];
+    List<PluginInfo> pluginsInfo = ImmutableList.copyOf(Jin.getInstance().getPlugins(getServer()));
+    Plugin [] plugins = new Plugin[pluginsInfo.size()];
 
-    Preferences [] pluginPrefs = new Preferences[pluginsInfo.length];
+    Preferences [] pluginPrefs = new Preferences[pluginsInfo.size()];
     for (int i = 0; i < pluginPrefs.length; i++)
-      pluginPrefs[i] = pluginsInfo[i].getPluginPreferences();
+      pluginPrefs[i] = pluginsInfo.get(i).getPluginPreferences();
 
     // Instantiate plugins
     for (int i = 0; i < plugins.length; i++){
-      Class pluginClass = pluginsInfo[i].getPluginClass();
+      Class pluginClass = pluginsInfo.get(i).getPluginClass();
       try{
         plugins[i] = (Plugin)pluginClass.newInstance();
       } catch (InstantiationException e){

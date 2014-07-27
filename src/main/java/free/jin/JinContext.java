@@ -21,6 +21,7 @@
 
 package free.jin;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -150,7 +151,7 @@ public interface JinContext{
    * for the specified server.
    */
 
-  PluginInfo [] getPlugins(Server server);
+  Collection<PluginInfo> getPlugins(Server server);
 
 
 

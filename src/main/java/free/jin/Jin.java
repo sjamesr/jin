@@ -22,6 +22,7 @@
 package free.jin;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -361,8 +362,8 @@ public class Jin{
    * for the specified server.
    */
 
-  public PluginInfo [] getPlugins(Server server){
-    return context.getPlugins(server).clone();
+  public Collection<PluginInfo> getPlugins(Server server){
+    return context.getPlugins(server);
   }
   
   

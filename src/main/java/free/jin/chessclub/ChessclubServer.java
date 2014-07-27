@@ -32,7 +32,7 @@ import free.jin.UsernamePolicy;
  * See http://www.chessclub.com for more information.
  */
 
-public class ChessclubServer extends AbstractServer{
+public abstract class ChessclubServer extends AbstractServer{
 
 
 

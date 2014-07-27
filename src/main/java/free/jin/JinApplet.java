@@ -48,6 +48,8 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -126,7 +128,7 @@ public class JinApplet extends Applet implements JinContext{
    * The plugins we'll be using.
    */
    
-  private PluginInfo [] plugins;
+  private Collection<PluginInfo> plugins;
   
   
   
@@ -396,15 +398,16 @@ public class JinApplet extends Applet implements JinContext{
    * Loads the plugins we'll be using.
    */
    
-  private PluginInfo [] loadPlugins() throws IOException, ClassNotFoundException{
+  private Collection<PluginInfo> loadPlugins() throws IOException, ClassNotFoundException{
     String pluginClassnames = getParameter("plugin.classnames");
     if (pluginClassnames == null)
       throw new IllegalStateException("No plugin.classnames parameter specified");
     StringTokenizer pluginClassnamesTokenizer = new StringTokenizer(pluginClassnames, " ");
     
-    PluginInfo [] plugins = new PluginInfo[pluginClassnamesTokenizer.countTokens()];
+    int pluginCount = pluginClassnamesTokenizer.countTokens();
+    Collection<PluginInfo> plugins = new ArrayList<>(pluginCount);
     
-    for (int i = 0; i < plugins.length; i++){
+    for (int i = 0; i < pluginCount; i++){
       String className = pluginClassnamesTokenizer.nextToken();
 
       // We should actually read the definition file here.
@@ -424,7 +427,7 @@ public class JinApplet extends Applet implements JinContext{
       if (pluginPrefsIn != null)
         pluginPrefsIn.close();
   
-      plugins[i] = new PluginInfo(pluginClass, pluginPrefs);
+      plugins.add(new PluginInfo(pluginClass, pluginPrefs));
     }
     
     return plugins;
@@ -804,7 +807,7 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   @Override
-  public PluginInfo [] getPlugins(Server server){
+  public Collection<PluginInfo> getPlugins(Server server){
     if (server != this.server)
       throw new IllegalArgumentException("Unknown server: " + server);
     
