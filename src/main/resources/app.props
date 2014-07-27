@@ -1,7 +1,7 @@
 
 # These properties are set by the buildfile.
-app.name=
-app.version=
+app.name=Jin
+app.version=2.4
 
 app.websiteURL=http://www.jinchess.com
 app.latestVersionDataURL=http://www.jinchess.com/latestVersion.properties
