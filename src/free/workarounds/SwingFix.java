@@ -21,10 +21,18 @@
 
 package free.workarounds;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.event.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.RepaintManager;
+import javax.swing.UIManager;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Keymap;
 
 /**
  * A class which statically applies various fixes/workarounds for swing. To use

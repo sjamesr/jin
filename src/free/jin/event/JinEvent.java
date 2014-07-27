@@ -22,6 +22,7 @@
 package free.jin.event;
 
 import java.util.EventObject;
+
 import free.jin.Connection;
 
 

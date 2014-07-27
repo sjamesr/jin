@@ -24,7 +24,14 @@ package free.util.swing;
 import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import free.util.Localization;

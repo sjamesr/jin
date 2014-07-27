@@ -21,21 +21,22 @@
 
 package free.jin.board.fics;
 
-import free.jin.plugin.PluginUIEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import free.freechess.Ivar;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.Preferences;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
-import free.jin.freechess.JinFreechessConnection;
-import free.jin.Game;
-import free.jin.Connection;
-import free.jin.Preferences;
-import free.jin.event.GameStartEvent;
 import free.jin.event.GameEndEvent;
+import free.jin.event.GameStartEvent;
 import free.jin.freechess.FreechessListenerManager;
-import free.jin.freechess.event.IvarStateChangeListener;
+import free.jin.freechess.JinFreechessConnection;
 import free.jin.freechess.event.IvarStateChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
+import free.jin.freechess.event.IvarStateChangeListener;
+import free.jin.plugin.PluginUIEvent;
 
 
 /**

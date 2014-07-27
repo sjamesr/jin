@@ -21,8 +21,9 @@
 
 package free.chess.variants.shuffleboth;
 
+import free.chess.Chess;
+import free.chess.Position;
 import free.chess.variants.BothSidesCastlingVariant;
-import free.chess.*;
 
 
 /**

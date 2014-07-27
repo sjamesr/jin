@@ -24,7 +24,13 @@ package free.jin.ui;
 import java.awt.Font;
 import java.util.StringTokenizer;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JSeparator;
 
 import free.jin.I18n;
 import free.jin.Jin;

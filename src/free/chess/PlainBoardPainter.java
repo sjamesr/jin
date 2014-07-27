@@ -21,9 +21,9 @@
 
 package free.chess;
 
-import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
 
 
 /**

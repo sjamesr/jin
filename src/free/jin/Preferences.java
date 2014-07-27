@@ -39,7 +39,16 @@ import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import free.util.*;
+import free.util.BeanProperties;
+import free.util.EventListenerList;
+import free.util.FilteringEnumeration;
+import free.util.FormatException;
+import free.util.IOUtilities;
+import free.util.MappingEnumeration;
+import free.util.RectDouble;
+import free.util.StringEncoder;
+import free.util.StringParser;
+import free.util.Utilities;
 
 
 /**

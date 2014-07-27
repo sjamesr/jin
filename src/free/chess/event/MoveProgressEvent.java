@@ -22,6 +22,7 @@
 package free.chess.event;
 
 import java.util.EventObject;
+
 import free.chess.JBoard;
 
 

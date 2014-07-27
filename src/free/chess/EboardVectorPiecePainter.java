@@ -23,7 +23,9 @@
 
 package free.chess;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Polygon;
 
 
 /**

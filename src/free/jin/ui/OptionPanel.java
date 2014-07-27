@@ -26,7 +26,14 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import free.jin.I18n;
 import free.util.TableLayout;

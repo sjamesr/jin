@@ -21,9 +21,9 @@
 
 package free.jin.chessclub.event;
 
-import free.jin.event.JinEvent;
 import free.jin.chessclub.ChessEvent;
 import free.jin.chessclub.JinChessclubConnection;
+import free.jin.event.JinEvent;
 
 
 /**

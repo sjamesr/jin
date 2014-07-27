@@ -21,10 +21,18 @@
 
 package free.util.swing;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 
 import free.util.imagefilters.IconImageFilters;
 

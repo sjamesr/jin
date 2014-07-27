@@ -21,13 +21,14 @@
 
 package free.jin.scripter.icc;
 
-import free.jin.scripter.*;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import free.jin.Connection;
 import free.jin.event.ChatEvent;
 import free.jin.event.ChatListener;
 import free.jin.event.ListenerManager;
-import java.util.Hashtable;
-import java.util.Vector;
+import free.jin.scripter.Scripter;
 
 
 /**

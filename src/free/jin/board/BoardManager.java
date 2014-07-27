@@ -31,7 +31,13 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import free.chess.BoardPainter;
 import free.chess.ColoredBoardPainter;

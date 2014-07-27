@@ -21,10 +21,11 @@
 
 package free.chess;
 
-import javax.swing.Icon;
-import java.awt.Graphics;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Rectangle;
+
+import javax.swing.Icon;
 
 public class PieceIcon implements Icon{
 

@@ -22,13 +22,16 @@
 
 package free.jin.board.icc;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+
 import free.chess.Position;
 import free.chess.Square;
-import free.jin.board.JinBoard;
 import free.jin.board.Arrow;
 import free.jin.board.Circle;
+import free.jin.board.JinBoard;
 
 
 /**

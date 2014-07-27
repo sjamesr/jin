@@ -21,8 +21,9 @@
 
 package free.util.swing;
 
-import javax.swing.table.DefaultTableModel;
 import java.util.Vector;
+
+import javax.swing.table.DefaultTableModel;
 
 
 /**

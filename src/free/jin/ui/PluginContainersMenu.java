@@ -27,7 +27,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 
 import free.jin.I18n;
 import free.jin.plugin.PluginUIContainer;

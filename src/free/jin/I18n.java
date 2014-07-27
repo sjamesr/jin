@@ -29,11 +29,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
-import free.util.*;
+import free.util.AWTUtilities;
+import free.util.Localization;
+import free.util.Pair;
+import free.util.PlatformUtils;
+import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PlainTextDialog;
 import free.util.swing.SwingUtils;

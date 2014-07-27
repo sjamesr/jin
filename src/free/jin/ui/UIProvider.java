@@ -22,6 +22,7 @@
 package free.jin.ui;
 
 import java.awt.Component;
+
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 

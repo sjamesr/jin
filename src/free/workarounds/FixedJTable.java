@@ -21,12 +21,13 @@
 
 package free.workarounds;
 
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.ListSelectionModel;
 import java.awt.Dimension;
 import java.util.Vector;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 
 /**

@@ -21,9 +21,9 @@
 
 package free.jin.freechess.event;
 
-import free.jin.freechess.JinFreechessConnection;
-import free.jin.event.JinEvent;
 import free.freechess.Ivar;
+import free.jin.event.JinEvent;
+import free.jin.freechess.JinFreechessConnection;
 
 
 /**

@@ -5,7 +5,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessPiece;
+import free.chess.Piece;
+import free.chess.Position;
+import free.chess.Square;
 import free.chess.variants.NoCastlingVariant;
 
 

@@ -21,19 +21,22 @@
 
 package free.jin.console.prefs;
 
-import javax.swing.*;
-import java.awt.Font;
-import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.Vector;
-import javax.swing.event.DocumentListener;
+
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import free.jin.I18n;
 import free.jin.console.ConsoleManager;
-import free.util.swing.IntegerStrictPlainDocument;
 import free.util.TextUtilities;
+import free.util.swing.IntegerStrictPlainDocument;
 
 
 /**

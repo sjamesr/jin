@@ -21,15 +21,16 @@
 
 package free.workarounds;
 
-import javax.swing.JTextField;
-import javax.swing.text.Document;
-import javax.swing.UIManager;
-import java.awt.Cursor;
 import java.awt.Color;
-import java.awt.Rectangle;
+import java.awt.Cursor;
 import java.awt.Insets;
-import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.text.Document;
 
 
 /**

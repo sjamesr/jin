@@ -22,8 +22,17 @@
 
 package free.util;
 
-import java.awt.*;
-import java.lang.reflect.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 /**

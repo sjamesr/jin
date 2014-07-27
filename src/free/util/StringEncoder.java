@@ -21,9 +21,9 @@
 
 package free.util;
 
-import java.awt.Rectangle;
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 
 
 /**

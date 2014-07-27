@@ -21,8 +21,8 @@
 
 package free.util;
 
-import java.util.EventListener;
 import java.lang.reflect.Array;
+import java.util.EventListener;
 
 
 /**

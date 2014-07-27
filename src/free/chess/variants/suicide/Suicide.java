@@ -21,7 +21,11 @@
 
 package free.chess.variants.suicide;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessPiece;
+import free.chess.Piece;
+import free.chess.Position;
+import free.chess.Square;
 import free.chess.variants.NoCastlingVariant;
 
 

@@ -21,11 +21,10 @@
 
 package free.util;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Hashtable;
-import free.util.IOUtilities;
 
 
 /**

@@ -22,9 +22,10 @@
 package free.jin.board.event;
 
 import java.util.EventListener;
-import free.jin.board.JinBoard;
+
 import free.jin.board.Arrow;
 import free.jin.board.Circle;
+import free.jin.board.JinBoard;
 
 
 /**

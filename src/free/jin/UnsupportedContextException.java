@@ -21,6 +21,9 @@
 
 package free.jin;
 
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginContext;
+
 
 /**
  * This exception is thrown by plugins from the

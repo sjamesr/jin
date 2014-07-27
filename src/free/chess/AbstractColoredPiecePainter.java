@@ -21,7 +21,7 @@
 
 package free.chess;
 
-import java.awt.*;
+import java.awt.Color;
 
 
 /**

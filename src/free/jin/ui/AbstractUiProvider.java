@@ -21,13 +21,22 @@
 
 package free.jin.ui;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.swing.event.EventListenerList;
 
-import free.jin.*;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.Session;
+import free.jin.SessionEvent;
+import free.jin.SessionListener;
+import free.jin.User;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;

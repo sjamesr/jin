@@ -21,8 +21,12 @@
 
 package free.util.swing;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+
 import javax.swing.JDesktopPane;
+
 import free.util.ImageUtilities;
 
 

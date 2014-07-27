@@ -21,13 +21,17 @@
 
 package free.util.audio;
 
-import javax.sound.sampled.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import free.util.BlockingQueue;
-import free.util.PlatformUtils;
 import free.util.IOUtilities;
+import free.util.PlatformUtils;
 
 
 /**

@@ -25,7 +25,13 @@ import java.util.Map;
 
 import javax.swing.ListModel;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.Resource;
+import free.jin.Server;
+import free.jin.User;
 import free.jin.action.ActionContext;
 import free.jin.action.JinAction;
 import free.jin.ui.PreferencesPanel;

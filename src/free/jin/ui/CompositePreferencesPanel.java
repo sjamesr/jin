@@ -21,7 +21,11 @@
 
 package free.jin.ui;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

@@ -21,7 +21,9 @@
 
 package free.jin.action;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.Preferences;
+import free.jin.User;
 
 
 /**

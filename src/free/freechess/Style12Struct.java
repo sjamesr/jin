@@ -22,8 +22,9 @@
 
 package free.freechess;
 
-import free.util.Struct;
 import java.util.StringTokenizer;
+
+import free.util.Struct;
 
 
 /**

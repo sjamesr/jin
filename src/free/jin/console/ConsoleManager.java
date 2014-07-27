@@ -33,14 +33,35 @@ import java.beans.PropertyChangeListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingConstants;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.Game;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.ServerUser;
 import free.jin.action.JinAction;
-import free.jin.event.*;
+import free.jin.event.ChatEvent;
+import free.jin.event.ChatListener;
+import free.jin.event.ConnectionListener;
+import free.jin.event.GameAdapter;
+import free.jin.event.GameEvent;
+import free.jin.event.GameListener;
+import free.jin.event.GameStartEvent;
+import free.jin.event.JinEvent;
+import free.jin.event.ListenerManager;
+import free.jin.event.PlainTextEvent;
+import free.jin.event.PlainTextListener;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIAdapter;
 import free.jin.plugin.PluginUIContainer;
@@ -48,7 +69,11 @@ import free.jin.plugin.PluginUIEvent;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.TextUtilities;
-import free.util.swing.tabbedpane.*;
+import free.util.swing.tabbedpane.Tab;
+import free.util.swing.tabbedpane.TabbedPane;
+import free.util.swing.tabbedpane.TabbedPaneEvent;
+import free.util.swing.tabbedpane.TabbedPaneListener;
+import free.util.swing.tabbedpane.TabbedPaneModel;
 
 
 /**

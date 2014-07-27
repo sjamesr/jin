@@ -21,10 +21,10 @@
 
 package free.jin.event;
 
-import free.jin.Game;
-import free.chess.Position;
 import free.chess.ChesslikeGenericVariant;
+import free.chess.Position;
 import free.jin.Connection;
+import free.jin.Game;
 import free.jin.PGNConnection;
 
 

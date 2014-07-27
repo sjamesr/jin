@@ -22,8 +22,8 @@
 
 package free.util;
 
-import java.awt.Graphics;
 import java.awt.Component;
+import java.awt.Graphics;
 
 
 /**

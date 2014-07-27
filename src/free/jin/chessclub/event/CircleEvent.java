@@ -22,10 +22,10 @@
 
 package free.jin.chessclub.event;
 
+import free.chess.Square;
 import free.jin.Game;
 import free.jin.chessclub.JinChessclubConnection;
 import free.jin.event.GameEvent;
-import free.chess.Square;
 
 
 /**

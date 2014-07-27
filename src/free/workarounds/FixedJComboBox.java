@@ -21,10 +21,13 @@
 
 package free.workarounds;
 
-import javax.swing.JComboBox;
-import javax.swing.ComboBoxModel;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.util.Vector;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
 
 
 /**

@@ -21,8 +21,9 @@
 
 package free.jin.board;
 
-import free.chess.Square;
 import java.awt.Color;
+
+import free.chess.Square;
 
 
 /**

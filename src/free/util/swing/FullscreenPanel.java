@@ -21,11 +21,22 @@
 
 package free.util.swing;
 
-import java.awt.*;
+import java.awt.AWTPermission;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import free.util.AWTUtilities;
 import free.util.Localization;

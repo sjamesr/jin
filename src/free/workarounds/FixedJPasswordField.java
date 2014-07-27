@@ -21,11 +21,12 @@
 
 package free.workarounds;
 
+import java.awt.Cursor;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
-import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
 
 
 /**

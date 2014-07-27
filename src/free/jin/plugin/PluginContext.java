@@ -21,11 +21,14 @@
 
 package free.jin.plugin;
 
-import free.jin.*;
-import javax.swing.ListModel;
 import javax.swing.DefaultListModel;
-import free.util.Utilities;
+import javax.swing.ListModel;
+
+import free.jin.Connection;
+import free.jin.Preferences;
+import free.jin.User;
 import free.jin.action.JinAction;
+import free.util.Utilities;
 
 
 /**

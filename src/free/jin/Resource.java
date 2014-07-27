@@ -21,8 +21,9 @@
 
 package free.jin;
 
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
+
 import free.jin.plugin.Plugin;
 
 

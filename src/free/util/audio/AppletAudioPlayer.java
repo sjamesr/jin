@@ -22,8 +22,9 @@
 package free.util.audio;
 
 import java.util.Hashtable;
-import free.util.PlatformUtils;
+
 import free.util.BlockingQueue;
+import free.util.PlatformUtils;
 
 
 /**

@@ -21,10 +21,10 @@
 
 package free.chess;
 
-import java.awt.*;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.URL;

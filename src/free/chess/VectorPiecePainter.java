@@ -21,9 +21,12 @@
 
 package free.chess;
 
-import java.awt.*;
-import free.chess.Piece;
-import free.chess.ChessPiece;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Polygon;
+import java.awt.Rectangle;
                                                 
 
 /**            

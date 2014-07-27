@@ -22,9 +22,19 @@
 package free.jin.ui;
 
 import java.awt.BorderLayout;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

@@ -22,8 +22,8 @@
 package free.jin.event;
 
 import free.chess.Player;
-import free.jin.Game;
 import free.jin.Connection;
+import free.jin.Game;
 
 
 /**

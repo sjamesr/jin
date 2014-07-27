@@ -21,20 +21,30 @@
 
 package free.jin.console.prefs;
 
-import javax.swing.*;
-import java.awt.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.util.Vector;
-import java.util.StringTokenizer;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.Enumeration;
-import free.util.swing.ColorChooser;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.console.ConsoleManager;
 import free.jin.ui.PreferencesPanel;
+import free.util.swing.ColorChooser;
 
 
 /**

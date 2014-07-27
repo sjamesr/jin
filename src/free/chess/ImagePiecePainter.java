@@ -21,13 +21,22 @@
 
 package free.chess;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import free.util.IOUtilities;
 import free.util.ImageUtilities;

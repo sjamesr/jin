@@ -21,15 +21,16 @@
 
 package free.jin.board;
 
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
+
+import free.chess.DefaultPiecePainter;
+import free.chess.PiecePainter;
+import free.chess.ResourcePiecePainter;
 import free.jin.Resource;
 import free.jin.Server;
 import free.jin.plugin.Plugin;
-import free.chess.PiecePainter;
-import free.chess.ResourcePiecePainter;
-import free.chess.DefaultPiecePainter;
 import free.util.IOUtilities;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;

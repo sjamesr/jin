@@ -21,7 +21,12 @@
 
 package free.chess.variants.giveaway;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessPiece;
+import free.chess.ChesslikeGenericVariant;
+import free.chess.Piece;
+import free.chess.Position;
+import free.chess.Square;
 
 
 /**

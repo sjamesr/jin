@@ -21,8 +21,8 @@
 
 package free.chess;
 
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
 
 
 /**

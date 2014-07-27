@@ -21,9 +21,9 @@
 
 package free.util;
 
-import java.util.Hashtable;
-import java.net.URLStreamHandlerFactory;
 import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
+import java.util.Hashtable;
 
 
 /**

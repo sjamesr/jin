@@ -22,7 +22,12 @@
 
 package free.freechess;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PushbackInputStream;
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;

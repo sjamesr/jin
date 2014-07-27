@@ -22,7 +22,13 @@
 package free.jin;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;

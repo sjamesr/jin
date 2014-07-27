@@ -22,13 +22,13 @@
 package free.jin.board.icc;
 
 
-import free.jin.plugin.PluginUIEvent;
+import free.jin.Connection;
+import free.jin.Game;
 import free.jin.board.BoardManager;
 import free.jin.board.BoardPanel;
-import free.jin.Game;
-import free.jin.Connection;
-import free.jin.event.GameStartEvent;
 import free.jin.event.GameEndEvent;
+import free.jin.event.GameStartEvent;
+import free.jin.plugin.PluginUIEvent;
 
 
 /**

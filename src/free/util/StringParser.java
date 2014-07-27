@@ -21,10 +21,10 @@
 
 package free.util;
 
-import java.util.StringTokenizer;
-import java.awt.Rectangle;
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.util.StringTokenizer;
 
 
 /**

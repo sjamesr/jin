@@ -21,9 +21,9 @@
 
 package free.jin;
 
-import free.util.Struct;
-import free.chess.WildVariant;
 import free.chess.Player;
+import free.chess.WildVariant;
+import free.util.Struct;
 
 
 /**

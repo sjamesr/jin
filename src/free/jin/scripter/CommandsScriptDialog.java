@@ -28,7 +28,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.StringTokenizer;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import bsh.EvalError;
 import bsh.Interpreter;

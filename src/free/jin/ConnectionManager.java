@@ -27,7 +27,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import free.jin.event.ConnectionListener;
 import free.jin.plugin.PluginStartException;

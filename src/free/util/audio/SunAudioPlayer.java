@@ -21,9 +21,10 @@
 
 package free.util.audio;
 
-import sun.audio.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
+import sun.audio.NativeAudioStream;
 import free.util.BlockingQueue;
 
 

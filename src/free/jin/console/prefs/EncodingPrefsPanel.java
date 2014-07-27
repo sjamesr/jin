@@ -24,9 +24,20 @@ package free.jin.console.prefs;
 import java.awt.Component;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

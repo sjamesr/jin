@@ -24,8 +24,8 @@ package free.jin.freechess;
 import free.freechess.Ivar;
 import free.jin.event.BasicListenerManager;
 import free.jin.event.SeekListener;
-import free.jin.freechess.event.IvarStateChangeListener;
 import free.jin.freechess.event.IvarStateChangeEvent;
+import free.jin.freechess.event.IvarStateChangeListener;
 
 
 /**

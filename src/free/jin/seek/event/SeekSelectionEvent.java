@@ -22,6 +22,7 @@
 package free.jin.seek.event;
 
 import java.util.EventObject;
+
 import free.jin.Seek;
 
 

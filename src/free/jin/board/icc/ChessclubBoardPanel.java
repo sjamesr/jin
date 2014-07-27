@@ -24,7 +24,11 @@ package free.jin.board.icc;
 import java.awt.Color;
 
 import free.jin.Game;
-import free.jin.board.*;
+import free.jin.board.Arrow;
+import free.jin.board.BoardManager;
+import free.jin.board.BoardPanel;
+import free.jin.board.Circle;
+import free.jin.board.JinBoard;
 import free.jin.board.event.ArrowCircleListener;
 import free.jin.chessclub.event.ArrowEvent;
 import free.jin.chessclub.event.ChessclubGameListener;

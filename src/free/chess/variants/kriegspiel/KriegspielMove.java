@@ -21,7 +21,11 @@
 
 package free.chess.variants.kriegspiel;
 
-import free.chess.*;
+import free.chess.ChessPiece;
+import free.chess.Move;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.Square;
 
 
 

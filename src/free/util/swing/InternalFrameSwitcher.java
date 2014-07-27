@@ -21,13 +21,15 @@
 
 package free.util.swing;
 
-import javax.swing.*;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.beans.PropertyVetoException;
 import java.util.Vector;
-import java.awt.event.ContainerListener;
-import java.awt.event.ContainerEvent;
-import javax.swing.event.InternalFrameListener;
+
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 
 
 /**

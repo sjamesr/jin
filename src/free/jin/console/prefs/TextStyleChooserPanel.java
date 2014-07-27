@@ -21,7 +21,14 @@
 
 package free.jin.console.prefs;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
+import java.awt.RenderingHints;
 import java.lang.reflect.Method;
 
 import javax.swing.JPanel;

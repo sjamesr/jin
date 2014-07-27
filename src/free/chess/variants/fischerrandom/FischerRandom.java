@@ -21,7 +21,15 @@
 
 package free.chess.variants.fischerrandom;
 
-import free.chess.*;
+import free.chess.Chess;
+import free.chess.ChessMove;
+import free.chess.ChessPiece;
+import free.chess.ChesslikeGenericVariant;
+import free.chess.Move;
+import free.chess.Piece;
+import free.chess.Player;
+import free.chess.Position;
+import free.chess.Square;
 
 
 /**

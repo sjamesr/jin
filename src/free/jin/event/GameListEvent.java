@@ -21,7 +21,8 @@
 
 package free.jin.event;
 
-import free.jin.*;
+import free.jin.Connection;
+import free.jin.GameListItem;
 
 
 /**

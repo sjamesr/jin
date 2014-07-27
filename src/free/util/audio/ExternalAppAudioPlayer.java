@@ -22,8 +22,9 @@
 package free.util.audio;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+
 import free.util.BlockingQueue;
 import free.util.IOUtilities;
 

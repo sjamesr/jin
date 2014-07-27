@@ -21,8 +21,9 @@
 
 package free.workarounds;
 
-import javax.swing.JInternalFrame;
 import java.beans.PropertyVetoException;
+
+import javax.swing.JInternalFrame;
 
 
 /**

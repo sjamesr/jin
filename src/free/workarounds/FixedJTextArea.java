@@ -21,9 +21,10 @@
 
 package free.workarounds;
 
+import java.awt.Cursor;
+
 import javax.swing.JTextArea;
 import javax.swing.text.Document;
-import java.awt.Cursor;
 
 
 /**

@@ -22,6 +22,7 @@
 package free.jin.board.event;
 
 import java.util.EventObject;
+
 import free.chess.Move;
 
 

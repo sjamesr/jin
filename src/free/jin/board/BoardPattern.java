@@ -21,6 +21,10 @@
 
 package free.jin.board;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
+
 import free.chess.BoardPainter;
 import free.chess.DefaultBoardPainter;
 import free.chess.ResourceBoardPainter;
@@ -31,10 +35,6 @@ import free.util.IOUtilities;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
 import free.util.URLClassLoader;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Properties;
 
 
 /**

@@ -25,10 +25,19 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.ImageObserver;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.ToolTipManager;
 
 import free.util.AWTUtilities;
 
