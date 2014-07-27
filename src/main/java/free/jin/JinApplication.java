@@ -26,7 +26,6 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,21 +34,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+
+import org.reflections.Reflections;
+
+import com.google.common.collect.ImmutableSet;
 
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
@@ -106,7 +110,7 @@ public class JinApplication implements JinContext{
    * Are we loading plugins, actions etc. dynamically with special classloaders?
    */
   
-  private static final boolean dynamicLoad = !"true".equals(System.getProperty("jin.noDynamicLoad"));
+  private static final boolean dynamicLoad = false;
   
   
   
@@ -225,7 +229,7 @@ public class JinApplication implements JinContext{
    * A list of <code>Server</code> objects representing the supported servers.
    */
 
-  private final Server [] servers;
+  private final Set<Server> servers;
   
   
   
@@ -517,41 +521,16 @@ public class JinApplication implements JinContext{
    * various servers.
    */
 
-  private Server [] loadServers() throws IOException, ClassNotFoundException,
+  private Set<Server> loadServers() throws IOException, ClassNotFoundException,
       InstantiationException, IllegalAccessException{
-
-    File serversDir = new File(JIN_DIR, "servers");
-    checkDirectoryExists(serversDir);
-    
-    List servers = new LinkedList();
-    
-    File [] protocolDirs = serversDir.listFiles(new FileFilter(){
-      @Override
-      public boolean accept(File file){
-        return file.isDirectory();
+    Reflections reflections = new Reflections("free.jin");
+    Set<Server> result = new HashSet<>();
+    for (Class<? extends Server> serverClass : reflections.getSubTypesOf(Server.class)) {
+      if (!Modifier.isAbstract(serverClass.getModifiers())) {
+        result.add(serverClass.newInstance());
       }
-    });
-    
-    for (int i = 0; i < protocolDirs.length; i++){
-      File protocolDir = protocolDirs[i];
-      File protocolFile = new File(protocolDir, "protocol.jar");
-      ChildClassLoader protocolLoader = new ZipClassLoader(protocolFile, libsLoader);
-      
-      String [] jars = protocolDir.list(new ExtensionFilenameFilter(".jar"){
-        @Override
-        public boolean accept(File dir, String filename){
-          return super.accept(dir, filename) && !"protocol.jar".equals(filename);
-        }
-      });
-
-      for (int j = 0; j < jars.length; j++)
-        servers.add(loadServer(protocolLoader, new File(protocolDir, jars[j])));
     }
-    
-    if (servers.size() == 0)
-      throw new IllegalStateException("No server specifications found in:\n" + serversDir);
-
-    return (Server[])servers.toArray(new Server[servers.size()]);
+    return result;
   }
 
 
@@ -601,8 +580,8 @@ public class JinApplication implements JinContext{
    */
 
   @Override
-  public Server [] getServers(){
-    return servers;
+  public Set<Server> getServers(){
+    return ImmutableSet.copyOf(servers);
   }
   
   
@@ -617,8 +596,7 @@ public class JinApplication implements JinContext{
     Vector usersVector = new Vector();
     
     if (usersDir.exists()){
-      for (int i = 0; i < servers.length; i++){
-        Server server = servers[i];
+      for (Server server : getServers()){
         File serverSpecificUserDir = new File(usersDir, server.getId());
         if (!serverSpecificUserDir.exists())
           continue;
@@ -752,8 +730,7 @@ public class JinApplication implements JinContext{
     
     
     // Save guest users
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
+    for (Server server : getServers()){
       User guest = server.getGuest();
       
       if (guest.isDirty())
@@ -885,8 +862,8 @@ public class JinApplication implements JinContext{
    
   private Hashtable loadActions() throws IOException, ClassNotFoundException{
     Hashtable actions = new Hashtable();
-    for (int i = 0; i < servers.length; i++)
-      actions.put(servers[i], new Vector());
+    for (Server server : getServers())
+      actions.put(server, new Vector());
 
     // actions that are shared between all users - usually the ones that come with Jin
     loadActions(actions, new File(JIN_DIR, "actions")); 
@@ -897,8 +874,7 @@ public class JinApplication implements JinContext{
 
     // Convert the Server->Vector map to Server->ActionInfo[] map
     Hashtable result = new Hashtable();
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
+    for (Server server : getServers()) {
       Vector actionsVector = (Vector)actions.get(server);
       ActionInfo [] actionsArray = new ActionInfo[actionsVector.size()];
       actionsVector.copyInto(actionsArray);
@@ -930,15 +906,13 @@ public class JinApplication implements JinContext{
       if (actionInfo == null)
         continue;
 
-      for (int j = 0; j < servers.length; j++)
-        ((Vector)actions.get(servers[j])).addElement(actionInfo);
+      for (Server server : getServers())
+        ((Vector)actions.get(server)).addElement(actionInfo);
     }
 
 
     // Load server specific actions
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
-
+    for (Server server : getServers()) {
       File serverSpecificDir = new File(dir, server.getProtocolId());
       if (!serverSpecificDir.isDirectory())
         continue;
@@ -1014,8 +988,8 @@ public class JinApplication implements JinContext{
 
   private Hashtable loadPlugins() throws IOException, ClassNotFoundException{
     Hashtable plugins = new Hashtable();
-    for (int i = 0; i < servers.length; i++)
-      plugins.put(servers[i], new Vector());
+    for (Server server : getServers())
+      plugins.put(server, new Vector());
 
     // plugins that are shared between all users - usually the ones that come with Jin
     loadPlugins(plugins, new File(JIN_DIR, "plugins")); 
@@ -1026,8 +1000,7 @@ public class JinApplication implements JinContext{
 
     // Convert the Server->Vector map to Server->PluginInfo[] map
     Hashtable result = new Hashtable();
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
+    for (Server server : getServers()){
       Vector pluginsVector = (Vector)plugins.get(server);
       PluginInfo [] pluginsArray = new PluginInfo[pluginsVector.size()];
       pluginsVector.copyInto(pluginsArray);
@@ -1059,15 +1032,13 @@ public class JinApplication implements JinContext{
       if (pluginInfo == null)
         continue;
 
-      for (int j = 0; j < servers.length; j++)
-        ((Vector)plugins.get(servers[j])).addElement(pluginInfo);
+      for (Server server : getServers())
+        ((Vector)plugins.get(server)).addElement(pluginInfo);
     }
 
 
     // Load server specific plugins
-    for (int i = 0; i < servers.length; i++){
-      Server server = servers[i];
-
+    for (Server server : getServers()){
       File serverSpecificDir = new File(dir, server.getProtocolId());
       if (!serverSpecificDir.isDirectory())
         continue;
@@ -1346,9 +1317,9 @@ public class JinApplication implements JinContext{
    */
 
   private Server getServerById(String id){
-    for (int i = 0; i < servers.length; i++)
-      if (servers[i].getId().equals(id))
-        return servers[i];
+    for (Server server : getServers())
+      if (server.getId().equals(id))
+        return server;
 
     return null;
   }

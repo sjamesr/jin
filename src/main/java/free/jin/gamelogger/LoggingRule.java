@@ -104,7 +104,7 @@ class LoggingRule{
 
     Object val = bsh.eval(condition);
     if (!(val instanceof Boolean))
-      throw new EvalError("Not a boolean expression");
+      throw new EvalError("Not a boolean expression", null, null);
 
     this.condition = condition;
   }

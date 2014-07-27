@@ -26,6 +26,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -34,6 +35,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+
+import com.google.common.collect.Iterables;
 
 import free.jin.event.ConnectionListener;
 import free.jin.plugin.PluginStartException;
@@ -140,8 +143,8 @@ public class ConnectionManager{
       return lastUser.getServer();
     
     // Sole supported server
-    if (jin.getServers().length == 1)
-      return jin.getServers()[0];
+    if (jin.getServers().size() == 1)
+      return Iterables.getOnlyElement(jin.getServers());
     
     // Server choice panel
     Server askedServer = new ServerChoicePanel().askServer();
@@ -260,10 +263,10 @@ public class ConnectionManager{
   public void displayNewConnUI(){
     Server server;
     
-    Server [] servers = Jin.getInstance().getServers();
+    Set<Server> servers = Jin.getInstance().getServers();
     // Sole supported server
-    if (servers.length == 1)
-      server = servers[0];
+    if (servers.size() == 1)
+      server = Iterables.getOnlyElement(servers);
     else{  // Server choice panel
       server = new ServerChoicePanel().askServer();
       if (server == null){ // user canceled the dialog

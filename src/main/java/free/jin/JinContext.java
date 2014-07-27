@@ -23,6 +23,7 @@ package free.jin;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
@@ -114,7 +115,7 @@ public interface JinContext{
    * Returns a list of supported servers.
    */
 
-  Server [] getServers();
+  Set<Server> getServers();
   
   
   

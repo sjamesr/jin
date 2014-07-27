@@ -26,9 +26,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -40,6 +40,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.google.common.collect.ImmutableList;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -69,9 +71,9 @@ public class ServerChoicePanel extends DialogPanel{
 
   public ServerChoicePanel(){
     serverListModel = new DefaultListModel();
-    Server [] servers = Jin.getInstance().getServers();
-    for (int i = 0; i < servers.length; i++)
-      serverListModel.addElement(servers[i]);
+    List<Server> servers = ImmutableList.copyOf(Jin.getInstance().getServers());
+    for (Server server : servers)
+      serverListModel.addElement(server);
 
     createUI();
   }

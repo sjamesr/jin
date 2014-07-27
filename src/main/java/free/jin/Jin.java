@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -338,8 +339,8 @@ public class Jin{
    * Returns a list of supported servers.
    */
    
-  public Server [] getServers(){
-    return context.getServers().clone();
+  public Set<Server> getServers(){
+    return context.getServers();
   }
 
 
@@ -507,10 +508,9 @@ public class Jin{
    */
 
   public Server getServerById(String id){
-    Server [] servers = context.getServers();
-    for (int i = 0; i < servers.length; i++)
-      if (servers[i].getId().equals(id))
-        return servers[i];
+    for (Server server : context.getServers())
+      if (server.getId().equals(id))
+        return server;
 
     return null;
   }

@@ -53,9 +53,12 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import com.google.common.collect.ImmutableSet;
 
 import free.chess.BoardImageBoardPainter;
 import free.chess.ImagePiecePainter;
@@ -753,8 +756,8 @@ public class JinApplet extends Applet implements JinContext{
    */
    
   @Override
-  public Server [] getServers(){
-    return new Server[]{server};
+  public Set<Server> getServers(){
+    return ImmutableSet.of(server);
   }
   
   

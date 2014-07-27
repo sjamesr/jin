@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -41,6 +42,8 @@ import javax.swing.ListModel;
 
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
+
+import com.google.common.collect.ImmutableList;
 
 import free.jin.ConnectionDetails;
 import free.jin.I18n;
@@ -78,7 +81,7 @@ public class LoginPanel extends DialogPanel{
    * The list of servers, in the order we put them in the serverBox.
    */
    
-  private Server [] servers;
+  private List<Server> servers;
   
   
   
@@ -253,7 +256,7 @@ public class LoginPanel extends DialogPanel{
     this.registerLink = new LinkLabel(i18n.getString("registerLink.text"));
     this.registerAction = new UrlDisplayingAction(null);
     
-    this.servers = Jin.getInstance().getServers();
+    this.servers = ImmutableList.copyOf(Jin.getInstance().getServers());
     
     serverBox.setEditable(false);
     usernameBox.setEditable(true);
@@ -324,7 +327,7 @@ public class LoginPanel extends DialogPanel{
     serverBox.addActionListener(new ActionListener(){
       @Override
       public void actionPerformed(ActionEvent evt){
-        Server server = servers[serverBox.getSelectedIndex()];
+        Server server = servers.get(serverBox.getSelectedIndex());
         User [] users = getServerUsers(server);
         
         if ((users.length != 0) && !users[0].isGuest())   
@@ -370,7 +373,7 @@ public class LoginPanel extends DialogPanel{
    
   private void setData(Server server, ConnectionDetails connDetails, boolean updateServer, boolean updateUsername){
     if (updateServer)
-      serverBox.setSelectedIndex(Utilities.indexOf(servers, server));
+      serverBox.setSelectedIndex(servers.indexOf(updateServer));
     
     if (updateUsername){
       users = getServerUsers(server);
@@ -452,8 +455,8 @@ public class LoginPanel extends DialogPanel{
    
   private ComboBoxModel createServerBoxModel(){
     DefaultComboBoxModel model = new DefaultComboBoxModel();
-    for (int i = 0; i < servers.length; i++)
-      model.addElement(servers[i].getLongName());
+    for (Server server : servers)
+      model.addElement(server.getLongName());
     
     return model;
   }
@@ -536,7 +539,7 @@ public class LoginPanel extends DialogPanel{
    */
    
   private Server getServer(){
-    return servers[serverBox.getSelectedIndex()];     
+    return servers.get(serverBox.getSelectedIndex());     
   }
 
 

@@ -185,7 +185,7 @@ class CommandsScriptDialog extends ScriptDialog{
       }
       Object val = bsh.eval(condition);
       if (!(val instanceof Boolean))
-        throw new EvalError("Not a boolean expression");
+        throw new EvalError("Not a boolean expression", null, null);
     } catch (EvalError e){
         I18n i18n = I18n.get(CommandsScriptDialog.class);
         Object result = 
