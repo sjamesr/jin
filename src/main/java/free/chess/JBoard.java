@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -2459,7 +2460,7 @@ public class JBoard extends JComponent{
 
   public static void main(String [] args){
     javax.swing.JFrame frame = new javax.swing.JFrame("JBoard Test");
-    frame.addWindowListener(new free.util.AppKiller());
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.getContentPane().setLayout(new java.awt.BorderLayout());
     final JBoard board = new JBoard();
 //    board.setShowShadowPieceInTargetSquare(true);
