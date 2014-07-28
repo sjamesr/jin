@@ -23,3 +23,10 @@ This fork of Jin uses [Apache Maven](http://maven.apache.org/) as its build syst
 1. Install Maven. If you need help, you can follow [these instructions](http://maven.apache.org/download.cgi#Installation).
 2. Build Jin. Run the following in your `jin` directory: `mvn package`
 3. Run Jin. `MAVEN_OPTS=-Djava.library.path=target/natives mvn exec:java -Dexec.mainClass=free.jin.JinApplication`
+
+Developing with Eclipse
+=======================
+
+Recent versions of Eclipse support Maven projects natively. You should be able to import Jin as a Maven project into Eclipse and start coding right away.
+
+In order to run Jin from Eclipse, right-click on the `JinApplication` class in the package explorer, Run As... Java Application. You will need to edit the run configuration to add `-Djava.library.path=target/natives` as a JVM argument, otherwise Jin's sound will not work.
