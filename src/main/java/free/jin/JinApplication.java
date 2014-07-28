@@ -1110,7 +1110,8 @@ public class JinApplication implements JinContext{
     String serverId = plugin.getServer().getId();
 
     File userResDir = new File(new File(prefsDir, "resources"), type);
-    File jinResDir = new File(new File(JIN_DIR, "resources"), type);
+    File jinResDir = new File(new File(JIN_DIR, Joiner.on(File.separator).join("src", "main",
+        "resources")), type);
     File jinServerResDir = new File(new File(new File(JIN_DIR, "resources"), type), serverId);
     
     File [] files = new File[]{
