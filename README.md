@@ -15,8 +15,8 @@ Getting Jin
 
 You will now have a directory called `jin` in your current working directory.
 
-Building Jin and running Jin
-============================
+Building and running Jin
+========================
 
 This fork of Jin uses [Apache Maven](http://maven.apache.org/) as its build system. So,
 
