@@ -24,6 +24,7 @@ package free.jin.board;
 import java.awt.Adjustable;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -201,7 +202,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   protected JLabel whiteLabel;
-  
+  protected JPanel whiteLabelPanel;
   
   
   /**
@@ -209,6 +210,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
    */
   
   protected JLabel blackLabel;
+  protected JPanel blackLabelPanel;
   
   
   
@@ -549,7 +551,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     gameLabel = createGameLabel(game);
     whiteLabel = createWhiteLabel(game);
+    whiteLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+    whiteLabelPanel.add(whiteLabel);
     blackLabel = createBlackLabel(game);
+    blackLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+    blackLabelPanel.add(blackLabel);
     fullscreenButton = createFullscreenButton();
     whiteClock = createWhiteClock(game);
     blackClock = createBlackClock(game);
@@ -603,8 +609,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   private void addComponents(){
     contentPanel.add(board);
-    contentPanel.add(whiteLabel);
-    contentPanel.add(blackLabel);
+    contentPanel.add(whiteLabelPanel);
+    contentPanel.add(blackLabelPanel);
     contentPanel.add(whiteClock);
     contentPanel.add(blackClock);
     contentPanel.add(gameLabel);
@@ -1194,8 +1200,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      * Preferred sizes of our children.
      */
     
-    private Dimension whiteLabelPrefSize = null;
-    private Dimension blackLabelPrefSize = null;
+    private Dimension whiteLabelPanelPrefSize = null;
+    private Dimension blackLabelPanelPrefSize = null;
     private Dimension fullscreenButtonPrefSize = null;
     private Dimension gameLabelPrefSize = null;
     private Dimension positionScrollbarPrefSize = null;
@@ -1233,10 +1239,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      */
     
     private void calcPrefSizes(){
-      if (whiteLabelPrefSize == null)
-        whiteLabelPrefSize = whiteLabel.getPreferredSize();
-      if (blackLabelPrefSize == null)
-        blackLabelPrefSize = blackLabel.getPreferredSize();
+      if (whiteLabelPanelPrefSize == null)
+        whiteLabelPanelPrefSize = whiteLabelPanel.getPreferredSize();
+      if (blackLabelPanelPrefSize == null)
+        blackLabelPanelPrefSize = blackLabelPanel.getPreferredSize();
       if (fullscreenButtonPrefSize == null)
         fullscreenButtonPrefSize = fullscreenButton.getPreferredSize();
       if (gameLabelPrefSize == null)
@@ -1270,29 +1276,29 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
       width -= x + CONTAINER_GAP;
       height = boardSize;
       
-      JComponent topLabel, bottomLabel, topClock, bottomClock;
+      JComponent topLabelPanel, bottomLabelPanel, topClock, bottomClock;
       ImageComponent topImageComponent, bottomImageComponent;
       Dimension topLabelPrefSize, bottomLabelPrefSize;
       
       if (isFlipped){
-        topLabel = whiteLabel;
+        topLabelPanel = whiteLabelPanel;
         topClock = whiteClock;
         topImageComponent = whiteImageComponent;
-        bottomLabel = blackLabel;
+        bottomLabelPanel = blackLabelPanel;
         bottomClock = blackClock;
         bottomImageComponent = blackImageComponent;
-        topLabelPrefSize = whiteLabelPrefSize;
-        bottomLabelPrefSize = blackLabelPrefSize;
+        topLabelPrefSize = whiteLabelPanelPrefSize;
+        bottomLabelPrefSize = blackLabelPanelPrefSize;
       }
       else{
-        topLabel = blackLabel;
+        topLabelPanel = blackLabelPanel;
         topClock = blackClock;
         topImageComponent = blackImageComponent;
-        bottomLabel = whiteLabel;
+        bottomLabelPanel = whiteLabelPanel;
         bottomClock = whiteClock;
         bottomImageComponent = whiteImageComponent;
-        topLabelPrefSize = blackLabelPrefSize;
-        bottomLabelPrefSize = whiteLabelPrefSize;
+        topLabelPrefSize = blackLabelPanelPrefSize;
+        bottomLabelPrefSize = whiteLabelPanelPrefSize;
       }
       
       int clockHeight = height/10;
@@ -1301,11 +1307,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         topImageComponent.setBounds(x, y, topLabelPrefSize.height, topLabelPrefSize.height);
       else
         topImageComponent.setBounds(x - GAP, y, 0, 0);
-      topLabel.setBounds(topImageComponent.getX() + topImageComponent.getWidth() + GAP, y, 
+      topLabelPanel.setBounds(topImageComponent.getX() + topImageComponent.getWidth() + GAP, y, 
           fullscreenButton.getX() - (topImageComponent.getWidth() + topImageComponent.getX()) - GAP, 
           topLabelPrefSize.height);
-      y += topLabel.getHeight() + GAP;
-      height -= topLabel.getHeight() + GAP;
+      y += topLabelPanel.getHeight() + GAP;
+      height -= topLabelPanel.getHeight() + GAP;
       
       topClock.setBounds(x, y, width, clockHeight);
       y += topClock.getHeight() + GAP;
@@ -1324,9 +1330,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
             bottomLabelPrefSize.height, bottomLabelPrefSize.height);
       else
         bottomImageComponent.setBounds(x - GAP, y + height - bottomLabelPrefSize.height, 0, 0);
-      bottomLabel.setBounds(bottomImageComponent.getX() + bottomImageComponent.getWidth() + GAP, 
+      bottomLabelPanel.setBounds(bottomImageComponent.getX() + bottomImageComponent.getWidth() + GAP, 
           y + height - bottomLabelPrefSize.height, width, bottomLabelPrefSize.height);
-      height -= bottomLabel.getHeight() + GAP;
+      height -= bottomLabelPanel.getHeight() + GAP;
       
       bottomClock.setBounds(x, y + height - clockHeight, width, clockHeight);
       height -= bottomClock.getHeight() + GAP;
@@ -1347,29 +1353,29 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
      */
     
     private void layoutVertical(){
-      JComponent topLabel, bottomLabel;
+      JComponent topLabelPanel, bottomLabelPanel;
       JChessClock topClock, bottomClock;
       ImageComponent topImageComponent, bottomImageComponent;
       Dimension topLabelPrefSize, bottomLabelPrefSize;
       if (isFlipped){
-        topLabel = whiteLabel;
+        topLabelPanel = whiteLabelPanel;
         topClock = whiteClock;
         topImageComponent = whiteImageComponent;
-        bottomLabel = blackLabel;
+        bottomLabelPanel = blackLabelPanel;
         bottomClock = blackClock;
         bottomImageComponent = blackImageComponent;
-        topLabelPrefSize = whiteLabelPrefSize;
-        bottomLabelPrefSize = blackLabelPrefSize;
+        topLabelPrefSize = whiteLabelPanelPrefSize;
+        bottomLabelPrefSize = blackLabelPanelPrefSize;
       }
       else{
-        topLabel = blackLabel;
+        topLabelPanel = blackLabelPanel;
         topClock = blackClock;
         topImageComponent = blackImageComponent;
-        bottomLabel = whiteLabel;
+        bottomLabelPanel = whiteLabelPanel;
         bottomClock = whiteClock;
         bottomImageComponent = whiteImageComponent;
-        topLabelPrefSize = blackLabelPrefSize;
-        bottomLabelPrefSize = whiteLabelPrefSize;
+        topLabelPrefSize = blackLabelPanelPrefSize;
+        bottomLabelPrefSize = whiteLabelPanelPrefSize;
       }
       
       buttonPanel.setBounds(0, 0, 0, 0);
@@ -1396,11 +1402,11 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         topImageComponent.setBounds(x, y, topLabelPrefSize.height, topLabelPrefSize.height);
       else
         topImageComponent.setBounds(x - GAP, y, 0, 0);
-      topLabel.setBounds(topImageComponent.getX() + topImageComponent.getWidth() + GAP, y,
+      topLabelPanel.setBounds(topImageComponent.getX() + topImageComponent.getWidth() + GAP, y,
           topLabelPrefSize.width, topLabelPrefSize.height);
       topClock.setBounds(x + width - clockWidth, y, clockWidth, topLabelPrefSize.height);
-      y += topLabel.getHeight() + GAP;
-      height -= topLabel.getHeight() + GAP;
+      y += topLabelPanel.getHeight() + GAP;
+      height -= topLabelPanel.getHeight() + GAP;
       
       int boardSize = (Math.min(height - bottomLabelPrefSize.height - 2*GAP - CONTAINER_GAP, width)/8)*8;
       board.setBounds((getWidth() - boardSize)/2, y, boardSize, boardSize);
@@ -1411,15 +1417,15 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
         bottomImageComponent.setBounds(x, y, bottomLabelPrefSize.height, bottomLabelPrefSize.height);
       else
         bottomImageComponent.setBounds(x - GAP, y, 0, 0);
-      bottomLabel.setBounds(bottomImageComponent.getX() + bottomImageComponent.getWidth() + GAP, y,
+      bottomLabelPanel.setBounds(bottomImageComponent.getX() + bottomImageComponent.getWidth() + GAP, y,
           bottomLabelPrefSize.width, bottomLabelPrefSize.height);
       bottomClock.setBounds(x + width - clockWidth, y, clockWidth, bottomLabelPrefSize.height);
-      if ((buttonPanelPrefSize.width <= bottomClock.getX() - bottomLabel.getX() - bottomLabel.getWidth() - 2*GAP) &&
+      if ((buttonPanelPrefSize.width <= bottomClock.getX() - bottomLabelPanel.getX() - bottomLabelPanel.getWidth() - 2*GAP) &&
           (height >= buttonPanelPrefSize.height))
-        buttonPanel.setBounds(bottomLabel.getX() + bottomLabel.getWidth() + GAP, y,
-            bottomClock.getX() - bottomLabel.getX() - bottomLabel.getWidth() - 2*GAP, buttonPanelPrefSize.height);
-      y += Math.max(bottomLabel.getHeight(), buttonPanel.getHeight()) + GAP;
-      height -= Math.max(bottomLabel.getHeight(), buttonPanel.getHeight()) + GAP;
+        buttonPanel.setBounds(bottomLabelPanel.getX() + bottomLabelPanel.getWidth() + GAP, y,
+            bottomClock.getX() - bottomLabelPanel.getX() - bottomLabelPanel.getWidth() - 2*GAP, buttonPanelPrefSize.height);
+      y += Math.max(bottomLabelPanel.getHeight(), buttonPanel.getHeight()) + GAP;
+      height -= Math.max(bottomLabelPanel.getHeight(), buttonPanel.getHeight()) + GAP;
       
       if ((buttonPanel.getHeight() == 0) && (height - CONTAINER_GAP >= buttonPanelPrefSize.height)){
         buttonPanel.setBounds(x, y, width, buttonPanelPrefSize.height);
@@ -1437,8 +1443,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     public void invalidate(){
       super.invalidate();
       
-      whiteLabelPrefSize = null;
-      blackLabelPrefSize = null;
+      whiteLabelPanelPrefSize = null;
+      blackLabelPanelPrefSize = null;
       fullscreenButtonPrefSize = null;
       gameLabelPrefSize = null;
       positionScrollbarPrefSize = null;
@@ -1471,10 +1477,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     public Dimension getHorizontalPrefSize(){
       return new Dimension(
           320 + Math.max(
-              Math.max(blackLabelPrefSize.width, whiteLabelPrefSize.width) + fullscreenButtonPrefSize.width,
+              Math.max(blackLabelPanelPrefSize.width, whiteLabelPanelPrefSize.width) + fullscreenButtonPrefSize.width,
               buttonPanelPrefSize.width) + 2*CONTAINER_GAP,
-              Math.max(320, blackLabelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
-                  moveListTableScrollPanePrefSize.height + buttonPanelPrefSize.height + 30 + whiteLabelPrefSize.height +
+              Math.max(320, blackLabelPanelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
+                  moveListTableScrollPanePrefSize.height + buttonPanelPrefSize.height + 30 + whiteLabelPanelPrefSize.height +
                   7*GAP));
     }
     
@@ -1486,8 +1492,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     public Dimension getVerticalPrefSize(){
       return new Dimension(320,
-          320 + blackLabelPrefSize.height + gameLabelPrefSize.height + 
-          Math.max(whiteLabelPrefSize.height, buttonPanelPrefSize.height) + 4*GAP + 2*CONTAINER_GAP);
+          320 + blackLabelPanelPrefSize.height + gameLabelPrefSize.height + 
+          Math.max(whiteLabelPanelPrefSize.height, buttonPanelPrefSize.height) + 4*GAP + 2*CONTAINER_GAP);
     }
     
     
@@ -1515,10 +1521,10 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     public Dimension getHorizontalMinSize(){
       return new Dimension(
           240 + Math.max(
-              Math.max(blackLabelPrefSize.width, whiteLabelPrefSize.width) + fullscreenButtonPrefSize.width,
+              Math.max(blackLabelPanelPrefSize.width, whiteLabelPanelPrefSize.width) + fullscreenButtonPrefSize.width,
               buttonPanelPrefSize.width) + 2*CONTAINER_GAP,
-              Math.max(240, blackLabelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
-                  buttonPanelPrefSize.height + 30 + whiteLabelPrefSize.height +
+              Math.max(240, blackLabelPanelPrefSize.height + 30 + gameLabelPrefSize.height + positionScrollbarPrefSize.height +
+                  buttonPanelPrefSize.height + 30 + whiteLabelPanelPrefSize.height +
                   6*GAP));
     }
     
@@ -1530,7 +1536,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     public Dimension getVerticalMinSize(){
       return new Dimension(240,
-          240 + blackLabelPrefSize.height + gameLabelPrefSize.height + whiteLabelPrefSize.height + 3*GAP + 2*CONTAINER_GAP);
+          240 + blackLabelPanelPrefSize.height + gameLabelPrefSize.height + whiteLabelPanelPrefSize.height + 3*GAP + 2*CONTAINER_GAP);
     }
     
     
