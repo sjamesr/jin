@@ -217,10 +217,6 @@ public class Jin{
   private void restoreLookAndFeel(){
     String defaultLnf = UIManager.getSystemLookAndFeelClassName();
 
-    // GTK Look and Feel still sucks. Remove this when it doesn't.
-    if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(defaultLnf))
-      defaultLnf = UIManager.getCrossPlatformLookAndFeelClassName();
-    
     Preferences prefs = getCustomizingPrefs() == null ? 
         getPrefs() : Preferences.createBackedUp(getPrefs(), getCustomizingPrefs());
     
