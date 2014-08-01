@@ -203,6 +203,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   protected JLabel whiteLabel;
   protected JPanel whiteLabelPanel;
+  protected JMaterialPanel whiteMaterialPanel;
   
   
   /**
@@ -211,6 +212,7 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
   
   protected JLabel blackLabel;
   protected JPanel blackLabelPanel;
+  protected JMaterialPanel blackMaterialPanel;
   
   
   
@@ -553,9 +555,13 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     whiteLabel = createWhiteLabel(game);
     whiteLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
     whiteLabelPanel.add(whiteLabel);
+    whiteMaterialPanel = new JMaterialPanel(game, Player.WHITE_PLAYER);
+    whiteLabelPanel.add(whiteMaterialPanel);
     blackLabel = createBlackLabel(game);
     blackLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
     blackLabelPanel.add(blackLabel);
+    blackMaterialPanel = new JMaterialPanel(game, Player.BLACK_PLAYER);
+    blackLabelPanel.add(blackMaterialPanel);
     fullscreenButton = createFullscreenButton();
     whiteClock = createWhiteClock(game);
     blackClock = createBlackClock(game);
@@ -1793,6 +1799,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     updateClockActiveness();
     addMoveToListTable(move);
+    whiteMaterialPanel.updateMaterial(realPosition, move);
+    blackMaterialPanel.updateMaterial(realPosition, move);
   }
   
   

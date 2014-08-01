@@ -175,7 +175,11 @@ public interface WildVariant{
    */
   
   String getName();  
-  
-  
-  
+
+  /**
+   * Returns the approximate material value of the given piece in this variant.
+   * For example, for chess, queen will be assigned the value 9, rooks 5,
+   * knights and bishops 3 and pawns 1.
+   */
+  int getApproximateMaterialValue(Piece piece);
 }

@@ -323,7 +323,21 @@ public class Kriegspiel implements WildVariant{
   public String toString(){
     return getName();
   }
-  
-  
-  
+
+  @Override
+  public int getApproximateMaterialValue(Piece piece) {
+    switch (piece.getType()) {
+    case ChessPiece.QUEEN:
+      return 9;
+    case ChessPiece.ROOK:
+      return 5;
+    case ChessPiece.KNIGHT:
+    case ChessPiece.BISHOP:
+      return 3;
+    case ChessPiece.PAWN:
+      return 1;
+    default:
+      return 0;
+    }
+  }
 }

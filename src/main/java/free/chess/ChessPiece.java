@@ -38,7 +38,7 @@ public class ChessPiece extends Piece{
    * A constant representing a pawn.
    */
 
-  protected static final int PAWN = 1;
+  public static final int PAWN = 1;
 
 
 
@@ -46,7 +46,7 @@ public class ChessPiece extends Piece{
    * A constant representing a knight.
    */
 
-  protected static final int KNIGHT = 2;
+  public static final int KNIGHT = 2;
 
 
 
@@ -55,7 +55,7 @@ public class ChessPiece extends Piece{
    * A constant representing a bishop.
    */
                                         
-  protected static final int BISHOP = 3;
+  public static final int BISHOP = 3;
 
 
 
@@ -63,7 +63,7 @@ public class ChessPiece extends Piece{
    * A constant representing a rook.
    */
 
-  protected static final int ROOK = 4;
+  public static final int ROOK = 4;
 
 
 
@@ -71,7 +71,7 @@ public class ChessPiece extends Piece{
    * A constant representing a queen.
    */
 
-  protected static final int QUEEN = 5;
+  public static final int QUEEN = 5;
 
 
 
@@ -79,7 +79,7 @@ public class ChessPiece extends Piece{
    * A constant representing a king.
    */
 
-  protected static final int KING = 6;
+  public static final int KING = 6;
 
 
 
@@ -113,7 +113,7 @@ public class ChessPiece extends Piece{
    * {@link #BISHOP}, {@link #ROOK}, {@link #QUEEN} or {@link #KING}.
    */
 
-  private ChessPiece(int color, int type){
+  public ChessPiece(int color, int type){
     super(color, type);
   }
 

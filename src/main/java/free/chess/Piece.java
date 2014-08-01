@@ -259,5 +259,7 @@ public abstract class Piece{
     return val==((Piece)o).val;
   }
 
-
+  public int getType() {
+    return Math.abs(val);
+  }
 }
