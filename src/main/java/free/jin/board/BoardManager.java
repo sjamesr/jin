@@ -386,7 +386,7 @@ public class BoardManager extends Plugin implements GameListener, UserMoveListen
     
     setShowShadowPieceInTargetSquare(prefs.getBool("shadow-piece-in-target-square", false));
     setHighlightLegalTargetSquares(prefs.getBool("highlight-possible-target-squares", false));
-    setSnapToLegalSquare(prefs.getBool("snap-to-legal-square", true));
+    setSnapToLegalSquare(prefs.getBool("snap-to-legal-square", false));
     
     setSlideDuration(prefs.getInt("slide-duration", 100));
   }
