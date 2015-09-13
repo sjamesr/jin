@@ -76,7 +76,7 @@ public class PluginStartException extends Exception{
    */
 
   public PluginStartException(Exception cause, String message){
-    super(message);
+    super(message, cause);
 
     this.cause = cause;
   }
