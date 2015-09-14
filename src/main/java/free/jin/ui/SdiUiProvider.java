@@ -242,7 +242,7 @@ public class SdiUiProvider extends AbstractUiProvider{
       
       frame.setJMenuBar(menubar);
       
-      setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("resources/logo32.png")));
+      setIconImpl(Toolkit.getDefaultToolkit().getImage(Jin.class.getResource("/logo32.png")));
       
       JRootPane rootPane = frame.getRootPane();
       ActionListener closer = new ActionListener(){
