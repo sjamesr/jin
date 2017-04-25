@@ -1,8 +1,5 @@
 package free.jin.board;
 
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-
 import free.chess.ChessMove;
 import free.chess.ChessPiece;
 import free.chess.Move;
@@ -10,6 +7,9 @@ import free.chess.Piece;
 import free.chess.Player;
 import free.chess.Position;
 import free.jin.Game;
+
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 public class JMaterialPanel extends JPanel {
 
@@ -21,24 +21,13 @@ public class JMaterialPanel extends JPanel {
     super();
     bar = new JProgressBar();
     bar.setStringPainted(true);
-    int initialMaterial = 0;
-    Position initialPosition = game.getInitialPosition();
-    for (int i = 0; i < 8; i++) {
-      for (int j = 0; j < 8; j++) {
-        Piece piece = initialPosition.getPieceAt(i, j);
-        if (piece != null && piece.getPlayer().equals(player)) {
-          initialMaterial += game.getVariant().getApproximateMaterialValue(piece);
-        }
-      }
-    }
-    bar.setValue(initialMaterial);
-    bar.setString(initialMaterial + "");
+    updateMaterial(game.getInitialPosition());
     this.game = game;
     this.player = player;
     add(bar);
   }
 
-  public void updateMaterial(Position position, Move move) {
+  public void updateMaterial(Move move) {
     if (!(move instanceof ChessMove)) {
       return;
     }
@@ -55,5 +44,19 @@ public class JMaterialPanel extends JPanel {
 
     bar.setValue(newMaterial);
     bar.setString(newMaterial + "");
+  }
+
+  public void updateMaterial(Position position) {
+    int material = 0;
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        Piece piece = position.getPieceAt(i, j);
+        if (piece != null && piece.getPlayer().equals(player)) {
+          material += game.getVariant().getApproximateMaterialValue(piece);
+        }
+      }
+    }
+    bar.setValue(material);
+    bar.setString(material + "");
   }
 }

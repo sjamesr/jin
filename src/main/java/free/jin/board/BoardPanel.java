@@ -1799,8 +1799,8 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     updateClockActiveness();
     addMoveToListTable(move);
-    whiteMaterialPanel.updateMaterial(realPosition, move);
-    blackMaterialPanel.updateMaterial(realPosition, move);
+    whiteMaterialPanel.updateMaterial(move);
+    blackMaterialPanel.updateMaterial(move);
   }
   
   
@@ -1858,6 +1858,9 @@ public class BoardPanel extends FixedJPanel implements MoveListener, GameListene
     
     updateClockActiveness();
     updateMoveListTable();
+
+    whiteMaterialPanel.updateMaterial(realPosition);
+    blackMaterialPanel.updateMaterial(realPosition);
   }
   
   
