@@ -1,24 +1,19 @@
 /**
- * Jin - a chess client for internet chess servers.
- * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
- * All rights reserved.
+ * Jin - a chess client for internet chess servers. More information is available at
+ * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
-
 package free.jin.board.event;
 
 import java.util.EventListener;
@@ -27,46 +22,28 @@ import free.jin.board.Arrow;
 import free.jin.board.Circle;
 import free.jin.board.JinBoard;
 
-
 /**
- * The interface for listening to arrows and circles being added to the board
- * or removed from it.
+ * The interface for listening to arrows and circles being added to the board or removed from it.
  */
-
-public interface ArrowCircleListener extends EventListener{
-
-  
+public interface ArrowCircleListener extends EventListener {
 
   /**
    * Gets called when an arrow is added.
    */
-
   void arrowAdded(JinBoard board, Arrow arrow);
-
-
 
   /**
    * Gets called when an arrow is removed.
    */
-
   void arrowRemoved(JinBoard board, Arrow arrow);
-
-
 
   /**
    * Gets called when a circle is added.
    */
-
   void circleAdded(JinBoard board, Circle circle);
-
-
 
   /**
    * Gets called when a circle is removed.
    */
-
   void circleRemoved(JinBoard board, Circle circle);
-  
- 
-
 }

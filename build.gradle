@@ -1,6 +1,8 @@
 plugins {
     id "application"
     id "wrapper"
+
+    id 'com.github.sherter.google-java-format' version '0.3.2'
 }
 
 wrapper {
@@ -23,3 +25,12 @@ dependencies {
     compile "org.lwjgl.lwjgl:lwjgl_util:2.9.1"
 }
 
+// If Java formatter checks fail, tell the user how to fix them.
+task printFormatHelperMessage {
+    doLast {
+        throw new GradleException('google-java-format is required.\n' +
+            'Use ./gradlew googleJavaFormat to reformat the broken files')
+    }
+}
+verifyGoogleJavaFormat.finalizedBy printFormatHelperMessage
+printFormatHelperMessage.onlyIf { verifyGoogleJavaFormat.state.failure != null }

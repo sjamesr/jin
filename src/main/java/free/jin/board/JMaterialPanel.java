@@ -37,9 +37,11 @@ public class JMaterialPanel extends JPanel {
     if (chessMove.isCapture() && chessMove.getCapturedPiece().getPlayer().equals(player)) {
       newMaterial -= game.getVariant().getApproximateMaterialValue(chessMove.getCapturedPiece());
     } else if (chessMove.isPromotion()) {
-      newMaterial += (game.getVariant().getApproximateMaterialValue(chessMove.getPromotionTarget()) - game
-          .getVariant().getApproximateMaterialValue(
-              new ChessPiece(player.getPieceColor(), ChessPiece.PAWN)));
+      newMaterial +=
+          (game.getVariant().getApproximateMaterialValue(chessMove.getPromotionTarget())
+              - game.getVariant()
+                  .getApproximateMaterialValue(
+                      new ChessPiece(player.getPieceColor(), ChessPiece.PAWN)));
     }
 
     bar.setValue(newMaterial);
