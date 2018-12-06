@@ -1,24 +1,19 @@
 /**
- * Jin - a chess client for internet chess servers.
- * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2002 Alexander Maryanovsky.
- * All rights reserved.
+ * Jin - a chess client for internet chess servers. More information is available at
+ * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
-
 package free.jin.seek;
 
 import java.awt.Component;
@@ -69,149 +64,107 @@ import free.util.swing.tabbedpane.TabbedPaneEvent;
 import free.util.swing.tabbedpane.TabbedPaneListener;
 import free.util.swing.tabbedpane.TabbedPaneModel;
 
-
 /**
- * The plugin which implements the SoughtGraph. Even though I haven't put this
- * plugin in one of the server specific packages, it's pretty specific to the
- * ICS derived servers (ICC, FICS, chess.net).
+ * The plugin which implements the SoughtGraph. Even though I haven't put this plugin in one of the
+ * server specific packages, it's pretty specific to the ICS derived servers (ICC, FICS, chess.net).
  */
+public class SoughtGraphPlugin extends Plugin
+    implements SeekListener, SeekSelectionListener, PluginUIListener, ConnectionListener {
 
-public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelectionListener,
-    PluginUIListener, ConnectionListener{
-  
-  
-  
   /**
    * The ID of this plugin.
    */
-  
   public static final String PLUGIN_ID = "seek";
-  
-  
-  
+
   /**
    * The panel for issuing seeks.
    */
-  
   private IssueSeekPanel issueSeekPanel;
-  
-  
-  
+
   /**
-   * The panel for issuing match offers. May be <code>null</code> if there is
-   * no such panel (if, for example, the connection is not an instance of
-   * <code>MatchOfferConnection</code>).
+   * The panel for issuing match offers. May be <code>null</code> if there is no such panel (if, for
+   * example, the connection is not an instance of <code>MatchOfferConnection</code>).
    */
-  
   private IssueMatchPanel issueMatchPanel;
-  
-  
-  
+
   /**
-   * The tabbed pane holding the issue seek and match panels. May be
-   * <code>null</code> if there is no issueMatchPanel.
+   * The tabbed pane holding the issue seek and match panels. May be <code>null</code> if there is
+   * no issueMatchPanel.
    */
-  
   private TabbedPane issueTabbedPane;
-  
-  
-  
+
   /**
    * The seek graph.
    */
-
   private SoughtGraph soughtGraph;
-  
-  
-  
+
   /**
    * The container of our UI.
    */
-  
   private PluginUIContainer uiContainer;
-  
-  
-  
-  /**
-   * Sets the plugin context - return <code>false</code> if the connection is
-   * not an instance of <code>SeekConnection</code>.
-   */
 
+  /**
+   * Sets the plugin context - return <code>false</code> if the connection is not an instance of
+   * <code>SeekConnection</code>.
+   */
   @Override
-  public boolean setContext(PluginContext context){
-    if (!(context.getConnection() instanceof SeekConnection))
-      return false;
+  public boolean setContext(PluginContext context) {
+    if (!(context.getConnection() instanceof SeekConnection)) return false;
 
     return super.setContext(context);
   }
-  
-  
-  
+
   /**
-   * Returns the connection to the server, cast to a
-   * <code>SeekConnection</code>.
+   * Returns the connection to the server, cast to a <code>SeekConnection</code>.
    */
-  
-  private SeekConnection getSeekConn(){
-    return (SeekConnection)getConn();
+  private SeekConnection getSeekConn() {
+    return (SeekConnection) getConn();
   }
 
-
- 
   /**
    * Starts this plugin.
    */
-
   @Override
-  public void start(){
+  public void start() {
     createUI();
     registerListeners();
     exportAction(new FindGameAction());
   }
 
-
-
   /**
    * Stops this plugin.
    */
-
   @Override
-  public void stop(){
+  public void stop() {
     unregisterListeners();
     savePrefs();
   }
-  
-  
-  
+
   /**
    * Saves the plugin's preferences.
    */
-  
-  private void savePrefs(){
+  private void savePrefs() {
     issueSeekPanel.savePrefs();
-    
-    if (issueMatchPanel != null){
+
+    if (issueMatchPanel != null) {
       issueMatchPanel.savePrefs();
-      
+
       Preferences prefs = getPrefs();
       prefs.setString("visibleIssuePanel", issueSeekPanel.isVisible() ? "seek" : "match");
     }
   }
 
-
-
   /**
    * Creates the UI.
    */
-
-  protected void createUI(){
+  protected void createUI() {
     I18n i18n = getI18n();
-    
+
     uiContainer = createContainer("", UIProvider.HIDEABLE_CONTAINER_MODE);
     uiContainer.setTitle(i18n.getString("uiContainerTitle"));
 
     URL iconImageURL = SoughtGraphPlugin.class.getResource("icon.gif");
-    if (iconImageURL!= null)
+    if (iconImageURL != null)
       uiContainer.setIcon(Toolkit.getDefaultToolkit().getImage(iconImageURL));
 
     uiContainer.addPluginUIListener(this);
@@ -219,420 +172,380 @@ public class SoughtGraphPlugin extends Plugin implements SeekListener, SeekSelec
     issueSeekPanel = createIssueSeekPanel();
     issueMatchPanel = createIssueMatchPanel();
     soughtGraph = new SoughtGraph(this);
-    
+
     JLabel soughtGraphLabel = i18n.createLabel("soughtGraphLabel");
     soughtGraphLabel.setFont(soughtGraphLabel.getFont().deriveFont(Font.BOLD));
-    
+
     issueTabbedPane = new TabbedPane(SwingConstants.TOP);
     issueTabbedPane.setAlwaysShowTabs(false);
-    
+
     TabbedPaneModel model = issueTabbedPane.getModel();
     model.addTab(new Tab(issueSeekPanel, i18n.getString("issueSeekTab.text"), null, false));
     if (issueMatchPanel != null)
       model.addTab(new Tab(issueMatchPanel, i18n.getString("issueMatchTab.text"), null, false));
-    model.setSelectedIndex(model.indexOfComponent(
-        getPrefs().getString("visibleIssuePanel", "seek").equals("seek") ?
-            (Component)issueSeekPanel : (Component)issueMatchPanel));
-    
-    model.addTabbedPaneListener(new TabbedPaneListener(){
-      @Override
-      public void tabSelected(TabbedPaneEvent evt){
-        Container issuePanel = (Container)evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
-        Component defaultComponent = issuePanel.getFocusTraversalPolicy().getDefaultComponent(issuePanel);
-        if (defaultComponent != null)
-          defaultComponent.requestFocusInWindow();
-      }
-      
-      @Override
-      public void tabAdded(TabbedPaneEvent evt){}
-      @Override
-      public void tabDeselected(TabbedPaneEvent evt){}
-      @Override
-      public void tabRemoved(TabbedPaneEvent evt){}
-    });
-    
+    model.setSelectedIndex(
+        model.indexOfComponent(
+            getPrefs().getString("visibleIssuePanel", "seek").equals("seek")
+                ? (Component) issueSeekPanel
+                : (Component) issueMatchPanel));
+
+    model.addTabbedPaneListener(
+        new TabbedPaneListener() {
+          @Override
+          public void tabSelected(TabbedPaneEvent evt) {
+            Container issuePanel =
+                (Container) evt.getTabbedPaneModel().getTab(evt.getTabIndex()).getComponent();
+            Component defaultComponent =
+                issuePanel.getFocusTraversalPolicy().getDefaultComponent(issuePanel);
+            if (defaultComponent != null) defaultComponent.requestFocusInWindow();
+          }
+
+          @Override
+          public void tabAdded(TabbedPaneEvent evt) {}
+
+          @Override
+          public void tabDeselected(TabbedPaneEvent evt) {}
+
+          @Override
+          public void tabRemoved(TabbedPaneEvent evt) {}
+        });
+
     JLabel issueSeekLabel = null;
-    if (issueMatchPanel == null){
+    if (issueMatchPanel == null) {
       issueSeekLabel = i18n.createLabel("issueSeekLabel");
       issueSeekLabel.setFont(issueSeekLabel.getFont().deriveFont(Font.BOLD));
     }
-    
-    
-    JComponent soughtGraphWrapper = new WrapperComponent(){
-      @Override
-      public Dimension getPreferredSize(){
-        // The sought graph doesn't really have a preferred size, as much as a
-        // preferred width:height ratio
-        int height = Math.max(issueTabbedPane.getPreferredSize().height, getMinimumSize().height);
-        int width = (int)(1.5*height);
-        
-        return new Dimension(width, height);
-      }
-    };
+
+    JComponent soughtGraphWrapper =
+        new WrapperComponent() {
+          @Override
+          public Dimension getPreferredSize() {
+            // The sought graph doesn't really have a preferred size, as much as a
+            // preferred width:height ratio
+            int height =
+                Math.max(issueTabbedPane.getPreferredSize().height, getMinimumSize().height);
+            int width = (int) (1.5 * height);
+
+            return new Dimension(width, height);
+          }
+        };
     soughtGraphWrapper.add(soughtGraph);
-    soughtGraph.setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background").darker()));
-    
-    
+    soughtGraph.setBorder(
+        BorderFactory.createLineBorder(UIManager.getColor("Panel.background").darker()));
+
     JPanel content = new JPanel();
     GroupLayout layout = new GroupLayout(content);
     content.setLayout(layout);
     layout.setAutocreateContainerGaps(true);
-    
-    if (issueSeekLabel == null){
-      layout.setHorizontalGroup(layout.createSequentialGroup()
-          .add(issueTabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-          .addPreferredGap(LayoutStyle.UNRELATED)
-          .add(layout.createParallelGroup()
-            .add(soughtGraphLabel).add(soughtGraphWrapper)));
-        
-        layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.TRAILING)
-          .add(issueTabbedPane)
-          .add(layout.createSequentialGroup()
-            .add(soughtGraphLabel)
-            .addPreferredGap(LayoutStyle.RELATED)
-            .add(soughtGraphWrapper)));
+
+    if (issueSeekLabel == null) {
+      layout.setHorizontalGroup(
+          layout
+              .createSequentialGroup()
+              .add(
+                  issueTabbedPane,
+                  GroupLayout.PREFERRED_SIZE,
+                  GroupLayout.DEFAULT_SIZE,
+                  GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(LayoutStyle.UNRELATED)
+              .add(layout.createParallelGroup().add(soughtGraphLabel).add(soughtGraphWrapper)));
+
+      layout.setVerticalGroup(
+          layout
+              .createParallelGroup(GroupLayout.TRAILING)
+              .add(issueTabbedPane)
+              .add(
+                  layout
+                      .createSequentialGroup()
+                      .add(soughtGraphLabel)
+                      .addPreferredGap(LayoutStyle.RELATED)
+                      .add(soughtGraphWrapper)));
+    } else {
+      layout.setHorizontalGroup(
+          layout
+              .createSequentialGroup()
+              .add(
+                  layout
+                      .createParallelGroup()
+                      .add(issueSeekLabel)
+                      .add(
+                          issueTabbedPane,
+                          GroupLayout.PREFERRED_SIZE,
+                          GroupLayout.DEFAULT_SIZE,
+                          GroupLayout.PREFERRED_SIZE))
+              .addPreferredGap(LayoutStyle.UNRELATED)
+              .add(layout.createParallelGroup().add(soughtGraphLabel).add(soughtGraphWrapper)));
+
+      layout.setVerticalGroup(
+          layout
+              .createSequentialGroup()
+              .add(
+                  layout
+                      .createParallelGroup(GroupLayout.BASELINE)
+                      .add(issueSeekLabel)
+                      .add(soughtGraphLabel))
+              .addPreferredGap(LayoutStyle.RELATED)
+              .add(
+                  layout
+                      .createParallelGroup(GroupLayout.LEADING)
+                      .add(issueTabbedPane)
+                      .add(soughtGraphWrapper)));
     }
-    else{
-      layout.setHorizontalGroup(layout.createSequentialGroup()
-        .add(layout.createParallelGroup()
-          .add(issueSeekLabel)
-          .add(issueTabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(LayoutStyle.UNRELATED)
-        .add(layout.createParallelGroup()
-          .add(soughtGraphLabel).add(soughtGraphWrapper)));
-      
-      layout.setVerticalGroup(layout.createSequentialGroup()
-        .add(layout.createParallelGroup(GroupLayout.BASELINE)
-          .add(issueSeekLabel).add(soughtGraphLabel))
-        .addPreferredGap(LayoutStyle.RELATED)
-        .add(layout.createParallelGroup(GroupLayout.LEADING)
-          .add(issueTabbedPane).add(soughtGraphWrapper)));
-    }
-    
+
     uiContainer.getContentPane().setLayout(WrapLayout.getInstance());
     uiContainer.getContentPane().add(content);
   }
-  
-  
-  
+
   /**
-   * Creates the <code>IssueSeekPanel</code>. This method allows subclasses to
-   * provide their own, custom, versions of <code>IssueSeekPanel</code>.
+   * Creates the <code>IssueSeekPanel</code>. This method allows subclasses to provide their own,
+   * custom, versions of <code>IssueSeekPanel</code>.
    */
-  
-  protected IssueSeekPanel createIssueSeekPanel(){
-    return new IssueSeekPanel(this, uiContainer,
-        Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
+  protected IssueSeekPanel createIssueSeekPanel() {
+    return new IssueSeekPanel(
+        this, uiContainer, Preferences.createWrapped(getPrefs(), "issueSeekPanel."));
   }
-  
-  
-  
+
   /**
-   * Creates the <code>IssueMatchPanel</code>. This method allows subclasses to
-   * provide their own, custom, versions of <code>IssueMatchPanel</code>.
-   * Returns <code>null</code> if there is no <code>IssueMatchPanel</code> (if,
-   * for example, the connection is not an instance of
+   * Creates the <code>IssueMatchPanel</code>. This method allows subclasses to provide their own,
+   * custom, versions of <code>IssueMatchPanel</code>. Returns <code>null</code> if there is no
+   * <code>IssueMatchPanel</code> (if, for example, the connection is not an instance of
    * <code>MatchOfferConnection</code>).
    */
-  
-  protected IssueMatchPanel createIssueMatchPanel(){
+  protected IssueMatchPanel createIssueMatchPanel() {
     if (getConn() instanceof MatchOfferConnection)
-      return new IssueMatchPanel(this, uiContainer,
-          Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
-    else
-      return null;
+      return new IssueMatchPanel(
+          this, uiContainer, Preferences.createWrapped(getPrefs(), "issueMatchPanel."));
+    else return null;
   }
-  
-  
-  
+
   /**
    * Returns whether we have UI for issuing match offers.
-   * 
+   *
    * @see #displayMatchUI(ServerUser)
    */
-  
-  public boolean hasMatchUI(){
+  public boolean hasMatchUI() {
     return issueMatchPanel != null;
   }
-  
-  
-  
+
   /**
-   * Sets the UI up to issue a match offer to the specified player (may be
-   * <code>null</code>, to indicate a blank opponent).
-   * 
+   * Sets the UI up to issue a match offer to the specified player (may be <code>null</code>, to
+   * indicate a blank opponent).
+   *
    * @see #hasMatchUI()
    */
-  
-  public void displayMatchUI(ServerUser opponent){
-    if (!hasMatchUI())
-      throw new IllegalArgumentException("No UI for matching");
-    
+  public void displayMatchUI(ServerUser opponent) {
+    if (!hasMatchUI()) throw new IllegalArgumentException("No UI for matching");
+
     TabbedPaneModel model = issueTabbedPane.getModel();
     model.setSelectedIndex(model.indexOfComponent(issueMatchPanel));
     uiContainer.setActive(true);
     issueMatchPanel.prepareFor(opponent);
   }
-  
-  
-  
+
   /**
    * Gets called when the seek graph container is made visible.
    */
-
   @Override
-  public void pluginUIShown(PluginUIEvent evt){
+  public void pluginUIShown(PluginUIEvent evt) {
     SeekConnection conn = getSeekConn();
-    
-    for (Iterator i = conn.getSeeks().iterator(); i.hasNext();){
-      Seek seek = (Seek)i.next();
+
+    for (Iterator i = conn.getSeeks().iterator(); i.hasNext(); ) {
+      Seek seek = (Seek) i.next();
       soughtGraph.addSeek(seek);
     }
-    
+
     conn.getSeekListenerManager().addSeekListener(this);
   }
-
-
 
   /**
    * Gets called when the seek graph container is made invisible.
    */
-
   @Override
-  public void pluginUIHidden(PluginUIEvent evt){
+  public void pluginUIHidden(PluginUIEvent evt) {
     soughtGraph.removeAllSeeks();
 
     SeekConnection conn = getSeekConn();
     conn.getSeekListenerManager().removeSeekListener(this);
   }
-  
-  
-  
-  @Override
-  public void pluginUIClosing(PluginUIEvent evt){}
-  @Override
-  public void pluginUIActivated(PluginUIEvent evt){}
-  @Override
-  public void pluginUIDeactivated(PluginUIEvent evt){}
-  @Override
-  public void pluginUIDisposed(PluginUIEvent evt){}
-  @Override
-  public void pluginUITitleChanged(PluginUIEvent evt){}
-  @Override
-  public void pluginUIIconChanged(PluginUIEvent evt){}
-  
 
+  @Override
+  public void pluginUIClosing(PluginUIEvent evt) {}
 
+  @Override
+  public void pluginUIActivated(PluginUIEvent evt) {}
 
+  @Override
+  public void pluginUIDeactivated(PluginUIEvent evt) {}
+
+  @Override
+  public void pluginUIDisposed(PluginUIEvent evt) {}
+
+  @Override
+  public void pluginUITitleChanged(PluginUIEvent evt) {}
+
+  @Override
+  public void pluginUIIconChanged(PluginUIEvent evt) {}
 
   /**
    * Registers the necessary listeners.
    */
-
-  protected void registerListeners(){
+  protected void registerListeners() {
     soughtGraph.addSeekSelectionListener(this);
     getConn().getListenerManager().addConnectionListener(this);
   }
 
-
-
-
   /**
    * Unregisters all the listeners registered by this SoughtGraphPlugin.
    */
-
-  protected void unregisterListeners(){
+  protected void unregisterListeners() {
     soughtGraph.removeSeekSelectionListener(this);
     getConn().getListenerManager().removeConnectionListener(this);
   }
-  
-  
-  
+
   /**
    * SeekListener implementation. Gets called when a seek is added.
    */
-
   @Override
-  public void seekAdded(SeekEvent evt){
+  public void seekAdded(SeekEvent evt) {
     soughtGraph.addSeek(evt.getSeek());
   }
-
-
 
   /**
    * SeekListener implementation. Gets called when a seek is removed.
    */
-
   @Override
-  public void seekRemoved(SeekEvent evt){
+  public void seekRemoved(SeekEvent evt) {
     soughtGraph.removeSeek(evt.getSeek());
   }
 
-
-
   /**
-   * SeekSelectionListener implementation. Gets called when the user selects a
-   * Seek. This method asks the SeekConnection to accept the selected seek.
+   * SeekSelectionListener implementation. Gets called when the user selects a Seek. This method
+   * asks the SeekConnection to accept the selected seek.
    */
-
   @Override
-  public void seekSelected(SeekSelectionEvent evt){
+  public void seekSelected(SeekSelectionEvent evt) {
     Seek seek = evt.getSeek();
     SeekConnection conn = getSeekConn();
-    
+
     // Is it our own seek?
-    if (seek.getSeeker().equals(getConn().getUser()))
-      conn.withdraw(seek);
-    else
-      conn.accept(seek);
+    if (seek.getSeeker().equals(getConn().getUser())) conn.withdraw(seek);
+    else conn.accept(seek);
   }
-  
-  
-  
+
   /**
-   * Remove all seeks on disconnection. This just seems to make more sense than
-   * leaving them on.   
+   * Remove all seeks on disconnection. This just seems to make more sense than leaving them on.
    */
-  
   @Override
-  public void connectionLost(Connection conn){
+  public void connectionLost(Connection conn) {
     soughtGraph.removeAllSeeks();
   }
-  
-  
-  
+
   // The rest of ConnectionListener's methods.
   @Override
-  public void connectingFailed(Connection conn, String reason){}
-  @Override
-  public void connectionAttempted(Connection conn, String hostname, int port){}
-  @Override
-  public void connectionEstablished(Connection conn){}
-  @Override
-  public void loginFailed(Connection conn, String reason){}
-  @Override
-  public void loginSucceeded(Connection conn){}
+  public void connectingFailed(Connection conn, String reason) {}
 
+  @Override
+  public void connectionAttempted(Connection conn, String hostname, int port) {}
 
+  @Override
+  public void connectionEstablished(Connection conn) {}
+
+  @Override
+  public void loginFailed(Connection conn, String reason) {}
+
+  @Override
+  public void loginSucceeded(Connection conn) {}
 
   /**
    * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
    */
-
   @Override
-  public String getId(){
+  public String getId() {
     return PLUGIN_ID;
   }
-
-
 
   /**
    * An action which displays/hides our UI.
    */
-  
-  private class FindGameAction extends JinAction implements PluginUIListener{
-    
-    
-    
+  private class FindGameAction extends JinAction implements PluginUIListener {
+
     /**
      * Creates a new <code>FindGameAction</code>.
      */
-    
-    public FindGameAction(){
+    public FindGameAction() {
       uiContainer.addPluginUIListener(this);
     }
-    
-    
-    
+
     /**
      * Returns the id of this action - "findgame".
      */
-      
     @Override
-    public String getId(){
+    public String getId() {
       return "findgame";
     }
-    
-    
-    
+
     /**
      * Displays or hides the UI.
      */
-    
     @Override
-    public void actionPerformed(ActionEvent evt){
-      if (uiContainer.isVisible())
-        uiContainer.setVisible(false);
-      else
-        uiContainer.setActive(true);
+    public void actionPerformed(ActionEvent evt) {
+      if (uiContainer.isVisible()) uiContainer.setVisible(false);
+      else uiContainer.setActive(true);
     }
-    
-    
-    
+
     /**
      * Invoked when the "find game" UI is shown.
      */
-    
     @Override
-    public void pluginUIShown(PluginUIEvent evt){
+    public void pluginUIShown(PluginUIEvent evt) {
       I18n i18n = I18n.get(FindGameAction.class);
-      
+
       putValue(Action.NAME, i18n.getString("name.hide"));
       putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription.hide"));
     }
-    
-    
-    
+
     /**
      * Invoked when the "find game" UI is hidden.
      */
-    
     @Override
-    public void pluginUIHidden(PluginUIEvent evt){
+    public void pluginUIHidden(PluginUIEvent evt) {
       I18n i18n = I18n.get(FindGameAction.class);
-      
+
       putValue(Action.NAME, i18n.getString("name"));
       putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription"));
     }
-    
-    
-    
+
     /**
      * Invoked when the "find game" UI is made active.
      */
-    
     @Override
-    public void pluginUIActivated(PluginUIEvent evt){
+    public void pluginUIActivated(PluginUIEvent evt) {
       Container focusCycleRoot = issueTabbedPane.getFocusCycleRootAncestor();
       if (focusCycleRoot == null) // Weird things can happen on shutdown
-        return;
-      
+      return;
+
       FocusTraversalPolicy policy = focusCycleRoot.getFocusTraversalPolicy();
-      if (policy == null)
-        return;
-      
+      if (policy == null) return;
+
       Component defaultComponent = policy.getDefaultComponent(issueTabbedPane);
-      if (defaultComponent == null)
-        return;
-      
+      if (defaultComponent == null) return;
+
       defaultComponent.requestFocusInWindow();
     }
-    
+
     @Override
-    public void pluginUIClosing(PluginUIEvent evt){}
+    public void pluginUIClosing(PluginUIEvent evt) {}
+
     @Override
-    public void pluginUIDeactivated(PluginUIEvent evt){}
+    public void pluginUIDeactivated(PluginUIEvent evt) {}
+
     @Override
-    public void pluginUIDisposed(PluginUIEvent evt){}
+    public void pluginUIDisposed(PluginUIEvent evt) {}
+
     @Override
-    public void pluginUITitleChanged(PluginUIEvent evt){}
+    public void pluginUITitleChanged(PluginUIEvent evt) {}
+
     @Override
-    public void pluginUIIconChanged(PluginUIEvent evt){}
-    
-    
-    
+    public void pluginUIIconChanged(PluginUIEvent evt) {}
   }
-
-
-
 }

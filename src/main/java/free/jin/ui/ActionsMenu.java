@@ -1,24 +1,19 @@
 /**
- * Jin - a chess client for internet chess servers.
- * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2005 Alexander Maryanovsky.
- * All rights reserved.
+ * Jin - a chess client for internet chess servers. More information is available at
+ * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
-
 package free.jin.ui;
 
 import javax.swing.JMenu;
@@ -34,139 +29,115 @@ import free.jin.SessionEvent;
 import free.jin.SessionListener;
 import free.jin.action.JinAction;
 
-
-
 /**
  * A menu allowing the user to use any available Actions.
  */
+public class ActionsMenu extends JMenu implements SessionListener, ListDataListener {
 
-public class ActionsMenu extends JMenu implements SessionListener, ListDataListener{
-  
-  
-  
   /**
    * Creates a new <code>ActionsMenu</code>.
    */
-  
-  public ActionsMenu(){
+  public ActionsMenu() {
     I18n.get(ActionsMenu.class).initAbstractButton(this, "this");
   }
-  
-  
-  
+
   /**
    * Initializes the menu, registering any needed listeners.
    */
-  
   @Override
-  public void addNotify(){
+  public void addNotify() {
     super.addNotify();
-    
-    ConnectionManager connManager = Jin.getInstance().getConnManager(); 
+
+    ConnectionManager connManager = Jin.getInstance().getConnManager();
     connManager.addSessionListener(this);
-    
-    Session session  = connManager.getSession();
-    if (session != null){
+
+    Session session = connManager.getSession();
+    if (session != null) {
       ListModel actions = session.getPluginContext().getActions();
       actions.addListDataListener(this);
-      
+
       updateActionMenuItems(actions);
     }
   }
-  
-  
-  
+
   /**
    * Unregisters any listeners we've registered.
    */
-  
   @Override
-  public void removeNotify(){
+  public void removeNotify() {
     super.removeNotify();
-    
+
     ConnectionManager connManager = Jin.getInstance().getConnManager();
     connManager.removeSessionListener(this);
-    
+
     Session session = connManager.getSession();
-    if (session != null){
+    if (session != null) {
       ListModel actions = session.getPluginContext().getActions();
       actions.removeListDataListener(this);
-      
+
       removeAll();
     }
   }
-  
-  
-  
+
   /**
    * Sets the action menu items to match the specified list of actions.
    */
-   
-  private void updateActionMenuItems(ListModel actions){
+  private void updateActionMenuItems(ListModel actions) {
     removeAll();
-    for (int i = 0; i < actions.getSize(); i++){
-      JinAction action = (JinAction)actions.getElementAt(i);
+    for (int i = 0; i < actions.getSize(); i++) {
+      JinAction action = (JinAction) actions.getElementAt(i);
       add(action);
     }
   }
-  
-  
-  
-  
+
   /*
    * SessionListener implementation. Registers and unregisters us as session
    * listeners and updates the menu items accordingly.
    */
-  
+
   @Override
-  public void sessionEstablished(SessionEvent evt){
+  public void sessionEstablished(SessionEvent evt) {
     Session session = evt.getSession();
 
     ListModel actions = session.getPluginContext().getActions();
     actions.addListDataListener(this);
-    
+
     updateActionMenuItems(actions);
   }
-  
+
   @Override
-  public void sessionClosed(SessionEvent evt){
+  public void sessionClosed(SessionEvent evt) {
     Session session = evt.getSession();
-    
+
     ListModel actions = session.getPluginContext().getActions();
     actions.removeListDataListener(this);
-    
+
     removeAll();
   }
-  
+
   @Override
-  public void sessionStarting(SessionEvent evt){}
+  public void sessionStarting(SessionEvent evt) {}
+
   @Override
-  public void sessionClosing(SessionEvent evt){}
-  
-  
-  
-  
-  
+  public void sessionClosing(SessionEvent evt) {}
+
   /*
    * ListDataListener implementation. Synchronizes the menu items with
    * the list of actions
    */
-  
+
   @Override
-  public void intervalAdded(ListDataEvent evt){
-    updateActionMenuItems((ListModel)evt.getSource());
+  public void intervalAdded(ListDataEvent evt) {
+    updateActionMenuItems((ListModel) evt.getSource());
   }
-  
+
   @Override
-  public void intervalRemoved(ListDataEvent evt){
-    updateActionMenuItems((ListModel)evt.getSource());
+  public void intervalRemoved(ListDataEvent evt) {
+    updateActionMenuItems((ListModel) evt.getSource());
   }
-  
+
   @Override
-  public void contentsChanged(ListDataEvent evt){
-    updateActionMenuItems((ListModel)evt.getSource());
+  public void contentsChanged(ListDataEvent evt) {
+    updateActionMenuItems((ListModel) evt.getSource());
   }
-  
-  
-  
 }

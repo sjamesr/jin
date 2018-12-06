@@ -1,24 +1,19 @@
 /**
- * Jin - a chess client for internet chess servers.
- * More information is available at http://www.jinchess.com/.
- * Copyright (C) 2007 Alexander Maryanovsky.
- * All rights reserved.
+ * Jin - a chess client for internet chess servers. More information is available at
+ * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
-
 package free.jin.chessclub;
 
 import free.chessclub.level2.Datagram;
@@ -36,48 +31,36 @@ import free.jin.event.GameListener;
 import free.jin.event.MatchOfferListener;
 import free.jin.event.SeekListener;
 
-
 /**
- * A chessclub.com specific extension of <code>BasicListenerManager</code>.
- * Used by <code>JinChessclubConnection</code>.
+ * A chessclub.com specific extension of <code>BasicListenerManager</code>. Used by
+ * <code>JinChessclubConnection</code>.
  */
+public class ChessclubListenerManager extends BasicListenerManager {
 
-public class ChessclubListenerManager extends BasicListenerManager{
-  
-  
-  
   /**
    * The source <code>JinChessclubConnection</code>.
    */
-  
   private final JinChessclubConnection source;
-  
-  
-  
+
   /**
-   * Creates a new <code>ChessclubListenerManager</code> with the specified
-   * source <code>JinChessclubConnection</code>.
+   * Creates a new <code>ChessclubListenerManager</code> with the specified source
+   * <code>JinChessclubConnection</code>.
    */
-  
-  public ChessclubListenerManager(JinChessclubConnection source){
+  public ChessclubListenerManager(JinChessclubConnection source) {
     super(source);
-    
+
     this.source = source;
   }
-  
-  
-  
-  
+
   /**
-   * Adds the specified <code>ChatListener</code> to receive notifications when
-   * chat related messages arrive from the server.
+   * Adds the specified <code>ChatListener</code> to receive notifications when chat related
+   * messages arrive from the server.
    */
-  
   @Override
-  public void addChatListener(ChatListener listener){
+  public void addChatListener(ChatListener listener) {
     super.addChatListener(listener);
-    
-    if (listenerList.getListenerCount(ChatListener.class) == 1){
+
+    if (listenerList.getListenerCount(ChatListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_PERSONAL_TELL);
       source.addDatagramListener(source, Datagram.DG_PERSONAL_QTELL);
       source.addDatagramListener(source, Datagram.DG_SHOUT);
@@ -86,20 +69,16 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.addDatagramListener(source, Datagram.DG_KIBITZ);
     }
   }
-  
-  
-  
+
   /**
-   * Removes the given <code>ChatListener</code> from the list of
-   * <code>ChatListener</code>s receiving notification when chat related
-   * messages arrive from the server.
+   * Removes the given <code>ChatListener</code> from the list of <code>ChatListener</code>s
+   * receiving notification when chat related messages arrive from the server.
    */
-  
   @Override
-  public void removeChatListener(ChatListener listener){
+  public void removeChatListener(ChatListener listener) {
     super.removeChatListener(listener);
-    
-    if (listenerList.getListenerCount(ChatListener.class) == 0){
+
+    if (listenerList.getListenerCount(ChatListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_PERSONAL_TELL);
       source.removeDatagramListener(source, Datagram.DG_PERSONAL_QTELL);
       source.removeDatagramListener(source, Datagram.DG_SHOUT);
@@ -108,22 +87,18 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.removeDatagramListener(source, Datagram.DG_KIBITZ);
     }
   }
-  
-  
-  
+
   /**
-   * Adds the specified <code>GameListener</code> to the list of listeners
-   * receiving notifications of <code>GameEvent</code>s. This method will accept
-   * and handle <code>ChessclubGameListener</code>s properly (by calling the
-   * chessclub specific methods in that interface when needed) as well as
-   * regular <code>GameListener</code>s.
+   * Adds the specified <code>GameListener</code> to the list of listeners receiving notifications
+   * of <code>GameEvent</code>s. This method will accept and handle
+   * <code>ChessclubGameListener</code>s properly (by calling the chessclub specific methods in that
+   * interface when needed) as well as regular <code>GameListener</code>s.
    */
-  
   @Override
-  public void addGameListener(GameListener listener){
+  public void addGameListener(GameListener listener) {
     super.addGameListener(listener);
-    
-    if (listenerList.getListenerCount(GameListener.class) == 1){
+
+    if (listenerList.getListenerCount(GameListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_MY_GAME_STARTED);
       source.addDatagramListener(source, Datagram.DG_STARTED_OBSERVING);
       source.addDatagramListener(source, Datagram.DG_ISOLATED_BOARD);
@@ -153,21 +128,18 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.setStyle(13);
     }
   }
-  
-  
-  
+
   /**
-   * Removes the specified <code>GameListener</code> from the list of listeners
-   * receiving notifications of <code>GameEvent</code>s. This method can be used
-   * to remove <code>ChessclubGameListener</code>s added via the
-   * <code>addGameListener(GameListener)</code> method.
+   * Removes the specified <code>GameListener</code> from the list of listeners receiving
+   * notifications of <code>GameEvent</code>s. This method can be used to remove
+   * <code>ChessclubGameListener</code>s added via the <code>addGameListener(GameListener)</code>
+   * method.
    */
-  
   @Override
-  public void removeGameListener(GameListener listener){
+  public void removeGameListener(GameListener listener) {
     super.removeGameListener(listener);
-    
-    if (listenerList.getListenerCount(GameListener.class) == 0){
+
+    if (listenerList.getListenerCount(GameListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_MY_GAME_STARTED);
       source.removeDatagramListener(source, Datagram.DG_STARTED_OBSERVING);
       source.removeDatagramListener(source, Datagram.DG_ISOLATED_BOARD);
@@ -193,187 +165,153 @@ public class ChessclubListenerManager extends BasicListenerManager{
       source.removeDatagramListener(source, Datagram.DG_UNCIRCLE);
       // Do not remove listeners after this one - it marks the end of the
       // datagram changes (see JinChessclubConnection.gameDatagramsStateChanged).
-      
+
       source.setStyle(1);
     }
   }
-  
-  
-  
+
   /**
-   * Overrides <code>BasicJinListenerManager.fireGameEvent</code> to handling
-   * firing of chessclub.com specific events.
+   * Overrides <code>BasicJinListenerManager.fireGameEvent</code> to handling firing of
+   * chessclub.com specific events.
    */
-  
   @Override
-  public void fireGameEvent(GameEvent evt){
-    if (!isChessclubSpecificEvent(evt))
-      super.fireGameEvent(evt);
-    else{
-      Object [] listeners = listenerList.getListenerList();
-      for (int i = 0; i < listeners.length; i += 2){
-        if (listeners[i] == GameListener.class){
-          GameListener listener = (GameListener)listeners[i+1];
-          try{
-            if (listener instanceof ChessclubGameListener){
-              ChessclubGameListener chessclubListener = (ChessclubGameListener)listener;
-              
-              if (evt instanceof CircleEvent){
-                CircleEvent cevt = (CircleEvent)evt;
-                
-                if (cevt.getId() == CircleEvent.CIRCLE_ADDED)
-                  chessclubListener.circleAdded(cevt);
+  public void fireGameEvent(GameEvent evt) {
+    if (!isChessclubSpecificEvent(evt)) super.fireGameEvent(evt);
+    else {
+      Object[] listeners = listenerList.getListenerList();
+      for (int i = 0; i < listeners.length; i += 2) {
+        if (listeners[i] == GameListener.class) {
+          GameListener listener = (GameListener) listeners[i + 1];
+          try {
+            if (listener instanceof ChessclubGameListener) {
+              ChessclubGameListener chessclubListener = (ChessclubGameListener) listener;
+
+              if (evt instanceof CircleEvent) {
+                CircleEvent cevt = (CircleEvent) evt;
+
+                if (cevt.getId() == CircleEvent.CIRCLE_ADDED) chessclubListener.circleAdded(cevt);
                 else if (cevt.getId() == CircleEvent.CIRCLE_REMOVED)
                   chessclubListener.circleRemoved(cevt);
-              }
-              else if (evt instanceof ArrowEvent){
-                ArrowEvent aevt = (ArrowEvent)evt;
-                
-                if (aevt.getId() == ArrowEvent.ARROW_ADDED)
-                  chessclubListener.arrowAdded(aevt);
+              } else if (evt instanceof ArrowEvent) {
+                ArrowEvent aevt = (ArrowEvent) evt;
+
+                if (aevt.getId() == ArrowEvent.ARROW_ADDED) chessclubListener.arrowAdded(aevt);
                 else if (aevt.getId() == ArrowEvent.ARROW_REMOVED)
                   chessclubListener.arrowRemoved(aevt);
-              }
-              else
+              } else
                 throw new IllegalArgumentException("Unknown GameEvent type: " + evt.getClass());
             }
-          } catch (RuntimeException e){
-              e.printStackTrace();
-            }
+          } catch (RuntimeException e) {
+            e.printStackTrace();
+          }
         }
       }
     }
   }
-  
-  
-  
+
   /**
-   * Returns whether the specified event is a chessclub.com specific
-   * <code>GameEvent</code>.
+   * Returns whether the specified event is a chessclub.com specific <code>GameEvent</code>.
    */
-  
-  private boolean isChessclubSpecificEvent(GameEvent evt){
+  private boolean isChessclubSpecificEvent(GameEvent evt) {
     return (evt instanceof CircleEvent) || (evt instanceof ArrowEvent);
   }
-  
-  
-  
+
   /**
-   * Adds the specified <code>SeekListener</code> to the list of listeners
-   * receiving notification of <code>SeekEvent</code>s.
+   * Adds the specified <code>SeekListener</code> to the list of listeners receiving notification of
+   * <code>SeekEvent</code>s.
    */
-  
   @Override
-  public void addSeekListener(SeekListener listener){
+  public void addSeekListener(SeekListener listener) {
     super.addSeekListener(listener);
-    
-    if (listenerList.getListenerCount(SeekListener.class) == 1){
+
+    if (listenerList.getListenerCount(SeekListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_SEEK);
       source.addDatagramListener(source, Datagram.DG_SEEK_REMOVED);
       // Do not add listeners after this one - it marks the end of the
       // datagram changes (see JinChessclubConnection.seekDatagramsStateChanged).
     }
   }
-  
-  
-  
+
   /**
-   * Removes the specified <code>SeekListener</code> from the list of listeners
-   * receiving notification of <code>SeekEvent</code>s.
+   * Removes the specified <code>SeekListener</code> from the list of listeners receiving
+   * notification of <code>SeekEvent</code>s.
    */
-  
   @Override
-  public void removeSeekListener(SeekListener listener){
+  public void removeSeekListener(SeekListener listener) {
     super.removeSeekListener(listener);
-    
-    if (listenerList.getListenerCount(SeekListener.class) == 0){
+
+    if (listenerList.getListenerCount(SeekListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_SEEK);
       source.removeDatagramListener(source, Datagram.DG_SEEK_REMOVED);
       // Do not remove listeners after this one - it marks the end of the
       // datagram changes (see JinChessclubConnection.seekDatagramsStateChanged).
     }
   }
-  
-  
-  
+
   /**
-   * Adds the specified <code>GameListListener</code> to receive notifications
-   * of <code>GameListEvent</code>s.
+   * Adds the specified <code>GameListListener</code> to receive notifications of
+   * <code>GameListEvent</code>s.
    */
-  
   @Override
-  public void addGameListListener(GameListListener listener){
+  public void addGameListListener(GameListListener listener) {
     super.addGameListListener(listener);
-    
-    if (listenerList.getListenerCount(GameListListener.class) == 1){
+
+    if (listenerList.getListenerCount(GameListListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_GAMELIST_BEGIN);
       source.addDatagramListener(source, Datagram.DG_GAMELIST_ITEM);
     }
   }
-  
-  
-  
+
   /**
-   * Removes the given <code>GameListListener</code> from the list of listeners
-   * receiving notifications of <code>GameListEvent</code>s.
+   * Removes the given <code>GameListListener</code> from the list of listeners receiving
+   * notifications of <code>GameListEvent</code>s.
    */
-  
   @Override
-  public void removeGameListListener(GameListListener listener){
+  public void removeGameListListener(GameListListener listener) {
     super.removeGameListListener(listener);
-    
-    if (listenerList.getListenerCount(GameListListener.class) == 0){
+
+    if (listenerList.getListenerCount(GameListListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_GAMELIST_BEGIN);
       source.removeDatagramListener(source, Datagram.DG_GAMELIST_ITEM);
     }
   }
-  
-  
-  
+
   /**
-   * Adds the specified <code>ChessEventListener</code> to the list of listeners
-   * receiving notifications when an event is added.
+   * Adds the specified <code>ChessEventListener</code> to the list of listeners receiving
+   * notifications when an event is added.
    */
-  
-  public void addChessEventListener(ChessEventListener listener){
+  public void addChessEventListener(ChessEventListener listener) {
     listenerList.add(ChessEventListener.class, listener);
-    
-    if (listenerList.getListenerCount(ChessEventListener.class) == 1){
+
+    if (listenerList.getListenerCount(ChessEventListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_TOURNEY);
       source.addDatagramListener(source, Datagram.DG_REMOVE_TOURNEY);
     }
   }
-  
-  
-  
+
   /**
-   * Removes the specified <code>ChessEventListener</code> from the list of
-   * listeners receiving notifications when an event is added.
+   * Removes the specified <code>ChessEventListener</code> from the list of listeners receiving
+   * notifications when an event is added.
    */
-  
-  public void removeChessEventListener(ChessEventListener listener){
+  public void removeChessEventListener(ChessEventListener listener) {
     listenerList.remove(ChessEventListener.class, listener);
-    
-    if (listenerList.getListenerCount(ChessEventListener.class)==0){
+
+    if (listenerList.getListenerCount(ChessEventListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_TOURNEY);
       source.removeDatagramListener(source, Datagram.DG_REMOVE_TOURNEY);
     }
   }
-  
-  
-  
-  /**
-   * Dispatches the specified <code>ChessEventEvent</code> to all interested
-   * listeners.
-   */
 
-  public void fireChessEventEvent(ChessEventEvent evt){
-    Object [] listeners = listenerList.getListenerList();
-    for (int i = 0; i < listeners.length; i += 2){
-      if (listeners[i] == ChessEventListener.class){
-        ChessEventListener listener = (ChessEventListener)listeners[i+1];
-        try{
-          switch (evt.getID()){
+  /**
+   * Dispatches the specified <code>ChessEventEvent</code> to all interested listeners.
+   */
+  public void fireChessEventEvent(ChessEventEvent evt) {
+    Object[] listeners = listenerList.getListenerList();
+    for (int i = 0; i < listeners.length; i += 2) {
+      if (listeners[i] == ChessEventListener.class) {
+        ChessEventListener listener = (ChessEventListener) listeners[i + 1];
+        try {
+          switch (evt.getID()) {
             case ChessEventEvent.EVENT_ADDED:
               listener.chessEventAdded(evt);
               break;
@@ -381,25 +319,22 @@ public class ChessclubListenerManager extends BasicListenerManager{
               listener.chessEventRemoved(evt);
               break;
           }
-        } catch (RuntimeException e){
-            e.printStackTrace();
-          }
+        } catch (RuntimeException e) {
+          e.printStackTrace();
+        }
       }
     }
   }
-  
-  
-  
-  /**
-   * Adds the specified <code>FriendsListener</code> to the list of listeners
-   * receiving notifications of <code>FriendsEvent</code>s.
-   */
 
+  /**
+   * Adds the specified <code>FriendsListener</code> to the list of listeners receiving
+   * notifications of <code>FriendsEvent</code>s.
+   */
   @Override
-  public void addFriendsListener(FriendsListener listener){
+  public void addFriendsListener(FriendsListener listener) {
     super.addFriendsListener(listener);
 
-    if (listenerList.getListenerCount(FriendsListener.class) == 1){
+    if (listenerList.getListenerCount(FriendsListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
       source.addDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
       source.addDatagramListener(source, Datagram.DG_NOTIFY_STATE);
@@ -408,19 +343,16 @@ public class ChessclubListenerManager extends BasicListenerManager{
       // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
     }
   }
-  
-  
-  
+
   /**
-   * Removes the specified <code>FriendsListener</code> from the list of
-   * listeners receiving notifications of <code>FriendsEvent</code>s.
+   * Removes the specified <code>FriendsListener</code> from the list of listeners receiving
+   * notifications of <code>FriendsEvent</code>s.
    */
-  
   @Override
-  public void removeFriendsListener(FriendsListener listener){
+  public void removeFriendsListener(FriendsListener listener) {
     super.removeFriendsListener(listener);
 
-    if (listenerList.getListenerCount(FriendsListener.class) == 0){
+    if (listenerList.getListenerCount(FriendsListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_NOTIFY_ARRIVED);
       source.removeDatagramListener(source, Datagram.DG_NOTIFY_LEFT);
       source.removeDatagramListener(source, Datagram.DG_NOTIFY_STATE);
@@ -429,41 +361,32 @@ public class ChessclubListenerManager extends BasicListenerManager{
       // datagram changes (see JinChessclubConnection.friendsDatagramsStateChanged).
     }
   }
-  
-  
-  
+
   /**
-   * Adds the specified <code>MatchOfferListener</code> to receive notifications
-   * of <code>MatchOfferEvent</code>s.
+   * Adds the specified <code>MatchOfferListener</code> to receive notifications of
+   * <code>MatchOfferEvent</code>s.
    */
-  
   @Override
-  public void addMatchOfferListener(MatchOfferListener listener){
+  public void addMatchOfferListener(MatchOfferListener listener) {
     super.addMatchOfferListener(listener);
-    
-    if (listenerList.getListenerCount(MatchOfferListener.class) == 1){
+
+    if (listenerList.getListenerCount(MatchOfferListener.class) == 1) {
       source.addDatagramListener(source, Datagram.DG_MATCH);
       source.addDatagramListener(source, Datagram.DG_MATCH_REMOVED);
     }
   }
-  
-  
-  
+
   /**
-   * Removes the specified <code>MatchOfferListener</code> from the list of
-   * listeners receiving notifications of <code>MatchOfferEvent</code>s.
+   * Removes the specified <code>MatchOfferListener</code> from the list of listeners receiving
+   * notifications of <code>MatchOfferEvent</code>s.
    */
-  
   @Override
-  public void removeMatchOfferListener(MatchOfferListener listener){
+  public void removeMatchOfferListener(MatchOfferListener listener) {
     super.removeMatchOfferListener(listener);
-    
-    if (listenerList.getListenerCount(MatchOfferListener.class) == 0){
+
+    if (listenerList.getListenerCount(MatchOfferListener.class) == 0) {
       source.removeDatagramListener(source, Datagram.DG_MATCH);
       source.removeDatagramListener(source, Datagram.DG_MATCH_REMOVED);
     }
   }
-  
-  
-  
 }
