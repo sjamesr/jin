@@ -19,16 +19,16 @@ dependencies {
     compile "org.jdesktop:appframework:1.0.3"
     compile "org.swinglabs:swing-layout:1.0.3"
     compile "org.beanshell:bsh:2.0b5"
-    compile "org.reflections:reflections:0.9.9-RC1"
-    compile "com.google.guava:guava:17.0"
-    compile "org.lwjgl.lwjgl:lwjgl:2.8.4"
+    compile "org.reflections:reflections:0.9.12"
+    compile "com.google.guava:guava:30.1.1-jre"
+    compile "org.lwjgl.lwjgl:lwjgl:2.9.3"
     compile "org.lwjgl.lwjgl:lwjgl_util:2.9.1"
 }
 
 // If Java formatter checks fail, tell the user how to fix them.
 task printFormatHelperMessage {
     doLast {
-        throw new GradleException('google-java-format is required.\n' +
+        throw new FileNotFoundException('google-java-format is required.\n' +
             'Use ./gradlew googleJavaFormat to reformat the broken files')
     }
 }
