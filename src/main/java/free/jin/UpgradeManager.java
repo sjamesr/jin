@@ -49,7 +49,7 @@ public class UpgradeManager {
           new Thread("NewVersionChecker") {
             @Override
             public void run() {
-              checkNewVersion();
+              //checkNewVersion();
             }
           };
       t.setDaemon(true);
