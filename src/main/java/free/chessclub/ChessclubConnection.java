@@ -2,20 +2,27 @@
  * The chessclub.com connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002-2003 Alexander Maryanovsky. All rights reserved.
  *
- * The chessclub.com connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The chessclub.com connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The chessclub.com connection library is distributed in the hope that it will be useful, but
+ * <p>The chessclub.com connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * chessclub.com connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.chessclub;
 
+import free.chessclub.level1.Packet;
+import free.chessclub.level2.Datagram;
+import free.chessclub.level2.DatagramEvent;
+import free.chessclub.level2.DatagramListener;
+import free.util.Connection;
+import free.util.EventListenerList;
+import free.util.FormatException;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -30,14 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import free.chessclub.level1.Packet;
-import free.chessclub.level2.Datagram;
-import free.chessclub.level2.DatagramEvent;
-import free.chessclub.level2.DatagramListener;
-import free.util.Connection;
-import free.util.EventListenerList;
-import free.util.FormatException;
-
 /**
  * This class is responsible for connecting to the chessclub.com server, logging on and further
  * processing of information as it arrives from the server. Before using this class you should read
@@ -48,39 +47,25 @@ import free.util.FormatException;
  */
 public class ChessclubConnection extends free.util.Connection {
 
-  /**
-   * The standard delimiter, used to delimit both level1 and level2.
-   */
+  /** The standard delimiter, used to delimit both level1 and level2. */
   private static final char STANDARD_DELIMITER = '\u0019';
 
-  /**
-   * The start-of-level1-packet delimiter.
-   */
+  /** The start-of-level1-packet delimiter. */
   private static final char PACKET_START_DELIMITER = '[';
 
-  /**
-   * The end-of-level1-packet delimiter.
-   */
+  /** The end-of-level1-packet delimiter. */
   private static final char PACKET_END_DELIMITER = ']';
 
-  /**
-   * The start-of-level2-datagram delimiter.
-   */
+  /** The start-of-level2-datagram delimiter. */
   private static final char DATAGRAM_START_DELIMITER = '(';
 
-  /**
-   * The end-of-datagram delimiter.
-   */
+  /** The end-of-datagram delimiter. */
   private static final char DATAGRAM_END_DELIMITER = ')';
 
-  /**
-   * Maps rating keys to their english names.
-   */
+  /** Maps rating keys to their english names. */
   private final Hashtable ratingCategoryNames = new Hashtable();
 
-  /**
-   * Maps wild variant indices to their english names.
-   */
+  /** Maps wild variant indices to their english names. */
   private final Hashtable variantNames = new Hashtable();
 
   /**
@@ -93,46 +78,32 @@ public class ChessclubConnection extends free.util.Connection {
   /**
    * The level2 settings requested by the client. The bit at each index specifies whether the
    * Datagram with that index will be turned on.
-   * <P>
-   * Note that these aren't the "real" settings because the settings only take effect once the
+   *
+   * <p>Note that these aren't the "real" settings because the settings only take effect once the
    * server reads them and responds with a DG_SET2. The "real" level 2 settings are stored in
    * level2settings.
    */
   private BitSet requestedLevel2Settings = new BitSet();
 
-  /**
-   * The current board sending "style".
-   */
+  /** The current board sending "style". */
   private int style = 1;
 
-  /**
-   * The value we're supposed to assign to the interface variable during login.
-   */
+  /** The value we're supposed to assign to the interface variable during login. */
   private String interfaceVar = "Java chessclub.com library (http://www.jinchess.com/)";
 
-  /**
-   * The current setting of level1.
-   */
+  /** The current setting of level1. */
   private int level1State = 0;
 
-  /**
-   * The "real" level 2 settings on which currently the client and the server agree.
-   */
+  /** The "real" level 2 settings on which currently the client and the server agree. */
   private BitSet level2Settings = new BitSet();
 
-  /**
-   * This is set to <code>true</code> when the "level2settings=..." line has been sent.
-   */
+  /** This is set to <code>true</code> when the "level2settings=..." line has been sent. */
   private boolean level2SettingsSent = false;
 
-  /**
-   * The queue of commands we are to send on-login.
-   */
+  /** The queue of commands we are to send on-login. */
   private LinkedList onLoginCommandQueue = new LinkedList();
 
-  /**
-   * A list of listeners to our datagram events, lazily instantiated.
-   */
+  /** A list of listeners to our datagram events, lazily instantiated. */
   private final EventListenerList[] datagramListeners =
       new EventListenerList[Datagram.MAX_DG_ID + 1];
 
@@ -142,12 +113,11 @@ public class ChessclubConnection extends free.util.Connection {
    * (level2 settings for example) and then call the <code>connectAndLogin</code> method.
    *
    * @param requestedUsername The requested username, note that the actual username is unknown until
-   * after the login.
+   *     after the login.
    * @param password The password of the account.
    * @param logStream The PrintStream where this ChessclubConnection will log all information sent
-   * by the server and commands sent by this <code>ChessclubConnection</code>. Pass
-   * <code>null</code> if you don't want logging.
-   *
+   *     by the server and commands sent by this <code>ChessclubConnection</code>. Pass <code>null
+   *     </code> if you don't want logging.
    * @see #setDGState(int, boolean)
    */
   public ChessclubConnection(String requestedUsername, String password, PrintStream logStream) {
@@ -180,8 +150,8 @@ public class ChessclubConnection extends free.util.Connection {
    * receive. It may seem a bit silly, but it's cleaner than making <code>setDGState</code> public.
    * This also means that when processing the fields of a datagram, you should always be prepared to
    * handle all the optional fields, even if you did not request them (someone else might have
-   * requested them). You can check which of the optional fields are on via the
-   * <code>isDGOn(int)</code> method.
+   * requested them). You can check which of the optional fields are on via the <code>isDGOn(int)
+   * </code> method.
    */
   public void addDatagramListener(DatagramListener dgListener, int dgId) {
     if (datagramListeners[dgId] == null) {
@@ -198,8 +168,8 @@ public class ChessclubConnection extends free.util.Connection {
    * type of datagram will cause that datagram to be turned off with the server. This is true even
    * for datagrams which are never sent to the client, but instead act as flags for other datagrams
    * (DG_MOVE_SMITH for example), which means you may have to unregister listeners for datagrams you
-   * never indend to receive. It may seem a bit silly, but it's cleaner than making
-   * <code>setDGState</code> public.
+   * never indend to receive. It may seem a bit silly, but it's cleaner than making <code>setDGState
+   * </code> public.
    */
   public void removeDatagramListener(DatagramListener dgListener, int dgId) {
     if (datagramListeners[dgId] == null) return;
@@ -242,9 +212,8 @@ public class ChessclubConnection extends free.util.Connection {
   }
 
   /**
-   * Returns the current level1 state. See
-   * <code>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</code> for documentation about
-   * level1.
+   * Returns the current level1 state. See <code>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt
+   * </code> for documentation about level1.
    */
   public final synchronized int getLevel1() {
     return level1State;
@@ -257,19 +226,17 @@ public class ChessclubConnection extends free.util.Connection {
    * <code>level2settings=0011011011...</code> format. Note that some datagrams are necessary for
    * the correct behaviour of this class, and cannot be turned off (DG_WHO_AM_I and DG_SET2 for
    * example). This method is no longer the "normal" way of controlling datagrams' state. In fact,
-   * you should not control the datagrams' state directly at all - instead, register a
-   * <code>DatagramListener</code> with the id of the datagram you want to receive and it will be
-   * turned on for you automatically. This is true even for datagrams which are never sent to the
-   * client, but instead act as flags for other datagrams (DG_MOVE_SMITH for example). It may seem a
-   * bit silly, but it's cleaner than making this method public.
+   * you should not control the datagrams' state directly at all - instead, register a <code>
+   * DatagramListener</code> with the id of the datagram you want to receive and it will be turned
+   * on for you automatically. This is true even for datagrams which are never sent to the client,
+   * but instead act as flags for other datagrams (DG_MOVE_SMITH for example). It may seem a bit
+   * silly, but it's cleaner than making this method public.
    *
    * @param dgNumber The number of the datagram.
    * @param state Whether turn the datagram on or off.
-   *
    * @return Whether the state of the datagram was modified successfully. This always returns true
-   * when setting a datagram on, and only returns false when trying to set an essential datagram
-   * off.
-   *
+   *     when setting a datagram on, and only returns false when trying to set an essential datagram
+   *     off.
    * @see #isEssentialDG(int)
    * @see #isDGOn(int)
    */
@@ -308,9 +275,7 @@ public class ChessclubConnection extends free.util.Connection {
     sendCommand("set-2 " + dgNumber + " 1", false, true, tag);
   }
 
-  /**
-   * Same as <code>setDGOnAgain</code>, but without the tag.
-   */
+  /** Same as <code>setDGOnAgain</code>, but without the tag. */
   protected void setDGOnAgain(int dgNumber) {
     setDGOnAgain(dgNumber, null);
   }
@@ -327,11 +292,11 @@ public class ChessclubConnection extends free.util.Connection {
   }
 
   /**
-   * Sets the style. If the ChessclubConnection is already logged in, then a
-   * "set-quietly style <style>" command is send immediately, otherwise, the setting is saved and
-   * sent immediately after logging in. If the <code>getEssentialStyle()</code> method returns a
-   * nonzero value different from the specified style, this method will return <code>false</code>;
-   * otherwise, it returns <code>true</code>.
+   * Sets the style. If the ChessclubConnection is already logged in, then a "set-quietly style
+   * <style>" command is send immediately, otherwise, the setting is saved and sent immediately
+   * after logging in. If the <code>getEssentialStyle()</code> method returns a nonzero value
+   * different from the specified style, this method will return <code>false</code>; otherwise, it
+   * returns <code>true</code>.
    */
   public final synchronized boolean setStyle(int style) {
     int essentialStyle = getEssentialStyle();
@@ -377,16 +342,13 @@ public class ChessclubConnection extends free.util.Connection {
    * previous state.
    *
    * @param dg The datagram number whose status you want to check.
-   *
    * @see #setDGState(int,boolean)
    */
   public synchronized boolean isDGOn(int dg) {
     return level2Settings.get(dg);
   }
 
-  /**
-   * Sends the login information to the server.
-   */
+  /** Sends the login information to the server. */
   @Override
   protected void sendLoginSequence() {
     if ((getPassword() == null) || (getPassword().length() == 0))
@@ -417,9 +379,7 @@ public class ChessclubConnection extends free.util.Connection {
     super.handleConnected();
   }
 
-  /**
-   * Sets the various things we need to set on login.
-   */
+  /** Sets the various things we need to set on login. */
   @Override
   protected void handleLoginSucceeded() {
     synchronized (this) {
@@ -446,27 +406,23 @@ public class ChessclubConnection extends free.util.Connection {
     super.handleLoginSucceeded();
   }
 
-  /**
-   * Handles the specified message.
-   */
+  /** Handles the specified message. */
   @Override
   protected void handleMessage(Object message) {
     handleMessage(message, null);
   }
 
   /**
-   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the specified
-   * <code>InputStream</code> in a <code>BufferedInputStream</code> and a
-   * <code>PushbackInputStream</code>.
+   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the specified <code>
+   * InputStream</code> in a <code>BufferedInputStream</code> and a <code>PushbackInputStream</code>
+   * .
    */
   @Override
   protected InputStream createInputStream(InputStream in) {
     return new PushbackInputStream(new BufferedInputStream(in), 2);
   }
 
-  /**
-   * Reads either a line of plain text, a level1 packet or a level2 datagram from the server.
-   */
+  /** Reads either a line of plain text, a level1 packet or a level2 datagram from the server. */
   @Override
   protected Object readMessage(InputStream in) throws IOException {
     PushbackInputStream pin = (PushbackInputStream) in;
@@ -477,8 +433,8 @@ public class ChessclubConnection extends free.util.Connection {
       if (b < 0) // Clean disconnection
       return null;
 
-      if (b
-          == STANDARD_DELIMITER) { // May be a level1 packet or datagram (but may also be just a line with this character
+      if (b == STANDARD_DELIMITER) { // May be a level1 packet or datagram (but may also be just a
+        // line with this character
         int next = pin.read();
         if (next < 0) throw new EOFException("EOF after STANDARD_DELIMITER");
 
@@ -570,9 +526,7 @@ public class ChessclubConnection extends free.util.Connection {
     }
   }
 
-  /**
-   * Read a line of plain text from the server.
-   */
+  /** Read a line of plain text from the server. */
   private String readLine(PushbackInputStream in) throws IOException {
     StringBuffer buf = new StringBuffer();
 
@@ -636,9 +590,7 @@ public class ChessclubConnection extends free.util.Connection {
     return buf.toString();
   }
 
-  /**
-   * Sends the "exit" command to the server, when logged in.
-   */
+  /** Sends the "exit" command to the server, when logged in. */
   public void exit() {
     sendCommand("exit", true, true, null);
   }
@@ -648,10 +600,10 @@ public class ChessclubConnection extends free.util.Connection {
    *
    * @param command The command.
    * @param whenLoggedIn If set and we are not yet logged in, wait until login and then send the
-   * command. If unset, the command is sent immediately.
+   *     command. If unset, the command is sent immediately.
    * @param avoidAliasing Avoid triggering any aliases with the command.
    * @param tag The client tag ("arbitrary-string" in formats.txt) with which we tag the command;
-   * <code>null</code> if none.
+   *     <code>null</code> if none.
    */
   public synchronized void sendCommand(
       String command, boolean whenLoggedIn, boolean avoidAliasing, String tag) {
@@ -661,9 +613,7 @@ public class ChessclubConnection extends free.util.Connection {
     else onLoginCommandQueue.addLast(command);
   }
 
-  /**
-   * Creates the actual command to be sent based on the specified options.
-   */
+  /** Creates the actual command to be sent based on the specified options. */
   private synchronized String makeCommand(String command, boolean avoidAliasing, String tag) {
     if (avoidAliasing && !(command.startsWith("multi ") || (command.indexOf(';') != -1)))
       command = "multi " + command;
@@ -679,9 +629,7 @@ public class ChessclubConnection extends free.util.Connection {
     return command;
   }
 
-  /**
-   * Sends the given command to the server, optionally logging it to the log stream.
-   */
+  /** Sends the given command to the server, optionally logging it to the log stream. */
   private synchronized void sendCommandImpl(String command, boolean log) {
     if (!isConnected()) throw new IllegalStateException("Not connected");
 
@@ -721,10 +669,11 @@ public class ChessclubConnection extends free.util.Connection {
 
   /**
    * Passes the message to one of:
+   *
    * <ul>
-   * <li>{@link #handlePacket(Packet, String)}
-   * <li>{@link #handleDatagram(Datagram, String))}
-   * <li>{@link #handleLine(String, String)}
+   *   <li>{@link #handlePacket(Packet, String)}
+   *   <li>{@link #handleDatagram(Datagram, String))}
+   *   <li>{@link #handleLine(String, String)}
    * </ul>
    */
   protected void handleMessage(Object message, String clientTag) {
@@ -756,7 +705,6 @@ public class ChessclubConnection extends free.util.Connection {
    *
    * @param datagram The level2 datagram that was received.
    * @param clientTag The client tag of the containing packet, if any.
-   *
    * @see #processDatagram(Datagram)
    */
   private final void handleDatagram(Datagram datagram, String clientTag) {
@@ -788,7 +736,6 @@ public class ChessclubConnection extends free.util.Connection {
    *
    * @param line The line that was received, '\n' not included.
    * @param clientTag The client tag of the containing packet, if any.
-   *
    * @see #processLine(String)
    */
   private final void handleLine(String line, String clientTag) {

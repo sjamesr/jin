@@ -1,16 +1,15 @@
 package free.chess.variants.shatranj;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import free.chess.Chess;
 import free.chess.ChessPiece;
 import free.chess.Piece;
 import free.chess.Position;
 import free.chess.Square;
 import free.chess.variants.NoCastlingVariant;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Implements the Shatranj wild variant. See <a
@@ -22,39 +21,27 @@ import free.chess.variants.NoCastlingVariant;
  */
 public class Shatranj extends NoCastlingVariant {
 
-  /**
-   * The FEN representation of the initial position in Shatranj.
-   */
+  /** The FEN representation of the initial position in Shatranj. */
   public static final String SHATRANJ_INITIAL_POSITION_FEN =
       "rnbkqbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w - - 0 1";
 
-  /**
-   * Pawns can promote only to a fers (queen) in Shatranj.
-   */
+  /** Pawns can promote only to a fers (queen) in Shatranj. */
   private static final ChessPiece[] WHITE_PROMOTION_TARGETS =
       new ChessPiece[] {ChessPiece.WHITE_QUEEN};
 
-  /**
-   * Pawns can promote only to a fers (queen) in Shatranj.
-   */
+  /** Pawns can promote only to a fers (queen) in Shatranj. */
   private static final ChessPiece[] BLACK_PROMOTION_TARGETS =
       new ChessPiece[] {ChessPiece.BLACK_QUEEN};
 
-  /**
-   * The sole instance of this class.
-   */
+  /** The sole instance of this class. */
   private static final Shatranj INSTANCE = new Shatranj();
 
-  /**
-   * Returns an instance of this class.
-   */
+  /** Returns an instance of this class. */
   public static Shatranj getInstance() {
     return INSTANCE;
   }
 
-  /**
-   * Creates an instance of Shatranj.
-   */
+  /** Creates an instance of Shatranj. */
   private Shatranj() {
     super(SHATRANJ_INITIAL_POSITION_FEN, "Shatranj");
   }
@@ -94,16 +81,12 @@ public class Shatranj extends NoCastlingVariant {
   private static final int[][] FERS_DIRECTIONS =
       new int[][] {new int[] {-1, -1}, new int[] {1, -1}, new int[] {-1, 1}, new int[] {1, 1}};
 
-  /**
-   * Returns target squares for a fers.
-   */
+  /** Returns target squares for a fers. */
   private Collection getFersTargetSquares(Position pos, Square square) {
     return getJumpingTargetSquares(pos, square, FERS_DIRECTIONS);
   }
 
-  /**
-   * Overrides to return the shatranj queen (fers) target squares.
-   */
+  /** Overrides to return the shatranj queen (fers) target squares. */
   @Override
   protected Collection getQueenTargetSquares(Position pos, Square square) {
     checkPosition(pos);
@@ -118,16 +101,12 @@ public class Shatranj extends NoCastlingVariant {
   private static final int[][] ELEPHANT_DIRECTIONS =
       new int[][] {new int[] {-2, -2}, new int[] {2, -2}, new int[] {-2, 2}, new int[] {2, 2}};
 
-  /**
-   * Returns target squares for an elephant (bishop).
-   */
+  /** Returns target squares for an elephant (bishop). */
   private Collection getElephantTargetSquares(Position pos, Square square) {
     return getJumpingTargetSquares(pos, square, ELEPHANT_DIRECTIONS);
   }
 
-  /**
-   * Overrides to return the shatranj bishop (elephant) target squares.
-   */
+  /** Overrides to return the shatranj bishop (elephant) target squares. */
   @Override
   protected Collection getBishopTargetSquares(Position pos, Square square) {
     checkPosition(pos);
@@ -159,9 +138,7 @@ public class Shatranj extends NoCastlingVariant {
     return targetSquares;
   }
 
-  /**
-   * Overrides to return the shatranj pawn target squares.
-   */
+  /** Overrides to return the shatranj pawn target squares. */
   @Override
   protected Collection getPawnTargetSquares(Position pos, Square square) {
     checkPosition(pos);

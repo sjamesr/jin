@@ -2,20 +2,35 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.seek;
 
+import free.chess.Chess;
+import free.chess.FischerTimeControl;
+import free.chess.Player;
+import free.chess.WildVariant;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.Seek;
+import free.jin.ServerUser;
+import free.jin.plugin.Plugin;
+import free.jin.seek.event.SeekSelectionEvent;
+import free.jin.seek.event.SeekSelectionListener;
+import free.jin.ui.InfoButton;
+import free.util.ImageUtilities;
+import free.util.TableLayout;
+import free.util.swing.WrapLayout;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
@@ -33,7 +48,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.util.Hashtable;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -46,111 +60,59 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolTip;
 
-import free.chess.Chess;
-import free.chess.FischerTimeControl;
-import free.chess.Player;
-import free.chess.WildVariant;
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.Seek;
-import free.jin.ServerUser;
-import free.jin.plugin.Plugin;
-import free.jin.seek.event.SeekSelectionEvent;
-import free.jin.seek.event.SeekSelectionListener;
-import free.jin.ui.InfoButton;
-import free.util.ImageUtilities;
-import free.util.TableLayout;
-import free.util.swing.WrapLayout;
-
-/**
- * The sought graph component.
- */
+/** The sought graph component. */
 public class SoughtGraph extends JComponent {
 
-  /**
-   * The amount of slots dedicated to bullet.
-   */
+  /** The amount of slots dedicated to bullet. */
   protected static final int BULLET_SLOTS = 7;
 
-  /**
-   * The amount of slots dedicated to blitz.
-   */
+  /** The amount of slots dedicated to blitz. */
   protected static final int BLITZ_SLOTS = 28;
 
-  /**
-   * The amount of slots dedicated to standard.
-   */
+  /** The amount of slots dedicated to standard. */
   protected static final int STANDARD_SLOTS = 15;
 
-  /**
-   * The total amount of rating (vertical) slots.
-   */
+  /** The total amount of rating (vertical) slots. */
   protected static final int RATING_SLOTS = 32;
 
-  /**
-   * The percentage of the width dedicated to the graph itself.
-   */
+  /** The percentage of the width dedicated to the graph itself. */
   protected static final double GRAPH_WIDTH_PERCENTAGE = 0.92;
 
-  /**
-   * The percentage of the height dedicated to the graph itself.
-   */
+  /** The percentage of the height dedicated to the graph itself. */
   protected static final double GRAPH_HEIGHT_PERCENTAGE = 0.85;
 
-  /**
-   * The Plugin this SoughtGraph is used by.
-   */
+  /** The Plugin this SoughtGraph is used by. */
   protected final Plugin plugin;
 
-  /**
-   * The size of the smallest seek image.
-   */
+  /** The size of the smallest seek image. */
   private final int minSeekImageSize;
 
-  /**
-   * The size of the largest seek image.
-   */
+  /** The size of the largest seek image. */
   private final int maxSeekImageSize;
 
-  /**
-   * Maps Seeks to Point objects indicating their locations on the graph.
-   */
+  /** Maps Seeks to Point objects indicating their locations on the graph. */
   protected final Hashtable seeksToLocations = new Hashtable();
 
-  /**
-   * A matrix of seeks which maps locations to seeks in those locations.
-   */
+  /** A matrix of seeks which maps locations to seeks in those locations. */
   protected final Seek[][] seekMatrix =
       new Seek[BULLET_SLOTS + BLITZ_SLOTS + STANDARD_SLOTS][RATING_SLOTS];
 
-  /**
-   * The seek currently under the mouse cursor.
-   */
+  /** The seek currently under the mouse cursor. */
   protected Seek curSeek = null;
 
-  /**
-   * The current location of the mouse.
-   */
+  /** The current location of the mouse. */
   protected Point curMouseLocation = null;
 
-  /**
-   * The background image.
-   */
+  /** The background image. */
   private final Image bgImage;
 
-  /**
-   * The name of the fast games category.
-   */
+  /** The name of the fast games category. */
   private final String fastCategoryName;
 
-  /**
-   * The name of the moderate speed games category.
-   */
+  /** The name of the moderate speed games category. */
   private final String moderateCategoryName;
 
-  /**
-   * The name of the slow games category.
-   */
+  /** The name of the slow games category. */
   private final String slowCategoryName;
 
   /**
@@ -160,19 +122,13 @@ public class SoughtGraph extends JComponent {
    */
   private final Hashtable[] seekImageCache;
 
-  /**
-   * Our legend popup.
-   */
+  /** Our legend popup. */
   private final JPopupMenu legendPopup;
 
-  /**
-   * The <code>ServerUser</code> object for the account we're logged in with.
-   */
+  /** The <code>ServerUser</code> object for the account we're logged in with. */
   private ServerUser user;
 
-  /**
-   * Creates a new SoughtGraph with the give user Plugin.
-   */
+  /** Creates a new SoughtGraph with the give user Plugin. */
   public SoughtGraph(Plugin plugin) {
     this.plugin = plugin;
 
@@ -210,9 +166,7 @@ public class SoughtGraph extends JComponent {
     setToolTipText(""); // Enables tooltips
   }
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   private void createUI() {
     setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -229,9 +183,7 @@ public class SoughtGraph extends JComponent {
     add(legendButton);
   }
 
-  /**
-   * Creates the legend popup.
-   */
+  /** Creates the legend popup. */
   private JPopupMenu createLegendPopup() {
     I18n i18n = I18n.get(SoughtGraph.class);
     Class imageLoader = SoughtGraph.class;
@@ -317,9 +269,7 @@ public class SoughtGraph extends JComponent {
     return popup;
   }
 
-  /**
-   * Returns the etime, multiplied by 3.
-   */
+  /** Returns the etime, multiplied by 3. */
   private static int calcEtimeTimes3(Seek seek) {
     FischerTimeControl tc = (FischerTimeControl) seek.getTimeControl();
     return 3 * tc.getInitial() / (60 * 1000) + 2 * tc.getIncrement() / 1000;
@@ -418,9 +368,7 @@ public class SoughtGraph extends JComponent {
     }
   }
 
-  /**
-   * Adds the given Seek to this SoughtGraph.
-   */
+  /** Adds the given Seek to this SoughtGraph. */
   public void addSeek(Seek seek) {
     if (!(seek.getTimeControl() instanceof FischerTimeControl)) return;
 
@@ -436,9 +384,7 @@ public class SoughtGraph extends JComponent {
     if (curMouseLocation != null) updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
   }
 
-  /**
-   * Removes the given Seek from this SoughtGraph.
-   */
+  /** Removes the given Seek from this SoughtGraph. */
   public void removeSeek(Seek seek) {
     Point location = (Point) seeksToLocations.remove(seek);
     if (location == null) return;
@@ -452,9 +398,7 @@ public class SoughtGraph extends JComponent {
     updateCurrentSeek(curMouseLocation.x, curMouseLocation.y);
   }
 
-  /**
-   * Removes all the seeks.
-   */
+  /** Removes all the seeks. */
   public void removeAllSeeks() {
     seeksToLocations.clear();
 
@@ -464,9 +408,7 @@ public class SoughtGraph extends JComponent {
     repaint();
   }
 
-  /**
-   * Returns the bounding rectangle of the seek at the given location in the seek matrix.
-   */
+  /** Returns the bounding rectangle of the seek at the given location in the seek matrix. */
   protected Rectangle getSeekBounds(int x, int y, Rectangle rect) {
     if (rect == null) rect = new Rectangle();
 
@@ -489,9 +431,7 @@ public class SoughtGraph extends JComponent {
     return rect;
   }
 
-  /**
-   * Paints this SoughtGraph on the given Graphics.
-   */
+  /** Paints this SoughtGraph on the given Graphics. */
   @Override
   public void paintComponent(Graphics g) {
     Rectangle clipRect = g.getClipBounds();
@@ -565,7 +505,8 @@ public class SoughtGraph extends JComponent {
                 Math.min(
                     (float) (height - (graphY + graphHeight)) / 3, // The category strings
                     (float) (graphX)
-                        / 3))); // The rating strings (should divide by "2000".length(), but we want it slightly larger
+                        / 3))); // The rating strings (should divide by "2000".length(), but we want
+    // it slightly larger
     FontMetrics fm = g.getFontMetrics();
     int ratingStrWidth = fm.stringWidth("2000");
     while (ratingStrWidth > graphX) {
@@ -624,9 +565,7 @@ public class SoughtGraph extends JComponent {
     }
   }
 
-  /**
-   * Returns the Image that should be drawn for the specified Seek at the specified size.
-   */
+  /** Returns the Image that should be drawn for the specified Seek at the specified size. */
   private Image getSeekImage(Rectangle seekBounds, Seek seek) {
     int size = Math.min(seekBounds.width, seekBounds.height);
     if (size <= 0) throw new IllegalArgumentException("Seek bounds size must be positive");
@@ -678,9 +617,7 @@ public class SoughtGraph extends JComponent {
     return image;
   }
 
-  /**
-   * Draws a single seek within the given bounds.
-   */
+  /** Draws a single seek within the given bounds. */
   protected void drawSeek(Graphics g, Seek seek, Rectangle seekBounds) {
     Image seekImage = getSeekImage(seekBounds, seek);
 
@@ -700,11 +637,10 @@ public class SoughtGraph extends JComponent {
         null);
   }
 
-  /**
-   * Returns a string representing the given seek.
-   */
+  /** Returns a string representing the given seek. */
   protected String getSeekString(Seek seek) {
-    //  <name><titles> <rating> <(provisional)> seeks <time> <inc> [isRated] [wild] [color] [minrating]-[maxrating] [manual] [formula]
+    //  <name><titles> <rating> <(provisional)> seeks <time> <inc> [isRated] [wild] [color]
+    // [minrating]-[maxrating] [manual] [formula]
 
     I18n i18n = I18n.get(SoughtGraph.class);
     String provisional = i18n.getString("provisional");
@@ -762,9 +698,7 @@ public class SoughtGraph extends JComponent {
     return buf.toString();
   }
 
-  /**
-   * Returns the seek at the given pixel coordinates, or null if none.
-   */
+  /** Returns the seek at the given pixel coordinates, or null if none. */
   protected Seek seekAtLocation(int x, int y) {
     int width = getWidth();
     int height = getHeight();
@@ -788,9 +722,7 @@ public class SoughtGraph extends JComponent {
     return seekMatrix[i][j];
   }
 
-  /**
-   * Returns the tooltip text to be displayed at the specified coordinate.
-   */
+  /** Returns the tooltip text to be displayed at the specified coordinate. */
   @Override
   public String getToolTipText(MouseEvent evt) {
     Seek seek = seekAtLocation(evt.getX(), evt.getY());
@@ -816,9 +748,7 @@ public class SoughtGraph extends JComponent {
     }
   }
 
-  /**
-   * Changes the current seek under mouse and repaints if necessary.
-   */
+  /** Changes the current seek under mouse and repaints if necessary. */
   @Override
   protected void processMouseMotionEvent(MouseEvent evt) {
     super.processMouseMotionEvent(evt);
@@ -873,9 +803,7 @@ public class SoughtGraph extends JComponent {
     listenerList.remove(SeekSelectionListener.class, listener);
   }
 
-  /**
-   * Fires the given SeekSelectionEvent to all interested SeekSelectionListeners.
-   */
+  /** Fires the given SeekSelectionEvent to all interested SeekSelectionListeners. */
   protected void fireSeekSelectionEvent(SeekSelectionEvent evt) {
     Object[] listenerList = this.listenerList.getListenerList();
     for (int i = 0; i < listenerList.length; i += 2) {
@@ -886,9 +814,7 @@ public class SoughtGraph extends JComponent {
     }
   }
 
-  /**
-   * Returns the minimum size of the sought graph.
-   */
+  /** Returns the minimum size of the sought graph. */
   @Override
   public Dimension getMinimumSize() {
     int width =
@@ -900,9 +826,7 @@ public class SoughtGraph extends JComponent {
     return new Dimension(width, height);
   }
 
-  /**
-   * Returns the preferred size of the sought graph.
-   */
+  /** Returns the preferred size of the sought graph. */
   @Override
   public Dimension getPreferredSize() {
     int width =
@@ -914,9 +838,7 @@ public class SoughtGraph extends JComponent {
     return new Dimension(width, height);
   }
 
-  /**
-   * Returns the maximum size of the sought graph.
-   */
+  /** Returns the maximum size of the sought graph. */
   @Override
   public Dimension getMaximumSize() {
     return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);

@@ -2,37 +2,35 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.prefs;
 
+import free.jin.I18n;
+import free.jin.console.ConsoleManager;
+import free.util.TextUtilities;
+import free.util.swing.IntegerStrictPlainDocument;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.Vector;
-
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import free.jin.I18n;
-import free.jin.console.ConsoleManager;
-import free.util.TextUtilities;
-import free.util.swing.IntegerStrictPlainDocument;
 
 /**
  * An extension of the <code>TextPrefsPanel</code> class which allows adding a channels category
@@ -44,14 +42,16 @@ import free.util.swing.IntegerStrictPlainDocument;
  * <pre>"channels-panel"</pre>
  *
  * and specify the following properties:
- * <ul>
- * <li>channels-panel.ids: A list of ids specifying channel tell properties, separated by
- * semicolons. For example:
  *
- * <pre>"channel-tell;channel-atell"</pre>.
- * <li>channels-panel.channels-count: The amount of channels available on the server.
- * <li>channels-panel.name: The name of the category/panel.
+ * <ul>
+ *   <li>channels-panel.ids: A list of ids specifying channel tell properties, separated by
+ *       semicolons. For example:
+ *       <pre>"channel-tell;channel-atell"</pre>
+ *       .
+ *   <li>channels-panel.channels-count: The amount of channels available on the server.
+ *   <li>channels-panel.name: The name of the category/panel.
  * </ul>
+ *
  * The
  *
  * <pre>"channels-panel"</pre>
@@ -72,9 +72,7 @@ import free.util.swing.IntegerStrictPlainDocument;
  */
 public class ChannelTextPrefsPanel extends TextPrefsPanel {
 
-  /**
-   * A Vector holding all the <code>ChannelPanels</code>.
-   */
+  /** A Vector holding all the <code>ChannelPanels</code>. */
   private Vector channelPanels;
 
   /**
@@ -111,9 +109,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel {
     } else return super.createCustomCategoryPanel(id);
   }
 
-  /**
-   * Creates a new ChannelsCategoryPanel.
-   */
+  /** Creates a new ChannelsCategoryPanel. */
   private ChannelsCategoryPanel createChannelsCategoryPanel(
       String categoryName, String[] categoryIDs, int channelsCount) {
     String mainCategory = categoryIDs[0];
@@ -135,9 +131,7 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel {
    */
   private class ChannelsCategoryPanel extends CategoryPanel {
 
-    /**
-     * The textfield where the user chooses the channel number.
-     */
+    /** The textfield where the user chooses the channel number. */
     private final JTextField channelNumberField;
 
     /**
@@ -194,7 +188,8 @@ public class ChannelTextPrefsPanel extends TextPrefsPanel {
     public void setChannel(String channel) {
       TextStyleChooserPanel textStyleChooser = getTextStyleChooser();
 
-      // We're about to change it, we don't want the listener to think it's the user changing settings.
+      // We're about to change it, we don't want the listener to think it's the user changing
+      // settings.
       textStyleChooser.removeChangeListener(settingsChangeListener);
 
       String category = super.getMainCategory() + ("".equals(channel) ? "" : "." + channel);

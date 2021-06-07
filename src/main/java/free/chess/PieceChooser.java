@@ -2,20 +2,21 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2004 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.util.AWTUtilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
@@ -24,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Hashtable;
-
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -33,31 +33,19 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
-import free.util.AWTUtilities;
-
-/**
- * A dialog which lets the user choose a Piece from the given set of pieces.
- */
+/** A dialog which lets the user choose a Piece from the given set of pieces. */
 public class PieceChooser extends JComponent implements ActionListener {
 
-  /**
-   * Maps JButtons to Pieces.
-   */
+  /** Maps JButtons to Pieces. */
   private final Hashtable buttonsToPieces = new Hashtable();
 
-  /**
-   * Maps pieces to buttons.
-   */
+  /** Maps pieces to buttons. */
   private final Hashtable piecesToButtons = new Hashtable();
 
-  /**
-   * The selected piece.
-   */
+  /** The selected piece. */
   private Piece chosenPiece = null;
 
-  /**
-   * Creates a new PieceChooser with the given array of Pieces and the given PiecePainter.
-   */
+  /** Creates a new PieceChooser with the given array of Pieces and the given PiecePainter. */
   public PieceChooser(Piece[] pieces, PiecePainter piecePainter) {
     int gridSize = (int) Math.round(Math.ceil(Math.sqrt(pieces.length)));
     setLayout(new GridLayout(gridSize, gridSize, 10, 10));
@@ -74,16 +62,12 @@ public class PieceChooser extends JComponent implements ActionListener {
     }
   }
 
-  /**
-   * Returns the selected Piece.
-   */
+  /** Returns the selected Piece. */
   public Piece getSelectedPiece() {
     return chosenPiece;
   }
 
-  /**
-   * Returns the button corresponding to the specified piece.
-   */
+  /** Returns the button corresponding to the specified piece. */
   public JButton buttonForPiece(Piece piece) {
     return (JButton) piecesToButtons.get(piece);
   }
@@ -150,9 +134,7 @@ public class PieceChooser extends JComponent implements ActionListener {
     return selectedPiece;
   }
 
-  /**
-   * Handles ActionEvents from the piece buttons.
-   */
+  /** Handles ActionEvents from the piece buttons. */
   @Override
   public void actionPerformed(ActionEvent evt) {
     chosenPiece = (Piece) buttonsToPieces.get(evt.getSource());
@@ -166,16 +148,12 @@ public class PieceChooser extends JComponent implements ActionListener {
     listenerList.add(ActionListener.class, listener);
   }
 
-  /**
-   * Removes an ActionListener from this PieceChooser.
-   */
+  /** Removes an ActionListener from this PieceChooser. */
   public void removeActionListener(ActionListener listener) {
     listenerList.remove(ActionListener.class, listener);
   }
 
-  /**
-   * Fires an ActionEvent.
-   */
+  /** Fires an ActionEvent. */
   protected void fireActionPerformed(ActionEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     ActionEvent e =

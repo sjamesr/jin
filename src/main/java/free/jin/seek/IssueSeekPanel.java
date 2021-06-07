@@ -2,31 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.seek;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -38,20 +26,23 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
 import free.util.swing.MoreLessOptionsButton;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
-/**
- * A panel which lets the user select the seek options.
- */
+/** A panel which lets the user select the seek options. */
 public class IssueSeekPanel extends JPanel {
 
-  /**
-   * The connection.
-   */
+  /** The connection. */
   private final SeekConnection conn;
 
-  /**
-   * Our preferences.
-   */
+  /** Our preferences. */
   private final Preferences prefs;
 
   // The various UI elements.
@@ -66,8 +57,8 @@ public class IssueSeekPanel extends JPanel {
   private final JButton issueSeek;
 
   /**
-   * Creates a new <code>IssueSeekPanel</code> with the specified arguments and a
-   * <code>Preferences</code> object to load/save settings from/to.
+   * Creates a new <code>IssueSeekPanel</code> with the specified arguments and a <code>Preferences
+   * </code> object to load/save settings from/to.
    */
   public IssueSeekPanel(Plugin plugin, final PluginUIContainer container, Preferences prefs) {
     if (plugin == null) throw new IllegalArgumentException("plugin may not be null");
@@ -151,24 +142,18 @@ public class IssueSeekPanel extends JPanel {
     createUI();
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isFocusCycleRoot() {
     return true;
   }
 
-  /**
-   * Returns the <code>I18n</code> for this class.
-   */
+  /** Returns the <code>I18n</code> for this class. */
   private I18n getI18n() {
     return I18n.get(IssueSeekPanel.class);
   }
 
-  /**
-   * Saves the panel's preferences.
-   */
+  /** Saves the panel's preferences. */
   public void savePrefs() {
     UserSeek seek = getSeek();
 
@@ -187,9 +172,7 @@ public class IssueSeekPanel extends JPanel {
     prefs.setBool("isMore", moreLess.isMore());
   }
 
-  /**
-   * Creates the ui of this panel, laying out all the ui elements.
-   */
+  /** Creates the ui of this panel, laying out all the ui elements. */
   private void createUI() {
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
@@ -309,9 +292,7 @@ public class IssueSeekPanel extends JPanel {
             .add(layout.createParallelGroup(GroupLayout.BASELINE).add(moreLess).add(issueSeek)));
   }
 
-  /**
-   * Returns the currently specified <code>UserSeek</code>.
-   */
+  /** Returns the currently specified <code>UserSeek</code>. */
   private UserSeek getSeek() {
     int time = timeControls.getTime();
     int inc = timeControls.getIncrement();

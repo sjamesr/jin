@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -22,14 +22,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-/**
- * A class loader which delegates loading to other classloaders.
- */
+/** A class loader which delegates loading to other classloaders. */
 public class DelegatingClassLoader extends ChildClassLoader {
 
-  /**
-   * A list of <code>ChildClassLoaders</code> to which we delegate.
-   */
+  /** A list of <code>ChildClassLoaders</code> to which we delegate. */
   private final Vector delegates = new Vector();
 
   /**
@@ -39,37 +35,27 @@ public class DelegatingClassLoader extends ChildClassLoader {
    */
   private final Hashtable beingLoaded = new Hashtable();
 
-  /**
-   * Creates a new <code>DelegatingClassLoader</code> with the specified parent class loader.
-   */
+  /** Creates a new <code>DelegatingClassLoader</code> with the specified parent class loader. */
   public DelegatingClassLoader(ChildClassLoader parent) {
     super(parent);
   }
 
-  /**
-   * Creates a new <code>DelegatingClassLoader</code> with no parent.
-   */
+  /** Creates a new <code>DelegatingClassLoader</code> with no parent. */
   public DelegatingClassLoader() {
     super();
   }
 
-  /**
-   * Adds a delegate class loader.
-   */
+  /** Adds a delegate class loader. */
   public void addDelegate(ChildClassLoader classLoader) {
     delegates.addElement(classLoader);
   }
 
-  /**
-   * Removes the specified delegate class loader.
-   */
+  /** Removes the specified delegate class loader. */
   public void removeDelegate(ChildClassLoader classLoader) {
     delegates.removeElement(classLoader);
   }
 
-  /**
-   * Loads and optionally resolves the specified class.
-   */
+  /** Loads and optionally resolves the specified class. */
   @Override
   protected Class loadClassImpl(String name, boolean resolve) {
     if (beingLoaded.containsKey(name)) // Avoid endless recursion
@@ -91,9 +77,7 @@ public class DelegatingClassLoader extends ChildClassLoader {
     return c;
   }
 
-  /**
-   * Returns an <code>InputStream</code> for reading the resource with the specified name.
-   */
+  /** Returns an <code>InputStream</code> for reading the resource with the specified name. */
   @Override
   protected InputStream getResourceAsStreamImpl(String name) {
     if (beingLoaded.containsKey(name)) // Avoid endless recursion
@@ -112,9 +96,7 @@ public class DelegatingClassLoader extends ChildClassLoader {
     return in;
   }
 
-  /**
-   * Returns a <code>URL</code> pointing to the resource with the specified name.
-   */
+  /** Returns a <code>URL</code> pointing to the resource with the specified name. */
   @Override
   protected URL getResourceImpl(String name) {
     if (beingLoaded.containsKey(name)) // Avoid endless recursion

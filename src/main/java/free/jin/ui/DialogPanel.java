@@ -2,37 +2,34 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
+import free.jin.Jin;
+import free.util.AWTUtilities;
+import free.util.swing.SwingUtils;
+import free.util.swing.WrapLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-
 import org.jdesktop.layout.LayoutStyle;
-
-import free.jin.Jin;
-import free.util.AWTUtilities;
-import free.util.swing.SwingUtils;
-import free.util.swing.WrapLayout;
 
 /**
  * The superclass for panels which ask the user to choose something or fill in information. They are
@@ -41,53 +38,35 @@ import free.util.swing.WrapLayout;
  */
 public abstract class DialogPanel extends JPanel {
 
-  /**
-   * The title of the panel.
-   */
+  /** The title of the panel. */
   private final String title;
 
-  /**
-   * The dialog in which we're displayed.
-   */
+  /** The dialog in which we're displayed. */
   private JDialog dialog = null;
 
-  /**
-   * The parent component which we pass to <code>UIProvider.show(DialogPanel, Component)</code>.
-   */
+  /** The parent component which we pass to <code>UIProvider.show(DialogPanel, Component)</code>. */
   private Component hintParent = null;
 
-  /**
-   * The default button.
-   */
+  /** The default button. */
   private JButton defaultButton = null;
 
-  /**
-   * The result - the information specified by the user.
-   */
+  /** The result - the information specified by the user. */
   private Object result;
 
-  /**
-   * Has the result been set?
-   */
+  /** Has the result been set? */
   private boolean resultSet = false;
 
-  /**
-   * Creates a new <code>DialogPanel</code>.
-   */
+  /** Creates a new <code>DialogPanel</code>. */
   public DialogPanel() {
     this(null);
   }
 
-  /**
-   * Creates a new <code>DialogPanel</code> with the specified title.
-   */
+  /** Creates a new <code>DialogPanel</code> with the specified title. */
   public DialogPanel(String title) {
     this.title = title;
   }
 
-  /**
-   * Returns the title of the panel.
-   */
+  /** Returns the title of the panel. */
   protected String getTitle() {
     return title;
   }
@@ -109,8 +88,8 @@ public abstract class DialogPanel extends JPanel {
   }
 
   /**
-   * Displays the panel in the specified dialog centered relative to the specified
-   * <code>hintParent</code>.
+   * Displays the panel in the specified dialog centered relative to the specified <code>hintParent
+   * </code>.
    */
   public void show(JDialog dialog, Component hintParent) {
     this.dialog = dialog;
@@ -136,9 +115,7 @@ public abstract class DialogPanel extends JPanel {
     dialog.setVisible(true);
   }
 
-  /**
-   * Configures the dialog in which we'll be displayed.
-   */
+  /** Configures the dialog in which we'll be displayed. */
   protected void configureDialog(JDialog dialog) {
     SwingUtils.registerEscapeCloser(dialog);
     dialog.setModal(true);
@@ -148,9 +125,7 @@ public abstract class DialogPanel extends JPanel {
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
   }
 
-  /**
-   * Resizes the container of the panel to match the its preferred size.
-   */
+  /** Resizes the container of the panel to match the its preferred size. */
   public void resizeContainerToFit() {
     if (dialog != null) dialog.pack();
   }
@@ -186,26 +161,18 @@ public abstract class DialogPanel extends JPanel {
     dialog = null;
   }
 
-  /**
-   * An action listener useful for closing the panel with a result known up-front.
-   */
+  /** An action listener useful for closing the panel with a result known up-front. */
   protected class ClosingListener implements ActionListener {
 
-    /**
-     * The result value.
-     */
+    /** The result value. */
     private final Object result;
 
-    /**
-     * Creates a new <code>ClosingListener</code> with the specified result object.
-     */
+    /** Creates a new <code>ClosingListener</code> with the specified result object. */
     public ClosingListener(Object result) {
       this.result = result;
     }
 
-    /**
-     * Invoked <code>close</code> with the result object specified in the constructor.
-     */
+    /** Invoked <code>close</code> with the result object specified in the constructor. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       close(result);

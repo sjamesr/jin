@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -32,15 +32,11 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.Properties;
 
-/**
- * Various utility methods that have something to do with I/O.
- */
+/** Various utility methods that have something to do with I/O. */
 public class IOUtilities {
 
-  /**
-   * Maps URLs to byte arrays of the data loaded from them.
-   */
-  private final static Hashtable urlCache = new Hashtable();
+  /** Maps URLs to byte arrays of the data loaded from them. */
+  private static final Hashtable urlCache = new Hashtable();
 
   /**
    * Returns a DataOutputStream object based on the given OutputStream. If the given OutputStream is
@@ -220,9 +216,7 @@ public class IOUtilities {
     return buf.toByteArray();
   }
 
-  /**
-   * Loads and returns data from the specified URL.
-   */
+  /** Loads and returns data from the specified URL. */
   public static byte[] load(URL url, boolean allowCache) throws IOException {
     InputStream in = inputStreamForURL(url, allowCache);
     try {
@@ -281,12 +275,12 @@ public class IOUtilities {
    * Compares the 2 given sub arrays. Returns true if they are equal, false otherwise.
    *
    * @throws ArrayIndexOutOfBounds if
-   * <UL>
-   * <LI> <code>offset1</code> or <code>offset2</code> are negative.
-   * <LI>length is negative.
-   * <LI> <code>offset1+length</code> is bigger than <code>arr1.length</code>
-   * <LI> <code>offset2+length</code> is bigger than <code>arr2.length</code>
-   * </UL>
+   *     <UL>
+   *       <LI><code>offset1</code> or <code>offset2</code> are negative.
+   *       <LI>length is negative.
+   *       <LI><code>offset1+length</code> is bigger than <code>arr1.length</code>
+   *       <LI><code>offset2+length</code> is bigger than <code>arr2.length</code>
+   *     </UL>
    */
   public static boolean equal(byte[] arr1, int offset1, byte[] arr2, int offset2, int length) {
     if ((offset1 < 0)
@@ -303,9 +297,9 @@ public class IOUtilities {
   }
 
   /**
-   * Returns a <code>URL</code> corresponding to the specified <code>File</code> or
-   * <code>null</code> if the <code>File</code> cannot be converted into a <code>URL</code>. NOTE:
-   * This is copied from the JDK1.3 source, File.java
+   * Returns a <code>URL</code> corresponding to the specified <code>File</code> or <code>null
+   * </code> if the <code>File</code> cannot be converted into a <code>URL</code>. NOTE: This is
+   * copied from the JDK1.3 source, File.java
    */
   public static URL fileToURL(File file) {
     try {
@@ -328,8 +322,8 @@ public class IOUtilities {
   }
 
   /**
-   * Loads properties from the specified <code>InputStream</code> into the specified
-   * <code>Properties</code> object. Returns the passed <code>Properties</code> object.
+   * Loads properties from the specified <code>InputStream</code> into the specified <code>
+   * Properties</code> object. Returns the passed <code>Properties</code> object.
    */
   public static Properties loadProperties(InputStream in, Properties props) throws IOException {
     if (in == null) return null;
@@ -340,8 +334,8 @@ public class IOUtilities {
   }
 
   /**
-   * Similar to the {@link #loadProperties(InputStream)} method, but closes the specified
-   * <code>InputStream</code> at the end of its operation.
+   * Similar to the {@link #loadProperties(InputStream)} method, but closes the specified <code>
+   * InputStream</code> at the end of its operation.
    */
   public static Properties loadPropertiesAndClose(InputStream in) throws IOException {
     return loadPropertiesAndClose(in, new Properties());
@@ -381,10 +375,9 @@ public class IOUtilities {
   }
 
   /**
-   * Loads properties from the specified <code>URL</code> into the specified
-   * </code>Properties</code> object. Returns the passed <code>Properties</code> object.
-   * <code>allowCache</code> specifies whether the data may be retrieved from the cache instead of
-   * being actually retrieved.
+   * Loads properties from the specified <code>URL</code> into the specified </code>Properties
+   * </code> object. Returns the passed <code>Properties</code> object. <code>allowCache</code>
+   * specifies whether the data may be retrieved from the cache instead of being actually retrieved.
    */
   public static Properties loadProperties(URL url, boolean allowCache, Properties props)
       throws IOException {
@@ -409,17 +402,15 @@ public class IOUtilities {
     urlCache.put(url, data);
   }
 
-  /**
-   * Returns whether the specified URL is cached.
-   */
+  /** Returns whether the specified URL is cached. */
   public static boolean isURLCached(URL url) {
     return urlCache.containsKey(url);
   }
 
   /**
-   * Returns an <code>InpuStream</code> for reading the data at the specified URL. If
-   * <code>allowCache</code> is <code>true</code>, and the URL is cached, a
-   * <code>ByteArrayInpuStream</code> with the cached data is returned.
+   * Returns an <code>InpuStream</code> for reading the data at the specified URL. If <code>
+   * allowCache</code> is <code>true</code>, and the URL is cached, a <code>ByteArrayInpuStream
+   * </code> with the cached data is returned.
    */
   public static InputStream inputStreamForURL(URL url, boolean allowCache) throws IOException {
     byte[] cached = null;
@@ -452,9 +443,7 @@ public class IOUtilities {
     new UrlDataReader(urls.clone(), id, receiver, allowCache).run();
   }
 
-  /**
-   * The callback interface for asynchronous reading of data.
-   */
+  /** The callback interface for asynchronous reading of data. */
   public static interface DataReceiver {
 
     /**
@@ -464,44 +453,28 @@ public class IOUtilities {
     void dataRead(URL[] urls, Object id, byte[][] data, IOException[] exceptions);
   }
 
-  /**
-   * Reads data from URLs.
-   */
+  /** Reads data from URLs. */
   private static class UrlDataReader implements Runnable {
 
-    /**
-     * The number of <code>Threads</code> running <code>UrlDataReader</code>s already created.
-     */
+    /** The number of <code>Threads</code> running <code>UrlDataReader</code>s already created. */
     public static int threadCount = 0;
 
-    /**
-     * The URLs to load data from.
-     */
+    /** The URLs to load data from. */
     private final URL[] urls;
 
-    /**
-     * The identifier of this download.
-     */
+    /** The identifier of this download. */
     private final Object id;
 
-    /**
-     * The callback <code>DataReceiver</code>.
-     */
+    /** The callback <code>DataReceiver</code>. */
     private final DataReceiver receiver;
 
-    /**
-     * Whether it is allowed for the data to be retrieved from cache.
-     */
+    /** Whether it is allowed for the data to be retrieved from cache. */
     private final boolean allowCache;
 
-    /**
-     * The data.
-     */
+    /** The data. */
     private final byte[][] data;
 
-    /**
-     * The <code>IOExceptions</code> thrown while loading the data.
-     */
+    /** The <code>IOExceptions</code> thrown while loading the data. */
     private final IOException[] exceptions;
 
     /**
@@ -517,9 +490,7 @@ public class IOUtilities {
       this.exceptions = new IOException[urls.length];
     }
 
-    /**
-     * Reads the data and reports back to the receiver.
-     */
+    /** Reads the data and reports back to the receiver. */
     @Override
     public void run() {
       for (int i = 0; i < urls.length; i++) {

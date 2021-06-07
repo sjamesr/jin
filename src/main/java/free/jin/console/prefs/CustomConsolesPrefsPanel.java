@@ -2,20 +2,29 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2008 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.prefs;
 
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.console.Channel;
+import free.jin.console.ConsoleManager;
+import free.jin.ui.PreferencesPanel;
+import free.util.Encodings;
+import free.util.Utilities;
+import free.util.swing.AddRemoveButtons;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -33,7 +42,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -55,16 +63,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.JTextComponent;
 
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.console.Channel;
-import free.jin.console.ConsoleManager;
-import free.jin.ui.PreferencesPanel;
-import free.util.Encodings;
-import free.util.Utilities;
-import free.util.swing.AddRemoveButtons;
-
 /**
  * A preferences panel allowing the user to specify the set of custom consoles he will be using.
  *
@@ -79,74 +77,46 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
   private static final String MAIN_WINDOW_NAME =
       I18n.get(CustomConsolesPrefsPanel.class).getString("mainWindowName");
 
-  /**
-   * The console manager we're part of.
-   */
+  /** The console manager we're part of. */
   protected final ConsoleManager consoleManager;
 
-  /**
-   * The list model of console specs.
-   */
+  /** The list model of console specs. */
   protected final DefaultListModel consoles;
 
-  /**
-   * The <code>JList</code> displaying the console specs.
-   */
+  /** The <code>JList</code> displaying the console specs. */
   protected final JList consolesList;
 
-  /**
-   * The "Add Console" button.
-   */
+  /** The "Add Console" button. */
   protected final JButton addConsoleButton;
 
-  /**
-   * The "Remove Console" button.
-   */
+  /** The "Remove Console" button. */
   protected final JButton removeConsoleButton;
 
-  /**
-   * The "Move Up" button.
-   */
+  /** The "Move Up" button. */
   protected final JButton moveUpButton;
 
-  /**
-   * The "Move Down" button.
-   */
+  /** The "Move Down" button. */
   protected final JButton moveDownButton;
 
-  /**
-   * The textfield for the console's title.
-   */
+  /** The textfield for the console's title. */
   protected final JTextField titleField;
 
-  /**
-   * The <code>ComboBoxModel</code> of the window box.
-   */
+  /** The <code>ComboBoxModel</code> of the window box. */
   private final DefaultComboBoxModel windowModel = new DefaultComboBoxModel();
 
-  /**
-   * The combo box for the console's window.
-   */
+  /** The combo box for the console's window. */
   protected final JComboBox windowBox;
 
-  /**
-   * The <code>ComboBoxModel</code> of the encoding box.
-   */
+  /** The <code>ComboBoxModel</code> of the encoding box. */
   private final DefaultComboBoxModel encodingModel = new DefaultComboBoxModel();
 
-  /**
-   * The combo box for the console's encoding.
-   */
+  /** The combo box for the console's encoding. */
   protected final JComboBox encodingBox;
 
-  /**
-   * The text field for the console's channels.
-   */
+  /** The text field for the console's channels. */
   protected final JTextField channelsField;
 
-  /**
-   * The "add/remove" widget for adding and removing channels.
-   */
+  /** The "add/remove" widget for adding and removing channels. */
   protected final AddRemoveButtons addRemoveChannels;
 
   /**
@@ -155,39 +125,25 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
    */
   protected final JTextField messageRegexField;
 
-  /**
-   * The label for the consoles list.
-   */
+  /** The label for the consoles list. */
   protected final JLabel consolesListLabel;
 
-  /**
-   * The scrollpane for the console's list.
-   */
+  /** The scrollpane for the console's list. */
   protected final JScrollPane consolesListScrollPane;
 
-  /**
-   * The label for the title field.
-   */
+  /** The label for the title field. */
   protected final JLabel titleLabel;
 
-  /**
-   * The label for the window box.
-   */
+  /** The label for the window box. */
   protected final JLabel windowLabel;
 
-  /**
-   * The label for the encoding box.
-   */
+  /** The label for the encoding box. */
   protected final JLabel encodingLabel;
 
-  /**
-   * The label for the channels field.
-   */
+  /** The label for the channels field. */
   protected final JLabel channelsLabel;
 
-  /**
-   * The label for the message regex field.
-   */
+  /** The label for the message regex field. */
   protected final JLabel messageRegexLabel;
 
   /**
@@ -210,8 +166,8 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
   private boolean layoutCreated = false;
 
   /**
-   * Creates a new <code>CustomConsolesPrefsPanel</code> for the specified
-   * <code>ConsoleManager</code>.
+   * Creates a new <code>CustomConsolesPrefsPanel</code> for the specified <code>ConsoleManager
+   * </code>.
    */
   public CustomConsolesPrefsPanel(ConsoleManager consoleManager) {
     if (consoleManager == null)
@@ -595,17 +551,13 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean applyRequiresRestart() {
     return true;
   }
 
-  /**
-   * Invokes {@link #createLayout()} the first time we're added anywhere.
-   */
+  /** Invokes {@link #createLayout()} the first time we're added anywhere. */
   @Override
   public void addNotify() {
     super.addNotify();
@@ -622,21 +574,15 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Creates the layout of this panel.
-   */
+  /** Creates the layout of this panel. */
   protected abstract void createLayout();
 
-  /**
-   * Returns the currently selected console; <code>null</code> if none.
-   */
+  /** Returns the currently selected console; <code>null</code> if none. */
   protected ConsoleSpec getSelectedConsole() {
     return (ConsoleSpec) consolesList.getSelectedValue();
   }
 
-  /**
-   * Updates the UI according to the currently selected console.
-   */
+  /** Updates the UI according to the currently selected console. */
   protected void updateUiFromSelectedConsole() {
     try {
       setIgnoreConsolePropertiesChange(true);
@@ -724,9 +670,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     messageRegexField.setEditable(spec != null);
   }
 
-  /**
-   * Creates a string to be displayed in the channels field for the specified channels.
-   */
+  /** Creates a string to be displayed in the channels field for the specified channels. */
   protected abstract String makeChannelListDisplayString(List channels);
 
   /**
@@ -775,9 +719,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     spec.setMessageRegex(matchRegex);
   }
 
-  /**
-   * Returns whether we are temporarily ignoring changes in the console properties UI.
-   */
+  /** Returns whether we are temporarily ignoring changes in the console properties UI. */
   protected final boolean isIgnoreConsolePropertiesChange() {
     return isIgnoreConsolePropertiesChange;
   }
@@ -791,9 +733,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     this.isIgnoreConsolePropertiesChange = ignore;
   }
 
-  /**
-   * Returns whether we are temporarily ignoring changes in the console selection.
-   */
+  /** Returns whether we are temporarily ignoring changes in the console selection. */
   protected final boolean isIgnoreConsoleListSelectionChange() {
     return isIgnoreConsoleListSelectionChange;
   }
@@ -807,9 +747,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     this.isIgnoreConsoleListSelectionChange = ignore;
   }
 
-  /**
-   * Applies the changes in the preferences panel, storing the preferences.
-   */
+  /** Applies the changes in the preferences panel, storing the preferences. */
   @Override
   public void applyChanges() throws BadChangesException {
     int selectedIndex = consolesList.getSelectedIndex();
@@ -853,9 +791,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     return new ConsoleSpec();
   }
 
-  /**
-   * Loads a <code>ConsoleSpec</code> with the specified prefix from preferences.
-   */
+  /** Loads a <code>ConsoleSpec</code> with the specified prefix from preferences. */
   protected ConsoleSpec loadConsoleSpec(Preferences prefs, String prefix) {
     ConsoleSpec spec = createNewConsoleSpec();
 
@@ -871,9 +807,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     return spec;
   }
 
-  /**
-   * Stores the specified <code>ConsoleSpec</code> into preferences, using the specified prefix.
-   */
+  /** Stores the specified <code>ConsoleSpec</code> into preferences, using the specified prefix. */
   protected void storeConsoleSpec(Preferences prefs, ConsoleSpec spec, String prefix) {
     prefs.setString(prefix + "title", spec.getTitle());
     prefs.setString(prefix + "encoding", spec.getEncoding());
@@ -902,35 +836,23 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
    */
   protected abstract String makeChannelPopupString(Channel channel);
 
-  /**
-   * Encapsulates information about a custom console.
-   */
+  /** Encapsulates information about a custom console. */
   protected static class ConsoleSpec {
 
-    /**
-     * The default title we display when the title is empty.
-     */
+    /** The default title we display when the title is empty. */
     private static final String DEFAULT_TITLE =
         I18n.get(CustomConsolesPrefsPanel.class).getString("defaultConsoleTitle");
 
-    /**
-     * The console's title.
-     */
+    /** The console's title. */
     private String title = "";
 
-    /**
-     * The console's window.
-     */
+    /** The console's window. */
     private String window = MAIN_WINDOW_NAME;
 
-    /**
-     * The console's encoding; <code>null</code> for default.
-     */
+    /** The console's encoding; <code>null</code> for default. */
     private String encoding;
 
-    /**
-     * The list of channels the console is showing.
-     */
+    /** The list of channels the console is showing. */
     private final List channels = new LinkedList();
 
     /**
@@ -939,94 +861,68 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
      */
     private String messageRegex = null;
 
-    /**
-     * Returns the title.
-     */
+    /** Returns the title. */
     public String getTitle() {
       return title;
     }
 
-    /**
-     * Sets the title.
-     */
+    /** Sets the title. */
     public void setTitle(String title) {
       this.title = title;
     }
 
-    /**
-     * Returns the window.
-     */
+    /** Returns the window. */
     public String getWindow() {
       return window;
     }
 
-    /**
-     * Sets the window.
-     */
+    /** Sets the window. */
     public void setWindow(String window) {
       this.window = window;
     }
 
-    /**
-     * Returns the encoding; <code>null</code> for default.
-     */
+    /** Returns the encoding; <code>null</code> for default. */
     public String getEncoding() {
       return encoding;
     }
 
-    /**
-     * Sets the encoding. Use <code>null</code> for the default encoding.
-     */
+    /** Sets the encoding. Use <code>null</code> for the default encoding. */
     public void setEncoding(String encoding) {
       this.encoding = encoding;
     }
 
-    /**
-     * Returns the list of channels.
-     */
+    /** Returns the list of channels. */
     public List getChannels() {
       return Collections.unmodifiableList(channels);
     }
 
-    /**
-     * Sets the list of channels.
-     */
+    /** Sets the list of channels. */
     public void setChannels(List channels) {
       this.channels.clear();
       this.channels.addAll(channels);
     }
 
-    /**
-     * Adds a channel.
-     */
+    /** Adds a channel. */
     public void addChannel(Channel channel) {
       channels.add(channel);
     }
 
-    /**
-     * Removes a channel.
-     */
+    /** Removes a channel. */
     public void removeChannel(Channel channel) {
       channels.remove(channel);
     }
 
-    /**
-     * Returns the message regex.
-     */
+    /** Returns the message regex. */
     public String getMessageRegex() {
       return messageRegex;
     }
 
-    /**
-     * Sets the match regex.
-     */
+    /** Sets the match regex. */
     public void setMessageRegex(String messageRegex) {
       this.messageRegex = messageRegex;
     }
 
-    /**
-     * Returns the console's title, or a special string, if it's empty.
-     */
+    /** Returns the console's title, or a special string, if it's empty. */
     @Override
     public String toString() {
       String title = getTitle();
@@ -1034,19 +930,13 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * The popup we use to display the list of channels for the user to add/remove.
-   */
+  /** The popup we use to display the list of channels for the user to add/remove. */
   private class ChannelsPopup extends BasicComboPopup {
 
-    /**
-     * The list of channels.
-     */
+    /** The list of channels. */
     private final Channel[] channels;
 
-    /**
-     * Creates a new <code>ChannelsPopup</code> with the specified list of channels.
-     */
+    /** Creates a new <code>ChannelsPopup</code> with the specified list of channels. */
     public ChannelsPopup(Channel[] channels) {
       super(new JComboBox());
 
@@ -1076,9 +966,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
       comboBox.removeActionListener(listener);
     }
 
-    /**
-     * Returns the currently selected channel; <code>null</code> if none.
-     */
+    /** Returns the currently selected channel; <code>null</code> if none. */
     public Channel getSelectedChannel() {
       int selectedIndex = comboBox.getSelectedIndex();
       return selectedIndex == -1 ? null : channels[selectedIndex];
@@ -1092,9 +980,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
    */
   private class EncodingBoxCellRenderer extends JLabel implements ListCellRenderer {
 
-    /**
-     * The delegate renderer (the box's original renderer).
-     */
+    /** The delegate renderer (the box's original renderer). */
     private final ListCellRenderer delegateRenderer;
 
     /**
@@ -1105,9 +991,7 @@ public abstract class CustomConsolesPrefsPanel extends PreferencesPanel {
       this.delegateRenderer = delegateRenderer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Component getListCellRendererComponent(
         JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

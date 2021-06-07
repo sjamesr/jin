@@ -2,23 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.plugin;
-
-import java.util.Map;
-
-import javax.swing.ListModel;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -33,30 +29,24 @@ import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.MemoryFile;
 import free.util.models.Model;
+import java.util.Map;
+import javax.swing.ListModel;
 
 /**
  * The base class for all plugins. All subclasses must have a no-arg constructor to work properly.
  */
 public abstract class Plugin {
 
-  /**
-   * The plugin's context.
-   */
+  /** The plugin's context. */
   private PluginContext context;
 
-  /**
-   * The connection.
-   */
+  /** The connection. */
   private Connection conn;
 
-  /**
-   * The preferences.
-   */
+  /** The preferences. */
   private Preferences prefs;
 
-  /**
-   * The <code>I18n</code> for this plugin.
-   */
+  /** The <code>I18n</code> for this plugin. */
   private I18n i18n;
 
   /**
@@ -74,24 +64,21 @@ public abstract class Plugin {
   }
 
   /**
-   * <p>
    * Returns a list of plugin IDs of the plugins which this plugin needs to be started in order to
    * start itself. This is not a hard dependency on the existance of the returned plugins (such
    * dependencies should be enforced by the plugins themselves) - it merely tells the environment
    * the order in which plugins should be started. The plugins with the returned IDs will be started
    * before this plugin. No circular dependencies are allowed.
-   * <p>
-   * The default implementation returns an empty array.
-   * <p>
-   * Note that this method is invoked before <code>start()</code>.
+   *
+   * <p>The default implementation returns an empty array.
+   *
+   * <p>Note that this method is invoked before <code>start()</code>.
    */
   public String[] getDependencies() {
     return new String[0];
   }
 
-  /**
-   * Returns the connection to the server.
-   */
+  /** Returns the connection to the server. */
   public Connection getConn() {
     if (conn == null) conn = context.getConnection();
 
@@ -123,16 +110,14 @@ public abstract class Plugin {
   }
 
   /**
-   * Returns the resource of the specified type and of the specified id. See
-   * <code>JinContext.getResource</code> for more information.
+   * Returns the resource of the specified type and of the specified id. See <code>
+   * JinContext.getResource</code> for more information.
    */
   public Resource getResource(String resourceType, String resourceId) {
     return Jin.getInstance().getResource(resourceType, resourceId, this);
   }
 
-  /**
-   * A helper function which returns the <code>I18n</code> for this plugin.
-   */
+  /** A helper function which returns the <code>I18n</code> for this plugin. */
   public I18n getI18n() {
     if (i18n == null) i18n = I18n.get(getClass(), Plugin.class);
 
@@ -140,16 +125,16 @@ public abstract class Plugin {
   }
 
   /**
-   * Creates a UI container with the specified id for this plugin. See
-   * {@link UIProvider#createPluginUIContainer(Plugin, String, int)} for more information.
+   * Creates a UI container with the specified id for this plugin. See {@link
+   * UIProvider#createPluginUIContainer(Plugin, String, int)} for more information.
    */
   public PluginUIContainer createContainer(String id, int mode) {
     return Jin.getInstance().getUIProvider().createPluginUIContainer(this, id, mode);
   }
 
   /**
-   * Returns the user's <code>MemoryFile</code> with the specified name. See
-   * {@link #setFile(String, MemoryFile)} for an explanation on the user files mechanism.
+   * Returns the user's <code>MemoryFile</code> with the specified name. See {@link #setFile(String,
+   * MemoryFile)} for an explanation on the user files mechanism.
    */
   public MemoryFile getFile(String filename) {
     return getUser().getFile(getId() + "/" + filename);
@@ -179,9 +164,7 @@ public abstract class Plugin {
     return context.getUser();
   }
 
-  /**
-   * Returns the <code>Server</code> object representing the server we're connected to.
-   */
+  /** Returns the <code>Server</code> object representing the server we're connected to. */
   public Server getServer() {
     return getUser().getServer();
   }
@@ -193,9 +176,7 @@ public abstract class Plugin {
     return context.getPlugin(id);
   }
 
-  /**
-   * Asks all other plugins, to set their paused state to the specified state.
-   */
+  /** Asks all other plugins, to set their paused state to the specified state. */
   public void setOtherPluginsPaused(boolean isPaused) {
     Plugin[] plugins = context.getPlugins();
 
@@ -220,9 +201,7 @@ public abstract class Plugin {
     return context.getAction(id);
   }
 
-  /**
-   * Exports the specified <code>JinAction</code> to the other plugins.
-   */
+  /** Exports the specified <code>JinAction</code> to the other plugins. */
   public void exportAction(JinAction action) {
     String actionId = action.getId();
     Preferences actionPrefs = Preferences.createWrapped(getPrefs(), actionId + ".");
@@ -267,16 +246,14 @@ public abstract class Plugin {
    * normal preferences specified by <code>getPreferencesUI</code>. The preferences are specified as
    * <code>Models</code> and its up to the <code>UIProvider</code> to display appropriate UI that
    * allows the user to modify the model. Currently only <code>BooleanModel</code> is supported -
-   * support for other models will be added as necessary. The default implementation returns
-   * <code>null</code> to indicate that no hot preferences are speicified for this plugin.
+   * support for other models will be added as necessary. The default implementation returns <code>
+   * null</code> to indicate that no hot preferences are speicified for this plugin.
    */
   public Model[] getHotPrefs() {
     return null;
   }
 
-  /**
-   * Returns whatever <code>getName</code> does.
-   */
+  /** Returns whatever <code>getName</code> does. */
   @Override
   public String toString() {
     return getName();

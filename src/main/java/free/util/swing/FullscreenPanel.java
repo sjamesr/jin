@@ -2,20 +2,26 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.AWTUtilities;
+import free.util.Localization;
+import free.util.models.BooleanListener;
+import free.util.models.BooleanModel;
+import free.util.models.UnmodifiableBooleanModel;
+import free.workarounds.FixedJPanel;
 import java.awt.AWTPermission;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -24,21 +30,12 @@ import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import free.util.AWTUtilities;
-import free.util.Localization;
-import free.util.models.BooleanListener;
-import free.util.models.BooleanModel;
-import free.util.models.UnmodifiableBooleanModel;
-import free.workarounds.FixedJPanel;
 
 /**
  * A <code>JPanel</code> which allows its content (always a single component) to be displayed in
@@ -46,34 +43,22 @@ import free.workarounds.FixedJPanel;
  */
 public class FullscreenPanel extends FixedJPanel {
 
-  /**
-   * The target component.
-   */
+  /** The target component. */
   private final Component target;
 
-  /**
-   * The panel displayed in place of the target.
-   */
+  /** The panel displayed in place of the target. */
   private final JPanel restorePanel;
 
-  /**
-   * Are we allowed to use fullscreen exclusive mode?
-   */
+  /** Are we allowed to use fullscreen exclusive mode? */
   private boolean allowExclusiveMode;
 
-  /**
-   * The model specifying whether we're in fullscreen mode.
-   */
+  /** The model specifying whether we're in fullscreen mode. */
   private final BooleanModel fullscreenModeModel;
 
-  /**
-   * Are we in the process of entering/exiting fullscreen mode.
-   */
+  /** Are we in the process of entering/exiting fullscreen mode. */
   private boolean beingModified = false;
 
-  /**
-   * The frame which contains this panel when it's in fullscreen mode.
-   */
+  /** The frame which contains this panel when it's in fullscreen mode. */
   private JFrame fullscreenFrame = null;
 
   /**
@@ -95,9 +80,7 @@ public class FullscreenPanel extends FixedJPanel {
    */
   private Frame originalFrame;
 
-  /**
-   * Creates a new <code>FullscreenPanel</code> with the specified target component.
-   */
+  /** Creates a new <code>FullscreenPanel</code> with the specified target component. */
   public FullscreenPanel(Component target) {
     super(new BorderLayout());
 
@@ -118,12 +101,10 @@ public class FullscreenPanel extends FixedJPanel {
     restorePanel = createRestorePanel();
   }
 
-  /**
-   * Creates the panel displayed in place of the target component when in fullscreen mode.
-   */
+  /** Creates the panel displayed in place of the target component when in fullscreen mode. */
   private JPanel createRestorePanel() {
     Localization l10n = LocalizationService.getForClass(FullscreenPanel.class);
-    JButton restore = new JButton(l10n.getString("restoreNormalModeButton.text")); //$NON-NLS-1$
+    JButton restore = new JButton(l10n.getString("restoreNormalModeButton.text")); // $NON-NLS-1$
     restore.addActionListener(
         new ActionListener() {
           @Override
@@ -133,7 +114,7 @@ public class FullscreenPanel extends FixedJPanel {
         });
     restore.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    JLabel label = new JLabel(l10n.getString("fullscreenInfoLabel.text")); //$NON-NLS-1$
+    JLabel label = new JLabel(l10n.getString("fullscreenInfoLabel.text")); // $NON-NLS-1$
     label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
     JPanel panel = new JPanel();
@@ -147,9 +128,7 @@ public class FullscreenPanel extends FixedJPanel {
     return panel;
   }
 
-  /**
-   * Overrides the superclass method to disallow adding any components.
-   */
+  /** Overrides the superclass method to disallow adding any components. */
   @Override
   public void add(Component comp, Object constraints, int index) {
     if (beingModified) super.add(comp, constraints, index);
@@ -158,9 +137,7 @@ public class FullscreenPanel extends FixedJPanel {
           "You may not add components to FullscreenPanel"); //$NON-NLS-1$
   }
 
-  /**
-   * Overrides the superclass method to disallow removing any components.
-   */
+  /** Overrides the superclass method to disallow removing any components. */
   @Override
   public void remove(int index) {
     if (beingModified) super.remove(index);
@@ -177,9 +154,7 @@ public class FullscreenPanel extends FixedJPanel {
     this.allowExclusiveMode = allowExclusiveMode;
   }
 
-  /**
-   * Sets this panel's fullscreen mode.
-   */
+  /** Sets this panel's fullscreen mode. */
   private void setFullscreen(boolean on) {
     beingModified = true;
     if (on) makeFullscreen();
@@ -187,16 +162,12 @@ public class FullscreenPanel extends FixedJPanel {
     beingModified = false;
   }
 
-  /**
-   * Returns the <code>BooleanModel</code> specifying whether we're in fullscreen mode.
-   */
+  /** Returns the <code>BooleanModel</code> specifying whether we're in fullscreen mode. */
   public BooleanModel getFullscreenModeModel() {
     return fullscreenModeModel;
   }
 
-  /**
-   * Puts this panel into fullscreen mode.
-   */
+  /** Puts this panel into fullscreen mode. */
   private void makeFullscreen() {
     remove(target);
     add(restorePanel);
@@ -212,15 +183,13 @@ public class FullscreenPanel extends FixedJPanel {
     fullscreenFrame.getContentPane().validate();
   }
 
-  /**
-   * Returns whether the security manager allows fullscreen mode.
-   */
+  /** Returns whether the security manager allows fullscreen mode. */
   private static boolean securityManagerAllowsFullscreen() {
     SecurityManager sm = System.getSecurityManager();
     if (sm == null) return true;
 
     try {
-      sm.checkPermission(new AWTPermission("fullScreenExclusive")); //$NON-NLS-1$
+      sm.checkPermission(new AWTPermission("fullScreenExclusive")); // $NON-NLS-1$
     } catch (SecurityException e) {
       return false;
     }
@@ -233,7 +202,7 @@ public class FullscreenPanel extends FixedJPanel {
    */
   private JFrame setRealFullscreen() {
     originalFrame = SwingUtils.frameForComponent(this);
-    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); //$NON-NLS-1$
+    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); // $NON-NLS-1$
     if (originalFrame != null) frame.setIconImage(originalFrame.getIconImage());
 
     frame.setUndecorated(true);
@@ -257,7 +226,7 @@ public class FullscreenPanel extends FixedJPanel {
    */
   private JFrame setFakeFullscreen() {
     originalFrame = SwingUtils.frameForComponent(this);
-    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); //$NON-NLS-1$
+    JFrame frame = new JFrame(originalFrame == null ? "" : originalFrame.getTitle()); // $NON-NLS-1$
 
     frame.setUndecorated(true);
     frame.setResizable(false);
@@ -270,9 +239,7 @@ public class FullscreenPanel extends FixedJPanel {
     return frame;
   }
 
-  /**
-   * Puts this panel into normal (non-fullscreen) mode.
-   */
+  /** Puts this panel into normal (non-fullscreen) mode. */
   private void makeNormal() {
     fullscreenFrame.getContentPane().remove(target);
 
@@ -286,9 +253,7 @@ public class FullscreenPanel extends FixedJPanel {
     fullscreenFrame = null;
   }
 
-  /**
-   * Restores a real fullscreen window.
-   */
+  /** Restores a real fullscreen window. */
   private void makeRealNormal() {
     fullscreenFrame.getGraphicsConfiguration().getDevice().setFullScreenWindow(null);
     fullscreenFrame.dispose();
@@ -299,9 +264,7 @@ public class FullscreenPanel extends FixedJPanel {
     }
   }
 
-  /**
-   * Restores a fake fullscreen window.
-   */
+  /** Restores a fake fullscreen window. */
   private void makeFakeNormal() {
     fullscreenFrame.dispose();
   }

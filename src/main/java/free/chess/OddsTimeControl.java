@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -18,19 +18,13 @@ package free.chess;
 
 import free.util.Localization;
 
-/**
- * A <code>TimeControl</code> when the time control for white and black differ.
- */
+/** A <code>TimeControl</code> when the time control for white and black differ. */
 public class OddsTimeControl extends TimeControl {
 
-  /**
-   * The white's time control.
-   */
+  /** The white's time control. */
   private final TimeControl whiteTimeControl;
 
-  /**
-   * The black's time control.
-   */
+  /** The black's time control. */
   private final TimeControl blackTimeControl;
 
   /**
@@ -46,38 +40,28 @@ public class OddsTimeControl extends TimeControl {
     this.blackTimeControl = blackTimeControl;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int getInitialTime(Player player) {
     return (player.isWhite() ? whiteTimeControl : blackTimeControl).getInitialTime(player);
   }
 
-  /**
-   * Returns white's time control.
-   */
+  /** Returns white's time control. */
   public TimeControl getWhiteTimeControl() {
     return whiteTimeControl;
   }
 
-  /**
-   * Returns black's time control.
-   */
+  /** Returns black's time control. */
   public TimeControl getBlackTimeControl() {
     return blackTimeControl;
   }
 
-  /**
-   * Returns whether the two time controls really differ.
-   */
+  /** Returns whether the two time controls really differ. */
   public boolean isOdds() {
     return !whiteTimeControl.equals(blackTimeControl);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedShortDescription() {
     return getDescription(
@@ -86,9 +70,7 @@ public class OddsTimeControl extends TimeControl {
         blackTimeControl.getLocalizedShortDescription());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedMediumDescription() {
     return getDescription(
@@ -97,9 +79,7 @@ public class OddsTimeControl extends TimeControl {
         blackTimeControl.getLocalizedMediumDescription());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedLongDescription() {
     return getDescription(
@@ -108,9 +88,7 @@ public class OddsTimeControl extends TimeControl {
         blackTimeControl.getLocalizedLongDescription());
   }
 
-  /**
-   * Returns a description of the time control obtained using the specified localization key.
-   */
+  /** Returns a description of the time control obtained using the specified localization key. */
   private String getDescription(String key, String whiteDescription, String blackDescription) {
     Localization l10n = LocalizationService.getForClass(OddsTimeControl.class);
     Object[] args = new Object[] {whiteDescription, blackDescription};
@@ -118,9 +96,7 @@ public class OddsTimeControl extends TimeControl {
     return l10n.getFormattedString(key, args);
   }
 
-  /**
-   * Returns whether the specified object equals to this one.
-   */
+  /** Returns whether the specified object equals to this one. */
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof OddsTimeControl) || (o == null)) return false;
@@ -130,9 +106,7 @@ public class OddsTimeControl extends TimeControl {
         && tc.blackTimeControl.equals(blackTimeControl);
   }
 
-  /**
-   * Returns the hash code for this object.
-   */
+  /** Returns the hash code for this object. */
   @Override
   public int hashCode() {
     return whiteTimeControl.hashCode() ^ blackTimeControl.hashCode();

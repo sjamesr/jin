@@ -2,20 +2,28 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.gamelogger;
 
+import bsh.EvalError;
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.ui.OptionPanel;
+import free.jin.ui.PreferencesPanel;
+import free.util.swing.ExtensionFileFilter;
+import free.workarounds.FixedJTextField;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -28,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -50,83 +57,46 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
-import bsh.EvalError;
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.ui.OptionPanel;
-import free.jin.ui.PreferencesPanel;
-import free.util.swing.ExtensionFileFilter;
-import free.workarounds.FixedJTextField;
-
-/**
- * The preferences panel for the game logger.
- */
+/** The preferences panel for the game logger. */
 public class GameLoggerPreferencesPanel extends PreferencesPanel {
 
-  /**
-   * The GameLogger this panel shows preferences for.
-   */
+  /** The GameLogger this panel shows preferences for. */
   protected final GameLogger gameLogger;
 
-  /**
-   * The radio button that specifies a LOG_NONE mode.
-   */
+  /** The radio button that specifies a LOG_NONE mode. */
   private JRadioButton logNoneButton;
 
-  /**
-   * The radio button that specifies a LOG_ALL mode.
-   */
+  /** The radio button that specifies a LOG_ALL mode. */
   private JRadioButton logAllButton;
 
-  /**
-   * The radio button that specifies a USE_RULES mode.
-   */
+  /** The radio button that specifies a USE_RULES mode. */
   private JRadioButton useRulesButton;
 
-  /**
-   * The text field where the user can specify the name of the file to log all the games into.
-   */
+  /** The text field where the user can specify the name of the file to log all the games into. */
   private JTextField allGamesLogFileField;
 
-  /**
-   * The list holding all the logging rules.
-   */
+  /** The list holding all the logging rules. */
   private JList loggingRulesList;
 
-  /**
-   * The text field for the rule name.
-   */
+  /** The text field for the rule name. */
   private JTextField rulenameField;
 
-  /**
-   * The text field for the filename where the rule specific games will be logged.
-   */
+  /** The text field for the filename where the rule specific games will be logged. */
   private JTextField filenameField;
 
-  /**
-   * The text field for the rule condition.
-   */
+  /** The text field for the rule condition. */
   private JTextField conditionField;
 
-  /**
-   * The button for deleting rules.
-   */
+  /** The button for deleting rules. */
   private JButton deleteRuleButton;
 
-  /**
-   * The panel which holds the UI for the "log all" option.
-   */
+  /** The panel which holds the UI for the "log all" option. */
   private JPanel logAllPanel;
 
-  /**
-   * The panel which holds the UI for the "log via rules" option.
-   */
+  /** The panel which holds the UI for the "log via rules" option. */
   private JPanel useRulesPanel;
 
-  /**
-   * The panel which holds the UI for setting up a specific rule.
-   */
+  /** The panel which holds the UI for setting up a specific rule. */
   private JPanel rulePropertiesPanel;
 
   /**
@@ -171,18 +141,14 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
         }
       };
 
-  /**
-   * Creates a new <code>GameLoggerPreferencesPanel</code> for the specified GameLogger.
-   */
+  /** Creates a new <code>GameLoggerPreferencesPanel</code> for the specified GameLogger. */
   public GameLoggerPreferencesPanel(GameLogger gameLogger) {
     this.gameLogger = gameLogger;
 
     createUI();
   }
 
-  /**
-   * Updates the UI according to the current user selections.
-   */
+  /** Updates the UI according to the current user selections. */
   protected void syncUI() {
     try {
       ignoreRuleFieldsDocumentChange = true;
@@ -224,9 +190,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Creates the user interface for this preferences panel.
-   */
+  /** Creates the user interface for this preferences panel. */
   protected void createUI() {
     I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
 
@@ -567,8 +531,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
   }
 
   /**
-   * Updates the currently selected rule from the current rule properties in the UI. Throws a
-   * <code>BadChangesException</code> if the properties entered by the user were bad.
+   * Updates the currently selected rule from the current rule properties in the UI. Throws a <code>
+   * BadChangesException</code> if the properties entered by the user were bad.
    */
   private void updateRuleFromUI(int ruleIndex) throws BadChangesException {
     I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
@@ -630,8 +594,8 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
   }
 
   /**
-   * Checks whether the specified file is good as a target for logging games. Returns
-   * <code>null</code> if so, otherwise, returns an error message.
+   * Checks whether the specified file is good as a target for logging games. Returns <code>null
+   * </code> if so, otherwise, returns an error message.
    */
   private String checkLogFile(String filename) {
     I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
@@ -661,9 +625,7 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
     return null;
   }
 
-  /**
-   * Applies the changed preferences done by the user.
-   */
+  /** Applies the changed preferences done by the user. */
   @Override
   public void applyChanges() throws BadChangesException {
     I18n i18n = I18n.get(GameLoggerPreferencesPanel.class);
@@ -713,14 +675,10 @@ public class GameLoggerPreferencesPanel extends PreferencesPanel {
    */
   private static class PGNFileSelectActionListener implements ActionListener {
 
-    /**
-     * The parent component.
-     */
+    /** The parent component. */
     private final Component parent;
 
-    /**
-     * The textfield we set the selected filename to.
-     */
+    /** The textfield we set the selected filename to. */
     private final JTextField textfield;
 
     /**

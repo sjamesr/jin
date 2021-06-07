@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -25,19 +25,13 @@ import bsh.Interpreter;
  */
 class LoggingRule {
 
-  /**
-   * The name of the rule.
-   */
+  /** The name of the rule. */
   private String name;
 
-  /**
-   * The condition.
-   */
+  /** The condition. */
   private String condition;
 
-  /**
-   * The filename of the file into which to log the game.
-   */
+  /** The filename of the file into which to log the game. */
   private String filename;
 
   /**
@@ -50,9 +44,7 @@ class LoggingRule {
     setFilename(filename);
   }
 
-  /**
-   * Creates a copy of the specified <code>LoggingRule</code>.
-   */
+  /** Creates a copy of the specified <code>LoggingRule</code>. */
   public LoggingRule(LoggingRule rule) {
     this.name = rule.name;
     this.condition = rule.condition;
@@ -77,48 +69,36 @@ class LoggingRule {
     this.condition = condition;
   }
 
-  /**
-   * Returns the logging condition.
-   */
+  /** Returns the logging condition. */
   public String getCondition() {
     return condition;
   }
 
-  /**
-   * Sets the name of this logging rule.
-   */
+  /** Sets the name of this logging rule. */
   public void setName(String name) {
     if ((name == null) || "".equals(name)) throw new IllegalArgumentException();
 
     this.name = name;
   }
 
-  /**
-   * Returns the name of this logging rule.
-   */
+  /** Returns the name of this logging rule. */
   public String getName() {
     return name;
   }
 
-  /**
-   * Sets the filename of the file into which to save the game.
-   */
+  /** Sets the filename of the file into which to save the game. */
   public void setFilename(String filename) {
     if ((filename == null) || "".equals(filename)) throw new IllegalArgumentException();
 
     this.filename = filename;
   }
 
-  /**
-   * Returns the filename of the file into which to save the game.
-   */
+  /** Returns the filename of the file into which to save the game. */
   public String getFilename() {
     return filename;
   }
 
-  /**
-   * Returns the name of this logging rule.
-   */
+  /** Returns the name of this logging rule. */
   @Override
   public String toString() {
     return getName();

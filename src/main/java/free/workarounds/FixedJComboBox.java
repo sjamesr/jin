@@ -2,15 +2,15 @@
  * The workarounds library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The workarounds library is free software; you can redistribute it and/or modify it under the
+ * <p>The workarounds library is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * workarounds library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -20,19 +20,19 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.util.Vector;
-
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 
 /**
  * A fix of JComboBox. Fixes the following bugs:
+ *
  * <UL>
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html"> Ibeam cursor
- * not appearing on JTextComponents in editmode</A>.
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4269430.html"> JComboBox -
- * Should match preferred height of JTextField</A>.
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4513773.html"> requestFocus
- * on an editable JComboBox sends focus to the combobox button</A>.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4262163.html"> Ibeam cursor
+ *       not appearing on JTextComponents in editmode</A>.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4269430.html"> JComboBox -
+ *       Should match preferred height of JTextField</A>.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4513773.html"> requestFocus
+ *       on an editable JComboBox sends focus to the combobox button</A>.
  * </UL>
  */
 public class FixedJComboBox extends JComboBox {

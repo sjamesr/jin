@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307, USA
  */
@@ -21,47 +21,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * An implementation of a virtual file, whose contents are kept in memory.
- */
+/** An implementation of a virtual file, whose contents are kept in memory. */
 public class MemoryFile {
 
-  /**
-   * The default buffer size.
-   */
+  /** The default buffer size. */
   private static final int DEFAULT_BUFFER_SIZE = 2048;
 
-  /**
-   * The initial buffer size.
-   */
+  /** The initial buffer size. */
   private final int initBufSize;
 
-  /**
-   * The data byte array.
-   */
+  /** The data byte array. */
   private byte[] data = null;
 
-  /**
-   * The amount of bytes that have been written into the file.
-   */
+  /** The amount of bytes that have been written into the file. */
   private volatile int size = 0;
 
   /**
-   * The currently open <code>OutputStream</code> writing into this <code>MemoryFile</code>.
-   * <code>null</code> if none.
+   * The currently open <code>OutputStream</code> writing into this <code>MemoryFile</code>. <code>
+   * null</code> if none.
    */
   private OutputStream out = null;
 
-  /**
-   * Creates a new, empty, <code>MemoryFile</code>.
-   */
+  /** Creates a new, empty, <code>MemoryFile</code>. */
   public MemoryFile() {
     this(null, DEFAULT_BUFFER_SIZE);
   }
 
-  /**
-   * Creates a new empty <code>MemoryFile</code> with the specified initial buffer size.
-   */
+  /** Creates a new empty <code>MemoryFile</code> with the specified initial buffer size. */
   public MemoryFile(int bufSize) {
     this(null, bufSize);
   }
@@ -92,9 +78,7 @@ public class MemoryFile {
     }
   }
 
-  /**
-   * Returns the size of the file.
-   */
+  /** Returns the size of the file. */
   public int getSize() {
     return size;
   }
@@ -105,7 +89,7 @@ public class MemoryFile {
    * invoking this method clears the current contents of the file.
    *
    * @throws IOException if an open OutputStream writing into this <code>MemoryFile</code> already
-   * exists.
+   *     exists.
    */
   public synchronized OutputStream getOutputStream() throws IOException {
     if (out != null) throw new IOException("MemoryFile already open for writing");
@@ -136,8 +120,8 @@ public class MemoryFile {
   }
 
   /**
-   * Writes the contents of this <code>MemoryFile</code> into the specified
-   * <code>OutputStream</code>.
+   * Writes the contents of this <code>MemoryFile</code> into the specified <code>OutputStream
+   * </code>.
    */
   public synchronized void writeTo(OutputStream out) throws IOException {
     out.write(data, 0, getSize());
@@ -154,9 +138,7 @@ public class MemoryFile {
     data = newData;
   }
 
-  /**
-   * Writes a single byte into the file.
-   */
+  /** Writes a single byte into the file. */
   private synchronized void write(int b) {
     if (data.length - size == 0) growBuf(1);
 
@@ -186,9 +168,8 @@ public class MemoryFile {
   }
 
   /**
-   * The <code>OutputStream</code> class that is responsible for writing into this
-   * <code>MemoryFile</code>. This class simply forwards the calls to the methods in its outer
-   * class.
+   * The <code>OutputStream</code> class that is responsible for writing into this <code>MemoryFile
+   * </code>. This class simply forwards the calls to the methods in its outer class.
    */
   private class InternalOutputStream extends OutputStream {
 

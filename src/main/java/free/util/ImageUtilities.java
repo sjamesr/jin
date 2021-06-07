@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -20,29 +20,19 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
-/**
- * Various image related utilities.
- */
+/** Various image related utilities. */
 public class ImageUtilities {
 
-  /**
-   * A constant indicating that the loading of the image completed.
-   */
+  /** A constant indicating that the loading of the image completed. */
   public static final int COMPLETE = 1;
 
-  /**
-   * A constant indicating that the loading of the image errored.
-   */
+  /** A constant indicating that the loading of the image errored. */
   public static final int ERRORED = 2;
 
-  /**
-   * A constant indicating that the loading of the image was aborted.
-   */
+  /** A constant indicating that the loading of the image was aborted. */
   public static final int ABORTED = 3;
 
-  /**
-   * A constant indicating that the loading of the image was interrupted.
-   */
+  /** A constant indicating that the loading of the image was interrupted. */
   public static final int INTERRUPTED = 4;
 
   /**
@@ -50,9 +40,8 @@ public class ImageUtilities {
    * efficient to preload a lot of images at once using the preload(Image []) method instead of this
    * one.
    *
-   * @return The result of the image loading, either {@link #COMPLETE}, {@link #ERRORED},
-   * {@link #ABORTED} or {@link #INTERRUPTED}.
-   *
+   * @return The result of the image loading, either {@link #COMPLETE}, {@link #ERRORED}, {@link
+   *     #ABORTED} or {@link #INTERRUPTED}.
    * @see #preload(java.awt.Image [], int [])
    */
   public static int preload(Image image) {
@@ -85,9 +74,8 @@ public class ImageUtilities {
    * Starts loading the given images, returns only when all the images are done loading. If you just
    * need to preload one Image, use the preload(Image) method instead.
    *
-   * @return An array specifying the loading result of each image. Possible values are
-   * {@link #COMPLETE}, {@link #ERRORED} and {@link #ABORTED}.
-   *
+   * @return An array specifying the loading result of each image. Possible values are {@link
+   *     #COMPLETE}, {@link #ERRORED} and {@link #ABORTED}.
    * @see #preload(Image)
    */
   public static int[] preload(Image[] images, int[] results) {
@@ -130,9 +118,7 @@ public class ImageUtilities {
     return results;
   }
 
-  /**
-   * Returns whether the specified image is already fully loaded.
-   */
+  /** Returns whether the specified image is already fully loaded. */
   public static boolean isLoaded(Image image) {
     return (Toolkit.getDefaultToolkit().checkImage(image, -1, -1, null) & ImageObserver.ALLBITS)
         != 0;
@@ -144,14 +130,10 @@ public class ImageUtilities {
    */
   public static class ImageLoadObserver implements ImageObserver {
 
-    /**
-     * The lock.
-     */
+    /** The lock. */
     private final Object lock;
 
-    /**
-     * The loading result.
-     */
+    /** The loading result. */
     private int result = -1;
 
     /**

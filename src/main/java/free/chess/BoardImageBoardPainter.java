@@ -2,20 +2,22 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.util.IOUtilities;
+import free.util.ImageUtilities;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -27,17 +29,10 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
-import free.util.IOUtilities;
-import free.util.ImageUtilities;
-
-/**
- * A <code>BoardPainter</code> which paints the entire board using a single, scaled image.
- */
+/** A <code>BoardPainter</code> which paints the entire board using a single, scaled image. */
 public class BoardImageBoardPainter implements ResourceBoardPainter {
 
-  /**
-   * A delegate board painter we use while the board image is being loaded.
-   */
+  /** A delegate board painter we use while the board image is being loaded. */
   private static final BoardPainter whileLoadingDelegate = new DefaultBoardPainter();
 
   /**
@@ -47,15 +42,13 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
   private static volatile boolean asyncImageLoad = false;
 
   /**
-   * The board image. When <code>BoardImageBoardPainter</code> is used as a
-   * <code>ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
+   * The board image. When <code>BoardImageBoardPainter</code> is used as a <code>
+   * ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
    * loaded.
    */
   private Image boardImage = null;
 
-  /**
-   * The board image, scaled according to the last request to paint a board.
-   */
+  /** The board image, scaled according to the last request to paint a board. */
   private Image scaledBoardImage = null;
 
   /**
@@ -64,14 +57,12 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
    */
   private URL boardImageUrl = null;
 
-  /**
-   * The <code>ImageDataReceiver</code>, if any, currently waiting on board image data to load.
-   */
+  /** The <code>ImageDataReceiver</code>, if any, currently waiting on board image data to load. */
   private ImageDataReceiver imageDataReceiver = null;
 
   /**
-   * A no-arg constructor so that this <code>BoardImageBoardPainter</code> can be used as a
-   * <code>ResourceBoardPainter</code>.
+   * A no-arg constructor so that this <code>BoardImageBoardPainter</code> can be used as a <code>
+   * ResourceBoardPainter</code>.
    */
   public BoardImageBoardPainter() {}
 
@@ -90,9 +81,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
     BoardImageBoardPainter.asyncImageLoad = asyncImageLoad;
   }
 
-  /**
-   * Since <code>BoardImageBoardPainter</code>s are immutable, simply returns <code>this</code>.
-   */
+  /** Since <code>BoardImageBoardPainter</code>s are immutable, simply returns <code>this</code>. */
   @Override
   public BoardPainter freshInstance() {
     return this;
@@ -100,13 +89,15 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
 
   /**
    * Loads the painter from the specified URL. The file structure at the URL is described below.
-   * <p>
-   * A properties file named "definition" must be located at the URL. That file should contain the
-   * following property:
+   *
+   * <p>A properties file named "definition" must be located at the URL. That file should contain
+   * the following property:
+   *
    * <ul>
-   * <li><code>ext</code>: Specifies the extension (type) of the image(s) - gif, png, etc. If this
-   * is omitted, "gif" is assumed.
+   *   <li><code>ext</code>: Specifies the extension (type) of the image(s) - gif, png, etc. If this
+   *       is omitted, "gif" is assumed.
    * </ul>
+   *
    * An image file named <code>board.ext</code> must be located at the URL, where "ext" is the value
    * of the <code>ext</code> property.
    */
@@ -156,9 +147,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
     }
   }
 
-  /**
-   * Scales the board image to the specified size.
-   */
+  /** Scales the board image to the specified size. */
   private void scaleBoardImage(int width, int height) {
     if ((scaledBoardImage != null)
         && (scaledBoardImage.getWidth(null) == width)
@@ -168,23 +157,17 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
     ImageUtilities.preload(scaledBoardImage);
   }
 
-  /**
-   * Paints the board at the given location on the given Graphics scaled to the given size.
-   */
+  /** Paints the board at the given location on the given Graphics scaled to the given size. */
   @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height) {
     if (prepareBoardImage(width, height, component)) g.drawImage(scaledBoardImage, x, y, component);
     else whileLoadingDelegate.paintBoard(g, component, x, y, width, height);
   }
 
-  /**
-   * The receiver of board image data. Responsible for creating the board image.
-   */
+  /** The receiver of board image data. Responsible for creating the board image. */
   private class ImageDataReceiver implements IOUtilities.DataReceiver {
 
-    /**
-     * The set of components to repaint once the image is loaded.
-     */
+    /** The set of components to repaint once the image is loaded. */
     private final Set componentsToRepaint = new HashSet(2);
 
     /**
@@ -203,9 +186,7 @@ public class BoardImageBoardPainter implements ResourceBoardPainter {
       componentsToRepaint.add(component);
     }
 
-    /**
-     * Called when the image data has been loaded. Creates the board image.
-     */
+    /** Called when the image data has been loaded. Creates the board image. */
     @Override
     public void dataRead(URL[] urls, Object id, byte[][] data, IOException[] exceptions) {
       // If there are any exceptions, we simply quit - this will cause

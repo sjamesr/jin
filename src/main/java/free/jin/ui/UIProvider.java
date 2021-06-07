@@ -2,24 +2,23 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
-import java.awt.Component;
-
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginUIContainer;
+import java.awt.Component;
 
 /**
  * This interface is implemented by classes that provide different "top level" UI containers for the
@@ -55,9 +54,7 @@ public interface UIProvider {
    */
   public static final int SELF_MANAGED_CONTAINER_MODE = -1;
 
-  /**
-   * Invoked to tell the <code>UIProvider</code> to initialize itself.
-   */
+  /** Invoked to tell the <code>UIProvider</code> to initialize itself. */
   void init();
 
   /**
@@ -67,32 +64,32 @@ public interface UIProvider {
   void start();
 
   /**
-   * <p>
    * Creates a new ui container for the specified plugin with the specified id and in the specified
    * mode.
-   * <p>
-   * The id is used to identify the container between invocations of this method and to track its
+   *
+   * <p>The id is used to identify the container between invocations of this method and to track its
    * properties (such as geometry). You may not request more than one container with a given id, but
    * if you use <code>null</code> as the id, the container will not be tracked at all, and you can
    * request as many as you wish. It is recommended to use an empty string for the plugin's main
    * container, if applicable.
-   * <p>
-   * The mode specifies how the container is treated by the ui provider. Available modes are:
+   *
+   * <p>The mode specifies how the container is treated by the ui provider. Available modes are:
+   *
    * <ul>
-   * <li> {@link #ESSENTIAL_CONTAINER_MODE}
-   * <li> {@link #CLOSABLE_CONTAINER_MODE}
-   * <li> {@link #HIDEABLE_CONTAINER_MODE}
-   * <li> {@link #SELF_MANAGED_CONTAINER_MODE}
+   *   <li>{@link #ESSENTIAL_CONTAINER_MODE}
+   *   <li>{@link #CLOSABLE_CONTAINER_MODE}
+   *   <li>{@link #HIDEABLE_CONTAINER_MODE}
+   *   <li>{@link #SELF_MANAGED_CONTAINER_MODE}
    * </ul>
    */
   PluginUIContainer createPluginUIContainer(Plugin plugin, String id, int mode);
 
   /**
    * Displays the specified <code>DialogPanel</code> and waits for the user to finish interacting
-   * with it. The specified "parent" component is used as a hint as to where to display the
-   * <code>DialogPanel</code> and may be <code>null</code> to indicate no preference.
-   * <strong>Note:</strong> Users should not invoke this method, but instead use their
-   * <code>DialogPanel</code>'s specific method which returns the proper type.
+   * with it. The specified "parent" component is used as a hint as to where to display the <code>
+   * DialogPanel</code> and may be <code>null</code> to indicate no preference.
+   * <strong>Note:</strong> Users should not invoke this method, but instead use their <code>
+   * DialogPanel</code>'s specific method which returns the proper type.
    */
   void showDialog(DialogPanel dialog, Component parent);
 

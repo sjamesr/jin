@@ -2,26 +2,21 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
-
 import com.google.common.collect.ImmutableList;
-
 import free.jin.action.ActionContext;
 import free.jin.action.ActionInfo;
 import free.jin.action.JinAction;
@@ -30,45 +25,32 @@ import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginContext;
 import free.jin.plugin.PluginInfo;
 import free.jin.plugin.PluginStartException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 
-/**
- * Represents a session with a chess server.
- */
+/** Represents a session with a chess server. */
 public class Session {
 
-  /**
-   * The <code>ConnectionDetails</code> which we use to connect and log in.
-   */
+  /** The <code>ConnectionDetails</code> which we use to connect and log in. */
   private final ConnectionDetails connDetails;
 
-  /**
-   * The connection to the server.
-   */
+  /** The connection to the server. */
   private final Connection conn;
 
-  /**
-   * True when this session has been closed.
-   */
+  /** True when this session has been closed. */
   private boolean isClosed = false;
 
-  /**
-   * An array of the standalone actions in this session.
-   */
+  /** An array of the standalone actions in this session. */
   private final JinAction[] actions;
 
-  /**
-   * An array of the plugins in this session.
-   */
+  /** An array of the plugins in this session. */
   private final Plugin[] plugins;
 
-  /**
-   * The plugin context in this session.
-   */
+  /** The plugin context in this session. */
   private PluginContext pluginContext;
 
-  /**
-   * The port on which we've actually connected.
-   */
+  /** The port on which we've actually connected. */
   private int port = -1;
 
   /**
@@ -123,9 +105,7 @@ public class Session {
     return actionsArr;
   }
 
-  /**
-   * Creates the plugins for this session and returns an array of them.
-   */
+  /** Creates the plugins for this session and returns an array of them. */
   private Plugin[] createPlugins() throws PluginStartException {
     List<PluginInfo> pluginsInfo = ImmutableList.copyOf(Jin.getInstance().getPlugins(getServer()));
     Plugin[] plugins = new Plugin[pluginsInfo.size()];
@@ -155,52 +135,40 @@ public class Session {
     return pluginContext.getPlugins();
   }
 
-  /**
-   * Returns the connection details of this <code>Session</code>.
-   */
+  /** Returns the connection details of this <code>Session</code>. */
   public ConnectionDetails getConnDetails() {
     return connDetails;
   }
 
-  /**
-   * Returns the port on which we've actually connected, or -1 if we haven't connected yet.
-   */
+  /** Returns the port on which we've actually connected, or -1 if we haven't connected yet. */
   public synchronized int getPort() {
     return port;
   }
 
-  /**
-   * Returns the server to which this session is.
-   */
+  /** Returns the server to which this session is. */
   public Server getServer() {
     return getUser().getServer();
   }
 
-  /**
-   * Returns the <code>User</code> object representing the account for this session.
-   */
+  /** Returns the <code>User</code> object representing the account for this session. */
   public User getUser() {
     return connDetails.getUser();
   }
 
-  /**
-   * Returns an array containing the plugins in this session.
-   */
+  /** Returns an array containing the plugins in this session. */
   public synchronized Plugin[] getPlugins() {
     return (plugins == null) ? null : (Plugin[]) plugins.clone();
   }
 
-  /**
-   * Returns the <code>PluginContext</code> for this session.
-   */
+  /** Returns the <code>PluginContext</code> for this session. */
   public PluginContext getPluginContext() {
     return pluginContext;
   }
 
   /**
    * Initiates connecting and logging in on the server. The method itself returns without waiting
-   * for a connection to be established or for login to finish, but it causes
-   * {@link ConnectionManager#loginFailed(String)} to be invoked if login fails.
+   * for a connection to be established or for login to finish, but it causes {@link
+   * ConnectionManager#loginFailed(String)} to be invoked if login fails.
    */
   synchronized void initiateLogin() {
     if (conn.isConnected()) throw new IllegalArgumentException("Session already logged in");
@@ -210,9 +178,7 @@ public class Session {
     new ConnectionInitializer(connDetails.getHost(), connDetails.getPorts()).go();
   }
 
-  /**
-   * Returns the connection to the server.
-   */
+  /** Returns the connection to the server. */
   public Connection getConnection() {
     return conn;
   }
@@ -251,24 +217,16 @@ public class Session {
    */
   private class ConnectionInitializer implements ConnectionListener {
 
-    /**
-     * The hostname to connect to.
-     */
+    /** The hostname to connect to. */
     private final String hostname;
 
-    /**
-     * The ports to connect on.
-     */
+    /** The ports to connect on. */
     private final int[] ports;
 
-    /**
-     * The error messages we receive when logging in on each port.
-     */
+    /** The error messages we receive when logging in on each port. */
     private final String[] errorMessages;
 
-    /**
-     * The index of the current port on which we're trying to connect.
-     */
+    /** The index of the current port on which we're trying to connect. */
     private int portIndex = 0;
 
     /**
@@ -281,9 +239,7 @@ public class Session {
       this.errorMessages = new String[ports.length];
     }
 
-    /**
-     * Initiates connection and login.
-     */
+    /** Initiates connection and login. */
     public void go() {
       conn.getListenerManager().addConnectionListener(this);
       conn.initiateConnectAndLogin(hostname, ports[portIndex]);
@@ -314,9 +270,7 @@ public class Session {
       }
     }
 
-    /**
-     * Notifies the connection manager that login failed.
-     */
+    /** Notifies the connection manager that login failed. */
     @Override
     public void loginFailed(Connection conn, String reason) {
       // Stop plugins
@@ -325,17 +279,13 @@ public class Session {
       Jin.getInstance().getConnManager().loginFailed(reason);
     }
 
-    /**
-     * Unregisters us as a connection listener, since connection succeeded.
-     */
+    /** Unregisters us as a connection listener, since connection succeeded. */
     @Override
     public void loginSucceeded(Connection conn) {
       conn.getListenerManager().removeConnectionListener(this);
     }
 
-    /**
-     * Sets the connection port in Session.
-     */
+    /** Sets the connection port in Session. */
     @Override
     public void connectionEstablished(Connection conn) {
       synchronized (Session.this) {

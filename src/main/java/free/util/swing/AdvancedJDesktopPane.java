@@ -2,64 +2,51 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.ImageUtilities;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-
 import javax.swing.JDesktopPane;
-
-import free.util.ImageUtilities;
 
 /**
  * Implements some more features on top of JDesktopPane:
+ *
  * <UL>
- * <LI>You can set a wallpaper image which will be either centered, tiled or stretched.
+ *   <LI>You can set a wallpaper image which will be either centered, tiled or stretched.
  * </UL>
  */
 public class AdvancedJDesktopPane extends JDesktopPane {
 
-  /**
-   * The code for centering the wallpaper image.
-   */
+  /** The code for centering the wallpaper image. */
   public static final int CENTER = 1;
 
-  /**
-   * The code for tiling the wallpaper image.
-   */
+  /** The code for tiling the wallpaper image. */
   public static final int TILE = 2;
 
-  /**
-   * The code for scaling the wallpaper image to match the size of the desktop.
-   */
+  /** The code for scaling the wallpaper image to match the size of the desktop. */
   public static final int SCALE = 3;
 
-  /**
-   * The wallpaper image.
-   */
+  /** The wallpaper image. */
   private Image wallpaper;
 
-  /**
-   * The layout style of the wallpaper image.
-   */
+  /** The layout style of the wallpaper image. */
   private int wallpaperLayoutStyle = CENTER;
 
-  /**
-   * Sets the wallpaper.
-   */
+  /** Sets the wallpaper. */
   public void setWallpaper(Image wallpaper) {
     this.wallpaper = wallpaper;
 
@@ -70,16 +57,14 @@ public class AdvancedJDesktopPane extends JDesktopPane {
     repaint();
   }
 
-  /**
-   * Returns the current wallpaper image.
-   */
+  /** Returns the current wallpaper image. */
   public Image getWallpaper() {
     return wallpaper;
   }
 
   /**
-   * Sets the wallpaper layout style. Possible values are {@link #CENTER}, {@link #SCALE} and
-   * {@link #TILE}.
+   * Sets the wallpaper layout style. Possible values are {@link #CENTER}, {@link #SCALE} and {@link
+   * #TILE}.
    */
   public void setWallpaperLayoutStyle(int wallpaperLayoutStyle) {
     switch (wallpaperLayoutStyle) {
@@ -89,16 +74,14 @@ public class AdvancedJDesktopPane extends JDesktopPane {
         break;
       default:
         throw new IllegalArgumentException(
-            "Illegal wallpaper layout style: " + wallpaperLayoutStyle); //$NON-NLS-1$
+            "Illegal wallpaper layout style: " + wallpaperLayoutStyle); // $NON-NLS-1$
     }
 
     this.wallpaperLayoutStyle = wallpaperLayoutStyle;
     repaint();
   }
 
-  /**
-   * Returns the current wallpaper layout style.
-   */
+  /** Returns the current wallpaper layout style. */
   public int getWallpaperLayoutStyle() {
     return wallpaperLayoutStyle;
   }

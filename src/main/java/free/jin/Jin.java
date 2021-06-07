@@ -2,38 +2,21 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import javax.swing.UIManager;
-
 import com.google.common.io.Resources;
-
 import free.jin.action.ActionInfo;
 import free.jin.plugin.Plugin;
 import free.jin.plugin.PluginInfo;
@@ -44,20 +27,28 @@ import free.util.IOUtilities;
 import free.util.Pair;
 import free.util.PlatformUtils;
 import free.util.TextUtilities;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
+import javax.swing.UIManager;
 
-/**
- * The class responsible for starting up Jin.
- */
+/** The class responsible for starting up Jin. */
 public class Jin {
 
-  /**
-   * Application (Jin) properties.
-   */
-  private final static Properties appProps;
+  /** Application (Jin) properties. */
+  private static final Properties appProps;
 
-  /**
-   * Loads and returns the application properties.
-   */
+  /** Loads and returns the application properties. */
   static {
     try {
       appProps =
@@ -68,14 +59,10 @@ public class Jin {
     }
   }
 
-  /**
-   * The sole Jin instance.
-   */
+  /** The sole Jin instance. */
   private static volatile Jin instance = null;
 
-  /**
-   * The context.
-   */
+  /** The context. */
   private final JinContext context;
 
   /**
@@ -86,24 +73,16 @@ public class Jin {
    */
   private final Map resourceCache = new HashMap();
 
-  /**
-   * A list of known users (accounts on various servers).
-   */
+  /** A list of known users (accounts on various servers). */
   private final DefaultListModel users;
 
-  /**
-   * The ui provider.
-   */
+  /** The ui provider. */
   private final UIProvider uiProvider;
 
-  /**
-   * The connection manager.
-   */
+  /** The connection manager. */
   private final ConnectionManager connManager;
 
-  /**
-   * Creates a new <code>Jin</code> instance, with the specified context.
-   */
+  /** Creates a new <code>Jin</code> instance, with the specified context. */
   private Jin(JinContext context) {
     this.context = context;
 
@@ -122,34 +101,26 @@ public class Jin {
     connManager = new ConnectionManager();
   }
 
-  /**
-   * Creates the sole Jin instance, with the specified context.
-   */
-  public synchronized static void createInstance(JinContext context) {
+  /** Creates the sole Jin instance, with the specified context. */
+  public static synchronized void createInstance(JinContext context) {
     if (hasInstance()) throw new IllegalStateException("Jin instance already exists");
 
     instance = new Jin(context);
   }
 
-  /**
-   * Returns the sole Jin instance.
-   */
-  public synchronized static Jin getInstance() {
+  /** Returns the sole Jin instance. */
+  public static synchronized Jin getInstance() {
     if (!hasInstance()) throw new IllegalStateException("Jin instance doesn't yet exist");
 
     return instance;
   }
 
-  /**
-   * Returns whether the Jin instance has already been created.
-   */
-  public synchronized static boolean hasInstance() {
+  /** Returns whether the Jin instance has already been created. */
+  public static synchronized boolean hasInstance() {
     return instance != null;
   }
 
-  /**
-   * Starts Jin. This method is invoked by the context.
-   */
+  /** Starts Jin. This method is invoked by the context. */
   public void start() {
     uiProvider.init();
 
@@ -158,9 +129,7 @@ public class Jin {
     uiProvider.start();
   }
 
-  /**
-   * Sets the current look and feel to the one specified in user preferences.
-   */
+  /** Sets the current look and feel to the one specified in user preferences. */
   private void restoreLookAndFeel() {
     String defaultLnf = UIManager.getSystemLookAndFeelClassName();
 
@@ -186,9 +155,7 @@ public class Jin {
     }
   }
 
-  /**
-   * Creates the UIProvider based on user preferences.
-   */
+  /** Creates the UIProvider based on user preferences. */
   private UIProvider createUiProvider() {
     String defaultUiProviderClassname =
         getAppProperty("uiProvider.classname." + PlatformUtils.getOSName(), null);
@@ -206,16 +173,12 @@ public class Jin {
     }
   }
 
-  /**
-   * Returns the application name.
-   */
+  /** Returns the application name. */
   public static String getAppName() {
     return getAppProperty("app.name", null);
   }
 
-  /**
-   * Returns the application version.
-   */
+  /** Returns the application version. */
   public static String getAppVersion() {
     return getAppProperty("app.version", null);
   }
@@ -236,32 +199,26 @@ public class Jin {
     return context.getParameter(paramName);
   }
 
-  /**
-   * Returns the application-wide preferences.
-   */
+  /** Returns the application-wide preferences. */
   public Preferences getPrefs() {
     return context.getPrefs();
   }
 
   /**
    * Returns the application's customizing preferences. These are used as default preferences for
-   * each user. They allow 3rd parties to customize Jin to their liking. May return
-   * <code>null</code>.
+   * each user. They allow 3rd parties to customize Jin to their liking. May return <code>null
+   * </code>.
    */
   public Preferences getCustomizingPrefs() {
     return context.getCustomizingPrefs();
   }
 
-  /**
-   * Returns the locale for this instance of Jin.
-   */
+  /** Returns the locale for this instance of Jin. */
   public Locale getLocale() {
     return context.getLocale();
   }
 
-  /**
-   * Returns a list of supported servers.
-   */
+  /** Returns a list of supported servers. */
   public Set<Server> getServers() {
     return context.getServers();
   }
@@ -304,9 +261,7 @@ public class Jin {
     return Collections.unmodifiableMap(resourceMap);
   }
 
-  /**
-   * Returns the resource with the specified type and id.
-   */
+  /** Returns the resource with the specified type and id. */
   public Resource getResource(String resourceType, String id, Plugin plugin) {
     Pair key = new Pair(resourceType, plugin);
     Pair value = (Pair) resourceCache.get(key);
@@ -336,9 +291,7 @@ public class Jin {
     return users;
   }
 
-  /**
-   * Adds the specified user to the list of known users.
-   */
+  /** Adds the specified user to the list of known users. */
   public void addUser(User user) {
     if (user == null) throw new IllegalArgumentException("user may not be null");
     if (user.isGuest()) throw new IllegalArgumentException("user may not be a guest");
@@ -346,9 +299,7 @@ public class Jin {
     users.addElement(user);
   }
 
-  /**
-   * Removes the specified user from the list of known users.
-   */
+  /** Removes the specified user from the list of known users. */
   public void removeUser(User user) {
     if (user == null) throw new IllegalArgumentException("user may not be null");
     if (user.isGuest()) throw new IllegalArgumentException("user may not be a guest");
@@ -366,16 +317,12 @@ public class Jin {
     return false;
   }
 
-  /**
-   * Returns the ui provider.
-   */
+  /** Returns the ui provider. */
   public UIProvider getUIProvider() {
     return uiProvider;
   }
 
-  /**
-   * Returns the connection manager.
-   */
+  /** Returns the connection manager. */
   public ConnectionManager getConnManager() {
     return connManager;
   }
@@ -389,9 +336,7 @@ public class Jin {
     return null;
   }
 
-  /**
-   * Returns a list of the users on the specified server.
-   */
+  /** Returns a list of the users on the specified server. */
   public List getUsers(Server server) {
     List serverUsers = new LinkedList();
     for (int i = 0; i < users.getSize(); i++) {
@@ -415,16 +360,12 @@ public class Jin {
     return null;
   }
 
-  /**
-   * Returns whether the context in which Jin is running is capable of saving user preferences.
-   */
+  /** Returns whether the context in which Jin is running is capable of saving user preferences. */
   public boolean isSavePrefsCapable() {
     return context.isSavePrefsCapable();
   }
 
-  /**
-   * Returns text warning the user about saving his password and asking him to confirm it.
-   */
+  /** Returns text warning the user about saving his password and asking him to confirm it. */
   public String getPasswordSaveWarning() {
     return context.getPasswordSaveWarning();
   }
@@ -437,9 +378,7 @@ public class Jin {
     return context.isUserExtensible();
   }
 
-  /**
-   * Causes the "About" dialog to be displayed.
-   */
+  /** Causes the "About" dialog to be displayed. */
   public void showAboutDialog() {
     new AboutPanel().display();
   }

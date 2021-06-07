@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2004 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -19,24 +19,19 @@ package free.util.swing;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-
 import javax.swing.JPanel;
 
 /**
- * A small subclass of JPanel which simply overrides the <code>getMaximumSize</code> and
- * <code>getMinimumSize</code> to return the value returned by <code>getPreferredSize</code>. This
- * allows the panel to always be sized at its preferred size.
+ * A small subclass of JPanel which simply overrides the <code>getMaximumSize</code> and <code>
+ * getMinimumSize</code> to return the value returned by <code>getPreferredSize</code>. This allows
+ * the panel to always be sized at its preferred size.
  */
 public class PreferredSizedPanel extends JPanel {
 
-  /**
-   * Creates a new <code>PreferredSizedPanel</code>.
-   */
+  /** Creates a new <code>PreferredSizedPanel</code>. */
   public PreferredSizedPanel() {}
 
-  /**
-   * Creates a new <code>PreferredSizedPanel</code> with the specified layout manager.
-   */
+  /** Creates a new <code>PreferredSizedPanel</code> with the specified layout manager. */
   public PreferredSizedPanel(LayoutManager layoutManager) {
     super(layoutManager);
   }
@@ -68,8 +63,8 @@ public class PreferredSizedPanel extends JPanel {
   }
 
   /**
-   * Overrides <code>getMinimumSize</code> to return the value returned by
-   * <code>getPreferredSize</code>.
+   * Overrides <code>getMinimumSize</code> to return the value returned by <code>getPreferredSize
+   * </code>.
    */
   @Override
   public Dimension getMinimumSize() {
@@ -77,8 +72,8 @@ public class PreferredSizedPanel extends JPanel {
   }
 
   /**
-   * Overrides <code>getMaximumSize</code> to return the value returned by
-   * <code>getPreferredSize</code>.
+   * Overrides <code>getMaximumSize</code> to return the value returned by <code>getPreferredSize
+   * </code>.
    */
   @Override
   public Dimension getMaximumSize() {

@@ -2,37 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2004 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.prefs;
-
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import free.chess.Chess;
 import free.chess.JBoard;
@@ -47,110 +29,84 @@ import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.util.TableLayout;
 import free.util.swing.ColorChooser;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-/**
- * A preferences panel allowing the user to modify move input preferences.
- */
+/** A preferences panel allowing the user to modify move input preferences. */
 public class MoveInputPanel extends BoardModifyingPrefsPanel {
 
-  /**
-   * The "unified" move input style selecting radio button.
-   */
+  /** The "unified" move input style selecting radio button. */
   private final JRadioButton unified;
 
-  /**
-   * The "drag and drop" move input style selecting radio button.
-   */
+  /** The "drag and drop" move input style selecting radio button. */
   private final JRadioButton dragndrop;
 
-  /**
-   * The "click and click" move input style selecting radio button.
-   */
+  /** The "click and click" move input style selecting radio button. */
   private final JRadioButton clicknclick;
 
-  /**
-   * The "auto promote" checkbox.
-   */
+  /** The "auto promote" checkbox. */
   private final JCheckBox autoPromote;
 
-  /**
-   * The "piece follows cursor" checkbox.
-   */
+  /** The "piece follows cursor" checkbox. */
   private final JCheckBox pieceFollowsCursor;
 
-  /**
-   * The "draw piece in target square" checkbox.
-   */
+  /** The "draw piece in target square" checkbox. */
   private final JCheckBox showPieceInTargetSquare;
 
-  /**
-   * The "highlight move squares" checkbox.
-   */
+  /** The "highlight move squares" checkbox. */
   private final JCheckBox highlightMadeMoveSquares;
 
-  /**
-   * The color chooser for the made move squares highlight color.
-   */
+  /** The color chooser for the made move squares highlight color. */
   private final ColorChooser madeMoveSquaresHighlightColor;
 
-  /**
-   * The radio button for disallowing making moves when it isn't the user's turn.
-   */
+  /** The radio button for disallowing making moves when it isn't the user's turn. */
   private final JRadioButton disallowMoveInAdvance;
 
-  /**
-   * The radio button for sending a move made when it isn't the user's turn immediately.
-   */
+  /** The radio button for sending a move made when it isn't the user's turn immediately. */
   private final JRadioButton immediateSendMove;
 
-  /**
-   * The radio button for enabling premove.
-   */
+  /** The radio button for enabling premove. */
   private final JRadioButton premove;
 
-  /**
-   * The radio button for no move highlighting.
-   */
+  /** The radio button for no move highlighting. */
   private final JRadioButton none;
 
-  /**
-   * The radio button for target square move highlighting.
-   */
+  /** The radio button for target square move highlighting. */
   private final JRadioButton targetSquare;
 
-  /**
-   * The radio button for both squares move highlighting.
-   */
+  /** The radio button for both squares move highlighting. */
   private final JRadioButton bothSquares;
 
-  /**
-   * The radio button for arrow move highlighting.
-   */
+  /** The radio button for arrow move highlighting. */
   private final JRadioButton arrow;
 
-  /**
-   * The checkbox for whether the user's moves should be highlighted.
-   */
+  /** The checkbox for whether the user's moves should be highlighted. */
   private final JCheckBox highlightOwnMoves;
 
-  /**
-   * The color chooser for the move highlighting color.
-   */
+  /** The color chooser for the move highlighting color. */
   private final ColorChooser highlightColor;
 
-  /**
-   * The "highlight legal target squares" checkbox.
-   */
+  /** The "highlight legal target squares" checkbox. */
   private final JCheckBox highlightLegalTargetSquares;
 
-  /**
-   * The "snap to legal squares" checkbox.
-   */
+  /** The "snap to legal squares" checkbox. */
   private final JCheckBox snapToLegalTargetSquares;
 
-  /**
-   * The last move made on the board.
-   */
+  /** The last move made on the board. */
   private Move lastMove = null;
 
   /**
@@ -406,9 +362,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     add(movingInAdvancePanel);
   }
 
-  /**
-   * Returns the currently selected move input style.
-   */
+  /** Returns the currently selected move input style. */
   private int getMoveInputStyle() {
     if (unified.isSelected()) return JBoard.UNIFIED_MOVE_INPUT_STYLE;
     else if (dragndrop.isSelected()) return JBoard.DRAG_N_DROP_MOVE_INPUT_STYLE;
@@ -416,9 +370,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     else throw new IllegalStateException("None of the radio buttons are selected");
   }
 
-  /**
-   * Returns the currently selected move sending mode.
-   */
+  /** Returns the currently selected move sending mode. */
   private int getMoveSendingMode() {
     if (disallowMoveInAdvance.isSelected()) return BoardManager.LEGAL_CHESS_MOVE_SENDING_MODE;
     else if (immediateSendMove.isSelected()) return BoardManager.PREDRAG_MOVE_SENDING_MODE;
@@ -426,9 +378,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     else throw new IllegalStateException("None of the radio buttons are selected");
   }
 
-  /**
-   * Returns the currently selected move highlighting style.
-   */
+  /** Returns the currently selected move highlighting style. */
   private int getMoveHighlightingStyle() {
     if (none.isSelected()) return JBoard.NO_MOVE_HIGHLIGHTING;
     else if (targetSquare.isSelected()) return JBoard.TARGET_SQUARE_MOVE_HIGHLIGHTING;
@@ -437,9 +387,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     else throw new IllegalStateException("None of the radio buttons are selected");
   }
 
-  /**
-   * Sets the initial properties of the preview board.
-   */
+  /** Sets the initial properties of the preview board. */
   @Override
   public void initPreviewBoard() {
     previewBoard.setMoveInputStyle(getMoveInputStyle());
@@ -464,9 +412,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     previewBoard.setHighlightedMove(move);
   }
 
-  /**
-   * Creates the move input panel.
-   */
+  /** Creates the move input panel. */
   private JComponent createMoveInputUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -489,9 +435,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Creates the promotion panel.
-   */
+  /** Creates the promotion panel. */
   private JComponent createPromotionUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -510,9 +454,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Creates the move visualization panel.
-   */
+  /** Creates the move visualization panel. */
   private JComponent createMoveVisualizationUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -537,9 +479,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Creates the moving in advance panel.
-   */
+  /** Creates the moving in advance panel. */
   private JComponent createMovingInAdvanceUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -571,9 +511,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Creates the move highlight panel.
-   */
+  /** Creates the move highlight panel. */
   private JComponent createMoveHighlightUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -602,9 +540,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Creates the move assistance panel.
-   */
+  /** Creates the move assistance panel. */
   private JComponent createMoveAssistanceUI() {
     I18n i18n = I18n.get(MoveInputPanel.class);
 
@@ -624,9 +560,7 @@ public class MoveInputPanel extends BoardModifyingPrefsPanel {
     return panel;
   }
 
-  /**
-   * Applies any changes made by the user.
-   */
+  /** Applies any changes made by the user. */
   @Override
   public void applyChanges() throws BadChangesException {
     boardManager.setMoveInputStyle(getMoveInputStyle());

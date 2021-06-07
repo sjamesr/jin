@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -22,20 +22,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <P>
  * Implements WildVariant for chesslike variants. Subclasses must only define the initial position
  * and the name of the variant. Although this class is not abstract, directly instantiating it is
  * discouraged except for cases where the name or the initial position is unknown at compile time.
  * When the initial position and the name are known at compile time, its best to instantiate a
  * subclass which defines them.
  *
- * <P>
- * This class also provides some methods for determining the various properties of a move in the
+ * <p>This class also provides some methods for determining the various properties of a move in the
  * game of chess (en-passant, promotion, castling, etc.). Variants that only differ from chess in
  * their definition of these terms can override these methods and implement them accordingly. Note
- * that it is not necessary to override the
- * {@link #createMove(Position, Square, Square, Piece, String)} method as it already calls the
- * forementioned methods when determining the properties of the created ChessMove.
+ * that it is not necessary to override the {@link #createMove(Position, Square, Square, Piece,
+ * String)} method as it already calls the forementioned methods when determining the properties of
+ * the created ChessMove.
  */
 public class ChesslikeGenericVariant implements WildVariant {
 
@@ -63,9 +61,7 @@ public class ChesslikeGenericVariant implements WildVariant {
         ChessPiece.BLACK_KNIGHT
       };
 
-  /**
-   * A white short castling move.
-   */
+  /** A white short castling move. */
   public static final ChessMove WHITE_SHORT_CASTLING =
       new ChessMove(
           Square.parseSquare("e1"),
@@ -79,9 +75,7 @@ public class ChesslikeGenericVariant implements WildVariant {
           null,
           "O-O");
 
-  /**
-   * A white long castling move.
-   */
+  /** A white long castling move. */
   public static final ChessMove WHITE_LONG_CASTLING =
       new ChessMove(
           Square.parseSquare("e1"),
@@ -95,9 +89,7 @@ public class ChesslikeGenericVariant implements WildVariant {
           null,
           "O-O-O");
 
-  /**
-   * A black short castling move.
-   */
+  /** A black short castling move. */
   public static final ChessMove BLACK_SHORT_CASTLING =
       new ChessMove(
           Square.parseSquare("e8"),
@@ -111,9 +103,7 @@ public class ChesslikeGenericVariant implements WildVariant {
           null,
           "O-O");
 
-  /**
-   * A black long castling move.
-   */
+  /** A black long castling move. */
   public static final ChessMove BLACK_LONG_CASTLING =
       new ChessMove(
           Square.parseSquare("e8"),
@@ -127,14 +117,10 @@ public class ChesslikeGenericVariant implements WildVariant {
           null,
           "O-O-O");
 
-  /**
-   * The initial position of this variant, in FEN format.
-   */
+  /** The initial position of this variant, in FEN format. */
   private final String initialPositionFEN;
 
-  /**
-   * The name of this variant.
-   */
+  /** The name of this variant. */
   private final String variantName;
 
   /**
@@ -247,12 +233,11 @@ public class ChesslikeGenericVariant implements WildVariant {
   }
 
   /**
-   * Returns the piece captured by the move defined by the given arguments. Returns
-   * <code>null</code> if none. The result for an illegal move is undefined, but it should throw no
+   * Returns the piece captured by the move defined by the given arguments. Returns <code>null
+   * </code> if none. The result for an illegal move is undefined, but it should throw no
    * exceptions. This is a convenience method which determines whether the move defined by the given
-   * properties is an en-passant by invoking
-   * {@link #isEnPassant(Position, Square, Square, ChessPiece)}. Keep in mind that the called method
-   * may be overriden.
+   * properties is an en-passant by invoking {@link #isEnPassant(Position, Square, Square,
+   * ChessPiece)}. Keep in mind that the called method may be overriden.
    */
   public ChessPiece getCapturedPiece(
       Position pos, Square startingSquare, Square endingSquare, ChessPiece promotionTarget) {
@@ -262,8 +247,8 @@ public class ChesslikeGenericVariant implements WildVariant {
   }
 
   /**
-   * Returns the piece captured by the move defined by the given arguments. Returns
-   * <code>null</code> if none. The result for an illegal move is undefined, but it should throw no
+   * Returns the piece captured by the move defined by the given arguments. Returns <code>null
+   * </code> if none. The result for an illegal move is undefined, but it should throw no
    * exceptions.
    */
   public ChessPiece getCapturedPiece(
@@ -316,7 +301,7 @@ public class ChesslikeGenericVariant implements WildVariant {
    * Sets the initial position of this chess variant on the given Position object.
    *
    * @throws IllegalArgumentException If the given Position is incompatible with this WildVariant as
-   * defined by {@link #checkPosition(Position)}
+   *     defined by {@link #checkPosition(Position)}
    */
   @Override
   public void init(Position pos) {
@@ -329,12 +314,11 @@ public class ChesslikeGenericVariant implements WildVariant {
    * If the a move created by the given starting square and ending square in the given position is a
    * promotion, returns an array containing a knight, bishop, rook and queen of the color of the
    * promoted pawn. Otherwise returns null. If you want to use this method from the implementation
-   * of some other wild variant, use the static
-   * {@link #getChessPromotionTargets(Position, Square, Square)} method instead - it doesn't check
-   * the wild variant of the position.
+   * of some other wild variant, use the static {@link #getChessPromotionTargets(Position, Square,
+   * Square)} method instead - it doesn't check the wild variant of the position.
    *
    * @throws IllegalArgumentException If the given Position is incompatible with this WildVariant as
-   * defined by {@link #checkPosition(Position)}
+   *     defined by {@link #checkPosition(Position)}
    */
   @Override
   public Piece[] getPromotionTargets(Position pos, Square startingSquare, Square endingSquare) {
@@ -371,11 +355,9 @@ public class ChesslikeGenericVariant implements WildVariant {
    * mildly different from Chess.
    *
    * @throws IllegalArgumentException If the given Position is incompatible with this WildVariant as
-   * defined by {@link #checkPosition(Position)}
-   *
+   *     defined by {@link #checkPosition(Position)}
    * @throws IllegalArgumentException If the promotionTarget is not null and is not an instance of
-   * <code>ChessPiece</code>.
-   *
+   *     <code>ChessPiece</code>.
    * @throws IllegalArgumentException If the there is no piece at the starting square.
    */
   @Override
@@ -392,14 +374,14 @@ public class ChesslikeGenericVariant implements WildVariant {
   }
 
   /**
-   * Creates a <code>ChessMove</code> from the specified parameters as documented in
-   * {@link #createMove(Position, Square, Square, Piece, String)} This method is here solely for the
+   * Creates a <code>ChessMove</code> from the specified parameters as documented in {@link
+   * #createMove(Position, Square, Square, Piece, String)} This method is here solely for the
    * benefit of <code>WildVariant</code> implementations which need to create normal chess moves but
    * don't want to reimplement this method. Note that because this method is not static, to actually
-   * use it, you still need to obtain an instance of <code>Chess</code> via
-   * <code>Chess.getInstance()</code>. Unlike the
-   * {@link #createMove(Position, Square, Square, Piece, String)} method, this method does not
-   * enforce the wild variant of the position by calling {@link #checkPosition(Position)}.
+   * use it, you still need to obtain an instance of <code>Chess</code> via <code>
+   * Chess.getInstance()</code>. Unlike the {@link #createMove(Position, Square, Square, Piece,
+   * String)} method, this method does not enforce the wild variant of the position by calling
+   * {@link #checkPosition(Position)}.
    */
   public ChessMove createChessMove(
       Position pos,
@@ -464,9 +446,7 @@ public class ChesslikeGenericVariant implements WildVariant {
         cmove.getStringRepresentation());
   }
 
-  /**
-   * Creates a short castling move for the current player in the specified position.
-   */
+  /** Creates a short castling move for the current player in the specified position. */
   @Override
   public Move createShortCastling(Position pos) {
     checkPosition(pos);
@@ -476,9 +456,7 @@ public class ChesslikeGenericVariant implements WildVariant {
     else return BLACK_SHORT_CASTLING;
   }
 
-  /**
-   * Creates a long castling move for the current player in the specified position.
-   */
+  /** Creates a long castling move for the current player in the specified position. */
   @Override
   public Move createLongCastling(Position pos) {
     checkPosition(pos);
@@ -489,20 +467,17 @@ public class ChesslikeGenericVariant implements WildVariant {
   }
 
   /**
-   * <P>
    * Makes the given ChessMove in the given Position. <B>This method shoudln't (and can't) be called
    * directly - call {@link Position#makeMove(Move)} instead.</B>
    *
-   * <P>
-   * If you want to use this method from an implementation of some other wild variant, use the
+   * <p>If you want to use this method from an implementation of some other wild variant, use the
    * static {@link #makeChessMove(ChessMove, Position, Position.Modifier)} method instead - it
    * doesn't check the wild variant of the position.
    *
    * @throws IllegalArgumentException If the given Position is incompatible with this WildVariant as
-   * defined by {@link #checkPosition(Position)}
-   *
+   *     defined by {@link #checkPosition(Position)}
    * @throws IllegalArgumentException if the given Move is not an instance of <code>ChessMove</code>
-   * .
+   *     .
    */
   @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier) {
@@ -522,10 +497,10 @@ public class ChesslikeGenericVariant implements WildVariant {
    * Makes the given ChessMove on the given Position using the given position modifier. This method
    * is here solely for the benefit of WildVariant implementations which sometimes need to make a
    * regular ChessMove on a position and don't want to reimplement this method. Note that because
-   * this method is not static, to actually use it, you still need to obtain an instance of
-   * <code>Chess</code> via <code>Chess.getInstance()</code>. Unlike the
-   * {@link #makeMove(Move, Position, Position.Modifier)} method, this method does not enforce the
-   * wild variant of the position by calling {@link #checkPosition(Position)}.
+   * this method is not static, to actually use it, you still need to obtain an instance of <code>
+   * Chess</code> via <code>Chess.getInstance()</code>. Unlike the {@link #makeMove(Move, Position,
+   * Position.Modifier)} method, this method does not enforce the wild variant of the position by
+   * calling {@link #checkPosition(Position)}.
    */
   public void makeChessMove(ChessMove cmove, Position pos, Position.Modifier modifier) {
     // This method is not static in solidarity with the createChessMove method
@@ -563,12 +538,10 @@ public class ChesslikeGenericVariant implements WildVariant {
   /**
    * Returns what is described by the {@link #parseChessPiece(String)} method.
    *
-   * <P>
-   * If you want to use this method from an implementation of some other wild variant, use the
+   * <p>If you want to use this method from an implementation of some other wild variant, use the
    * static {@link #parseChessPiece(String)} method instead.
    *
    * @param piece The string representing the piece.
-   *
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
   @Override
@@ -580,7 +553,6 @@ public class ChesslikeGenericVariant implements WildVariant {
    * Calls <code>ChessPiece.fromShortString(String)</code> to parse the piece.
    *
    * @param piece The string representing the piece.
-   *
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
   public static ChessPiece parseChessPiece(String piece) {
@@ -590,12 +562,10 @@ public class ChesslikeGenericVariant implements WildVariant {
   /**
    * Returns what is described by the {@link #chessPieceToString(ChessPiece)} method.
    *
-   * <P>
-   * If you want to use this method from an implementation of some other wild variant, use the
+   * <p>If you want to use this method from an implementation of some other wild variant, use the
    * static {@link #chessPieceToString(ChessPiece)} method instead.
    *
    * @param piece The string representing the piece.
-   *
    * @throws IllegalArgumentException if the string is not in the correctformat.
    */
   @Override
@@ -613,9 +583,7 @@ public class ChesslikeGenericVariant implements WildVariant {
     return piece.toShortString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public Collection getTargetSquares(Position pos, Square square) {
     checkPosition(pos);
@@ -627,9 +595,9 @@ public class ChesslikeGenericVariant implements WildVariant {
    * Same as {@link #getTargetSquares(Position, Square)}, but does not check that the wild variant
    * of the specified position is <code>this</code> variant. This method is here for the benefit of
    * <code>WildVariant</code>s which don't subclass this class, but have the same target squares as
-   * normal chess. The method isn't static because it uses instance methods such as
-   * {@link #isEnPassant(Position, Square, Square, ChessPiece)}, which may be overridden, but it may
-   * be used via {@link Chess#getInstance()} from a non-subclass variant.
+   * normal chess. The method isn't static because it uses instance methods such as {@link
+   * #isEnPassant(Position, Square, Square, ChessPiece)}, which may be overridden, but it may be
+   * used via {@link Chess#getInstance()} from a non-subclass variant.
    */
   public Collection getChessTargetSquares(Position pos, Square square) {
     ChessPiece piece = (ChessPiece) pos.getPieceAt(square);
@@ -644,9 +612,7 @@ public class ChesslikeGenericVariant implements WildVariant {
     else throw new IllegalStateException("Unknown piece: " + piece);
   }
 
-  /**
-   * Returns the target squares for a piece which jumps to its destination (king and knight).
-   */
+  /** Returns the target squares for a piece which jumps to its destination (king and knight). */
   public static Collection getJumpingTargetSquares(Position pos, Square square, int[][] offsets) {
     List targetSquares = new LinkedList();
 
@@ -710,9 +676,7 @@ public class ChesslikeGenericVariant implements WildVariant {
     return targetSquares;
   }
 
-  /**
-   * King move offsets.
-   */
+  /** King move offsets. */
   private static final int[][] KING_OFFSETS =
       new int[][] {
         new int[] {-1, -1},
@@ -725,9 +689,7 @@ public class ChesslikeGenericVariant implements WildVariant {
         new int[] {1, 1}
       };
 
-  /**
-   * Returns target squares for a king.
-   */
+  /** Returns target squares for a king. */
   protected Collection getKingTargetSquares(Position pos, Square square) {
     Collection targetSquares = getJumpingTargetSquares(pos, square, KING_OFFSETS);
 
@@ -741,9 +703,7 @@ public class ChesslikeGenericVariant implements WildVariant {
     return targetSquares;
   }
 
-  /**
-   * Queen move directions.
-   */
+  /** Queen move directions. */
   private static final int[][] QUEEN_DIRECTIONS =
       new int[][] {
         new int[] {-1, -1},
@@ -756,42 +716,30 @@ public class ChesslikeGenericVariant implements WildVariant {
         new int[] {1, 1}
       };
 
-  /**
-   * Returns target squares for a queen.
-   */
+  /** Returns target squares for a queen. */
   protected Collection getQueenTargetSquares(Position pos, Square square) {
     return getSlidingTargetSquares(pos, square, QUEEN_DIRECTIONS);
   }
 
-  /**
-   * Rook move directions.
-   */
+  /** Rook move directions. */
   private static final int[][] ROOK_DIRECTIONS =
       new int[][] {new int[] {0, -1}, new int[] {-1, 0}, new int[] {1, 0}, new int[] {0, 1}};
 
-  /**
-   * Returns target squares for a rook.
-   */
+  /** Returns target squares for a rook. */
   protected Collection getRookTargetSquares(Position pos, Square square) {
     return getSlidingTargetSquares(pos, square, ROOK_DIRECTIONS);
   }
 
-  /**
-   * Bishop move directions.
-   */
+  /** Bishop move directions. */
   private static final int[][] BISHOP_DIRECTIONS =
       new int[][] {new int[] {-1, -1}, new int[] {1, -1}, new int[] {-1, 1}, new int[] {1, 1}};
 
-  /**
-   * Returns target squares for a bishop.
-   */
+  /** Returns target squares for a bishop. */
   protected Collection getBishopTargetSquares(Position pos, Square square) {
     return getSlidingTargetSquares(pos, square, BISHOP_DIRECTIONS);
   }
 
-  /**
-   * Knight move offsets.
-   */
+  /** Knight move offsets. */
   private static final int[][] KNIGHT_OFFSETS =
       new int[][] {
         new int[] {-1, -2},
@@ -804,16 +752,12 @@ public class ChesslikeGenericVariant implements WildVariant {
         new int[] {1, 2},
       };
 
-  /**
-   * Returns target squares for a knight.
-   */
+  /** Returns target squares for a knight. */
   protected Collection getKnightTargetSquares(Position pos, Square square) {
     return getJumpingTargetSquares(pos, square, KNIGHT_OFFSETS);
   }
 
-  /**
-   * Returns target squares for a pawn.
-   */
+  /** Returns target squares for a pawn. */
   protected Collection getPawnTargetSquares(Position pos, Square square) {
     List targetSquares = new LinkedList();
 
@@ -862,33 +806,25 @@ public class ChesslikeGenericVariant implements WildVariant {
     return targetSquares;
   }
 
-  /**
-   * Returns an instance of DefaultPiecePainter.
-   */
+  /** Returns an instance of DefaultPiecePainter. */
   @Override
   public PiecePainter createDefaultPiecePainter() {
     return new DefaultPiecePainter();
   }
 
-  /**
-   * Returns an instance of DefaultBoardPainter.
-   */
+  /** Returns an instance of DefaultBoardPainter. */
   @Override
   public BoardPainter createDefaultBoardPainter() {
     return new DefaultBoardPainter();
   }
 
-  /**
-   * Returns the name of this wild variant.
-   */
+  /** Returns the name of this wild variant. */
   @Override
   public String getName() {
     return variantName;
   }
 
-  /**
-   * Returns a textual representation of this wild variant.
-   */
+  /** Returns a textual representation of this wild variant. */
   @Override
   public String toString() {
     return getName();

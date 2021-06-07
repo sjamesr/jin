@@ -2,37 +2,21 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-
 import com.google.common.collect.Iterables;
-
 import free.jin.event.ConnectionListener;
 import free.jin.plugin.PluginStartException;
 import free.jin.ui.DialogPanel;
@@ -42,25 +26,30 @@ import free.jin.ui.ServerChoicePanel;
 import free.util.EventListenerList;
 import free.util.TextUtilities;
 import free.util.swing.SwingUtils;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Set;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
-/**
- * Manages the creation, initiation and closing of the connection to the server.
- */
+/** Manages the creation, initiation and closing of the connection to the server. */
 public class ConnectionManager {
 
-  /**
-   * The current Session. Null when none.
-   */
+  /** The current Session. Null when none. */
   private Session session = null;
 
-  /**
-   * The model whose state matches whether a session is currently established.
-   */
+  /** The model whose state matches whether a session is currently established. */
   private final EventListenerList listenerList = new EventListenerList();
 
-  /**
-   * Creates a new <code>ConnectionManager</code>.
-   */
+  /** Creates a new <code>ConnectionManager</code>. */
   public ConnectionManager() {}
 
   /**
@@ -86,12 +75,14 @@ public class ConnectionManager {
 
   /**
    * Determines and returns the server we should login to, based on (in that order):
+   *
    * <ol>
-   * <li>Application parameters.
-   * <li>Last logged in user.
-   * <li>Sole supported server.
-   * <li>Server choice panel displayed to the user.
+   *   <li>Application parameters.
+   *   <li>Last logged in user.
+   *   <li>Sole supported server.
+   *   <li>Server choice panel displayed to the user.
    * </ol>
+   *
    * Returns <code>null</code> if all the above methods fail (implies that the user canceled the
    * server choice panel).
    */
@@ -124,11 +115,13 @@ public class ConnectionManager {
 
   /**
    * Determines and returns the user account we should login with, based on (in that order):
+   *
    * <ol>
-   * <li>Application parameters.
-   * <li>Last logged in user.
-   * <li>Sole known user for the server.
+   *   <li>Application parameters.
+   *   <li>Last logged in user.
+   *   <li>Sole known user for the server.
    * </ol>
+   *
    * Returns <code>null</code> if all the above methods fail.
    */
   private User findLoginUser(Server server) {
@@ -159,11 +152,13 @@ public class ConnectionManager {
   /**
    * Determines the connection details we should use when logging in, based on (in that order, for
    * each connection detail):
+   *
    * <ol>
-   * <li>Application parameters.
-   * <li>Specified user.
-   * <li>Specified server.
+   *   <li>Application parameters.
+   *   <li>Specified user.
+   *   <li>Specified server.
    * </ol>
+   *
    * Additionally, if the applications parameters allow displaying the login panel, any connection
    * details modified by the user there override all others. Returns <code>null</code> if all the
    * above methods fail (implies that the user canceled the login panel). The specified user may be
@@ -206,9 +201,7 @@ public class ConnectionManager {
     return connDetails;
   }
 
-  /**
-   * Displays UI for creating a new connection (from scratch).
-   */
+  /** Displays UI for creating a new connection (from scratch). */
   public void displayNewConnUI() {
     Server server;
 
@@ -226,9 +219,7 @@ public class ConnectionManager {
     displayNewConnUI(server);
   }
 
-  /**
-   * Displays UI for connecting to the specified server.
-   */
+  /** Displays UI for connecting to the specified server. */
   public void displayNewConnUI(Server server) {
     ConnectionDetails connDetails = new LoginPanel(server).askConnectionDetails();
 
@@ -240,9 +231,7 @@ public class ConnectionManager {
     login(connDetails);
   }
 
-  /**
-   * Displays UI for connecting with the specified account.
-   */
+  /** Displays UI for connecting with the specified account. */
   public void displayNewConnUI(User user) {
     ConnectionDetails connDetails =
         new LoginPanel(user.getPreferredConnDetails()).askConnectionDetails();
@@ -255,9 +244,7 @@ public class ConnectionManager {
     login(connDetails);
   }
 
-  /**
-   * Initiates login with the specified connection details.
-   */
+  /** Initiates login with the specified connection details. */
   private void login(ConnectionDetails connDetails) {
     try {
       fireSessionEvent(new SessionEvent(this, SessionEvent.SESSION_STARTING, null));
@@ -295,9 +282,7 @@ public class ConnectionManager {
     displayNewConnUI(user);
   }
 
-  /**
-   * Closes the current session, if any.
-   */
+  /** Closes the current session, if any. */
   public void closeSession() {
     closeSession(false);
   }
@@ -341,30 +326,22 @@ public class ConnectionManager {
     if (reconnect) login(tempSession.getConnDetails());
   }
 
-  /**
-   * Returns the current <code>Session</code>, or <code>null</code> if none.
-   */
+  /** Returns the current <code>Session</code>, or <code>null</code> if none. */
   public Session getSession() {
     return session;
   }
 
-  /**
-   * Adds a session listener.
-   */
+  /** Adds a session listener. */
   public void addSessionListener(SessionListener l) {
     listenerList.add(SessionListener.class, l);
   }
 
-  /**
-   * Removes a session listener.
-   */
+  /** Removes a session listener. */
   public void removeSessionListener(SessionListener l) {
     listenerList.remove(SessionListener.class, l);
   }
 
-  /**
-   * Fires a session event.
-   */
+  /** Fires a session event. */
   private void fireSessionEvent(SessionEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -389,8 +366,8 @@ public class ConnectionManager {
   }
 
   /**
-   * Returns the <code>User</code> object of the last account that logged on. Returns
-   * <code>null</code> if none.
+   * Returns the <code>User</code> object of the last account that logged on. Returns <code>null
+   * </code> if none.
    */
   private User loadLastUser() {
     Preferences prefs = Jin.getInstance().getPrefs();
@@ -404,9 +381,7 @@ public class ConnectionManager {
     else return Jin.getInstance().getUser(server, username);
   }
 
-  /**
-   * Saves the information about the last account that logged in into preferences.
-   */
+  /** Saves the information about the last account that logged in into preferences. */
   private void saveLastUser(User user) {
     Preferences prefs = Jin.getInstance().getPrefs();
     String serverId = user.getServer().getId();
@@ -417,19 +392,13 @@ public class ConnectionManager {
         user.isGuest() || !Jin.getInstance().isKnownUser(user) ? null : user.getUsername());
   }
 
-  /**
-   * A dialog panel we display to the user when he gets disconnected.
-   */
+  /** A dialog panel we display to the user when he gets disconnected. */
   private class ReconnectDialogPanel extends DialogPanel implements ConnectionListener {
 
-    /**
-     * The session we are used for.
-     */
+    /** The session we are used for. */
     private final Session session;
 
-    /**
-     * Whether the connection actually ever logged in. If not, we don't show ourselves.
-     */
+    /** Whether the connection actually ever logged in. If not, we don't show ourselves. */
     private boolean loggedIn = false;
 
     /**
@@ -470,9 +439,7 @@ public class ConnectionManager {
       session.getConnection().getListenerManager().addConnectionListener(this);
     }
 
-    /**
-     * Creates the UI of this dialog.
-     */
+    /** Creates the UI of this dialog. */
     private void createUi() {
       setLayout(new BorderLayout(10, 10));
 
@@ -521,9 +488,7 @@ public class ConnectionManager {
       add(BorderLayout.SOUTH, buttonPanel);
     }
 
-    /**
-     * Configures the dialog not to be modal.
-     */
+    /** Configures the dialog not to be modal. */
     @Override
     protected void configureDialog(JDialog dialog) {
       super.configureDialog(dialog);
@@ -531,9 +496,7 @@ public class ConnectionManager {
       dialog.setModal(false);
     }
 
-    /**
-     * Remember that the user got logged in, because otherwise we don't show ourselves.
-     */
+    /** Remember that the user got logged in, because otherwise we don't show ourselves. */
     @Override
     public void loginSucceeded(Connection conn) {
       loggedIn = true;
@@ -544,9 +507,7 @@ public class ConnectionManager {
       createUi();
     }
 
-    /**
-     * If the connection was lost but the session is still open, show ourselves.
-     */
+    /** If the connection was lost but the session is still open, show ourselves. */
     @Override
     public void connectionLost(Connection conn) {
       if (loggedIn && !sessionClosing) Jin.getInstance().getUIProvider().showDialog(this, null);

@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -57,27 +57,20 @@ public class Suicide extends NoCastlingVariant {
         ChessPiece.BLACK_KING
       };
 
-  /**
-   * The sole instance of this class.
-   */
+  /** The sole instance of this class. */
   private static final Suicide INSTANCE = new Suicide();
 
-  /**
-   * Returns an instance of this class.
-   */
+  /** Returns an instance of this class. */
   public static Suicide getInstance() {
     return INSTANCE;
   }
 
-  /**
-   * Creates an instance of Suicide.
-   */
+  /** Creates an instance of Suicide. */
   private Suicide() {
     super(Chess.INITIAL_POSITION_FEN, "Suicide");
   }
 
   /**
-   * <P>
    * If the a move created by the given starting square and ending square in the given position is a
    * promotion, returns an array containing a king, pawn, knight, bishop, rook queen of the color of
    * the promoted pawn. Otherwise returns <code>null</code>.

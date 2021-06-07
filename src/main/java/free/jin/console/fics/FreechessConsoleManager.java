@@ -2,24 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.fics;
-
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import free.jin.Game;
 import free.jin.I18n;
@@ -31,15 +26,15 @@ import free.jin.console.ics.IcsConsoleManager;
 import free.jin.console.ics.IcsCustomConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 
-/**
- * An extension of the default ConsoleManager for the freechess.org server.
- */
+/** An extension of the default ConsoleManager for the freechess.org server. */
 public class FreechessConsoleManager extends IcsConsoleManager {
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected String getDefaultTextForChat(ChatEvent evt, String encoding) {
     String type = evt.getType();
@@ -58,58 +53,44 @@ public class FreechessConsoleManager extends IcsConsoleManager {
     return i18n.getFormattedString(type + ".displayPattern", args);
   }
 
-  /**
-   * Returns a FICS-specific system console designation.
-   */
+  /** Returns a FICS-specific system console designation. */
   @Override
   protected ConsoleDesignation createSystemConsoleDesignation() {
     return new FreechessSystemConsoleDesignation(getConn(), getEncoding());
   }
 
-  /**
-   * Returns a FICS-specific help console designation.
-   */
+  /** Returns a FICS-specific help console designation. */
   @Override
   protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable) {
     return new FreechessHelpConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
 
-  /**
-   * Returns a FICS-specific general chat console designation.
-   */
+  /** Returns a FICS-specific general chat console designation. */
   @Override
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable) {
     return new FicsGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
 
-  /**
-   * Returns a FICS-specific personal chat console designation.
-   */
+  /** Returns a FICS-specific personal chat console designation. */
   @Override
   protected ConsoleDesignation createPersonalChatConsoleDesignation(
       ServerUser user, boolean isCloseable) {
     return new PersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
   }
 
-  /**
-   * Creates an ICC-specific game chat console designation.
-   */
+  /** Creates an ICC-specific game chat console designation. */
   @Override
   protected ConsoleDesignation createGameConsoleDesignation(Game game) {
     return new FreechessGameConsoleDesignation(getConn(), game, getEncoding());
   }
 
-  /**
-   * Creates a <code>FreechessConsole</code> with the specified designation.
-   */
+  /** Creates a <code>FreechessConsole</code> with the specified designation. */
   @Override
   protected Console createConsole(ConsoleDesignation designation) {
     return new FreechessConsole(this, designation);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(
       String prefsPrefix,
@@ -123,9 +104,7 @@ public class FreechessConsoleManager extends IcsConsoleManager {
         getConn(), title, encoding, false, channels, messageRegex, includeShouts, includeCShouts);
   }
 
-  /**
-   * Returns the set of FICS channels.
-   */
+  /** Returns the set of FICS channels. */
   @Override
   protected SortedMap createChannels() {
     SortedMap channels = new TreeMap();
@@ -135,9 +114,7 @@ public class FreechessConsoleManager extends IcsConsoleManager {
     return channels;
   }
 
-  /**
-   * Return a PreferencesPanel for changing the console manager's settings.
-   */
+  /** Return a PreferencesPanel for changing the console manager's settings. */
   @Override
   public PreferencesPanel getPreferencesUI() {
     return new FreechessConsolePrefsPanel(this);

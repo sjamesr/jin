@@ -2,33 +2,27 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
-/**
- * The superclass of all classes representing pieces in wild chess variants.
- */
+/** The superclass of all classes representing pieces in wild chess variants. */
 public abstract class Piece {
 
-  /**
-   * A constant representing a white piece.
-   */
+  /** A constant representing a white piece. */
   public static final int WHITE = 1;
 
-  /**
-   * A constant representing a black piece.
-   */
+  /** A constant representing a black piece. */
   public static final int BLACK = -1;
 
   /**
@@ -57,45 +51,33 @@ public abstract class Piece {
     this.val = color * type;
   }
 
-  /**
-   * Returns true if the given Piece has opposite color from this piece.
-   */
+  /** Returns true if the given Piece has opposite color from this piece. */
   public boolean isOppositeColor(Piece piece) {
     return this.getColor() != piece.getColor();
   }
 
-  /**
-   * Returns trie of the given Piece has the same color as this Piece.
-   */
+  /** Returns trie of the given Piece has the same color as this Piece. */
   public boolean isSameColor(Piece piece) {
     return this.getColor() == piece.getColor();
   }
 
-  /**
-   * Returns the <code>Player</code> this piece belongs to.
-   */
+  /** Returns the <code>Player</code> this piece belongs to. */
   public Player getPlayer() {
     if (isWhite()) return Player.WHITE_PLAYER;
     else return Player.BLACK_PLAYER;
   }
 
-  /**
-   * Returns the color of this Piece, either {@link #BLACK} or {@link #WHITE}.
-   */
+  /** Returns the color of this Piece, either {@link #BLACK} or {@link #WHITE}. */
   public int getColor() {
     return val < 0 ? BLACK : WHITE;
   }
 
-  /**
-   * Returns true if this Piece is white, returns false otherwise.
-   */
+  /** Returns true if this Piece is white, returns false otherwise. */
   public boolean isWhite() {
     return (val > 0);
   }
 
-  /**
-   * Returns true if this Piece is black, returns false otherwise.
-   */
+  /** Returns true if this Piece is black, returns false otherwise. */
   public boolean isBlack() {
     return (val < 0);
   }
@@ -129,22 +111,16 @@ public abstract class Piece {
     throw new Error("This may never happen");
   }
 
-  /**
-   * Returns a string representing the type of this piece ("Knight" for a knight for example).
-   */
+  /** Returns a string representing the type of this piece ("Knight" for a knight for example). */
   public abstract String getTypeName();
 
-  /**
-   * Returns a string representation of this chess piece. Returns "Empty" for the empty piece.
-   */
+  /** Returns a string representation of this chess piece. Returns "Empty" for the empty piece. */
   @Override
   public String toString() {
     return getColorName() + ' ' + getTypeName();
   }
 
-  /**
-   * Returns the hashcode of this Piece.
-   */
+  /** Returns the hashcode of this Piece. */
   @Override
   public int hashCode() {
     return val;

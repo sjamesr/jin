@@ -2,32 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2008 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.ics;
-
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JCheckBox;
-import javax.swing.SwingConstants;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
@@ -36,6 +23,16 @@ import free.jin.console.Channel;
 import free.jin.console.ConsoleManager;
 import free.jin.console.prefs.CustomConsolesPrefsPanel;
 import free.util.TextUtilities;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 /**
  * A common base <code>CustomConsolesPrefsPanel</code> for ICS-based servers.
@@ -44,9 +41,7 @@ import free.util.TextUtilities;
  */
 public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
 
-  /**
-   * A checkbox allowing the user to include shouts in the console.
-   */
+  /** A checkbox allowing the user to include shouts in the console. */
   private final JCheckBox shoutsBox;
 
   /**
@@ -56,9 +51,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
    */
   private final JCheckBox cshoutsBox;
 
-  /**
-   * Creates a new <code>IcsCustomConsolesPrefsPanel</code> for the specified console manager.
-   */
+  /** Creates a new <code>IcsCustomConsolesPrefsPanel</code> for the specified console manager. */
   public IcsCustomConsolesPrefsPanel(ConsoleManager cm) {
     super(cm);
 
@@ -79,9 +72,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     cshoutsBox.addItemListener(changeFiringItemListener);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected void createLayout() {
     GroupLayout layout = new GroupLayout(this);
@@ -210,17 +201,13 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
             .add(layout.createParallelGroup(GroupLayout.BASELINE).add(shoutsBox).add(cshoutsBox)));
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected ConsoleSpec createNewConsoleSpec() {
     return new IcsConsoleSpec();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected void updateUiFromSelectedConsole() {
     super.updateUiFromSelectedConsole();
@@ -254,9 +241,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     cshoutsBox.setSelected((spec != null) && spec.isIncludeCShouts());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected void updateConsoleFromUi(ConsoleSpec cSpec) throws BadChangesException {
     super.updateConsoleFromUi(cSpec);
@@ -267,9 +252,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     spec.setIncludeCShouts(cshoutsBox.isSelected());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected ConsoleSpec loadConsoleSpec(Preferences prefs, String prefix) {
     IcsConsoleSpec spec = (IcsConsoleSpec) super.loadConsoleSpec(prefs, prefix);
@@ -280,9 +263,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     return spec;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected void storeConsoleSpec(Preferences prefs, ConsoleSpec cSpec, String prefix) {
     super.storeConsoleSpec(prefs, cSpec, prefix);
@@ -293,9 +274,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     prefs.setBool(prefix + "includeCShouts", spec.isIncludeCShouts());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected String makeChannelListDisplayString(List channels) {
     StringBuffer buffer = new StringBuffer();
@@ -310,9 +289,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     return buffer.toString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected List parseChannelsListDisplayString(String channelsString) throws BadChangesException {
     Map allChannels = consoleManager.getChannels();
@@ -332,9 +309,7 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     return channels;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected String makeChannelPopupString(Channel channel) {
     String id = channel.getId().toString();
@@ -347,45 +322,31 @@ public class IcsCustomConsolesPrefsPanel extends CustomConsolesPrefsPanel {
     return buf.toString();
   }
 
-  /**
-   * An ICS-specific <code>ConsoleSpec</code>, which adds certain ICS-specific properties.
-   */
+  /** An ICS-specific <code>ConsoleSpec</code>, which adds certain ICS-specific properties. */
   protected static class IcsConsoleSpec extends ConsoleSpec {
 
-    /**
-     * Whether shouts are displayed in the console.
-     */
+    /** Whether shouts are displayed in the console. */
     private boolean isIncludeShouts = false;
 
-    /**
-     * Whether c-shouts are included in the console.
-     */
+    /** Whether c-shouts are included in the console. */
     private boolean isIncludeCShouts = false;
 
-    /**
-     * Returns whether shouts are included in the console.
-     */
+    /** Returns whether shouts are included in the console. */
     public boolean isIncludeShouts() {
       return isIncludeShouts;
     }
 
-    /**
-     * Sets whether shouts are included in the console.
-     */
+    /** Sets whether shouts are included in the console. */
     public void setIncludeShouts(boolean isIncludeShouts) {
       this.isIncludeShouts = isIncludeShouts;
     }
 
-    /**
-     * Returns whether c-shouts are included in the console.
-     */
+    /** Returns whether c-shouts are included in the console. */
     public boolean isIncludeCShouts() {
       return isIncludeCShouts;
     }
 
-    /**
-     * Sets whether c-shouts are included in the console.
-     */
+    /** Sets whether c-shouts are included in the console. */
     public void setIncludeCShouts(boolean isIncludeCShouts) {
       this.isIncludeCShouts = isIncludeCShouts;
     }

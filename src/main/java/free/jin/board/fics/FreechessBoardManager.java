@@ -2,22 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.fics;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import free.freechess.Ivar;
 import free.jin.Connection;
@@ -32,20 +29,16 @@ import free.jin.freechess.JinFreechessConnection;
 import free.jin.freechess.event.IvarStateChangeEvent;
 import free.jin.freechess.event.IvarStateChangeListener;
 import free.jin.plugin.PluginUIEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-/**
- * A freechess.org specific extension of the BoardManager plugin.
- */
+/** A freechess.org specific extension of the BoardManager plugin. */
 public class FreechessBoardManager extends BoardManager implements IvarStateChangeListener {
 
-  /**
-   * The current primary (observed) game.
-   */
+  /** The current primary (observed) game. */
   private Object primaryObservedGameID = null;
 
-  /**
-   * The current primary (played) game.
-   */
+  /** The current primary (played) game. */
   private Object primaryPlayedGameID = null;
 
   /**
@@ -73,9 +66,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
         });
   }
 
-  /**
-   * Registers our own listeners.
-   */
+  /** Registers our own listeners. */
   @Override
   protected void registerConnListeners() {
     super.registerConnListeners();
@@ -86,9 +77,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     listenerManager.addIvarStateChangeListener(this);
   }
 
-  /**
-   * Unregisters the listeners we've registered in <code>registerConnListeners</code>.
-   */
+  /** Unregisters the listeners we've registered in <code>registerConnListeners</code>. */
   @Override
   protected void unregisterConnListeners() {
     super.unregisterConnListeners();
@@ -99,9 +88,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     listenerManager.removeIvarStateChangeListener(this);
   }
 
-  /**
-   * Overrides BoardManager.createBoardPanel() to return a FreechessBoardPanel.
-   */
+  /** Overrides BoardManager.createBoardPanel() to return a FreechessBoardPanel. */
   @Override
   protected BoardPanel createBoardPanel(Game game) {
     BoardPanel boardPanel = new FreechessBoardPanel(this, game);
@@ -109,9 +96,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     return boardPanel;
   }
 
-  /**
-   * Overrides the superclass' method to set the primary game properly.
-   */
+  /** Overrides the superclass' method to set the primary game properly. */
   @Override
   public void pluginUIActivated(PluginUIEvent e) {
     Connection conn = getConn();
@@ -143,8 +128,8 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
   }
 
   /**
-   * Overrides the superclass' method to set <code>primaryObservedGameID</code> and
-   * <code>primaryPlayedGameID</code> properly.
+   * Overrides the superclass' method to set <code>primaryObservedGameID</code> and <code>
+   * primaryPlayedGameID</code> properly.
    */
   @Override
   public void gameStarted(GameStartEvent evt) {
@@ -161,8 +146,8 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
   }
 
   /**
-   * Overrides the superclass' method to set <code>primaryObservedGameID</code> and
-   * <code>primaryPlayedGameID</code> properly.
+   * Overrides the superclass' method to set <code>primaryObservedGameID</code> and <code>
+   * primaryPlayedGameID</code> properly.
    */
   @Override
   public void gameEnded(GameEndEvent evt) {
@@ -178,9 +163,7 @@ public class FreechessBoardManager extends BoardManager implements IvarStateChan
     super.gameEnded(evt);
   }
 
-  /**
-   * <code>IvarStateChangeListener</code> implementation.
-   */
+  /** <code>IvarStateChangeListener</code> implementation. */
   @Override
   public void ivarStateChanged(IvarStateChangeEvent evt) {
     // Did the user try to set iv_premove manually to false?

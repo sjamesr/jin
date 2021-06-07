@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -24,34 +24,22 @@ package free.chess;
  */
 public class ChessPiece extends Piece {
 
-  /**
-   * A constant representing a pawn.
-   */
+  /** A constant representing a pawn. */
   public static final int PAWN = 1;
 
-  /**
-   * A constant representing a knight.
-   */
+  /** A constant representing a knight. */
   public static final int KNIGHT = 2;
 
-  /**
-   * A constant representing a bishop.
-   */
+  /** A constant representing a bishop. */
   public static final int BISHOP = 3;
 
-  /**
-   * A constant representing a rook.
-   */
+  /** A constant representing a rook. */
   public static final int ROOK = 4;
 
-  /**
-   * A constant representing a queen.
-   */
+  /** A constant representing a queen. */
   public static final int QUEEN = 5;
 
-  /**
-   * A constant representing a king.
-   */
+  /** A constant representing a king. */
   public static final int KING = 6;
 
   // Final objects representing each piece.
@@ -75,7 +63,7 @@ public class ChessPiece extends Piece {
    *
    * @param color The color of the piece - either {@link Piece#WHITE} or {@link Piece#BLACK}.
    * @param type The type of the piece - one of {@link #PAWN}, {@link #KNIGHT}, {@link #BISHOP},
-   * {@link #ROOK}, {@link #QUEEN} or {@link #KING}.
+   *     {@link #ROOK}, {@link #QUEEN} or {@link #KING}.
    */
   public ChessPiece(int color, int type) {
     super(color, type);
@@ -123,9 +111,7 @@ public class ChessPiece extends Piece {
     throw new IllegalArgumentException("Unknown piece: " + piece);
   }
 
-  /**
-   * Returns <code>true</code> if this chess piece is of the same color as the given piece.
-   */
+  /** Returns <code>true</code> if this chess piece is of the same color as the given piece. */
   public final boolean isSameColorAs(ChessPiece otherPiece) {
     return this.val * otherPiece.val > 0;
   }
@@ -138,44 +124,32 @@ public class ChessPiece extends Piece {
     return Math.abs(this.val) == Math.abs(otherPiece.val);
   }
 
-  /**
-   * Returns true if this Piece is a pawn, returns false otherwise.
-   */
+  /** Returns true if this Piece is a pawn, returns false otherwise. */
   public final boolean isPawn() {
     return (this == WHITE_PAWN) || (this == BLACK_PAWN);
   }
 
-  /**
-   * Returns true if this Piece is a knight, returns false otherwise.
-   */
+  /** Returns true if this Piece is a knight, returns false otherwise. */
   public final boolean isKnight() {
     return (this == WHITE_KNIGHT) || (this == BLACK_KNIGHT);
   }
 
-  /**
-   * Returns true if this Piece is a bishop, returns false otherwise.
-   */
+  /** Returns true if this Piece is a bishop, returns false otherwise. */
   public final boolean isBishop() {
     return (this == WHITE_BISHOP) || (this == BLACK_BISHOP);
   }
 
-  /**
-   * Returns true if this Piece is a rook, returns false otherwise.
-   */
+  /** Returns true if this Piece is a rook, returns false otherwise. */
   public final boolean isRook() {
     return (this == WHITE_ROOK) || (this == BLACK_ROOK);
   }
 
-  /**
-   * Returns true if this Piece is a queen, returns false otherwise.
-   */
+  /** Returns true if this Piece is a queen, returns false otherwise. */
   public final boolean isQueen() {
     return (this == WHITE_QUEEN) || (this == BLACK_QUEEN);
   }
 
-  /**
-   * Returns true if this Piece is a king, returns false otherwise.
-   */
+  /** Returns true if this Piece is a king, returns false otherwise. */
   public final boolean isKing() {
     return (this == WHITE_KING) || (this == BLACK_KING);
   }
@@ -185,7 +159,6 @@ public class ChessPiece extends Piece {
    * example, and "P" for a black pawn).
    *
    * @return a short string representing this piece.
-   *
    * @see #fromShortString(String)
    */
   @Override
@@ -200,9 +173,7 @@ public class ChessPiece extends Piece {
     throw new Error("This may never happen");
   }
 
-  /**
-   * Returns a string representing the type of this piece ("Knight" for a knight for example).
-   */
+  /** Returns a string representing the type of this piece ("Knight" for a knight for example). */
   @Override
   public String getTypeName() {
     if (isPawn()) return "Pawn";

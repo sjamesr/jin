@@ -2,35 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.freechess;
-
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.Socket;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.SwingUtilities;
 
 import free.chess.Chess;
 import free.chess.ChessMove;
@@ -82,16 +66,26 @@ import free.jin.event.TakebackEvent;
 import free.jin.freechess.event.IvarStateChangeEvent;
 import free.util.Pair;
 import free.util.TextUtilities;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.Socket;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.SwingUtilities;
 
-/**
- * An implementation of the JinConnection interface for the freechess.org server.
- */
+/** An implementation of the JinConnection interface for the freechess.org server. */
 public class JinFreechessConnection extends FreechessConnection
     implements Connection, SeekConnection, PGNConnection {
 
-  /**
-   * Our listener manager.
-   */
+  /** Our listener manager. */
   private final FreechessListenerManager listenerManager = new FreechessListenerManager(this);
 
   /**
@@ -137,9 +131,7 @@ public class JinFreechessConnection extends FreechessConnection
     return osVersion;
   }
 
-  /**
-   * Returns <code>null</code>, since FICS doesn't even support 8-bit characters.
-   */
+  /** Returns <code>null</code>, since FICS doesn't even support 8-bit characters. */
   @Override
   public String getTextEncoding() {
     return null;
@@ -156,24 +148,18 @@ public class JinFreechessConnection extends FreechessConnection
     else throw new IllegalArgumentException("Bad player string: " + s);
   }
 
-  /**
-   * Returns our ListenerManager.
-   */
+  /** Returns our ListenerManager. */
   @Override
   public ListenerManager getListenerManager() {
     return getFreechessListenerManager();
   }
 
-  /**
-   * Returns out ListenerManager as a reference to FreechessListenerManager.
-   */
+  /** Returns out ListenerManager as a reference to FreechessListenerManager. */
   public FreechessListenerManager getFreechessListenerManager() {
     return listenerManager;
   }
 
-  /**
-   * Sends the specified command to the server.
-   */
+  /** Sends the specified command to the server. */
   @Override
   public void sendCommand(String command) {
     sendCommand(command, false, false, false);
@@ -188,8 +174,8 @@ public class JinFreechessConnection extends FreechessConnection
   }
 
   /**
-   * Fires an "attempting" connection event and invokes
-   * {@link free.util.Connection#initiateConnect(String, int)}.
+   * Fires an "attempting" connection event and invokes {@link
+   * free.util.Connection#initiateConnect(String, int)}.
    */
   @Override
   public void initiateConnectAndLogin(String hostname, int port) {
@@ -198,9 +184,7 @@ public class JinFreechessConnection extends FreechessConnection
     initiateConnect(hostname, port);
   }
 
-  /**
-   * Fires an "established" connection event.
-   */
+  /** Fires an "established" connection event. */
   @Override
   protected void handleConnected() {
     listenerManager.fireConnectionEstablished(this);
@@ -208,9 +192,7 @@ public class JinFreechessConnection extends FreechessConnection
     super.handleConnected();
   }
 
-  /**
-   * Fires a "failed" connection event.
-   */
+  /** Fires a "failed" connection event. */
   @Override
   protected void handleConnectingFailed(IOException e) {
     listenerManager.fireConnectingFailed(this, e.getMessage());
@@ -218,9 +200,7 @@ public class JinFreechessConnection extends FreechessConnection
     super.handleConnectingFailed(e);
   }
 
-  /**
-   * Fires a "login succeeded" connection event and performs other on-login tasks.
-   */
+  /** Fires a "login succeeded" connection event and performs other on-login tasks. */
   @Override
   protected void handleLoginSucceeded() {
     super.handleLoginSucceeded();
@@ -231,9 +211,7 @@ public class JinFreechessConnection extends FreechessConnection
     listenerManager.fireLoginSucceeded(this);
   }
 
-  /**
-   * Fires a "login failed" connection event.
-   */
+  /** Fires a "login failed" connection event. */
   @Override
   protected void handleLoginFailed(String reason) {
     listenerManager.fireLoginFailed(this, reason);
@@ -241,9 +219,7 @@ public class JinFreechessConnection extends FreechessConnection
     super.handleLoginFailed(reason);
   }
 
-  /**
-   * Fires a "connection lost" connection event.
-   */
+  /** Fires a "connection lost" connection event. */
   @Override
   protected void handleDisconnection(IOException e) {
     listenerManager.fireConnectionLost(this);
@@ -290,9 +266,7 @@ public class JinFreechessConnection extends FreechessConnection
     listenerManager.firePlainTextEvent(new PlainTextEvent(this, null, line));
   }
 
-  /**
-   * Gets called when the server notifies us of a change in the state of some ivar.
-   */
+  /** Gets called when the server notifies us of a change in the state of some ivar. */
   @Override
   protected boolean processIvarStateChanged(Ivar ivar, boolean state) {
     if (ivar == Ivar.SEEKINFO) seekInfoChanged(state);
@@ -304,39 +278,29 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Simply forwards to <code>sendCommand</code>, since FICS doesn't support tagged commands.
-   */
+  /** Simply forwards to <code>sendCommand</code>, since FICS doesn't support tagged commands. */
   @Override
   public void sendTaggedCommand(String command, String tag) {
     sendCommand(command);
   }
 
-  /**
-   * Sends a personal tell to the specified user.
-   */
+  /** Sends a personal tell to the specified user. */
   @Override
   public void sendPersonalTell(ServerUser user, String message, String tag) {
     sendCommand("xtell " + user.getName() + "! " + message, true, true, false);
   }
 
-  /**
-   * Does nothing, since nothing needs to be done.
-   */
+  /** Does nothing, since nothing needs to be done. */
   @Override
   public void joinPersonalChat(ServerUser user) {}
 
-  /**
-   * Joins channel 1.
-   */
+  /** Joins channel 1. */
   @Override
   public void joinHelpForum() {
     sendCommand("+channel 1", true, true, true);
   }
 
-  /**
-   * Joins the specified chat forum.
-   */
+  /** Joins the specified chat forum. */
   @Override
   public void joinChat(String type, Object forum) {
     if ("shout".equals(type)) sendCommand("set shout 1", true, true, true);
@@ -350,9 +314,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processPersonalTell(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -370,9 +332,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processSayTell(String username, String titles, int gameNumber, String message) {
     listenerManager.fireChatEvent(
@@ -390,9 +350,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processPTell(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -410,9 +368,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processChannelTell(
       String username, String titles, int channelNumber, String message) {
@@ -432,9 +388,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processKibitz(
       String username, String titles, int rating, int gameNumber, String message) {
@@ -461,9 +415,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processWhisper(
       String username, String titles, int rating, int gameNumber, String message) {
@@ -490,15 +442,11 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Regex for matching tourney tell qtells.
-   */
+  /** Regex for matching tourney tell qtells. */
   private static final Pattern TOURNEY_TELL_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")?\\(T(\\d+)\\): (.*)");
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processQTell(String message) {
     ChatEvent evt;
@@ -539,9 +487,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processShout(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -559,9 +505,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processIShout(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -579,9 +523,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processTShout(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -599,9 +541,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processCShout(String username, String titles, String message) {
     listenerManager.fireChatEvent(
@@ -619,9 +559,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate ChatEvent.
-   */
+  /** Fires an appropriate ChatEvent. */
   @Override
   protected boolean processAnnouncement(String username, String message) {
     listenerManager.fireChatEvent(
@@ -688,14 +626,10 @@ public class JinFreechessConnection extends FreechessConnection
     return null;
   }
 
-  /**
-   * A list of supported wild variants, initialized lazily.
-   */
+  /** A list of supported wild variants, initialized lazily. */
   private static WildVariant[] wildVariants;
 
-  /**
-   * Returns a list of support wild variants.
-   */
+  /** Returns a list of support wild variants. */
   @Override
   public WildVariant[] getSupportedVariants() {
     if (wildVariants == null) {
@@ -725,9 +659,7 @@ public class JinFreechessConnection extends FreechessConnection
    */
   private final Hashtable unstartedGamesData = new Hashtable(1);
 
-  /**
-   * Maps game numbers to InternalGameData objects of ongoing games.
-   */
+  /** Maps game numbers to InternalGameData objects of ongoing games. */
   private final Hashtable ongoingGamesData = new Hashtable(5);
 
   /**
@@ -763,8 +695,8 @@ public class JinFreechessConnection extends FreechessConnection
   }
 
   /**
-   * Returns the InternalGameData for the ongoing game with the specified number. Throws a
-   * <code>NoSuchGameException</code> if there's no such game.
+   * Returns the InternalGameData for the ongoing game with the specified number. Throws a <code>
+   * NoSuchGameException</code> if there's no such game.
    */
   private InternalGameData getGameData(int gameNumber) throws NoSuchGameException {
     InternalGameData gameData = (InternalGameData) ongoingGamesData.get(new Integer(gameNumber));
@@ -812,9 +744,7 @@ public class JinFreechessConnection extends FreechessConnection
     throw new NoSuchGameException();
   }
 
-  /**
-   * Saves the GameInfoStruct until we receive enough info to fire a GameStartEvent.
-   */
+  /** Saves the GameInfoStruct until we receive enough info to fire a GameStartEvent. */
   @Override
   protected boolean processGameInfo(GameInfoStruct data) {
     unstartedGamesData.put(new Integer(data.getGameNumber()), data);
@@ -822,9 +752,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires an appropriate GameEvent depending on the situation.
-   */
+  /** Fires an appropriate GameEvent depending on the situation. */
   @Override
   protected boolean processStyle12(Style12Struct boardData) {
     Integer gameNumber = new Integer(boardData.getGameNumber());
@@ -1009,9 +937,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Calculates the material strength of the specified player in the specified position.
-   */
+  /** Calculates the material strength of the specified player in the specified position. */
   private static int calcStrength(Position pos, Player player) {
     int count = 0;
     for (int i = 0; i < 8; i++) {
@@ -1047,9 +973,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Changes the bsetup state of the game.
-   */
+  /** Changes the bsetup state of the game. */
   @Override
   protected boolean processBSetupMode(boolean entered) {
     try {
@@ -1060,35 +984,24 @@ public class JinFreechessConnection extends FreechessConnection
     return super.processBSetupMode(entered);
   }
 
-  /**
-   * A small class for keeping internal data about a game.
-   */
+  /** A small class for keeping internal data about a game. */
   private static class InternalGameData {
 
-    /**
-     * The Game object representing the game.
-     */
+    /** The Game object representing the game. */
     public final Game game;
 
-    /**
-     * A list of Moves done in the game.
-     */
+    /** A list of Moves done in the game. */
     public Vector moveList = new Vector();
 
-    /**
-     * The last Style12Struct we got for this game.
-     */
+    /** The last Style12Struct we got for this game. */
     public Style12Struct boardData = null;
 
-    /**
-     * Is this game in bsetup mode?
-     */
+    /** Is this game in bsetup mode? */
     public boolean isBSetup = false;
 
     /**
-     * Maps offer indices to offers. Offers are Pairs where the first element is the
-     * <code>Player</code> who made the offer and the 2nd is the offer id. Takeback offers are kept
-     * separately.
+     * Maps offer indices to offers. Offers are Pairs where the first element is the <code>Player
+     * </code> who made the offer and the 2nd is the offer id. Takeback offers are kept separately.
      */
     public final Hashtable indicesToOffers = new Hashtable();
 
@@ -1106,33 +1019,23 @@ public class JinFreechessConnection extends FreechessConnection
      */
     private final Hashtable offers = new Hashtable();
 
-    /**
-     * The number of plies the white player offerred to takeback.
-     */
+    /** The number of plies the white player offerred to takeback. */
     private int whiteTakeback;
 
-    /**
-     * The number of plies the black player offerred to takeback.
-     */
+    /** The number of plies the black player offerred to takeback. */
     private int blackTakeback;
 
-    /**
-     * Creates a new InternalGameData.
-     */
+    /** Creates a new InternalGameData. */
     public InternalGameData(Game game) {
       this.game = game;
     }
 
-    /**
-     * Returns the amount of moves made in the game (as far as we counted).
-     */
+    /** Returns the amount of moves made in the game (as far as we counted). */
     public int getMoveCount() {
       return moveList.size();
     }
 
-    /**
-     * Adds the specified move to the moves list.
-     */
+    /** Adds the specified move to the moves list. */
     public void addMove(Move move) {
       moveList.addElement(move);
     }
@@ -1150,9 +1053,7 @@ public class JinFreechessConnection extends FreechessConnection
       for (int i = first; i >= last; i--) moveList.removeElementAt(i);
     }
 
-    /**
-     * Removes all the moves made in the game.
-     */
+    /** Removes all the moves made in the game. */
     public void clearMoves() {
       moveList.removeAllElements();
     }
@@ -1174,26 +1075,20 @@ public class JinFreechessConnection extends FreechessConnection
       else offers.remove(offer);
     }
 
-    /**
-     * Sets the takeback offer in the game to the specified amount of plies.
-     */
+    /** Sets the takeback offer in the game to the specified amount of plies. */
     public void setTakebackOffer(Player player, int plies) {
       if (player.isWhite()) whiteTakeback = plies;
       else blackTakeback = plies;
     }
 
-    /**
-     * Returns the amount of plies offered to take back by the specified player.
-     */
+    /** Returns the amount of plies offered to take back by the specified player. */
     public int getTakebackOffer(Player player) {
       if (player.isWhite()) return whiteTakeback;
       else return blackTakeback;
     }
   }
 
-  /**
-   * Changes the primary played game.
-   */
+  /** Changes the primary played game. */
   @Override
   protected boolean processSimulCurrentBoardChanged(int gameNumber, String oppName) {
     primaryPlayedGame = gameNumber;
@@ -1201,9 +1096,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Changes the primary observed game.
-   */
+  /** Changes the primary observed game. */
   @Override
   protected boolean processPrimaryGameChanged(int gameNumber) {
     primaryObservedGame = gameNumber;
@@ -1211,9 +1104,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Invokes <code>closeGame(int)</code>.
-   */
+  /** Invokes <code>closeGame(int)</code>. */
   @Override
   protected boolean processGameEnd(
       int gameNumber, String whiteName, String blackName, String reason, String result) {
@@ -1229,9 +1120,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Invokes <code>closeGame(int)</code>.
-   */
+  /** Invokes <code>closeGame(int)</code>. */
   @Override
   protected boolean processStoppedObserving(int gameNumber) {
     closeGame(gameNumber, Game.UNKNOWN_RESULT);
@@ -1239,9 +1128,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Invokes <code>closeGame(int)</code>.
-   */
+  /** Invokes <code>closeGame(int)</code>. */
   @Override
   protected boolean processStoppedExamining(int gameNumber) {
     closeGame(gameNumber, Game.UNKNOWN_RESULT);
@@ -1249,9 +1136,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Invokes <code>illegalMoveAttempted</code>.
-   */
+  /** Invokes <code>illegalMoveAttempted</code>. */
   @Override
   protected boolean processIllegalMove(String moveString, int reasonCode, String reason) {
     illegalMoveAttempted(moveString, reasonCode, reason);
@@ -1393,9 +1278,7 @@ public class JinFreechessConnection extends FreechessConnection
     return gameData;
   }
 
-  /**
-   * Updates any game parameters that differ in the board data from the current game data.
-   */
+  /** Updates any game parameters that differ in the board data from the current game data. */
   private void updateGame(InternalGameData gameData, Style12Struct boardData) {
     Game game = gameData.game;
     Style12Struct oldBoardData = gameData.boardData;
@@ -1418,9 +1301,7 @@ public class JinFreechessConnection extends FreechessConnection
     gameData.boardData = boardData;
   }
 
-  /**
-   * Gets called when a move is made. Fires an appropriate MoveMadeEvent.
-   */
+  /** Gets called when a move is made. Fires an appropriate MoveMadeEvent. */
   private void makeMove(InternalGameData gameData, Style12Struct boardData) {
     Game game = gameData.game;
     Style12Struct oldBoardData = gameData.boardData;
@@ -1467,8 +1348,8 @@ public class JinFreechessConnection extends FreechessConnection
   }
 
   /**
-   * Returns whether <code>echoedMove</code> (sent to us by the server) is the same move as
-   * <code>sentMove</code> (a move we sent to the server).
+   * Returns whether <code>echoedMove</code> (sent to us by the server) is the same move as <code>
+   * sentMove</code> (a move we sent to the server).
    */
   private static boolean isSameMove(Game game, Move echoedMove, Move sentMove) {
     try {
@@ -1484,9 +1365,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Fires an appropriate ClockAdjustmentEvent.
-   */
+  /** Fires an appropriate ClockAdjustmentEvent. */
   private void updateClocks(InternalGameData gameData, Style12Struct boardData) {
     Game game = gameData.game;
 
@@ -1508,9 +1387,7 @@ public class JinFreechessConnection extends FreechessConnection
         new ClockAdjustmentEvent(this, null, game, Player.BLACK_PLAYER, blackTime, blackRunning));
   }
 
-  /**
-   * Fires an appropriate GameEndEvent.
-   */
+  /** Fires an appropriate GameEndEvent. */
   private void closeGame(int gameNumber, int result) {
     Integer gameID = new Integer(gameNumber);
 
@@ -1542,17 +1419,13 @@ public class JinFreechessConnection extends FreechessConnection
     } else unsupportedGames.removeElement(gameID);
   }
 
-  /**
-   * Fires an appropriate BoardFlipEvent.
-   */
+  /** Fires an appropriate BoardFlipEvent. */
   private void flipBoard(InternalGameData gameData, Style12Struct newBoardData) {
     listenerManager.fireGameEvent(
         new BoardFlipEvent(this, null, gameData.game, newBoardData.isBoardFlipped()));
   }
 
-  /**
-   * Fires an appropriate IllegalMoveEvent.
-   */
+  /** Fires an appropriate IllegalMoveEvent. */
   private void illegalMoveAttempted(String moveString, int ficsReasonCode, String reason) {
     try {
       InternalGameData gameData = findMyGame();
@@ -1621,9 +1494,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Fires an appropriate TakebackEvent.
-   */
+  /** Fires an appropriate TakebackEvent. */
   private void issueTakeback(InternalGameData gameData, Style12Struct newBoardData) {
     Style12Struct oldBoardData = gameData.boardData;
     int takebackCount = oldBoardData.getPlayedPlyCount() - newBoardData.getPlayedPlyCount();
@@ -1633,9 +1504,7 @@ public class JinFreechessConnection extends FreechessConnection
     gameData.removeLastMoves(takebackCount);
   }
 
-  /**
-   * Fires an appropriate PositionChangedEvent.
-   */
+  /** Fires an appropriate PositionChangedEvent. */
   private void changePosition(InternalGameData gameData, Style12Struct newBoardData) {
     Game game = gameData.game;
 
@@ -1657,29 +1526,21 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Maps seek IDs to Seek objects currently in the sought list.
-   */
+  /** Maps seek IDs to Seek objects currently in the sought list. */
   private final Hashtable seeks = new Hashtable();
 
-  /**
-   * Returns the SeekListenerManager via which you can register and unregister SeekListeners.
-   */
+  /** Returns the SeekListenerManager via which you can register and unregister SeekListeners. */
   @Override
   public SeekListenerManager getSeekListenerManager() {
     return getFreechessListenerManager();
   }
 
-  /**
-   * Invoked when seekinfo ivar's state changes.
-   */
+  /** Invoked when seekinfo ivar's state changes. */
   protected void seekInfoChanged(boolean isOn) {
     if (!isOn) clearSeeks();
   }
 
-  /**
-   * Creates an appropriate Seek object and fires a SeekEvent.
-   */
+  /** Creates an appropriate Seek object and fires a SeekEvent. */
   @Override
   protected boolean processSeekAdded(SeekInfoStruct seekInfo) {
     // We may get seeks after setting seekinfo to false because the server
@@ -1764,9 +1625,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Issues the appropriate SeekEvents and removes the seeks.
-   */
+  /** Issues the appropriate SeekEvents and removes the seeks. */
   @Override
   protected boolean processSeeksRemoved(int[] removedSeeks) {
     for (int i = 0; i < removedSeeks.length; i++) {
@@ -1783,18 +1642,14 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Issues the appropriate SeeksEvents and removes the seeks.
-   */
+  /** Issues the appropriate SeeksEvents and removes the seeks. */
   @Override
   protected boolean processSeeksCleared() {
     clearSeeks();
     return true;
   }
 
-  /**
-   * Removes all currently known seeks, notifying any interested listeners.
-   */
+  /** Removes all currently known seeks, notifying any interested listeners. */
   private void clearSeeks() {
     Set seekIndices = seeks.keySet();
     for (Iterator i = seekIndices.iterator(); i.hasNext(); ) {
@@ -1806,9 +1661,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Returns the current set of seeks.
-   */
+  /** Returns the current set of seeks. */
   @Override
   public Collection getSeeks() {
     return Collections.unmodifiableCollection(seeks.values());
@@ -1826,9 +1679,7 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("play " + seek.getID(), true, true, false);
   }
 
-  /**
-   * Withdraws the specified seek, issued by the user.
-   */
+  /** Withdraws the specified seek, issued by the user. */
   @Override
   public void withdraw(Seek seek) {
     if (!seeks.contains(seek))
@@ -1837,17 +1688,13 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("unseek " + seek.getID(), true, true, false);
   }
 
-  /**
-   * Withdraws all seeks.
-   */
+  /** Withdraws all seeks. */
   @Override
   public void withdrawAllSeeks() {
     sendCommand("unseek", true, true, false);
   }
 
-  /**
-   * Issues the specified seek.
-   */
+  /** Issues the specified seek. */
   @Override
   public void issue(UserSeek seek) {
     WildVariant variant = seek.getVariant();
@@ -1897,9 +1744,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Overrides the superclass' method only to return true.
-   */
+  /** Overrides the superclass' method only to return true. */
   @Override
   protected boolean processMatchOffered(
       boolean toUser, int offerIndex, String oppName, String matchDetails) {
@@ -1908,9 +1753,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processTakebackOffered(
       boolean toUser, int offerIndex, String oppName, int takebackCount) {
@@ -1932,9 +1775,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processDrawOffered(boolean toUser, int offerIndex, String oppName) {
     super.processDrawOffered(toUser, offerIndex, oppName);
@@ -1944,9 +1785,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processAbortOffered(boolean toUser, int offerIndex, String oppName) {
     super.processAbortOffered(toUser, offerIndex, oppName);
@@ -1956,9 +1795,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processAdjournOffered(boolean toUser, int offerIndex, String oppName) {
     super.processAdjournOffered(toUser, offerIndex, oppName);
@@ -1985,9 +1822,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processOfferRemoved(int offerIndex) {
     super.processOfferRemoved(offerIndex);
@@ -2015,9 +1850,7 @@ public class JinFreechessConnection extends FreechessConnection
     return true;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processPlayerCounteredTakebackOffer(
       int gameNum, String playerName, int takebackCount) {
@@ -2035,9 +1868,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processPlayerOffered(int gameNum, String playerName, String offerName) {
     super.processPlayerOffered(gameNum, playerName, offerName);
@@ -2057,9 +1888,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processPlayerDeclined(int gameNum, String playerName, String offerName) {
     super.processPlayerDeclined(gameNum, playerName, offerName);
@@ -2079,9 +1908,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processPlayerWithdrew(int gameNum, String playerName, String offerName) {
     super.processPlayerWithdrew(gameNum, playerName, offerName);
@@ -2101,9 +1928,7 @@ public class JinFreechessConnection extends FreechessConnection
     return false;
   }
 
-  /**
-   * Fires the appropriate OfferEvent(s).
-   */
+  /** Fires the appropriate OfferEvent(s). */
   @Override
   protected boolean processPlayerOfferedTakeback(
       int gameNum, String playerName, int takebackCount) {
@@ -2132,9 +1957,7 @@ public class JinFreechessConnection extends FreechessConnection
     else throw new IllegalArgumentException("Unknown offer name: " + offerName);
   }
 
-  /**
-   * Updates the specified offer, firing any necessary events.
-   */
+  /** Updates the specified offer, firing any necessary events. */
   private void updateOffers(InternalGameData gameData, int offerId, Player player, boolean on) {
     Game game = gameData.game;
 
@@ -2155,9 +1978,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Updates the takeback offer in the specified game to the specified amount of plies.
-   */
+  /** Updates the takeback offer in the specified game to the specified amount of plies. */
   private void updateTakebackOffer(InternalGameData gameData, Player player, int takebackCount) {
     Game game = gameData.game;
 
@@ -2171,49 +1992,37 @@ public class JinFreechessConnection extends FreechessConnection
       listenerManager.fireGameEvent(new OfferEvent(this, null, game, true, player, takebackCount));
   }
 
-  /**
-   * Sends the "exit" command to the server.
-   */
+  /** Sends the "exit" command to the server. */
   @Override
   public void exit() {
     sendCommand("quit", true, true, false);
   }
 
-  /**
-   * Returns the user with which we are logged in.
-   */
+  /** Returns the user with which we are logged in. */
   @Override
   public ServerUser getUser() {
     return userForName(getUsername());
   }
 
-  /**
-   * Returns a <code>FreechessUser</code> with the specified name.
-   */
+  /** Returns a <code>FreechessUser</code> with the specified name. */
   @Override
   public ServerUser userForName(String name) {
     return FreechessUser.get(name);
   }
 
-  /**
-   * Starts a new, empty, examination game.
-   */
+  /** Starts a new, empty, examination game. */
   @Override
   public void examineNewGame() {
     sendCommand("examine", true, true, false);
   }
 
-  /**
-   * Starts observing the specified player.
-   */
+  /** Starts observing the specified player. */
   @Override
   public void observeBoard(ServerUser user) {
     sendCommand("observe " + user.getName(), true, true, false);
   }
 
-  /**
-   * Quits the specified game.
-   */
+  /** Quits the specified game. */
   @Override
   public void quitGame(Game game) {
     Object id = game.getID();
@@ -2230,9 +2039,7 @@ public class JinFreechessConnection extends FreechessConnection
     }
   }
 
-  /**
-   * Makes the given move in the given game.
-   */
+  /** Makes the given move in the given game. */
   @Override
   public void makeMove(Game game, Move move) {
     Enumeration gamesDataEnum = ongoingGamesData.elements();
@@ -2260,9 +2067,9 @@ public class JinFreechessConnection extends FreechessConnection
   }
 
   /**
-   * Converts the given move into a string we can send to the server. Throws an
-   * <code>IllegalArgumentException</code> if the move is not of a type that we know how to send to
-   * the server.
+   * Converts the given move into a string we can send to the server. Throws an <code>
+   * IllegalArgumentException</code> if the move is not of a type that we know how to send to the
+   * server.
    */
   private static String moveToString(Game game, Move move) throws IllegalArgumentException {
     WildVariant variant = game.getVariant();
@@ -2277,9 +2084,7 @@ public class JinFreechessConnection extends FreechessConnection
     } else throw new IllegalArgumentException("Unsupported Move type: " + move.getClass());
   }
 
-  /**
-   * Resigns the given game. The given game must be a played game and of type Game.MY_GAME.
-   */
+  /** Resigns the given game. The given game must be a played game and of type Game.MY_GAME. */
   @Override
   public void resign(Game game) {
     checkGameMineAndPlayed(game);
@@ -2298,9 +2103,7 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("draw", true, true, false);
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isAbortSupported() {
     return true;
@@ -2317,9 +2120,7 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("abort", true, true, false);
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isAdjournSupported() {
     return true;
@@ -2336,17 +2137,13 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("adjourn", true, true, false);
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isTakebackSupported() {
     return true;
   }
 
-  /**
-   * Sends "takeback 1" to the server.
-   */
+  /** Sends "takeback 1" to the server. */
   @Override
   public void requestTakeback(Game game) {
     checkGameMineAndPlayed(game);
@@ -2354,17 +2151,13 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("takeback 1", true, true, false);
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isMultipleTakebackSupported() {
     return true;
   }
 
-  /**
-   * Sends "takeback plyCount" to the server.
-   */
+  /** Sends "takeback plyCount" to the server. */
   @Override
   public void requestTakeback(Game game, int plyCount) {
     checkGameMineAndPlayed(game);
@@ -2401,9 +2194,7 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("forward " + plyCount, true, true, false);
   }
 
-  /**
-   * Goes to the beginning of the given game.
-   */
+  /** Goes to the beginning of the given game. */
   @Override
   public void goToBeginning(Game game) {
     checkGameMineAndExamined(game);
@@ -2411,9 +2202,7 @@ public class JinFreechessConnection extends FreechessConnection
     sendCommand("backward 999", true, true, false);
   }
 
-  /**
-   * Goes to the end of the given game.
-   */
+  /** Goes to the end of the given game. */
   @Override
   public void goToEnd(Game game) {
     checkGameMineAndExamined(game);
@@ -2441,17 +2230,13 @@ public class JinFreechessConnection extends FreechessConnection
           "The given game must be of type Game.MY_GAME and an examined one");
   }
 
-  /**
-   * Sends the "help" command to the server.
-   */
+  /** Sends the "help" command to the server. */
   @Override
   public void showServerHelp() {
     sendCommand("help", true, true, false);
   }
 
-  /**
-   * Sends the specified question string to channel 1.
-   */
+  /** Sends the specified question string to channel 1. */
   @Override
   public void sendHelpQuestion(String question, String tag) {
     sendCommand(

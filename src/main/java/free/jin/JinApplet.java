@@ -2,20 +2,32 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
+import com.google.common.collect.ImmutableSet;
+import free.chess.BoardImageBoardPainter;
+import free.chess.ImagePiecePainter;
+import free.chess.SquareImagesBoardPainter;
+import free.jin.action.ActionInfo;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginInfo;
+import free.util.AWTUtilities;
+import free.util.BrowserControl;
+import free.util.IOUtilities;
+import free.util.Localization;
+import free.util.audio.AppletContextAudioPlayer;
 import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.Button;
@@ -55,33 +67,13 @@ import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.google.common.collect.ImmutableSet;
-
-import free.chess.BoardImageBoardPainter;
-import free.chess.ImagePiecePainter;
-import free.chess.SquareImagesBoardPainter;
-import free.jin.action.ActionInfo;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginInfo;
-import free.util.AWTUtilities;
-import free.util.BrowserControl;
-import free.util.IOUtilities;
-import free.util.Localization;
-import free.util.audio.AppletContextAudioPlayer;
-
-/**
- * A <code>JinContext</code> implementation for running Jin as an applet.
- */
+/** A <code>JinContext</code> implementation for running Jin as an applet. */
 public class JinApplet extends Applet implements JinContext {
 
-  /**
-   * The <code>Locale</code> for this instance of Jin.
-   */
+  /** The <code>Locale</code> for this instance of Jin. */
   private Locale locale;
 
-  /**
-   * The <code>Localization</code> for this class.
-   */
+  /** The <code>Localization</code> for this class. */
   private Localization l10n;
 
   /**
@@ -89,49 +81,31 @@ public class JinApplet extends Applet implements JinContext {
    */
   private final Properties autologinParams = new Properties();
 
-  /**
-   * The server we're connecting to.
-   */
+  /** The server we're connecting to. */
   private Server server;
 
-  /**
-   * The actions we'll be using.
-   */
+  /** The actions we'll be using. */
   private ActionInfo[] actions;
 
-  /**
-   * The plugins we'll be using.
-   */
+  /** The plugins we'll be using. */
   private Collection<PluginInfo> plugins;
 
-  /**
-   * The preferences, created after authenticating the user.
-   */
+  /** The preferences, created after authenticating the user. */
   private Preferences prefs;
 
-  /**
-   * Customizing preferences.
-   */
+  /** Customizing preferences. */
   private Preferences customizingPrefs;
 
-  /**
-   * The list of known accounts, created after authenticating the user.
-   */
+  /** The list of known accounts, created after authenticating the user. */
   private User[] users;
 
-  /**
-   * The username with which we authenticated the user.
-   */
+  /** The username with which we authenticated the user. */
   private String username;
 
-  /**
-   * The password with which we authenticated the user.
-   */
+  /** The password with which we authenticated the user. */
   private String password;
 
-  /**
-   * Initializes the applet.
-   */
+  /** Initializes the applet. */
   @Override
   public void init() {
     try {
@@ -168,9 +142,7 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * Invoked when the applet shuts down.
-   */
+  /** Invoked when the applet shuts down. */
   @Override
   public void stop() {
     if (Jin.hasInstance()) Jin.getInstance().quit(false);
@@ -220,9 +192,7 @@ public class JinApplet extends Applet implements JinContext {
     Jin.getInstance().start();
   }
 
-  /**
-   * Starts Jin and logs on as a guest.
-   */
+  /** Starts Jin and logs on as a guest. */
   private void startAsGuest() {
     this.username = null;
     this.password = null;
@@ -238,9 +208,7 @@ public class JinApplet extends Applet implements JinContext {
     Jin.getInstance().start();
   }
 
-  /**
-   * Determines the locale for this instance of Jin.
-   */
+  /** Determines the locale for this instance of Jin. */
   private Locale determineLocale() {
     String language = getParameter("locale.language");
     String country = getParameter("locale.country");
@@ -253,9 +221,7 @@ public class JinApplet extends Applet implements JinContext {
     return new Locale(language, country, variant);
   }
 
-  /**
-   * Configures various libraries the applet uses.
-   */
+  /** Configures various libraries the applet uses. */
   private void configureLibraries() {
     Localization.setAppLocale(locale);
     BrowserControl.setAppletContext(getAppletContext());
@@ -265,9 +231,7 @@ public class JinApplet extends Applet implements JinContext {
     SquareImagesBoardPainter.setAsyncImageLoad(true);
   }
 
-  /**
-   * Creates and returns the <code>Server</code> object for the server we'll be connecting to.
-   */
+  /** Creates and returns the <code>Server</code> object for the server we'll be connecting to. */
   private Server loadServer()
       throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
@@ -289,9 +253,7 @@ public class JinApplet extends Applet implements JinContext {
     return server;
   }
 
-  /**
-   * Loads the actions we'll be using.
-   */
+  /** Loads the actions we'll be using. */
   private ActionInfo[] loadActions() throws IOException, ClassNotFoundException {
     String actionClassnames = getParameter("action.classnames");
     if (actionClassnames == null)
@@ -319,9 +281,7 @@ public class JinApplet extends Applet implements JinContext {
     return actions;
   }
 
-  /**
-   * Loads the plugins we'll be using.
-   */
+  /** Loads the plugins we'll be using. */
   private Collection<PluginInfo> loadPlugins() throws IOException, ClassNotFoundException {
     String pluginClassnames = getParameter("plugin.classnames");
     if (pluginClassnames == null)
@@ -357,9 +317,7 @@ public class JinApplet extends Applet implements JinContext {
     return plugins;
   }
 
-  /**
-   * Returns the locale for this instance of Jin.
-   */
+  /** Returns the locale for this instance of Jin. */
   @Override
   public Locale getLocale() {
     return locale;
@@ -376,17 +334,13 @@ public class JinApplet extends Applet implements JinContext {
     return paramValue == null ? super.getParameter(paramName) : paramValue;
   }
 
-  /**
-   * Returns the application-wide preferences.
-   */
+  /** Returns the application-wide preferences. */
   @Override
   public Preferences getPrefs() {
     return prefs;
   }
 
-  /**
-   * Loads and returns the application's customizing preferences.
-   */
+  /** Loads and returns the application's customizing preferences. */
   private Preferences loadCustomizingPrefs() {
     try {
       URL url = new URL(getCodeBase(), "custom.properties");
@@ -397,17 +351,15 @@ public class JinApplet extends Applet implements JinContext {
     return null;
   }
 
-  /**
-   * Returns the application's customizing preferences.
-   */
+  /** Returns the application's customizing preferences. */
   @Override
   public Preferences getCustomizingPrefs() {
     return customizingPrefs;
   }
 
   /**
-   * Returns all the resources of the specified type. See
-   * {@link JinContext#getResources(String, Plugin)} for more information.
+   * Returns all the resources of the specified type. See {@link JinContext#getResources(String,
+   * Plugin)} for more information.
    */
   @Override
   public Map getResources(String resourceType, Plugin plugin) {
@@ -452,9 +404,7 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * Loads a single resource from the specified URL. Returns <code>null</code> if unsuccessful.
-   */
+  /** Loads a single resource from the specified URL. Returns <code>null</code> if unsuccessful. */
   private Resource loadResource(URL url, Plugin plugin) throws IOException {
     URL defURL = new URL(url, "definition");
     if (!IOUtilities.isURLCached(defURL)) IOUtilities.cacheURL(defURL);
@@ -482,19 +432,13 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * The thread that uploads the user settings. <code>null</code> when none.
-   */
+  /** The thread that uploads the user settings. <code>null</code> when none. */
   private Thread settingsUploadThread = null;
 
-  /**
-   * The dialog displayed to the user while settings are uploaded.
-   */
+  /** The dialog displayed to the user while settings are uploaded. */
   private Dialog settingsUploadDialog = null;
 
-  /**
-   * Uploads preferences and reinitializes the applet, so that it's ready to go again.
-   */
+  /** Uploads preferences and reinitializes the applet, so that it's ready to go again. */
   @Override
   public void shutdown() {
     if (username != null) { // Not logged in as guest
@@ -536,9 +480,7 @@ public class JinApplet extends Applet implements JinContext {
               errorDialog.setVisible(true);
             }
 
-            /**
-             * Shows a password dialog and returns whether preferences upload should be retried.
-             */
+            /** Shows a password dialog and returns whether preferences upload should be retried. */
             private boolean showPasswordDialog(String message) {
               PasswordDialog passDialog =
                   new PasswordDialog(
@@ -579,9 +521,7 @@ public class JinApplet extends Applet implements JinContext {
     restart();
   }
 
-  /**
-   * Stores the user settings.
-   */
+  /** Stores the user settings. */
   private String uploadSettings() throws IOException {
     URL savePrefsUrl = getPrefsUploadUrl();
     URLConnection conn = savePrefsUrl.openConnection();
@@ -632,17 +572,13 @@ public class JinApplet extends Applet implements JinContext {
     // Todo: add storing user files
   }
 
-  /**
-   * Returns an array containing the server we're connecting to.
-   */
+  /** Returns an array containing the server we're connecting to. */
   @Override
   public Set<Server> getServers() {
     return ImmutableSet.of(server);
   }
 
-  /**
-   * Returns the list of known user's accounts on the server.
-   */
+  /** Returns the list of known user's accounts on the server. */
   @Override
   public User[] getUsers() {
     return users;
@@ -657,9 +593,7 @@ public class JinApplet extends Applet implements JinContext {
     this.users = users;
   }
 
-  /**
-   * Returns the descriptions of actions for the specified server.
-   */
+  /** Returns the descriptions of actions for the specified server. */
   @Override
   public ActionInfo[] getActions(Server server) {
     if (server != this.server) throw new IllegalArgumentException("Unknown server: " + server);
@@ -667,9 +601,7 @@ public class JinApplet extends Applet implements JinContext {
     return actions;
   }
 
-  /**
-   * Returns the descriptions of plugins for the specified server.
-   */
+  /** Returns the descriptions of plugins for the specified server. */
   @Override
   public Collection<PluginInfo> getPlugins(Server server) {
     if (server != this.server) throw new IllegalArgumentException("Unknown server: " + server);
@@ -677,17 +609,13 @@ public class JinApplet extends Applet implements JinContext {
     return plugins;
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isSavePrefsCapable() {
     return true;
   }
 
-  /**
-   * Returns text warning the user about saving his password and asking him to confirm it.
-   */
+  /** Returns text warning the user about saving his password and asking him to confirm it. */
   @Override
   public String getPasswordSaveWarning() {
     try {
@@ -703,17 +631,13 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * Returns <code>false</code>.
-   */
+  /** Returns <code>false</code>. */
   @Override
   public boolean isUserExtensible() {
     return false;
   }
 
-  /**
-   * Creates UI which informs the user that the specified error has occurred.
-   */
+  /** Creates UI which informs the user that the specified error has occurred. */
   private void createErrorUI(Throwable t) {
     removeAll();
 
@@ -729,17 +653,13 @@ public class JinApplet extends Applet implements JinContext {
     doLayout();
   }
 
-  /**
-   * Returns the URL from which we download user settings.
-   */
+  /** Returns the URL from which we download user settings. */
   private URL getPrefsDownloadUrl() throws MalformedURLException {
     URL url = new URL(getDocumentBase(), getParameter("loadPrefsURL"));
     return new URL(getParameter("prefsProtocol"), url.getHost(), url.getPort(), url.getFile());
   }
 
-  /**
-   * Returns the URL to which we upload user settings.
-   */
+  /** Returns the URL to which we upload user settings. */
   private URL getPrefsUploadUrl() throws MalformedURLException {
     URL url = new URL(getDocumentBase(), getParameter("savePrefsURL"));
     return new URL(getParameter("prefsProtocol"), url.getHost(), url.getPort(), url.getFile());
@@ -747,46 +667,32 @@ public class JinApplet extends Applet implements JinContext {
 
   /**
    * A panel which asks the user to specify his username and password. When the user submits those,
-   * the settings for that user are retrieved and the
-   * <code>start(Preferences, User, User [], String, String)</code> method of <code>JinApplet</code>
-   * is invoked. If the user chooses to continue as guest, the <code>startAsGuest</code> method of
+   * the settings for that user are retrieved and the <code>
+   * start(Preferences, User, User [], String, String)</code> method of <code>JinApplet</code> is
+   * invoked. If the user chooses to continue as guest, the <code>startAsGuest</code> method of
    * <code>JinApplet</code> is invoked.
    */
   private class UserAuthPanel extends Panel implements Runnable {
 
-    /**
-     * The username text field.
-     */
+    /** The username text field. */
     private final TextField usernameField;
 
-    /**
-     * The password field.
-     */
+    /** The password field. */
     private final TextField passwordField;
 
-    /**
-     * The status label.
-     */
+    /** The status label. */
     private final Label statusLabel;
 
-    /**
-     * The login button.
-     */
+    /** The login button. */
     private Button loginButton;
 
-    /**
-     * The "login as guest" button.
-     */
+    /** The "login as guest" button. */
     private Button guestButton;
 
-    /**
-     * The thread authenticating the user and retrieving his settings.
-     */
+    /** The thread authenticating the user and retrieving his settings. */
     private Thread authThread = null;
 
-    /**
-     * Creates a new <code>UserAuthPanel</code>.
-     */
+    /** Creates a new <code>UserAuthPanel</code>. */
     public UserAuthPanel() {
       usernameField = new TextField(20);
       passwordField = new TextField(20);
@@ -797,17 +703,13 @@ public class JinApplet extends Applet implements JinContext {
       createUI();
     }
 
-    /**
-     * Sets the status to the specified value (sets the status label).
-     */
+    /** Sets the status to the specified value (sets the status label). */
     private void setStatus(String status, Color color) {
       statusLabel.setForeground(color);
       statusLabel.setText(status);
     }
 
-    /**
-     * Builds the ui of this panel.
-     */
+    /** Builds the ui of this panel. */
     private void createUI() {
       this.setLayout(new BorderLayout());
 
@@ -895,14 +797,10 @@ public class JinApplet extends Applet implements JinContext {
           });
     }
 
-    /**
-     * Have we been painted already?
-     */
+    /** Have we been painted already? */
     private boolean isPainted = false;
 
-    /**
-     * Set focus to the username field on the first paint.
-     */
+    /** Set focus to the username field on the first paint. */
     @Override
     public void paint(Graphics g) {
       super.paint(g);
@@ -913,9 +811,7 @@ public class JinApplet extends Applet implements JinContext {
       }
     }
 
-    /**
-     * Authenticates the user and retrieves the preferences from the server.
-     */
+    /** Authenticates the user and retrieves the preferences from the server. */
     private synchronized void retrievePrefs() {
       if (authThread == null) {
         authThread = new Thread(this);
@@ -923,9 +819,7 @@ public class JinApplet extends Applet implements JinContext {
       }
     }
 
-    /**
-     * Connects to the server and retrieves the preferences.
-     */
+    /** Connects to the server and retrieves the preferences. */
     @Override
     public void run() {
       try {
@@ -1007,9 +901,7 @@ public class JinApplet extends Applet implements JinContext {
       }
     }
 
-    /**
-     * Creates a User from the specified <code>InputStream</code>.
-     */
+    /** Creates a User from the specified <code>InputStream</code>. */
     private User loadUser(DataInputStream in) throws IOException {
       String username = in.readUTF();
       int prefsLength = in.readInt();
@@ -1021,14 +913,10 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * A dialog which is displayed while the user settings are uploaded.
-   */
+  /** A dialog which is displayed while the user settings are uploaded. */
   private abstract class SettingsUploadDialog extends Dialog {
 
-    /**
-     * Creates a new <code>SettingsUploadDialog</code> with the specified parent Frame.
-     */
+    /** Creates a new <code>SettingsUploadDialog</code> with the specified parent Frame. */
     public SettingsUploadDialog(Frame parent) {
       super(parent, "", true);
 
@@ -1055,15 +943,11 @@ public class JinApplet extends Applet implements JinContext {
           });
     }
 
-    /**
-     * Gets called when the user pressed the "cancel" button.
-     */
+    /** Gets called when the user pressed the "cancel" button. */
     public abstract void canceled();
   }
 
-  /**
-   * A dialog for displaying the error that occurred while uploading user settings.
-   */
+  /** A dialog for displaying the error that occurred while uploading user settings. */
   private class SettingsUploadErrorDialog extends Dialog {
 
     /**
@@ -1079,9 +963,7 @@ public class JinApplet extends Applet implements JinContext {
       createUI(errorMessage);
     }
 
-    /**
-     * Creates the UI of this dialog.
-     */
+    /** Creates the UI of this dialog. */
     private void createUI(String errorMessage) {
       this.setLayout(new BorderLayout(5, 5));
 
@@ -1111,24 +993,16 @@ public class JinApplet extends Applet implements JinContext {
     }
   }
 
-  /**
-   * A dialog which asks the user to input his password and retry uploading the preferences.
-   */
+  /** A dialog which asks the user to input his password and retry uploading the preferences. */
   private class PasswordDialog extends Dialog {
 
-    /**
-     * The username field.
-     */
+    /** The username field. */
     private final TextField usernameField;
 
-    /**
-     * The password field.
-     */
+    /** The password field. */
     private final TextField passwordField;
 
-    /**
-     * Whether prefs upload should be retried.
-     */
+    /** Whether prefs upload should be retried. */
     private boolean shouldRetry;
 
     /**
@@ -1149,9 +1023,7 @@ public class JinApplet extends Applet implements JinContext {
       createUI(errorMessage);
     }
 
-    /**
-     * Creates the UI of this dialog.
-     */
+    /** Creates the UI of this dialog. */
     private void createUI(String errorMessage) {
       this.setLayout(new BorderLayout(5, 5));
 
@@ -1211,24 +1083,18 @@ public class JinApplet extends Applet implements JinContext {
           });
     }
 
-    /**
-     * Displays the dialog and returns whether the user asked to retry prefs upload.
-     */
+    /** Displays the dialog and returns whether the user asked to retry prefs upload. */
     public boolean shouldRetry() {
       this.setVisible(true);
       return shouldRetry;
     }
 
-    /**
-     * Returns the username specified by the user.
-     */
+    /** Returns the username specified by the user. */
     public String getUsername() {
       return usernameField.getText();
     }
 
-    /**
-     * Returns the password specified by the user.
-     */
+    /** Returns the password specified by the user. */
     public String getPassword() {
       return passwordField.getText();
     }

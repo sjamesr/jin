@@ -2,30 +2,28 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
-import java.util.Collection;
-import java.util.StringTokenizer;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
-
 import free.chess.event.MoveEvent;
 import free.chess.event.MoveListener;
 import free.util.Utilities;
+import java.util.Collection;
+import java.util.StringTokenizer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 
 /**
  * Represents a position in one of the chess wild variants. The Position class itself is generally
@@ -35,29 +33,19 @@ import free.util.Utilities;
  */
 public final class Position {
 
-  /**
-   * The WildVariant of this Position.
-   */
+  /** The WildVariant of this Position. */
   private final WildVariant variant;
 
-  /**
-   * A matrix to keep references to the pieces.
-   */
+  /** A matrix to keep references to the pieces. */
   private final Piece[][] pieces = new Piece[8][8];
 
-  /**
-   * The Modifier of this Position.
-   */
+  /** The Modifier of this Position. */
   private final Modifier modifier;
 
-  /**
-   * The Player whose turn it currently is in this Position.
-   */
+  /** The Player whose turn it currently is in this Position. */
   private Player currentPlayer;
 
-  /**
-   * A FEN representation of the position.
-   */
+  /** A FEN representation of the position. */
   private String positionFEN;
 
   /**
@@ -66,9 +54,7 @@ public final class Position {
    */
   protected transient ChangeEvent changeEvent = null;
 
-  /**
-   * The listeners waiting for model changes.
-   */
+  /** The listeners waiting for model changes. */
   protected EventListenerList listenerList = new EventListenerList();
 
   /**
@@ -80,27 +66,21 @@ public final class Position {
     this(Chess.getInstance());
   }
 
-  /**
-   * Creates a new Position with the given WildVariant.
-   */
+  /** Creates a new Position with the given WildVariant. */
   public Position(WildVariant variant) {
     this.variant = variant;
     this.modifier = new Modifier(this);
     init();
   }
 
-  /**
-   * Creates a new Position which is exactly like the given Position.
-   */
+  /** Creates a new Position which is exactly like the given Position. */
   public Position(Position source) {
     this.variant = source.variant;
     this.modifier = new Modifier(this);
     copyFrom(source);
   }
 
-  /**
-   * Returns the WildVariant of this Position.
-   */
+  /** Returns the WildVariant of this Position. */
   public WildVariant getVariant() {
     return variant;
   }
@@ -114,16 +94,14 @@ public final class Position {
     return getPieceAt(square.getFile(), square.getRank());
   }
 
-  /**
-   * Returns the piece at the square with the given file and rank.
-   */
+  /** Returns the piece at the square with the given file and rank. */
   public Piece getPieceAt(int file, int rank) {
     return pieces[file][rank];
   }
 
   /**
-   * Returns the piece at the square specified by the given string, as if by
-   * {@link Square#parseSquare(String)}.
+   * Returns the piece at the square specified by the given string, as if by {@link
+   * Square#parseSquare(String)}.
    */
   public Piece getPieceAt(String square) {
     return getPieceAt(Square.parseSquare(square));
@@ -150,9 +128,7 @@ public final class Position {
     setPieceAt(piece, Square.parseSquare(square));
   }
 
-  /**
-   * Returns the player whose turn it is in this position, the "current" player.
-   */
+  /** Returns the player whose turn it is in this position, the "current" player. */
   public Player getCurrentPlayer() {
     return currentPlayer;
   }
@@ -174,7 +150,6 @@ public final class Position {
    * white pieces.
    *
    * @param pos The string representing the position.
-   *
    * @throws PositionFormatException if the given string is not in the expected format.
    */
   public void setLexigraphic(String pos) throws PositionFormatException {
@@ -278,9 +253,7 @@ public final class Position {
     return positionFEN;
   }
 
-  /**
-   * Sets this Position to the initial position.
-   */
+  /** Sets this Position to the initial position. */
   public final void init() {
     variant.init(this);
   }
@@ -302,9 +275,8 @@ public final class Position {
    * ChangeEvent.
    *
    * @param move The move to make.
-   *
    * @throws IllegalArgumentException if the given Move is incompatible with the wild variant of
-   * this Position.
+   *     this Position.
    */
   public void makeMove(Move move) {
     variant.makeMove(move, this, modifier);
@@ -343,7 +315,6 @@ public final class Position {
    *
    * @param piece The piece to put.
    * @param square The square where to put the piece.
-   *
    * @see #setPieceAt(Piece, Square);
    */
   private void setPieceAtImpl(Piece piece, Square square) {
@@ -383,9 +354,7 @@ public final class Position {
     listenerList.remove(ChangeListener.class, l);
   }
 
-  /**
-   * Run each ChangeListeners stateChanged() method.
-   */
+  /** Run each ChangeListeners stateChanged() method. */
   protected void fireStateChanged() {
     Object[] listeners = listenerList.getListenerList();
     for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -444,18 +413,14 @@ public final class Position {
     return variant.getTargetSquares(this, square);
   }
 
-  /**
-   * Returns a textual representation of the board.
-   */
+  /** Returns a textual representation of the board. */
   @Override
   public String toString() {
     if (getCurrentPlayer().isWhite()) return "White to move in " + getLexigraphic();
     else return "Black to move in " + getLexigraphic();
   }
 
-  /**
-   * Returns true iff the specified <code>Position</code> is the same as this one.
-   */
+  /** Returns true iff the specified <code>Position</code> is the same as this one. */
   public boolean equals(Position pos) {
     if (!variant.equals(pos.variant)) return false;
 
@@ -479,9 +444,7 @@ public final class Position {
     return equals((Position) obj);
   }
 
-  /**
-   * Returns the hashcode of this position.
-   */
+  /** Returns the hashcode of this position. */
   @Override
   public int hashCode() {
     int result = 17;
@@ -512,23 +475,17 @@ public final class Position {
      */
     private final Position position;
 
-    /**
-     * Creates a new PositionModifier with the given Position.
-     */
+    /** Creates a new PositionModifier with the given Position. */
     private Modifier(Position position) {
       this.position = position;
     }
 
-    /**
-     * Puts the given piece at the given Square.
-     */
+    /** Puts the given piece at the given Square. */
     public void setPieceAt(Piece piece, Square square) {
       position.setPieceAtImpl(piece, square);
     }
 
-    /**
-     * Sets the current player.
-     */
+    /** Sets the current player. */
     public void setCurrentPlayer(Player player) {
       position.setCurrentPlayerImpl(player);
     }

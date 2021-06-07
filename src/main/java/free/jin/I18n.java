@@ -2,37 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
-
-import java.awt.Component;
-import java.awt.Font;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButton;
-import javax.swing.border.TitledBorder;
 
 import free.jin.ui.OptionPanel;
 import free.util.AWTUtilities;
@@ -43,36 +25,42 @@ import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PlainTextDialog;
 import free.util.swing.SwingUtils;
+import java.awt.Component;
+import java.awt.Font;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButton;
+import javax.swing.border.TitledBorder;
 
 /**
- * <p>
  * Responsible for translation of text and other locale sensitive data.
  *
- * <p>
- * Additionally, it has convenience methods to create certain UI elements and set some of their
+ * <p>Additionally, it has convenience methods to create certain UI elements and set some of their
  * properties to values specified by the <code>I18n</code> object. These methods define an ad-hoc
  * format for specifying the properties of these UI elements in a resource bundle.
  */
 public class I18n {
 
-  /**
-   * A cache of <code>I18n</code> objects.
-   */
+  /** A cache of <code>I18n</code> objects. */
   private static final Map cache = new HashMap();
 
-  /**
-   * The name of the OS we're running under.
-   */
+  /** The name of the OS we're running under. */
   private static final String osName = PlatformUtils.getOSName();
 
-  /**
-   * Holds the actual translation.
-   */
+  /** Holds the actual translation. */
   private final Localization localization;
 
-  /**
-   * The name of the class whose information we translate.
-   */
+  /** The name of the class whose information we translate. */
   private final String className;
 
   /**
@@ -91,16 +79,12 @@ public class I18n {
     this.parent = parent;
   }
 
-  /**
-   * Creates a new <code>I18n</code> object for the specified class and locale.
-   */
+  /** Creates a new <code>I18n</code> object for the specified class and locale. */
   private I18n(Class requestingClass, Locale locale) {
     this(requestingClass, locale, null);
   }
 
-  /**
-   * Returns an <code>I18n</code> object for the specified class and the current Jin locale.
-   */
+  /** Returns an <code>I18n</code> object for the specified class and the current Jin locale. */
   public static I18n get(Class requestingClass) {
     I18n result = (I18n) cache.get(requestingClass);
 
@@ -136,16 +120,12 @@ public class I18n {
     return result;
   }
 
-  /**
-   * Returns an i18n key formed from combining the two specified keys.
-   */
+  /** Returns an i18n key formed from combining the two specified keys. */
   private static String combineKeys(String key1, String key2) {
     return "".equals(key1) ? key2 : ("".equals(key2) ? key1 : key1 + "." + key2);
   }
 
-  /**
-   * Returns the translation for the specified key.
-   */
+  /** Returns the translation for the specified key. */
   public String getString(String key) throws MissingResourceException {
     String result = getString(key, null);
     if (result != null) return result;
@@ -181,9 +161,7 @@ public class I18n {
     return formatMessage(getString(key), args);
   }
 
-  /**
-   * Returns the translation for the specified key, parsed as an integer.
-   */
+  /** Returns the translation for the specified key, parsed as an integer. */
   public int getInt(String key) throws MissingResourceException {
     return Integer.parseInt(getString(key));
   }
@@ -207,9 +185,7 @@ public class I18n {
     return messageArgs == null ? message : MessageFormat.format(message, messageArgs);
   }
 
-  /**
-   * Creates a <code>JLabel</code> using the specified i18n key.
-   */
+  /** Creates a <code>JLabel</code> using the specified i18n key. */
   public JLabel createLabel(String i18nKey) {
     JLabel label = new JLabel();
 
@@ -221,9 +197,7 @@ public class I18n {
     return label;
   }
 
-  /**
-   * Creates a <code>JRadioButton</code> using the specified i18n key.
-   */
+  /** Creates a <code>JRadioButton</code> using the specified i18n key. */
   public JRadioButton createRadioButton(String i18nKey) {
     return (JRadioButton) initAbstractButton(new JRadioButton(), i18nKey);
   }
@@ -237,9 +211,7 @@ public class I18n {
     return (JRadioButton) initAbstractButton(new JRadioButton(), i18nKey, args);
   }
 
-  /**
-   * Creates a <code>JCheckBox</code> using the specified i18n key.
-   */
+  /** Creates a <code>JCheckBox</code> using the specified i18n key. */
   public JCheckBox createCheckBox(String i18nKey) {
     return (JCheckBox) initAbstractButton(new JCheckBox(), i18nKey);
   }
@@ -253,9 +225,7 @@ public class I18n {
     return (JCheckBox) initAbstractButton(new JCheckBox(), i18nKey, args);
   }
 
-  /**
-   * Creates a <code>JButton</code> using the specified i18n key.
-   */
+  /** Creates a <code>JButton</code> using the specified i18n key. */
   public JButton createButton(String i18nKey) {
     return (JButton) initAbstractButton(new JButton(), i18nKey);
   }
@@ -269,9 +239,7 @@ public class I18n {
     return (JButton) initAbstractButton(new JButton(), i18nKey, args);
   }
 
-  /**
-   * Creates a <code>JMenuItem</code> using the specified i18n key.
-   */
+  /** Creates a <code>JMenuItem</code> using the specified i18n key. */
   public JMenuItem createMenuItem(String i18nKey) {
     return createMenuItem(i18nKey, null);
   }
@@ -285,9 +253,7 @@ public class I18n {
     return (JMenuItem) initAbstractButton(new JMenuItem(), i18nKey, args);
   }
 
-  /**
-   * Creates a <code>ColorChooser</code> from the specified i18n key.
-   */
+  /** Creates a <code>ColorChooser</code> from the specified i18n key. */
   public ColorChooser createColorChooser(String i18nKey) {
     ColorChooser colorChooser = new ColorChooser();
 
@@ -297,9 +263,7 @@ public class I18n {
     return colorChooser;
   }
 
-  /**
-   * Initializes the specified <code>AbstractButton</code> from the specified i18n key.
-   */
+  /** Initializes the specified <code>AbstractButton</code> from the specified i18n key. */
   public AbstractButton initAbstractButton(AbstractButton button, String i18nKey) {
     return initAbstractButton(button, i18nKey, null);
   }
@@ -338,16 +302,12 @@ public class I18n {
     return action;
   }
 
-  /**
-   * Creates a titled border with the specified i18n key.
-   */
+  /** Creates a titled border with the specified i18n key. */
   public TitledBorder createTitledBorder(String i18nKey) {
     return BorderFactory.createTitledBorder(getTitle(i18nKey));
   }
 
-  /**
-   * Obtains the title associated with the specified i18n key.
-   */
+  /** Obtains the title associated with the specified i18n key. */
   private String getTitle(String i18nKey) {
     return getString(combineKeys(i18nKey, "title"));
   }
@@ -366,14 +326,13 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates and shows an error panel.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public void error(String i18nKey, Component hintParent, Object[] messageArgs) {
@@ -384,13 +343,12 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates and shows an error panel.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public void error(String i18nKey, Component hintParent) {
@@ -398,22 +356,20 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates and shows an error panel.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
    */
   public void error(String i18nKey, Object[] messageArgs) {
     error(i18nKey, null, messageArgs);
   }
 
   /**
-   * <p>
    * Creates and shows an error panel.
-   * <p>
-   * The information required to display the panel (such as the title and the message) using the
+   *
+   * <p>The information required to display the panel (such as the title and the message) using the
    * specified i18n key.
    */
   public void error(String i18nKey) {
@@ -421,15 +377,14 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates, displays a confirmation panel and returns the result value. Possible result values are
    * {@link OptionPanel#OK} and {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public Object confirm(
@@ -441,14 +396,13 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates, displays a confirmation panel and returns the result value. Possible result values are
    * {@link OptionPanel#OK} and {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public Object confirm(Object defaultOption, String i18nKey, Component hintParent) {
@@ -456,41 +410,38 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates, displays a confirmation panel and returns the result value. Possible result values are
    * {@link OptionPanel#OK} and {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
    */
   public Object confirm(Object defaultOption, String i18nKey, Object[] messageArgs) {
     return confirm(defaultOption, i18nKey, null, messageArgs);
   }
 
   /**
-   * <p>
    * Creates, displays a confirmation panel and returns the result value. Possible result values are
    * {@link OptionPanel#OK} and {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
    */
   public Object confirm(Object defaultOption, String i18nKey) {
     return confirm(defaultOption, i18nKey, null, null);
   }
 
   /**
-   * <p>
    * Creates, displays a yes/no question dialog with the specified arguments and returns the result
    * value. The possible result options are {@link OptionPanel#YES}, {@link OptionPanel#NO} and
    * {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public Object question(
@@ -502,15 +453,14 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates, displays a yes/no question dialog with the specified arguments and returns the result
    * value. The possible result options are {@link OptionPanel#YES}, {@link OptionPanel#NO} and
    * {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public Object question(Object defaultOption, String i18nKey, Component hintParent) {
@@ -518,27 +468,25 @@ public class I18n {
   }
 
   /**
-   * <p>
    * Creates, displays a yes/no question dialog with the specified arguments and returns the result
    * value. The possible result options are {@link OptionPanel#YES}, {@link OptionPanel#NO} and
    * {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
    */
   public Object question(Object defaultOption, String i18nKey, Object[] messageArgs) {
     return question(defaultOption, i18nKey, null, messageArgs);
   }
 
   /**
-   * <p>
    * Creates, displays a yes/no question dialog with the specified arguments and returns the result
    * value. The possible result options are {@link OptionPanel#YES}, {@link OptionPanel#NO} and
    * {@link OptionPanel#CANCEL}.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
    */
   public Object question(Object defaultOption, String i18nKey) {
     return question(defaultOption, i18nKey, null, null);
@@ -547,10 +495,10 @@ public class I18n {
   /**
    * Creates, displays a text query dialog using the specified i18n key and returns the value
    * specified by the user.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key. The panel's message is treated as a pattern and
-   * <code>messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key. The panel's message is treated as a pattern and <code>
+   * messageArgs</code>, if not <code>null</code> are inserted at the appropriate locations.
    */
   public String queryText(String i18nKey, Component hintParent, Object[] messageArgs) {
     String title = getTitle(i18nKey);
@@ -563,9 +511,9 @@ public class I18n {
   /**
    * Creates, displays a text query dialog using the specified i18n key and returns the value
    * specified by the user.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
    */
   public String queryText(String i18nKey, Component hintParent) {
     return queryText(i18nKey, hintParent, null);
@@ -574,17 +522,15 @@ public class I18n {
   /**
    * Creates, displays a text query dialog using the specified i18n key and returns the value
    * specified by the user.
-   * <p>
-   * The information required to display the panel (such as the title and the message) is obtained
-   * using the specified i18n key.
+   *
+   * <p>The information required to display the panel (such as the title and the message) is
+   * obtained using the specified i18n key.
    */
   public String queryText(String i18nKey) {
     return queryText(i18nKey, null, null);
   }
 
-  /**
-   * Displays text in a <code>PlainTextDialog</code>.
-   */
+  /** Displays text in a <code>PlainTextDialog</code>. */
   public void showPlainTextDialog(String i18nKey, Component hintParent) {
     String title = getTitle(i18nKey);
     String message = getMessage(i18nKey, null);

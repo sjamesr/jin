@@ -2,20 +2,25 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.prefs;
 
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.console.ConsoleManager;
+import free.jin.ui.PreferencesPanel;
+import free.util.swing.ColorChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,7 +28,6 @@ import java.awt.GridLayout;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -36,60 +40,34 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.console.ConsoleManager;
-import free.jin.ui.PreferencesPanel;
-import free.util.swing.ColorChooser;
-
-/**
- * The preferences panel for the console manager.
- */
+/** The preferences panel for the console manager. */
 public class TextPrefsPanel extends PreferencesPanel {
 
-  /**
-   * The ConsoleManager this panel shows preferences for.
-   */
+  /** The ConsoleManager this panel shows preferences for. */
   protected final ConsoleManager consoleManager;
 
-  /**
-   * The preferences we've modified as a result of user actions.
-   */
+  /** The preferences we've modified as a result of user actions. */
   protected final Preferences prefs;
 
-  /**
-   * A list of panels to be displayed. The items in the list are CategoryPanels.
-   */
+  /** A list of panels to be displayed. The items in the list are CategoryPanels. */
   private final Vector categoryPanels = new Vector();
 
-  /**
-   * The currently visible category panel.
-   */
+  /** The currently visible category panel. */
   private CategoryPanel currentCategoryPanel;
 
-  /**
-   * The selection color choosing button.
-   */
+  /** The selection color choosing button. */
   private ColorChooser selectionColorButton;
 
-  /**
-   * The selected text color choosing button.
-   */
+  /** The selected text color choosing button. */
   private ColorChooser selectedColorButton;
 
-  /**
-   * The default settings panel.
-   */
+  /** The default settings panel. */
   private CategoryPanel defaultSettingsPanel;
 
-  /**
-   * A holder panel for the current category panel.
-   */
+  /** A holder panel for the current category panel. */
   private final JPanel categoryPanelHolder = new JPanel(new BorderLayout());
 
-  /**
-   * Creates a new TextPrefsPanel for the givenConsoleManager.
-   */
+  /** Creates a new TextPrefsPanel for the givenConsoleManager. */
   public TextPrefsPanel(ConsoleManager consoleManager) {
     this.consoleManager = consoleManager;
 
@@ -100,9 +78,7 @@ public class TextPrefsPanel extends PreferencesPanel {
     createLayout();
   }
 
-  /**
-   * Adds the specified CategoryPanel to the list of displayed panels.
-   */
+  /** Adds the specified CategoryPanel to the list of displayed panels. */
   protected void addCategoryPanel(CategoryPanel panel) {
     categoryPanels.addElement(panel);
 
@@ -110,17 +86,14 @@ public class TextPrefsPanel extends PreferencesPanel {
     if (textStyleChooser != null) textStyleChooser.addChangeListener(settingsChangeListener);
   }
 
-  /**
-   * A flag we set to true so we know not to handle echo change events.
-   */
+  /** A flag we set to true so we know not to handle echo change events. */
   private boolean handlingChangeEvent = false;
 
   /**
    * The listener that listens to settings changes in the various panels and updates the properties
    * accordingly. You may register this listener as the change listener of any custom components
-   * you're adding. Note that if you do that, you should also override
-   * <code>updatePropertiesFrom</code> and <code>updatePanels</code> to apply changes and update
-   * your components respectively.
+   * you're adding. Note that if you do that, you should also override <code>updatePropertiesFrom
+   * </code> and <code>updatePanels</code> to apply changes and update your components respectively.
    */
   protected final ChangeListener settingsChangeListener =
       new ChangeListener() {
@@ -204,18 +177,14 @@ public class TextPrefsPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Creates all the settings panels.
-   */
+  /** Creates all the settings panels. */
   protected void createSettingsPanels() {
     createDefaultSettingsPanel();
 
     createSettingsPanelsFromProperties();
   }
 
-  /**
-   * Creates the default settings panel.
-   */
+  /** Creates the default settings panel. */
   private void createDefaultSettingsPanel() {
     Font font = getCategoryFont("");
     Color foreground = prefs.getColor("foreground");
@@ -253,9 +222,7 @@ public class TextPrefsPanel extends PreferencesPanel {
     selectedColorButton.addChangeListener(settingsChangeListener);
   }
 
-  /**
-   * Creates settings panels as specified in the properties.
-   */
+  /** Creates settings panels as specified in the properties. */
   private void createSettingsPanelsFromProperties() {
     int categoriesCount = prefs.getInt("preferences.categories.count", 0);
 
@@ -289,7 +256,6 @@ public class TextPrefsPanel extends PreferencesPanel {
   }
 
   /**
-   * <P>
    * Creates a custom CategoryPanel with the specified id. This is used to enable subclasses to
    * create their own, custom, server specific (or otherwise specific) panels. In order to add such
    * a panel, mark the panel as custom (in plugin properties) and give it an ID. Then override this
@@ -323,9 +289,7 @@ public class TextPrefsPanel extends PreferencesPanel {
     return button;
   }
 
-  /**
-   * Lays out all the components as necessary.
-   */
+  /** Lays out all the components as necessary. */
   protected void createLayout() {
     setLayout(new BorderLayout(10, 10));
 
@@ -352,13 +316,12 @@ public class TextPrefsPanel extends PreferencesPanel {
     add(listPanel, BorderLayout.WEST);
     add(categoryPanelHolder, BorderLayout.CENTER);
 
-    // The call propagates to the registered selection listener which sets the current panel properly
+    // The call propagates to the registered selection listener which sets the current panel
+    // properly
     categoryList.setSelectedIndex(0);
   }
 
-  /**
-   * Sets the currently displayed panel to the specified CategoryPanel.
-   */
+  /** Sets the currently displayed panel to the specified CategoryPanel. */
   private void setCurrentPanel(CategoryPanel panel) {
     categoryPanelHolder.removeAll();
     currentCategoryPanel = panel;
@@ -374,9 +337,7 @@ public class TextPrefsPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Applies the changes done by the user.
-   */
+  /** Applies the changes done by the user. */
   @Override
   public void applyChanges() {
     Preferences consolePrefs = consoleManager.getPrefs();
@@ -398,9 +359,7 @@ public class TextPrefsPanel extends PreferencesPanel {
     consoleManager.refreshFromProperties();
   }
 
-  /**
-   * Returns the font used for the specified category.
-   */
+  /** Returns the font used for the specified category. */
   protected Font getCategoryFont(String categoryName) {
     String fontFamily = (String) prefs.lookup("font-family." + categoryName, "Monospaced");
     int fontSize =
@@ -426,19 +385,13 @@ public class TextPrefsPanel extends PreferencesPanel {
     prefs.set(propertyName, propertyValue);
   }
 
-  /**
-   * An extension of JPanel which also holds category information.
-   */
+  /** An extension of JPanel which also holds category information. */
   protected class CategoryPanel extends JPanel {
 
-    /**
-     * The long name of the category.
-     */
+    /** The long name of the category. */
     private final String categoryName;
 
-    /**
-     * The TextStyleChooserPanel in this panel.
-     */
+    /** The TextStyleChooserPanel in this panel. */
     private TextStyleChooserPanel textStyleChooser = null;
 
     /**
@@ -479,9 +432,7 @@ public class TextPrefsPanel extends PreferencesPanel {
       return textStyleChooser;
     }
 
-    /**
-     * Creates the TextStyleChooserPanel.
-     */
+    /** Creates the TextStyleChooserPanel. */
     public void createTextStyleChooser() {
       if (textStyleChooser == null) {
         String mainCategory = getMainCategory();
@@ -505,18 +456,14 @@ public class TextPrefsPanel extends PreferencesPanel {
       return categories.clone();
     }
 
-    /**
-     * Returns the main category. This is the category used to visualize the setting.
-     */
+    /** Returns the main category. This is the category used to visualize the setting. */
     public String getMainCategory() {
       // If you update this, check ChannelTextPrefsPanel.createChannelsCategoryPanel() as well
       // as it assumes the main category is the first element as well.
       return getCategories()[0];
     }
 
-    /**
-     * Returns the name specified in the constructor.
-     */
+    /** Returns the name specified in the constructor. */
     @Override
     public String toString() {
       return categoryName;

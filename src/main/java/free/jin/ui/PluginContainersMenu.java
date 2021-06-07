@@ -2,41 +2,37 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSeparator;
 
 import free.jin.I18n;
 import free.jin.plugin.PluginUIContainer;
 import free.jin.plugin.PluginUIEvent;
 import free.jin.plugin.PluginUIListener;
 import free.util.Utilities;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 
-/**
- * A menu which allows the user to manage the various plugin containers.
- */
+/** A menu which allows the user to manage the various plugin containers. */
 public class PluginContainersMenu extends JMenu
     implements PluginUIListener, PluginUIContainerCreationListener, ActionListener {
 
@@ -77,9 +73,7 @@ public class PluginContainersMenu extends JMenu
    */
   private int sepIndex = -1;
 
-  /**
-   * Creates a new <code>PluginContainersMenu</code>.
-   */
+  /** Creates a new <code>PluginContainersMenu</code>. */
   public PluginContainersMenu() {
     this(Utilities.EMPTY_ENUM);
   }
@@ -93,9 +87,7 @@ public class PluginContainersMenu extends JMenu
       pluginContainerAdded((PluginUIContainer) existingContainers.nextElement());
   }
 
-  /**
-   * Synchronizes our own item list with what the menu thinks it has for children.
-   */
+  /** Synchronizes our own item list with what the menu thinks it has for children. */
   private void syncMenus() {
     removeAll();
 
@@ -116,9 +108,7 @@ public class PluginContainersMenu extends JMenu
         i18n.getFormattedString("showPluginContainerCheckBox.text", new Object[] {pc.getTitle()}));
   }
 
-  /**
-   * This method is invoked to notify us that a new plugin container has been created.
-   */
+  /** This method is invoked to notify us that a new plugin container has been created. */
   @Override
   public void pluginContainerAdded(PluginUIContainer pc) {
     if (pc.getMode() == UIProvider.HIDEABLE_CONTAINER_MODE) {
@@ -146,9 +136,7 @@ public class PluginContainersMenu extends JMenu
     pc.addPluginUIListener(this);
   }
 
-  /**
-   * Adds the specified show/hide checkbox at the appropriate location.
-   */
+  /** Adds the specified show/hide checkbox at the appropriate location. */
   private void addShowCheckBox(JCheckBoxMenuItem item) {
     if (sepIndex != -1) { // separator already exists
       items.insertElementAt(item, sepIndex++);
@@ -161,9 +149,7 @@ public class PluginContainersMenu extends JMenu
     syncMenus();
   }
 
-  /**
-   * Removes the specified show/hide checkbox.
-   */
+  /** Removes the specified show/hide checkbox. */
   private void removeShowCheckBox(JCheckBoxMenuItem item) {
     items.removeElement(item);
 
@@ -177,9 +163,7 @@ public class PluginContainersMenu extends JMenu
     syncMenus();
   }
 
-  /**
-   * Adds the specified activeness controlling radio button at the appropriate location.
-   */
+  /** Adds the specified activeness controlling radio button at the appropriate location. */
   private void addActiveRadioButton(JRadioButtonMenuItem item) {
     if (sepIndex != -1) // separator already exists
     items.addElement(item);
@@ -193,9 +177,7 @@ public class PluginContainersMenu extends JMenu
     syncMenus();
   }
 
-  /**
-   * Removes the specified activeness controlling radio button.
-   */
+  /** Removes the specified activeness controlling radio button. */
   private void removeActiveRadioButton(JRadioButtonMenuItem item) {
     items.removeElement(item);
 
@@ -207,9 +189,7 @@ public class PluginContainersMenu extends JMenu
     syncMenus();
   }
 
-  /**
-   * This method is invoked when one of the current plugin ui containers is shown.
-   */
+  /** This method is invoked when one of the current plugin ui containers is shown. */
   @Override
   public void pluginUIShown(PluginUIEvent evt) {
     JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) containersToVisCheckBoxes.get(evt.getSource());
@@ -220,9 +200,7 @@ public class PluginContainersMenu extends JMenu
     addActiveRadioButton(radioButton);
   }
 
-  /**
-   * This method is invoked when one of the current plugin ui containers is hidden.
-   */
+  /** This method is invoked when one of the current plugin ui containers is hidden. */
   @Override
   public void pluginUIHidden(PluginUIEvent evt) {
     JCheckBoxMenuItem item = (JCheckBoxMenuItem) containersToVisCheckBoxes.get(evt.getSource());
@@ -233,9 +211,7 @@ public class PluginContainersMenu extends JMenu
     removeActiveRadioButton(radioButton);
   }
 
-  /**
-   * This method is invoked when the plugin ui becomes "active".
-   */
+  /** This method is invoked when the plugin ui becomes "active". */
   @Override
   public void pluginUIActivated(PluginUIEvent evt) {
     JRadioButtonMenuItem radioButton =
@@ -243,9 +219,7 @@ public class PluginContainersMenu extends JMenu
     radioButton.setSelected(true);
   }
 
-  /**
-   * This method is invoked when the plugin ui becomes "inactive".
-   */
+  /** This method is invoked when the plugin ui becomes "inactive". */
   @Override
   public void pluginUIDeactivated(PluginUIEvent evt) {
     JRadioButtonMenuItem radioButton =
@@ -253,17 +227,13 @@ public class PluginContainersMenu extends JMenu
     radioButton.setSelected(false);
   }
 
-  /**
-   * This method is invoked when the plugin ui is disposed.
-   */
+  /** This method is invoked when the plugin ui is disposed. */
   @Override
   public void pluginUIDisposed(PluginUIEvent evt) {
     pluginContainerRemoved(evt.getPluginUIContainer());
   }
 
-  /**
-   * This method is invoked when the plugin ui title changes.
-   */
+  /** This method is invoked when the plugin ui title changes. */
   @Override
   public void pluginUITitleChanged(PluginUIEvent evt) {
     PluginUIContainer pc = evt.getPluginUIContainer();
@@ -282,15 +252,11 @@ public class PluginContainersMenu extends JMenu
   @Override
   public void pluginUIClosing(PluginUIEvent evt) {}
 
-  /**
-   * This method is invoked when the plugin ui icon changes.
-   */
+  /** This method is invoked when the plugin ui icon changes. */
   @Override
   public void pluginUIIconChanged(PluginUIEvent evt) {}
 
-  /**
-   * This method is invoked when one of the checkboxes or radio buttons is clicked.
-   */
+  /** This method is invoked when one of the checkboxes or radio buttons is clicked. */
   @Override
   public void actionPerformed(ActionEvent evt) {
     Object source = evt.getSource();
@@ -307,9 +273,7 @@ public class PluginContainersMenu extends JMenu
     }
   }
 
-  /**
-   * This method is called when a plugin container has been disposed of.
-   */
+  /** This method is called when a plugin container has been disposed of. */
   private void pluginContainerRemoved(PluginUIContainer pc) {
     // remove the visibility controlling menu item
     if (pc.getMode() == UIProvider.HIDEABLE_CONTAINER_MODE) {

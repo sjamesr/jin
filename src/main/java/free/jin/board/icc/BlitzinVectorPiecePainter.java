@@ -2,27 +2,26 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.icc;
 
+import free.chess.PiecePainter;
+import free.chess.VectorPiecePainter;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Polygon;
-
-import free.chess.PiecePainter;
-import free.chess.VectorPiecePainter;
 
 /**
  * An implementation of PiecePainter which draws blitzin-like vector pieces. Note that the vector
@@ -66,24 +65,18 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     super(whiteColor, blackColor, whiteOutline, blackOutline);
   }
 
-  /**
-   * Returns a new <code>BlitzinVectorPiecePainter</code>.
-   */
+  /** Returns a new <code>BlitzinVectorPiecePainter</code>. */
   @Override
   public PiecePainter freshInstance() {
     return new BlitzinVectorPiecePainter();
   }
 
-  /**
-   * Returns 36x36.
-   */
+  /** Returns 36x36. */
   public Dimension getPreferredPieceSize() {
     return new Dimension(36, 36);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a king.
-   */
+  /** Creates and returns a Polygon for drawing a king. */
   @Override
   protected Polygon createKingPolygon(int width, int height) {
     Polygon kingPolygon = new Polygon();
@@ -175,9 +168,7 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(18 * width / 37, 11 * height / 37, 19 * width / 37, 11 * height / 37);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a queen.
-   */
+  /** Creates and returns a Polygon for drawing a queen. */
   @Override
   protected Polygon createQueenPolygon(int width, int height) {
     Polygon queenPolygon = new Polygon();
@@ -246,9 +237,7 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(24 * width / 37, 25 * height / 37, 29 * width / 37, 26 * height / 37);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a rook.
-   */
+  /** Creates and returns a Polygon for drawing a rook. */
   @Override
   protected Polygon createRookPolygon(int width, int height) {
     Polygon rookPolygon = new Polygon();
@@ -291,9 +280,7 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(26 * width / 37, 12 * height / 37, 11 * width / 37, 12 * height / 37);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a bishop.
-   */
+  /** Creates and returns a Polygon for drawing a bishop. */
   @Override
   protected Polygon createBishopPolygon(int width, int height) {
     Polygon bishopPolygon = new Polygon();
@@ -348,9 +335,7 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(18 * width / 37, 16 * height / 37, 18 * width / 37, 19 * height / 37);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a knight.
-   */
+  /** Creates and returns a Polygon for drawing a knight. */
   @Override
   protected Polygon createKnightPolygon(int width, int height) {
     Polygon knightPolygon = new Polygon();
@@ -409,9 +394,7 @@ public final class BlitzinVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(6 * width / 37, 21 * height / 37, 5 * width / 37, 20 * height / 37);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a pawn.
-   */
+  /** Creates and returns a Polygon for drawing a pawn. */
   @Override
   protected Polygon createPawnPolygon(int width, int height) {
     Polygon pawnPolygon = new Polygon();

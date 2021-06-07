@@ -2,15 +2,15 @@
  * The workarounds library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The workarounds library is free software; you can redistribute it and/or modify it under the
+ * <p>The workarounds library is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * workarounds library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -18,7 +18,6 @@ package free.workarounds;
 
 import java.awt.Dimension;
 import java.util.Vector;
-
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
@@ -26,11 +25,12 @@ import javax.swing.table.TableModel;
 
 /**
  * A fix for JTable. Fixes the following bugs:
+ *
  * <UL>
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4276838.html">
- * TableColumn.getHeaderRenderer() default to null</A>
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4104863.html"> JTable returns
- * a big (hardcoded) preferred size</A>
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4276838.html">
+ *       TableColumn.getHeaderRenderer() default to null</A>
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4104863.html"> JTable
+ *       returns a big (hardcoded) preferred size</A>
  * </UL>
  */
 public class FixedJTable extends JTable {
@@ -91,9 +91,7 @@ public class FixedJTable extends JTable {
     super(rowData, columnNames);
   }
 
-  /**
-   * Fixes bug 4276838 by using FixedTableColumn instead of TableColumn.
-   */
+  /** Fixes bug 4276838 by using FixedTableColumn instead of TableColumn. */
   @Override
   public void createDefaultColumnsFromModel() {
     TableModel m = getModel();
@@ -113,10 +111,9 @@ public class FixedJTable extends JTable {
   }
 
   /**
-   * Fixes bug 4104863 by setting the preferredScrollableViewportSize to null. The
-   * <code>getPreferredScrollableViewportSize()</code> method in this class cooperates with this
-   * method and returns the preferred JTable size as long as the preferredScrollableViewportSize is
-   * null.
+   * Fixes bug 4104863 by setting the preferredScrollableViewportSize to null. The <code>
+   * getPreferredScrollableViewportSize()</code> method in this class cooperates with this method
+   * and returns the preferred JTable size as long as the preferredScrollableViewportSize is null.
    */
   @Override
   protected void initializeLocalVars() {

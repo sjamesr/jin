@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -25,43 +25,37 @@ import free.util.EventListenerList;
 import free.util.UnsupportedOperationException;
 
 /**
- * A basic implementation of the <code>ListenerManager</code> interface which uses an
- * <code>EventListenerList</code> to hold the listeners. It also provides convenient event firing
- * methods.
+ * A basic implementation of the <code>ListenerManager</code> interface which uses an <code>
+ * EventListenerList</code> to hold the listeners. It also provides convenient event firing methods.
  */
 public class BasicListenerManager
-    implements ListenerManager, SeekListenerManager, GameListListenerManager,
-        FriendsListenerManager, MatchOfferListenerManager {
+    implements ListenerManager,
+        SeekListenerManager,
+        GameListListenerManager,
+        FriendsListenerManager,
+        MatchOfferListenerManager {
 
-  /**
-   * The source of the events.
-   */
+  /** The source of the events. */
   protected final Connection source;
 
-  /**
-   * The <code>EventListenerList</code> where we keep all of our listeners.
-   */
+  /** The <code>EventListenerList</code> where we keep all of our listeners. */
   protected final EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Creates a new <code>BasicListenerManager</code> with the specified source
-   * <code>Connection</code>.
+   * Creates a new <code>BasicListenerManager</code> with the specified source <code>Connection
+   * </code>.
    */
   public BasicListenerManager(Connection source) {
     this.source = source;
   }
 
-  /**
-   * Adds the given <code>ConnectionListener</code> to receive connection related events.
-   */
+  /** Adds the given <code>ConnectionListener</code> to receive connection related events. */
   @Override
   public void addConnectionListener(ConnectionListener listener) {
     listenerList.add(ConnectionListener.class, listener);
   }
 
-  /**
-   * Removes the given <code>ConnectionListener</code> from receiving connection events.
-   */
+  /** Removes the given <code>ConnectionListener</code> from receiving connection events. */
   @Override
   public void removeConnectionListener(ConnectionListener listener) {
     listenerList.remove(ConnectionListener.class, listener);
@@ -120,9 +114,7 @@ public class BasicListenerManager
     }
   }
 
-  /**
-   * Notifies all interested <code>Connection</code> listeners that login succeeded.
-   */
+  /** Notifies all interested <code>Connection</code> listeners that login succeeded. */
   public void fireLoginSucceeded(Connection conn) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -137,9 +129,7 @@ public class BasicListenerManager
     }
   }
 
-  /**
-   * Notifies all interested <code>Connection</code> listeners that login failed.
-   */
+  /** Notifies all interested <code>Connection</code> listeners that login failed. */
   public void fireLoginFailed(Connection conn, String reason) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -190,9 +180,7 @@ public class BasicListenerManager
     listenerList.remove(PlainTextListener.class, listener);
   }
 
-  /**
-   * Fires the specified <code>PlainTextEvent</code> to all interested listeners.
-   */
+  /** Fires the specified <code>PlainTextEvent</code> to all interested listeners. */
   public void firePlainTextEvent(PlainTextEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -225,9 +213,7 @@ public class BasicListenerManager
     listenerList.remove(ChatListener.class, listener);
   }
 
-  /**
-   * Dispatches the specified <code>ChatEvent</code> to all interested listeners.
-   */
+  /** Dispatches the specified <code>ChatEvent</code> to all interested listeners. */
   public void fireChatEvent(ChatEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -260,9 +246,7 @@ public class BasicListenerManager
     listenerList.remove(GameListener.class, listener);
   }
 
-  /**
-   * Dispatches the specified <code>GameEvent</code> to all interested listeners.
-   */
+  /** Dispatches the specified <code>GameEvent</code> to all interested listeners. */
   public void fireGameEvent(GameEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -315,9 +299,7 @@ public class BasicListenerManager
     listenerList.remove(SeekListener.class, listener);
   }
 
-  /**
-   * Fires the specified <code>SeekEvent</code> to all interested <code>SeekListener</code>s.
-   */
+  /** Fires the specified <code>SeekEvent</code> to all interested <code>SeekListener</code>s. */
   public void fireSeekEvent(SeekEvent evt) {
     if (!(source instanceof SeekConnection))
       throw new UnsupportedOperationException(
@@ -346,8 +328,8 @@ public class BasicListenerManager
   }
 
   /**
-   * Adds the specified <code>GameListListener</code> to receive notifications of
-   * <code>GameListEvent</code>s.
+   * Adds the specified <code>GameListListener</code> to receive notifications of <code>
+   * GameListEvent</code>s.
    */
   @Override
   public void addGameListListener(GameListListener listener) {
@@ -419,9 +401,7 @@ public class BasicListenerManager
     listenerList.remove(FriendsListener.class, listener);
   }
 
-  /**
-   * Dispatches the given <code>FriendsEvent</code> to all interested listeners.
-   */
+  /** Dispatches the given <code>FriendsEvent</code> to all interested listeners. */
   public void fireFriendsEvent(FriendsEvent evt) {
     if (!(source instanceof FriendsConnection))
       throw new UnsupportedOperationException(
@@ -457,8 +437,8 @@ public class BasicListenerManager
   }
 
   /**
-   * Adds the specified <code>MatchOfferListener</code> to receive notifications of
-   * <code>MatchOfferEvent</code>s.
+   * Adds the specified <code>MatchOfferListener</code> to receive notifications of <code>
+   * MatchOfferEvent</code>s.
    */
   @Override
   public void addMatchOfferListener(MatchOfferListener listener) {
@@ -482,9 +462,7 @@ public class BasicListenerManager
     listenerList.remove(MatchOfferListener.class, listener);
   }
 
-  /**
-   * Dispatches the specified <code>MatchOfferEvent</code> to all interested listeners.
-   */
+  /** Dispatches the specified <code>MatchOfferEvent</code> to all interested listeners. */
   public void fireMatchOfferEvent(MatchOfferEvent evt) {
     if (!(source instanceof MatchOfferConnection))
       throw new UnsupportedOperationException(

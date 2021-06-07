@@ -2,60 +2,21 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003-2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
-import java.io.File;
-import java.util.Vector;
-
-import javax.swing.DefaultDesktopManager;
-import javax.swing.DefaultFocusManager;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-
 import com.google.common.io.Resources;
-
 import free.jin.ConnectionManager;
 import free.jin.I18n;
 import free.jin.Jin;
@@ -76,6 +37,42 @@ import free.util.swing.AdvancedJDesktopPane;
 import free.util.swing.BackgroundChooser;
 import free.util.swing.InternalFrameSwitcher;
 import free.workarounds.FixedJInternalFrame;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.io.File;
+import java.util.Vector;
+import javax.swing.DefaultDesktopManager;
+import javax.swing.DefaultFocusManager;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 
 /**
  * An MDI implementation of <code>UIProvider</code> - each <code>PluginUIContainer</code> is
@@ -84,44 +81,28 @@ import free.workarounds.FixedJInternalFrame;
  */
 public class MdiUiProvider extends AbstractUiProvider {
 
-  /**
-   * The main frame.
-   */
+  /** The main frame. */
   private JFrame mainFrame;
 
-  /**
-   * The desktop pane.
-   */
+  /** The desktop pane. */
   private AdvancedJDesktopPane desktop;
 
-  /**
-   * The menubar.
-   */
+  /** The menubar. */
   private JMenuBar menubar;
 
-  /**
-   * The "Windows" menu.
-   */
+  /** The "Windows" menu. */
   private PluginContainersMenu windowsMenu;
 
-  /**
-   * The "Actions" menu.
-   */
+  /** The "Actions" menu. */
   private ActionsMenu actionsMenu;
 
-  /**
-   * The internal frame switcher that tracks the order of internal frames.
-   */
+  /** The internal frame switcher that tracks the order of internal frames. */
   private InternalFrameSwitcher frameSwitcher;
 
-  /**
-   * Creates a new <code>MdiUiProvider</code>.
-   */
+  /** Creates a new <code>MdiUiProvider</code>. */
   public MdiUiProvider() {}
 
-  /**
-   * Creates all the UI.
-   */
+  /** Creates all the UI. */
   @Override
   public void init() {
     super.init();
@@ -186,13 +167,12 @@ public class MdiUiProvider extends AbstractUiProvider {
   public void start() {
     super.start();
 
-    // There's a window listener which starts the connection manager when the main frame is displayed
+    // There's a window listener which starts the connection manager when the main frame is
+    // displayed
     mainFrame.setVisible(true);
   }
 
-  /**
-   * Creates and configures the main frame.
-   */
+  /** Creates and configures the main frame. */
   private JFrame createMainFrame() {
     JFrame frame = new JFrame();
     frame.setTitle(Jin.getAppName());
@@ -209,9 +189,7 @@ public class MdiUiProvider extends AbstractUiProvider {
     return frame;
   }
 
-  /**
-   * Configures the desktop according to user preferences.
-   */
+  /** Configures the desktop according to user preferences. */
   private void configureDesktop(AdvancedJDesktopPane desktop) {
     Preferences prefs = Jin.getInstance().getPrefs();
 
@@ -228,17 +206,13 @@ public class MdiUiProvider extends AbstractUiProvider {
     desktop.setWallpaperLayoutStyle(layoutStyle);
     if (wallpaper != null) desktop.setWallpaper(desktop.getToolkit().getImage(wallpaper));
 
-    //desktop.putClientProperty("JDesktopPane.dragMode", "outline");
+    // desktop.putClientProperty("JDesktopPane.dragMode", "outline");
   }
 
-  /**
-   * Configures the menubar according to user preferences.
-   */
+  /** Configures the menubar according to user preferences. */
   private void configureMenubar(JMenuBar menubar) {}
 
-  /**
-   * Displays the specified <code>DialogPanel</code> via {@link DialogPanel#show(JDialog)}.
-   */
+  /** Displays the specified <code>DialogPanel</code> via {@link DialogPanel#show(JDialog)}. */
   @Override
   public void showDialog(DialogPanel dialog, Component parent) {
     Frame parentFrame = mainFrame;
@@ -247,9 +221,7 @@ public class MdiUiProvider extends AbstractUiProvider {
     dialog.show(new JDialog(parentFrame), parent == null ? parentFrame : parent);
   }
 
-  /**
-   * SessionListener implementation. Adjusts the title of the main frame.
-   */
+  /** SessionListener implementation. Adjusts the title of the main frame. */
   @Override
   public void sessionEstablished(SessionEvent evt) {
     super.sessionEstablished(evt);
@@ -268,9 +240,7 @@ public class MdiUiProvider extends AbstractUiProvider {
     menubar.add(windowsMenu, 3);
   }
 
-  /**
-   * SessionListener implementation. Adjusts the title of the main frame.
-   */
+  /** SessionListener implementation. Adjusts the title of the main frame. */
   @Override
   public void sessionClosed(SessionEvent evt) {
     super.sessionClosed(evt);
@@ -285,9 +255,7 @@ public class MdiUiProvider extends AbstractUiProvider {
     if (!PlatformUtils.isMacOSX()) menubar.requestFocus();
   }
 
-  /**
-   * Returns a new UIContainer for the specified plugin.
-   */
+  /** Returns a new UIContainer for the specified plugin. */
   @Override
   public PluginUIContainer createPluginUIContainer(Plugin plugin, String id, int mode) {
     AbstractPluginUIContainer container = new InternalFramePluginUIContainer(plugin, id, mode);
@@ -297,9 +265,7 @@ public class MdiUiProvider extends AbstractUiProvider {
     return container;
   }
 
-  /**
-   * Returns whether the main frame is visible.
-   */
+  /** Returns whether the main frame is visible. */
   @Override
   public boolean isUiVisible() {
     return mainFrame.isVisible();
@@ -314,29 +280,19 @@ public class MdiUiProvider extends AbstractUiProvider {
     mainFrame.dispose();
   }
 
-  /**
-   * The connection menu.
-   */
+  /** The connection menu. */
   private class ConnectionMenu extends JMenu implements ActionListener, SessionListener {
 
-    /**
-     * The maximum accounts on the recently used accounts list.
-     */
+    /** The maximum accounts on the recently used accounts list. */
     private static final int MAX_RECENT_LIST = 5;
 
-    /**
-     * The "New Connection" menu item.
-     */
+    /** The "New Connection" menu item. */
     private final JMenuItem newConnection;
 
-    /**
-     * The "Close Connection" menu item.
-     */
+    /** The "Close Connection" menu item. */
     private final JMenuItem closeConnection;
 
-    /**
-     * The "Exit" menu item.
-     */
+    /** The "Exit" menu item. */
     private final JMenuItem exit;
 
     /**
@@ -345,14 +301,10 @@ public class MdiUiProvider extends AbstractUiProvider {
      */
     private final Vector recentAccounts;
 
-    /**
-     * The index of the separator following the close connection menu item.
-     */
+    /** The index of the separator following the close connection menu item. */
     private final int separatorIndex;
 
-    /**
-     * Creates a new <code>ConnectionMenu</code>.
-     */
+    /** Creates a new <code>ConnectionMenu</code>. */
     public ConnectionMenu() {
       I18n i18n = I18n.get(MdiUiProvider.class);
 
@@ -379,9 +331,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       setConnected(false, null);
     }
 
-    /**
-     * Registers us as session listener.
-     */
+    /** Registers us as session listener. */
     @Override
     public void addNotify() {
       super.addNotify();
@@ -391,9 +341,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       setConnected(session != null, session);
     }
 
-    /**
-     * Unregisters us as a session listener.
-     */
+    /** Unregisters us as a session listener. */
     @Override
     public void removeNotify() {
       super.removeNotify();
@@ -401,17 +349,13 @@ public class MdiUiProvider extends AbstractUiProvider {
       Jin.getInstance().getConnManager().removeSessionListener(this);
     }
 
-    /**
-     * SessionListener implementation. Simply delegates to <code>setConnected</code>.
-     */
+    /** SessionListener implementation. Simply delegates to <code>setConnected</code>. */
     @Override
     public void sessionEstablished(SessionEvent evt) {
       setConnected(true, evt.getSession());
     }
 
-    /**
-     * SessionListener implementation. Simple delegates to <code>setConnected</code>.
-     */
+    /** SessionListener implementation. Simple delegates to <code>setConnected</code>. */
     @Override
     public void sessionClosed(SessionEvent evt) {
       setConnected(false, evt.getSession());
@@ -472,9 +416,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * Brings the recent history menu item list up-to-date.
-     */
+    /** Brings the recent history menu item list up-to-date. */
     private void updateRecentAccountsMenuItems() {
       // Remove all existing history menu items
       while (getItem(separatorIndex + 1) != exit) remove(separatorIndex + 1);
@@ -497,17 +439,13 @@ public class MdiUiProvider extends AbstractUiProvider {
       if (recentAccounts.size() != 0) insertSeparator(separatorIndex + recentAccounts.size() + 1);
     }
 
-    /**
-     * Enables or disables the recent accounts menu items.
-     */
+    /** Enables or disables the recent accounts menu items. */
     private void setRecentAccountsMenuItemsEnabled(boolean isEnabled) {
       for (int i = 1; i <= recentAccounts.size(); i++)
         getItem(separatorIndex + i).setEnabled(isEnabled);
     }
 
-    /**
-     * Loads the recently used accounts list into a vector and returns it.
-     */
+    /** Loads the recently used accounts list into a vector and returns it. */
     private Vector loadRecentAccounts() {
       Vector accounts = new Vector(MAX_RECENT_LIST);
       Preferences prefs = Jin.getInstance().getPrefs();
@@ -530,9 +468,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       return accounts;
     }
 
-    /**
-     * Saves the recent account list into user preferences.
-     */
+    /** Saves the recent account list into user preferences. */
     private void saveRecentAccounts(Vector accounts) {
       Preferences prefs = Jin.getInstance().getPrefs();
 
@@ -551,14 +487,10 @@ public class MdiUiProvider extends AbstractUiProvider {
     }
   }
 
-  /**
-   * An extended preferences menu for MDI mode.
-   */
+  /** An extended preferences menu for MDI mode. */
   private class MdiPrefsMenu extends PrefsMenu {
 
-    /**
-     * Creates a new MdiPrefsMenu.
-     */
+    /** Creates a new MdiPrefsMenu. */
     public MdiPrefsMenu() {
       JMenuItem bgMenuItem =
           I18n.get(MdiUiProvider.class).createMenuItem("backgroundPrefsMenuItem");
@@ -622,14 +554,10 @@ public class MdiUiProvider extends AbstractUiProvider {
   private class InternalFramePluginUIContainer extends AbstractPluginUIContainer
       implements VetoableChangeListener, InternalFrameListener {
 
-    /**
-     * The actual internal frame.
-     */
+    /** The actual internal frame. */
     private final MdiInternalFrame frame;
 
-    /**
-     * Creates a new <code>InternalFranePluginUIContainer</code>.
-     */
+    /** Creates a new <code>InternalFranePluginUIContainer</code>. */
     public InternalFramePluginUIContainer(Plugin plugin, String id, int mode) {
       super(plugin, id, mode);
 
@@ -648,9 +576,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       setIconImpl(Toolkit.getDefaultToolkit().getImage(Resources.getResource("logo32.png")));
     }
 
-    /**
-     * Disposes of this plugin container.
-     */
+    /** Disposes of this plugin container. */
     @Override
     public void disposeImpl() {
       setVisible(false);
@@ -676,33 +602,25 @@ public class MdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * Returns whether the frame of this plugin container is currently selected.
-     */
+    /** Returns whether the frame of this plugin container is currently selected. */
     @Override
     public boolean isActive() {
       return frame.isVisible() && frame.isSelected();
     }
 
-    /**
-     * Sets the resizable state of this plugin container's frame.
-     */
+    /** Sets the resizable state of this plugin container's frame. */
     @Override
     public void setResizable(boolean resizable) {
       frame.setResizable(resizable);
     }
 
-    /**
-     * Returns whether the frame of this plugin container is currently resizable.
-     */
+    /** Returns whether the frame of this plugin container is currently resizable. */
     @Override
     public boolean isResizable() {
       return frame.isResizable();
     }
 
-    /**
-     * Resizes the frame to its preferred size.
-     */
+    /** Resizes the frame to its preferred size. */
     @Override
     public void pack() {
       setVisible(true);
@@ -714,25 +632,19 @@ public class MdiUiProvider extends AbstractUiProvider {
       if (!isResizable) frame.setResizable(false);
     }
 
-    /**
-     * Returns the content pane of the frame.
-     */
+    /** Returns the content pane of the frame. */
     @Override
     public JComponent getContentPane() {
       return (JComponent) frame.getContentPane();
     }
 
-    /**
-     * Sets the title of the frame.
-     */
+    /** Sets the title of the frame. */
     @Override
     public void setTitleImpl(String title) {
       frame.setTitle(title);
     }
 
-    /**
-     * Sets the icon of the frame.
-     */
+    /** Sets the icon of the frame. */
     @Override
     public void setIconImpl(Image image) {
       // InternalFrames don't seem to scale their icons properly on their own
@@ -747,9 +659,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       frame.setFrameIcon(new ImageIcon(image));
     }
 
-    /**
-     * Adds the frame to the desktop and makes it visible.
-     */
+    /** Adds the frame to the desktop and makes it visible. */
     @Override
     public void setVisible(boolean isVisible) {
       if (isVisible == isVisible()) return;
@@ -758,18 +668,14 @@ public class MdiUiProvider extends AbstractUiProvider {
       else hide();
     }
 
-    /**
-     * Returns whether the frame is currently visible.
-     */
+    /** Returns whether the frame is currently visible. */
     @Override
     public boolean isVisible() {
       return (frame.getParent() != null)
           || ((frame.getDesktopIcon() != null) && (frame.getDesktopIcon().getParent() != null));
     }
 
-    /**
-     * Shows the frame.
-     */
+    /** Shows the frame. */
     private void show() {
       loadState();
 
@@ -779,9 +685,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_SHOWN));
     }
 
-    /**
-     * Hides the frame.
-     */
+    /** Hides the frame. */
     private void hide() {
       saveState();
 
@@ -829,9 +733,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * Saves the properties of this plugin container into user preferences.
-     */
+    /** Saves the properties of this plugin container into user preferences. */
     @Override
     protected void saveState() {
       String id = getId();
@@ -861,9 +763,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       //        prefs.setBool(prefix + "visible", isVisible());
     }
 
-    /**
-     * Loads the saved properties of this plugin container and configures it properly.
-     */
+    /** Loads the saved properties of this plugin container and configures it properly. */
     @Override
     protected void loadState() {
       String id = getId();
@@ -898,9 +798,7 @@ public class MdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * InternalFrameListener implementation.
-     */
+    /** InternalFrameListener implementation. */
     @Override
     public void internalFrameActivated(InternalFrameEvent e) {
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ACTIVATED));
@@ -928,17 +826,13 @@ public class MdiUiProvider extends AbstractUiProvider {
 
     private class MdiInternalFrame extends FixedJInternalFrame {
 
-      /**
-       * Creates a new MdiInternalFrame.
-       */
+      /** Creates a new MdiInternalFrame. */
       public MdiInternalFrame() {
         super("", true, true, true, true);
         setContentPane(new JPanel());
       }
 
-      /**
-       * Returns the minimum size of the frame, based on the minimum size of its contents.
-       */
+      /** Returns the minimum size of the frame, based on the minimum size of its contents. */
       @Override
       public Dimension getMinimumSize() {
         Insets insets = getInsets();
@@ -982,22 +876,16 @@ public class MdiUiProvider extends AbstractUiProvider {
     }
   }
 
-  /**
-   * An extension of the default desktop manager to add our own functionality.
-   */
+  /** An extension of the default desktop manager to add our own functionality. */
   private class DesktopManager extends DefaultDesktopManager {
 
-    /**
-     * The amount of pixels on the x axis of an internal frame that must always be visible.
-     */
-    private final static int X_MARGIN = 100;
+    /** The amount of pixels on the x axis of an internal frame that must always be visible. */
+    private static final int X_MARGIN = 100;
     // This must be big enough for the draggable area of the title bar to always
     // be visible.
 
-    /**
-     * The amount of pixels on the y axis of an internal frame that must always be visible.
-     */
-    private final static int Y_MARGIN = 50;
+    /** The amount of pixels on the y axis of an internal frame that must always be visible. */
+    private static final int Y_MARGIN = 50;
     // Must be at least the height of the title bar
 
     /**

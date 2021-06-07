@@ -2,29 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
-
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import javax.swing.event.EventListenerList;
 
 import free.jin.Jin;
 import free.jin.Preferences;
@@ -37,10 +27,16 @@ import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
 import free.util.Pair;
 import free.util.RectDouble;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import javax.swing.event.EventListenerList;
 
-/**
- * A skeleton implementation of the most likely way a UIProvider would work.
- */
+/** A skeleton implementation of the most likely way a UIProvider would work. */
 public abstract class AbstractUiProvider implements UIProvider, SessionListener {
 
   /**
@@ -49,34 +45,24 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
    */
   private final Hashtable pluginContainers = new Hashtable();
 
-  /**
-   * The list of our listeners.
-   */
+  /** The list of our listeners. */
   private final EventListenerList listenerList = new EventListenerList();
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void init() {
     Jin.getInstance().getConnManager().addSessionListener(this);
   }
 
-  /**
-   * {@inheridDoc}
-   */
+  /** {@inheridDoc} */
   @Override
   public void start() {}
 
-  /**
-   * SessionListener implementation.
-   */
+  /** SessionListener implementation. */
   @Override
   public void sessionStarting(SessionEvent evt) {}
 
-  /**
-   * SessionListener implementation. Restores various preferences.
-   */
+  /** SessionListener implementation. Restores various preferences. */
   @Override
   public void sessionEstablished(SessionEvent evt) {
     loadSelectedFrame(evt.getSession());
@@ -94,9 +80,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
     }
   }
 
-  /**
-   * SessionListener implementation. Stores various preferences.
-   */
+  /** SessionListener implementation. Stores various preferences. */
   @Override
   public void sessionClosing(SessionEvent evt) {
     saveSelectedFrame(evt.getSession());
@@ -115,15 +99,11 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
     removePluginContainers();
   }
 
-  /**
-   * SessionListener implementation.
-   */
+  /** SessionListener implementation. */
   @Override
   public void sessionClosed(SessionEvent evt) {}
 
-  /**
-   * Sets the selected frame to the frame we remembered was selected last time.
-   */
+  /** Sets the selected frame to the frame we remembered was selected last time. */
   private void loadSelectedFrame(Session session) {
     User user = session.getUser();
     String pluginId = user.getPrefs().getString("selected.plugin", null);
@@ -140,9 +120,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
     }
   }
 
-  /**
-   * Sets a preference specifying which frame was selected.
-   */
+  /** Sets a preference specifying which frame was selected. */
   private void saveSelectedFrame(Session session) {
     User user = session.getUser();
 
@@ -197,9 +175,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
     return (PluginUIContainer) pluginContainers.get(new Pair(pluginId, containerId));
   }
 
-  /**
-   * Returns a list of existing plugin ui containers.
-   */
+  /** Returns a list of existing plugin ui containers. */
   public Enumeration getExistingPluginUIContainers() {
     return pluginContainers.elements();
   }
@@ -231,9 +207,7 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
     pluginContainers.clear();
   }
 
-  /**
-   * Restores the geometry of the specified window from the preferences.
-   */
+  /** Restores the geometry of the specified window from the preferences. */
   public static void restoreWindowGeometry(
       Preferences prefs, Window window, String prefNamePrefix, RectDouble defaultFrameBounds) {
 

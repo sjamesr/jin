@@ -2,22 +2,21 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
 import java.util.Vector;
-
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -25,9 +24,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class NonEditableTableModel extends DefaultTableModel {
 
-  /**
-   * Constructs a default NonEditableTableModel which is a table of zero columns and zero rows.
-   */
+  /** Constructs a default NonEditableTableModel which is a table of zero columns and zero rows. */
   public NonEditableTableModel() {}
 
   /**
@@ -48,18 +45,18 @@ public class NonEditableTableModel extends DefaultTableModel {
   }
 
   /**
-   * Constructs a NonEditableTableModel with as many columns as there are elements in
-   * <code>columnNames</code> and <code>numRows</code> of <b>null</b> object values. Each column's
-   * name will be taken from the <code>columnNames</code> array.
+   * Constructs a NonEditableTableModel with as many columns as there are elements in <code>
+   * columnNames</code> and <code>numRows</code> of <b>null</b> object values. Each column's name
+   * will be taken from the <code>columnNames</code> array.
    */
   public NonEditableTableModel(Object[] columnNames, int numRows) {
     super(columnNames, numRows);
   }
 
   /**
-   * Constructs a NonEditableTableModel with as many columns as there are elements in
-   * <code>columnNames</code> and <code>numRows</code> of <b>null</b> object values. Each column's
-   * name will be taken from the columnNames vector.
+   * Constructs a NonEditableTableModel with as many columns as there are elements in <code>
+   * columnNames</code> and <code>numRows</code> of <b>null</b> object values. Each column's name
+   * will be taken from the columnNames vector.
    */
   public NonEditableTableModel(Vector columnNames, int numRows) {
     super(columnNames, numRows);
@@ -73,9 +70,7 @@ public class NonEditableTableModel extends DefaultTableModel {
     super(data, columnNames);
   }
 
-  /**
-   * Returns false regardless of the parameters passed.
-   */
+  /** Returns false regardless of the parameters passed. */
   @Override
   public boolean isCellEditable(int row, int column) {
     return false;

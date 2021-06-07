@@ -2,20 +2,38 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import free.jin.action.ActionInfo;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginInfo;
+import free.util.ChildClassLoader;
+import free.util.DelegatingClassLoader;
+import free.util.ExtensionFilenameFilter;
+import free.util.IOUtilities;
+import free.util.Localization;
+import free.util.MemoryFile;
+import free.util.MultiOutputStream;
+import free.util.PlatformUtils;
+import free.util.Utilities;
+import free.util.zip.ZipClassLoader;
+import free.util.zip.ZipURLStreamHandler;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -44,39 +62,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.swing.JOptionPane;
-
 import org.reflections.Reflections;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-
-import free.jin.action.ActionInfo;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginInfo;
-import free.util.ChildClassLoader;
-import free.util.DelegatingClassLoader;
-import free.util.ExtensionFilenameFilter;
-import free.util.IOUtilities;
-import free.util.Localization;
-import free.util.MemoryFile;
-import free.util.MultiOutputStream;
-import free.util.PlatformUtils;
-import free.util.Utilities;
-import free.util.zip.ZipClassLoader;
-import free.util.zip.ZipURLStreamHandler;
-
-/**
- * A <code>JinContext</code> implementation for running Jin as a standalone application.
- */
+/** A <code>JinContext</code> implementation for running Jin as a standalone application. */
 public class JinApplication implements JinContext {
 
-  /**
-   * Set a URLStreamHandlerFactory which knows about our "zip" protocol.
-   */
+  /** Set a URLStreamHandlerFactory which knows about our "zip" protocol. */
   static {
     URL.setURLStreamHandlerFactory(
         new URLStreamHandlerFactory() {
@@ -88,44 +80,28 @@ public class JinApplication implements JinContext {
         });
   }
 
-  /**
-   * The current directory. This should be the Jin directory.
-   */
+  /** The current directory. This should be the Jin directory. */
   private static final File JIN_DIR = new File(System.getProperty("user.dir"));
 
-  /**
-   * Are we loading plugins, actions etc. dynamically with special classloaders?
-   */
+  /** Are we loading plugins, actions etc. dynamically with special classloaders? */
   private static final boolean dynamicLoad = false;
 
-  /**
-   * The locale for this instance of Jin.
-   */
+  /** The locale for this instance of Jin. */
   private final Locale locale;
 
-  /**
-   * The <code>Localization</code> for this class.
-   */
+  /** The <code>Localization</code> for this class. */
   private Localization l10n = null;
 
-  /**
-   * The commandline parameters.
-   */
+  /** The commandline parameters. */
   private final Properties params;
 
-  /**
-   * The main directory where we load/save preferences from/to.
-   */
+  /** The main directory where we load/save preferences from/to. */
   private final File prefsDir;
 
-  /**
-   * Application-wide user preferences.
-   */
+  /** Application-wide user preferences. */
   private final Preferences userPrefs;
 
-  /**
-   * Customizing preferences.
-   */
+  /** Customizing preferences. */
   private final Preferences customizingPrefs;
 
   /**
@@ -167,10 +143,11 @@ public class JinApplication implements JinContext {
    * </pre>
    *
    * This structure allows:
+   *
    * <ul>
-   * <li>A plugin to access all the servers and libs but not other plugins.
-   * <li>A server to access all the libs but not other servers or plugins.
-   * <li>A lib to access all the other libs but not servers or plugins.
+   *   <li>A plugin to access all the servers and libs but not other plugins.
+   *   <li>A server to access all the libs but not other servers or plugins.
+   *   <li>A lib to access all the other libs but not servers or plugins.
    * </ul>
    *
    * This variable is a reference to the top delegating classloader. Note: this is <code>null</code>
@@ -184,19 +161,13 @@ public class JinApplication implements JinContext {
    */
   private final ChildClassLoader libsLoader;
 
-  /**
-   * A list of <code>Server</code> objects representing the supported servers.
-   */
+  /** A list of <code>Server</code> objects representing the supported servers. */
   private final Set<Server> servers;
 
-  /**
-   * The list of known server accounts.
-   */
+  /** The list of known server accounts. */
   private User[] users;
 
-  /**
-   * The list of known server accounts at the moment Jin is started.
-   */
+  /** The list of known server accounts at the moment Jin is started. */
   private final User[] originalUsers;
 
   /**
@@ -258,25 +229,19 @@ public class JinApplication implements JinContext {
     serversToPlugins = loadPlugins();
   }
 
-  /**
-   * Returns the locale for this instance of Jin.
-   */
+  /** Returns the locale for this instance of Jin. */
   @Override
   public Locale getLocale() {
     return locale;
   }
 
-  /**
-   * Returns value of the specified commandline parameter passed to Jin.
-   */
+  /** Returns value of the specified commandline parameter passed to Jin. */
   @Override
   public String getParameter(String paramName) {
     return params.getProperty(paramName);
   }
 
-  /**
-   * Loads the application-wide user preferences.
-   */
+  /** Loads the application-wide user preferences. */
   private Preferences loadUserPrefs() throws IOException {
     File prefsFile = new File(prefsDir, "user.prefs");
     if (!prefsFile.exists()) return Preferences.createNew();
@@ -284,17 +249,13 @@ public class JinApplication implements JinContext {
     return Preferences.load(prefsFile);
   }
 
-  /**
-   * Returns the application-wide user preferences.
-   */
+  /** Returns the application-wide user preferences. */
   @Override
   public Preferences getPrefs() {
     return userPrefs;
   }
 
-  /**
-   * Loads and returns the application's customizing preferences.
-   */
+  /** Loads and returns the application's customizing preferences. */
   private Preferences loadCustomizingPrefs() {
     File file = new File(JIN_DIR, "custom.properties");
 
@@ -307,17 +268,13 @@ public class JinApplication implements JinContext {
     return null;
   }
 
-  /**
-   * Returns the application's customizing preferences.
-   */
+  /** Returns the application's customizing preferences. */
   @Override
   public Preferences getCustomizingPrefs() {
     return customizingPrefs;
   }
 
-  /**
-   * Stores the application-wide user preferences.
-   */
+  /** Stores the application-wide user preferences. */
   private void storeUserPrefs() {
     File userPrefsFile = new File(prefsDir, "user.prefs");
 
@@ -389,9 +346,7 @@ public class JinApplication implements JinContext {
     }
   }
 
-  /**
-   * Determines the locale for this instance of Jin.
-   */
+  /** Determines the locale for this instance of Jin. */
   private Locale determineLocale() {
     String language, country, variant;
 
@@ -411,16 +366,12 @@ public class JinApplication implements JinContext {
     return new Locale(language, country == null ? "" : country, variant == null ? "" : variant);
   }
 
-  /**
-   * Configures various libraries the application uses.
-   */
+  /** Configures various libraries the application uses. */
   private void configureLibraries() {
     Localization.setAppLocale(locale);
   }
 
-  /**
-   * Loads the <code>Server</code> objects that implement support for the various servers.
-   */
+  /** Loads the <code>Server</code> objects that implement support for the various servers. */
   private Set<Server> loadServers()
       throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
     Reflections reflections = new Reflections("free.jin");
@@ -439,17 +390,13 @@ public class JinApplication implements JinContext {
     return result;
   }
 
-  /**
-   * Returns the list of supported servers.
-   */
+  /** Returns the list of supported servers. */
   @Override
   public Set<Server> getServers() {
     return ImmutableSet.copyOf(servers);
   }
 
-  /**
-   * Loads the known user accounts.
-   */
+  /** Loads the known user accounts. */
   private User[] loadUsers() throws IOException {
     File usersDir = new File(prefsDir, "accounts");
 
@@ -534,25 +481,19 @@ public class JinApplication implements JinContext {
     return files;
   }
 
-  /**
-   * Returns the list of known users.
-   */
+  /** Returns the list of known users. */
   @Override
   public User[] getUsers() {
     return users;
   }
 
-  /**
-   * Sets the list of known users so that we can properly store them when shutting down.
-   */
+  /** Sets the list of known users so that we can properly store them when shutting down. */
   @Override
   public void setUsers(User[] users) {
     this.users = users;
   }
 
-  /**
-   * Stores all the known users.
-   */
+  /** Stores all the known users. */
   private void storeUsers() {
 
     for (int i = 0; i < users.length; i++) {
@@ -575,8 +516,8 @@ public class JinApplication implements JinContext {
   }
 
   /**
-   * Stores the specified user. Returns whether successful. Helper method for
-   * <code>storeUsers</code>.
+   * Stores the specified user. Returns whether successful. Helper method for <code>storeUsers
+   * </code>.
    */
   private boolean storeUser(User user) {
     // We don't need a special case for guest users because they are stored
@@ -640,9 +581,7 @@ public class JinApplication implements JinContext {
     return true;
   }
 
-  /**
-   * Displays an error message regarding an problem with saving account preferences.
-   */
+  /** Displays an error message regarding an problem with saving account preferences. */
   private void showAccountSaveError(String errorI18nKey, File targetFile) {
     showErrorMessage(
         l10n.getString("savingAccountErrorDialog.title"),
@@ -767,9 +706,7 @@ public class JinApplication implements JinContext {
     return new ActionInfo(actionClass, actionPrefs);
   }
 
-  /**
-   * Returns the list of actions for the specified server.
-   */
+  /** Returns the list of actions for the specified server. */
   @Override
   public ActionInfo[] getActions(Server server) {
     return (ActionInfo[]) serversToActions.get(server);
@@ -837,9 +774,7 @@ public class JinApplication implements JinContext {
     return new PluginInfo(pluginClass, pluginPrefs);
   }
 
-  /**
-   * Returns the list of plugins for the specified server.
-   */
+  /** Returns the list of plugins for the specified server. */
   @Override
   public Collection<PluginInfo> getPlugins(Server server) {
     return serversToPlugins.get(server);
@@ -858,14 +793,16 @@ public class JinApplication implements JinContext {
   /**
    * Returns all the resources for the specified resource type. Resources are assumed to be zip
    * files and are looked up in three directories (in that order):
+   *
    * <ol>
-   * <li><code>JIN_DIR/resources/resType</code>
-   * <li><code>JIN_DIR/resources/resType/serverId</code>
-   * <li><code>prefsDir/resources/resType</code>
+   *   <li><code>JIN_DIR/resources/resType</code>
+   *   <li><code>JIN_DIR/resources/resType/serverId</code>
+   *   <li><code>prefsDir/resources/resType</code>
    * </ol>
+   *
    * with resources loaded later overriding earlier ones.
    *
-   * See {@link JinContext#getResources(String, Plugin)} for more information.
+   * <p>See {@link JinContext#getResources(String, Plugin)} for more information.
    */
   @Override
   public Map getResources(String resType, Plugin plugin) {
@@ -910,9 +847,7 @@ public class JinApplication implements JinContext {
     }
   }
 
-  /**
-   * Returns the resource with the specified type and id.
-   */
+  /** Returns the resource with the specified type and id. */
   @Override
   public Resource getResource(String type, String id, Plugin plugin) {
     String serverId = plugin.getServer().getId();
@@ -976,33 +911,25 @@ public class JinApplication implements JinContext {
     }
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isSavePrefsCapable() {
     return true;
   }
 
-  /**
-   * Returns text warning the user about saving his password and asking him to confirm it.
-   */
+  /** Returns text warning the user about saving his password and asking him to confirm it. */
   @Override
   public String getPasswordSaveWarning() {
     return l10n.getString("passwordSaveWarning");
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isUserExtensible() {
     return true;
   }
 
-  /**
-   * Stores all preferences and calls <code>System.exit(0)</code>.
-   */
+  /** Stores all preferences and calls <code>System.exit(0)</code>. */
   @Override
   public void shutdown() {
     storeUserPrefs();
@@ -1011,9 +938,7 @@ public class JinApplication implements JinContext {
     System.exit(0);
   }
 
-  /**
-   * Displays an error message to the user.
-   */
+  /** Displays an error message to the user. */
   private void showErrorMessage(String title, String message) {
     JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
   }
@@ -1027,9 +952,7 @@ public class JinApplication implements JinContext {
     return null;
   }
 
-  /**
-   * The main method.
-   */
+  /** The main method. */
   public static void main(String[] args) {
     try {
       Properties params = parseCommandlineArgs(args);
@@ -1110,9 +1033,7 @@ public class JinApplication implements JinContext {
         .put("apple.laf.useScreenMenuBar", javaVersion.compareTo("1.4.2") >= 0 ? "true" : "false");
   }
 
-  /**
-   * Performs some platform specific stuff.
-   */
+  /** Performs some platform specific stuff. */
   private static void doPlatformSpecificStuff() {
     if (PlatformUtils.isMacOSX()) {
       try {

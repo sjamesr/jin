@@ -2,20 +2,22 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.WindowDisposingListener;
+import free.util.imagefilters.IconImageFilters;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Image;
@@ -26,7 +28,6 @@ import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -45,17 +46,10 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import free.util.WindowDisposingListener;
-import free.util.imagefilters.IconImageFilters;
-
-/**
- * Provides various swing related utilities.
- */
+/** Provides various swing related utilities. */
 public class SwingUtils {
 
-  /**
-   * The ESCAPE keystroke we use to close a dialog/window.
-   */
+  /** The ESCAPE keystroke we use to close a dialog/window. */
   private static final KeyStroke CLOSE_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 
   /**
@@ -88,9 +82,7 @@ public class SwingUtils {
     return null;
   }
 
-  /**
-   * Creates and returns a <code>JPanel</code> with x-axis <code>BoxLayout</code>.
-   */
+  /** Creates and returns a <code>JPanel</code> with x-axis <code>BoxLayout</code>. */
   public static JPanel createHorizontalBox() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -98,9 +90,7 @@ public class SwingUtils {
     return panel;
   }
 
-  /**
-   * Creates and returns a <code>JPanel</code> with y-axis <code>BoxLayout</code>.
-   */
+  /** Creates and returns a <code>JPanel</code> with y-axis <code>BoxLayout</code>. */
   public static JPanel createVerticalBox() {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -151,9 +141,7 @@ public class SwingUtils {
     else return labelSpec.substring(0, ampIndex) + labelSpec.substring(ampIndex + 1);
   }
 
-  /**
-   * Applies the label specification on the specified button.
-   */
+  /** Applies the label specification on the specified button. */
   public static void applyLabelSpec(AbstractButton button, String labelSpec) {
     button.setText(getLabelText(labelSpec));
 
@@ -167,9 +155,7 @@ public class SwingUtils {
     }
   }
 
-  /**
-   * Applies the label specification on the specified label.
-   */
+  /** Applies the label specification on the specified label. */
   public static void applyLabelSpec(JLabel label, String labelSpec) {
     label.setText(getLabelText(labelSpec));
 
@@ -183,9 +169,7 @@ public class SwingUtils {
     }
   }
 
-  /**
-   * Applies the label specification on the specified mnemonicable component.
-   */
+  /** Applies the label specification on the specified mnemonicable component. */
   public static void applyLabelSpec(Mnemonicable mnemonicable, String labelSpec) {
     mnemonicable.setText(getLabelText(labelSpec));
 
@@ -199,9 +183,7 @@ public class SwingUtils {
     }
   }
 
-  /**
-   * Creates a label for each line in the specified string.
-   */
+  /** Creates a label for each line in the specified string. */
   public static JLabel[] labelsForLines(String text) {
     StringTokenizer tokenizer = new StringTokenizer(text, "\r\n");
     JLabel[] labels = new JLabel[tokenizer.countTokens()];
@@ -210,38 +192,28 @@ public class SwingUtils {
     return labels;
   }
 
-  /**
-   * Returns whether we're currently running the Mac OS X Look&Feel.
-   */
+  /** Returns whether we're currently running the Mac OS X Look&Feel. */
   public static boolean isMacLnF() {
     String id = UIManager.getLookAndFeel().getID();
     return id.equals("Mac") || id.equals("Aqua");
   }
 
-  /**
-   * Returns whether we're currently running the Metal Look&Feel.
-   */
+  /** Returns whether we're currently running the Metal Look&Feel. */
   public static boolean isMetalLnF() {
     return UIManager.getLookAndFeel().getID().equals("Metal");
   }
 
-  /**
-   * Returns whether we're currently running the Motif Look&Feel.
-   */
+  /** Returns whether we're currently running the Motif Look&Feel. */
   public static boolean isMotiflLnF() {
     return UIManager.getLookAndFeel().getID().equals("Motif");
   }
 
-  /**
-   * Returns whether we're currently running the Windows Look&Feel.
-   */
+  /** Returns whether we're currently running the Windows Look&Feel. */
   public static boolean isWindowsLnF() {
     return UIManager.getLookAndFeel().getID().equals("Windows");
   }
 
-  /**
-   * Returns whether we're currently running the GKT Look&Feel.
-   */
+  /** Returns whether we're currently running the GKT Look&Feel. */
   public static boolean isGtkLnF() {
     return UIManager.getLookAndFeel().getID().equals("GTK");
   }

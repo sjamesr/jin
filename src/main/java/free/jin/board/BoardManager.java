@@ -2,37 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 import free.chess.BoardPainter;
 import free.chess.ColoredBoardPainter;
@@ -66,10 +48,25 @@ import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
 import free.jin.ui.UIProvider;
 import free.util.BeanProperties;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
-/**
- * The plugin responsible for displaying boards and handling all things related to that.
- */
+/** The plugin responsible for displaying boards and handling all things related to that. */
 public class BoardManager extends Plugin
     implements GameListener, UserMoveListener, PluginUIListener, ConnectionListener {
 
@@ -92,59 +89,37 @@ public class BoardManager extends Plugin
    */
   public static final int PREMOVE_MOVE_SENDING_MODE = 3;
 
-  /**
-   * A reference to the sound manager, if one exists.
-   */
+  /** A reference to the sound manager, if one exists. */
   private Plugin soundManager = null;
 
-  /**
-   * A Hashtable mapping Game objects to BoardPanel objects which are currently used.
-   */
+  /** A Hashtable mapping Game objects to BoardPanel objects which are currently used. */
   protected final Hashtable gamesToBoardPanels = new Hashtable();
 
-  /**
-   * A Hashtable mapping PluginUIContainer objects to BoardPanels they contain.
-   */
+  /** A Hashtable mapping PluginUIContainer objects to BoardPanels they contain. */
   protected final Hashtable containersToBoardPanels = new Hashtable();
 
-  /**
-   * A Hashtable mapping BoardPanels to their PluginUIContainers.
-   */
+  /** A Hashtable mapping BoardPanels to their PluginUIContainers. */
   protected final Hashtable boardPanelsToContainers = new Hashtable();
 
-  /**
-   * A list of the PluginUIContainers in the order they were created.
-   */
+  /** A list of the PluginUIContainers in the order they were created. */
   protected final Vector containers = new Vector();
 
-  /**
-   * A <code>BeanProperties</code> object where we keep our properties.
-   */
+  /** A <code>BeanProperties</code> object where we keep our properties. */
   private final BeanProperties props = new BeanProperties(this);
 
-  /**
-   * The current piece painter.
-   */
+  /** The current piece painter. */
   private PiecePainter piecePainter;
 
-  /**
-   * The current board painter.
-   */
+  /** The current board painter. */
   private BoardPainter boardPainter;
 
-  /**
-   * The "Change Board" action.
-   */
+  /** The "Change Board" action. */
   private JinAction changeBoardAction;
 
-  /**
-   * The "Change Pieces" action.
-   */
+  /** The "Change Pieces" action. */
   private JinAction changePiecesAction;
 
-  /**
-   * Starts this plugin.
-   */
+  /** Starts this plugin. */
   @Override
   public void start() throws PluginStartException {
     obtainSoundManager();
@@ -153,24 +128,18 @@ public class BoardManager extends Plugin
     exportActions();
   }
 
-  /**
-   * Stops this plugin.
-   */
+  /** Stops this plugin. */
   @Override
   public void stop() {
     unregisterConnListeners();
   }
 
-  /**
-   * Obtains a reference to the SoundManager, if one exists.
-   */
+  /** Obtains a reference to the SoundManager, if one exists. */
   private void obtainSoundManager() {
     soundManager = getPlugin("sound");
   }
 
-  /**
-   * Plays the sound for the given event name.
-   */
+  /** Plays the sound for the given event name. */
   public void playSound(String eventName) {
     if (soundManager != null) playSoundImpl(eventName);
     else Toolkit.getDefaultToolkit().beep();
@@ -198,9 +167,7 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * Loads the piece sets.
-   */
+  /** Loads the piece sets. */
 
   // protected void loadPieceSets() throws PluginStartException{
   //   Resource [] pieceSetsArr = getResources("pieces");
@@ -217,9 +184,7 @@ public class BoardManager extends Plugin
   //   }
   // }
 
-  /**
-   * Loads the board patterns.
-   */
+  /** Loads the board patterns. */
 
   // protected void loadBoardPatterns() throws PluginStartException{
   //   Resource [] boardPatternsArr = getResources("boards");
@@ -236,9 +201,7 @@ public class BoardManager extends Plugin
   //   }
   // }
 
-  /**
-   * Initializes various preferences from the user's properties.
-   */
+  /** Initializes various preferences from the user's properties. */
   protected void initPreferences() {
     Preferences prefs = getPrefs();
 
@@ -308,23 +271,17 @@ public class BoardManager extends Plugin
     setSlideDuration(prefs.getInt("slide-duration", 100));
   }
 
-  /**
-   * Registers the specified <code>PropertyChangeListener</code>.
-   */
+  /** Registers the specified <code>PropertyChangeListener</code>. */
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     props.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Unregisters the specified <code>PropertyChangeListener</code>.
-   */
+  /** Unregisters the specified <code>PropertyChangeListener</code>. */
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     props.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Configures the current <code>PiecePainter</code> to prepare it for usage.
-   */
+  /** Configures the current <code>PiecePainter</code> to prepare it for usage. */
   protected void configurePiecePainter() {
     if (piecePainter instanceof ColoredPiecePainter) {
       ColoredPiecePainter coloredPiecePainter = (ColoredPiecePainter) piecePainter;
@@ -341,9 +298,7 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * Configures the current <code>BoardPainter</code> preparing it to be used.
-   */
+  /** Configures the current <code>BoardPainter</code> preparing it to be used. */
   protected void configureBoardPainter() {
     if (boardPainter instanceof ColoredBoardPainter) {
       ColoredBoardPainter coloredBoardPainter = (ColoredBoardPainter) boardPainter;
@@ -356,99 +311,75 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * Returns the current white pieces color.
-   */
+  /** Returns the current white pieces color. */
   public Color getWhitePieceColor() {
     return (Color) props.getProperty("whitePieceColor", null);
   }
 
-  /**
-   * Sets the white piece color to the specified value.
-   */
+  /** Sets the white piece color to the specified value. */
   public void setWhitePieceColor(Color color) {
     props.setProperty("whitePieceColor", color);
     configurePiecePainter();
   }
 
-  /**
-   * Returns the current black pieces color.
-   */
+  /** Returns the current black pieces color. */
   public Color getBlackPieceColor() {
     return (Color) props.getProperty("blackPieceColor", null);
   }
 
-  /**
-   * Sets the black piece color to the specified value.
-   */
+  /** Sets the black piece color to the specified value. */
   public void setBlackPieceColor(Color color) {
     props.setProperty("blackPieceColor", color);
     configurePiecePainter();
   }
 
-  /**
-   * Returns the current white pieces outline color.
-   */
+  /** Returns the current white pieces outline color. */
   public Color getWhiteOutlineColor() {
     return (Color) props.getProperty("whiteOutlineColor", null);
   }
 
-  /**
-   * Sets the white piece outline color to the specified value.
-   */
+  /** Sets the white piece outline color to the specified value. */
   public void setWhiteOutlineColor(Color color) {
     props.setProperty("whiteOutlineColor", color);
     configurePiecePainter();
   }
 
-  /**
-   * Returns the current black pieces outline color.
-   */
+  /** Returns the current black pieces outline color. */
   public Color getBlackOutlineColor() {
     return (Color) props.getProperty("blackOutlineColor", null);
   }
 
-  /**
-   * Sets the black piece outline color to the specified value.
-   */
+  /** Sets the black piece outline color to the specified value. */
   public void setBlackOutlineColor(Color color) {
     props.setProperty("blackOutlineColor", color);
     configurePiecePainter();
   }
 
-  /**
-   * Returns the current light squares color.
-   */
+  /** Returns the current light squares color. */
   public Color getLightSquareColor() {
     return (Color) props.getProperty("lightSquareColor", null);
   }
 
-  /**
-   * Sets the light squares color to the specified value.
-   */
+  /** Sets the light squares color to the specified value. */
   public void setLightSquareColor(Color color) {
     props.setProperty("lightSquareColor", color);
     configureBoardPainter();
   }
 
-  /**
-   * Returns the current dark squares color.
-   */
+  /** Returns the current dark squares color. */
   public Color getDarkSquareColor() {
     return (Color) props.getProperty("darkSquareColor", null);
   }
 
-  /**
-   * Sets the dark squares color to the specified value.
-   */
+  /** Sets the dark squares color to the specified value. */
   public void setDarkSquareColor(Color color) {
     props.setProperty("darkSquareColor", color);
     configureBoardPainter();
   }
 
   /**
-   * Returns the current move input style. Possible values are defined in
-   * <code>free.chess.JBoard</code>.
+   * Returns the current move input style. Possible values are defined in <code>free.chess.JBoard
+   * </code>.
    */
   public int getMoveInputStyle() {
     return props.getIntegerProperty("moveInputStyle");
@@ -457,8 +388,8 @@ public class BoardManager extends Plugin
   /**
    * Sets the move input style to the specified value.
    *
-   * @param moveInputStyle The new move input style. Possible values are defined in
-   * <code>free.chess.JBoard</code>.
+   * @param moveInputStyle The new move input style. Possible values are defined in <code>
+   *     free.chess.JBoard</code>.
    */
   public void setMoveInputStyle(int moveInputStyle) {
     switch (moveInputStyle) {
@@ -473,16 +404,12 @@ public class BoardManager extends Plugin
     props.setIntegerProperty("moveInputStyle", moveInputStyle);
   }
 
-  /**
-   * Returns whether the moved piece follows the mouse cursor.
-   */
+  /** Returns whether the moved piece follows the mouse cursor. */
   public boolean isPieceFollowsCursor() {
     return props.getBooleanProperty("pieceFollowsCursor");
   }
 
-  /**
-   * Sets whether the moved piece follows the mouse cursor.
-   */
+  /** Sets whether the moved piece follows the mouse cursor. */
   public void setPieceFollowsCursor(boolean pieceFollowsCursor) {
     props.setBooleanProperty("pieceFollowsCursor", pieceFollowsCursor);
   }
@@ -497,23 +424,17 @@ public class BoardManager extends Plugin
     return props.getBooleanProperty("highlightMadeMoveSquares");
   }
 
-  /**
-   * Sets whether the currently made move is highlighted.
-   */
+  /** Sets whether the currently made move is highlighted. */
   public void setHighlightMadeMoveSquares(boolean highlight) {
     props.setBooleanProperty("highlightMadeMoveSquares", highlight);
   }
 
-  /**
-   * Returns the color used for highlighting in <code>highlightMadeMoveSquares</code> mode.
-   */
+  /** Returns the color used for highlighting in <code>highlightMadeMoveSquares</code> mode. */
   public Color getMadeMoveSquaresHighlightColor() {
     return (Color) props.getProperty("madeMoveSquaresHighlightColor");
   }
 
-  /**
-   * Sets the color used for highlighting in <code>highlightMadeMoveSquares</code> mode.
-   */
+  /** Sets the color used for highlighting in <code>highlightMadeMoveSquares</code> mode. */
   public void setMadeMoveSquaresHighlightColor(Color color) {
     props.setProperty("madeMoveSquaresHighlightColor", color);
   }
@@ -536,8 +457,8 @@ public class BoardManager extends Plugin
   }
 
   /**
-   * Returns the current move highlighting style. Posssible values are defined in
-   * <code>free.chess.JBoard</code>.
+   * Returns the current move highlighting style. Posssible values are defined in <code>
+   * free.chess.JBoard</code>.
    */
   public int getMoveHighlightingStyle() {
     return props.getIntegerProperty("moveHighlightingStyle");
@@ -547,7 +468,7 @@ public class BoardManager extends Plugin
    * Sets the current move highlighting style to the specified value.
    *
    * @param moveHighlightingStyle The new move highlighting style. Possible values are defined in
-   * <code>free.chess.JBoard</code>.
+   *     <code>free.chess.JBoard</code>.
    */
   public void setMoveHighlightingStyle(int moveHighlightingStyle) {
     switch (moveHighlightingStyle) {
@@ -576,15 +497,14 @@ public class BoardManager extends Plugin
    * Sets whether own moves will be highlighted.
    *
    * @param isHighlightingOwnMoves <code>true</code> if own moves should be highlighted as well as
-   * the opponent's moves. <code>false</code> if only the opponent's moves should be highlighted.
+   *     the opponent's moves. <code>false</code> if only the opponent's moves should be
+   *     highlighted.
    */
   public void setHighlightingOwnMoves(boolean isHighlightingOwnMoves) {
     props.setBooleanProperty("highlightingOwnMoves", isHighlightingOwnMoves);
   }
 
-  /**
-   * Returns the current move highlighting color.
-   */
+  /** Returns the current move highlighting color. */
   public Color getMoveHighlightingColor() {
     return (Color) props.getProperty("moveHighlightingColor");
   }
@@ -598,19 +518,18 @@ public class BoardManager extends Plugin
     props.setProperty("moveHighlightingColor", moveHighlightingColor);
   }
 
-  /**
-   * Returns the current move sending mode.
-   */
+  /** Returns the current move sending mode. */
   public int getMoveSendingMode() {
     return props.getIntegerProperty("moveSendingMode");
   }
 
   /**
    * Sets the move sending mode to the specified value. Possible values are
+   *
    * <UL>
-   * <LI><code>LEGAL_CHESS_MOVE_SENDING_MODE</code>
-   * <LI><code>PREDRAG_MOVE_SENDING_MODE</code>
-   * <LI><code>PREMOVE_MOVE_SENDING_MODE</code>
+   *   <LI><code>LEGAL_CHESS_MOVE_SENDING_MODE</code>
+   *   <LI><code>PREDRAG_MOVE_SENDING_MODE</code>
+   *   <LI><code>PREMOVE_MOVE_SENDING_MODE</code>
    * </UL>
    */
   public void setMoveSendingMode(int moveSendingMode) {
@@ -628,16 +547,16 @@ public class BoardManager extends Plugin
   }
 
   /**
-   * Returns the current coordinate display style. Possible values are defined in
-   * <code>free.chess.JBoard</code>.
+   * Returns the current coordinate display style. Possible values are defined in <code>
+   * free.chess.JBoard</code>.
    */
   public int getCoordsDisplayStyle() {
     return props.getIntegerProperty("coordsDisplayStyle");
   }
 
   /**
-   * Sets the coordinate display style to the specified value. Possible values are defined in
-   * <code>free.chess.JBoard</code>.
+   * Sets the coordinate display style to the specified value. Possible values are defined in <code>
+   * free.chess.JBoard</code>.
    */
   public void setCoordsDisplayStyle(int coordsDisplayStyle) {
     switch (coordsDisplayStyle) {
@@ -654,58 +573,42 @@ public class BoardManager extends Plugin
     props.setIntegerProperty("coordsDisplayStyle", coordsDisplayStyle);
   }
 
-  /**
-   * Returns the color used for coordinates display.
-   */
+  /** Returns the color used for coordinates display. */
   public Color getCoordsDisplayColor() {
     return (Color) props.getProperty("coordsDisplayColor");
   }
 
-  /**
-   * Sets the color used for coordinates display to the specified value.
-   */
+  /** Sets the color used for coordinates display to the specified value. */
   public void setCoordsDisplayColor(Color color) {
     props.setProperty("coordsDisplayColor", color);
   }
 
-  /**
-   * Sets whether during a move a shadow piece is displayed at the target square.
-   */
+  /** Sets whether during a move a shadow piece is displayed at the target square. */
   public void setShowShadowPieceInTargetSquare(boolean newValue) {
     props.setBooleanProperty("showShadowPieceInTargetSquare", newValue);
   }
 
-  /**
-   * Returns whether during a move a shadow piece is displayed at the target square.
-   */
+  /** Returns whether during a move a shadow piece is displayed at the target square. */
   public boolean isShowShadowPieceInTargetSquare() {
     return props.getBooleanProperty("showShadowPieceInTargetSquare");
   }
 
-  /**
-   * Sets whether during a move the legal target squares are highlighted.
-   */
+  /** Sets whether during a move the legal target squares are highlighted. */
   public void setHighlightLegalTargetSquares(boolean newValue) {
     props.setBooleanProperty("highlightLegalTargetSquares", newValue);
   }
 
-  /**
-   * Returns whether during a move the legal target squares are highlighted.
-   */
+  /** Returns whether during a move the legal target squares are highlighted. */
   public boolean isHighlightLegalTargetSquares() {
     return props.getBooleanProperty("highlightLegalTargetSquares");
   }
 
-  /**
-   * Sets whether the target square during a move is snapped to the nearest legal square.
-   */
+  /** Sets whether the target square during a move is snapped to the nearest legal square. */
   public void setSnapToLegalSquare(boolean newValue) {
     props.setBooleanProperty("snapToLegalSquare", newValue);
   }
 
-  /**
-   * Returns whether the target square during a move is snapped to the nearest legal square.
-   */
+  /** Returns whether the target square during a move is snapped to the nearest legal square. */
   public boolean isSnapToLegalSquare() {
     return props.getBooleanProperty("snapToLegalSquare");
   }
@@ -726,30 +629,22 @@ public class BoardManager extends Plugin
     return props.getIntegerProperty("slideDuration");
   }
 
-  /**
-   * Returns the current piece set.
-   */
+  /** Returns the current piece set. */
   public PieceSet getPieceSet() {
     return (PieceSet) props.getProperty("pieceSet", null);
   }
 
-  /**
-   * Returns the current piece painter. The returned value should not be modified.
-   */
+  /** Returns the current piece painter. The returned value should not be modified. */
   public PiecePainter getPiecePainter() {
     return piecePainter;
   }
 
-  /**
-   * Returns the current board pattern.
-   */
+  /** Returns the current board pattern. */
   public BoardPattern getBoardPattern() {
     return (BoardPattern) props.getProperty("boardPattern", null);
   }
 
-  /**
-   * Returns the current board painter. The returned value should not be modified.
-   */
+  /** Returns the current board painter. The returned value should not be modified. */
   public BoardPainter getBoardPainter() {
     return boardPainter;
   }
@@ -778,9 +673,7 @@ public class BoardManager extends Plugin
     props.setProperty("boardPattern", boardPattern);
   }
 
-  /**
-   * Registers all the necessary listeners with the Connection.
-   */
+  /** Registers all the necessary listeners with the Connection. */
   protected void registerConnListeners() {
     ListenerManager listenerManager = getConn().getListenerManager();
 
@@ -788,9 +681,7 @@ public class BoardManager extends Plugin
     listenerManager.addConnectionListener(this);
   }
 
-  /**
-   * Unregisters all the necessary listeners from the Connection.
-   */
+  /** Unregisters all the necessary listeners from the Connection. */
   protected void unregisterConnListeners() {
     ListenerManager listenerManager = getConn().getListenerManager();
 
@@ -798,9 +689,7 @@ public class BoardManager extends Plugin
     listenerManager.removeConnectionListener(this);
   }
 
-  /**
-   * Creates and export out actions.
-   */
+  /** Creates and export out actions. */
   private void exportActions() {
     this.changeBoardAction = new ChangeBoardAction();
     this.changePiecesAction = new ChangePieceSetAction();
@@ -813,24 +702,18 @@ public class BoardManager extends Plugin
     exportAction(changePiecesAction);
   }
 
-  /**
-   * Returns the BoardPanel displaying the given Game.
-   */
+  /** Returns the BoardPanel displaying the given Game. */
   public BoardPanel getBoardPanel(Game game) {
     return (BoardPanel) gamesToBoardPanels.get(game);
   }
 
-  /**
-   * Gets called when a game starts.
-   */
+  /** Gets called when a game starts. */
   @Override
   public void gameStarted(GameStartEvent evt) {
     createNewBoardPanel(evt.getGame());
   }
 
-  /**
-   * Creates a new BoardPanel for the specified game, a container for it and displays them.
-   */
+  /** Creates a new BoardPanel for the specified game, a container for it and displays them. */
   protected void createNewBoardPanel(Game game) {
     BoardPanel boardPanel = createBoardPanel(game);
     initBoardPanel(game, boardPanel);
@@ -867,9 +750,7 @@ public class BoardManager extends Plugin
     return createNewBoardContainer();
   }
 
-  /**
-   * Creates and configures a new PluginUIContainer for use with a board.
-   */
+  /** Creates and configures a new PluginUIContainer for use with a board. */
   private PluginUIContainer createNewBoardContainer() {
     PluginUIContainer boardContainer =
         createContainer(String.valueOf(containers.size()), UIProvider.SELF_MANAGED_CONTAINER_MODE);
@@ -885,9 +766,7 @@ public class BoardManager extends Plugin
     return boardContainer;
   }
 
-  /**
-   * Recycles the specified container, making it ready to be used again.
-   */
+  /** Recycles the specified container, making it ready to be used again. */
   private PluginUIContainer recycleContainer(PluginUIContainer container) {
     BoardPanel oldBoardPanel = (BoardPanel) containersToBoardPanels.remove(container);
     if (oldBoardPanel != null) {
@@ -901,18 +780,14 @@ public class BoardManager extends Plugin
     return container;
   }
 
-  /**
-   * Creates and configures a new BoardPanel for the given Game.
-   */
+  /** Creates and configures a new BoardPanel for the given Game. */
   protected BoardPanel createBoardPanel(Game game) {
     BoardPanel boardPanel = new BoardPanel(this, game);
 
     return boardPanel;
   }
 
-  /**
-   * Initializes the given BoardPanel, making it ready for use.
-   */
+  /** Initializes the given BoardPanel, making it ready for use. */
   protected void initBoardPanel(Game game, BoardPanel boardPanel) {
     boardPanel.addUserMoveListener(this);
     getConn().getListenerManager().addGameListener(boardPanel);
@@ -933,9 +808,7 @@ public class BoardManager extends Plugin
     boardContainer.setActive(true);
   }
 
-  /**
-   * Closes the specified board container.
-   */
+  /** Closes the specified board container. */
   private void closeBoardContainer(PluginUIContainer boardContainer) {
     boardContainer.setVisible(false);
     BoardPanel boardPanel = (BoardPanel) containersToBoardPanels.remove(boardContainer);
@@ -969,17 +842,13 @@ public class BoardManager extends Plugin
   @Override
   public void offerUpdated(OfferEvent evt) {}
 
-  /**
-   * Cleanup the game.
-   */
+  /** Cleanup the game. */
   @Override
   public void gameEnded(GameEndEvent evt) {
     gameEndCleanup(evt.getGame());
   }
 
-  /**
-   * ConnectionListener implementation.
-   */
+  /** ConnectionListener implementation. */
   @Override
   public void connectingFailed(Connection conn, String reason) {}
 
@@ -992,9 +861,7 @@ public class BoardManager extends Plugin
   @Override
   public void loginFailed(Connection conn, String reason) {}
 
-  /**
-   * If the "examineOnLogin" preference is set, open a new examination board.
-   */
+  /** If the "examineOnLogin" preference is set, open a new examination board. */
   @Override
   public void loginSucceeded(Connection conn) {
     if (getPrefs().getBool("examineOnLogin", false)) getConn().examineNewGame();
@@ -1015,9 +882,7 @@ public class BoardManager extends Plugin
     for (int i = 0; i < games.size(); i++) gameEndCleanup((Game) games.elementAt(i));
   }
 
-  /**
-   * Performs cleanup when we stop looking at the specified game.
-   */
+  /** Performs cleanup when we stop looking at the specified game. */
   protected void gameEndCleanup(Game game) {
     BoardPanel boardPanel = (BoardPanel) gamesToBoardPanels.remove(game);
     if (boardPanel != null) {
@@ -1033,9 +898,7 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * Returns the ui container title used for the specified board panel.
-   */
+  /** Returns the ui container title used for the specified board panel. */
   protected String getBoardTitle(BoardPanel boardPanel) {
     Game game = boardPanel.getGame();
 
@@ -1045,9 +908,7 @@ public class BoardManager extends Plugin
           .getFormattedString("inactiveBoardTitle", new Object[] {game.getShortDescription()});
   }
 
-  /**
-   * Returns whether the user is currently playing a game.
-   */
+  /** Returns whether the user is currently playing a game. */
   public boolean isUserPlaying() {
     Enumeration games = gamesToBoardPanels.keys();
     while (games.hasMoreElements()) {
@@ -1058,9 +919,7 @@ public class BoardManager extends Plugin
     return false;
   }
 
-  /**
-   * Gets called when the user makes a move on the board.
-   */
+  /** Gets called when the user makes a move on the board. */
   @Override
   public void userMadeMove(UserMoveEvent evt) {
     Object src = evt.getSource();
@@ -1072,25 +931,19 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * Invoked when the last of our boards has been hidden.
-   */
+  /** Invoked when the last of our boards has been hidden. */
   private void lastBoardBecameInvisible() {
     changeBoardAction.setEnabled(false);
     changePiecesAction.setEnabled(false);
   }
 
-  /**
-   * Invoked when a single board container becomes visible.
-   */
+  /** Invoked when a single board container becomes visible. */
   private void firstBoardBecameVisible() {
     changeBoardAction.setEnabled(true);
     changePiecesAction.setEnabled(true);
   }
 
-  /**
-   * PluginUIListener implementation. Handles proper closing of the frame.
-   */
+  /** PluginUIListener implementation. Handles proper closing of the frame. */
   @Override
   public void pluginUIClosing(PluginUIEvent evt) {
     PluginUIContainer boardContainer = evt.getPluginUIContainer();
@@ -1115,9 +968,7 @@ public class BoardManager extends Plugin
     } else closeBoardContainer(boardContainer);
   }
 
-  /**
-   * Returns the number of visible board containers.
-   */
+  /** Returns the number of visible board containers. */
   private int getVisibleBoardContainers() {
     int count = 0;
     for (Iterator i = containersToBoardPanels.keySet().iterator(); i.hasNext(); ) {
@@ -1127,25 +978,19 @@ public class BoardManager extends Plugin
     return count;
   }
 
-  /**
-   * Invoked when one of our plugin UIs has been hidden.
-   */
+  /** Invoked when one of our plugin UIs has been hidden. */
   @Override
   public void pluginUIHidden(PluginUIEvent evt) {
     if (getVisibleBoardContainers() == 0) lastBoardBecameInvisible();
   }
 
-  /**
-   * Invoked when one of our plugin UIs has been shown.
-   */
+  /** Invoked when one of our plugin UIs has been shown. */
   @Override
   public void pluginUIShown(PluginUIEvent evt) {
     if (getVisibleBoardContainers() == 1) firstBoardBecameVisible();
   }
 
-  /**
-   * PluginUIListener implementation.
-   */
+  /** PluginUIListener implementation. */
   @Override
   public void pluginUIActivated(PluginUIEvent evt) {}
 
@@ -1161,9 +1006,7 @@ public class BoardManager extends Plugin
   @Override
   public void pluginUIIconChanged(PluginUIEvent evt) {}
 
-  /**
-   * Overrides <code>Plugin.hasPreferencesUI()</code> to return <code>true</code>.
-   */
+  /** Overrides <code>Plugin.hasPreferencesUI()</code> to return <code>true</code>. */
   @Override
   public boolean hasPreferencesUI() {
     return true;
@@ -1178,9 +1021,7 @@ public class BoardManager extends Plugin
     return new BoardPreferencesPanel(this);
   }
 
-  /**
-   * Saves the user preferences.
-   */
+  /** Saves the user preferences. */
   @Override
   public void saveState() {
     Preferences prefs = getPrefs();
@@ -1280,30 +1121,22 @@ public class BoardManager extends Plugin
     prefs.setInt("slide-duration", getSlideDuration());
   }
 
-  /**
-   * Returns the string "board".
-   */
+  /** Returns the string "board". */
   @Override
   public String getId() {
     return "board";
   }
 
-  /**
-   * An action which changes the board pattern.
-   */
+  /** An action which changes the board pattern. */
   private class ChangeBoardAction extends JinAction {
 
-    /**
-     * Returns the id of this action - "changeboard".
-     */
+    /** Returns the id of this action - "changeboard". */
     @Override
     public String getId() {
       return "changeboard";
     }
 
-    /**
-     * Changes the board pattern to the next one.
-     */
+    /** Changes the board pattern to the next one. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1;
@@ -1320,22 +1153,16 @@ public class BoardManager extends Plugin
     }
   }
 
-  /**
-   * An action which changes the piece set.
-   */
+  /** An action which changes the piece set. */
   private class ChangePieceSetAction extends JinAction {
 
-    /**
-     * Returns the id of this action - "changepieces".
-     */
+    /** Returns the id of this action - "changepieces". */
     @Override
     public String getId() {
       return "changepieces";
     }
 
-    /**
-     * Changes the piece set to the next one.
-     */
+    /** Changes the piece set to the next one. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       int offset = (evt.getModifiers() & ActionEvent.ALT_MASK) == 0 ? 1 : -1;

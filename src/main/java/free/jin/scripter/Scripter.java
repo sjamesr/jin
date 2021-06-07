@@ -2,29 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
 
 import bsh.EvalError;
 import free.chess.Chess;
@@ -68,6 +58,15 @@ import free.jin.plugin.Plugin;
 import free.jin.ui.PreferencesPanel;
 import free.util.MemoryFile;
 import free.util.Utilities;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * A plugin allowing to run user specified commands or code in response to various server events.
@@ -80,9 +79,7 @@ public class Scripter extends Plugin {
    */
   private final Hashtable dispatchers = new Hashtable();
 
-  /**
-   * The constructor. duh.
-   */
+  /** The constructor. duh. */
   public Scripter() {
     registerScriptDispatcher("connection", new ConnectionScriptDispatcher());
     registerScriptDispatcher("plainText", new PlainTextScriptDispatcher());
@@ -112,9 +109,7 @@ public class Scripter extends Plugin {
     return dispatcher;
   }
 
-  /**
-   * Returns an array of supported event types.
-   */
+  /** Returns an array of supported event types. */
   public String[] getSupportedEventTypes() {
     Connection conn = getConn();
 
@@ -159,17 +154,13 @@ public class Scripter extends Plugin {
     return dispatcher.getAvailableVars(eventSubtypes);
   }
 
-  /**
-   * Gets things going :-)
-   */
+  /** Gets things going :-) */
   @Override
   public void start() {
     loadScripts();
   }
 
-  /**
-   * Calls <code>saveScripts</code>.
-   */
+  /** Calls <code>saveScripts</code>. */
   @Override
   public void saveState() {
     saveScripts();
@@ -192,9 +183,7 @@ public class Scripter extends Plugin {
     dispatcher.addScript(script);
   }
 
-  /**
-   * Removes the specified <code>Script</code> from the list of registered scripts.
-   */
+  /** Removes the specified <code>Script</code> from the list of registered scripts. */
   public void removeScript(Script script) {
     String eventType = script.getEventType();
     ScriptDispatcher dispatcher = getScriptDispatcher(eventType);
@@ -205,9 +194,7 @@ public class Scripter extends Plugin {
     dispatcher.removeScript(script);
   }
 
-  /**
-   * Returns an array containing all the currently registered <code>Scripts</code>.
-   */
+  /** Returns an array containing all the currently registered <code>Scripts</code>. */
   public Script[] getScripts() {
     Vector scriptsVector = new Vector();
     String[] eventTypes = getSupportedEventTypes();
@@ -225,25 +212,19 @@ public class Scripter extends Plugin {
     return scriptsArr;
   }
 
-  /**
-   * Returns <code>true</code> to indicate that we have a preferences UI.
-   */
+  /** Returns <code>true</code> to indicate that we have a preferences UI. */
   @Override
   public boolean hasPreferencesUI() {
     return true;
   }
 
-  /**
-   * Returns the Scripter's preferences UI panel.
-   */
+  /** Returns the Scripter's preferences UI panel. */
   @Override
   public PreferencesPanel getPreferencesUI() {
     return new ScripterPreferencesPanel(this);
   }
 
-  /**
-   * Loads all the scripts from user files.
-   */
+  /** Loads all the scripts from user files. */
   private void loadScripts() {
     int scriptCount = getPrefs().getInt("scripts.count", 0);
 
@@ -262,9 +243,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * Saves all the scripts into user files.
-   */
+  /** Saves all the scripts into user files. */
   private void saveScripts() {
     Preferences prefs = getPrefs();
 
@@ -289,9 +268,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * Parses and returns a <code>Script</code>.
-   */
+  /** Parses and returns a <code>Script</code>. */
   private Script parseScript(InputStream in) {
     try {
       DataInputStream dataIn = new DataInputStream(in);
@@ -344,9 +321,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * Maps old event type names to new ones.
-   */
+  /** Maps old event type names to new ones. */
   private Hashtable oldToNewEventTypes = null;
 
   /**
@@ -372,9 +347,7 @@ public class Scripter extends Plugin {
     return newEventType == null ? eventType : newEventType;
   }
 
-  /**
-   * Maps event types (new ones) to a mapping of old event subtypes to new subtypes.
-   */
+  /** Maps event types (new ones) to a mapping of old event subtypes to new subtypes. */
   private Hashtable eventTypesToOldToNewEventSubtypes;
 
   /**
@@ -443,9 +416,7 @@ public class Scripter extends Plugin {
     return newSubtype == null ? eventSubtype : newSubtype;
   }
 
-  /**
-   * Writes the specified <code>Script</code> into the specified <code>OutputStream</code>.
-   */
+  /** Writes the specified <code>Script</code> into the specified <code>OutputStream</code>. */
   private void writeScript(Script script, OutputStream out) throws IOException {
     String scriptType = script.getType();
 
@@ -489,9 +460,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * Returns the string "scripter".
-   */
+  /** Returns the string "scripter". */
   @Override
   public String getId() {
     return "scripter";
@@ -504,9 +473,7 @@ public class Scripter extends Plugin {
    */
   protected abstract class ScriptDispatcher {
 
-    /**
-     * The list of user defined scripts we're running when the supported event occurs.
-     */
+    /** The list of user defined scripts we're running when the supported event occurs. */
     private final Vector scripts = new Vector();
 
     /**
@@ -557,9 +524,7 @@ public class Scripter extends Plugin {
       if (scripts.size() == 0) unregisterForEvent(getConn().getListenerManager());
     }
 
-    /**
-     * Returns the scripts registered with this <code>ScriptDispatcher</code>.
-     */
+    /** Returns the scripts registered with this <code>ScriptDispatcher</code>. */
     public Script[] getScripts() {
       Script[] scriptsArr = new Script[scripts.size()];
       scripts.copyInto(scriptsArr);
@@ -567,9 +532,7 @@ public class Scripter extends Plugin {
       return scriptsArr;
     }
 
-    /**
-     * Runs all the scripts.
-     */
+    /** Runs all the scripts. */
     protected void runScripts(JinEvent evt, String eventSubtype, Object[][] vars) {
       String[] supportedSubtypes = getEventSubtypesImpl();
       if ((supportedSubtypes != null)
@@ -601,14 +564,10 @@ public class Scripter extends Plugin {
      */
     public abstract boolean isSupportedBy(Connection conn);
 
-    /**
-     * Registers for the event with the specified <code>ListenerManager</code>.
-     */
+    /** Registers for the event with the specified <code>ListenerManager</code>. */
     protected abstract void registerForEvent(ListenerManager listenerManager);
 
-    /**
-     * Unregisters for the event with the specified <code>ListenerManager</code>.
-     */
+    /** Unregisters for the event with the specified <code>ListenerManager</code>. */
     protected abstract void unregisterForEvent(ListenerManager listenerManager);
 
     /**
@@ -620,9 +579,7 @@ public class Scripter extends Plugin {
     protected abstract Object[][] getAvailableVars(String[] eventSubtypes);
   }
 
-  /**
-   * A <code>ScriptDispatcher</code> for <code>ConnectionEvents</code>.
-   */
+  /** A <code>ScriptDispatcher</code> for <code>ConnectionEvents</code>. */
   private class ConnectionScriptDispatcher extends ScriptDispatcher implements ConnectionListener {
 
     private final String[] subtypes = new String[] {"attempt", "connect", "login", "disconnect"};
@@ -680,9 +637,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * A <code>ScriptDispatcher</code> for <code>PlainTextEvents</code>.
-   */
+  /** A <code>ScriptDispatcher</code> for <code>PlainTextEvents</code>. */
   private class PlainTextScriptDispatcher extends ScriptDispatcher implements PlainTextListener {
 
     @Override
@@ -716,9 +671,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * A <code>ScriptDispatcher</code> for <code>GameEvents</code>.
-   */
+  /** A <code>ScriptDispatcher</code> for <code>GameEvents</code>. */
   private class GameScriptDispatcher extends ScriptDispatcher implements GameListener {
 
     private final String[] subtypes =
@@ -754,9 +707,7 @@ public class Scripter extends Plugin {
       listenerManager.removeGameListener(this);
     }
 
-    /**
-     * Creates the basic set of variables for the specified GameEvent.
-     */
+    /** Creates the basic set of variables for the specified GameEvent. */
     private Vector createVarsVector(GameEvent evt) {
       Vector vars = new Vector(29);
 
@@ -870,7 +821,8 @@ public class Scripter extends Plugin {
     public void moveMade(MoveMadeEvent evt) {
       Vector varsVector = createVarsVector(evt);
       varsVector.addElement(new Object[] {"move", evt.getMove()});
-      //      varsVector.addElement(new Object[]{"isNewMove", evt.isNew() ? Boolean.TRUE : Boolean.FALSE});
+      //      varsVector.addElement(new Object[]{"isNewMove", evt.isNew() ? Boolean.TRUE :
+      // Boolean.FALSE});
       // Since I'm not sure myself whether isNewMove does what it was intended to,
       // let's not confuse the user...
 
@@ -1211,9 +1163,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * A <code>ScriptDispatcher</code> for <code>SeekEvents</code>.
-   */
+  /** A <code>ScriptDispatcher</code> for <code>SeekEvents</code>. */
   private class SeekScriptDispatcher extends ScriptDispatcher implements SeekListener {
 
     private final String[] subtypes = new String[] {"post", "withdraw"};
@@ -1238,9 +1188,7 @@ public class Scripter extends Plugin {
       ((SeekListenerManager) listenerManager).removeSeekListener(this);
     }
 
-    /**
-     * Creates the basic set of variables for the specified SeekEvent.
-     */
+    /** Creates the basic set of variables for the specified SeekEvent. */
     private Vector createVarsVector(SeekEvent evt) {
       Vector vars = new Vector(15);
 
@@ -1364,9 +1312,7 @@ public class Scripter extends Plugin {
     }
   }
 
-  /**
-   * A <code>ScriptDispatcher</code> for <code>FriendsEvents</code>.
-   */
+  /** A <code>ScriptDispatcher</code> for <code>FriendsEvents</code>. */
   private class FriendsScriptDispatcher extends ScriptDispatcher implements FriendsListener {
 
     private final String[] subtypes =

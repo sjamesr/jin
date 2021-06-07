@@ -2,23 +2,22 @@
  * The freechess.org connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The freechess.org connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The freechess.org connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The freechess.org connection library is distributed in the hope that it will be useful, but
+ * <p>The freechess.org connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * freechess.org connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.freechess;
 
-import java.util.StringTokenizer;
-
 import free.util.Struct;
+import java.util.StringTokenizer;
 
 /**
  * A structure holding parsed information from a seekinfo line. More information about the format is
@@ -27,69 +26,53 @@ import free.util.Struct;
  */
 public class SeekInfoStruct extends Struct {
 
-  /**
-   * The bit mask for an unregistered player.
-   */
+  /** The bit mask for an unregistered player. */
   public static final int UNREGISTERED = 0x1;
 
-  /**
-   * The bit mask for a computer player.
-   */
+  /** The bit mask for a computer player. */
   public static final int COMPUTER = 0x2;
 
-  /**
-   * The bit mask for a GM.
-   */
+  /** The bit mask for a GM. */
   public static final int GM = 0x4;
 
-  /**
-   * The bit mask for an IM.
-   */
+  /** The bit mask for an IM. */
   public static final int IM = 0x8;
 
-  /**
-   * The bit mask for an FM.
-   */
+  /** The bit mask for an FM. */
   public static final int FM = 0x10;
 
-  /**
-   * The bit mask for a WGM.
-   */
+  /** The bit mask for a WGM. */
   public static final int WGM = 0x20;
 
-  /**
-   * The bit mask for a WIM.
-   */
+  /** The bit mask for a WIM. */
   public static final int WIM = 0x40;
 
-  /**
-   * The bit mask for a WFM.
-   */
+  /** The bit mask for a WFM. */
   public static final int WFM = 0x80;
 
   /**
    * Creates a new SeekInfoStruct with the specified arguments.
    *
    * @param canAcceptSeek <code>true</code> if the user can accept the seek, <code>false</code>
-   * otherwise.
+   *     otherwise.
    * @param index The seek index.
    * @param name The handle of the seeking player.
    * @param titles The titles of the player, ORed into an int.
    * @param rating The rating of the player.
    * @param provShow The seeker's rating provshow character, 'E' is estimated, 'P' if provisional
-   * and ' ' if neither.
+   *     and ' ' if neither.
    * @param time The time of the sought game, in minutes.
    * @param inc The increment of the sought game, in seconds.
    * @param isRated The ratedness of the sought game.
    * @param matchType The type of the match (either variant or rating type - "suicide", "lightning",
-   * "blitz" etc.).
+   *     "blitz" etc.).
    * @param color The requested color. 'W' if white, 'B' if black and '?' if doesn't care.
    * @param minRating The minimum rating of the sought opponent.
    * @param maxRating The maximum rating of the sought opponent.
-   * @param isAutomaticAccept <code>true</code> if the acceptance of the seek is automatic,
-   * <code>false</code> if manual.
+   * @param isAutomaticAccept <code>true</code> if the acceptance of the seek is automatic, <code>
+   *     false</code> if manual.
    * @param isFormulaUsed <code>true</code> if the you must pass the seeker's formula to accept the
-   * offer.
+   *     offer.
    */
   public SeekInfoStruct(
       boolean canAcceptSeek,
@@ -241,16 +224,12 @@ public class SeekInfoStruct extends Struct {
     return getBooleanProperty("CanAcceptSeek");
   }
 
-  /**
-   * Returns the index of the seek.
-   */
+  /** Returns the index of the seek. */
   public int getSeekIndex() {
     return getIntegerProperty("Index");
   }
 
-  /**
-   * Returns the handle of the seeking player.
-   */
+  /** Returns the handle of the seeking player. */
   public String getSeekerHandle() {
     return getStringProperty("Name");
   }
@@ -263,9 +242,7 @@ public class SeekInfoStruct extends Struct {
     return getIntegerProperty("Titles");
   }
 
-  /**
-   * Returns the seeker's rating.
-   */
+  /** Returns the seeker's rating. */
   public int getSeekerRating() {
     return getIntegerProperty("Rating");
   }
@@ -278,23 +255,17 @@ public class SeekInfoStruct extends Struct {
     return getCharProperty("ProvShow");
   }
 
-  /**
-   * Returns the initial time of the sought match, in minutes.
-   */
+  /** Returns the initial time of the sought match, in minutes. */
   public int getMatchTime() {
     return getIntegerProperty("Time");
   }
 
-  /**
-   * Returns the increment of the sought match, in seconds.
-   */
+  /** Returns the increment of the sought match, in seconds. */
   public int getMatchIncrement() {
     return getIntegerProperty("Increment");
   }
 
-  /**
-   * Returns <code>true</code> if the sought match is rated, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if the sought match is rated, <code>false</code> otherwise. */
   public boolean isMatchRated() {
     return getBooleanProperty("IsRated");
   }
@@ -315,16 +286,12 @@ public class SeekInfoStruct extends Struct {
     return getCharProperty("RequestedColor");
   }
 
-  /**
-   * Returns the minimum rating of the desired opponent.
-   */
+  /** Returns the minimum rating of the desired opponent. */
   public int getOpponentMinRating() {
     return getIntegerProperty("MinRating");
   }
 
-  /**
-   * Returns the maximum rating of the desired opponent.
-   */
+  /** Returns the maximum rating of the desired opponent. */
   public int getOpponentMaxRating() {
     return getIntegerProperty("MaxRating");
   }

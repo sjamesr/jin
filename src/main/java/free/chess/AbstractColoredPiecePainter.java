@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -18,29 +18,19 @@ package free.chess;
 
 import java.awt.Color;
 
-/**
- * A skeleton implementation of <code>ColoredPiecePainter</code>.
- */
+/** A skeleton implementation of <code>ColoredPiecePainter</code>. */
 public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter {
 
-  /**
-   * The color of the white pieces.
-   */
+  /** The color of the white pieces. */
   private Color whiteColor;
 
-  /**
-   * The color of the black pieces.
-   */
+  /** The color of the black pieces. */
   private Color blackColor;
 
-  /**
-   * The color of the outline of the white pieces.
-   */
+  /** The color of the outline of the white pieces. */
   private Color whiteOutline;
 
-  /**
-   * The color of the outline of the black pieces.
-   */
+  /** The color of the outline of the black pieces. */
   private Color blackOutline;
 
   /**
@@ -106,9 +96,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return whiteColor;
   }
 
-  /**
-   * Sets the color with which white pieces are drawn.
-   */
+  /** Sets the color with which white pieces are drawn. */
   @Override
   public void setWhiteColor(Color color) {
     if (color == null) throw new IllegalArgumentException("Null color");
@@ -126,9 +114,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return blackColor;
   }
 
-  /**
-   * Sets the color with which black pieces are drawn.
-   */
+  /** Sets the color with which black pieces are drawn. */
   @Override
   public void setBlackColor(Color color) {
     if (color == null) throw new IllegalArgumentException("Null color");
@@ -146,9 +132,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return whiteOutline;
   }
 
-  /**
-   * Sets the color with which the outline of white pieces is drawn.
-   */
+  /** Sets the color with which the outline of white pieces is drawn. */
   @Override
   public void setWhiteOutline(Color color) {
     if (color == null) throw new IllegalArgumentException("Null color");
@@ -166,9 +150,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return blackOutline;
   }
 
-  /**
-   * Sets the color with which the outline of black pieces is drawn.
-   */
+  /** Sets the color with which the outline of black pieces is drawn. */
   @Override
   public void setBlackOutline(Color color) {
     if (color == null) throw new IllegalArgumentException("Null color");
@@ -176,9 +158,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     blackOutline = color;
   }
 
-  /**
-   * Returns with which the specified piece should be drawn.
-   */
+  /** Returns with which the specified piece should be drawn. */
   public Color getPieceColor(Piece piece, boolean isShaded) {
     if (piece == null) return null;
 
@@ -186,9 +166,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return isShaded ? getShaded(color) : color;
   }
 
-  /**
-   * Returns the color with which the outline of the specified piece should be drawn.
-   */
+  /** Returns the color with which the outline of the specified piece should be drawn. */
   public Color getOutlineColor(Piece piece, boolean isShaded) {
     if (piece == null) return null;
 
@@ -196,9 +174,7 @@ public abstract class AbstractColoredPiecePainter implements ColoredPiecePainter
     return isShaded ? getShaded(color) : color;
   }
 
-  /**
-   * Returns a shaded version of the specified color.
-   */
+  /** Returns a shaded version of the specified color. */
   protected Color getShaded(Color color) {
     int r = (color.getRed() + 128 * 2) / 3;
     int g = (color.getGreen() + 128 * 2) / 3;

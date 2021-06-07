@@ -2,52 +2,39 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
+import free.util.MemoryFile;
 import java.util.Hashtable;
 
-import free.util.MemoryFile;
-
-/**
- * Contains the details of an account on a chess server.
- */
+/** Contains the details of an account on a chess server. */
 public class User {
 
-  /**
-   * The server of this account.
-   */
+  /** The server of this account. */
   private final Server server;
 
-  /**
-   * The username of this account.
-   */
+  /** The username of this account. */
   private String username;
 
-  /**
-   * The preferences of the user.
-   */
+  /** The preferences of the user. */
   private final Preferences prefs;
 
-  /**
-   * Maps filenames to <code>MemoryFile</code> objects.
-   */
+  /** Maps filenames to <code>MemoryFile</code> objects. */
   private final Hashtable files;
 
-  /**
-   * True when this user has been modified but hasn't been saved yet.
-   */
+  /** True when this user has been modified but hasn't been saved yet. */
   private boolean isDirty;
 
   /**
@@ -75,16 +62,12 @@ public class User {
     this(server, username, Preferences.createNew(), new Hashtable());
   }
 
-  /**
-   * Returns the server on which this account is registered.
-   */
+  /** Returns the server on which this account is registered. */
   public Server getServer() {
     return server;
   }
 
-  /**
-   * Returns the username of this account.
-   */
+  /** Returns the username of this account. */
   public String getUsername() {
     return username;
   }
@@ -99,9 +82,7 @@ public class User {
     else return Preferences.createBackedUp(prefs, customizingPrefs);
   }
 
-  /**
-   * Returns the files hashtable. This is used by code that stores the memory files.
-   */
+  /** Returns the files hashtable. This is used by code that stores the memory files. */
   Hashtable getFilesMap() {
     return files;
   }
@@ -124,16 +105,12 @@ public class User {
     else files.put(filename, file);
   }
 
-  /**
-   * Returns whether this <code>User</code> object represents the guest account.
-   */
+  /** Returns whether this <code>User</code> object represents the guest account. */
   public boolean isGuest() {
     return this == server.getGuest();
   }
 
-  /**
-   * Returns the preferred connection details of this user.
-   */
+  /** Returns the preferred connection details of this user. */
   public ConnectionDetails getPreferredConnDetails() {
     String password = prefs.getString("login.password", "");
     boolean savePassword = prefs.getBool("login.savePassword", false);
@@ -146,9 +123,7 @@ public class User {
           getServer(), this, username, password, savePassword, hostname, ports);
   }
 
-  /**
-   * Sets the specified user's connection details to the specified ones.
-   */
+  /** Sets the specified user's connection details to the specified ones. */
   void setPreferredConnDetails(ConnectionDetails details) {
     if (details.isGuest() != isGuest())
       throw new IllegalArgumentException("isGuest property mismatch");
@@ -166,23 +141,17 @@ public class User {
     }
   }
 
-  /**
-   * Marks this user as dirty, meaning that it has been modified, but hasn't been saved yet.
-   */
+  /** Marks this user as dirty, meaning that it has been modified, but hasn't been saved yet. */
   public void markDirty() {
     isDirty = true;
   }
 
-  /**
-   * Returns whether this user is dirty.
-   */
+  /** Returns whether this user is dirty. */
   public boolean isDirty() {
     return isDirty;
   }
 
-  /**
-   * Returns a description of the user.
-   */
+  /** Returns a description of the user. */
   @Override
   public String toString() {
     return getUsername() + "@" + getServer().getShortName();

@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -44,25 +44,23 @@ import java.util.StringTokenizer;
 
 /**
  * A simple, static class to display a URL in the system browser.
+ *
  * <UL>
- * <LI>Windows - The default browser will be opened via
- * <code>rundll32 url.dll,FileProtocolHandler url</code>
- * <LI>Mac OS X - The <code>open</code> command is used to open the url in the default browser.
- * <LI>Classic MacOS - Netscape is used.
- * <LI>All other platforms - The command specified by the BROWSER environment variable is executed,
- * with <code>%s</code> in it replaced by the URL. If $BROWSER is not specified, mozilla is tried.
+ *   <LI>Windows - The default browser will be opened via <code>
+ *       rundll32 url.dll,FileProtocolHandler url</code>
+ *   <LI>Mac OS X - The <code>open</code> command is used to open the url in the default browser.
+ *   <LI>Classic MacOS - Netscape is used.
+ *   <LI>All other platforms - The command specified by the BROWSER environment variable is
+ *       executed, with <code>%s</code> in it replaced by the URL. If $BROWSER is not specified,
+ *       mozilla is tried.
  * </UL>
  */
 public class BrowserControl {
 
-  /**
-   * A Properties hashtable containing the environment variables and their values.
-   */
+  /** A Properties hashtable containing the environment variables and their values. */
   private static Properties environment = null;
 
-  /**
-   * The context of the applet we're running within, if any.
-   */
+  /** The context of the applet we're running within, if any. */
   private static AppletContext appletContext = null;
 
   /**
@@ -142,9 +140,7 @@ public class BrowserControl {
     return true;
   }
 
-  /**
-   * Tries to open the specified URL in mozilla.
-   */
+  /** Tries to open the specified URL in mozilla. */
   public static boolean tryMozilla(String url) {
     try {
       String[] cmd = new String[] {"mozilla", "-remote", "openURL(" + url + ", new-tab)"};
@@ -272,16 +268,14 @@ public class BrowserControl {
   }
 
   /**
-   * Passes the <code>AppletContext</code> to <code>BrowserControl</code>. That
-   * <code>AppletContext</code> will then be used for opening URLs.
+   * Passes the <code>AppletContext</code> to <code>BrowserControl</code>. That <code>AppletContext
+   * </code> will then be used for opening URLs.
    */
   public static void setAppletContext(AppletContext appletContext) {
     BrowserControl.appletContext = appletContext;
   }
 
-  /**
-   * Displays a small awt dialog to test URL opening.
-   */
+  /** Displays a small awt dialog to test URL opening. */
   public static void main(String[] args) {
     Frame f = new Frame("BrowserControl Test");
     f.setLocation(100, 100);

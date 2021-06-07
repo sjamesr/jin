@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -37,19 +37,19 @@ public abstract class GameListItem {
    * @param index The index of the game. The actual meaning may be redefined by the subclass.
    * @param gameID The id of the game - something that uniquely identifies it.
    * @param dateString The date of the game. Whether this is end, start, estimated time of beginning
-   * or anything else depends on the subclass.
+   *     or anything else depends on the subclass.
    * @param timeString The time of the game. Whether this is end, start, estimated time of beginning
-   * or anything else depends on the subclass.
+   *     or anything else depends on the subclass.
    * @param whiteName The name of the player with the white pieces.
    * @param blackName The name of the player with the black pieces.
    * @param whiteTime The initial amount of time on the clock of the player with the white pieces,
-   * in milliseconds.
+   *     in milliseconds.
    * @param whiteInc The amount of time added to the clock of the player with the white pieces every
-   * time he makes a move, in milliseconds.
+   *     time he makes a move, in milliseconds.
    * @param blackTime The initial amount of time on the clock of the player with the black pieces,
-   * in milliseconds.
+   *     in milliseconds.
    * @param blackInc The amount of time added to the clock of the player with the black pieces every
-   * time he makes a move, in milliseconds.
+   *     time he makes a move, in milliseconds.
    * @param whiteRating The rating of the player with the white pieces.
    * @param blackRating The rating of the player with the black pieces.
    * @param isRated True if the game is rated, false otherwise.
@@ -93,37 +93,27 @@ public abstract class GameListItem {
     setProperty("ECO", eco);
   }
 
-  /**
-   * Returns the value of the given property.
-   */
+  /** Returns the value of the given property. */
   protected final Object getProperty(Object property) {
     return gameProperties.get(property);
   }
 
-  /**
-   * Returns the value of the given integer property.
-   */
+  /** Returns the value of the given integer property. */
   protected final int getIntegerProperty(Object property) {
     return ((Integer) getProperty(property)).intValue();
   }
 
-  /**
-   * Returns the value of the given string property.
-   */
+  /** Returns the value of the given string property. */
   protected final String getStringProperty(Object property) {
     return (String) getProperty(property);
   }
 
-  /**
-   * Returns the value of the given boolean property.
-   */
+  /** Returns the value of the given boolean property. */
   protected final boolean getBooleanProperty(Object property) {
     return ((Boolean) getProperty(property)).booleanValue();
   }
 
-  /**
-   * Sets the value of the given property. A property may not have its value reset.
-   */
+  /** Sets the value of the given property. A property may not have its value reset. */
   protected final void setProperty(Object property, Object propertyValue) {
     Object oldValue = gameProperties.put(property, propertyValue);
     if (oldValue != null) {
@@ -133,16 +123,12 @@ public abstract class GameListItem {
     }
   }
 
-  /**
-   * Returns the index of the game. The actual meaning of the index depends on the superclass.
-   */
+  /** Returns the index of the game. The actual meaning of the index depends on the superclass. */
   public int getIndex() {
     return getIntegerProperty("Index");
   }
 
-  /**
-   * Returns the id of the game.
-   */
+  /** Returns the id of the game. */
   public String getID() {
     return getStringProperty("GameID");
   }
@@ -163,23 +149,17 @@ public abstract class GameListItem {
     return getStringProperty("TimeString");
   }
 
-  /**
-   * Returns the name of the player with the white pieces.
-   */
+  /** Returns the name of the player with the white pieces. */
   public String getWhiteName() {
     return getStringProperty("WhiteName");
   }
 
-  /**
-   * Returns the name of the player with the black pieces.
-   */
+  /** Returns the name of the player with the black pieces. */
   public String getBlackName() {
     return getStringProperty("BlackName");
   }
 
-  /**
-   * Returns the initial time on the clock of the player with the white pieces, in milliseconds.
-   */
+  /** Returns the initial time on the clock of the player with the white pieces, in milliseconds. */
   public int getWhiteTime() {
     return getIntegerProperty("WhiteTime");
   }
@@ -193,23 +173,17 @@ public abstract class GameListItem {
     return getIntegerProperty("WhiteInc");
   }
 
-  /**
-   * Returns the initial time on the clock of the player with the black pieces, in milliseconds.
-   */
+  /** Returns the initial time on the clock of the player with the black pieces, in milliseconds. */
   public int getBlackTime() {
     return getIntegerProperty("BlackTime");
   }
 
-  /**
-   * Returns the rating of the player with the white pieces.
-   */
+  /** Returns the rating of the player with the white pieces. */
   public int getWhiteRating() {
     return getIntegerProperty("WhiteRating");
   }
 
-  /**
-   * Returns the rating of the player with the black pieces.
-   */
+  /** Returns the rating of the player with the black pieces. */
   public int getBlackRating() {
     return getIntegerProperty("BlackRating");
   }
@@ -223,30 +197,22 @@ public abstract class GameListItem {
     return getIntegerProperty("BlackInc");
   }
 
-  /**
-   * Returns true if this game is rated, false otherwise.
-   */
+  /** Returns true if this game is rated, false otherwise. */
   public boolean isRated() {
     return getBooleanProperty("IsRated");
   }
 
-  /**
-   * Returns the name of the wild variant of the game.
-   */
+  /** Returns the name of the wild variant of the game. */
   public String getVariantName() {
     return getStringProperty("VariantName");
   }
 
-  /**
-   * Returns the name of the rating category to which the game belongs.
-   */
+  /** Returns the name of the rating category to which the game belongs. */
   public String getRatingCategoryName() {
     return getStringProperty("RatingCategoryName");
   }
 
-  /**
-   * Returns the ECO code of the game.
-   */
+  /** Returns the ECO code of the game. */
   public String getECO() {
     return getStringProperty("ECO");
   }

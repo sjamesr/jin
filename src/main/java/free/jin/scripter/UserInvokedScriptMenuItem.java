@@ -2,20 +2,28 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import free.jin.ui.DialogPanel;
+import free.jin.ui.OptionPanel;
+import free.util.PlatformUtils;
+import free.workarounds.FixedJComboBox;
+import free.workarounds.FixedJTable;
+import free.workarounds.FixedTableColumn;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -24,7 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -48,28 +55,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import free.jin.ui.DialogPanel;
-import free.jin.ui.OptionPanel;
-import free.util.PlatformUtils;
-import free.workarounds.FixedJComboBox;
-import free.workarounds.FixedJTable;
-import free.workarounds.FixedTableColumn;
-
-/**
- * The menu item we use for user invoked scripts.
- */
+/** The menu item we use for user invoked scripts. */
 class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener {
 
-  /**
-   * The script.
-   */
+  /** The script. */
   private final Script script;
 
-  /**
-   * The constructor, duh.
-   */
+  /** The constructor, duh. */
   public UserInvokedScriptMenuItem(Script script) {
     super(script.getName());
 
@@ -79,9 +71,7 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener {
     addActionListener(this);
   }
 
-  /**
-   * Runs the script.
-   */
+  /** Runs the script. */
   @Override
   public void actionPerformed(ActionEvent evt) {
     VariablesPanel varsPanel = new VariablesPanel();
@@ -92,41 +82,27 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener {
     script.run(null, null, vars);
   }
 
-  /**
-   * Returns the script.
-   */
+  /** Returns the script. */
   public Script getScript() {
     return script;
   }
 
-  /**
-   * A panel which allows the user to specify variables to the script.
-   */
+  /** A panel which allows the user to specify variables to the script. */
   private class VariablesPanel extends DialogPanel {
 
-    /**
-     * The available variable types.
-     */
+    /** The available variable types. */
     private final String[] varTypes = new String[] {"String", "Integer", "Boolean", "Real"};
 
-    /**
-     * The table model.
-     */
+    /** The table model. */
     private final DefaultTableModel tableModel;
 
-    /**
-     * The column model.
-     */
+    /** The column model. */
     private final DefaultTableColumnModel columnModel;
 
-    /**
-     * The "Run Script" button. We need this because we want to set the focus to it.
-     */
+    /** The "Run Script" button. We need this because we want to set the focus to it. */
     private JButton runScriptButton;
 
-    /**
-     * The constructor.
-     */
+    /** The constructor. */
     public VariablesPanel() {
       columnModel = new DefaultTableColumnModel();
       JComboBox typeChoice = new FixedJComboBox(varTypes);
@@ -151,24 +127,18 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener {
       createUI();
     }
 
-    /**
-     * Returns the title of this dialog panel.
-     */
+    /** Returns the title of this dialog panel. */
     @Override
     public String getTitle() {
       return "Specify Variables for the Script";
     }
 
-    /**
-     * Displays the dialog and returns the variables once the user is done.
-     */
+    /** Displays the dialog and returns the variables once the user is done. */
     public Object[][] askVars() {
       return (Object[][]) super.askResult();
     }
 
-    /**
-     * Creates the UI for this dialog.
-     */
+    /** Creates the UI for this dialog. */
     private void createUI() {
       final JTable table = new FixedJTable(tableModel, columnModel);
       table.setCellSelectionEnabled(false);
@@ -244,7 +214,8 @@ class UserInvokedScriptMenuItem extends JMenuItem implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent evt) {
               if (table.isEditing()) {
-                // Makes sure that the editing stops so that table.getValueAt() returns up-to-date values.
+                // Makes sure that the editing stops so that table.getValueAt() returns up-to-date
+                // values.
                 TableCellEditor editor = table.getCellEditor();
                 editor.stopCellEditing();
               }

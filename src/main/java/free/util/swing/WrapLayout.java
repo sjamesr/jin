@@ -2,20 +2,21 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.UnsupportedOperationException;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -23,28 +24,18 @@ import java.awt.Insets;
 import java.awt.LayoutManager2;
 import java.awt.Rectangle;
 
-import free.util.UnsupportedOperationException;
-
-/**
- * A layout manager which makes all the children span the entire area of the parent.
- */
+/** A layout manager which makes all the children span the entire area of the parent. */
 public class WrapLayout implements LayoutManager2 {
 
-  /**
-   * Our shared instance.
-   */
+  /** Our shared instance. */
   private static final WrapLayout SHARED_INSTANCE = new WrapLayout();
 
-  /**
-   * Returns an instance of <code>WrapLayout</code>.
-   */
+  /** Returns an instance of <code>WrapLayout</code>. */
   public static WrapLayout getInstance() {
     return SHARED_INSTANCE;
   }
 
-  /**
-   * Lays out the specified container.
-   */
+  /** Lays out the specified container. */
   @Override
   public void layoutContainer(Container parent) {
     Dimension size = parent.getSize();
@@ -61,9 +52,7 @@ public class WrapLayout implements LayoutManager2 {
     for (int i = 0; i < componentCount; i++) parent.getComponent(i).setBounds(bounds);
   }
 
-  /**
-   * Appends the specified insets to the specified <code>Dimension</code> object and returns it.
-   */
+  /** Appends the specified insets to the specified <code>Dimension</code> object and returns it. */
   private static Dimension append(Dimension size, Insets insets) {
     size.width += insets.left + insets.right;
     size.height += insets.top + insets.bottom;
@@ -71,9 +60,7 @@ public class WrapLayout implements LayoutManager2 {
     return size;
   }
 
-  /**
-   * Returns the minimum size of the specified container, when laid out by us.
-   */
+  /** Returns the minimum size of the specified container, when laid out by us. */
   @Override
   public Dimension minimumLayoutSize(Container parent) {
     Dimension size = new Dimension(0, 0);
@@ -90,9 +77,7 @@ public class WrapLayout implements LayoutManager2 {
     return append(size, insets);
   }
 
-  /**
-   * Returns the preferred size of the specified container, when laid out by us.
-   */
+  /** Returns the preferred size of the specified container, when laid out by us. */
   @Override
   public Dimension preferredLayoutSize(Container parent) {
     Dimension size = new Dimension(0, 0);
@@ -109,9 +94,7 @@ public class WrapLayout implements LayoutManager2 {
     return append(size, insets);
   }
 
-  /**
-   * Returns the maximum size of the specified container, when laid out by us.
-   */
+  /** Returns the maximum size of the specified container, when laid out by us. */
   @Override
   public Dimension maximumLayoutSize(Container parent) {
     Dimension size = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -128,45 +111,33 @@ public class WrapLayout implements LayoutManager2 {
     return append(size, insets);
   }
 
-  /**
-   * Throws an exception.
-   */
+  /** Throws an exception. */
   @Override
   public void addLayoutComponent(String name, Component comp) {
     throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
   }
 
-  /**
-   * Adds the specified component to the layout.
-   */
+  /** Adds the specified component to the layout. */
   @Override
   public void addLayoutComponent(Component comp, Object constraints) {}
 
-  /**
-   * Removes the specified component from the layout.
-   */
+  /** Removes the specified component from the layout. */
   @Override
   public void removeLayoutComponent(Component comp) {}
 
-  /**
-   * Returns the x-axis layout alignment of the specified container.
-   */
+  /** Returns the x-axis layout alignment of the specified container. */
   @Override
   public float getLayoutAlignmentX(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
-  /**
-   * Returns the y-axis layout alignment of the specified container.
-   */
+  /** Returns the y-axis layout alignment of the specified container. */
   @Override
   public float getLayoutAlignmentY(Container target) {
     return Component.CENTER_ALIGNMENT;
   }
 
-  /**
-   * Invalidates the layout, dropping any cached values.
-   */
+  /** Invalidates the layout, dropping any cached values. */
   @Override
   public void invalidateLayout(Container target) {}
 }

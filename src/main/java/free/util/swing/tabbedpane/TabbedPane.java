@@ -2,20 +2,22 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing.tabbedpane;
 
+import free.util.UnsupportedOperationException;
+import free.util.swing.WrapLayout;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,26 +30,17 @@ import java.awt.LayoutManager2;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
-import free.util.UnsupportedOperationException;
-import free.util.swing.WrapLayout;
-
-/**
- * A better implementation of a tabbed pane.
- */
+/** A better implementation of a tabbed pane. */
 public class TabbedPane extends JComponent {
 
-  /**
-   * The color of various lines in the tabbed pane.
-   */
+  /** The color of various lines in the tabbed pane. */
   private static final Color LINE_COLOR = new Color(0, 0, 0, 96);
   //  static{
   //    Color bg = UIManager.getColor("Panel.background");
@@ -56,24 +49,16 @@ public class TabbedPane extends JComponent {
   //    LINE_COLOR = new Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
   //  }
 
-  /**
-   * The panel where our tab handles reside.
-   */
+  /** The panel where our tab handles reside. */
   private final JPanel handlePanel = new TabHandlesPanel();
 
-  /**
-   * The panel holding the components.
-   */
+  /** The panel holding the components. */
   private final JPanel componentPanel = new JPanel(WrapLayout.getInstance());
 
-  /**
-   * Our tab handles.
-   */
+  /** Our tab handles. */
   private final List tabHandles = new ArrayList();
 
-  /**
-   * Our proxy listener with the model.
-   */
+  /** Our proxy listener with the model. */
   private final TabbedPaneListener proxyModelListener =
       new TabbedPaneListener() {
 
@@ -98,38 +83,29 @@ public class TabbedPane extends JComponent {
         }
       };
 
-  /**
-   * Our tab handle factory.
-   */
+  /** Our tab handle factory. */
   private TabHandleFactory tabHandleFactory;
 
-  /**
-   * Our model.
-   */
+  /** Our model. */
   private TabbedPaneModel model;
 
-  /**
-   * The placement of our tabs.
-   */
+  /** The placement of our tabs. */
   private int tabPlacement;
 
-  /**
-   * Whether we show tabs even when there's only a single tab.
-   */
+  /** Whether we show tabs even when there's only a single tab. */
   private boolean isAlwaysShowTabs = true;
 
-  /**
-   * Our approver of tab close actions.
-   */
+  /** Our approver of tab close actions. */
   private TabCloseApprover tabCloseApprover = null;
 
   /**
    * Creates a new <code>TabbedPane</code> with the specified tab placement - one of:
+   *
    * <ul>
-   * <li><code>SwingConstants.TOP</code>
-   * <li><code>SwingConstants.BOTTOM</code>
-   * <li><code>SwingConstants.LEFT</code>
-   * <li><code>SwingConstants.RIGHT</code>
+   *   <li><code>SwingConstants.TOP</code>
+   *   <li><code>SwingConstants.BOTTOM</code>
+   *   <li><code>SwingConstants.LEFT</code>
+   *   <li><code>SwingConstants.RIGHT</code>
    * </ul>
    */
   public TabbedPane(int tabPlacement) {
@@ -157,24 +133,18 @@ public class TabbedPane extends JComponent {
     recreateUI();
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isFocusCycleRoot() {
     return true;
   }
 
-  /**
-   * Returns the model of this tabbed pane.
-   */
+  /** Returns the model of this tabbed pane. */
   public TabbedPaneModel getModel() {
     return model;
   }
 
-  /**
-   * Sets the model of this tabbed pane.
-   */
+  /** Sets the model of this tabbed pane. */
   public void setModel(TabbedPaneModel model) {
     if (model == null) throw new IllegalArgumentException("model may not be null");
 
@@ -185,30 +155,22 @@ public class TabbedPane extends JComponent {
     recreateUI();
   }
 
-  /**
-   * Registers any listeners we need with the model.
-   */
+  /** Registers any listeners we need with the model. */
   private void registerModelListeners(TabbedPaneModel model) {
     model.addTabbedPaneListener(proxyModelListener);
   }
 
-  /**
-   * Unregisters any listeners we registered with the model.
-   */
+  /** Unregisters any listeners we registered with the model. */
   private void unregisterModelListeners(TabbedPaneModel model) {
     model.removeTabbedPaneListener(proxyModelListener);
   }
 
-  /**
-   * Returns the tab handle factory of this tabbed pane.
-   */
+  /** Returns the tab handle factory of this tabbed pane. */
   public TabHandleFactory getTabHandleFactory() {
     return tabHandleFactory;
   }
 
-  /**
-   * Sets the tab handle factory of this tabbed pane.
-   */
+  /** Sets the tab handle factory of this tabbed pane. */
   public void setTabHandleFactory(TabHandleFactory tabHandleFactory) {
     if (tabHandleFactory == null)
       throw new IllegalArgumentException("tabHandleFactory may not be null");
@@ -220,11 +182,12 @@ public class TabbedPane extends JComponent {
 
   /**
    * Returns the tab placement of this tabbed pane - one of:
+   *
    * <ul>
-   * <li><code>SwingConstants.TOP</code>
-   * <li><code>SwingConstants.BOTTOM</code>
-   * <li><code>SwingConstants.LEFT</code>
-   * <li><code>SwingConstants.RIGHT</code>
+   *   <li><code>SwingConstants.TOP</code>
+   *   <li><code>SwingConstants.BOTTOM</code>
+   *   <li><code>SwingConstants.LEFT</code>
+   *   <li><code>SwingConstants.RIGHT</code>
    * </ul>
    */
   public int getTabPlacement() {
@@ -233,11 +196,12 @@ public class TabbedPane extends JComponent {
 
   /**
    * Sets the tab placement of this tabbed pane to one of:
+   *
    * <ul>
-   * <li><code>SwingConstants.TOP</code>
-   * <li><code>SwingConstants.BOTTOM</code>
-   * <li><code>SwingConstants.LEFT</code>
-   * <li><code>SwingConstants.RIGHT</code>
+   *   <li><code>SwingConstants.TOP</code>
+   *   <li><code>SwingConstants.BOTTOM</code>
+   *   <li><code>SwingConstants.LEFT</code>
+   *   <li><code>SwingConstants.RIGHT</code>
    * </ul>
    */
   public void setTabPlacement(int tabPlacement) {
@@ -247,16 +211,12 @@ public class TabbedPane extends JComponent {
     repaint();
   }
 
-  /**
-   * Returns whether we always show tabs, even when the model only has a single tab.
-   */
+  /** Returns whether we always show tabs, even when the model only has a single tab. */
   public boolean isAlwaysShowTabs() {
     return isAlwaysShowTabs;
   }
 
-  /**
-   * Sets whether we always show tabs, even when the model only has a single tab.
-   */
+  /** Sets whether we always show tabs, even when the model only has a single tab. */
   public void setAlwaysShowTabs(boolean isAlwaysShowTabs) {
     this.isAlwaysShowTabs = isAlwaysShowTabs;
 
@@ -266,9 +226,7 @@ public class TabbedPane extends JComponent {
     }
   }
 
-  /**
-   * Returns the current approver of tab close actions; <code>null</code> if none.
-   */
+  /** Returns the current approver of tab close actions; <code>null</code> if none. */
   public TabCloseApprover getTabCloseApprover() {
     return tabCloseApprover;
   }
@@ -284,9 +242,7 @@ public class TabbedPane extends JComponent {
     this.tabCloseApprover = tabCloseApprover;
   }
 
-  /**
-   * Invoked when a new tab is added to the model.
-   */
+  /** Invoked when a new tab is added to the model. */
   private void tabAdded(TabbedPaneEvent evt) {
     int index = evt.getTabIndex();
     TabbedPaneModel model = evt.getTabbedPaneModel();
@@ -309,9 +265,7 @@ public class TabbedPane extends JComponent {
     repaint();
   }
 
-  /**
-   * Invoked when a tab is removed from the model.
-   */
+  /** Invoked when a tab is removed from the model. */
   private void tabRemoved(TabbedPaneEvent evt) {
     int index = evt.getTabIndex();
 
@@ -327,9 +281,7 @@ public class TabbedPane extends JComponent {
     repaint();
   }
 
-  /**
-   * Invoked when a tab is selected in the model.
-   */
+  /** Invoked when a tab is selected in the model. */
   private void tabSelected(TabbedPaneEvent evt) {
     int index = evt.getTabIndex();
     TabbedPaneModel model = getModel();
@@ -343,9 +295,7 @@ public class TabbedPane extends JComponent {
     repaint();
   }
 
-  /**
-   * Invoked when a tab is deselected in the model.
-   */
+  /** Invoked when a tab is deselected in the model. */
   private void tabDeselected(TabbedPaneEvent evt) {
     int index = evt.getTabIndex();
     TabbedPaneModel model = getModel();
@@ -359,9 +309,7 @@ public class TabbedPane extends JComponent {
     repaint();
   }
 
-  /**
-   * Creates (or re-creates, if already exists) the UI of this tabbed pane.
-   */
+  /** Creates (or re-creates, if already exists) the UI of this tabbed pane. */
   protected void recreateUI() {
     TabbedPaneModel model = getModel();
 
@@ -476,9 +424,7 @@ public class TabbedPane extends JComponent {
     componentPanel.setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
   }
 
-  /**
-   * Paints the tabbed pane.
-   */
+  /** Paints the tabbed pane. */
   @Override
   public void paint(Graphics graphics) {
     super.paint(graphics);
@@ -626,14 +572,10 @@ public class TabbedPane extends JComponent {
     g.drawLine(x + w, y + h, x + w + dx, y + h + dy);
   }
 
-  /**
-   * The panel hosting the tab handles.
-   */
+  /** The panel hosting the tab handles. */
   private class TabHandlesPanel extends JPanel {
 
-    /**
-     * Creates a new <code>TabHandlesPanel</code>.
-     */
+    /** Creates a new <code>TabHandlesPanel</code>. */
     public TabHandlesPanel() {
       super(new TabHandlesLayout());
 
@@ -662,29 +604,19 @@ public class TabbedPane extends JComponent {
     }
   }
 
-  /**
-   * The layout manager we use for the main tab row.
-   */
+  /** The layout manager we use for the main tab row. */
   private class TabHandlesLayout implements LayoutManager2 {
 
-    /**
-     * The size of the gap between the tabs.
-     */
+    /** The size of the gap between the tabs. */
     private static final int TAB_GAP = 1;
 
-    /**
-     * The minimum sizes of the children.
-     */
+    /** The minimum sizes of the children. */
     private Dimension[] minSizes = null;
 
-    /**
-     * The preferred sizes of the children.
-     */
+    /** The preferred sizes of the children. */
     private Dimension[] prefSizes = null;
 
-    /**
-     * Returns the minimum sizes of the child tabs.
-     */
+    /** Returns the minimum sizes of the child tabs. */
     private Dimension[] getMinTabSizes() {
       if (minSizes != null) return minSizes;
 
@@ -696,9 +628,7 @@ public class TabbedPane extends JComponent {
       return minSizes;
     }
 
-    /**
-     * Returns the preferred sizes of the child tabs.
-     */
+    /** Returns the preferred sizes of the child tabs. */
     private Dimension[] getPrefTabSizes() {
       if (prefSizes != null) return prefSizes;
 
@@ -711,9 +641,7 @@ public class TabbedPane extends JComponent {
       return prefSizes;
     }
 
-    /**
-     * Lays out the tab row.
-     */
+    /** Lays out the tab row. */
     @Override
     public void layoutContainer(Container parent) {
       if (parent != handlePanel)
@@ -774,11 +702,10 @@ public class TabbedPane extends JComponent {
     }
 
     /**
-     * <p>
      * Attempts to fit the tabs into the specified available size (isn't successful if the sum of
      * the minimum sizes is larger than the available size).
-     * <p>
-     * The algorithm is roughly as follows: each round, find the tabs that have the maximum
+     *
+     * <p>The algorithm is roughly as follows: each round, find the tabs that have the maximum
      * reduction capability (difference between current size and minimum size) and find the second
      * largest value. Reduce these tabs to the second largest value and repeat. The algorithm ends
      * when either it is impossible to reduce further (all tabs at their minimum sizes) or when the
@@ -840,9 +767,7 @@ public class TabbedPane extends JComponent {
       }
     }
 
-    /**
-     * Returns the layout size for the specified tab sizes.
-     */
+    /** Returns the layout size for the specified tab sizes. */
     private Dimension layoutSize(Dimension[] tabSizes) {
       int tabPlacement = getTabPlacement();
       boolean isVertical =
@@ -864,9 +789,7 @@ public class TabbedPane extends JComponent {
           (isVertical ? mainSize : secondarySize) + insets.top + insets.bottom);
     }
 
-    /**
-     * Returns the minimum size for the tab row.
-     */
+    /** Returns the minimum size for the tab row. */
     @Override
     public Dimension minimumLayoutSize(Container parent) {
       if (parent != handlePanel)
@@ -875,9 +798,7 @@ public class TabbedPane extends JComponent {
       return layoutSize(getMinTabSizes());
     }
 
-    /**
-     * Returns the preferred size for the tab row.
-     */
+    /** Returns the preferred size for the tab row. */
     @Override
     public Dimension preferredLayoutSize(Container parent) {
       if (parent != handlePanel)
@@ -886,17 +807,13 @@ public class TabbedPane extends JComponent {
       return layoutSize(getPrefTabSizes());
     }
 
-    /**
-     * Returns the maximum size for the tab row.
-     */
+    /** Returns the maximum size for the tab row. */
     @Override
     public Dimension maximumLayoutSize(Container target) {
       return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
-    /**
-     * Deprecated. Throws an exception.
-     */
+    /** Deprecated. Throws an exception. */
     @Override
     public void addLayoutComponent(String name, Component comp) {
       throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
@@ -908,25 +825,19 @@ public class TabbedPane extends JComponent {
     @Override
     public void removeLayoutComponent(Component comp) {}
 
-    /**
-     * Returns our layout alignment along the X axis.
-     */
+    /** Returns our layout alignment along the X axis. */
     @Override
     public float getLayoutAlignmentX(Container target) {
       return Component.LEFT_ALIGNMENT;
     }
 
-    /**
-     * Returns our layout alignment along the Y axis.
-     */
+    /** Returns our layout alignment along the Y axis. */
     @Override
     public float getLayoutAlignmentY(Container target) {
       return Component.CENTER_ALIGNMENT;
     }
 
-    /**
-     * Flushes cached size values.
-     */
+    /** Flushes cached size values. */
     @Override
     public void invalidateLayout(Container target) {
       minSizes = null;
@@ -934,14 +845,10 @@ public class TabbedPane extends JComponent {
     }
   }
 
-  /**
-   * A component which holds the tab handle component.
-   */
+  /** A component which holds the tab handle component. */
   private class TabCell extends JPanel {
 
-    /**
-     * The handle sits inside this panel.
-     */
+    /** The handle sits inside this panel. */
     private final JPanel mainPanel = new JPanel();
 
     /**
@@ -951,9 +858,7 @@ public class TabbedPane extends JComponent {
      */
     private final JPanel smallPanel = new JPanel();
 
-    /**
-     * Creates a new <code>TabCell</code> for the specified tab handle.
-     */
+    /** Creates a new <code>TabCell</code> for the specified tab handle. */
     public TabCell(TabHandle tabHandle, boolean initiallySelected) {
       int tabPlacement = getTabPlacement();
       boolean isVertical =
@@ -996,9 +901,7 @@ public class TabbedPane extends JComponent {
       setSelected(initiallySelected);
     }
 
-    /**
-     * Notifies us of the selection status of the tab whose handle we're holding.
-     */
+    /** Notifies us of the selection status of the tab whose handle we're holding. */
     public void setSelected(boolean isSelected) {
       mainPanel.setOpaque(isSelected);
       smallPanel.setOpaque(isSelected);

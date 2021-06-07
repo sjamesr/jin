@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -20,7 +20,6 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyVetoException;
 import java.util.Vector;
-
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameEvent;
@@ -34,9 +33,7 @@ import javax.swing.event.InternalFrameListener;
  */
 public class InternalFrameSwitcher implements ContainerListener, InternalFrameListener {
 
-  /**
-   * A vector of the current internal frames, in the right order.
-   */
+  /** A vector of the current internal frames, in the right order. */
   private final Vector frames = new Vector();
 
   /**
@@ -45,16 +42,12 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
    */
   private boolean ignoreContainerEvents = false;
 
-  /**
-   * Creates a new <code>InternalFrameSwitcher</code> with the specified desktop pane.
-   */
+  /** Creates a new <code>InternalFrameSwitcher</code> with the specified desktop pane. */
   public InternalFrameSwitcher(JDesktopPane desktop) {
     desktop.addContainerListener(this);
   }
 
-  /**
-   * Adds the added <code>JInternalFrame</code> to the list of frames.
-   */
+  /** Adds the added <code>JInternalFrame</code> to the list of frames. */
   @Override
   public void componentAdded(ContainerEvent evt) {
     if (ignoreContainerEvents) return;
@@ -67,9 +60,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
     }
   }
 
-  /**
-   * Removes the removed <code>JInternalFrame</code> from the list of frames.
-   */
+  /** Removes the removed <code>JInternalFrame</code> from the list of frames. */
   @Override
   public void componentRemoved(ContainerEvent evt) {
     if (ignoreContainerEvents) return;
@@ -82,9 +73,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
     }
   }
 
-  /**
-   * Moves the source frame to the top of the frame list.
-   */
+  /** Moves the source frame to the top of the frame list. */
   @Override
   public void internalFrameActivated(InternalFrameEvent e) {
     JInternalFrame f = (JInternalFrame) e.getSource();
@@ -112,9 +101,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
   @Override
   public void internalFrameOpened(InternalFrameEvent e) {}
 
-  /**
-   * Switches to the frame that should be selected next.
-   */
+  /** Switches to the frame that should be selected next. */
   public void selectNext() {
     // JInternalFrame newSelectedFrame = null;
 
@@ -130,9 +117,7 @@ public class InternalFrameSwitcher implements ContainerListener, InternalFrameLi
     }
   }
 
-  /**
-   * Switches to the previous selected frame.
-   */
+  /** Switches to the previous selected frame. */
   public void selectPrevious() {
     if (!frames.isEmpty()) {
       Object f = frames.elementAt(0);

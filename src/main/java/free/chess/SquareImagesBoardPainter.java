@@ -2,20 +2,22 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.util.IOUtilities;
+import free.util.ImageUtilities;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -27,9 +29,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-
-import free.util.IOUtilities;
-import free.util.ImageUtilities;
 
 /**
  * A <code>BoardPainter</code> which paints the board with two images - one for light squares an one
@@ -53,9 +52,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
    */
   public static final int SLICE_MODE = 1;
 
-  /**
-   * A delegate board painter we use while the board image is being loaded.
-   */
+  /** A delegate board painter we use while the board image is being loaded. */
   private static final BoardPainter whileLoadingDelegate = new DefaultBoardPainter();
 
   /**
@@ -65,32 +62,26 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
   private static volatile boolean asyncImageLoad = false;
 
   /**
-   * The light square image. When <code>SquareImagesBoardPainter</code> is used as a
-   * <code>ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
+   * The light square image. When <code>SquareImagesBoardPainter</code> is used as a <code>
+   * ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
    * loaded.
    */
   private Image lightImage = null;
 
   /**
-   * The dark square image. When <code>SquareImagesBoardPainter</code> is used as a
-   * <code>ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
+   * The dark square image. When <code>SquareImagesBoardPainter</code> is used as a <code>
+   * ResourceBoardPainter</code>, this remains <code>null</code> until the image data is fully
    * loaded.
    */
   private Image darkImage = null;
 
-  /**
-   * The mode of image usage, either {@link #SCALE_MODE} or {@link #SLICE_MODE}.
-   */
+  /** The mode of image usage, either {@link #SCALE_MODE} or {@link #SLICE_MODE}. */
   private int mode;
 
-  /**
-   * A version of the light square image, scaled according to the last paint request.
-   */
+  /** A version of the light square image, scaled according to the last paint request. */
   private Image scaledLightImage = null;
 
-  /**
-   * A version of the dark square image, scaled according to the last paint request.
-   */
+  /** A version of the dark square image, scaled according to the last paint request. */
   private Image scaledDarkImage = null;
 
   /**
@@ -105,22 +96,19 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
    */
   private URL darkImageUrl = null;
 
-  /**
-   * The <code>ImageDataReceiver</code>, if any, currently waiting on board image data to load.
-   */
+  /** The <code>ImageDataReceiver</code>, if any, currently waiting on board image data to load. */
   private ImageDataReceiver imageDataReceiver = null;
 
   /**
-   * A no-arg constructor so that this <code>SquareImagesBoardPainter</code> can be used as a
-   * <code>ResourceBoardPainter</code>.
+   * A no-arg constructor so that this <code>SquareImagesBoardPainter</code> can be used as a <code>
+   * ResourceBoardPainter</code>.
    */
   public SquareImagesBoardPainter() {}
 
   /**
-   * <p>
-   * Creates a new <code>SquareImagesBoardPainter</code> which paints light squares with
-   * <code>lightImage</code> and dark squares with <code>darkImage</code>. <code>mode</code> is
-   * either {@link #SCALE_MODE} or {@link #SLICE_MODE}.
+   * Creates a new <code>SquareImagesBoardPainter</code> which paints light squares with <code>
+   * lightImage</code> and dark squares with <code>darkImage</code>. <code>mode</code> is either
+   * {@link #SCALE_MODE} or {@link #SLICE_MODE}.
    */
   public SquareImagesBoardPainter(Image lightImage, Image darkImage, int mode) {
     switch (mode) {
@@ -154,15 +142,17 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
 
   /**
    * Loads the painter from the specified URL. The file structure at the URL is described below.
-   * <p>
-   * A properties file named "definition" must be located at the URL. That file should contain the
-   * following properties:
+   *
+   * <p>A properties file named "definition" must be located at the URL. That file should contain
+   * the following properties:
+   *
    * <ul>
-   * <li><code>ext</code>: Specifies the extension (type) of the image(s) - gif, png, etc. If this
-   * is omitted, "gif" is assumed.
-   * <li><code>imageUseMode</code>: Specifies the way the images are used. Possible values are
-   * "scale" and "slice". If omitted, defaults to "slice".
+   *   <li><code>ext</code>: Specifies the extension (type) of the image(s) - gif, png, etc. If this
+   *       is omitted, "gif" is assumed.
+   *   <li><code>imageUseMode</code>: Specifies the way the images are used. Possible values are
+   *       "scale" and "slice". If omitted, defaults to "slice".
    * </ul>
+   *
    * Two images named <code>light.[ext]</code> and <code>dark.[ext]</code> must be located at the
    * URL, where "ext" is the value of the <code>ext</code> property.
    */
@@ -224,9 +214,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
     }
   }
 
-  /**
-   * Scales the square image to the specified board size.
-   */
+  /** Scales the square image to the specified board size. */
   private void scaleSquareImages(int width, int height) {
     if (mode == SCALE_MODE) {
       int squareWidth = width / 8;
@@ -246,9 +234,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
     }
   }
 
-  /**
-   * Paints the board at the given location on the given Graphics scaled to the given size.
-   */
+  /** Paints the board at the given location on the given Graphics scaled to the given size. */
   @Override
   public void paintBoard(Graphics g, Component component, int x, int y, int width, int height) {
     if (prepareSquareImages(width, height, component)) {
@@ -303,14 +289,10 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
     } else whileLoadingDelegate.paintBoard(g, component, x, y, width, height);
   }
 
-  /**
-   * The receiver of square image data. Responsible for creating the square images.
-   */
+  /** The receiver of square image data. Responsible for creating the square images. */
   private class ImageDataReceiver implements IOUtilities.DataReceiver {
 
-    /**
-     * The set of components to repaint once the images are loaded.
-     */
+    /** The set of components to repaint once the images are loaded. */
     private final Set componentsToRepaint = new HashSet(2);
 
     /**
@@ -329,9 +311,7 @@ public class SquareImagesBoardPainter implements ResourceBoardPainter {
       componentsToRepaint.add(component);
     }
 
-    /**
-     * Called when the image data has been loaded. Creates the square images.
-     */
+    /** Called when the image data has been loaded. Creates the square images. */
     @Override
     public void dataRead(URL[] urls, Object id, byte[][] data, IOException[] exceptions) {
       // If there are any exceptions, we simply quit - this will cause

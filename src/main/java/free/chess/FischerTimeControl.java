@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -24,14 +24,10 @@ import free.util.Localization;
  */
 public final class FischerTimeControl extends TimeControl {
 
-  /**
-   * The initial time on the clock, in milliseconds.
-   */
+  /** The initial time on the clock, in milliseconds. */
   private final int initial;
 
-  /**
-   * The amount of time added to the clock after each move, in milliseconds.
-   */
+  /** The amount of time added to the clock after each move, in milliseconds. */
   private final int increment;
 
   /**
@@ -39,7 +35,7 @@ public final class FischerTimeControl extends TimeControl {
    *
    * @param initial The initial amount of time on the player's clock, in milliseconds.
    * @param increment The amount of time added to the player's clock after each move, in
-   * milliseconds.
+   *     milliseconds.
    */
   public FischerTimeControl(int initial, int increment) {
     if (initial < 0) throw new IllegalArgumentException("Initial time may not be negative");
@@ -49,55 +45,41 @@ public final class FischerTimeControl extends TimeControl {
     this.increment = increment;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int getInitialTime(Player player) {
     return getInitial();
   }
 
-  /**
-   * Returns the initial amount of time on the player's clock, in milliseconds.
-   */
+  /** Returns the initial amount of time on the player's clock, in milliseconds. */
   public int getInitial() {
     return initial;
   }
 
-  /**
-   * Returns the amount of time added to the player's clock after each move.
-   */
+  /** Returns the amount of time added to the player's clock after each move. */
   public int getIncrement() {
     return increment;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedShortDescription() {
     return getDescription("shortDescription");
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedMediumDescription() {
     return getDescription("mediumDescription");
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public String getLocalizedLongDescription() {
     return getDescription("longDescription");
   }
 
-  /**
-   * Returns a description of the time control obtained using the specified localization key.
-   */
+  /** Returns a description of the time control obtained using the specified localization key. */
   private String getDescription(String key) {
     Localization l10n = LocalizationService.getForClass(FischerTimeControl.class);
     int initialMinutes = getInitial() / (1000 * 60);
@@ -107,9 +89,7 @@ public final class FischerTimeControl extends TimeControl {
     return l10n.getFormattedString(key, args);
   }
 
-  /**
-   * Returns whether the specified object equals to this one.
-   */
+  /** Returns whether the specified object equals to this one. */
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof FischerTimeControl) || (o == null)) return false;
@@ -118,9 +98,7 @@ public final class FischerTimeControl extends TimeControl {
     return (tc.initial == initial) && (tc.increment == increment);
   }
 
-  /**
-   * Returns the hash code for this object.
-   */
+  /** Returns the hash code for this object. */
   @Override
   public int hashCode() {
     return initial ^ increment;

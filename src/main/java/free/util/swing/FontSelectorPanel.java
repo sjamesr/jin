@@ -2,25 +2,26 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.AWTUtilities;
+import free.util.Localization;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Hashtable;
-
 import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -41,68 +42,41 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import free.util.AWTUtilities;
-import free.util.Localization;
-
-/**
- * A panel allowing the user to select a font from a given list of fonts.
- */
+/** A panel allowing the user to select a font from a given list of fonts. */
 public class FontSelectorPanel extends JPanel {
 
-  /**
-   * The localization for this class.
-   */
+  /** The localization for this class. */
   private static Localization l10n;
 
-  /**
-   * The id of the "bold" font option.
-   */
-  public static final String BOLD_OPTION_ID = "bold"; //$NON-NLS-1$
+  /** The id of the "bold" font option. */
+  public static final String BOLD_OPTION_ID = "bold"; // $NON-NLS-1$
 
-  /**
-   * The id of the "italic" font option.
-   */
-  public static final String ITALIC_OPTION_ID = "italic"; //$NON-NLS-1$
+  /** The id of the "italic" font option. */
+  public static final String ITALIC_OPTION_ID = "italic"; // $NON-NLS-1$
 
-  /**
-   * The default font sizes list.
-   */
+  /** The default font sizes list. */
   private static final int[] DEFAULT_FONT_SIZES =
       new int[] {5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
 
-  /**
-   * The list displaying possible font names.
-   */
+  /** The list displaying possible font names. */
   private final JList fontNamesList;
 
-  /**
-   * The list displaying possible font sizes.
-   */
+  /** The list displaying possible font sizes. */
   private final JList fontSizesList;
 
-  /**
-   * A Hashtable mapping <code>BooleanFontOption</code> id to <code>BooleanFontOptions</code>.
-   */
+  /** A Hashtable mapping <code>BooleanFontOption</code> id to <code>BooleanFontOptions</code>. */
   private Hashtable fontOptions = new Hashtable();
 
-  /**
-   * A Hashtable mapping <code>BooleanFontOptions</code> to JCheckBoxes representing them.
-   */
+  /** A Hashtable mapping <code>BooleanFontOptions</code> to JCheckBoxes representing them. */
   private Hashtable fontOptionCheckBoxes = new Hashtable();
 
-  /**
-   * The preview panel.
-   */
+  /** The preview panel. */
   private JComponent previewPanel;
 
-  /**
-   * The preview panel holder;
-   */
+  /** The preview panel holder; */
   private final JPanel previewPanelHolder;
 
-  /**
-   * The sole ChangeEvent we need.
-   */
+  /** The sole ChangeEvent we need. */
   private final ChangeEvent changeEvent = new ChangeEvent(this);
 
   /**
@@ -189,7 +163,7 @@ public class FontSelectorPanel extends JPanel {
     Border outsideBorder =
         new TitledBorder(
             new EtchedBorder(javax.swing.border.EtchedBorder.LOWERED),
-            getL10n().getString("preview")); //$NON-NLS-1$
+            getL10n().getString("preview")); // $NON-NLS-1$
     Border insideBorder = new EmptyBorder(10, 10, 10, 10);
     previewPanelHolder.setBorder(new CompoundBorder(outsideBorder, insideBorder));
 
@@ -209,9 +183,7 @@ public class FontSelectorPanel extends JPanel {
     fontSizesList.addListSelectionListener(changeListener);
   }
 
-  /**
-   * Returns the localization for this class.
-   */
+  /** Returns the localization for this class. */
   private static synchronized Localization getL10n() {
     if (l10n == null) l10n = LocalizationService.getForClass(FontSelectorPanel.class);
     return l10n;
@@ -229,7 +201,7 @@ public class FontSelectorPanel extends JPanel {
    * Returns the value of the <code>BooleanFontOption</code> with the specified id.
    *
    * @throws IllegalArgumentException if no <code>BooleanFontOption</code> with the specified name
-   * exists.
+   *     exists.
    */
   public boolean getFontOptionValue(String optionId) {
     BooleanFontOption fontOption = getFontOption(optionId);
@@ -242,7 +214,7 @@ public class FontSelectorPanel extends JPanel {
    */
   public static BooleanFontOption createBoldFontOption() {
     return new BooleanFontOption(
-        BOLD_OPTION_ID, getL10n().getString("bold"), 0, false); //$NON-NLS-1$
+        BOLD_OPTION_ID, getL10n().getString("bold"), 0, false); // $NON-NLS-1$
   }
 
   /**
@@ -250,12 +222,10 @@ public class FontSelectorPanel extends JPanel {
    */
   public static BooleanFontOption createItalicFontOption() {
     return new BooleanFontOption(
-        ITALIC_OPTION_ID, getL10n().getString("italic"), 0, false); //$NON-NLS-1$
+        ITALIC_OPTION_ID, getL10n().getString("italic"), 0, false); // $NON-NLS-1$
   }
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   private void createUI(BooleanFontOption[] fontOptions) {
     setLayout(new BorderLayout(10, 10));
 
@@ -266,7 +236,7 @@ public class FontSelectorPanel extends JPanel {
 
     JLabel fontNameLabel = new JLabel();
     SwingUtils.applyLabelSpec(
-        fontNameLabel, getL10n().getString("fontNameLabel.text")); //$NON-NLS-1$
+        fontNameLabel, getL10n().getString("fontNameLabel.text")); // $NON-NLS-1$
     fontNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     fontNameLabel.setLabelFor(fontNamesList);
@@ -278,7 +248,7 @@ public class FontSelectorPanel extends JPanel {
 
     JLabel fontSizeLabel = new JLabel();
     SwingUtils.applyLabelSpec(
-        fontSizeLabel, getL10n().getString("fontSizeLabel.text")); //$NON-NLS-1$
+        fontSizeLabel, getL10n().getString("fontSizeLabel.text")); // $NON-NLS-1$
     fontSizeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
     fontSizeLabel.setLabelFor(fontSizesList);
@@ -323,9 +293,7 @@ public class FontSelectorPanel extends JPanel {
     add(bottomPanel, BorderLayout.SOUTH);
   }
 
-  /**
-   * Returns the currently selected font, or null if none.
-   */
+  /** Returns the currently selected font, or null if none. */
   public Font getSelectedFont() {
     String fontName = (String) (fontNamesList.getSelectedValue());
     Integer fontSize = (Integer) (fontSizesList.getSelectedValue());
@@ -341,9 +309,7 @@ public class FontSelectorPanel extends JPanel {
     return new Font(fontName, style, fontSize.intValue());
   }
 
-  /**
-   * Sets the currently selected font.
-   */
+  /** Sets the currently selected font. */
   public void setSelectedFont(Font font) {
     BooleanFontOption boldOption = getFontOption(BOLD_OPTION_ID);
     BooleanFontOption italicOption = getFontOption(ITALIC_OPTION_ID);
@@ -357,9 +323,7 @@ public class FontSelectorPanel extends JPanel {
     fireStateChanged();
   }
 
-  /**
-   * This method is called by <code>BooleanFontOptions</code> when their value changes.
-   */
+  /** This method is called by <code>BooleanFontOptions</code> when their value changes. */
   protected void booleanOptionChanged(BooleanFontOption option) {
     AbstractButton checkbox = (AbstractButton) fontOptionCheckBoxes.get(option);
     checkbox.setSelected(option.getValue());
@@ -382,9 +346,7 @@ public class FontSelectorPanel extends JPanel {
     listenerList.remove(ChangeListener.class, listener);
   }
 
-  /**
-   * Fires a ChangeEvent to all interested listeners.
-   */
+  /** Fires a ChangeEvent to all interested listeners. */
   protected void fireStateChanged() {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -395,9 +357,7 @@ public class FontSelectorPanel extends JPanel {
     }
   }
 
-  /**
-   * Sets the preview panel.
-   */
+  /** Sets the preview panel. */
   public void setPreviewPanel(JComponent component) {
     if (previewPanel != null) previewPanelHolder.remove(previewPanel);
 
@@ -405,28 +365,20 @@ public class FontSelectorPanel extends JPanel {
     if (previewPanel != null) previewPanelHolder.add(previewPanel, BorderLayout.CENTER);
   }
 
-  /**
-   * Returns the preview panel.
-   */
+  /** Returns the preview panel. */
   public JComponent getPreviewPanel() {
     return previewPanel;
   }
 
-  /**
-   * The default preview panel.
-   */
+  /** The default preview panel. */
   public static class DefaultPreviewPanel extends JLabel implements ChangeListener {
 
-    /**
-     * The FontSelectorPanel we're a part of.
-     */
+    /** The FontSelectorPanel we're a part of. */
     protected final FontSelectorPanel fontSelectorPanel;
 
-    /**
-     * Creates a new DefaultPreviewPanel with the specified FontSelectorPanel as the user.
-     */
+    /** Creates a new DefaultPreviewPanel with the specified FontSelectorPanel as the user. */
     public DefaultPreviewPanel(FontSelectorPanel fontSelectorPanel) {
-      super(getL10n().getString("previewText"), SwingConstants.CENTER); //$NON-NLS-1$
+      super(getL10n().getString("previewText"), SwingConstants.CENTER); // $NON-NLS-1$
 
       this.fontSelectorPanel = fontSelectorPanel;
 
@@ -435,18 +387,14 @@ public class FontSelectorPanel extends JPanel {
       setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
 
-    /**
-     * ChangeListener implementation.
-     */
+    /** ChangeListener implementation. */
     @Override
     public void stateChanged(ChangeEvent evt) {
       setFont(fontSelectorPanel.getSelectedFont());
       repaint();
     }
 
-    /**
-     * Returns the preferred size of this preview panel.
-     */
+    /** Returns the preferred size of this preview panel. */
     @Override
     public Dimension getPreferredSize() {
       Dimension prefSize = super.getPreferredSize();
@@ -456,19 +404,13 @@ public class FontSelectorPanel extends JPanel {
     }
   }
 
-  /**
-   * A class allowing to specify a boolean option for the font, such as "Bold" or "Italic".
-   */
+  /** A class allowing to specify a boolean option for the font, such as "Bold" or "Italic". */
   public static class BooleanFontOption {
 
-    /**
-     * The id of the option.
-     */
+    /** The id of the option. */
     private final String id;
 
-    /**
-     * The name of the option, something like "Bold", or "Italic".
-     */
+    /** The name of the option, something like "Bold", or "Italic". */
     private final String name;
 
     /**
@@ -477,19 +419,13 @@ public class FontSelectorPanel extends JPanel {
      */
     private final int displayedMnemonicIndex;
 
-    /**
-     * The current boolean value.
-     */
+    /** The current boolean value. */
     private boolean value;
 
-    /**
-     * The FontSelectorPanel using us.
-     */
+    /** The FontSelectorPanel using us. */
     private FontSelectorPanel fontSelectorPanel;
 
-    /**
-     * Creates a new BooleanFontOption with the specified id, name, mnemonic and initial value.
-     */
+    /** Creates a new BooleanFontOption with the specified id, name, mnemonic and initial value. */
     public BooleanFontOption(
         String id, String name, int displayedMnemonicIndex, boolean initValue) {
       this.id = id;
@@ -498,37 +434,27 @@ public class FontSelectorPanel extends JPanel {
       this.value = initValue;
     }
 
-    /**
-     * Sets the <code>FontSelectorPanel</code> using this <code>BooleanFontOption</code>.
-     */
+    /** Sets the <code>FontSelectorPanel</code> using this <code>BooleanFontOption</code>. */
     private void setFontSelectorPanel(FontSelectorPanel fontSelectorPanel) {
       this.fontSelectorPanel = fontSelectorPanel;
     }
 
-    /**
-     * Returns the id of this <code>BooleanFontOption</code>.
-     */
+    /** Returns the id of this <code>BooleanFontOption</code>. */
     public String getOptionId() {
       return id;
     }
 
-    /**
-     * Returns the name of the <code>BooleanFontOption</code>.
-     */
+    /** Returns the name of the <code>BooleanFontOption</code>. */
     public String getOptionName() {
       return name;
     }
 
-    /**
-     * Returns the index of the mnemonic character used for the checkbox of this option.
-     */
+    /** Returns the index of the mnemonic character used for the checkbox of this option. */
     public int getDisplayedMnemonicIndex() {
       return displayedMnemonicIndex;
     }
 
-    /**
-     * Returns the current value of the option.
-     */
+    /** Returns the current value of the option. */
     public boolean getValue() {
       return value;
     }

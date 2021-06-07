@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -24,34 +24,22 @@ package free.chess;
  */
 public class ChessMove extends Move {
 
-  /**
-   * True if this move is an en-passant, false otherwise.
-   */
+  /** True if this move is an en-passant, false otherwise. */
   private final boolean isEnPassant;
 
-  /**
-   * True if this move is a short castling move, false otherwise.
-   */
+  /** True if this move is a short castling move, false otherwise. */
   private final boolean isShortCastling;
 
-  /**
-   * True if this move is a long castling move, false otherwise.
-   */
+  /** True if this move is a long castling move, false otherwise. */
   private final boolean isLongCastling;
 
-  /**
-   * The captured piece, null if this move is not a capture.
-   */
+  /** The captured piece, null if this move is not a capture. */
   private final ChessPiece capturedPiece;
 
-  /**
-   * The piece to which the moving pawn was promoted.
-   */
+  /** The piece to which the moving pawn was promoted. */
   private final ChessPiece promotionTarget;
 
-  /**
-   * The file of the double pawn push, or -1 if the move isn't a double pawn push.
-   */
+  /** The file of the double pawn push, or -1 if the move isn't a double pawn push. */
   private final int doublePawnPushFile;
 
   /**
@@ -169,51 +157,37 @@ public class ChessMove extends Move {
     return getStringRepresentation();
   }
 
-  /**
-   * Returns true if this move is a capture.
-   */
+  /** Returns true if this move is a capture. */
   public boolean isCapture() {
     return (capturedPiece != null);
   }
 
-  /**
-   * Returns the piece captured by this move, or null if this move is not a capture.
-   */
+  /** Returns the piece captured by this move, or null if this move is not a capture. */
   public ChessPiece getCapturedPiece() {
     return capturedPiece;
   }
 
-  /**
-   * Returns true if this move is a castling move, false otherwise.
-   */
+  /** Returns true if this move is a castling move, false otherwise. */
   public boolean isCastling() {
     return (isShortCastling || isLongCastling);
   }
 
-  /**
-   * Returns true if this move is short castling move, false otherwise.
-   */
+  /** Returns true if this move is short castling move, false otherwise. */
   public boolean isShortCastling() {
     return isShortCastling;
   }
 
-  /**
-   * Returns true if this move if a long castling move, false otherwise.
-   */
+  /** Returns true if this move if a long castling move, false otherwise. */
   public boolean isLongCastling() {
     return isLongCastling;
   }
 
-  /**
-   * Returns true if this move is an en-passant move, false otherwise.
-   */
+  /** Returns true if this move is an en-passant move, false otherwise. */
   public boolean isEnPassant() {
     return isEnPassant;
   }
 
-  /**
-   * Returns true if this move is a promotion.
-   */
+  /** Returns true if this move is a promotion. */
   public boolean isPromotion() {
     return promotionTarget != null;
   }
@@ -233,9 +207,7 @@ public class ChessMove extends Move {
     return doublePawnPushFile;
   }
 
-  /**
-   * Returns a textual representation of this ChessMove based on the move data.
-   */
+  /** Returns a textual representation of this ChessMove based on the move data. */
   @Override
   public String getMoveString() {
     if (isShortCastling()) return "O-O";

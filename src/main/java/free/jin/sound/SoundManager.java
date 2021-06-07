@@ -2,29 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.sound;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import free.jin.Connection;
 import free.jin.FriendsConnection;
@@ -53,37 +43,38 @@ import free.jin.plugin.Plugin;
 import free.util.audio.AudioClip;
 import free.util.models.BooleanModel;
 import free.util.models.Model;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-/**
- * The plugin responsible for producing sound on all the relevant events.
- */
+/** The plugin responsible for producing sound on all the relevant events. */
 public class SoundManager extends Plugin
-    implements PlainTextListener, ChatListener, ConnectionListener, GameListener, FriendsListener,
+    implements PlainTextListener,
+        ChatListener,
+        ConnectionListener,
+        GameListener,
+        FriendsListener,
         PropertyChangeListener {
 
-  /**
-   * Maps sound filenames to AudioClips loaded from those filenames.
-   */
-  protected final static Hashtable FILENAMES_TO_AUDIO_CLIPS = new Hashtable();
+  /** Maps sound filenames to AudioClips loaded from those filenames. */
+  protected static final Hashtable FILENAMES_TO_AUDIO_CLIPS = new Hashtable();
 
-  /**
-   * Maps chat patterns to filenames containing the sound data.
-   */
+  /** Maps chat patterns to filenames containing the sound data. */
   protected final Hashtable chatPatternsToFilenames = new Hashtable();
 
-  /**
-   * Maps text patterns to filenames containing the sound data.
-   */
+  /** Maps text patterns to filenames containing the sound data. */
   protected final Hashtable textPatternsToFilenames = new Hashtable();
 
-  /**
-   * Maps event names such as ("OnConnect") to AudioClips.
-   */
+  /** Maps event names such as ("OnConnect") to AudioClips. */
   protected final Hashtable eventsToAudioClips = new Hashtable();
 
-  /**
-   * True when the plugin is "on", i.e. sounds are on.
-   */
+  /** True when the plugin is "on", i.e. sounds are on. */
   protected BooleanModel soundState;
 
   /**
@@ -97,18 +88,14 @@ public class SoundManager extends Plugin
     registerListeners();
   }
 
-  /**
-   * Undoes what the <code>start()</code> method does.
-   */
+  /** Undoes what the <code>start()</code> method does. */
   @Override
   public void stop() {
     unregisterListeners();
     unloadSounds();
   }
 
-  /**
-   * Returns a boolean model specifying whether sound is on.
-   */
+  /** Returns a boolean model specifying whether sound is on. */
   @Override
   public Model[] getHotPrefs() {
     return new Model[] {soundState};
@@ -132,9 +119,7 @@ public class SoundManager extends Plugin
     getPrefs().setBool("on", soundState.isOn());
   }
 
-  /**
-   * Loads all the sounds and maps them to chat patterns.
-   */
+  /** Loads all the sounds and maps them to chat patterns. */
   protected void loadSounds() {
     loadPatternSounds("chat", chatPatternsToFilenames);
     loadPatternSounds("text", textPatternsToFilenames);
@@ -210,9 +195,7 @@ public class SoundManager extends Plugin
     }
   }
 
-  /**
-   * Registers all the necessary listeners.
-   */
+  /** Registers all the necessary listeners. */
   protected void registerListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -226,9 +209,7 @@ public class SoundManager extends Plugin
       ((FriendsConnection) conn).getFriendsListenerManager().addFriendsListener(this);
   }
 
-  /**
-   * Unregisters all the listeners registered by <code>registerListeners()</code>.
-   */
+  /** Unregisters all the listeners registered by <code>registerListeners()</code>. */
   protected void unregisterListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -239,17 +220,13 @@ public class SoundManager extends Plugin
     listenerManager.removeGameListener(this);
   }
 
-  /**
-   * Unloads all the sounds.
-   */
+  /** Unloads all the sounds. */
   protected void unloadSounds() {
     chatPatternsToFilenames.clear();
     FILENAMES_TO_AUDIO_CLIPS.clear();
   }
 
-  /**
-   * Listens to ChatEvents and makes appropriate sounds.
-   */
+  /** Listens to ChatEvents and makes appropriate sounds. */
   @Override
   public void chatMessageReceived(ChatEvent evt) {
     if (!isOn()) return;
@@ -276,9 +253,7 @@ public class SoundManager extends Plugin
     }
   }
 
-  /**
-   * Listens to PlainTextEvents and makes appropriate sounds.
-   */
+  /** Listens to PlainTextEvents and makes appropriate sounds. */
   @Override
   public void plainTextReceived(PlainTextEvent evt) {
     if (!isOn()) return;
@@ -299,19 +274,21 @@ public class SoundManager extends Plugin
 
   /**
    * Plays the event associated with the given event. Currently recognized event names include:
+   *
    * <UL>
-   * <LI>OnConnect - A connection was established.
-   * <LI>OnLogin - Login procedure succeeded.
-   * <LI>OnDisconnect - Disconnected.
-   * <LI>Move - A move is made.
-   * <LI>Capture - A capture move is made.
-   * <LI>Castling - A castling move is made.
-   * <LI>IllegalMove - An illegal move was attempted.
-   * <LI>GameStart - A game started.
-   * <LI>GameEnd - A game ended.
-   * <LI>FriendConnected - A buddy logged in.
-   * <LI>FriendDisconnected - A buddy logged out.
+   *   <LI>OnConnect - A connection was established.
+   *   <LI>OnLogin - Login procedure succeeded.
+   *   <LI>OnDisconnect - Disconnected.
+   *   <LI>Move - A move is made.
+   *   <LI>Capture - A capture move is made.
+   *   <LI>Castling - A castling move is made.
+   *   <LI>IllegalMove - An illegal move was attempted.
+   *   <LI>GameStart - A game started.
+   *   <LI>GameEnd - A game ended.
+   *   <LI>FriendConnected - A buddy logged in.
+   *   <LI>FriendDisconnected - A buddy logged out.
    * </UL>
+   *
    * Returns true if the given event is recognized, false otherwise. Note that for various reasons
    * (like the user disabling sounds), the sound may not be played.
    */
@@ -325,25 +302,19 @@ public class SoundManager extends Plugin
     return false;
   }
 
-  /**
-   * Plays the sound mapped to the "OnConnect" event.
-   */
+  /** Plays the sound mapped to the "OnConnect" event. */
   @Override
   public void connectionEstablished(Connection conn) {
     playEventSound("OnConnect");
   }
 
-  /**
-   * Plays the sound mapped to the "OnLogin" event.
-   */
+  /** Plays the sound mapped to the "OnLogin" event. */
   @Override
   public void loginSucceeded(Connection conn) {
     playEventSound("OnLogin");
   }
 
-  /**
-   * Plays the sound mapped to the "OnDisconnect" event.
-   */
+  /** Plays the sound mapped to the "OnDisconnect" event. */
   @Override
   public void connectionLost(Connection conn) {
     playEventSound("OnDisconnect");
@@ -359,9 +330,7 @@ public class SoundManager extends Plugin
   @Override
   public void loginFailed(Connection conn, String reason) {}
 
-  /**
-   * Plays the sound mapped to the "GameStart" event.
-   */
+  /** Plays the sound mapped to the "GameStart" event. */
   @Override
   public void gameStarted(GameStartEvent evt) {
     Game game = evt.getGame();
@@ -388,17 +357,13 @@ public class SoundManager extends Plugin
     }
   }
 
-  /**
-   * Plays the sound mapped to the "IllegalMove" event.
-   */
+  /** Plays the sound mapped to the "IllegalMove" event. */
   @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt) {
     playEventSound("IllegalMove");
   }
 
-  /**
-   * Plays the sound mapped to the "GameEnd" event.
-   */
+  /** Plays the sound mapped to the "GameEnd" event. */
   @Override
   public void gameEnded(GameEndEvent evt) {
     Game game = evt.getGame();
@@ -406,9 +371,7 @@ public class SoundManager extends Plugin
     game.removePropertyChangeListener(this);
   }
 
-  /**
-   * Plays the "DrawOffer", "AbortOffer" or "AdjournOffer" sounds if needed.
-   */
+  /** Plays the "DrawOffer", "AbortOffer" or "AdjournOffer" sounds if needed. */
   @Override
   public void offerUpdated(OfferEvent evt) {
     if (evt.isOffered()) {
@@ -444,17 +407,13 @@ public class SoundManager extends Plugin
   @Override
   public void boardFlipped(BoardFlipEvent evt) {}
 
-  /**
-   * Invoked when a friend connects.
-   */
+  /** Invoked when a friend connects. */
   @Override
   public void friendConnected(FriendsEvent evt) {
     playEventSound("FriendConnected");
   }
 
-  /**
-   * Invoked when a friend disconnects.
-   */
+  /** Invoked when a friend disconnects. */
   @Override
   public void friendDisconnected(FriendsEvent evt) {
     playEventSound("FriendDisconnected");
@@ -476,9 +435,7 @@ public class SoundManager extends Plugin
     return soundState.isOn();
   }
 
-  /**
-   * Returns the string "sound".
-   */
+  /** Returns the string "sound". */
   @Override
   public String getId() {
     return "sound";
