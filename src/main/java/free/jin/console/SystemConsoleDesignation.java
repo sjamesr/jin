@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -44,8 +44,8 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   }
 
   /**
-   * Registers ourselves as <code>FriendsListener</code>, if the connection implements
-   * <code>FriendsConnection</code>.
+   * Registers ourselves as <code>FriendsListener</code>, if the connection implements <code>
+   * FriendsConnection</code>.
    */
   @Override
   protected void joinForums() {
@@ -53,9 +53,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
       ((FriendsConnection) connection).getFriendsListenerManager().addFriendsListener(this);
   }
 
-  /**
-   * The system console displays all events.
-   */
+  /** The system console displays all events. */
   @Override
   protected boolean accept(JinEvent evt) {
     return true;
@@ -72,16 +70,12 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
     if (isPersonalTell(evt)) getConsole().personalTellReceived(evt.getSender());
   }
 
-  /**
-   * Returns whether the specified chat event is a personal tell to the user.
-   */
+  /** Returns whether the specified chat event is a personal tell to the user. */
   protected boolean isPersonalTell(ChatEvent evt) {
     return (evt.getCategory() == ChatEvent.PERSON_TO_PERSON_CHAT_CATEGORY);
   }
 
-  /**
-   * Invoked when a friend connects.
-   */
+  /** Invoked when a friend connects. */
   @Override
   public void friendConnected(FriendsEvent evt) {
     I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
@@ -92,9 +86,7 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
     console.addToOutput(text, console.textTypeForEvent(evt));
   }
 
-  /**
-   * Invoked when a friend disconnects.
-   */
+  /** Invoked when a friend disconnects. */
   @Override
   public void friendDisconnected(FriendsEvent evt) {
     I18n i18n = I18n.get(getClass(), SystemConsoleDesignation.class);
@@ -114,29 +106,21 @@ public abstract class SystemConsoleDesignation extends AbstractConsoleDesignatio
   @Override
   public void friendStateChanged(FriendsEvent evt) {}
 
-  /**
-   * A command type which sends the command typed by the user as-is to the server.
-   */
+  /** A command type which sends the command typed by the user as-is to the server. */
   private class IssueCommand extends AbstractCommandType {
 
-    /**
-     * Creates a new <code>IssueCommand</code>.
-     */
+    /** Creates a new <code>IssueCommand</code>. */
     public IssueCommand() {
       super(I18n.get(IssueCommand.class).getString("name"));
     }
 
-    /**
-     * Issues the specified command.
-     */
+    /** Issues the specified command. */
     @Override
     protected void send(String command) {
       sendCommand(command);
     }
 
-    /**
-     * Echoes the specified command to the console.
-     */
+    /** Echoes the specified command to the console. */
     @Override
     protected void echo(String command) {
       echoCommand(command);

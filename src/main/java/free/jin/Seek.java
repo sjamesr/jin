@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -21,9 +21,7 @@ import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.util.Struct;
 
-/**
- * A representation of a seek - a request for a player to play a game
- */
+/** A representation of a seek - a request for a player to play a game */
 public class Seek extends Struct {
 
   /**
@@ -41,16 +39,16 @@ public class Seek extends Struct {
    * @param timeControl The time control of the sought game.
    * @param isRated True if the sought game is rated.
    * @param color The side on which the seeking player wants to be - Player.WHITE_PLAYER if the seek
-   * is to play with white pieces, Player.BLACK_PLAYER if with black or null if the seek is for a
-   * random color.
+   *     is to play with white pieces, Player.BLACK_PLAYER if with black or null if the seek is for
+   *     a random color.
    * @param isRatingLimited Is the seeker limiting the rating of the players against whom he wants
-   * to play. If this is false, the minRating and maxRating parameters will be ignored.
+   *     to play. If this is false, the minRating and maxRating parameters will be ignored.
    * @param minRating The minimum rating against which the seeking player is willing to play.
    * @param maxRating The maximum rating against which the seeking player is willing to play.
    * @param isManualAccept True if the seeking player wishes to manually confirm that he wants to
-   * play against whoever accepts his seek.
+   *     play against whoever accepts his seek.
    * @param isFormula True if in order to start the game, you must pass the seeking player's
-   * formula.
+   *     formula.
    */
   public Seek(
       String seekID,
@@ -99,30 +97,22 @@ public class Seek extends Struct {
     return getStringProperty("SeekID");
   }
 
-  /**
-   * Returns the player who issued the seek.
-   */
+  /** Returns the player who issued the seek. */
   public ServerUser getSeeker() {
     return (ServerUser) getProperty("Seeker");
   }
 
-  /**
-   * Returns the handle/nickname of the player who issued the seek.
-   */
+  /** Returns the handle/nickname of the player who issued the seek. */
   public String getSeekerName() {
     return getSeeker().getName();
   }
 
-  /**
-   * Returns the title of the player who issued the seek.
-   */
+  /** Returns the title of the player who issued the seek. */
   public String getSeekerTitle() {
     return getStringProperty("SeekerTitle");
   }
 
-  /**
-   * Returns the rating of the player who issued the seek.
-   */
+  /** Returns the rating of the player who issued the seek. */
   public int getSeekerRating() {
     return getIntegerProperty("SeekerRating");
   }
@@ -148,16 +138,12 @@ public class Seek extends Struct {
     return getBooleanProperty("IsSeekerRated");
   }
 
-  /**
-   * Returns true if the player who issued the seek is a computer player, false if he's human.
-   */
+  /** Returns true if the player who issued the seek is a computer player, false if he's human. */
   public boolean isSeekerComputer() {
     return getBooleanProperty("IsComputer");
   }
 
-  /**
-   * Returns the WildVariant of the sought game.
-   */
+  /** Returns the WildVariant of the sought game. */
   public WildVariant getVariant() {
     return (WildVariant) getProperty("Variant");
   }
@@ -170,16 +156,12 @@ public class Seek extends Struct {
     return getStringProperty("RatingCategoryString");
   }
 
-  /**
-   * Returns the time control of the sought game.
-   */
+  /** Returns the time control of the sought game. */
   public TimeControl getTimeControl() {
     return (TimeControl) getProperty("TimeControl");
   }
 
-  /**
-   * Returns true if the sought game is rated, false otherwise.
-   */
+  /** Returns true if the sought game is rated, false otherwise. */
   public boolean isRated() {
     return getBooleanProperty("IsRated");
   }
@@ -200,16 +182,12 @@ public class Seek extends Struct {
     return getBooleanProperty("IsRatingLimited");
   }
 
-  /**
-   * Returns the minimum rating against which the player who issued the seek is willing to play.
-   */
+  /** Returns the minimum rating against which the player who issued the seek is willing to play. */
   public int getMinRating() {
     return getIntegerProperty("MinRating");
   }
 
-  /**
-   * Returns the maximum rating against which the player who issued the seek is willing to play.
-   */
+  /** Returns the maximum rating against which the player who issued the seek is willing to play. */
   public int getMaxRating() {
     return getIntegerProperty("MaxRating");
   }

@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -24,29 +24,19 @@ import free.jin.MatchOfferConnection;
  */
 public class MatchOfferEvent extends JinEvent {
 
-  /**
-   * The id for a match offer made.
-   */
+  /** The id for a match offer made. */
   public static final int MATCH_OFFER_MADE = 1;
 
-  /**
-   * The id for a match offer withdrawn.
-   */
+  /** The id for a match offer withdrawn. */
   public static final int MATCH_OFFER_WITHDRAWN = 2;
 
-  /**
-   * The id of this event.
-   */
+  /** The id of this event. */
   private final int id;
 
-  /**
-   * The actual match offer made/withdrawn.
-   */
+  /** The actual match offer made/withdrawn. */
   private final MatchOffer matchOffer;
 
-  /**
-   * Creates a new <code>MatchOfferEvent</code> with the specified arguments.
-   */
+  /** Creates a new <code>MatchOfferEvent</code> with the specified arguments. */
   public MatchOfferEvent(
       MatchOfferConnection source, String clientTag, int id, MatchOffer matchOffer) {
     super(source, clientTag);
@@ -64,23 +54,17 @@ public class MatchOfferEvent extends JinEvent {
     this.matchOffer = matchOffer;
   }
 
-  /**
-   * Returns the id of this event
-   */
+  /** Returns the id of this event */
   public int getID() {
     return id;
   }
 
-  /**
-   * Returns the match offer made/withdrawn.
-   */
+  /** Returns the match offer made/withdrawn. */
   public MatchOffer getMatchOffer() {
     return matchOffer;
   }
 
-  /**
-   * Returns the source <code>MatchOfferConnection</code>.
-   */
+  /** Returns the source <code>MatchOfferConnection</code>. */
   public MatchOfferConnection getMatchOfferConnection() {
     return (MatchOfferConnection) getConnection();
   }

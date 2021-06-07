@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -32,19 +32,17 @@ import free.jin.event.MatchOfferListener;
 import free.jin.event.SeekListener;
 
 /**
- * A chessclub.com specific extension of <code>BasicListenerManager</code>. Used by
- * <code>JinChessclubConnection</code>.
+ * A chessclub.com specific extension of <code>BasicListenerManager</code>. Used by <code>
+ * JinChessclubConnection</code>.
  */
 public class ChessclubListenerManager extends BasicListenerManager {
 
-  /**
-   * The source <code>JinChessclubConnection</code>.
-   */
+  /** The source <code>JinChessclubConnection</code>. */
   private final JinChessclubConnection source;
 
   /**
-   * Creates a new <code>ChessclubListenerManager</code> with the specified source
-   * <code>JinChessclubConnection</code>.
+   * Creates a new <code>ChessclubListenerManager</code> with the specified source <code>
+   * JinChessclubConnection</code>.
    */
   public ChessclubListenerManager(JinChessclubConnection source) {
     super(source);
@@ -90,9 +88,9 @@ public class ChessclubListenerManager extends BasicListenerManager {
 
   /**
    * Adds the specified <code>GameListener</code> to the list of listeners receiving notifications
-   * of <code>GameEvent</code>s. This method will accept and handle
-   * <code>ChessclubGameListener</code>s properly (by calling the chessclub specific methods in that
-   * interface when needed) as well as regular <code>GameListener</code>s.
+   * of <code>GameEvent</code>s. This method will accept and handle <code>ChessclubGameListener
+   * </code>s properly (by calling the chessclub specific methods in that interface when needed) as
+   * well as regular <code>GameListener</code>s.
    */
   @Override
   public void addGameListener(GameListener listener) {
@@ -131,9 +129,8 @@ public class ChessclubListenerManager extends BasicListenerManager {
 
   /**
    * Removes the specified <code>GameListener</code> from the list of listeners receiving
-   * notifications of <code>GameEvent</code>s. This method can be used to remove
-   * <code>ChessclubGameListener</code>s added via the <code>addGameListener(GameListener)</code>
-   * method.
+   * notifications of <code>GameEvent</code>s. This method can be used to remove <code>
+   * ChessclubGameListener</code>s added via the <code>addGameListener(GameListener)</code> method.
    */
   @Override
   public void removeGameListener(GameListener listener) {
@@ -209,9 +206,7 @@ public class ChessclubListenerManager extends BasicListenerManager {
     }
   }
 
-  /**
-   * Returns whether the specified event is a chessclub.com specific <code>GameEvent</code>.
-   */
+  /** Returns whether the specified event is a chessclub.com specific <code>GameEvent</code>. */
   private boolean isChessclubSpecificEvent(GameEvent evt) {
     return (evt instanceof CircleEvent) || (evt instanceof ArrowEvent);
   }
@@ -249,8 +244,8 @@ public class ChessclubListenerManager extends BasicListenerManager {
   }
 
   /**
-   * Adds the specified <code>GameListListener</code> to receive notifications of
-   * <code>GameListEvent</code>s.
+   * Adds the specified <code>GameListListener</code> to receive notifications of <code>
+   * GameListEvent</code>s.
    */
   @Override
   public void addGameListListener(GameListListener listener) {
@@ -302,9 +297,7 @@ public class ChessclubListenerManager extends BasicListenerManager {
     }
   }
 
-  /**
-   * Dispatches the specified <code>ChessEventEvent</code> to all interested listeners.
-   */
+  /** Dispatches the specified <code>ChessEventEvent</code> to all interested listeners. */
   public void fireChessEventEvent(ChessEventEvent evt) {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -363,8 +356,8 @@ public class ChessclubListenerManager extends BasicListenerManager {
   }
 
   /**
-   * Adds the specified <code>MatchOfferListener</code> to receive notifications of
-   * <code>MatchOfferEvent</code>s.
+   * Adds the specified <code>MatchOfferListener</code> to receive notifications of <code>
+   * MatchOfferEvent</code>s.
    */
   @Override
   public void addMatchOfferListener(MatchOfferListener listener) {

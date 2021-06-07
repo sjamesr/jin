@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2008 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -34,29 +34,19 @@ import java.util.TreeMap;
  */
 public class Encodings {
 
-  /**
-   * Our localization.
-   */
+  /** Our localization. */
   private static final Localization l10n = LocalizationService.getForClass(Encodings.class);
 
-  /**
-   * The list of encoding categories.
-   */
+  /** The list of encoding categories. */
   private static final List CATEGORIES = new LinkedList();
 
-  /**
-   * A map from encoding categories to lists of encodings in that category.
-   */
+  /** A map from encoding categories to lists of encodings in that category. */
   private static final Map CATEGORIES_TO_ENCODINGS = new TreeMap();
 
-  /**
-   * A map from encoding categories to their names in the current application's locale.
-   */
+  /** A map from encoding categories to their names in the current application's locale. */
   private static final Map CATEGORIES_TO_NAMES = new TreeMap();
 
-  /**
-   * A map of i18n
-   */
+  /** A map of i18n */
   static {
     try {
       Properties props =

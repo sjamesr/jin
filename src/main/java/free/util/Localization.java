@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307, USA
  */
@@ -24,24 +24,18 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 
 /**
- * A simple localization utility, backed up by a <code>Properties</code> object loaded from a
- * <code>localization.properties</code> resource.
+ * A simple localization utility, backed up by a <code>Properties</code> object loaded from a <code>
+ * localization.properties</code> resource.
  */
 public class Localization {
 
-  /**
-   * The locale used for the application.
-   */
+  /** The locale used for the application. */
   public static volatile Locale appLocale = Locale.getDefault();
 
-  /**
-   * The <code>Property</code> object holding the translations.
-   */
+  /** The <code>Property</code> object holding the translations. */
   private final Properties props;
 
-  /**
-   * The name of the class this <code>Localization</code> is for.
-   */
+  /** The name of the class this <code>Localization</code> is for. */
   private final String className;
 
   /**
@@ -54,9 +48,7 @@ public class Localization {
     this.className = className;
   }
 
-  /**
-   * Sets the locale for this application to the specified locale.
-   */
+  /** Sets the locale for this application to the specified locale. */
   public static void setAppLocale(Locale locale) {
     if (locale == null) throw new IllegalArgumentException("locale may not be null");
 
@@ -77,12 +69,14 @@ public class Localization {
    * <code>Localization</code> object is loaded from property resources located in the package of
    * the specified class. The resources are looked up in the following order, with each one being
    * the parent of the following one:
+   *
    * <ol>
-   * <li><code>localization.properties</code>
-   * <li><code>localization_[language].properties</code>
-   * <li><code>localization_[language]_[country].properties</code>.
-   * <li><code>localization_[language]_[country]_[variant].properties</code>.
+   *   <li><code>localization.properties</code>
+   *   <li><code>localization_[language].properties</code>
+   *   <li><code>localization_[language]_[country].properties</code>.
+   *   <li><code>localization_[language]_[country]_[variant].properties</code>.
    * </ol>
+   *
    * where <code>[language]</code>, <code>[country]</code> and <code>[variant]</code> are taken from
    * the locale (if the locale provides them). Returns <code>null</code> if all of the resources are
    * missing.
@@ -141,9 +135,7 @@ public class Localization {
     return props;
   }
 
-  /**
-   * Returns the translation for the specified key.
-   */
+  /** Returns the translation for the specified key. */
   public String getString(String key) {
     return props.getProperty(className + "." + key);
   }

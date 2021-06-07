@@ -2,43 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
-
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.Vector;
-import java.util.regex.Pattern;
-
-import javax.swing.SwingConstants;
 
 import free.jin.Connection;
 import free.jin.Game;
@@ -69,6 +45,28 @@ import free.util.swing.tabbedpane.TabbedPane;
 import free.util.swing.tabbedpane.TabbedPaneEvent;
 import free.util.swing.tabbedpane.TabbedPaneListener;
 import free.util.swing.tabbedpane.TabbedPaneModel;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.Vector;
+import java.util.regex.Pattern;
+import javax.swing.SwingConstants;
 
 /**
  * A Plugin which implements the consoles functionality. It's responsible for opening, positioning
@@ -78,89 +76,55 @@ import free.util.swing.tabbedpane.TabbedPaneModel;
 public abstract class ConsoleManager extends Plugin
     implements PlainTextListener, ChatListener, ConnectionListener {
 
-  /**
-   * The id of this plugin.
-   */
+  /** The id of this plugin. */
   public static final String PLUGIN_ID = "console";
 
-  /**
-   * The constant specifying "embedded" game lists display style.
-   */
+  /** The constant specifying "embedded" game lists display style. */
   public static final int EMBEDDED_GAME_LISTS = 0;
 
-  /**
-   * The constant specifying "external" game lists display style.
-   */
+  /** The constant specifying "external" game lists display style. */
   public static final int EXTERNAL_GAME_LISTS = 1;
 
-  /**
-   * The constant specifying that game lists aren't displayed specially.
-   */
+  /** The constant specifying that game lists aren't displayed specially. */
   public static final int NO_GAME_LISTS = 2;
 
-  /**
-   * The id of the main console container.
-   */
+  /** The id of the main console container. */
   public static final String MAIN_CONTAINER_ID = "";
 
-  /**
-   * (lazily created) map of channel IDs to channels.
-   */
+  /** (lazily created) map of channel IDs to channels. */
   private SortedMap channels = null;
 
-  /**
-   * The consoles.
-   */
+  /** The consoles. */
   private final List consoles = new ArrayList();
 
-  /**
-   * Maps console container IDs to console containers.
-   */
+  /** Maps console container IDs to console containers. */
   private final Map consoleContainers = new HashMap();
 
-  /**
-   * Maps console container IDs to the {@link TabbedPane} inside of each console container.
-   */
+  /** Maps console container IDs to the {@link TabbedPane} inside of each console container. */
   private final Map tabbedPanes = new HashMap();
 
-  /**
-   * Maps console container IDs to lists of consoles in that container.
-   */
+  /** Maps console container IDs to lists of consoles in that container. */
   private final Map containerIdsToConsoleLists = new HashMap();
 
-  /**
-   * Our encoding.
-   */
+  /** Our encoding. */
   private String encoding;
 
-  /**
-   * Are we currently paused?
-   */
+  /** Are we currently paused? */
   private boolean isPaused = false;
 
-  /**
-   * A queue of the events we've accumulated while being paused.
-   */
+  /** A queue of the events we've accumulated while being paused. */
   private final Vector pausedEventsQueue = new Vector();
 
-  /**
-   * The system console designation, if any.
-   */
+  /** The system console designation, if any. */
   private ConsoleDesignation systemConsoleDesignation;
 
-  /**
-   * The help console designation, if any.
-   */
+  /** The help console designation, if any. */
   private ConsoleDesignation helpConsoleDesignation;
 
-  /**
-   * The number of temporary console's we've added in the lifetime of this plugin.
-   */
+  /** The number of temporary console's we've added in the lifetime of this plugin. */
   private int temporaryConsoleCount = 0;
 
-  /**
-   * A game listener which invokes private methods for the events we care about.
-   */
+  /** A game listener which invokes private methods for the events we care about. */
   private final GameListener gameListener =
       new GameAdapter() {
         @Override
@@ -169,9 +133,7 @@ public abstract class ConsoleManager extends Plugin
         }
       };
 
-  /**
-   * Starts this plugin.
-   */
+  /** Starts this plugin. */
   @Override
   public void start() {
     createUI();
@@ -182,34 +144,26 @@ public abstract class ConsoleManager extends Plugin
     exportAction(new AskHelpQuestionAction());
   }
 
-  /**
-   * Stops the plugin.
-   */
+  /** Stops the plugin. */
   @Override
   public void stop() {
     unregisterConnListeners();
   }
 
-  /**
-   * Loads the plugin's state from preferences.
-   */
+  /** Loads the plugin's state from preferences. */
   private void loadState() {
     loadEncoding();
     createConsoles();
   }
 
-  /**
-   * Loads the console manager's encoding from preferences.
-   */
+  /** Loads the console manager's encoding from preferences. */
   private void loadEncoding() {
     String encoding = getPrefs().getString("encoding", TextUtilities.getDefaultCharsetName());
 
     this.encoding = Charset.isSupported(encoding) ? encoding : null;
   }
 
-  /**
-   * Creates the consoles we'll be displaying.
-   */
+  /** Creates the consoles we'll be displaying. */
   private void createConsoles() {
     Preferences prefs = getPrefs();
 
@@ -235,9 +189,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Creates a <code>ConsoleDesignation</code> from preferences, using the specified prefix.
-   */
+  /** Creates a <code>ConsoleDesignation</code> from preferences, using the specified prefix. */
   private ConsoleDesignation loadConsoleDesignation(String prefsPrefix) {
     Preferences prefs = getPrefs();
 
@@ -288,15 +240,11 @@ public abstract class ConsoleManager extends Plugin
    */
   protected abstract ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable);
 
-  /**
-   * Creates a console designation for personal chat with the specified user.
-   */
+  /** Creates a console designation for personal chat with the specified user. */
   protected abstract ConsoleDesignation createPersonalChatConsoleDesignation(
       ServerUser user, boolean isCloseable);
 
-  /**
-   * Creates a console designation for chat at a board.
-   */
+  /** Creates a console designation for chat at a board. */
   protected abstract ConsoleDesignation createGameConsoleDesignation(Game game);
 
   /**
@@ -306,9 +254,7 @@ public abstract class ConsoleManager extends Plugin
   protected abstract CustomConsoleDesignation loadCustomConsoleDesignation(
       String prefsPrefix, String title, String encoding, List channels, Pattern messageRegex);
 
-  /**
-   * Creates and displays the plugin's UI.
-   */
+  /** Creates and displays the plugin's UI. */
   private void createUI() {
     I18n i18n = getI18n();
     Preferences prefs = getPrefs();
@@ -360,9 +306,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Creates a tabbed pane for the specified console container.
-   */
+  /** Creates a tabbed pane for the specified console container. */
   private TabbedPane createTabbedPane(final PluginUIContainer container) {
     TabbedPane tabbedPane = new TabbedPane(SwingConstants.TOP);
     tabbedPane.setAlwaysShowTabs(false);
@@ -392,9 +336,7 @@ public abstract class ConsoleManager extends Plugin
     return tabbedPane;
   }
 
-  /**
-   * Transfers the focus to the currently visible console in the specified container.
-   */
+  /** Transfers the focus to the currently visible console in the specified container. */
   private void obtainFocus(PluginUIContainer container) {
     List consolesInContainer = (List) containerIdsToConsoleLists.get(container.getId());
 
@@ -408,9 +350,7 @@ public abstract class ConsoleManager extends Plugin
     if (console != null) console.obtainFocus();
   }
 
-  /**
-   * Returns the console with the specified designation, or <code>null</code> if none exists.
-   */
+  /** Returns the console with the specified designation, or <code>null</code> if none exists. */
   public Console getConsole(ConsoleDesignation designation) {
     for (int i = 0; i < consoles.size(); i++) {
       Console console = (Console) consoles.get(i);
@@ -482,17 +422,13 @@ public abstract class ConsoleManager extends Plugin
     if (index >= 0) tabbedPane.getModel().setSelectedIndex(index);
   }
 
-  /**
-   * Makes the console container with the specified ID active.
-   */
+  /** Makes the console container with the specified ID active. */
   public void makeActive(String containerId) {
     PluginUIContainer container = (PluginUIContainer) consoleContainers.get(containerId);
     if (container != null) container.setActive(true);
   }
 
-  /**
-   * Returns the ID of the currently active container; <code>null</code> if none.
-   */
+  /** Returns the ID of the currently active container; <code>null</code> if none. */
   public String getActiveContainerId() {
     for (Iterator i = consoleContainers.entrySet().iterator(); i.hasNext(); ) {
       Map.Entry entry = (Map.Entry) i.next();
@@ -556,9 +492,7 @@ public abstract class ConsoleManager extends Plugin
     helpConsole.flashInputField();
   }
 
-  /**
-   * Removes the specified console.
-   */
+  /** Removes the specified console. */
   public void removeConsole(Console console) {
     for (Iterator i = tabbedPanes.values().iterator(); i.hasNext(); ) {
       TabbedPane tabbedPane = (TabbedPane) i.next();
@@ -568,39 +502,31 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Creates a single <code>Console</code> for this <code>ConsoleManager</code>.
-   */
+  /** Creates a single <code>Console</code> for this <code>ConsoleManager</code>. */
   protected Console createConsole(ConsoleDesignation designation) {
     return new Console(this, designation);
   }
 
-  /**
-   * Sets whether text is copied to the clipboard automatically, upon selection.
-   */
+  /** Sets whether text is copied to the clipboard automatically, upon selection. */
   public void setCopyOnSelect(boolean isCopyOnSelect) {
     getPrefs().setBool("copyOnSelect", isCopyOnSelect);
   }
 
-  /**
-   * Returns whether text is copied to the clipboard automatically, upon selection.
-   */
+  /** Returns whether text is copied to the clipboard automatically, upon selection. */
   public boolean isCopyOnSelect() {
     return getPrefs().getBool("copyOnSelect", true);
   }
 
-  /**
-   * Returns the console manager's encoding.
-   */
+  /** Returns the console manager's encoding. */
   public String getEncoding() {
     return encoding;
   }
 
   /**
    * Sets the encoding with which we decode/encode text received/sent from/to the server. This is
-   * only relevant if the connections text encoding is non-null. See
-   * {@link free.jin.Connection#getTextEncoding()} for more information. A <code>null</code> value
-   * means the encoding will be re-set to the system's default encoding.
+   * only relevant if the connections text encoding is non-null. See {@link
+   * free.jin.Connection#getTextEncoding()} for more information. A <code>null</code> value means
+   * the encoding will be re-set to the system's default encoding.
    */
   public void setEncoding(String encoding) throws UnsupportedEncodingException {
     if (encoding == null) encoding = TextUtilities.getDefaultCharsetName();
@@ -637,9 +563,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Registers all the necessary listeners to JinConnection events.
-   */
+  /** Registers all the necessary listeners to JinConnection events. */
   protected void registerConnListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -650,9 +574,7 @@ public abstract class ConsoleManager extends Plugin
     listenerManager.addGameListener(gameListener);
   }
 
-  /**
-   * Unregisters all the listeners we've registered with the JinConnection.
-   */
+  /** Unregisters all the listeners we've registered with the JinConnection. */
   protected void unregisterConnListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -663,9 +585,7 @@ public abstract class ConsoleManager extends Plugin
     listenerManager.removeGameListener(gameListener);
   }
 
-  /**
-   * Adds the specified line of text to all the consoles.
-   */
+  /** Adds the specified line of text to all the consoles. */
   public void addSpecialLine(String line) {
     for (int i = 0; i < consoles.size(); i++) {
       Console console = (Console) consoles.get(i);
@@ -673,25 +593,19 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Listens to plain text events and adds them to the consoles.
-   */
+  /** Listens to plain text events and adds them to the consoles. */
   @Override
   public void plainTextReceived(PlainTextEvent evt) {
     eventForConsoleReceived(evt);
   }
 
-  /**
-   * Listens to ChatEvents and adds appropriate text to the console.
-   */
+  /** Listens to ChatEvents and adds appropriate text to the console. */
   @Override
   public void chatMessageReceived(ChatEvent evt) {
     eventForConsoleReceived(evt);
   }
 
-  /**
-   * Invoked when an event which may be displayed in a console occurs.
-   */
+  /** Invoked when an event which may be displayed in a console occurs. */
   protected void eventForConsoleReceived(JinEvent evt) {
     if (isPaused()) {
       pausedEventsQueue.addElement(evt);
@@ -725,9 +639,7 @@ public abstract class ConsoleManager extends Plugin
     if (!handled && (systemConsoleDesignation != null)) systemConsoleDesignation.receive(evt);
   }
 
-  /**
-   * Sets the pause state of the console manager.
-   */
+  /** Sets the pause state of the console manager. */
   @Override
   public void setPaused(boolean isPaused) {
     this.isPaused = isPaused;
@@ -747,9 +659,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Returns whether the console manager is currently paused.
-   */
+  /** Returns whether the console manager is currently paused. */
   @Override
   public boolean isPaused() {
     return isPaused;
@@ -763,9 +673,7 @@ public abstract class ConsoleManager extends Plugin
     return evt.toString();
   }
 
-  /**
-   * Gets called when a connection is attempted.
-   */
+  /** Gets called when a connection is attempted. */
   @Override
   public void connectionAttempted(Connection conn, String hostname, int port) {
     // We pass a String instead of an Integer for the port because an Integer is translated
@@ -782,9 +690,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Gets called when the connection to the server is established.
-   */
+  /** Gets called when the connection to the server is established. */
   @Override
   public void connectionEstablished(Connection conn) {
     String message = getI18n().getString("connectedMessage");
@@ -794,9 +700,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Gets called when the login procedure is done.
-   */
+  /** Gets called when the login procedure is done. */
   @Override
   public void loginSucceeded(Connection conn) {
     PluginUIContainer mainConsoleContainer =
@@ -815,9 +719,7 @@ public abstract class ConsoleManager extends Plugin
     }
   }
 
-  /**
-   * Gets called when the connection to the server is lost.
-   */
+  /** Gets called when the connection to the server is lost. */
   @Override
   public void connectionLost(Connection conn) {
     String message = getI18n().getString("disconnectedWarning");
@@ -835,9 +737,7 @@ public abstract class ConsoleManager extends Plugin
   @Override
   public void loginFailed(Connection conn, String reason) {}
 
-  /**
-   * Invoked when a new game has started.
-   */
+  /** Invoked when a new game has started. */
   protected void gameStarted(GameEvent evt) {
     if (getPrefs().getBool("newConsoleOnGameStart", false)) {
       // Ideally, we want to select and make active iff the game was started due
@@ -869,19 +769,13 @@ public abstract class ConsoleManager extends Plugin
    */
   protected abstract SortedMap createChannels();
 
-  /**
-   * Encodes the specified list of channels into a preference property value.
-   */
+  /** Encodes the specified list of channels into a preference property value. */
   public abstract Object encodeConsoleChannelsPref(List channels);
 
-  /**
-   * Parses the value of the preference specifying the list of channels a console displays.
-   */
+  /** Parses the value of the preference specifying the list of channels a console displays. */
   public abstract List parseConsoleChannelsPref(Object channelsPrefsValue);
 
-  /**
-   * Saves the current state into the user file.
-   */
+  /** Saves the current state into the user file. */
   @Override
   public void saveState() {
     Preferences prefs = getPrefs();
@@ -901,9 +795,7 @@ public abstract class ConsoleManager extends Plugin
     prefs.setString("encoding", getEncoding());
   }
 
-  /**
-   * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
-   */
+  /** Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}. */
   @Override
   public String getId() {
     return PLUGIN_ID;
@@ -922,28 +814,20 @@ public abstract class ConsoleManager extends Plugin
     return getPrefs().getBool("preferences.show", true);
   }
 
-  /**
-   * Return a PreferencesPanel for changing the console manager's settings.
-   */
+  /** Return a PreferencesPanel for changing the console manager's settings. */
   @Override
   public abstract PreferencesPanel getPreferencesUI();
 
-  /**
-   * An action which guides the user to ask a question using the help console.
-   */
+  /** An action which guides the user to ask a question using the help console. */
   private class AskHelpQuestionAction extends JinAction {
 
-    /**
-     * Returns the string <code>"askhelpquestion"</code>.
-     */
+    /** Returns the string <code>"askhelpquestion"</code>. */
     @Override
     public String getId() {
       return "askhelpquestion";
     }
 
-    /**
-     * Displays the help console and flashes the input field.
-     */
+    /** Displays the help console and flashes the input field. */
     @Override
     public void actionPerformed(ActionEvent e) {
       activateHelpConsole(MAIN_CONTAINER_ID);

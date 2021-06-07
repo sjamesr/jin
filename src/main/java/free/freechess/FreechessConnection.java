@@ -2,20 +2,21 @@
  * The freechess.org connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The freechess.org connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The freechess.org connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The freechess.org connection library is distributed in the hope that it will be useful, but
+ * <p>The freechess.org connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * freechess.org connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.freechess;
 
+import free.util.Connection;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,40 +31,31 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import free.util.Connection;
-
 /**
- * <P>
  * This class implements an easy way to communicate with a freechess.org server. It provides parsing
  * of messages sent by the server and allows receiving notifications of various events in an easy
  * manner.
- * <P>
- * Information usually arrives and is parsed/processed line by line. Usage usually involves
+ *
+ * <p>Information usually arrives and is parsed/processed line by line. Usage usually involves
  * overriding one of the many <code>processXXX(<arguments>)</code> methods and handling the arrived
  * information. The boolean value returned by the <code>processXXX(<arguments>)</code> methods
  * determines whether the arrived information has been processed completely and shouldn't be
  * processed any further. Currently, returning <code>false</code> will mean that the line sent by
  * the server will be sent to the <code>processLine(String)</code> method as well, but in the future
- * "further processing" might include other procedures. Since by default, all the
- * <code>processXXX(parsed data)</code> methods return <code>false</code>, the information usually
- * handled by any methods you don't override will end up in <code>processLine(String)</code> which
- * you can easily use for printing the output to the screen or a file.
+ * "further processing" might include other procedures. Since by default, all the <code>
+ * processXXX(parsed data)</code> methods return <code>false</code>, the information usually handled
+ * by any methods you don't override will end up in <code>processLine(String)</code> which you can
+ * easily use for printing the output to the screen or a file.
  */
 public class FreechessConnection extends Connection {
 
-  /**
-   * A regular expression string matching a FICS username.
-   */
+  /** A regular expression string matching a FICS username. */
   protected static final String USERNAME_REGEX = "[A-z]{3,17}";
 
-  /**
-   * A regular expression string for matching FICS titles.
-   */
+  /** A regular expression string for matching FICS titles. */
   protected static final String TITLES_REGEX = "\\([A-Z\\*\\(\\)]*\\)";
 
-  /**
-   * The stream where we log the commands sent to the server and data arriving from the server.
-   */
+  /** The stream where we log the commands sent to the server and data arriving from the server. */
   private final PrintStream logStream;
 
   /**
@@ -81,19 +73,15 @@ public class FreechessConnection extends Connection {
   private BitSet ivarStates = null;
 
   /**
-   * A Hashtable of lines that need to be filtered out. Maps <code>String</code>s to
-   * <code>Integer</code>s specified how many of these lines need to be filtered.
+   * A Hashtable of lines that need to be filtered out. Maps <code>String</code>s to <code>Integer
+   * </code>s specified how many of these lines need to be filtered.
    */
   private final Hashtable linesToFilter = new Hashtable();
 
-  /**
-   * The queue of commands we are to send on-login.
-   */
+  /** The queue of commands we are to send on-login. */
   private LinkedList onLoginCommandQueue = new LinkedList();
 
-  /**
-   * The value we're supposed to assign to the interface variable during login.
-   */
+  /** The value we're supposed to assign to the interface variable during login. */
   private String interfaceVar = "Java freechess.org library by Alexander Maryanovsky";
 
   /**
@@ -124,20 +112,19 @@ public class FreechessConnection extends Connection {
   }
 
   /**
-   * Sets the specified ivar on or off. If we're already logged in, a
-   * <code>set-2 [DG number] [0/1]</code> string is sent to the server, otherwise the setting is
-   * saved, and in the login procedure all the ivar settings are sent on the login line in the
-   * <code>%b0011011011...</code> format. You may call this method to set (or unset) an ivar that
-   * has already been set (or unset), which will result in the appropriate message being send again.
-   * Note that some ivars are necessary for the correct behaviour of this class, and their states
-   * may not be modified (defprompt for example).
+   * Sets the specified ivar on or off. If we're already logged in, a <code>set-2 [DG number] [0/1]
+   * </code> string is sent to the server, otherwise the setting is saved, and in the login
+   * procedure all the ivar settings are sent on the login line in the <code>%b0011011011...</code>
+   * format. You may call this method to set (or unset) an ivar that has already been set (or
+   * unset), which will result in the appropriate message being send again. Note that some ivars are
+   * necessary for the correct behaviour of this class, and their states may not be modified
+   * (defprompt for example).
    *
    * @param ivar The ivar.
    * @param state Whether set the variable on or off.
-   *
    * @return whether the state of the variable was modified successfully. This always returns true
-   * when setting an ivar on, and only returns false when trying to set an essential datagram off.
-   *
+   *     when setting an ivar on, and only returns false when trying to set an essential datagram
+   *     off.
    * @see #isEssentialIvar(Ivar)
    * @see #getIvarState(int)
    */
@@ -156,9 +143,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * Sends the appropriate command to the server to set the ivar to the specified state.
-   */
+  /** Sends the appropriate command to the server to set the ivar to the specified state. */
   private void setServerIvarState(Ivar ivar, boolean state) {
     sendCommand("iset " + ivar.getName() + " " + (state ? "1" : "0"), false, true, true);
     filterLine(ivar.getName() + " " + (state ? "" : "un") + "set.");
@@ -210,9 +195,7 @@ public class FreechessConnection extends Connection {
     this.interfaceVar = interfaceVar;
   }
 
-  /**
-   * Invoked when a connection to the server is established. Sends ivar settings to the server.
-   */
+  /** Invoked when a connection to the server is established. Sends ivar settings to the server. */
   @Override
   protected void handleConnected() {
     sendCommandImpl(createLoginIvarsSettingString(requestedIvarStates), true);
@@ -222,18 +205,14 @@ public class FreechessConnection extends Connection {
     super.handleConnected();
   }
 
-  /**
-   * Sends the login information to the server.
-   */
+  /** Sends the login information to the server. */
   @Override
   protected void sendLoginSequence() {
     sendCommandImpl(getRequestedUsername(), true);
     if (getPassword() != null) sendCommandImpl(getPassword(), false);
   }
 
-  /**
-   * Creates the string we send on the login line to set ivars.
-   */
+  /** Creates the string we send on the login line to set ivars. */
   private static String createLoginIvarsSettingString(BitSet ivars) {
     StringBuffer buf = new StringBuffer();
     buf.append("%b");
@@ -246,9 +225,7 @@ public class FreechessConnection extends Connection {
     return buf.toString();
   }
 
-  /**
-   * Sets the various things we need to set on login.
-   */
+  /** Sets the various things we need to set on login. */
   @Override
   protected void handleLoginSucceeded() {
     super.handleLoginSucceeded();
@@ -285,7 +262,7 @@ public class FreechessConnection extends Connection {
    *
    * @param command The command.
    * @param whenLoggedIn If set and we are not yet logged in, wait until login and then send the
-   * command. If unset, the command is sent immediately.
+   *     command. If unset, the command is sent immediately.
    * @param avoidAliasing Avoid triggering any aliases with the command.
    * @param avoidUnidling Avoid resetting the user's idle time counter with the command.
    */
@@ -297,9 +274,7 @@ public class FreechessConnection extends Connection {
     else onLoginCommandQueue.addLast(command);
   }
 
-  /**
-   * Creates the actual command to be sent based on the specified options.
-   */
+  /** Creates the actual command to be sent based on the specified options. */
   private String makeCommand(String command, boolean avoidAliasing, boolean avoidUnidling) {
     if (command.startsWith("+")
         || (command.startsWith("-"))) // Can't be aliased, and can't be prepended '$' or '$$'
@@ -309,9 +284,7 @@ public class FreechessConnection extends Connection {
     else return command;
   }
 
-  /**
-   * Sends the given command to the server, optionally echoing it to System.out.
-   */
+  /** Sends the given command to the server, optionally echoing it to System.out. */
   private synchronized void sendCommandImpl(String command, boolean echo) {
     if (!isConnected()) throw new IllegalStateException("Not connected");
 
@@ -333,24 +306,20 @@ public class FreechessConnection extends Connection {
    */
   protected void processLine(String line) {}
 
-  /**
-   * This method is called to process disconnection from the server.
-   */
+  /** This method is called to process disconnection from the server. */
   protected void processDisconnection() {}
 
   /**
-   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the specified
-   * <code>InputStream</code> in a <code>BufferedInputStream</code> and a
-   * <code>PushbackInputStream</code>.
+   * Overrides {@link Connection#createInputStream(InputStream)} to wrap the specified <code>
+   * InputStream</code> in a <code>BufferedInputStream</code> and a <code>PushbackInputStream</code>
+   * .
    */
   @Override
   protected InputStream createInputStream(InputStream in) {
     return new PushbackInputStream(new BufferedInputStream(in));
   }
 
-  /**
-   * Reads a single line from the server.
-   */
+  /** Reads a single line from the server. */
   @Override
   protected Object readMessage(InputStream inputStream) throws IOException {
     PushbackInputStream pin = (PushbackInputStream) inputStream;
@@ -476,16 +445,14 @@ public class FreechessConnection extends Connection {
     return processIvarStateChanged(ivar, state);
   }
 
-  /**
-   * Gets called when the server notifies us of a change in the state of some ivar.
-   */
+  /** Gets called when the server notifies us of a change in the state of some ivar. */
   protected boolean processIvarStateChanged(Ivar ivar, boolean state) {
     return false;
   }
 
   /**
-   * The regular expression matching login confirmation lines. Example:
-   * "**** Starting FICS session as AlexTheGreat ****"
+   * The regular expression matching login confirmation lines. Example: "**** Starting FICS session
+   * as AlexTheGreat ****"
    */
   private static final Pattern LOGIN_REGEX =
       Pattern.compile(
@@ -495,9 +462,7 @@ public class FreechessConnection extends Connection {
               + TITLES_REGEX
               + ")? \\*\\*\\*\\*");
 
-  /**
-   * The regular expression matching login failure due to wrong password lines.
-   */
+  /** The regular expression matching login failure due to wrong password lines. */
   private static final Pattern WRONG_PASSWORD_REGEX =
       Pattern.compile("^\\*\\*\\*\\* Invalid password! \\*\\*\\*\\*");
 
@@ -520,9 +485,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching personal tells.
-   */
+  /** The regular expression matching personal tells. */
   private static final Pattern PERSONAL_TELL_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? tells you: (.*)");
 
@@ -545,16 +508,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a personal tell is received.
-   */
+  /** This method is called when a personal tell is received. */
   protected boolean processPersonalTell(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching "say" tells.
-   */
+  /** The regular expression matching "say" tells. */
   private static final Pattern SAY_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")?(\\[(\\d+)\\])? says: (.*)");
 
@@ -588,9 +547,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching "ptell" tells.
-   */
+  /** The regular expression matching "ptell" tells. */
   private static final Pattern PTELL_REGEX =
       Pattern.compile(
           "^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? \\(your partner\\) tells you: (.*)");
@@ -614,16 +571,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a "ptell" tell is received.
-   */
+  /** This method is called when a "ptell" tell is received. */
   protected boolean processPTell(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching channel tells.
-   */
+  /** The regular expression matching channel tells. */
   private static final Pattern CHANNEL_TELL_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")?\\((\\d+)\\): (.*)");
 
@@ -649,17 +602,13 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a channel tell is received.
-   */
+  /** This method is called when a channel tell is received. */
   protected boolean processChannelTell(
       String username, String titles, int channelNumber, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching kibitzes.
-   */
+  /** The regular expression matching kibitzes. */
   private static final Pattern KIBITZ_REGEX =
       Pattern.compile(
           "^("
@@ -704,9 +653,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching whispers.
-   */
+  /** The regular expression matching whispers. */
   private static final Pattern WHISPER_REGEX =
       Pattern.compile(
           "^("
@@ -751,9 +698,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching qtells.
-   */
+  /** The regular expression matching qtells. */
   private static final Pattern QTELL_REGEX = Pattern.compile("^:(.*)");
 
   /**
@@ -773,16 +718,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a qtell is received.
-   */
+  /** This method is called when a qtell is received. */
   protected boolean processQTell(String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching shouts.
-   */
+  /** The regular expression matching shouts. */
   private static final Pattern SHOUT_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? shouts: (.*)");
 
@@ -805,16 +746,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a shout is received.
-   */
+  /** This method is called when a shout is received. */
   protected boolean processShout(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching "ishouts".
-   */
+  /** The regular expression matching "ishouts". */
   private static final Pattern ISHOUT_REGEX =
       Pattern.compile("^--> (" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? ?(.*)");
 
@@ -837,16 +774,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when an "ishout" is received.
-   */
+  /** This method is called when an "ishout" is received. */
   protected boolean processIShout(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching "tshouts".
-   */
+  /** The regular expression matching "tshouts". */
   private static final Pattern TSHOUT_REGEX =
       Pattern.compile("^:(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? t-shouts: (.*)");
 
@@ -869,16 +802,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a "tshout" is received.
-   */
+  /** This method is called when a "tshout" is received. */
   protected boolean processTShout(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching "cshouts".
-   */
+  /** The regular expression matching "cshouts". */
   private static final Pattern CSHOUT_REGEX =
       Pattern.compile("^(" + USERNAME_REGEX + ")(" + TITLES_REGEX + ")? c-shouts: (.*)");
 
@@ -901,16 +830,12 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a "cshout" is received.
-   */
+  /** This method is called when a "cshout" is received. */
   protected boolean processCShout(String username, String titles, String message) {
     return false;
   }
 
-  /**
-   * The regular expression matching announcements.
-   */
+  /** The regular expression matching announcements. */
   private static final Pattern ANNOUNCEMENT_REGEX =
       Pattern.compile("^    \\*\\*ANNOUNCEMENT\\*\\* from (" + USERNAME_REGEX + "): (.*)");
 
@@ -932,9 +857,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when an announcement is received.
-   */
+  /** This method is called when an announcement is received. */
   protected boolean processAnnouncement(String username, String message) {
     return false;
   }
@@ -954,8 +877,8 @@ public class FreechessConnection extends Connection {
   }
 
   /**
-   * This method is called when a gameinfo line is received. To turn gameinfo lines on, send
-   * <code>iset gameinfo 1</code>
+   * This method is called when a gameinfo line is received. To turn gameinfo lines on, send <code>
+   * iset gameinfo 1</code>
    */
   protected boolean processGameInfo(GameInfoStruct data) {
     return false;
@@ -976,8 +899,8 @@ public class FreechessConnection extends Connection {
   }
 
   /**
-   * This method is called when a style12 line is received. To turn on style 12, use
-   * <code>setStyle(12)</code>.
+   * This method is called when a style12 line is received. To turn on style 12, use <code>
+   * setStyle(12)</code>.
    */
   protected boolean processStyle12(Style12Struct data) {
     return false;
@@ -998,9 +921,9 @@ public class FreechessConnection extends Connection {
   }
 
   /**
-   * This method is called when a delta board line is received. To turn delta board on, send
-   * <code>iset compressmove 1</code>. Note, however, that it will disable the sending of a full
-   * board (like a style12 board) in some cases.
+   * This method is called when a delta board line is received. To turn delta board on, send <code>
+   * iset compressmove 1</code>. Note, however, that it will disable the sending of a full board
+   * (like a style12 board) in some cases.
    */
   protected boolean processDeltaBoard(DeltaBoardStruct data) {
     return false;
@@ -1051,9 +974,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a game end line is received.
-   */
+  /** This method is called when a game end line is received. */
   protected boolean processGameEnd(
       int gameNumber, String whiteName, String blackName, String reason, String result) {
     return false;
@@ -1123,9 +1044,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * Called to determine whether the specified line of text specifies entering bsetup mode.
-   */
+  /** Called to determine whether the specified line of text specifies entering bsetup mode. */
   private boolean handleEnteredBSetupMode(String line) {
     if (!line.equals("Entering setup mode.")) return false;
 
@@ -1134,9 +1053,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * Called to determine whether the specified line of text specifies exiting bsetup mode.
-   */
+  /** Called to determine whether the specified line of text specifies exiting bsetup mode. */
   private boolean handleExitedBSetupMode(String line) {
     if (!line.equals("Game is validated - entering examine mode.")) return false;
 
@@ -1162,9 +1079,7 @@ public class FreechessConnection extends Connection {
   private static final Pattern ILLEGAL_MOVE_REGEX =
       Pattern.compile("^Illegal move \\((.*)\\)\\.(.*)");
 
-  /**
-   * The reason code for an attempt to make an illegal move.
-   */
+  /** The reason code for an attempt to make an illegal move. */
   public static final int MOVE_REJECTED_ILLEGAL_MOVE = 1;
 
   /**
@@ -1173,9 +1088,7 @@ public class FreechessConnection extends Connection {
    */
   private static final Pattern NOT_YOUR_TURN_REGEX = Pattern.compile("^(It is not your move\\.)$");
 
-  /**
-   * The reason code for an attempt to make a move while it's not your turn.
-   */
+  /** The reason code for an attempt to make a move while it's not your turn. */
   public static final int MOVE_REJECTED_NOT_YOUR_TURN = 2;
 
   /**
@@ -1185,9 +1098,7 @@ public class FreechessConnection extends Connection {
   private static final Pattern MOVED_WHEN_GAME_PAUSED =
       Pattern.compile("^(The clock is paused, use \"unpause\" to resume\\.)$");
 
-  /**
-   * The reason code for an attempt to make a move wile the game is paused.
-   */
+  /** The reason code for an attempt to make a move wile the game is paused. */
   public static final int MOVE_REJECTED_GAME_PAUSED = 3;
 
   /**
@@ -1231,9 +1142,9 @@ public class FreechessConnection extends Connection {
    * received. <code>moveString</code> is the move string that was sent to the server, if the server
    * bothers to tells us what it was (otherwise, it is null). <code>reasonCode</code> is one of the
    * <code>MOVE_REJECTED_</code> constants and specifies the class of rejection. The list of these
-   * constants is not final, so client code should not break if the value is unexpected.
-   * <code>reason</code> specifies the exact reason why the move is illegal and may also be
-   * <code>null</code>.
+   * constants is not final, so client code should not break if the value is unexpected. <code>
+   * reason</code> specifies the exact reason why the move is illegal and may also be <code>null
+   * </code>.
    */
   protected boolean processIllegalMove(String moveString, int reasonCode, String reason) {
     return false;
@@ -1251,9 +1162,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a line specifying that all seeks have been cleared is received.
-   */
+  /** This method is called when a line specifying that all seeks have been cleared is received. */
   protected boolean processSeeksCleared() {
     return false;
   }
@@ -1272,9 +1181,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * This method is called when a line specifying that a new seek has been added is received.
-   */
+  /** This method is called when a line specifying that a new seek has been added is received. */
   protected boolean processSeekAdded(SeekInfoStruct seekInfo) {
     return false;
   }
@@ -1313,9 +1220,7 @@ public class FreechessConnection extends Connection {
   private static final Pattern OFFER_PARSER =
       Pattern.compile("^(\\d+) w=(" + USERNAME_REGEX + ") t=(\\S+) p=(.*)");
 
-  /**
-   * The regular expression matching lines specifying that an offer has been made to the user.
-   */
+  /** The regular expression matching lines specifying that an offer has been made to the user. */
   private static final Pattern OFFER_REGEX = Pattern.compile("^<p([tf])> (.*)");
 
   /**
@@ -1444,30 +1349,22 @@ public class FreechessConnection extends Connection {
   private static final Pattern PLAYER_OFFERED_DRAW_REGEX =
       Pattern.compile("^Game (\\d+): (" + USERNAME_REGEX + ") offers a draw\\.$");
 
-  /**
-   * The regular expression matching lines specifying that a player offered to abort the game.
-   */
+  /** The regular expression matching lines specifying that a player offered to abort the game. */
   private static final Pattern PLAYER_OFFERED_ABORT_REGEX =
       Pattern.compile("^Game (\\d+): (" + USERNAME_REGEX + ") requests to abort the game\\.$");
 
-  /**
-   * The regular expression matching lines specifying that a player offered to adjourn the game.
-   */
+  /** The regular expression matching lines specifying that a player offered to adjourn the game. */
   private static final Pattern PLAYER_OFFERED_ADJOURN_REGEX =
       Pattern.compile("^Game (\\d+): (" + USERNAME_REGEX + ") requests to adjourn the game\\.$");
 
-  /**
-   * The regular expression matching lines specifying that a player offered to takeback.
-   */
+  /** The regular expression matching lines specifying that a player offered to takeback. */
   private static final Pattern PLAYER_OFFERED_TAKEBACK_REGEX =
       Pattern.compile(
           "^Game (\\d+): ("
               + USERNAME_REGEX
               + ") requests to take back (\\d+) half move\\(s\\)\\.$");
 
-  /**
-   * Handles lines specifying that a player (in a game we're observing) made an offer.
-   */
+  /** Handles lines specifying that a player (in a game we're observing) made an offer. */
   private boolean handlePlayerOffered(String line) {
     if (!line.startsWith("Game ")) return false;
 
@@ -1509,9 +1406,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching lines specifying that a player declined an offer.
-   */
+  /** The regular expression matching lines specifying that a player declined an offer. */
   private static final Pattern PLAYER_DECLINED_REGEX =
       Pattern.compile("^Game (\\d+): (" + USERNAME_REGEX + ") declines the (\\w+) request\\.$");
 
@@ -1543,9 +1438,7 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching lines specifying that a player withdrew his offer.
-   */
+  /** The regular expression matching lines specifying that a player withdrew his offer. */
   private static final Pattern PLAYER_WITHDREW_REGEX =
       Pattern.compile("^Game (\\d+): (" + USERNAME_REGEX + ") withdraws the (\\w+) request\\.$");
 
@@ -1617,15 +1510,11 @@ public class FreechessConnection extends Connection {
     return false;
   }
 
-  /**
-   * The regular expression matching lines notifying the user which board he's at, in a simul.
-   */
+  /** The regular expression matching lines notifying the user which board he's at, in a simul. */
   private static final Pattern AT_BOARD_REGEX =
       Pattern.compile("^You are now at (" + USERNAME_REGEX + ")'s board \\(game (\\d+)\\)\\.$");
 
-  /**
-   * Handles lines notifying us that the board we're at (in a simul) has changed.
-   */
+  /** Handles lines notifying us that the board we're at (in a simul) has changed. */
   private boolean handleSimulCurrentBoardChanged(String line) {
     if (!line.startsWith("You are now at ")) return false;
 
@@ -1654,9 +1543,7 @@ public class FreechessConnection extends Connection {
   private static final Pattern PRIMARY_GAME_CHANGED_REGEX =
       Pattern.compile("^Your primary game is now game (\\d+)\\.$");
 
-  /**
-   * Handles lines notifying us that the primary observed game has changed.
-   */
+  /** Handles lines notifying us that the primary observed game has changed. */
   private boolean handlePrimaryGameChanged(String line) {
     if (!line.startsWith("Your primary game is now game ")) return false;
 
@@ -1670,9 +1557,7 @@ public class FreechessConnection extends Connection {
     return true;
   }
 
-  /**
-   * Gets called when a line notifying us that the primary observes game has changed arrives.
-   */
+  /** Gets called when a line notifying us that the primary observes game has changed arrives. */
   protected boolean processPrimaryGameChanged(int gameNumber) {
     return true;
   }

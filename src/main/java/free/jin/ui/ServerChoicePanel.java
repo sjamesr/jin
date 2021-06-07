@@ -2,20 +2,25 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
+import com.google.common.collect.ImmutableList;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Server;
+import free.util.BrowserControl;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -24,7 +29,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -36,26 +40,13 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.google.common.collect.ImmutableList;
-
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.Server;
-import free.util.BrowserControl;
-
-/**
- * A panel allowing the user to choose a server to connect to.
- */
+/** A panel allowing the user to choose a server to connect to. */
 public class ServerChoicePanel extends DialogPanel {
 
-  /**
-   * The ListModel holding the server list.
-   */
+  /** The ListModel holding the server list. */
   private final DefaultListModel serverListModel;
 
-  /**
-   * Creates a new <code>ServerChoicePanel</code>.
-   */
+  /** Creates a new <code>ServerChoicePanel</code>. */
   public ServerChoicePanel() {
     serverListModel = new DefaultListModel();
     List<Server> servers = ImmutableList.copyOf(Jin.getInstance().getServers());
@@ -64,24 +55,18 @@ public class ServerChoicePanel extends DialogPanel {
     createUI();
   }
 
-  /**
-   * Displays this panel and returns the selected server.
-   */
+  /** Displays this panel and returns the selected server. */
   public Server askServer() {
     return (Server) super.askResult();
   }
 
-  /**
-   * Returns the title for this panel.
-   */
+  /** Returns the title for this panel. */
   @Override
   protected String getTitle() {
     return I18n.get(ServerChoicePanel.class).getString("title");
   }
 
-  /**
-   * Creates the UI for this dialog.
-   */
+  /** Creates the UI for this dialog. */
   private void createUI() {
     I18n i18n = I18n.get(ServerChoicePanel.class);
 

@@ -2,20 +2,29 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginUIContainer;
+import free.jin.plugin.PluginUIEvent;
+import free.util.AWTUtilities;
+import free.util.RectDouble;
+import free.workarounds.FixedJFrame;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -31,7 +40,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -41,35 +49,19 @@ import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.Preferences;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginUIContainer;
-import free.jin.plugin.PluginUIEvent;
-import free.util.AWTUtilities;
-import free.util.RectDouble;
-import free.workarounds.FixedJFrame;
-
 /**
  * An SDI implementation of <code>UIManager</code> - each <code>PluginUIContainer</code> is
  * implemented via a single top level frame.
  */
 public class SdiUiProvider extends AbstractUiProvider {
 
-  /**
-   * The list currently open dialogs.
-   */
+  /** The list currently open dialogs. */
   private List openDialogs = new LinkedList();
 
-  /**
-   * Creates a new <code>SdiUiProvider</code>.
-   */
+  /** Creates a new <code>SdiUiProvider</code>. */
   public SdiUiProvider() {}
 
-  /**
-   * Simply invokes <code>start</code> on the <code>ConnectionManager</code>.
-   */
+  /** Simply invokes <code>start</code> on the <code>ConnectionManager</code>. */
   @Override
   public void start() {
     super.start();
@@ -77,9 +69,7 @@ public class SdiUiProvider extends AbstractUiProvider {
     Jin.getInstance().getConnManager().start();
   }
 
-  /**
-   * Returns a new UIContainer for the specified plugin.
-   */
+  /** Returns a new UIContainer for the specified plugin. */
   @Override
   public PluginUIContainer createPluginUIContainer(Plugin plugin, String id, int mode) {
     AbstractPluginUIContainer container = new FramePluginUIContainer(plugin, id, mode);
@@ -89,9 +79,7 @@ public class SdiUiProvider extends AbstractUiProvider {
     return container;
   }
 
-  /**
-   * Displays the specified <code>DialogPanel</code> via {@link DialogPanel#show(JDialog)}.
-   */
+  /** Displays the specified <code>DialogPanel</code> via {@link DialogPanel#show(JDialog)}. */
   @Override
   public void showDialog(DialogPanel dialog, Component parent) {
     Frame parentFrame = parent == null ? null : AWTUtilities.frameForComponent(parent);
@@ -123,9 +111,7 @@ public class SdiUiProvider extends AbstractUiProvider {
     dialog.show(jdialog, parent);
   }
 
-  /**
-   * Returns whether any plugin containers or dialogs are visible.
-   */
+  /** Returns whether any plugin containers or dialogs are visible. */
   @Override
   public boolean isUiVisible() {
     Enumeration containers = getExistingPluginUIContainers();
@@ -142,9 +128,7 @@ public class SdiUiProvider extends AbstractUiProvider {
     return false;
   }
 
-  /**
-   * Nothing for us to do here.
-   */
+  /** Nothing for us to do here. */
   @Override
   public void stop() {}
 
@@ -154,19 +138,13 @@ public class SdiUiProvider extends AbstractUiProvider {
    */
   private class FramePluginUIContainer extends AbstractPluginUIContainer implements WindowListener {
 
-    /**
-     * The <code>JFrame</code>.
-     */
+    /** The <code>JFrame</code>. */
     private final JFrame frame;
 
-    /**
-     * The menubar of the frame.
-     */
+    /** The menubar of the frame. */
     private final JMenuBar menubar;
 
-    /**
-     * Creates a new <code>FramePluginUIContainer</code>.
-     */
+    /** Creates a new <code>FramePluginUIContainer</code>. */
     public FramePluginUIContainer(Plugin plugin, String id, int mode) {
       super(plugin, id, mode);
 
@@ -210,18 +188,14 @@ public class SdiUiProvider extends AbstractUiProvider {
       rootPane.registerKeyboardAction(closer, closeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    /**
-     * Disposes of this plugin container.
-     */
+    /** Disposes of this plugin container. */
     @Override
     public void disposeImpl() {
       setVisible(false);
       frame.dispose();
     }
 
-    /**
-     * If <code>active == true</code>, makes our frame the currently selected one.
-     */
+    /** If <code>active == true</code>, makes our frame the currently selected one. */
     @Override
     public void setActive(boolean active) {
       if (active) {
@@ -232,33 +206,25 @@ public class SdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * Returns whether the frame of this plugin container is currently selected.
-     */
+    /** Returns whether the frame of this plugin container is currently selected. */
     @Override
     public boolean isActive() {
       return frame.isShowing() && (frame.getFocusOwner() != null);
     }
 
-    /**
-     * Sets the resizable state of this plugin container's frame.
-     */
+    /** Sets the resizable state of this plugin container's frame. */
     @Override
     public void setResizable(boolean resizable) {
       frame.setResizable(resizable);
     }
 
-    /**
-     * Returns whether the frame of this plugin container is currently resizable.
-     */
+    /** Returns whether the frame of this plugin container is currently resizable. */
     @Override
     public boolean isResizable() {
       return frame.isResizable();
     }
 
-    /**
-     * Resizes the frame to its preferred size.
-     */
+    /** Resizes the frame to its preferred size. */
     @Override
     public void pack() {
       setVisible(true);
@@ -270,33 +236,25 @@ public class SdiUiProvider extends AbstractUiProvider {
       if (!isResizable) frame.setResizable(false);
     }
 
-    /**
-     * Returns the content pane of the frame.
-     */
+    /** Returns the content pane of the frame. */
     @Override
     public JComponent getContentPane() {
       return (JComponent) frame.getContentPane();
     }
 
-    /**
-     * Sets the title of the frame.
-     */
+    /** Sets the title of the frame. */
     @Override
     public void setTitleImpl(String title) {
       frame.setTitle(title);
     }
 
-    /**
-     * Sets the icon of the frame.
-     */
+    /** Sets the icon of the frame. */
     @Override
     public void setIconImpl(Image image) {
       frame.setIconImage(image);
     }
 
-    /**
-     * Adds the frame to the desktop and makes it visible.
-     */
+    /** Adds the frame to the desktop and makes it visible. */
     @Override
     public void setVisible(boolean isVisible) {
       if (isVisible == isVisible()) return;
@@ -305,17 +263,13 @@ public class SdiUiProvider extends AbstractUiProvider {
       else hide();
     }
 
-    /**
-     * Returns whether the frame is currently visible.
-     */
+    /** Returns whether the frame is currently visible. */
     @Override
     public boolean isVisible() {
       return frame.isVisible();
     }
 
-    /**
-     * Shows the frame.
-     */
+    /** Shows the frame. */
     private void show() {
       loadState();
 
@@ -324,9 +278,7 @@ public class SdiUiProvider extends AbstractUiProvider {
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_SHOWN));
     }
 
-    /**
-     * Hides the frame.
-     */
+    /** Hides the frame. */
     private void hide() {
       saveState();
 
@@ -335,9 +287,7 @@ public class SdiUiProvider extends AbstractUiProvider {
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_HIDDEN));
     }
 
-    /**
-     * Saves the properties of this plugin container into user preferences.
-     */
+    /** Saves the properties of this plugin container into user preferences. */
     @Override
     protected void saveState() {
       String id = getId();
@@ -350,9 +300,7 @@ public class SdiUiProvider extends AbstractUiProvider {
       saveWindowGeometry(prefs, frame, prefix);
     }
 
-    /**
-     * Loads the saved properties of this plugin container and configures it properly.
-     */
+    /** Loads the saved properties of this plugin container and configures it properly. */
     @Override
     protected void loadState() {
       String prefix = getPrefsPrefix();
@@ -380,9 +328,7 @@ public class SdiUiProvider extends AbstractUiProvider {
       restoreWindowGeometry(prefs, frame, prefix, defaultBounds);
     }
 
-    /**
-     * Closes this window according to the plugin container mode.
-     */
+    /** Closes this window according to the plugin container mode. */
     private void close() {
       switch (getMode()) {
         case HIDEABLE_CONTAINER_MODE:
@@ -398,9 +344,7 @@ public class SdiUiProvider extends AbstractUiProvider {
       }
     }
 
-    /**
-     * WindowListener implementation.
-     */
+    /** WindowListener implementation. */
     @Override
     public void windowActivated(WindowEvent e) {
       firePluginUIEvent(new PluginUIEvent(this, PluginUIEvent.PLUGIN_UI_ACTIVATED));

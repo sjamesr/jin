@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -33,44 +32,28 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-/**
- * A component which allows the user to select a color.
- */
+/** A component which allows the user to select a color. */
 public class ColorChooser extends JComponent implements Mnemonicable {
 
-  /**
-   * The button we're using.
-   */
+  /** The button we're using. */
   private final JButton button;
 
-  /**
-   * The label we're using.
-   */
+  /** The label we're using. */
   private final JLabel label;
 
-  /**
-   * The icon's size.
-   */
+  /** The icon's size. */
   private static final Dimension ICON_SIZE = new Dimension(25, 10);
 
-  /**
-   * The color of the icon's border.
-   */
+  /** The color of the icon's border. */
   private static final Color ICON_BORDER_COLOR = Color.GRAY;
 
-  /**
-   * The current color.
-   */
+  /** The current color. */
   private Color color;
 
-  /**
-   * The sole ChangeEvent we need.
-   */
+  /** The sole ChangeEvent we need. */
   private final ChangeEvent changeEvent = new ChangeEvent(this);
 
-  /**
-   * Creates a new <code>ColorChooser</code> with no text and initial color of black.
-   */
+  /** Creates a new <code>ColorChooser</code> with no text and initial color of black. */
   public ColorChooser() {
     this(null, Color.black);
   }
@@ -82,16 +65,12 @@ public class ColorChooser extends JComponent implements Mnemonicable {
     this(text, Color.black);
   }
 
-  /**
-   * Creates a new <code>ColorChooser</code> with no text and the given initial color.
-   */
+  /** Creates a new <code>ColorChooser</code> with no text and the given initial color. */
   public ColorChooser(Color initialColor) {
     this(null, initialColor);
   }
 
-  /**
-   * Creates a new <code>ColorChooser</code> with the given text and initial color.
-   */
+  /** Creates a new <code>ColorChooser</code> with the given text and initial color. */
   public ColorChooser(String text, Color initialColor) {
     label = new JLabel();
     button = new JButton();
@@ -127,40 +106,30 @@ public class ColorChooser extends JComponent implements Mnemonicable {
         });
   }
 
-  /**
-   * Sets the text of the label.
-   */
+  /** Sets the text of the label. */
   @Override
   public void setText(String text) {
     label.setText(text);
   }
 
-  /**
-   * Returns the text of the label.
-   */
+  /** Returns the text of the label. */
   public String getText() {
     return label.getText();
   }
 
-  /**
-   * Sets the mnemonic.
-   */
+  /** Sets the mnemonic. */
   @Override
   public void setMnemonic(int mnemonic) {
     label.setDisplayedMnemonic(mnemonic);
   }
 
-  /**
-   * Sets the displayed mnemonic index.
-   */
+  /** Sets the displayed mnemonic index. */
   @Override
   public void setDisplayedMnemonicIndex(int mnemonicIndex) {
     label.setDisplayedMnemonicIndex(mnemonicIndex);
   }
 
-  /**
-   * Sets the enabled state of this color chooser.
-   */
+  /** Sets the enabled state of this color chooser. */
   @Override
   public void setEnabled(boolean enabled) {
     label.setEnabled(enabled);
@@ -185,9 +154,7 @@ public class ColorChooser extends JComponent implements Mnemonicable {
     listenerList.remove(ChangeListener.class, listener);
   }
 
-  /**
-   * Fires a ChangeEvent to all interested listeners.
-   */
+  /** Fires a ChangeEvent to all interested listeners. */
   protected void fireStateChanged() {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -198,16 +165,12 @@ public class ColorChooser extends JComponent implements Mnemonicable {
     }
   }
 
-  /**
-   * Returns the currently selected color.
-   */
+  /** Returns the currently selected color. */
   public Color getColor() {
     return color;
   }
 
-  /**
-   * Sets the current color.
-   */
+  /** Sets the current color. */
   public void setColor(Color color) {
     this.color = color;
 

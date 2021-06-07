@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -29,34 +29,26 @@ import java.util.Hashtable;
  */
 public abstract class ChildClassLoader extends ClassLoader {
 
-  /**
-   * The parent classloader. May be null.
-   */
+  /** The parent classloader. May be null. */
   private final ChildClassLoader parent;
 
-  /**
-   * Maps class names to already loaded classes.
-   */
+  /** Maps class names to already loaded classes. */
   private final Hashtable namesToClasses = new Hashtable();
 
   /**
-   * Creates a new <code>ChildClassLoader</code> with the specified parent. The parent may be
-   * <code>null</code>.
+   * Creates a new <code>ChildClassLoader</code> with the specified parent. The parent may be <code>
+   * null</code>.
    */
   public ChildClassLoader(ChildClassLoader parent) {
     this.parent = parent;
   }
 
-  /**
-   * Creates a new <code>ChildClassLoader</code> with no parent.
-   */
+  /** Creates a new <code>ChildClassLoader</code> with no parent. */
   public ChildClassLoader() {
     this(null);
   }
 
-  /**
-   * Returns the parent classloader.
-   */
+  /** Returns the parent classloader. */
   public ChildClassLoader getParentClassLoader() {
     return parent;
   }
@@ -141,13 +133,9 @@ public abstract class ChildClassLoader extends ClassLoader {
     }
   }
 
-  /**
-   * Returns an <code>InputStream</code> for reading the resource with the specified name.
-   */
+  /** Returns an <code>InputStream</code> for reading the resource with the specified name. */
   protected abstract InputStream getResourceAsStreamImpl(String name);
 
-  /**
-   * Returns a <code>URL</code> pointing to the resource with the specified name.
-   */
+  /** Returns a <code>URL</code> pointing to the resource with the specified name. */
   protected abstract URL getResourceImpl(String name);
 }

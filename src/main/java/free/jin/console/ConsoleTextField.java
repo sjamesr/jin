@@ -3,20 +3,26 @@
  * http://www.jinchess.com/. Copyright (C) 2002, 2003, 2004 Alexander Maryanovsky. All rights
  * reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
 
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.jin.ServerUser;
+import free.util.PlatformUtils;
+import free.workarounds.FixUtils;
+import free.workarounds.FixedJTextField;
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,7 +30,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
@@ -33,45 +38,31 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.jin.ServerUser;
-import free.util.PlatformUtils;
-import free.workarounds.FixUtils;
-import free.workarounds.FixedJTextField;
-
 /**
  * The JTextField used as the input component in a Console. Implements the following:
+ *
  * <UL>
- * <LI>On ENTER, adds the text to the Console and clears itself.
- * <LI>On CTRL+ENTER, the command is issued as a special command processed by the Console.
- * <LI>On SHIFT+ENTER, the command is issued as a blanked command - it's not echoed to the console
- * nor is it saved into the history.
- * <LI>On ESCAPE, clears itself.
- * <LI>Keeps a history of commands traversable with the UP and DOWN keys.
- * <LI>On CTRL+R, reverses the currently selected text (Watauba feature).
+ *   <LI>On ENTER, adds the text to the Console and clears itself.
+ *   <LI>On CTRL+ENTER, the command is issued as a special command processed by the Console.
+ *   <LI>On SHIFT+ENTER, the command is issued as a blanked command - it's not echoed to the console
+ *       nor is it saved into the history.
+ *   <LI>On ESCAPE, clears itself.
+ *   <LI>Keeps a history of commands traversable with the UP and DOWN keys.
+ *   <LI>On CTRL+R, reverses the currently selected text (Watauba feature).
  * </UL>
  */
 public class ConsoleTextField extends FixedJTextField {
 
-  /**
-   * The Console we're a part of.
-   */
+  /** The Console we're a part of. */
   protected final Console console;
 
-  /**
-   * The KeyStroke used for telling the last teller.
-   */
+  /** The KeyStroke used for telling the last teller. */
   private KeyStroke tellLastTellerKeyStroke;
 
-  /**
-   * The KeyStroke used for telling the next teller.
-   */
+  /** The KeyStroke used for telling the next teller. */
   private KeyStroke tellNextTellerKeyStroke;
 
-  /**
-   * The history of all the commands entered by the user.
-   */
+  /** The history of all the commands entered by the user. */
   private final Vector history = new Vector();
 
   /**
@@ -86,14 +77,10 @@ public class ConsoleTextField extends FixedJTextField {
    */
   private String typedInString = "";
 
-  /**
-   * The index of the current teller, or -1 if none.
-   */
+  /** The index of the current teller, or -1 if none. */
   private int tellerIndex = -1;
 
-  /**
-   * An action which sends the command.
-   */
+  /** An action which sends the command. */
   private final Action sendAction =
       new AbstractAction(I18n.get(ConsoleTextField.class).getString("sendAction.name")) {
         @Override
@@ -119,9 +106,7 @@ public class ConsoleTextField extends FixedJTextField {
         }
       };
 
-  /**
-   * Creates a new ConsoleTextField for the given Console.
-   */
+  /** Creates a new ConsoleTextField for the given Console. */
   public ConsoleTextField(Console console) {
     this.console = console;
 
@@ -151,16 +136,12 @@ public class ConsoleTextField extends FixedJTextField {
     sendAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
   }
 
-  /**
-   * Updates the state of <code>sendAction</code>.
-   */
+  /** Updates the state of <code>sendAction</code>. */
   private void updateSendAction() {
     sendAction.setEnabled(getDocument().getLength() != 0);
   }
 
-  /**
-   * Initializes this <code>ConsoleTextField</code> from the plugin properties.
-   */
+  /** Initializes this <code>ConsoleTextField</code> from the plugin properties. */
   protected void initFromProperties() {
     if (tellLastTellerKeyStroke != null) unregisterKeyboardAction(tellLastTellerKeyStroke);
 
@@ -185,9 +166,7 @@ public class ConsoleTextField extends FixedJTextField {
     }
   }
 
-  /**
-   * Returns the action which sends the command.
-   */
+  /** Returns the action which sends the command. */
   public Action getSendAction() {
     return sendAction;
   }
@@ -200,9 +179,7 @@ public class ConsoleTextField extends FixedJTextField {
     initFromProperties();
   }
 
-  /**
-   * Processes the key event.
-   */
+  /** Processes the key event. */
   @Override
   protected void processKeyEvent(KeyEvent evt) {
     int keyCode = evt.getKeyCode();
@@ -221,9 +198,7 @@ public class ConsoleTextField extends FixedJTextField {
     super.processKeyEvent(evt);
   }
 
-  /**
-   * Processes the KeyEvent.
-   */
+  /** Processes the KeyEvent. */
   @Override
   protected void processComponentKeyEvent(KeyEvent evt) {
     super.processComponentKeyEvent(evt); // We want the listeners to get the
@@ -310,9 +285,7 @@ public class ConsoleTextField extends FixedJTextField {
     }
   }
 
-  /**
-   * Processes the Focus Events of this ConsoleTextField.
-   */
+  /** Processes the Focus Events of this ConsoleTextField. */
   @Override
   protected void processFocusEvent(FocusEvent evt) {
     int oldSelectionStart = getSelectionStart();
@@ -368,9 +341,7 @@ public class ConsoleTextField extends FixedJTextField {
     }
   }
 
-  /**
-   * Displays the popup menu on a popup trigger event.
-   */
+  /** Displays the popup menu on a popup trigger event. */
   @Override
   protected void processMouseEvent(MouseEvent evt) {
     super.processMouseEvent(evt);
@@ -385,29 +356,19 @@ public class ConsoleTextField extends FixedJTextField {
     }
   }
 
-  /**
-   * The field's popup.
-   */
+  /** The field's popup. */
   private JPopupMenu popup;
 
-  /**
-   * The "cut" menu item.
-   */
+  /** The "cut" menu item. */
   private JMenuItem cut;
 
-  /**
-   * The "copy" menu item.
-   */
+  /** The "copy" menu item. */
   private JMenuItem copy;
 
-  /**
-   * The "paste" menu item.
-   */
+  /** The "paste" menu item. */
   private JMenuItem paste;
 
-  /**
-   * Creates the popup for this console text field.
-   */
+  /** Creates the popup for this console text field. */
   protected JPopupMenu createPopup() {
     I18n i18n = I18n.get(ConsoleTextField.class);
 

@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -24,9 +24,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 /**
- * An abstract base class for managers of a connection to a TCP/IP, session based server. A
- * <code>Connection</code> has 4 major states: Unconnected, Connecting, Connected and LoggedIn which
- * are specified by the {@link #isConnecting()}, {@link #isConnected()} and {@link #isLoggedIn()}
+ * An abstract base class for managers of a connection to a TCP/IP, session based server. A <code>
+ * Connection</code> has 4 major states: Unconnected, Connecting, Connected and LoggedIn which are
+ * specified by the {@link #isConnecting()}, {@link #isConnected()} and {@link #isLoggedIn()}
  * methods.
  */
 public abstract class Connection {
@@ -37,9 +37,7 @@ public abstract class Connection {
    */
   private final String requestedUsername;
 
-  /**
-   * The password provided by the user.
-   */
+  /** The password provided by the user. */
   private final String password;
 
   /**
@@ -48,9 +46,7 @@ public abstract class Connection {
    */
   private Thread readerThread = null;
 
-  /**
-   * The socket to the server, <code>null</code> when not connected.
-   */
+  /** The socket to the server, <code>null</code> when not connected. */
   private Socket socket;
 
   /**
@@ -70,23 +66,19 @@ public abstract class Connection {
   }
 
   /**
-   * Createa a new <code>Connection</code> object. The {@link #getRequestedUsername()} and
-   * {@link #getPassword()} of the new <code>Connection</code> object will return <code>null</code>.
+   * Createa a new <code>Connection</code> object. The {@link #getRequestedUsername()} and {@link
+   * #getPassword()} of the new <code>Connection</code> object will return <code>null</code>.
    */
   public Connection() {
     this(null, null);
   }
 
-  /**
-   * Returns the username requested by the user.
-   */
+  /** Returns the username requested by the user. */
   protected String getRequestedUsername() {
     return requestedUsername;
   }
 
-  /**
-   * Returns the password specified by the user.
-   */
+  /** Returns the password specified by the user. */
   protected String getPassword() {
     return password;
   }
@@ -113,9 +105,7 @@ public abstract class Connection {
     readerThread.start();
   }
 
-  /**
-   * Connects to the server. Returns whether successful.
-   */
+  /** Connects to the server. Returns whether successful. */
   private boolean connect(String hostname, int port) {
     try {
       Socket tmpSocket = connectImpl(hostname, port);
@@ -151,43 +141,35 @@ public abstract class Connection {
   /**
    * Creates and connects a socket to the specified hostname on the specified port. Note that this
    * method is called from the constructor, so an implementation may not depend on the subclass's
-   * constructor having finished. The default implementation returns a plain
-   * <code>java.net.Socket</code>.
+   * constructor having finished. The default implementation returns a plain <code>java.net.Socket
+   * </code>.
    */
   protected Socket connectImpl(String hostname, int port) throws IOException {
     return new Socket(hostname, port);
   }
 
-  /**
-   * Returns the <code>OutputStream</code> that sends data to the server.
-   */
+  /** Returns the <code>OutputStream</code> that sends data to the server. */
   public synchronized OutputStream getOutputStream() throws IOException {
     if (!isConnected()) throw new IllegalStateException("Not connected");
 
     return socket.getOutputStream();
   }
 
-  /**
-   * Returns the host we're connected to.
-   */
+  /** Returns the host we're connected to. */
   public synchronized InetAddress getHost() {
     if (!isConnected()) throw new IllegalStateException("Not connected");
 
     return socket.getInetAddress();
   }
 
-  /**
-   * Returns the port we're connected on.
-   */
+  /** Returns the port we're connected on. */
   public synchronized int getPort() {
     if (!isConnected()) throw new IllegalStateException("Not connected");
 
     return socket.getPort();
   }
 
-  /**
-   * A loop which reads data from the server.
-   */
+  /** A loop which reads data from the server. */
   private void readerLoop() {
     try {
       InputStream in = createInputStream(socket.getInputStream());
@@ -211,8 +193,8 @@ public abstract class Connection {
    * for parsing their specific protocol. This method is invoked once per socket, meaning that the
    * same <code>InputStream</code> is reused for all invocations of <code>readMessage</code>.
    * Subclasses are encouraged to wrap the argument in at least {@link BufferedInputStream}.
-   * <p>
-   * The default implementation simply returns the argument.
+   *
+   * <p>The default implementation simply returns the argument.
    */
   protected InputStream createInputStream(InputStream in) {
     return in;
@@ -232,8 +214,10 @@ public abstract class Connection {
    * data to the server.
    */
   protected final synchronized void connectionInterrupted(final IOException exception) {
-    if (!isConnected()) // Just ignore because we may be called twice. For example, if sending fails, this method is
-    return; // invoked and closes the connection. Then the reader thread fails and invokes it again.
+    if (!isConnected()) // Just ignore because we may be called twice. For example, if sending
+      // fails, this method is
+      return; // invoked and closes the connection. Then the reader thread fails and invokes it
+    // again.
 
     try {
       socket
@@ -253,40 +237,30 @@ public abstract class Connection {
     }
   }
 
-  /**
-   * Returns whether we are currently attempting to, but not yet connected to the server.
-   */
+  /** Returns whether we are currently attempting to, but not yet connected to the server. */
   public final synchronized boolean isConnecting() {
     return (readerThread != null) && !isConnected();
   }
 
-  /**
-   * Returns whether we are connected to the server.
-   */
+  /** Returns whether we are connected to the server. */
   public final synchronized boolean isConnected() {
     return socket != null;
   }
 
-  /**
-   * Returns whether this <code>Connection</code> is already logged in.
-   */
+  /** Returns whether this <code>Connection</code> is already logged in. */
   public final synchronized boolean isLoggedIn() {
     return username != null;
   }
 
-  /**
-   * Returns the username assigned to us by the server on login.
-   */
+  /** Returns the username assigned to us by the server on login. */
   public final synchronized String getUsername() {
     if (!isLoggedIn()) throw new IllegalStateException("Not yet logged in");
 
     return username;
   }
 
-  /**
-   * Initiates the login procedure. This method returns immediately, without blocking.
-   */
-  public synchronized final void initiateLogin() {
+  /** Initiates the login procedure. This method returns immediately, without blocking. */
+  public final synchronized void initiateLogin() {
     if (!isConnected()) throw new IllegalStateException("Not connected");
     if (isLoggedIn()) throw new IllegalStateException("Already logged in");
 
@@ -300,7 +274,6 @@ public abstract class Connection {
    * @param out The <code>OutputStream</code> to write the login sequence into.
    * @param username The requested username.
    * @param password The password for the requested username.
-   *
    * @throws IOException If an I/O error occurs while sending the login sequence.
    */
   protected abstract void sendLoginSequence();
@@ -324,7 +297,7 @@ public abstract class Connection {
    *
    * @param username The username assigned to us by the server. May not be <code>null</code>.
    */
-  protected synchronized final void loginSucceeded(String username) {
+  protected final synchronized void loginSucceeded(String username) {
     if (username == null) throw new IllegalArgumentException("username may not be null");
     if (isLoggedIn()) throw new IllegalStateException("Already logged in");
 
@@ -340,7 +313,7 @@ public abstract class Connection {
    *
    * @param reason The reason why the server denied to log us in. May be <code>null</code>.
    */
-  protected synchronized final void loginFailed(String reason) {
+  protected final synchronized void loginFailed(String reason) {
     if (isLoggedIn()) throw new IllegalStateException("Already logged in");
 
     // We are already in the client thread, so there's no need to use execRunnable
@@ -405,29 +378,22 @@ public abstract class Connection {
    */
   protected void handleDisconnection(IOException e) {}
 
-  /**
-   * A runnable which invokes the {@link #handleMessage(Object)} method.
-   */
+  /** A runnable which invokes the {@link #handleMessage(Object)} method. */
   private class MessageDispatcher extends SafeRunnable {
 
-    /**
-     * The message to handle.
-     */
+    /** The message to handle. */
     private final Object message;
 
-    /**
-     * Creates a new <code>MessageDispatcher</code>.
-     */
+    /** Creates a new <code>MessageDispatcher</code>. */
     public MessageDispatcher(Object message) {
       this.message = message;
     }
 
-    /**
-     * Invokes {@link Connection#handleMessage(Object)} with the message.
-     */
+    /** Invokes {@link Connection#handleMessage(Object)} with the message. */
     @Override
     public void safeRun() {
       handleMessage(message);
     }
-  };
+  }
+  ;
 }

@@ -2,75 +2,76 @@
  * The workarounds library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The workarounds library is free software; you can redistribute it and/or modify it under the
+ * <p>The workarounds library is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * workarounds library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.workarounds;
 
 import java.beans.PropertyVetoException;
-
 import javax.swing.JInternalFrame;
 
 /**
  * A fix of JInternalFrame. Fixes the following bugs:
+ *
  * <UL>
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4230389.html"> Adding a
- * desktop icon to JDesktopPane causes null pointer exception</A>. Note that the workaround for this
- * bug is not completely transparent - it changes the time when PropertyChangeListeners are invoked
- * for the iconified property to when the frame is added to another component.
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4769773.html">
- * JInternalFrame.setMaximum(true) before adding it to JDesktopPane causes NPE</A>. Note that the
- * workaround for this bug is not completely transparent - it changes the time when
- * PropertyChangeListeners are invoked for the iconified property to when the frame is added to
- * another component.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4230389.html"> Adding a
+ *       desktop icon to JDesktopPane causes null pointer exception</A>. Note that the workaround
+ *       for this bug is not completely transparent - it changes the time when
+ *       PropertyChangeListeners are invoked for the iconified property to when the frame is added
+ *       to another component.
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4769773.html">
+ *       JInternalFrame.setMaximum(true) before adding it to JDesktopPane causes NPE</A>. Note that
+ *       the workaround for this bug is not completely transparent - it changes the time when
+ *       PropertyChangeListeners are invoked for the iconified property to when the frame is added
+ *       to another component.
  * </UL>
  */
 public class FixedJInternalFrame extends JInternalFrame {
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the equivalent
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the equivalent <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame() {
     super();
   }
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame(String title) {
     super(title);
   }
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame(String title, boolean resizable) {
     super(title, resizable);
   }
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame(String title, boolean resizable, boolean closable) {
     super(title, resizable, closable);
   }
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame(
       String title, boolean resizable, boolean closable, boolean maximizable) {
@@ -78,8 +79,8 @@ public class FixedJInternalFrame extends JInternalFrame {
   }
 
   /**
-   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding
-   * <code>JInternalFrame</code> constructor.
+   * Creates a new <code>FixedJInternalFrame</code>, per the contract of the corresponding <code>
+   * JInternalFrame</code> constructor.
    */
   public FixedJInternalFrame(
       String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable) {
@@ -111,9 +112,7 @@ public class FixedJInternalFrame extends JInternalFrame {
     } else super.setIcon(iconified);
   }
 
-  /**
-   * Overrides isIcon to remain consistent with setIcon.
-   */
+  /** Overrides isIcon to remain consistent with setIcon. */
   @Override
   public boolean isIcon() {
     return super.isIcon() || speciallyIconified;
@@ -146,9 +145,7 @@ public class FixedJInternalFrame extends JInternalFrame {
     } else super.setMaximum(maximized);
   }
 
-  /**
-   * Overrides isMaximum to remain consistent with setMaximum.
-   */
+  /** Overrides isMaximum to remain consistent with setMaximum. */
   @Override
   public boolean isMaximum() {
     return super.isMaximum() || speciallyMaximized;
@@ -158,9 +155,7 @@ public class FixedJInternalFrame extends JInternalFrame {
 
   // <4230389> and <4769773>
 
-  /**
-   * Make ourselves really iconified/maximized when added to something.
-   */
+  /** Make ourselves really iconified/maximized when added to something. */
   @Override
   public void addNotify() {
     super.addNotify();

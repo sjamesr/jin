@@ -2,24 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
-
-import javax.swing.JMenu;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 import free.jin.ConnectionManager;
 import free.jin.I18n;
@@ -28,22 +23,20 @@ import free.jin.Session;
 import free.jin.SessionEvent;
 import free.jin.SessionListener;
 import free.jin.action.JinAction;
+import javax.swing.JMenu;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
-/**
- * A menu allowing the user to use any available Actions.
- */
+/** A menu allowing the user to use any available Actions. */
 public class ActionsMenu extends JMenu implements SessionListener, ListDataListener {
 
-  /**
-   * Creates a new <code>ActionsMenu</code>.
-   */
+  /** Creates a new <code>ActionsMenu</code>. */
   public ActionsMenu() {
     I18n.get(ActionsMenu.class).initAbstractButton(this, "this");
   }
 
-  /**
-   * Initializes the menu, registering any needed listeners.
-   */
+  /** Initializes the menu, registering any needed listeners. */
   @Override
   public void addNotify() {
     super.addNotify();
@@ -60,9 +53,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     }
   }
 
-  /**
-   * Unregisters any listeners we've registered.
-   */
+  /** Unregisters any listeners we've registered. */
   @Override
   public void removeNotify() {
     super.removeNotify();
@@ -79,9 +70,7 @@ public class ActionsMenu extends JMenu implements SessionListener, ListDataListe
     }
   }
 
-  /**
-   * Sets the action menu items to match the specified list of actions.
-   */
+  /** Sets the action menu items to match the specified list of actions. */
   private void updateActionMenuItems(ListModel actions) {
     removeAll();
     for (int i = 0; i < actions.getSize(); i++) {

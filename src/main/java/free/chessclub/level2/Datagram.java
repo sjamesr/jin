@@ -2,41 +2,37 @@
  * The chessclub.com connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The chessclub.com connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The chessclub.com connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The chessclub.com connection library is distributed in the hope that it will be useful, but
+ * <p>The chessclub.com connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * chessclub.com connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.chessclub.level2;
 
+import free.util.FormatException;
 import java.util.LinkedList;
 import java.util.List;
 
-import free.util.FormatException;
-
 /**
- * Represents a datagram sent by the chessclub.com server in the format described at
- * <code>ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</code>. This class defines methods
- * useful for parsing a datagram and retrieving arguments from it.
+ * Represents a datagram sent by the chessclub.com server in the format described at <code>
+ * ftp://ftp.chessclub.com/pub/icc/formats/formats.txt</code>. This class defines methods useful for
+ * parsing a datagram and retrieving arguments from it.
  */
 public class Datagram {
 
-  /**
-   * The start of a special string delimiter.
-   */
-  private final static char SPECIAL_STRING_DELIM_START = '\u0019';
+  /** The start of a special string delimiter. */
+  private static final char SPECIAL_STRING_DELIM_START = '\u0019';
 
-  /**
-   * Definitions of all the DG type IDs.
-   */
+  /** Definitions of all the DG type IDs. */
   public static final int DG_WHO_AM_I = 0;
+
   public static final int DG_PLAYER_ARRIVED = 1;
   public static final int DG_PLAYER_LEFT = 2;
   public static final int DG_BULLET = 3;
@@ -153,24 +149,16 @@ public class Datagram {
   public static final int DG_ONEMINUTE = 126;
   public static final int DG_KNOWS_FISCHER_RANDOM = 132;
 
-  /**
-   * The maximum datagram ID.
-   */
+  /** The maximum datagram ID. */
   public static final int MAX_DG_ID = 132;
 
-  /**
-   * The ID of the datagram.
-   */
+  /** The ID of the datagram. */
   private final int id;
 
-  /**
-   * An array holding the datagram fields.
-   */
+  /** An array holding the datagram fields. */
   private final String[] fields;
 
-  /**
-   * Creates a new <code>Datagram</code> with the specified datagram id and fields.
-   */
+  /** Creates a new <code>Datagram</code> with the specified datagram id and fields. */
   public Datagram(int id, String[] fields) {
     if (fields == null) throw new IllegalArgumentException("Datagram fields may not be null");
 
@@ -178,51 +166,39 @@ public class Datagram {
     this.fields = fields;
   }
 
-  /**
-   * Returns the ID of the datagram.
-   */
+  /** Returns the ID of the datagram. */
   public int getId() {
     return id;
   }
 
-  /**
-   * Returns the number of fields in this Datagram.
-   */
+  /** Returns the number of fields in this Datagram. */
   public int getFieldCount() {
     return fields.length;
   }
 
-  /**
-   * Returns the specified field, unparsed.
-   */
+  /** Returns the specified field, unparsed. */
   public String getField(int fieldIndex) {
     return fields[fieldIndex];
   }
 
-  /**
-   * Returns the specified field parsed as a string.
-   */
+  /** Returns the specified field parsed as a string. */
   public String getString(int fieldIndex) {
     return getField(fieldIndex);
   }
 
-  /**
-   * Returns the specified field parsed as an integer.
-   */
+  /** Returns the specified field parsed as an integer. */
   public int getInteger(int fieldIndex) {
     return Integer.parseInt(getField(fieldIndex));
   }
 
-  /**
-   * Returns the specified field parsed as a long.
-   */
+  /** Returns the specified field parsed as a long. */
   public long getLong(int fieldIndex) {
     return Long.parseLong(getField(fieldIndex));
   }
 
   /**
-   * Returns the specified field, parsed as a boolean. If the value of the field is "1",
-   * <code>true</code> is returned, otherwise <code>false</code> is returned.
+   * Returns the specified field, parsed as a boolean. If the value of the field is "1", <code>true
+   * </code> is returned, otherwise <code>false</code> is returned.
    */
   public boolean getBoolean(int fieldIndex) {
     return getField(fieldIndex).equals("1");
@@ -234,7 +210,7 @@ public class Datagram {
    * the surrounding delimiters.
    *
    * @throws FormatException if the specified string cannot be parsed as a datagram because it is
-   * not in the proper format.
+   *     not in the proper format.
    */
   public static Datagram parseDatagram(String dgString) throws FormatException {
     try {
@@ -282,9 +258,7 @@ public class Datagram {
     }
   }
 
-  /**
-   * Returns a textual representation of this datagram.
-   */
+  /** Returns a textual representation of this datagram. */
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer("[Datagram ID=" + getId());

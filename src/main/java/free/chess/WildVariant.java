@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -18,14 +18,10 @@ package free.chess;
 
 import java.util.Collection;
 
-/**
- * An interface classes defining rules for wild chess variants must implement.
- */
+/** An interface classes defining rules for wild chess variants must implement. */
 public interface WildVariant {
 
-  /**
-   * Sets the initial position for this wild variant on the given Position.
-   */
+  /** Sets the initial position for this wild variant on the given Position. */
   void init(Position pos);
 
   /**
@@ -55,8 +51,8 @@ public interface WildVariant {
   /**
    * Creates a <code>Move</code> object representing a move just like the specified one, but made in
    * the specified position. If the specified information is so bad that it's impossible to
-   * construct a move from it altogether, the implementation is allowed to throw an
-   * <code>IllegalArgumentException</code>.
+   * construct a move from it altogether, the implementation is allowed to throw an <code>
+   * IllegalArgumentException</code>.
    */
   Move createMove(Position pos, Move move) throws IllegalArgumentException;
 
@@ -77,9 +73,9 @@ public interface WildVariant {
    * directly - call Position.makeMove(Move) instead. Implementations of this method should only
    * modify the Position via the modifier to avoid the change listeners of the position from being
    * notified in the middle of a move procedure where the position isn't "stable". There is no need
-   * to trigger the listeners to be called after the move procedure is done -
-   * <code>Position.makeMove(Move)</code> triggers them as needed by itself (and since this method
-   * can't be called directly, that's the only way to make a move).
+   * to trigger the listeners to be called after the move procedure is done - <code>
+   * Position.makeMove(Move)</code> triggers them as needed by itself (and since this method can't
+   * be called directly, that's the only way to make a move).
    */
   void makeMove(Move move, Position pos, Position.Modifier modifier);
 
@@ -87,7 +83,7 @@ public interface WildVariant {
    * Returns the piece represented by the given String.
    *
    * @throws IllegalArgumentException if the given character does not represent a piece in this
-   * WildVariant.
+   *     WildVariant.
    */
   Piece parsePiece(String s);
 
@@ -122,9 +118,7 @@ public interface WildVariant {
    */
   Collection getTargetSquares(Position position, Square square);
 
-  /**
-   * Returns the name of this WildVariant.
-   */
+  /** Returns the name of this WildVariant. */
   String getName();
 
   /**

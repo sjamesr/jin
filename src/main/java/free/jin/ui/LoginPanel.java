@@ -2,44 +2,21 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.ListModel;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
-
 import com.google.common.collect.ImmutableList;
-
 import free.jin.ConnectionDetails;
 import free.jin.I18n;
 import free.jin.Jin;
@@ -54,119 +31,94 @@ import free.util.swing.UrlDisplayingAction;
 import free.workarounds.FixedJComboBox;
 import free.workarounds.FixedJPasswordField;
 import free.workarounds.FixedJTextField;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.ListModel;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
-/**
- * The login panel.
- */
+/** The login panel. */
 public class LoginPanel extends DialogPanel {
 
-  /**
-   * The <code>I18n</code> for this login panel.
-   */
+  /** The <code>I18n</code> for this login panel. */
   private final I18n i18n = I18n.get(LoginPanel.class);
 
-  /**
-   * The list of servers, in the order we put them in the serverBox.
-   */
+  /** The list of servers, in the order we put them in the serverBox. */
   private List<Server> servers;
 
-  /**
-   * The list of users, in the order we put them in the accountBox.
-   */
+  /** The list of users, in the order we put them in the accountBox. */
   private User[] users;
 
-  /**
-   * The JComboBox displaying the current server.
-   */
+  /** The JComboBox displaying the current server. */
   private final JComboBox serverBox;
 
-  /**
-   * The server website link.
-   */
+  /** The server website link. */
   private final LinkLabel serverWebsiteLink;
 
-  /**
-   * The action invoked when the server website link is clicked.
-   */
+  /** The action invoked when the server website link is clicked. */
   private final UrlDisplayingAction serverWebsiteAction;
 
-  /**
-   * The username label
-   */
+  /** The username label */
   private final JLabel usernameLabel;
 
-  /**
-   * The username box.
-   */
+  /** The username box. */
   private final JComboBox usernameBox;
 
-  /**
-   * The password label.
-   */
+  /** The password label. */
   private final JLabel passwordLabel;
 
-  /**
-   * The password field.
-   */
+  /** The password field. */
   private final JPasswordField passwordField;
 
-  /**
-   * The save password checkbox.
-   */
+  /** The save password checkbox. */
   private final JCheckBox savePasswordCheckBox;
 
-  /**
-   * The retrieve password link label.
-   */
+  /** The retrieve password link label. */
   private final LinkLabel retrievePasswordLink;
 
-  /**
-   * The action invoked when the retrieve password link is clicked.
-   */
+  /** The action invoked when the retrieve password link is clicked. */
   private final UrlDisplayingAction retrievePasswordAction;
 
-  /**
-   * The hostname box.
-   */
+  /** The hostname box. */
   private final JComboBox hostnameBox;
 
-  /**
-   * The ports field.
-   */
+  /** The ports field. */
   private final JTextField portsField;
 
-  /**
-   * The "connect" button.
-   */
+  /** The "connect" button. */
   private final JButton connectButton;
 
-  /**
-   * The "register" link label.
-   */
+  /** The "register" link label. */
   private final LinkLabel registerLink;
 
-  /**
-   * The action invoked when the register link is clicked.
-   */
+  /** The action invoked when the register link is clicked. */
   private final UrlDisplayingAction registerAction;
 
-  /**
-   * Creates a new <code>LoginPanel</code> with the specified initial connection details.
-   */
+  /** Creates a new <code>LoginPanel</code> with the specified initial connection details. */
   public LoginPanel(ConnectionDetails connDetails) {
     this(connDetails.getServer(), connDetails);
   }
 
-  /**
-   * Creates a new <code>LoginPanel</code> with the specified initial server.
-   */
+  /** Creates a new <code>LoginPanel</code> with the specified initial server. */
   public LoginPanel(Server server) {
     this(server, null);
   }
 
-  /**
-   * Creates a new <code>LoginPanel</code> with the specified server and connection details.
-   */
+  /** Creates a new <code>LoginPanel</code> with the specified server and connection details. */
   private LoginPanel(Server server, ConnectionDetails connDetails) {
     this.serverBox = new FixedJComboBox();
     this.serverWebsiteLink = new LinkLabel(i18n.getString("serverWebsiteLink.text"));
@@ -300,9 +252,9 @@ public class LoginPanel extends DialogPanel {
   }
 
   /**
-   * Sets the data currently displayed by the dialog. If the connection details are
-   * <code>null</code>, it means that the user is creating a new account from scratch (only the
-   * server is known).
+   * Sets the data currently displayed by the dialog. If the connection details are <code>null
+   * </code>, it means that the user is creating a new account from scratch (only the server is
+   * known).
    */
   private void setData(
       Server server, ConnectionDetails connDetails, boolean updateServer, boolean updateUsername) {
@@ -367,9 +319,7 @@ public class LoginPanel extends DialogPanel {
     else defaultFocusedComponent = focusedComponent;
   }
 
-  /**
-   * Creates the ComboBoxModel for the servers combo box.
-   */
+  /** Creates the ComboBoxModel for the servers combo box. */
   private ComboBoxModel createServerBoxModel() {
     DefaultComboBoxModel model = new DefaultComboBoxModel();
     for (Server server : servers) model.addElement(server.getLongName());
@@ -377,9 +327,7 @@ public class LoginPanel extends DialogPanel {
     return model;
   }
 
-  /**
-   * Returns a list of known users on the specified server.
-   */
+  /** Returns a list of known users on the specified server. */
   private User[] getServerUsers(Server server) {
     Vector usersVec = new Vector();
     ListModel usersList = Jin.getInstance().getUsers();
@@ -395,9 +343,7 @@ public class LoginPanel extends DialogPanel {
     return usersArr;
   }
 
-  /**
-   * Creates the ComboBoxModel for the users combo box.
-   */
+  /** Creates the ComboBoxModel for the users combo box. */
   private ComboBoxModel createAccountBoxModel() {
     DefaultComboBoxModel model = new DefaultComboBoxModel();
     model.addElement(i18n.getString("accountComboBox.newAccount"));
@@ -408,38 +354,30 @@ public class LoginPanel extends DialogPanel {
   }
 
   /**
-   * Displays this panel and returns the connection details specified by the user. Returns
-   * <code>null</code> if the user closes the panel or otherwise cancels the operation.
+   * Displays this panel and returns the connection details specified by the user. Returns <code>
+   * null</code> if the user closes the panel or otherwise cancels the operation.
    */
   public ConnectionDetails askConnectionDetails() {
     return (ConnectionDetails) super.askResult();
   }
 
-  /**
-   * Returns the title for this panel.
-   */
+  /** Returns the title for this panel. */
   @Override
   protected String getTitle() {
     return i18n.getString("title");
   }
 
-  /**
-   * Shows an error regarding telling the user that the ports list he selected is invalid.
-   */
+  /** Shows an error regarding telling the user that the ports list he selected is invalid. */
   private void showIllegalPortsError() {
     i18n.error("invalidPortsDialog", this);
   }
 
-  /**
-   * Returns the currently selected server. Helper function.
-   */
+  /** Returns the currently selected server. Helper function. */
   private Server getServer() {
     return servers.get(serverBox.getSelectedIndex());
   }
 
-  /**
-   * Creates and adds the user interface of this panel.
-   */
+  /** Creates and adds the user interface of this panel. */
   private void createUI() {
     JLabel serverLabel = i18n.createLabel("serverLabel");
     serverLabel.setLabelFor(serverBox);
@@ -611,9 +549,7 @@ public class LoginPanel extends DialogPanel {
     return ports;
   }
 
-  /**
-   * The component focused by default.
-   */
+  /** The component focused by default. */
   private Component defaultFocusedComponent = null;
 
   // Hack to set the focus where we want it.

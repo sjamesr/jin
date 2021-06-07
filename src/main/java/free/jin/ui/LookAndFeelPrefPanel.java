@@ -2,20 +2,24 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.util.PlatformUtils;
 import java.awt.BorderLayout;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.swing.Box;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -34,29 +37,16 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.Jin;
-import free.util.PlatformUtils;
-
-/**
- * A preferences panel for selecting the current Swing Look and Feel.
- */
+/** A preferences panel for selecting the current Swing Look and Feel. */
 public class LookAndFeelPrefPanel extends PreferencesPanel {
 
-  /**
-   * Have we installed the extra look and feels already?
-   */
+  /** Have we installed the extra look and feels already? */
   private static boolean extraLnFsInstalled = false;
 
-  /**
-   * The list of available Look and Feels. This actually holds instances of <code>LnF</code>.
-   */
+  /** The list of available Look and Feels. This actually holds instances of <code>LnF</code>. */
   private final JList lookAndFeels;
 
-  /**
-   * Creates a new <code>LookAndFeelPrefPanel</code>.
-   */
+  /** Creates a new <code>LookAndFeelPrefPanel</code>. */
   public LookAndFeelPrefPanel() {
     installExtraLookAndFeels();
 
@@ -102,9 +92,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel {
     createUI();
   }
 
-  /**
-   * Installs any extra look and feels Jin is using.
-   */
+  /** Installs any extra look and feels Jin is using. */
   private static synchronized void installExtraLookAndFeels() {
     if (extraLnFsInstalled) return;
     extraLnFsInstalled = true;
@@ -126,9 +114,7 @@ public class LookAndFeelPrefPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Creates the UI of this panel.
-   */
+  /** Creates the UI of this panel. */
   private void createUI() {
     lookAndFeels.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     lookAndFeels.setVisibleRowCount(Math.max(5, Math.min(lookAndFeels.getModel().getSize(), 10)));
@@ -174,27 +160,19 @@ public class LookAndFeelPrefPanel extends PreferencesPanel {
    */
   private static class LnF {
 
-    /**
-     * The Look and Feel name.
-     */
+    /** The Look and Feel name. */
     public final String name;
 
-    /**
-     * The Look and Feel classname.
-     */
+    /** The Look and Feel classname. */
     public final String classname;
 
-    /**
-     * Creates a new LnF from the specified <code>UIManager.LookAndFeelInfo</code>.
-     */
+    /** Creates a new LnF from the specified <code>UIManager.LookAndFeelInfo</code>. */
     public LnF(UIManager.LookAndFeelInfo info) {
       this.name = info.getName();
       this.classname = info.getClassName();
     }
 
-    /**
-     * Returns the name of the Look and Feel.
-     */
+    /** Returns the name of the Look and Feel. */
     @Override
     public String toString() {
       return name;

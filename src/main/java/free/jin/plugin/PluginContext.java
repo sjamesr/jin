@@ -2,28 +2,27 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.plugin;
-
-import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
 
 import free.jin.Connection;
 import free.jin.Preferences;
 import free.jin.User;
 import free.jin.action.JinAction;
 import free.util.Utilities;
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
 
 /**
  * The context of a plugin. Provides the plugin with methods to access the environment in which it
@@ -31,39 +30,25 @@ import free.util.Utilities;
  */
 public class PluginContext {
 
-  /**
-   * The connection to the server.
-   */
+  /** The connection to the server. */
   private final Connection conn;
 
-  /**
-   * The account with the server.
-   */
+  /** The account with the server. */
   private final User user;
 
-  /**
-   * A list of plugins run in the session.
-   */
+  /** A list of plugins run in the session. */
   private final Plugin[] plugins;
 
-  /**
-   * Specifies which plugins passed <code>Plugin.setContext</code>.
-   */
+  /** Specifies which plugins passed <code>Plugin.setContext</code>. */
   private final boolean[] isPluginActive;
 
-  /**
-   * The number of "active" plugins.
-   */
+  /** The number of "active" plugins. */
   private int activePluginsCount;
 
-  /**
-   * The plugins' preferences, in order matching the <code>plugins</code> variable.
-   */
+  /** The plugins' preferences, in order matching the <code>plugins</code> variable. */
   private final Preferences[] prefs;
 
-  /**
-   * A list of the actions in this session.
-   */
+  /** A list of the actions in this session. */
   private final DefaultListModel actions = new DefaultListModel();
 
   /**
@@ -127,41 +112,31 @@ public class PluginContext {
     }
   }
 
-  /**
-   * Returns the connection to the server.
-   */
+  /** Returns the connection to the server. */
   public Connection getConnection() {
     return conn;
   }
 
-  /**
-   * Returns the <code>User</code> object representing the account on the server.
-   */
+  /** Returns the <code>User</code> object representing the account on the server. */
   public User getUser() {
     return user;
   }
 
-  /**
-   * Returns the index of the plugin with the specified id. Returns <code>-1</code> if none.
-   */
+  /** Returns the index of the plugin with the specified id. Returns <code>-1</code> if none. */
   private int getPluginIndex(String id) {
     for (int i = 0; i < plugins.length; i++) if (plugins[i].getId().equals(id)) return i;
 
     return -1;
   }
 
-  /**
-   * Returns the plugin with the specified id.
-   */
+  /** Returns the plugin with the specified id. */
   public Plugin getPlugin(String id) {
     int index = getPluginIndex(id);
     if ((index >= 0) && isPluginActive[index]) return plugins[index];
     else return null;
   }
 
-  /**
-   * Returns a list of all the plugins within this context.
-   */
+  /** Returns a list of all the plugins within this context. */
   public Plugin[] getPlugins() {
     Plugin[] plugins = new Plugin[activePluginsCount];
 
@@ -172,9 +147,7 @@ public class PluginContext {
     return plugins;
   }
 
-  /**
-   * Returns the <code>Preferences</code> of the specified plugin.
-   */
+  /** Returns the <code>Preferences</code> of the specified plugin. */
   public synchronized Preferences getPreferences(Plugin plugin) {
     return prefs[Utilities.indexOf(plugins, plugin)];
   }
@@ -200,9 +173,7 @@ public class PluginContext {
     return null;
   }
 
-  /**
-   * Adds the specified action to the list of available actions.
-   */
+  /** Adds the specified action to the list of available actions. */
   public void addAction(JinAction action) {
     actions.addElement(action);
   }

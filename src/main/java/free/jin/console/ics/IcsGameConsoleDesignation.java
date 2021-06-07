@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -25,9 +25,7 @@ import free.jin.console.GameConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 
-/**
- * The game chat console for ICS-like servers.
- */
+/** The game chat console for ICS-like servers. */
 public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
 
   /**
@@ -47,9 +45,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
     addCommandType(new TellObserversCommandType());
   }
 
-  /**
-   * Accepts certain "say" and "tell" chat events, in addition to what the superclass accepts.
-   */
+  /** Accepts certain "say" and "tell" chat events, in addition to what the superclass accepts. */
   @Override
   protected boolean accept(JinEvent evt) {
     if (super.accept(evt)) return true;
@@ -71,29 +67,19 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
     return false;
   }
 
-  /**
-   * Returns the command to kibitz to a game.
-   */
+  /** Returns the command to kibitz to a game. */
   protected abstract String getKibitzToCommand();
 
-  /**
-   * Returns the command to whisper to a game.
-   */
+  /** Returns the command to whisper to a game. */
   protected abstract String getWhisperToCommand();
 
-  /**
-   * The command type for the "tell opponent" command type.
-   */
+  /** The command type for the "tell opponent" command type. */
   private class TellOpponentCommandType extends AbstractCommandType {
 
-    /**
-     * The opponent we're talking to.
-     */
+    /** The opponent we're talking to. */
     private final ServerUser opponent;
 
-    /**
-     * Creates a new <code>TellOpponentCommand</code>
-     */
+    /** Creates a new <code>TellOpponentCommand</code> */
     public TellOpponentCommandType() {
       super(I18n.get(TellOpponentCommandType.class).getString("name"));
 
@@ -103,9 +89,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
               : connection.userForName(game.getWhiteName());
     }
 
-    /**
-     * Sends the message to the opponent.
-     */
+    /** Sends the message to the opponent. */
     @Override
     protected void send(String userText) {
       // We don't use "say" because the "say" target might've changed since the
@@ -114,9 +98,7 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
       sendCommand("xtell " + opponent.getName() + "! " + userText);
     }
 
-    /**
-     * Echoes the command to the console.
-     */
+    /** Echoes the command to the console. */
     @Override
     protected void echo(String userText) {
       Console console = getConsole();
@@ -125,42 +107,30 @@ public abstract class IcsGameConsoleDesignation extends GameConsoleDesignation {
     }
   }
 
-  /**
-   * The command type for the "tell all" command type.
-   */
+  /** The command type for the "tell all" command type. */
   private class TellAllCommandType extends AbstractCommandType {
 
-    /**
-     * Creates a new <code>TellAllCommand</code>
-     */
+    /** Creates a new <code>TellAllCommand</code> */
     public TellAllCommandType() {
       super(I18n.get(TellAllCommandType.class).getString("name"));
     }
 
-    /**
-     * Sends the message to everyone at the board.
-     */
+    /** Sends the message to everyone at the board. */
     @Override
     protected void send(String userText) {
       sendCommand(getKibitzToCommand() + " " + game.getID() + " " + userText);
     }
   }
 
-  /**
-   * The command type for the "tell observers" command type.
-   */
+  /** The command type for the "tell observers" command type. */
   private class TellObserversCommandType extends AbstractCommandType {
 
-    /**
-     * Creates a new <code>TellObserversCommand</code>
-     */
+    /** Creates a new <code>TellObserversCommand</code> */
     public TellObserversCommandType() {
       super(I18n.get(TellObserversCommandType.class).getString("name"));
     }
 
-    /**
-     * Sends the message to all the game observers.
-     */
+    /** Sends the message to all the game observers. */
     @Override
     protected void send(String userText) {
       sendCommand(getWhisperToCommand() + " " + game.getID() + " " + userText);

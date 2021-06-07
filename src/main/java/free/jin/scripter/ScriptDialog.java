@@ -2,20 +2,28 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
 
+import free.jin.I18n;
+import free.util.AWTUtilities;
+import free.util.NamedWrapper;
+import free.util.TableLayout;
+import free.util.Utilities;
+import free.util.swing.SwingUtils;
+import free.workarounds.FixedJComboBox;
+import free.workarounds.FixedJTextField;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -24,7 +32,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -38,43 +45,22 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
-import free.jin.I18n;
-import free.util.AWTUtilities;
-import free.util.NamedWrapper;
-import free.util.TableLayout;
-import free.util.Utilities;
-import free.util.swing.SwingUtils;
-import free.workarounds.FixedJComboBox;
-import free.workarounds.FixedJTextField;
-
-/**
- * The superclass for dialogs allowing the user to create a <code>Script</code>.
- */
+/** The superclass for dialogs allowing the user to create a <code>Script</code>. */
 abstract class ScriptDialog extends JDialog {
 
-  /**
-   * The default event type we show in the event type choice.
-   */
+  /** The default event type we show in the event type choice. */
   private static final String SELECT_EVENT_TYPE = "selectEventType";
 
-  /**
-   * The scripter we're creating this <code>Script</code> for.
-   */
+  /** The scripter we're creating this <code>Script</code> for. */
   protected final Scripter scripter;
 
-  /**
-   * The template script.
-   */
+  /** The template script. */
   protected final Script templateScript;
 
-  /**
-   * The resulting script.
-   */
+  /** The resulting script. */
   private Script script = null;
 
-  /**
-   * Creates a new ScriptDialog with the specified parent component and title.
-   */
+  /** Creates a new ScriptDialog with the specified parent component and title. */
   public ScriptDialog(Component parent, String title, Scripter scripter, Script templateScript) {
     super(AWTUtilities.frameForComponent(parent), title, true);
 
@@ -86,9 +72,7 @@ abstract class ScriptDialog extends JDialog {
     SwingUtils.registerEscapeCloser(this);
   }
 
-  /**
-   * Creates the script type specific UI and returns a <code>Container</code> containing it.
-   */
+  /** Creates the script type specific UI and returns a <code>Container</code> containing it. */
   protected abstract Container createScriptTypeSpecificUI();
 
   /**
@@ -100,9 +84,7 @@ abstract class ScriptDialog extends JDialog {
   protected abstract Script createScriptOnOk(
       String scriptName, String eventType, String[] selectedSubtypes);
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   protected final void createUI() {
     I18n scripterI18n = scripter.getI18n();
     I18n i18n = I18n.get(ScriptDialog.class);
@@ -283,9 +265,7 @@ abstract class ScriptDialog extends JDialog {
     getRootPane().setDefaultButton(okButton);
   }
 
-  /**
-   * Puts the appropriate checkboxes in the subtypes panel.
-   */
+  /** Puts the appropriate checkboxes in the subtypes panel. */
   private void updateSubtypesPanel(JPanel panel, String eventType, String[] selectedSubtypes) {
     panel.removeAll();
 

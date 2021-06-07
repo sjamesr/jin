@@ -2,40 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.seek;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FocusTraversalPolicy;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.net.URL;
-import java.util.Iterator;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -63,6 +42,24 @@ import free.util.swing.tabbedpane.TabbedPane;
 import free.util.swing.tabbedpane.TabbedPaneEvent;
 import free.util.swing.tabbedpane.TabbedPaneListener;
 import free.util.swing.tabbedpane.TabbedPaneModel;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FocusTraversalPolicy;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.net.URL;
+import java.util.Iterator;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 /**
  * The plugin which implements the SoughtGraph. Even though I haven't put this plugin in one of the
@@ -71,14 +68,10 @@ import free.util.swing.tabbedpane.TabbedPaneModel;
 public class SoughtGraphPlugin extends Plugin
     implements SeekListener, SeekSelectionListener, PluginUIListener, ConnectionListener {
 
-  /**
-   * The ID of this plugin.
-   */
+  /** The ID of this plugin. */
   public static final String PLUGIN_ID = "seek";
 
-  /**
-   * The panel for issuing seeks.
-   */
+  /** The panel for issuing seeks. */
   private IssueSeekPanel issueSeekPanel;
 
   /**
@@ -93,14 +86,10 @@ public class SoughtGraphPlugin extends Plugin
    */
   private TabbedPane issueTabbedPane;
 
-  /**
-   * The seek graph.
-   */
+  /** The seek graph. */
   private SoughtGraph soughtGraph;
 
-  /**
-   * The container of our UI.
-   */
+  /** The container of our UI. */
   private PluginUIContainer uiContainer;
 
   /**
@@ -114,16 +103,12 @@ public class SoughtGraphPlugin extends Plugin
     return super.setContext(context);
   }
 
-  /**
-   * Returns the connection to the server, cast to a <code>SeekConnection</code>.
-   */
+  /** Returns the connection to the server, cast to a <code>SeekConnection</code>. */
   private SeekConnection getSeekConn() {
     return (SeekConnection) getConn();
   }
 
-  /**
-   * Starts this plugin.
-   */
+  /** Starts this plugin. */
   @Override
   public void start() {
     createUI();
@@ -131,18 +116,14 @@ public class SoughtGraphPlugin extends Plugin
     exportAction(new FindGameAction());
   }
 
-  /**
-   * Stops this plugin.
-   */
+  /** Stops this plugin. */
   @Override
   public void stop() {
     unregisterListeners();
     savePrefs();
   }
 
-  /**
-   * Saves the plugin's preferences.
-   */
+  /** Saves the plugin's preferences. */
   private void savePrefs() {
     issueSeekPanel.savePrefs();
 
@@ -154,9 +135,7 @@ public class SoughtGraphPlugin extends Plugin
     }
   }
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   protected void createUI() {
     I18n i18n = getI18n();
 
@@ -308,8 +287,8 @@ public class SoughtGraphPlugin extends Plugin
   /**
    * Creates the <code>IssueMatchPanel</code>. This method allows subclasses to provide their own,
    * custom, versions of <code>IssueMatchPanel</code>. Returns <code>null</code> if there is no
-   * <code>IssueMatchPanel</code> (if, for example, the connection is not an instance of
-   * <code>MatchOfferConnection</code>).
+   * <code>IssueMatchPanel</code> (if, for example, the connection is not an instance of <code>
+   * MatchOfferConnection</code>).
    */
   protected IssueMatchPanel createIssueMatchPanel() {
     if (getConn() instanceof MatchOfferConnection)
@@ -342,9 +321,7 @@ public class SoughtGraphPlugin extends Plugin
     issueMatchPanel.prepareFor(opponent);
   }
 
-  /**
-   * Gets called when the seek graph container is made visible.
-   */
+  /** Gets called when the seek graph container is made visible. */
   @Override
   public void pluginUIShown(PluginUIEvent evt) {
     SeekConnection conn = getSeekConn();
@@ -357,9 +334,7 @@ public class SoughtGraphPlugin extends Plugin
     conn.getSeekListenerManager().addSeekListener(this);
   }
 
-  /**
-   * Gets called when the seek graph container is made invisible.
-   */
+  /** Gets called when the seek graph container is made invisible. */
   @Override
   public void pluginUIHidden(PluginUIEvent evt) {
     soughtGraph.removeAllSeeks();
@@ -386,33 +361,25 @@ public class SoughtGraphPlugin extends Plugin
   @Override
   public void pluginUIIconChanged(PluginUIEvent evt) {}
 
-  /**
-   * Registers the necessary listeners.
-   */
+  /** Registers the necessary listeners. */
   protected void registerListeners() {
     soughtGraph.addSeekSelectionListener(this);
     getConn().getListenerManager().addConnectionListener(this);
   }
 
-  /**
-   * Unregisters all the listeners registered by this SoughtGraphPlugin.
-   */
+  /** Unregisters all the listeners registered by this SoughtGraphPlugin. */
   protected void unregisterListeners() {
     soughtGraph.removeSeekSelectionListener(this);
     getConn().getListenerManager().removeConnectionListener(this);
   }
 
-  /**
-   * SeekListener implementation. Gets called when a seek is added.
-   */
+  /** SeekListener implementation. Gets called when a seek is added. */
   @Override
   public void seekAdded(SeekEvent evt) {
     soughtGraph.addSeek(evt.getSeek());
   }
 
-  /**
-   * SeekListener implementation. Gets called when a seek is removed.
-   */
+  /** SeekListener implementation. Gets called when a seek is removed. */
   @Override
   public void seekRemoved(SeekEvent evt) {
     soughtGraph.removeSeek(evt.getSeek());
@@ -432,9 +399,7 @@ public class SoughtGraphPlugin extends Plugin
     else conn.accept(seek);
   }
 
-  /**
-   * Remove all seeks on disconnection. This just seems to make more sense than leaving them on.
-   */
+  /** Remove all seeks on disconnection. This just seems to make more sense than leaving them on. */
   @Override
   public void connectionLost(Connection conn) {
     soughtGraph.removeAllSeeks();
@@ -456,46 +421,34 @@ public class SoughtGraphPlugin extends Plugin
   @Override
   public void loginSucceeded(Connection conn) {}
 
-  /**
-   * Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}.
-   */
+  /** Returns the ID of this plugin. See also {@linkplain #PLUGIN_ID}. */
   @Override
   public String getId() {
     return PLUGIN_ID;
   }
 
-  /**
-   * An action which displays/hides our UI.
-   */
+  /** An action which displays/hides our UI. */
   private class FindGameAction extends JinAction implements PluginUIListener {
 
-    /**
-     * Creates a new <code>FindGameAction</code>.
-     */
+    /** Creates a new <code>FindGameAction</code>. */
     public FindGameAction() {
       uiContainer.addPluginUIListener(this);
     }
 
-    /**
-     * Returns the id of this action - "findgame".
-     */
+    /** Returns the id of this action - "findgame". */
     @Override
     public String getId() {
       return "findgame";
     }
 
-    /**
-     * Displays or hides the UI.
-     */
+    /** Displays or hides the UI. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       if (uiContainer.isVisible()) uiContainer.setVisible(false);
       else uiContainer.setActive(true);
     }
 
-    /**
-     * Invoked when the "find game" UI is shown.
-     */
+    /** Invoked when the "find game" UI is shown. */
     @Override
     public void pluginUIShown(PluginUIEvent evt) {
       I18n i18n = I18n.get(FindGameAction.class);
@@ -504,9 +457,7 @@ public class SoughtGraphPlugin extends Plugin
       putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription.hide"));
     }
 
-    /**
-     * Invoked when the "find game" UI is hidden.
-     */
+    /** Invoked when the "find game" UI is hidden. */
     @Override
     public void pluginUIHidden(PluginUIEvent evt) {
       I18n i18n = I18n.get(FindGameAction.class);
@@ -515,9 +466,7 @@ public class SoughtGraphPlugin extends Plugin
       putValue(Action.SHORT_DESCRIPTION, i18n.getString("shortDescription"));
     }
 
-    /**
-     * Invoked when the "find game" UI is made active.
-     */
+    /** Invoked when the "find game" UI is made active. */
     @Override
     public void pluginUIActivated(PluginUIEvent evt) {
       Container focusCycleRoot = issueTabbedPane.getFocusCycleRootAncestor();

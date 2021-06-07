@@ -2,29 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
-
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.event.SwingPropertyChangeSupport;
 
 import free.jin.Connection;
 import free.jin.event.ChatEvent;
@@ -33,56 +23,46 @@ import free.jin.event.PlainTextEvent;
 import free.util.AbstractNamed;
 import free.util.TextUtilities;
 import free.util.Utilities;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.event.SwingPropertyChangeSupport;
 
-/**
- * A base implementation of <code>ConsoleDesignation</code> with some useful facilities.
- */
+/** A base implementation of <code>ConsoleDesignation</code> with some useful facilities. */
 public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
 
-  /**
-   * The connection to the server.
-   */
+  /** The connection to the server. */
   protected final Connection connection;
 
-  /**
-   * Whether to count unseen messages and display their number in the designation name.
-   */
+  /** Whether to count unseen messages and display their number in the designation name. */
   private final boolean countUnseenMessages;
 
-  /**
-   * The name of the designation.
-   */
+  /** The name of the designation. */
   private String name;
 
   /**
-   * The encoding used to encode/decode certain messages sent to/received from the server. A
-   * <code>null</code> value indicates that the console manager's encoding should be used.
+   * The encoding used to encode/decode certain messages sent to/received from the server. A <code>
+   * null</code> value indicates that the console manager's encoding should be used.
    */
   private final String encoding;
 
-  /**
-   * Whether the console is closeable.
-   */
+  /** Whether the console is closeable. */
   private boolean isConsoleCloseable;
 
-  /**
-   * Our command types.
-   */
+  /** Our command types. */
   private final List commandTypes = new LinkedList();
 
-  /**
-   * The console we're responsible for.
-   */
+  /** The console we're responsible for. */
   private Console console;
 
-  /**
-   * The number of unseen (added when the console is invisible) messages we've received.
-   */
+  /** The number of unseen (added when the console is invisible) messages we've received. */
   private int unseenMessageCount = 0;
 
-  /**
-   * Our property change support.
-   */
+  /** Our property change support. */
   private final PropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /**
@@ -103,7 +83,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
    *
    * @param connection The connection to the server.
    * @param countUnseenMessages Whether to count the number of unseen messages and display it in the
-   * designation's name.
+   *     designation's name.
    * @param name The name of the console.
    * @param encoding The encoding to use for encoding/decoding messages.
    * @param isConsoleCloseable Whether the console should be closeable.
@@ -133,9 +113,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     return Integer.toHexString(System.identityHashCode(this));
   }
 
-  /**
-   * Sets our console.
-   */
+  /** Sets our console. */
   @Override
   public void setConsole(Console console) {
     this.console = console;
@@ -156,9 +134,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     joinForums();
   }
 
-  /**
-   * Returns the console we're responsible for.
-   */
+  /** Returns the console we're responsible for. */
   public Console getConsole() {
     return console;
   }
@@ -169,9 +145,7 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
    */
   protected void joinForums() {}
 
-  /**
-   * Sets the number of unseen messages and updates the title accordingly.
-   */
+  /** Sets the number of unseen messages and updates the title accordingly. */
   protected final void setUnseenMessageCount(int unseenMessageCount) {
     String oldName = getName();
     this.unseenMessageCount = unseenMessageCount;
@@ -179,37 +153,27 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     propertyChangeSupport.firePropertyChange("name", oldName, newName);
   }
 
-  /**
-   * Invoked when the console we're responsible for is shown.
-   */
+  /** Invoked when the console we're responsible for is shown. */
   protected void consoleShown() {
     if (countUnseenMessages) setUnseenMessageCount(0);
   }
 
-  /**
-   * Invoked when the console we're responsible for is hidden.
-   */
+  /** Invoked when the console we're responsible for is hidden. */
   protected void consoleHidden() {}
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Removes a property change listener.
-   */
+  /** Removes a property change listener. */
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Returns the name of this designation.
-   */
+  /** Returns the name of this designation. */
   @Override
   public String getName() {
     if (countUnseenMessages && (unseenMessageCount != 0))
@@ -255,17 +219,13 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     return encoding == null ? console.getConsoleManager().getEncoding() : encoding;
   }
 
-  /**
-   * Returns whether the console is closeable.
-   */
+  /** Returns whether the console is closeable. */
   @Override
   public boolean isConsoleCloseable() {
     return isConsoleCloseable;
   }
 
-  /**
-   * Sets the closeable status of the console.
-   */
+  /** Sets the closeable status of the console. */
   protected void setConsoleCloseable(boolean isConsoleCloseable) {
     if (this.isConsoleCloseable == isConsoleCloseable) return;
 
@@ -309,32 +269,26 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     return (tag != null) && (tag.equals(evt.getClientTag()));
   }
 
-  /**
-   * Returns whether the specified event is accepted by this <code>ConsoleDesignation</code>.
-   */
+  /** Returns whether the specified event is accepted by this <code>ConsoleDesignation</code>. */
   protected abstract boolean accept(JinEvent evt);
 
   /**
    * Appends the specified event to the console, causing it to be displayed there in some manner.
-   * The default implementation passes the event to either {@link #appendChat(ChatEvent)} or
-   * {@link #appendPlainText(PlainTextEvent)}, based on the class of the event.
+   * The default implementation passes the event to either {@link #appendChat(ChatEvent)} or {@link
+   * #appendPlainText(PlainTextEvent)}, based on the class of the event.
    */
   protected void append(JinEvent evt) {
     if (evt instanceof PlainTextEvent) appendPlainText((PlainTextEvent) evt);
     else if (evt instanceof ChatEvent) appendChat((ChatEvent) evt);
   }
 
-  /**
-   * Appends the specified chat event to the console.
-   */
+  /** Appends the specified chat event to the console. */
   protected void appendChat(ChatEvent evt) {
     Console console = getConsole();
     console.addToOutput(evt, getActualEncoding());
   }
 
-  /**
-   * Appends the text of the specified plain text event to the console.
-   */
+  /** Appends the text of the specified plain text event to the console. */
   protected void appendPlainText(PlainTextEvent evt) {
     getConsole().addToOutput(decode(evt.getText()), "plain");
   }
@@ -348,22 +302,16 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     commandTypes.add(commandType);
   }
 
-  /**
-   * Returns the command types we're capable of sending.
-   */
+  /** Returns the command types we're capable of sending. */
   @Override
   public final List getCommandTypes() {
     return Collections.unmodifiableList(commandTypes);
   }
 
-  /**
-   * A skeleton implementation of a command type.
-   */
+  /** A skeleton implementation of a command type. */
   protected abstract class AbstractCommandType extends AbstractNamed implements CommandType {
 
-    /**
-     * Whether user-text is encoded before passing it to the {@linkplain #send(String)} method.
-     */
+    /** Whether user-text is encoded before passing it to the {@linkplain #send(String)} method. */
     private final boolean encodeUserText;
 
     /**
@@ -378,8 +326,8 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     }
 
     /**
-     * Creates a new <code>AbstractCommandType</code> with the specified name. The new
-     * <code>AbstractCommandType</code> will automatically encode user-text with the designation's
+     * Creates a new <code>AbstractCommandType</code> with the specified name. The new <code>
+     * AbstractCommandType</code> will automatically encode user-text with the designation's
      * encoding before passing it to the {@linkplain #send(String)} method.
      */
     public AbstractCommandType(String name) {
@@ -389,9 +337,9 @@ public abstract class AbstractConsoleDesignation implements ConsoleDesignation {
     /**
      * Invoked when a command is issued by the user with this command type. If <code>userText</code>
      * is prefixed with a forward slash, the slash is stripped and the remaining command is passed
-     * to <code>sendCommand</code> and, if the <code>doNotEcho</code> flag is unset, to
-     * <code>echoCommand</code>. Otherwise, it is passed to <code>send</code> and, if the
-     * <code>doNotEcho</code> flag is unset, to <code>echo</code>.
+     * to <code>sendCommand</code> and, if the <code>doNotEcho</code> flag is unset, to <code>
+     * echoCommand</code>. Otherwise, it is passed to <code>send</code> and, if the <code>doNotEcho
+     * </code> flag is unset, to <code>echo</code>.
      */
     @Override
     public final void handleCommand(String userText, boolean doNotEcho) {

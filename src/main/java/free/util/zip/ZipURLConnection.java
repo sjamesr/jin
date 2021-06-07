@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -30,14 +30,10 @@ import java.util.zip.ZipFile;
  */
 public class ZipURLConnection extends URLConnection {
 
-  /**
-   * The zip file.
-   */
+  /** The zip file. */
   private final File file;
 
-  /**
-   * The name of the zip entry within the zip file.
-   */
+  /** The name of the zip entry within the zip file. */
   private final String zipEntryName;
 
   /**
@@ -47,8 +43,8 @@ public class ZipURLConnection extends URLConnection {
   private ZipFile zipFile = null;
 
   /**
-   * The <code>ZipEntry</code> object for the entry in the zip file. Created when
-   * <code>connect()</code> is called.
+   * The <code>ZipEntry</code> object for the entry in the zip file. Created when <code>connect()
+   * </code> is called.
    */
   private ZipEntry zipEntry = null;
 
@@ -63,9 +59,7 @@ public class ZipURLConnection extends URLConnection {
     this.zipEntryName = zipEntryName;
   }
 
-  /**
-   * Attempts to open the zip entry.
-   */
+  /** Attempts to open the zip entry. */
   @Override
   public void connect() throws IOException {
     this.zipFile = new ZipFile(file);
@@ -75,9 +69,7 @@ public class ZipURLConnection extends URLConnection {
     this.connected = true;
   }
 
-  /**
-   * Returns the <code>InputStream</code> that reads from this connection.
-   */
+  /** Returns the <code>InputStream</code> that reads from this connection. */
   @Override
   public InputStream getInputStream() throws IOException {
     if (!connected) connect();
@@ -85,9 +77,7 @@ public class ZipURLConnection extends URLConnection {
     return zipFile.getInputStream(zipEntry);
   }
 
-  /**
-   * Returns the length of the uncompressed zip entry.
-   */
+  /** Returns the length of the uncompressed zip entry. */
   @Override
   public int getContentLength() {
     if (!connected) return -1;

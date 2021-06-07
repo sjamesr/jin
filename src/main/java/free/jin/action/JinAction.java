@@ -2,33 +2,31 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2004 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.action;
-
-import java.awt.Toolkit;
-import java.net.URL;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import free.jin.Connection;
 import free.jin.I18n;
 import free.jin.Preferences;
 import free.jin.Server;
 import free.jin.User;
+import java.awt.Toolkit;
+import java.net.URL;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * The base class for Jin actions. Jin actions are miniature plugins, which encapsulate a single
@@ -38,24 +36,16 @@ import free.jin.User;
  */
 public abstract class JinAction extends AbstractAction {
 
-  /**
-   * The action's context.
-   */
+  /** The action's context. */
   private ActionContext context;
 
-  /**
-   * The <code>Preferences</code> object this action uses to store its preferences.
-   */
+  /** The <code>Preferences</code> object this action uses to store its preferences. */
   private Preferences prefs;
 
-  /**
-   * The <code>I18n</code> for this action.
-   */
+  /** The <code>I18n</code> for this action. */
   private I18n i18n;
 
-  /**
-   * Creates a new <code>JinAction</code> with the specified name, short description and icon.
-   */
+  /** Creates a new <code>JinAction</code> with the specified name, short description and icon. */
   public JinAction(String name, String description, Icon icon) {
     putValue(Action.NAME, name);
     putValue(Action.SHORT_DESCRIPTION, description);
@@ -75,9 +65,7 @@ public abstract class JinAction extends AbstractAction {
       putValue(Action.SMALL_ICON, new ImageIcon(Toolkit.getDefaultToolkit().getImage(iconURL)));
   }
 
-  /**
-   * Sets the action's context. Returns whether the context is supported.
-   */
+  /** Sets the action's context. Returns whether the context is supported. */
   public boolean setContext(ActionContext context) {
     if (this.context != null) throw new IllegalStateException("ActionContext already set");
 
@@ -94,30 +82,22 @@ public abstract class JinAction extends AbstractAction {
     return true;
   }
 
-  /**
-   * Returns the connection to the server.
-   */
+  /** Returns the connection to the server. */
   public Connection getConn() {
     return context.getConnection();
   }
 
-  /**
-   * Returns the user for the session.
-   */
+  /** Returns the user for the session. */
   public User getUser() {
     return context.getUser();
   }
 
-  /**
-   * Returns the server for the session.
-   */
+  /** Returns the server for the session. */
   public Server getServer() {
     return getUser().getServer();
   }
 
-  /**
-   * Returns the action's preferences.
-   */
+  /** Returns the action's preferences. */
   public Preferences getPrefs() {
     if (prefs == null) {
       Preferences actionPrefs = context.getPreferences();
@@ -130,9 +110,7 @@ public abstract class JinAction extends AbstractAction {
     return prefs;
   }
 
-  /**
-   * A helper function which returns the <code>I18n</code> for this action.
-   */
+  /** A helper function which returns the <code>I18n</code> for this action. */
   public I18n getI18n() {
     if (i18n == null) i18n = I18n.get(getClass(), JinAction.class);
 

@@ -2,25 +2,23 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.plugin;
 
-import java.awt.Image;
-
-import javax.swing.JComponent;
-
 import free.jin.ui.UIProvider;
+import java.awt.Image;
+import javax.swing.JComponent;
 
 /**
  * A container for the user interface components of a plugin. This can be implemented in different
@@ -29,66 +27,43 @@ import free.jin.ui.UIProvider;
  */
 public interface PluginUIContainer {
 
-  /**
-   * Returns the plugin to which this <code>PluginUIContainer</code> belongs.
-   */
+  /** Returns the plugin to which this <code>PluginUIContainer</code> belongs. */
   Plugin getPlugin();
 
-  /**
-   * Returns the id of this <code>PluginUIContainer</code>
-   */
+  /** Returns the id of this <code>PluginUIContainer</code> */
   String getId();
 
   /**
-   * Returns the mode of this container. See
-   * {@link UIProvider#createPluginUIContainer(Plugin, String, int)} for more information regarding
-   * the mode.
+   * Returns the mode of this container. See {@link UIProvider#createPluginUIContainer(Plugin,
+   * String, int)} for more information regarding the mode.
    */
   int getMode();
 
-  /**
-   * Adds a <code>PluginUIListener</code>.
-   */
+  /** Adds a <code>PluginUIListener</code>. */
   void addPluginUIListener(PluginUIListener listener);
 
-  /**
-   * Removes a <code>PluginUIListener</code>.
-   */
+  /** Removes a <code>PluginUIListener</code>. */
   void removePluginUIListener(PluginUIListener listener);
 
-  /**
-   * Returns the content pane to which plugins can add their user interface components.
-   */
+  /** Returns the content pane to which plugins can add their user interface components. */
   JComponent getContentPane();
 
-  /**
-   * Sets the title of the container.
-   */
+  /** Sets the title of the container. */
   void setTitle(String title);
 
-  /**
-   * Returns the title of the container.
-   */
+  /** Returns the title of the container. */
   String getTitle();
 
-  /**
-   * Sets the icon of the container.
-   */
+  /** Sets the icon of the container. */
   void setIcon(Image iconImage);
 
-  /**
-   * Returns the icon of the container.
-   */
+  /** Returns the icon of the container. */
   Image getIcon();
 
-  /**
-   * Sets whether the container is visible.
-   */
+  /** Sets whether the container is visible. */
   void setVisible(boolean visible);
 
-  /**
-   * Returns whether the container is currently visible.
-   */
+  /** Returns whether the container is currently visible. */
   boolean isVisible();
 
   /**
@@ -98,19 +73,13 @@ public interface PluginUIContainer {
    */
   void setActive(boolean active);
 
-  /**
-   * Returns whether this container is currently the "active" one.
-   */
+  /** Returns whether this container is currently the "active" one. */
   boolean isActive();
 
-  /**
-   * Sets whether this container should be resizable by the user.
-   */
+  /** Sets whether this container should be resizable by the user. */
   void setResizable(boolean resizable);
 
-  /**
-   * Returns whether this container is currently resizable by the user.
-   */
+  /** Returns whether this container is currently resizable by the user. */
   boolean isResizable();
 
   /**
@@ -120,9 +89,7 @@ public interface PluginUIContainer {
    */
   void setVisibleFirstTime(boolean isVisibleFirstTime);
 
-  /**
-   * Returns whether this container is visible when it is created the very first time.
-   */
+  /** Returns whether this container is visible when it is created the very first time. */
   boolean isVisibleFirstTime();
 
   /**

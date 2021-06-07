@@ -2,28 +2,27 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.audio;
 
+import free.util.IOUtilities;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Vector;
-
-import free.util.IOUtilities;
 
 /**
  * This class allows you to play sounds in an application in JDK 1.1 - it uses a variety of hacks
@@ -33,9 +32,7 @@ import free.util.IOUtilities;
  */
 public class AudioClip {
 
-  /**
-   * The AudioPlayer that succeeded in playing sounds. This one, if not null is tried first.
-   */
+  /** The AudioPlayer that succeeded in playing sounds. This one, if not null is tried first. */
   private static AudioPlayer successfulPlayer = null;
 
   /**
@@ -43,9 +40,7 @@ public class AudioClip {
    */
   private static final String[] PLAYER_CLASSNAMES;
 
-  /**
-   * Loads the AudioPlayer classnames.
-   */
+  /** Loads the AudioPlayer classnames. */
   static {
     String[] classnames = new String[0];
     try {
@@ -73,14 +68,10 @@ public class AudioClip {
     PLAYER_CLASSNAMES = classnames;
   }
 
-  /**
-   * The URL of the audio clip.
-   */
+  /** The URL of the audio clip. */
   private final URL url;
 
-  /**
-   * The audio clip data.
-   */
+  /** The audio clip data. */
   private final byte[] data;
 
   /**
@@ -156,16 +147,12 @@ public class AudioClip {
     }
   }
 
-  /**
-   * Returns the URL of the audio clip.
-   */
+  /** Returns the URL of the audio clip. */
   public URL getURL() {
     return url;
   }
 
-  /**
-   * Returns the data of the audio clip.
-   */
+  /** Returns the data of the audio clip. */
   public byte[] getData() {
     return data.clone();
   }

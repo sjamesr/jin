@@ -2,60 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board;
-
-import java.awt.Adjustable;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.net.URL;
-import java.util.Vector;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import free.chess.AbstractChessClock;
 import free.chess.Chess;
@@ -93,6 +52,45 @@ import free.util.swing.SwingUtils;
 import free.util.swing.WrapLayout;
 import free.workarounds.FixedJPanel;
 import free.workarounds.FixedJTable;
+import java.awt.Adjustable;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.net.URL;
+import java.util.Vector;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
  * A panel which displays a chess board and all related information, such as opponents' names,
@@ -102,44 +100,28 @@ import free.workarounds.FixedJTable;
 public class BoardPanel extends FixedJPanel
     implements MoveListener, GameListener, AdjustmentListener, PropertyChangeListener {
 
-  /**
-   * The <code>BoardManager</code> this BoardPanel is used by.
-   */
+  /** The <code>BoardManager</code> this BoardPanel is used by. */
   protected final BoardManager boardManager;
 
-  /**
-   * The Game this BoardPanel is displaying.
-   */
+  /** The Game this BoardPanel is displaying. */
   protected final Game game;
 
-  /**
-   * Is this BoardPanel active, i.e. is the game displayed is in progress?
-   */
+  /** Is this BoardPanel active, i.e. is the game displayed is in progress? */
   private boolean isActive = true;
 
-  /**
-   * Is this BoardPanel flipped.
-   */
+  /** Is this BoardPanel flipped. */
   protected boolean isFlipped = false;
 
-  /**
-   * The JinBoard showing the current position.
-   */
+  /** The JinBoard showing the current position. */
   protected JinBoard board;
 
-  /**
-   * True if we're highlighting our own moves. False if only opponent's moves.
-   */
+  /** True if we're highlighting our own moves. False if only opponent's moves. */
   private boolean highlightOwnMoves;
 
-  /**
-   * The current move sending mode. Possible values are defined in <code>BoardManager</code>.
-   */
+  /** The current move sending mode. Possible values are defined in <code>BoardManager</code>. */
   private int moveSendingMode;
 
-  /**
-   * The list of made moves.
-   */
+  /** The list of made moves. */
   protected final Vector madeMoves = new Vector();
 
   /**
@@ -148,63 +130,43 @@ public class BoardPanel extends FixedJPanel
    */
   protected final Position realPosition;
 
-  /**
-   * The number of the move after which the position displayed on the board occurs.
-   */
+  /** The number of the move after which the position displayed on the board occurs. */
   protected int displayedMoveNumber = 0;
 
-  /**
-   * The JLabel displaying information about the player with the white pieces.
-   */
+  /** The JLabel displaying information about the player with the white pieces. */
   protected JLabel whiteLabel;
+
   protected JPanel whiteLabelPanel;
   protected JMaterialPanel whiteMaterialPanel;
 
-  /**
-   * The JLabel displaying information about the player with the black pieces.
-   */
+  /** The JLabel displaying information about the player with the black pieces. */
   protected JLabel blackLabel;
+
   protected JPanel blackLabelPanel;
   protected JMaterialPanel blackMaterialPanel;
 
-  /**
-   * The Container of the action buttons (the button panel).
-   */
+  /** The Container of the action buttons (the button panel). */
   protected JPanel buttonPanel;
 
-  /**
-   * The button that makes the board fullscreen and restores it.
-   */
+  /** The button that makes the board fullscreen and restores it. */
   protected JToggleButton fullscreenButton;
 
-  /**
-   * The JChessClock displaying the time on white's clock.
-   */
+  /** The JChessClock displaying the time on white's clock. */
   protected JChessClock whiteClock;
 
-  /**
-   * The JChessClock displaying the time on black's clock.
-   */
+  /** The JChessClock displaying the time on black's clock. */
   protected JChessClock blackClock;
 
-  /**
-   * The JLabel displaying information about the game.
-   */
+  /** The JLabel displaying information about the game. */
   protected JLabel gameLabel;
 
-  /**
-   * The JTable displaying the move list.
-   */
+  /** The JTable displaying the move list. */
   protected JTable moveListTable;
 
-  /**
-   * The image component for the white player.
-   */
+  /** The image component for the white player. */
   protected ImageComponent whiteImageComponent;
 
-  /**
-   * The image component for the black player.
-   */
+  /** The image component for the black player. */
   protected ImageComponent blackImageComponent;
 
   /**
@@ -219,19 +181,13 @@ public class BoardPanel extends FixedJPanel
    */
   private boolean settingMoveListTableSelection = false;
 
-  /**
-   * The TableModel of the JTable displaying the move list.
-   */
+  /** The TableModel of the JTable displaying the move list. */
   protected TableModel moveListTableModel;
 
-  /**
-   * The JScrollPane in which we put the moveListTable.
-   */
+  /** The JScrollPane in which we put the moveListTable. */
   protected JScrollPane moveListTableScrollPane;
 
-  /**
-   * The scrollbar which lets you scroll through all the positions that occurred in the game.
-   */
+  /** The scrollbar which lets you scroll through all the positions that occurred in the game. */
   protected JScrollBar positionScrollBar;
 
   /**
@@ -265,14 +221,10 @@ public class BoardPanel extends FixedJPanel
    */
   private long sentMoveTimestamp = -1;
 
-  /**
-   * The FullscreenPanel allowing us to maximize the board panel.
-   */
+  /** The FullscreenPanel allowing us to maximize the board panel. */
   private final FullscreenPanel fullscreenPanel;
 
-  /**
-   * The target of the fullscreen panel, to which we add all the components.
-   */
+  /** The target of the fullscreen panel, to which we add all the components. */
   private final ContentPanel contentPanel;
 
   /**
@@ -337,9 +289,7 @@ public class BoardPanel extends FixedJPanel
     listenerList.remove(UserMoveListener.class, listener);
   }
 
-  /**
-   * Dispatches the given UserMoveEvent to all interested UserMoveListeners of this BoardPanel.
-   */
+  /** Dispatches the given UserMoveEvent to all interested UserMoveListeners of this BoardPanel. */
   protected void fireUserMadeMove(UserMoveEvent evt) {
     Object[] listenerList = this.listenerList.getListenerList();
     for (int i = 0; i < listenerList.length; i += 2) {
@@ -432,9 +382,7 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * This method is meant to create all the sub-components used by the BoardPanel.
-   */
+  /** This method is meant to create all the sub-components used by the BoardPanel. */
   protected void createComponents(Game game) {
     board = createBoard(game);
     initBoard(game, board);
@@ -505,9 +453,7 @@ public class BoardPanel extends FixedJPanel
     updateClockActiveness();
   }
 
-  /**
-   * Adds all the components to the content panel.
-   */
+  /** Adds all the components to the content panel. */
   private void addComponents() {
     contentPanel.add(board);
     contentPanel.add(whiteLabelPanel);
@@ -523,16 +469,12 @@ public class BoardPanel extends FixedJPanel
     contentPanel.add(blackImageComponent);
   }
 
-  /**
-   * Creates and returns the <code>JinBoard</code>.
-   */
+  /** Creates and returns the <code>JinBoard</code>. */
   protected JinBoard createBoard(Game game) {
     return new JinBoard(game.getInitialPosition());
   }
 
-  /**
-   * Initializes the board.
-   */
+  /** Initializes the board. */
   protected void initBoard(Game game, JinBoard board) {
     if (isFlipped()) board.setFlipped(true);
 
@@ -568,16 +510,12 @@ public class BoardPanel extends FixedJPanel
       board.setEditable(false);
   }
 
-  /**
-   * Configures the board according to the <code>Game</code> settings.
-   */
+  /** Configures the board according to the <code>Game</code> settings. */
   protected void configureBoardFromGame(Game game, JinBoard board) {
     board.setMoveInputMode(calcMoveInputMode(game));
   }
 
-  /**
-   * Configures the board according to the <code>BoardManager</code> settings.
-   */
+  /** Configures the board according to the <code>BoardManager</code> settings. */
   protected void configureBoardFromBoardManager(JinBoard board) {
     board.setPiecePainter(boardManager.getPiecePainter());
     board.setBoardPainter(boardManager.getBoardPainter());
@@ -596,9 +534,7 @@ public class BoardPanel extends FixedJPanel
     board.setSlideDuration(boardManager.getSlideDuration());
   }
 
-  /**
-   * Returns the move input mode that should be used for the specified game.
-   */
+  /** Returns the move input mode that should be used for the specified game. */
   protected int calcMoveInputMode(Game game) {
     if (game.getGameType() == Game.MY_GAME)
       if (game.isPlayed())
@@ -609,17 +545,13 @@ public class BoardPanel extends FixedJPanel
     return JBoard.NO_PIECES_MOVE;
   }
 
-  /**
-   * Creates the JLabel displaying information about the game.
-   */
+  /** Creates the JLabel displaying information about the game. */
   protected JLabel createGameLabel(Game game) {
     JLabel gameLabel = new JLabel(createGameLabelText(game));
     return gameLabel;
   }
 
-  /**
-   * Returns the text that should be displayed on the game label.
-   */
+  /** Returns the text that should be displayed on the game label. */
   protected String createGameLabelText(Game game) {
     WildVariant variant = game.getVariant();
     String category =
@@ -635,41 +567,31 @@ public class BoardPanel extends FixedJPanel
         });
   }
 
-  /**
-   * Creates the JLabel displaying information about the player with the white pieces.
-   */
+  /** Creates the JLabel displaying information about the player with the white pieces. */
   protected JLabel createWhiteLabel(Game game) {
     JLabel whiteLabel = new JLabel(createWhiteLabelText(game));
     whiteLabel.setFont(whiteLabel.getFont().deriveFont(20f).deriveFont(Font.BOLD));
     return whiteLabel;
   }
 
-  /**
-   * Returns the text that should be displayed by the white player's label.
-   */
+  /** Returns the text that should be displayed by the white player's label. */
   protected String createWhiteLabelText(Game game) {
     return game.getWhiteName() + game.getWhiteTitles() + " " + game.getWhiteRating();
   }
 
-  /**
-   * Creates the JLabel displaying information about the player with the black pieces.
-   */
+  /** Creates the JLabel displaying information about the player with the black pieces. */
   protected JLabel createBlackLabel(Game game) {
     JLabel blackLabel = new JLabel(createBlackLabelText(game));
     blackLabel.setFont(whiteLabel.getFont().deriveFont(20f).deriveFont(Font.BOLD));
     return blackLabel;
   }
 
-  /**
-   * Returns the text that should be displayed by the black player's label.
-   */
+  /** Returns the text that should be displayed by the black player's label. */
   protected String createBlackLabelText(Game game) {
     return game.getBlackName() + game.getBlackTitles() + " " + game.getBlackRating();
   }
 
-  /**
-   * Creates the button that makes the board fullscreen and restores it.
-   */
+  /** Creates the button that makes the board fullscreen and restores it. */
   protected JToggleButton createFullscreenButton() {
     I18n i18n = I18n.get(BoardPanel.class);
     JToggleButton button = new JToggleButton();
@@ -722,24 +644,20 @@ public class BoardPanel extends FixedJPanel
     return buttonPanel;
   }
 
-  /**
-   * Creates the button panel for a game played by the user.
-   */
+  /** Creates the button panel for a game played by the user. */
   protected JPanel createPlayedGameButtonPanel(Game game) {
     return new PlayedGameButtonPanel(boardManager, game, contentPanel);
   }
 
-  /**
-   * Creates the button panel for a game examined by the user.
-   */
+  /** Creates the button panel for a game examined by the user. */
   protected JPanel createExaminedGameButtonPanel(Game game) {
     return new ExaminedGameButtonPanel(boardManager, game);
   }
 
   /**
    * Creates the TableModel for the JTable which will be used for displaying the move list. If you
-   * override this method, you should also see if you need to override
-   * {@link #addMoveToListTable(Move)} and {@link #updateMoveListTable()}.
+   * override this method, you should also see if you need to override {@link
+   * #addMoveToListTable(Move)} and {@link #updateMoveListTable()}.
    */
   protected TableModel createMoveListTableModel(Game game) {
     I18n i18n = I18n.get(BoardPanel.class);
@@ -768,9 +686,7 @@ public class BoardPanel extends FixedJPanel
     return table;
   }
 
-  /**
-   * Creates the JScrollPane in which we put the moveListTable.
-   */
+  /** Creates the JScrollPane in which we put the moveListTable. */
   protected JScrollPane createMoveListTableScrollPane(Game game, JTable moveListTable) {
     JScrollPane scrollPane = new JScrollPane(moveListTable);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -779,32 +695,24 @@ public class BoardPanel extends FixedJPanel
     return scrollPane;
   }
 
-  /**
-   * Creates the component to display the image of the white player.
-   */
+  /** Creates the component to display the image of the white player. */
   protected ImageComponent createWhiteImageComponent(Game game) {
     return createPlayerImageComponent(game.getWhiteName());
   }
 
-  /**
-   * Creates the component to display the image of the black player.
-   */
+  /** Creates the component to display the image of the black player. */
   protected ImageComponent createBlackImageComponent(Game game) {
     return createPlayerImageComponent(game.getBlackName());
   }
 
-  /**
-   * Creates the component to display the image of the specified player.
-   */
+  /** Creates the component to display the image of the specified player. */
   protected ImageComponent createPlayerImageComponent(String name) {
     ImageComponent imageComponent = new ImageComponent(getPlayerImage(name));
     imageComponent.setImageToolTip(true);
     return imageComponent;
   }
 
-  /**
-   * Returns the image to display for the specified player. May return <code>null</code>.
-   */
+  /** Returns the image to display for the specified player. May return <code>null</code>. */
   protected Image getPlayerImage(String name) {
     Connection conn = boardManager.getConn();
     URL url = boardManager.getUser().getServer().getPlayerPictureURL(conn.userForName(name));
@@ -830,9 +738,7 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * Adds a single move to the move list TableModel.
-   */
+  /** Adds a single move to the move list TableModel. */
   protected void addMoveToListTable(Move move) {
     DefaultTableModel model = (DefaultTableModel) moveListTableModel;
     int movesSinceStart = game.getPliesSinceStart() / 2;
@@ -913,9 +819,7 @@ public class BoardPanel extends FixedJPanel
     SwingUtilities.invokeLater(new MoveListScrollBarUpdater());
   }
 
-  /**
-   * Sets the specified cell to be the selected cell in the move list table.
-   */
+  /** Sets the specified cell to be the selected cell in the move list table. */
   protected void setMoveListTableSelection(int row, int column) {
     int oldRow = moveListTable.getSelectedRow();
     int oldColumn = moveListTable.getSelectedColumn();
@@ -949,32 +853,22 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * Creates the JScrollBar which controls the position displayed on the board.
-   */
+  /** Creates the JScrollBar which controls the position displayed on the board. */
   protected JScrollBar createPositionScrollBar() {
     JScrollBar scrollbar = new JScrollBar(Adjustable.HORIZONTAL, 0, 1, 0, 1);
     return scrollbar;
   }
 
-  /**
-   * The panel actually containing all the components.
-   */
+  /** The panel actually containing all the components. */
   private class ContentPanel extends JPanel {
 
-    /**
-     * The gap between the container and components
-     */
+    /** The gap between the container and components */
     private static final int CONTAINER_GAP = 6;
 
-    /**
-     * The gap between components.
-     */
+    /** The gap between components. */
     private static final int GAP = 6;
 
-    /**
-     * Creates a new <code>ContentPanel</code>.
-     */
+    /** Creates a new <code>ContentPanel</code>. */
     public ContentPanel() {
       setLayout(null);
     }
@@ -991,16 +885,12 @@ public class BoardPanel extends FixedJPanel
     private Dimension moveListTableScrollPanePrefSize = null;
     private Dimension buttonPanelPrefSize = null;
 
-    /**
-     * Determines whether at the current size we should be in horizontal mode.
-     */
+    /** Determines whether at the current size we should be in horizontal mode. */
     private boolean isHorizontal() {
       return (getWidth() - 20 > getHeight()) || (getWidth() == 0) || (getHeight() == 0);
     }
 
-    /**
-     * Lays out the panel.
-     */
+    /** Lays out the panel. */
     @Override
     public void doLayout() {
       calcPrefSizes();
@@ -1009,9 +899,7 @@ public class BoardPanel extends FixedJPanel
       else layoutVertical();
     }
 
-    /**
-     * Queries our children for their preferred sizes.
-     */
+    /** Queries our children for their preferred sizes. */
     private void calcPrefSizes() {
       if (whiteLabelPanelPrefSize == null)
         whiteLabelPanelPrefSize = whiteLabelPanel.getPreferredSize();
@@ -1027,9 +915,7 @@ public class BoardPanel extends FixedJPanel
       if (buttonPanelPrefSize == null) buttonPanelPrefSize = buttonPanel.getPreferredSize();
     }
 
-    /**
-     * Lays out the panel in horizontal mode.
-     */
+    /** Lays out the panel in horizontal mode. */
     private void layoutHorizontal() {
       int width = getWidth();
       int height = getHeight();
@@ -1122,9 +1008,7 @@ public class BoardPanel extends FixedJPanel
       else moveListTableScrollPane.setBounds(0, 0, 0, 0);
     }
 
-    /**
-     * Lays out the panel in vertical mode.
-     */
+    /** Lays out the panel in vertical mode. */
     private void layoutVertical() {
       JComponent topLabelPanel, bottomLabelPanel;
       JChessClock topClock, bottomClock;
@@ -1224,9 +1108,7 @@ public class BoardPanel extends FixedJPanel
       }
     }
 
-    /**
-     * Clears the remembered preferred sizes of the children.
-     */
+    /** Clears the remembered preferred sizes of the children. */
     @Override
     public void invalidate() {
       super.invalidate();
@@ -1240,9 +1122,7 @@ public class BoardPanel extends FixedJPanel
       buttonPanelPrefSize = null;
     }
 
-    /**
-     * Returns our preferred size.
-     */
+    /** Returns our preferred size. */
     @Override
     public Dimension getPreferredSize() {
       calcPrefSizes();
@@ -1251,9 +1131,7 @@ public class BoardPanel extends FixedJPanel
       else return getVerticalPrefSize();
     }
 
-    /**
-     * Returns our preferred size in horizontal mode.
-     */
+    /** Returns our preferred size in horizontal mode. */
     public Dimension getHorizontalPrefSize() {
       return new Dimension(
           320
@@ -1275,9 +1153,7 @@ public class BoardPanel extends FixedJPanel
                   + 7 * GAP));
     }
 
-    /**
-     * Returns our preferred size in vertical mode.
-     */
+    /** Returns our preferred size in vertical mode. */
     public Dimension getVerticalPrefSize() {
       return new Dimension(
           320,
@@ -1289,9 +1165,7 @@ public class BoardPanel extends FixedJPanel
               + 2 * CONTAINER_GAP);
     }
 
-    /**
-     * Returns our minimum size.
-     */
+    /** Returns our minimum size. */
     @Override
     public Dimension getMinimumSize() {
       calcPrefSizes();
@@ -1300,9 +1174,7 @@ public class BoardPanel extends FixedJPanel
       else return getVerticalMinSize();
     }
 
-    /**
-     * Returns our minimum size in horizontal mode.
-     */
+    /** Returns our minimum size in horizontal mode. */
     public Dimension getHorizontalMinSize() {
       return new Dimension(
           240
@@ -1323,9 +1195,7 @@ public class BoardPanel extends FixedJPanel
                   + 6 * GAP));
     }
 
-    /**
-     * Returns our minimum size in vertical mode.
-     */
+    /** Returns our minimum size in vertical mode. */
     public Dimension getVerticalMinSize() {
       return new Dimension(
           240,
@@ -1338,9 +1208,7 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * Returns true if the BoardPanel is flipped (black at bottom).
-   */
+  /** Returns true if the BoardPanel is flipped (black at bottom). */
   public final boolean isFlipped() {
     // Final because we directly set the isFlipped *variable* in init(Game) and
     // thus must not let anyone redefine the meaning of "flipped".
@@ -1348,9 +1216,7 @@ public class BoardPanel extends FixedJPanel
     return isFlipped;
   }
 
-  /**
-   * Sets the flipped state of this BoardPanel.
-   */
+  /** Sets the flipped state of this BoardPanel. */
   public void setFlipped(boolean b) {
     if (isFlipped() != b) {
       isFlipped = b;
@@ -1359,30 +1225,22 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * Returns the Game displayed by this BoardPanel.
-   */
+  /** Returns the Game displayed by this BoardPanel. */
   public Game getGame() {
     return game;
   }
 
-  /**
-   * Returns the game board.
-   */
+  /** Returns the game board. */
   public JinBoard getBoard() {
     return board;
   }
 
-  /**
-   * Returns the specified player's clock.
-   */
+  /** Returns the specified player's clock. */
   protected AbstractChessClock getClockForPlayer(Player player) {
     return player.isWhite() ? whiteClock : blackClock;
   }
 
-  /**
-   * Updates the clock's activeness according to the current player to move on the board.
-   */
+  /** Updates the clock's activeness according to the current player to move on the board. */
   protected void updateClockActiveness() {
     Player curPlayer = board.getPosition().getCurrentPlayer();
     AbstractChessClock curClock = getClockForPlayer(curPlayer);
@@ -1392,16 +1250,14 @@ public class BoardPanel extends FixedJPanel
     oppClock.setActive(false);
   }
 
-  /**
-   * Plays the sound corresponding to the specified event.
-   */
+  /** Plays the sound corresponding to the specified event. */
   public void playSound(String eventName) {
     boardManager.playSound(eventName);
   }
 
   /**
-   * Returns if there is currently a move enRoute. This simply checks that the
-   * <code>moveInRoute</code> variable is non-null.
+   * Returns if there is currently a move enRoute. This simply checks that the <code>moveInRoute
+   * </code> variable is non-null.
    */
   private boolean isMoveEnRoute() {
     return moveEnRoute != null;
@@ -1420,9 +1276,7 @@ public class BoardPanel extends FixedJPanel
     board.setEditable((queuedMove == null) && (displayedMoveNumber == madeMoves.size()));
   }
 
-  /**
-   * Sets the currently displayed move to the specified move.
-   */
+  /** Sets the currently displayed move to the specified move. */
   private void setDisplayedMove(int moveNum) {
     if ((moveNum < 0) || (moveNum > madeMoves.size()))
       throw new IllegalArgumentException("displayed move number out of range");
@@ -1446,9 +1300,7 @@ public class BoardPanel extends FixedJPanel
   @Override
   public void gameStarted(GameStartEvent evt) {}
 
-  /**
-   * GameListener implementation. Makes the appropriate move on the board.
-   */
+  /** GameListener implementation. Makes the appropriate move on the board. */
   @Override
   public void moveMade(MoveMadeEvent evt) {
     if (evt.getGame() != game) return;
@@ -1529,8 +1381,8 @@ public class BoardPanel extends FixedJPanel
         board.getPosition().copyFrom(helpPos);
         // We do the above instead of the below because if move animation is on,
         // the code below causes the premove to be "replayed" with animation.
-        //board.getPosition().copyFrom(realPosition);
-        //board.getPosition().makeMove(premove);
+        // board.getPosition().copyFrom(realPosition);
+        // board.getPosition().makeMove(premove);
         isBoardPositionUpdating = false;
 
         moveEnRoute = premove;
@@ -1567,9 +1419,7 @@ public class BoardPanel extends FixedJPanel
     return true;
   }
 
-  /**
-   * GameListener implementation. Sets the appropriate position on the board.
-   */
+  /** GameListener implementation. Sets the appropriate position on the board. */
   @Override
   public void positionChanged(PositionChangedEvent evt) {
     if (evt.getGame() != game) return;
@@ -1627,9 +1477,7 @@ public class BoardPanel extends FixedJPanel
     updateMoveListTable();
   }
 
-  /**
-   * GameListener implementation. Returns the position on the board to its current "real" state.
-   */
+  /** GameListener implementation. Returns the position on the board to its current "real" state. */
   @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt) {
     if (evt.getGame() != game) return;
@@ -1656,9 +1504,7 @@ public class BoardPanel extends FixedJPanel
     updateMoveListTable();
   }
 
-  /**
-   * GameListener implementation. Adjusts the clock time and activeness.
-   */
+  /** GameListener implementation. Adjusts the clock time and activeness. */
   @Override
   public void clockAdjusted(ClockAdjustmentEvent evt) {
     if (evt.getGame() != game) return;
@@ -1672,9 +1518,7 @@ public class BoardPanel extends FixedJPanel
     clock.setRunning(isRunning);
   }
 
-  /**
-   * GameListener implementation.
-   */
+  /** GameListener implementation. */
   @Override
   public void boardFlipped(BoardFlipEvent evt) {
     if (evt.getGame() != game) return;
@@ -1682,15 +1526,11 @@ public class BoardPanel extends FixedJPanel
     setFlipped(evt.isFlipped());
   }
 
-  /**
-   * GameListener implementation.
-   */
+  /** GameListener implementation. */
   @Override
   public void offerUpdated(OfferEvent evt) {}
 
-  /**
-   * GameListener implementation.
-   */
+  /** GameListener implementation. */
   @Override
   public void gameEnded(GameEndEvent evt) {
     if (evt.getGame() != game) return;
@@ -1701,9 +1541,7 @@ public class BoardPanel extends FixedJPanel
     setInactive();
   }
 
-  /**
-   * Plays the audio clip appropriate for the given <code>Move</code>.
-   */
+  /** Plays the audio clip appropriate for the given <code>Move</code>. */
   protected void playAudioClipForMove(Move move) {
     if (move instanceof ChessMove) {
       ChessMove cMove = (ChessMove) move;
@@ -1713,9 +1551,7 @@ public class BoardPanel extends FixedJPanel
     } else playSound("Move");
   }
 
-  /**
-   * This is called when the user makes a move on the board (MoveListener implementation).
-   */
+  /** This is called when the user makes a move on the board (MoveListener implementation). */
   @Override
   public void moveMade(MoveEvent evt) {
     if (isBoardPositionUpdating) return;
@@ -1853,9 +1689,7 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * <code>PropertyChangeListener</code> implementation.
-   */
+  /** <code>PropertyChangeListener</code> implementation. */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     Object src = evt.getSource();
@@ -1938,17 +1772,15 @@ public class BoardPanel extends FixedJPanel
     }
   }
 
-  /**
-   * Returns true if this BoardPanel is active, false otherwise.
-   */
+  /** Returns true if this BoardPanel is active, false otherwise. */
   public boolean isActive() {
     return isActive;
   }
 
   /**
    * Makes the BoardPanel inactive. Calling this method will make the BoardPanel stop notifying
-   * about moves made by the user. It will also change the move input mode to
-   * {@link #ALL_PIECES_MOVE}.
+   * about moves made by the user. It will also change the move input mode to {@link
+   * #ALL_PIECES_MOVE}.
    */
   public void setInactive() {
     this.isActive = false;
@@ -1977,9 +1809,7 @@ public class BoardPanel extends FixedJPanel
     boardManager.removePropertyChangeListener(this);
   }
 
-  /**
-   * Before we are removed, if we are in fullscreen mode, we must restore normal mode.
-   */
+  /** Before we are removed, if we are in fullscreen mode, we must restore normal mode. */
   @Override
   public void removeNotify() {
     if (fullscreenPanel.getFullscreenModeModel().isOn())

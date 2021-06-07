@@ -2,20 +2,23 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2006 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.AWTUtilities;
+import free.util.Localization;
+import free.util.PlatformUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -27,7 +30,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -41,10 +43,6 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import free.util.AWTUtilities;
-import free.util.Localization;
-import free.util.PlatformUtils;
-
 /**
  * A dialog which lets the user choose a background/wallpaper for a given AdvancedJDesktopPane. To
  * use a BackgroundChooser, simply instantiate it and invoke <code>setVisible(true)</code> on it.
@@ -52,44 +50,28 @@ import free.util.PlatformUtils;
  */
 public class BackgroundChooser extends JDialog {
 
-  /**
-   * The localization for this class, loaded lazily.
-   */
+  /** The localization for this class, loaded lazily. */
   private static Localization l10n;
 
-  /**
-   * The AdvancedJDesktopPane we're working with.
-   */
+  /** The AdvancedJDesktopPane we're working with. */
   private final AdvancedJDesktopPane desktop;
 
-  /**
-   * The default wallpaper color.
-   */
+  /** The default wallpaper color. */
   private final Color defaultColor;
 
-  /**
-   * The default wallpaper image file.
-   */
+  /** The default wallpaper image file. */
   private final File defaultImageFile;
 
-  /**
-   * The default wallpaper layout style.
-   */
+  /** The default wallpaper layout style. */
   private final int defaultImageLayoutStyle;
 
-  /**
-   * The currently chosen wallpaper color.
-   */
+  /** The currently chosen wallpaper color. */
   private Color color;
 
-  /**
-   * The currently chosen wallpaper image file.
-   */
+  /** The currently chosen wallpaper image file. */
   private File imageFile;
 
-  /**
-   * The chosen background image layout style.
-   */
+  /** The chosen background image layout style. */
   private int imageLayoutStyle;
 
   /**
@@ -98,13 +80,13 @@ public class BackgroundChooser extends JDialog {
    *
    * @param parent The parent frame for the dialog.
    * @param desktop The <code>AdvancedJDesktopPane</code> to which the choices are applied. May be
-   * <code>null</code>, in which case the choices won't be applied.
+   *     <code>null</code>, in which case the choices won't be applied.
    * @param defaultColor The background color used when the "Use defaults" button is pressed. Use
-   * <code>null</code> for the color specified by the UIManager.
+   *     <code>null</code> for the color specified by the UIManager.
    * @param defaultImageFile The image file used when the "Use defaults" button is pressed. Use
-   * <code>null</code> for no image.
+   *     <code>null</code> for no image.
    * @param defaultImageLayoutStyle The image layout style used when the "Use defaults" button is
-   * pressed.
+   *     pressed.
    * @param color The current background color of the desktop pane.
    * @param imageFile The current image file.
    * @param imageLayoutStyle The current image layout style.
@@ -118,7 +100,7 @@ public class BackgroundChooser extends JDialog {
       Color color,
       File imageFile,
       int imageLayoutStyle) {
-    super(parent, getL10n().getString("title"), true); //$NON-NLS-1$
+    super(parent, getL10n().getString("title"), true); // $NON-NLS-1$
 
     this.desktop = desktop;
 
@@ -137,17 +119,13 @@ public class BackgroundChooser extends JDialog {
     SwingUtils.registerEscapeCloser(this);
   }
 
-  /**
-   * Returns the localization for this class.
-   */
+  /** Returns the localization for this class. */
   private static synchronized Localization getL10n() {
     if (l10n == null) l10n = LocalizationService.getForClass(BackgroundChooser.class);
     return l10n;
   }
 
-  /**
-   * Adds the UI components to the dialog.
-   */
+  /** Adds the UI components to the dialog. */
   private void createUI() {
     boolean allowImageSelection = hasAccessToFileSystem();
 
@@ -162,10 +140,12 @@ public class BackgroundChooser extends JDialog {
     JButton pickImage = new JButton();
     JButton useDefault = new JButton();
 
-    SwingUtils.applyLabelSpec(pickColor, getL10n().getString("pickColorButton.text")); //$NON-NLS-1$
-    SwingUtils.applyLabelSpec(pickImage, getL10n().getString("pickImageButton.text")); //$NON-NLS-1$
     SwingUtils.applyLabelSpec(
-        useDefault, getL10n().getString("useDefaultsButton.text")); //$NON-NLS-1$
+        pickColor, getL10n().getString("pickColorButton.text")); // $NON-NLS-1$
+    SwingUtils.applyLabelSpec(
+        pickImage, getL10n().getString("pickImageButton.text")); // $NON-NLS-1$
+    SwingUtils.applyLabelSpec(
+        useDefault, getL10n().getString("useDefaultsButton.text")); // $NON-NLS-1$
 
     pickColor.setDefaultCapable(false);
     pickImage.setDefaultCapable(false);
@@ -176,11 +156,11 @@ public class BackgroundChooser extends JDialog {
     final JRadioButton centerButton = new JRadioButton();
 
     SwingUtils.applyLabelSpec(
-        tileButton, getL10n().getString("tileRadioButton.text")); //$NON-NLS-1$
+        tileButton, getL10n().getString("tileRadioButton.text")); // $NON-NLS-1$
     SwingUtils.applyLabelSpec(
-        scaleButton, getL10n().getString("scaleRadioButton.text")); //$NON-NLS-1$
+        scaleButton, getL10n().getString("scaleRadioButton.text")); // $NON-NLS-1$
     SwingUtils.applyLabelSpec(
-        centerButton, getL10n().getString("centerRadioButton.text")); //$NON-NLS-1$
+        centerButton, getL10n().getString("centerRadioButton.text")); // $NON-NLS-1$
 
     switch (imageLayoutStyle) {
       case AdvancedJDesktopPane.TILE:
@@ -211,7 +191,7 @@ public class BackgroundChooser extends JDialog {
     }
     mainPanel.add(useDefault);
 
-    JButton closeButton = new JButton(getL10n().getString("closeButton.text")); //$NON-NLS-1$
+    JButton closeButton = new JButton(getL10n().getString("closeButton.text")); // $NON-NLS-1$
     JPanel closeButtonPanel = new JPanel(new GridLayout(1, 1));
     closeButtonPanel.setBorder(new javax.swing.border.EmptyBorder(0, 10, 0, 10));
     closeButtonPanel.add(closeButton);
@@ -236,7 +216,7 @@ public class BackgroundChooser extends JDialog {
                     if (clr != null) color = clr;
 
                     if (color == null)
-                      desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
+                      desktop.setBackground(UIManager.getColor("desktop")); // $NON-NLS-1$
                     else desktop.setBackground(color);
                   }
                 };
@@ -246,7 +226,7 @@ public class BackgroundChooser extends JDialog {
                   @Override
                   public void actionPerformed(ActionEvent evt) {
                     if (color == null)
-                      desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
+                      desktop.setBackground(UIManager.getColor("desktop")); // $NON-NLS-1$
                     else desktop.setBackground(color);
                   }
                 };
@@ -254,7 +234,7 @@ public class BackgroundChooser extends JDialog {
             JDialog dialog =
                 JColorChooser.createDialog(
                     BackgroundChooser.this,
-                    getL10n().getString("bgColorChooser.title"), //$NON-NLS-1$
+                    getL10n().getString("bgColorChooser.title"), // $NON-NLS-1$
                     true,
                     colorChooser,
                     okListener,
@@ -291,7 +271,8 @@ public class BackgroundChooser extends JDialog {
               imageFile = defaultImageFile;
               imageLayoutStyle = defaultImageLayoutStyle;
 
-              if (color == null) desktop.setBackground(UIManager.getColor("desktop")); //$NON-NLS-1$
+              if (color == null)
+                desktop.setBackground(UIManager.getColor("desktop")); // $NON-NLS-1$
               else desktop.setBackground(color);
 
               if (imageFile == null) desktop.setWallpaper(null);
@@ -344,14 +325,12 @@ public class BackgroundChooser extends JDialog {
     getRootPane().setDefaultButton(closeButton);
   }
 
-  /**
-   * Determines whether we have access to the filesystem.
-   */
+  /** Determines whether we have access to the filesystem. */
   private boolean hasAccessToFileSystem() {
     try {
       SecurityManager securityManager = System.getSecurityManager();
       if (securityManager != null)
-        securityManager.checkRead(System.getProperty("user.home")); //$NON-NLS-1$
+        securityManager.checkRead(System.getProperty("user.home")); // $NON-NLS-1$
     } catch (SecurityException e) {
       return false;
     }
@@ -359,9 +338,7 @@ public class BackgroundChooser extends JDialog {
     return true;
   }
 
-  /**
-   * Creates a JColorChooser.
-   */
+  /** Creates a JColorChooser. */
   private JColorChooser createColorChooser() {
     final JColorChooser chooser = new JColorChooser(desktop.getBackground());
 
@@ -381,25 +358,23 @@ public class BackgroundChooser extends JDialog {
     return chooser;
   }
 
-  /**
-   * Creates a file chooser for choosing the background image.
-   */
+  /** Creates a file chooser for choosing the background image. */
   private JFileChooser createImageFileChooser() {
     JFileChooser fileChooser = new JFileChooser();
 
     String[] supportedImageTypes;
-    if (PlatformUtils.isJavaBetterThan("1.3")) //$NON-NLS-1$
+    if (PlatformUtils.isJavaBetterThan("1.3")) // $NON-NLS-1$
     supportedImageTypes =
           new String[] {
             ".gif", ".jpg", ".jpeg", ".png"
           }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     else
       supportedImageTypes =
-          new String[] {".gif", ".jpg", ".jpeg"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          new String[] {".gif", ".jpg", ".jpeg"}; // $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     fileChooser.setFileFilter(
         new ExtensionFileFilter(
-            getL10n().getString("fileFilterName"), supportedImageTypes, false)); //$NON-NLS-1$
+            getL10n().getString("fileFilterName"), supportedImageTypes, false)); // $NON-NLS-1$
     fileChooser.setFileHidingEnabled(true);
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fileChooser.setMultiSelectionEnabled(false);
@@ -422,9 +397,7 @@ public class BackgroundChooser extends JDialog {
     return fileChooser;
   }
 
-  /**
-   * Overrides setVisible(boolean) to center the dialog before showing it.
-   */
+  /** Overrides setVisible(boolean) to center the dialog before showing it. */
   @Override
   public void setVisible(boolean visible) {
     if (visible) AWTUtilities.centerWindow(this, getParent());
@@ -432,23 +405,17 @@ public class BackgroundChooser extends JDialog {
     super.setVisible(visible);
   }
 
-  /**
-   * Returns the chosen background color.
-   */
+  /** Returns the chosen background color. */
   public Color getColor() {
     return color;
   }
 
-  /**
-   * Returns the chosen background image file.
-   */
+  /** Returns the chosen background image file. */
   public File getImageFile() {
     return imageFile;
   }
 
-  /**
-   * Returns the chosen background image layout style.
-   */
+  /** Returns the chosen background image layout style. */
   public int getImageLayoutStyle() {
     return imageLayoutStyle;
   }

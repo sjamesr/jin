@@ -2,23 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2008 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.ics;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import free.jin.Connection;
 import free.jin.I18n;
@@ -26,6 +22,9 @@ import free.jin.console.CustomConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.PlainTextEvent;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * An ICS-specific custom console designation.
@@ -34,9 +33,7 @@ import free.jin.event.PlainTextEvent;
  */
 public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignation {
 
-  /**
-   * Creates a new <code>IcsCustomConsoleDesignation</code>.
-   */
+  /** Creates a new <code>IcsCustomConsoleDesignation</code>. */
   public IcsCustomConsoleDesignation(
       Connection connection,
       String name,
@@ -63,9 +60,7 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
     if (isIncludeCShouts) addCShouts();
   }
 
-  /**
-   * Adds shouts to this designation.
-   */
+  /** Adds shouts to this designation. */
   protected void addShouts() {
     addAccepted("shout", null, ANY_SENDER);
     addAccepted("ishout", null, ANY_SENDER);
@@ -89,14 +84,10 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
         });
   }
 
-  /**
-   * Adds c-shouts (sshouts, for ICC) to this designation.
-   */
+  /** Adds c-shouts (sshouts, for ICC) to this designation. */
   protected abstract void addCShouts();
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected boolean accept(JinEvent evt) {
     if (super.accept(evt)) return true;
@@ -112,19 +103,13 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
     return false;
   }
 
-  /**
-   * A command type which sends the user's message to a specified channel.
-   */
+  /** A command type which sends the user's message to a specified channel. */
   private class TellChannelCommandType extends AbstractCommandType {
 
-    /**
-     * The channel we're sending tells to.
-     */
+    /** The channel we're sending tells to. */
     private final IcsChannel channel;
 
-    /**
-     * Creates a new <code>TellChannelCommandType</code> for the specified channel.
-     */
+    /** Creates a new <code>TellChannelCommandType</code> for the specified channel. */
     public TellChannelCommandType(IcsChannel channel) {
       super(
           I18n.get(TellChannelCommandType.class)
@@ -133,9 +118,7 @@ public abstract class IcsCustomConsoleDesignation extends CustomConsoleDesignati
       this.channel = channel;
     }
 
-    /**
-     * Sends a channel tell.
-     */
+    /** Sends a channel tell. */
     @Override
     protected void send(String userText) {
       sendCommand("xtell " + channel.getId() + " " + userText);

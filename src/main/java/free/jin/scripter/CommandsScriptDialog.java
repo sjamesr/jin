@@ -2,34 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.StringTokenizer;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -38,25 +23,32 @@ import free.jin.ui.OptionPanel;
 import free.util.TableLayout;
 import free.workarounds.FixedJTextArea;
 import free.workarounds.FixedJTextField;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.StringTokenizer;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
-/**
- * A dialog allowing the user to create a new CommandScript.
- */
+/** A dialog allowing the user to create a new CommandScript. */
 class CommandsScriptDialog extends ScriptDialog {
 
-  /**
-   * The text field for the condition.
-   */
+  /** The text field for the condition. */
   private JTextField conditionField;
 
-  /**
-   * The text area for the commands.
-   */
+  /** The text area for the commands. */
   private JTextArea commandsArea;
 
   /**
-   * Creates a new <code>CommandsScriptDialog</code> with the specified parent and
-   * <code>Script</code> whose properties are used as default values.
+   * Creates a new <code>CommandsScriptDialog</code> with the specified parent and <code>Script
+   * </code> whose properties are used as default values.
    */
   public CommandsScriptDialog(Component parent, Scripter scripter, CommandScript templateScript) {
     super(parent, "", scripter, templateScript);
@@ -66,9 +58,7 @@ class CommandsScriptDialog extends ScriptDialog {
     createUI();
   }
 
-  /**
-   * Creates the user interface for this dialog.
-   */
+  /** Creates the user interface for this dialog. */
   @Override
   protected Container createScriptTypeSpecificUI() {
     I18n i18n = I18n.get(CommandsScriptDialog.class);
@@ -136,9 +126,7 @@ class CommandsScriptDialog extends ScriptDialog {
     return panel;
   }
 
-  /**
-   * Creates and returns a CommandScript from the user specified information.
-   */
+  /** Creates and returns a CommandScript from the user specified information. */
   @Override
   protected Script createScriptOnOk(
       String scriptName, String eventType, String[] selectedSubtypes) {
@@ -190,9 +178,7 @@ class CommandsScriptDialog extends ScriptDialog {
     }
   }
 
-  /**
-   * Formats the specified string inserting newlines so that it can be displayed in a dialog.
-   */
+  /** Formats the specified string inserting newlines so that it can be displayed in a dialog. */
   private static String format(String s) {
     final int WRAP_BARRIER = 80;
     StringTokenizer tokenizer = new StringTokenizer(s, " ");

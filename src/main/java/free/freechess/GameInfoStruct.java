@@ -2,23 +2,22 @@
  * The freechess.org connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The freechess.org connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The freechess.org connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The freechess.org connection library is distributed in the hope that it will be useful, but
+ * <p>The freechess.org connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * freechess.org connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.freechess;
 
-import java.util.StringTokenizer;
-
 import free.util.Struct;
+import java.util.StringTokenizer;
 
 /**
  * A structure holding parsed information from a gameinfo line. See the "help iv_gameinfo" helpfile
@@ -32,24 +31,24 @@ public class GameInfoStruct extends Struct {
    * @param gameNumber The game number.
    * @param isGamePrivate Is the game private?
    * @param gameCategory A string specifying the category of the game. This will contain the rating
-   * type if it's a chess game or the wild variant name if it's a wild game.
+   *     type if it's a chess game or the wild variant name if it's a wild game.
    * @param isGameRated Is the game rated?
    * @param isWhiteRegistered Is the white player registered?
    * @param isBlackRegistered Is the black player registered?
    * @param whiteTime The initial amount of time on white's clock, in seconds.
    * @param whiteInc The amount of time white's clock is incremented by after each move he makes, in
-   * seconds.
+   *     seconds.
    * @param blackTime The initial amount of time on black's clock, in seconds.
    * @param blackInc The amount of time black's clock is incremented by after each move he makes, in
-   * seconds.
+   *     seconds.
    * @param partnerGameNumber The game number of the bughouse partner, or 0 if it's not a bughouse
-   * game.
+   *     game.
    * @param whiteRating White's rating.
    * @param whiteProvShow White's rating provshow character, 'E' is estimated, 'P' if provisional
-   * and ' ' if neither.
+   *     and ' ' if neither.
    * @param blackRating Black's rating.
    * @param blackProvShow Black's rating provshow character, 'E' is estimated, 'P' if provisional
-   * and ' ' if neither.
+   *     and ' ' if neither.
    * @param isWhiteTimesealed Is the white player using timeseal.
    * @param isBlackTimesealed Is the black player using timeseal.
    */
@@ -206,16 +205,12 @@ public class GameInfoStruct extends Struct {
           "Bad token \"" + realToken + "\", expected \"" + token + "\" instead");
   }
 
-  /**
-   * Returns the game number.
-   */
+  /** Returns the game number. */
   public int getGameNumber() {
     return getIntegerProperty("GameNumber");
   }
 
-  /**
-   * Returns <code>true</code> if the game is private, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if the game is private, <code>false</code> otherwise. */
   public boolean isGamePrivate() {
     return getBooleanProperty("IsGamePrivate");
   }
@@ -228,65 +223,47 @@ public class GameInfoStruct extends Struct {
     return getStringProperty("GameCategory");
   }
 
-  /**
-   * Returns <code>true</code> if the game is rated, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if the game is rated, <code>false</code> otherwise. */
   public boolean isGameRated() {
     return getBooleanProperty("IsGameRated");
   }
 
-  /**
-   * Returns <code>true</code> if the white player is registered, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if the white player is registered, <code>false</code> otherwise. */
   public boolean isWhiteRegistered() {
     return getBooleanProperty("IsWhiteRegistered");
   }
 
-  /**
-   * Returns <code>true</code> if the black player is registered, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if the black player is registered, <code>false</code> otherwise. */
   public boolean isBlackRegistered() {
     return getBooleanProperty("IsBlackRegistered");
   }
 
-  /**
-   * Returns the initial amount of time on white's clock, in seconds.
-   */
+  /** Returns the initial amount of time on white's clock, in seconds. */
   public int getWhiteTime() {
     return getIntegerProperty("WhiteTime");
   }
 
-  /**
-   * Returns the initial amount of time on black's clock, in seconds.
-   */
+  /** Returns the initial amount of time on black's clock, in seconds. */
   public int getBlackTime() {
     return getIntegerProperty("BlackTime");
   }
 
-  /**
-   * Returns the amount of time white's clock increases by after each move he makes, in seconds.
-   */
+  /** Returns the amount of time white's clock increases by after each move he makes, in seconds. */
   public int getWhiteInc() {
     return getIntegerProperty("WhiteInc");
   }
 
-  /**
-   * Returns the amount of time black's clock increases by after each move he makes, in seconds.
-   */
+  /** Returns the amount of time black's clock increases by after each move he makes, in seconds. */
   public int getBlackInc() {
     return getIntegerProperty("BlackInc");
   }
 
-  /**
-   * Returns the number of the partner's game, or 0 if none.
-   */
+  /** Returns the number of the partner's game, or 0 if none. */
   public int getPartnerGameNumber() {
     return getIntegerProperty("PartnerGameNumber");
   }
 
-  /**
-   * Returns white's rating.
-   */
+  /** Returns white's rating. */
   public int getWhiteRating() {
     return getIntegerProperty("WhiteRating");
   }
@@ -299,9 +276,7 @@ public class GameInfoStruct extends Struct {
     return getCharProperty("WhiteProvShow");
   }
 
-  /**
-   * Returns black's rating.
-   */
+  /** Returns black's rating. */
   public int getBlackRating() {
     return getIntegerProperty("BlackRating");
   }
@@ -314,16 +289,12 @@ public class GameInfoStruct extends Struct {
     return getCharProperty("BlackProvShow");
   }
 
-  /**
-   * Returns <code>true</code> if white uses timesealing, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if white uses timesealing, <code>false</code> otherwise. */
   public boolean isWhiteTimesealed() {
     return getBooleanProperty("IsWhiteTimesealed");
   }
 
-  /**
-   * Returns <code>true</code> if black uses timesealing, <code>false</code> otherwise.
-   */
+  /** Returns <code>true</code> if black uses timesealing, <code>false</code> otherwise. */
   public boolean isBlackTimesealed() {
     return getBooleanProperty("IsBlackTimesealed");
   }

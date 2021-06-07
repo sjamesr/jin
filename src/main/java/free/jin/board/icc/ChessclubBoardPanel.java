@@ -2,21 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.icc;
-
-import java.awt.Color;
 
 import free.jin.Game;
 import free.jin.board.Arrow;
@@ -32,10 +30,9 @@ import free.jin.event.IllegalMoveEvent;
 import free.jin.event.MoveMadeEvent;
 import free.jin.event.PositionChangedEvent;
 import free.jin.event.TakebackEvent;
+import java.awt.Color;
 
-/**
- * Extends <code>BoardPanel</code> to provide chessclub.com specific functionaly.
- */
+/** Extends <code>BoardPanel</code> to provide chessclub.com specific functionaly. */
 public class ChessclubBoardPanel extends BoardPanel
     implements ChessclubGameListener, ArrowCircleListener {
 
@@ -62,8 +59,8 @@ public class ChessclubBoardPanel extends BoardPanel
   }
 
   /**
-   * Overrides <code>configureBoard(Game, JinBoard)</code> to add ourselves as an
-   * <code>ArrowCircleListener</code> to the board.
+   * Overrides <code>configureBoard(Game, JinBoard)</code> to add ourselves as an <code>
+   * ArrowCircleListener</code> to the board.
    */
   @Override
   protected void configureBoardFromGame(Game game, JinBoard board) {
@@ -75,9 +72,7 @@ public class ChessclubBoardPanel extends BoardPanel
     } else board.setArrowCircleEnabled(false);
   }
 
-  /**
-   * Overrides <code>moveMade(MoveMadeEvent)</code> to clear the board of any arrows/circles.
-   */
+  /** Overrides <code>moveMade(MoveMadeEvent)</code> to clear the board of any arrows/circles. */
   @Override
   public void moveMade(MoveMadeEvent evt) {
     super.moveMade(evt);
@@ -88,9 +83,7 @@ public class ChessclubBoardPanel extends BoardPanel
     board.removeAllCircles();
   }
 
-  /**
-   * Overrides positionChanged(PositionChangedEvent) to clear the board of any arrows/circles.
-   */
+  /** Overrides positionChanged(PositionChangedEvent) to clear the board of any arrows/circles. */
   @Override
   public void positionChanged(PositionChangedEvent evt) {
     super.positionChanged(evt);
@@ -101,9 +94,7 @@ public class ChessclubBoardPanel extends BoardPanel
     board.removeAllCircles();
   }
 
-  /**
-   * Overrides takebackOccurred(TakebackEvent) to clear the board of any arrows/circles.
-   */
+  /** Overrides takebackOccurred(TakebackEvent) to clear the board of any arrows/circles. */
   @Override
   public void takebackOccurred(TakebackEvent evt) {
     super.takebackOccurred(evt);
@@ -114,9 +105,7 @@ public class ChessclubBoardPanel extends BoardPanel
     board.removeAllCircles();
   }
 
-  /**
-   * Overrides illegalMoveAttempted(IllegalMoveEvent) to clear the board of any arrows/circles.
-   */
+  /** Overrides illegalMoveAttempted(IllegalMoveEvent) to clear the board of any arrows/circles. */
   @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt) {
     super.illegalMoveAttempted(evt);
@@ -127,9 +116,7 @@ public class ChessclubBoardPanel extends BoardPanel
     board.removeAllCircles();
   }
 
-  /**
-   * Overrides BoardPanel.createWhiteLabelText(Game) to return a chessclub.com specific version.
-   */
+  /** Overrides BoardPanel.createWhiteLabelText(Game) to return a chessclub.com specific version. */
   @Override
   protected String createWhiteLabelText(Game game) {
     int rating = game.getWhiteRating();
@@ -137,9 +124,7 @@ public class ChessclubBoardPanel extends BoardPanel
     return game.getWhiteName() + game.getWhiteTitles() + ratingString;
   }
 
-  /**
-   * Overrides BoardPanel.createBlackLabel(Game) to return a chessclub.com specific version.
-   */
+  /** Overrides BoardPanel.createBlackLabel(Game) to return a chessclub.com specific version. */
   @Override
   protected String createBlackLabelText(Game game) {
     int rating = game.getBlackRating();
@@ -147,9 +132,7 @@ public class ChessclubBoardPanel extends BoardPanel
     return game.getBlackName() + game.getBlackTitles() + ratingString;
   }
 
-  /**
-   * Gets called when an arrow is added to the board (by the server).
-   */
+  /** Gets called when an arrow is added to the board (by the server). */
   @Override
   public void arrowAdded(ArrowEvent evt) {
     if (evt.getGame() != game) return;
@@ -162,9 +145,7 @@ public class ChessclubBoardPanel extends BoardPanel
     handlingArrowCircleEvent = false;
   }
 
-  /**
-   * Gets called when an arrow is removed from the board (by the server).
-   */
+  /** Gets called when an arrow is removed from the board (by the server). */
   @Override
   public void arrowRemoved(ArrowEvent evt) {
     if (evt.getGame() != game) return;
@@ -174,9 +155,7 @@ public class ChessclubBoardPanel extends BoardPanel
     handlingArrowCircleEvent = false;
   }
 
-  /**
-   * Gets called when a circle is added to the board (by the server).
-   */
+  /** Gets called when a circle is added to the board (by the server). */
   @Override
   public void circleAdded(CircleEvent evt) {
     if (evt.getGame() != game) return;
@@ -188,9 +167,7 @@ public class ChessclubBoardPanel extends BoardPanel
     handlingArrowCircleEvent = false;
   }
 
-  /**
-   * Gets called when a circle is removed from the board (by the server).
-   */
+  /** Gets called when a circle is removed from the board (by the server). */
   @Override
   public void circleRemoved(CircleEvent evt) {
     if (evt.getGame() != game) return;
@@ -200,9 +177,7 @@ public class ChessclubBoardPanel extends BoardPanel
     handlingArrowCircleEvent = false;
   }
 
-  /**
-   * Gets called when an arrow is added on the board (on the client, not server).
-   */
+  /** Gets called when an arrow is added on the board (on the client, not server). */
   @Override
   public void arrowAdded(JinBoard board, Arrow arrow) {
     if (handlingArrowCircleEvent) return;
@@ -210,9 +185,7 @@ public class ChessclubBoardPanel extends BoardPanel
     boardManager.getConn().sendCommand("arrow " + arrow.getFrom() + " " + arrow.getTo());
   }
 
-  /**
-   * Gets called when an arrow is removed on the board (on the client, not the server.
-   */
+  /** Gets called when an arrow is removed on the board (on the client, not the server. */
   @Override
   public void arrowRemoved(JinBoard board, Arrow arrow) {
     if (handlingArrowCircleEvent) return;
@@ -220,9 +193,7 @@ public class ChessclubBoardPanel extends BoardPanel
     boardManager.getConn().sendCommand("unarrow " + arrow.getFrom() + " " + arrow.getTo());
   }
 
-  /**
-   * Gets called when a circle is added (on the client, not the server).
-   */
+  /** Gets called when a circle is added (on the client, not the server). */
   @Override
   public void circleAdded(JinBoard board, Circle circle) {
     if (handlingArrowCircleEvent) return;
@@ -230,9 +201,7 @@ public class ChessclubBoardPanel extends BoardPanel
     boardManager.getConn().sendCommand("circle " + circle.getSquare());
   }
 
-  /**
-   * Gets called when a circle is removed (on the client, not the server).
-   */
+  /** Gets called when a circle is removed (on the client, not the server). */
   @Override
   public void circleRemoved(JinBoard board, Circle circle) {
     if (handlingArrowCircleEvent) return;

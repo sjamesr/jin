@@ -2,20 +2,21 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing.tabbedpane;
 
+import free.util.swing.SwingUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,7 +28,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -35,54 +35,34 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import free.util.swing.SwingUtils;
-
-/**
- * The default implementation of <code>TabHandle</code>.
- */
+/** The default implementation of <code>TabHandle</code>. */
 public class DefaultTabHandle implements TabHandle {
 
-  /**
-   * The close button icon.
-   */
+  /** The close button icon. */
   private static final Icon CLOSE_ICON_NORMAL =
       new ImageIcon(DefaultTabHandle.class.getResource("close.png"));
 
-  /**
-   * The rollover version of the close button icon.
-   */
+  /** The rollover version of the close button icon. */
   private static final Icon CLOSE_ICON_ROLLOVER =
       new ImageIcon(DefaultTabHandle.class.getResource("close_rollover.png"));
 
-  /**
-   * The pressed version of the close button icon.
-   */
+  /** The pressed version of the close button icon. */
   private static final Icon CLOSE_ICON_PRESSED =
       new ImageIcon(DefaultTabHandle.class.getResource("close_pressed.png"));
 
-  /**
-   * The tabbed pane we're part of.
-   */
+  /** The tabbed pane we're part of. */
   private final TabbedPane tabbedPane;
 
-  /**
-   * The tab we're representing.
-   */
+  /** The tab we're representing. */
   private final Tab tab;
 
-  /**
-   * The panel holding the actual tab components.
-   */
+  /** The panel holding the actual tab components. */
   private final JPanel component;
 
-  /**
-   * The label we employ for the title and icon.
-   */
+  /** The label we employ for the title and icon. */
   private final JLabel label;
 
-  /**
-   * The close button.
-   */
+  /** The close button. */
   private final JButton closeButton;
 
   /**
@@ -148,9 +128,7 @@ public class DefaultTabHandle implements TabHandle {
         });
   }
 
-  /**
-   * Creates the label part of the tab handle.
-   */
+  /** Creates the label part of the tab handle. */
   private JLabel makeLabel() {
     JLabel label = new JLabel();
     label.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
@@ -159,18 +137,14 @@ public class DefaultTabHandle implements TabHandle {
     return label;
   }
 
-  /**
-   * Sets the label's properties from the tab's properties.
-   */
+  /** Sets the label's properties from the tab's properties. */
   private void confLabelFromTab() {
     label.setText(tab.getTitle());
     label.setToolTipText(tab.getTitle());
     label.setIcon(tab.getIcon());
   }
 
-  /**
-   * Sets the component's properties from the tab's properties.
-   */
+  /** Sets the component's properties from the tab's properties. */
   private void confComponentFromTab() {
     component.removeAll();
 
@@ -184,9 +158,7 @@ public class DefaultTabHandle implements TabHandle {
     component.revalidate();
   }
 
-  /**
-   * Creates the button that closes the tab.
-   */
+  /** Creates the button that closes the tab. */
   private JButton makeCloseButton() {
     JButton closeButton = new JButton();
 
@@ -203,9 +175,7 @@ public class DefaultTabHandle implements TabHandle {
     return closeButton;
   }
 
-  /**
-   * Invoked when the user presses the tab handle. Makes the tab we're representing selected.
-   */
+  /** Invoked when the user presses the tab handle. Makes the tab we're representing selected. */
   protected void selectInvoked() {
     TabbedPaneModel model = tabbedPane.getModel();
     model.setSelectedIndex(model.indexOfTab(tab));
@@ -227,17 +197,13 @@ public class DefaultTabHandle implements TabHandle {
       model.removeTab(tabIndex);
   }
 
-  /**
-   * Returns the tab component.
-   */
+  /** Returns the tab component. */
   @Override
   public Component getComponent() {
     return component;
   }
 
-  /**
-   * Sets the selected state of the tab component.
-   */
+  /** Sets the selected state of the tab component. */
   @Override
   public void setSelected(boolean isSelected) {}
 }

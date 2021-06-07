@@ -3,16 +3,13 @@ package free.util.audio;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.util.WaveData;
 
-/**
- * An audio player that uses OpenAL to play audio clips.
- */
+/** An audio player that uses OpenAL to play audio clips. */
 public class OpenALAudioPlayer implements AudioPlayer {
   private boolean supported;
   IntBuffer buffer;
@@ -22,10 +19,9 @@ public class OpenALAudioPlayer implements AudioPlayer {
   FloatBuffer sourceVel;
   /** Position of the listener. */
   FloatBuffer listenerPos;
+
   FloatBuffer listenerVel;
-  /**
-   * Orientation of the listener. (first 3 elements are "at", second 3 are "up")
-   */
+  /** Orientation of the listener. (first 3 elements are "at", second 3 are "up") */
   FloatBuffer listenerOri =
       (FloatBuffer)
           BufferUtils.createFloatBuffer(6)

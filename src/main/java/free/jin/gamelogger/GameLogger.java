@@ -2,36 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.gamelogger;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import javax.swing.JFileChooser;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -66,60 +49,53 @@ import free.jin.ui.OptionPanel;
 import free.jin.ui.PreferencesPanel;
 import free.util.swing.ExtensionFileFilter;
 import free.util.swing.SwingUtils;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.swing.JFileChooser;
 
-/**
- * A plugin which allows logging games.
- */
+/** A plugin which allows logging games. */
 public class GameLogger extends Plugin implements GameListener, PropertyChangeListener {
 
-  /**
-   * The code for the logging mode when no games are logged.
-   */
+  /** The code for the logging mode when no games are logged. */
   public static final int LOG_NONE = 0;
 
-  /**
-   * The code for the logging mode when all games are logged into one file.
-   */
+  /** The code for the logging mode when all games are logged into one file. */
   public static final int LOG_ALL = 1;
 
-  /**
-   * The code for the logging mode when logging rules apply.
-   */
+  /** The code for the logging mode when logging rules apply. */
   public static final int USE_RULES = 2;
 
-  /**
-   * The DateFormat used for formatting the Date pgn tag.
-   */
+  /** The DateFormat used for formatting the Date pgn tag. */
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
-  /**
-   * The DateFormat used for formatting the Time pgn tag.
-   */
+  /** The DateFormat used for formatting the Time pgn tag. */
   private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
-  /**
-   * An action which allows the user to custom-save his last (saveable) game.
-   */
+  /** An action which allows the user to custom-save his last (saveable) game. */
   private final SaveGameAction saveGameAction = new SaveGameAction();
 
-  /**
-   * Maps Game objects to GameInfo objects.
-   */
+  /** Maps Game objects to GameInfo objects. */
   private final Hashtable gamesToGameInfo = new Hashtable();
 
-  /**
-   * The current logging mode.
-   */
+  /** The current logging mode. */
   private int loggingMode;
 
-  /**
-   * The filename of the file to log to when the logging setting is to log all games.
-   */
+  /** The filename of the file to log to when the logging setting is to log all games. */
   private String allGamesLogFile;
 
-  /**
-   * A Vector of LoggingRules.
-   */
+  /** A Vector of LoggingRules. */
   private Vector loggingRules;
 
   /**
@@ -134,8 +110,8 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   }
 
   /**
-   * Returns the current logging mode. Possible values are <code>LOG_NONE</code>,
-   * <code>LOG_ALL</code> and <code>USE_RULES</code>.
+   * Returns the current logging mode. Possible values are <code>LOG_NONE</code>, <code>LOG_ALL
+   * </code> and <code>USE_RULES</code>.
    */
   public int getLoggingMode() {
     return loggingMode;
@@ -149,9 +125,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     return allGamesLogFile;
   }
 
-  /**
-   * Returns a deep copy of the <code>loggingRules</code> Vector.
-   */
+  /** Returns a deep copy of the <code>loggingRules</code> Vector. */
   public Vector getLoggingRules() {
     Vector rules = new Vector(loggingRules.size());
     for (int i = 0; i < loggingRules.size(); i++) {
@@ -162,9 +136,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     return rules;
   }
 
-  /**
-   * Initializes the plugin.
-   */
+  /** Initializes the plugin. */
   @Override
   public void start() {
     registerListeners();
@@ -172,17 +144,13 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     exportAction(saveGameAction);
   }
 
-  /**
-   * Stops the plugin.
-   */
+  /** Stops the plugin. */
   @Override
   public void stop() {
     unregisterListeners();
   }
 
-  /**
-   * Registers all the necessary listeners.
-   */
+  /** Registers all the necessary listeners. */
   protected void registerListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -190,9 +158,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     listenerManager.addGameListener(this);
   }
 
-  /**
-   * Unregisters all the listeners registered by <code>registerListeners()</code>.
-   */
+  /** Unregisters all the listeners registered by <code>registerListeners()</code>. */
   protected void unregisterListeners() {
     Connection conn = getConn();
     ListenerManager listenerManager = conn.getListenerManager();
@@ -200,9 +166,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     listenerManager.removeGameListener(this);
   }
 
-  /**
-   * Loads the logging mode and logging rules.
-   */
+  /** Loads the logging mode and logging rules. */
   private void loadLoggingConditions() {
     Preferences prefs = getPrefs();
 
@@ -373,9 +337,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     return (game.getGameType() == Game.MY_GAME) && (game.getVariant() instanceof Chess);
   }
 
-  /**
-   * Logs the specified game to all the files it should be logged into.
-   */
+  /** Logs the specified game to all the files it should be logged into. */
   private void gameEnded(Game game) {
     GameInfo gameInfo = (GameInfo) gamesToGameInfo.get(game);
     saveGameAction.setLastGame(game, gameInfo);
@@ -386,9 +348,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     }
   }
 
-  /**
-   * Logs the specified game, with the specified game info into the specified file.
-   */
+  /** Logs the specified game, with the specified game info into the specified file. */
   private void log(Game game, GameInfo gameInfo, String filename) {
     try {
       String resultString;
@@ -492,17 +452,13 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     }
   }
 
-  /**
-   * Writes the specified pgn tag with the specified value to the specified output stream.
-   */
+  /** Writes the specified pgn tag with the specified value to the specified output stream. */
   private static void writeTag(DataOutputStream out, String tagName, String tagValue)
       throws IOException {
     out.writeBytes("[" + tagName + " \"" + tagValue + "\"]\n");
   }
 
-  /**
-   * Starts logging the moves.
-   */
+  /** Starts logging the moves. */
   @Override
   public void gameStarted(GameStartEvent evt) {
     Game game = evt.getGame();
@@ -513,9 +469,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     game.addPropertyChangeListener(this);
   }
 
-  /**
-   * Saves the ended game.
-   */
+  /** Saves the ended game. */
   @Override
   public void gameEnded(GameEndEvent evt) {
     Game game = evt.getGame();
@@ -523,9 +477,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     gamesToGameInfo.remove(game);
   }
 
-  /**
-   * Observes changes in the game which we care about.
-   */
+  /** Observes changes in the game which we care about. */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     Game game = (Game) evt.getSource();
@@ -536,9 +488,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     }
   }
 
-  /**
-   * Saves the move.
-   */
+  /** Saves the move. */
   @Override
   public void moveMade(MoveMadeEvent evt) {
     Game game = evt.getGame();
@@ -547,9 +497,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     gameInfo.movelist.addElement(move);
   }
 
-  /**
-   * Clears the move list.
-   */
+  /** Clears the move list. */
   @Override
   public void positionChanged(PositionChangedEvent evt) {
     Game game = evt.getGame();
@@ -557,9 +505,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     gameInfo.initPos = evt.getPosition();
   }
 
-  /**
-   * Removes the undone moves from the move list.
-   */
+  /** Removes the undone moves from the move list. */
   @Override
   public void takebackOccurred(TakebackEvent evt) {
     Game game = evt.getGame();
@@ -570,9 +516,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     for (int i = start; i >= stop; i--) movelist.removeElementAt(i);
   }
 
-  /**
-   * GameListener implementation.
-   */
+  /** GameListener implementation. */
   @Override
   public void illegalMoveAttempted(IllegalMoveEvent evt) {}
 
@@ -585,53 +529,37 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
   @Override
   public void offerUpdated(OfferEvent evt) {}
 
-  /**
-   * Return a PreferencesPanel for changing GameLogger's settings.
-   */
+  /** Return a PreferencesPanel for changing GameLogger's settings. */
   @Override
   public PreferencesPanel getPreferencesUI() {
     return new GameLoggerPreferencesPanel(this);
   }
 
-  /**
-   * Returns <code>true</code> that the game logger does feature a preferences panel.
-   */
+  /** Returns <code>true</code> that the game logger does feature a preferences panel. */
   @Override
   public boolean hasPreferencesUI() {
     return true;
   }
 
-  /**
-   * Returns the string "gamelogger".
-   */
+  /** Returns the string "gamelogger". */
   @Override
   public String getId() {
     return "gamelogger";
   }
 
-  /**
-   * A small class bundling information about a game.
-   */
+  /** A small class bundling information about a game. */
   private static class GameInfo {
 
-    /**
-     * The initial position.
-     */
+    /** The initial position. */
     public Position initPos;
 
-    /**
-     * The move list.
-     */
+    /** The move list. */
     public Vector movelist;
 
-    /**
-     * A Date object representing the time when the game started.
-     */
+    /** A Date object representing the time when the game started. */
     public final Date gameStartDate;
 
-    /**
-     * Creates a new GameInfo with the specified initial position.
-     */
+    /** Creates a new GameInfo with the specified initial position. */
     public GameInfo(Position initPos) {
       this.initPos = initPos;
       movelist = new Vector();
@@ -639,40 +567,28 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
     }
   }
 
-  /**
-   * A <code>JinAction</code> which lets the user save the last saveable game.
-   */
+  /** A <code>JinAction</code> which lets the user save the last saveable game. */
   private class SaveGameAction extends JinAction {
 
-    /**
-     * The last saveable game, <code>null</code> if none.
-     */
+    /** The last saveable game, <code>null</code> if none. */
     private Game lastGame = null;
 
-    /**
-     * The <code>GameInfo</code> of the last saveable game, <code>null</code> if none.
-     */
+    /** The <code>GameInfo</code> of the last saveable game, <code>null</code> if none. */
     private GameInfo lastGameInfo = null;
 
-    /**
-     * Creates a new <code>SaveGameAction</code>.
-     */
+    /** Creates a new <code>SaveGameAction</code>. */
     public SaveGameAction() {
       // We're disabled at first, since there's no game to save
       setEnabled(false);
     }
 
-    /**
-     * Returns the string <code>saveGame</code>.
-     */
+    /** Returns the string <code>saveGame</code>. */
     @Override
     public String getId() {
       return "savegame";
     }
 
-    /**
-     * Sets the last saveable game and its info.
-     */
+    /** Sets the last saveable game and its info. */
     public void setLastGame(Game game, GameInfo gameInfo) {
       lastGame = game;
       lastGameInfo = gameInfo;
@@ -680,9 +596,7 @@ public class GameLogger extends Plugin implements GameListener, PropertyChangeLi
       setEnabled(true);
     }
 
-    /**
-     * Lets the user select a file and then logs the game into it.
-     */
+    /** Lets the user select a file and then logs the game into it. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       Component hintParent =

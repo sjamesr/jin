@@ -2,20 +2,33 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
 
+import free.jin.Connection;
+import free.jin.I18n;
+import free.jin.Jin;
+import free.jin.Preferences;
+import free.jin.ServerUser;
+import free.jin.event.ChatEvent;
+import free.jin.event.FriendsEvent;
+import free.jin.event.JinEvent;
+import free.jin.event.PlainTextEvent;
+import free.jin.ui.SdiUiProvider;
+import free.util.BrowserControl;
+import free.util.PlatformUtils;
+import free.util.swing.MultiButton;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -35,7 +48,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -67,24 +79,9 @@ import javax.swing.text.Position;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
 import org.jdesktop.layout.Baseline;
 import org.jdesktop.layout.GroupLayout;
 import org.jdesktop.layout.LayoutStyle;
-
-import free.jin.Connection;
-import free.jin.I18n;
-import free.jin.Jin;
-import free.jin.Preferences;
-import free.jin.ServerUser;
-import free.jin.event.ChatEvent;
-import free.jin.event.FriendsEvent;
-import free.jin.event.JinEvent;
-import free.jin.event.PlainTextEvent;
-import free.jin.ui.SdiUiProvider;
-import free.util.BrowserControl;
-import free.util.PlatformUtils;
-import free.util.swing.MultiButton;
 
 /**
  * A Component which implements a text console in which the user can see the output of the server
@@ -93,29 +90,19 @@ import free.util.swing.MultiButton;
  */
 public class Console extends JPanel implements KeyListener {
 
-  /**
-   * The <code>ConsoleManager</code> we're a part of.
-   */
+  /** The <code>ConsoleManager</code> we're a part of. */
   private final ConsoleManager consoleManager;
 
-  /**
-   * This console's designation.
-   */
+  /** This console's designation. */
   private final ConsoleDesignation designation;
 
-  /**
-   * The listener list.
-   */
+  /** The listener list. */
   protected final EventListenerList listenerList = new EventListenerList();
 
-  /**
-   * The ConsoleTextPane where the output is displayed.
-   */
+  /** The ConsoleTextPane where the output is displayed. */
   private final ConsoleTextPane outputComponent;
 
-  /**
-   * The JScrollPane wrapping the output component.
-   */
+  /** The JScrollPane wrapping the output component. */
   private final JScrollPane outputScrollPane;
 
   /**
@@ -124,52 +111,34 @@ public class Console extends JPanel implements KeyListener {
    */
   private final JComponent commandTypeComponent;
 
-  /**
-   * The ConsoleTextField which takes the input from the user.
-   */
+  /** The ConsoleTextField which takes the input from the user. */
   private final ConsoleTextField inputComponent;
 
-  /**
-   * The preferences of this console.
-   */
+  /** The preferences of this console. */
   private final Preferences prefs;
 
-  /**
-   * The regular expressions against which we match the text to find links.
-   */
+  /** The regular expressions against which we match the text to find links. */
   private Pattern[] linkREs;
 
-  /**
-   * The commands executed for the matched links.
-   */
+  /** The commands executed for the matched links. */
   private String[] linkCommands;
 
-  /**
-   * The indices of the subexpression to make a link out of.
-   */
+  /** The indices of the subexpression to make a link out of. */
   private int[] linkSubexpressionIndices;
 
-  /**
-   * The regular expression we use for detecting URLs.
-   */
+  /** The regular expression we use for detecting URLs. */
   private static final Pattern URL_REGEX =
       Pattern.compile(
           "((([Ff][Tt][Pp]|[Hh][Tt][Tt][Pp]([Ss])?)://)|([Ww][Ww][Ww]\\.))([^\\s()<>\"])*[^\\s.,()<>\"'!?]");
 
-  /**
-   * The regular expression we use for detecting emails.
-   */
+  /** The regular expression we use for detecting emails. */
   private static final Pattern EMAIL_REGEX =
       Pattern.compile("[^\\s()<>\"\']+@[^\\s()<>\"]+\\.[^\\s.,()<>\"'?]+");
 
-  /**
-   * Maps text types that were actually looked up to the resulting AttributeSets.
-   */
+  /** Maps text types that were actually looked up to the resulting AttributeSets. */
   private final Hashtable attributesCache = new Hashtable();
 
-  /**
-   * A history of people who have told us anything.
-   */
+  /** A history of people who have told us anything. */
   private final Vector tellers = new Vector();
 
   /**
@@ -184,9 +153,7 @@ public class Console extends JPanel implements KeyListener {
    */
   private boolean didScrollToBottom = true;
 
-  /**
-   * An action which clears the console.
-   */
+  /** An action which clears the console. */
   private final Action clearAction =
       new AbstractAction(I18n.get(Console.class).getString("clearAction.name")) {
         @Override
@@ -195,9 +162,7 @@ public class Console extends JPanel implements KeyListener {
         }
       };
 
-  /**
-   * An action which closes the console.
-   */
+  /** An action which closes the console. */
   private final Action closeAction =
       new AbstractAction(I18n.get(Console.class).getString("closeAction.name")) {
         @Override
@@ -249,16 +214,12 @@ public class Console extends JPanel implements KeyListener {
     init();
   }
 
-  /**
-   * Returns this console's designation.
-   */
+  /** Returns this console's designation. */
   public ConsoleDesignation getDesignation() {
     return designation;
   }
 
-  /**
-   * Creates the UI (layout) of this console.
-   */
+  /** Creates the UI (layout) of this console. */
   private void createUI() {
     JComponent actionsComponent = createActionsComponent();
 
@@ -324,16 +285,12 @@ public class Console extends JPanel implements KeyListener {
     add(bottomPanel, BorderLayout.SOUTH);
   }
 
-  /**
-   * Transfers the focus to the input component.
-   */
+  /** Transfers the focus to the input component. */
   public void obtainFocus() {
     inputComponent.requestFocusInWindow();
   }
 
-  /**
-   * Flashes the input field, attracting attention to it.
-   */
+  /** Flashes the input field, attracting attention to it. */
   public void flashInputField() {
     inputComponent.setBackground(Color.red);
 
@@ -350,16 +307,12 @@ public class Console extends JPanel implements KeyListener {
     timer.start();
   }
 
-  /**
-   * Returns the preferences.
-   */
+  /** Returns the preferences. */
   public Preferences getPrefs() {
     return prefs;
   }
 
-  /**
-   * Returns the <code>ConsoleManager</code> a part of which we are.
-   */
+  /** Returns the <code>ConsoleManager</code> a part of which we are. */
   public ConsoleManager getConsoleManager() {
     return consoleManager;
   }
@@ -378,16 +331,12 @@ public class Console extends JPanel implements KeyListener {
     return button;
   }
 
-  /**
-   * Creates the <code>ConsoleTextPane</code> to which the server's textual output goes.
-   */
+  /** Creates the <code>ConsoleTextPane</code> to which the server's textual output goes. */
   protected ConsoleTextPane createOutputComponent() {
     return new ConsoleTextPane(this);
   }
 
-  /**
-   * Configures the output component to be used with this console.
-   */
+  /** Configures the output component to be used with this console. */
   protected void configureOutputComponent(final ConsoleTextPane textPane) {
     // Seriously hack the caret for our own purposes (desired scrolling and selecting).
     Caret caret =
@@ -552,9 +501,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Creates the JScrollPane in which the output component will be put.
-   */
+  /** Creates the JScrollPane in which the output component will be put. */
   protected JScrollPane createOutputScrollPane(JTextPane outputComponent) {
     JViewport viewport = new OutputComponentViewport();
     viewport.setView(outputComponent);
@@ -572,9 +519,7 @@ public class Console extends JPanel implements KeyListener {
     return scrollPane;
   }
 
-  /**
-   * Creates the component which lets the user choose the command type to execute his command.
-   */
+  /** Creates the component which lets the user choose the command type to execute his command. */
   private JComponent createCommandTypeComponent() {
     java.util.List commandTypes = designation.getCommandTypes();
 
@@ -612,9 +557,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Returns the currently selected command type; <code>null</code> if none.
-   */
+  /** Returns the currently selected command type; <code>null</code> if none. */
   private ConsoleDesignation.CommandType getSelectedCommandType() {
     if (commandTypeComponent instanceof JLabel) {
       JLabel label = (JLabel) commandTypeComponent;
@@ -703,9 +646,7 @@ public class Console extends JPanel implements KeyListener {
     inputComponent.refreshFromProperties();
   }
 
-  /**
-   * Returns whether text will be copied into the clipboard on selection.
-   */
+  /** Returns whether text will be copied into the clipboard on selection. */
   protected boolean isCopyOnSelect() {
     return prefs.getBool("copyOnSelect", true);
   }
@@ -715,8 +656,8 @@ public class Console extends JPanel implements KeyListener {
    * works together with the <code>assureScrolling</code> method.
    *
    * @returns whether the <code>assureScrolling</code> method should scroll the scrollpane of the
-   * output component to the bottom. This needs to be passed to the <code>assureScrolling</code>
-   * method.
+   *     output component to the bottom. This needs to be passed to the <code>assureScrolling</code>
+   *     method.
    */
   protected final boolean prepareAdding() {
     // Seriously hack the scrolling to make sure if we're at the bottom, we stay there,
@@ -737,8 +678,8 @@ public class Console extends JPanel implements KeyListener {
 
   /**
    * This method <B>must</B> be called after adding anything to the output component. This method
-   * works together with the <code>prepareAdding</code> method. Pass the value returned by
-   * <code>prepareAdding</code> as the argument of this method.
+   * works together with the <code>prepareAdding</code> method. Pass the value returned by <code>
+   * prepareAdding</code> as the argument of this method.
    */
   protected final void assureScrolling(boolean scrollToBottom) {
     class BottomScroller implements Runnable {
@@ -782,9 +723,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Adds the given component to the output.
-   */
+  /** Adds the given component to the output. */
   public void addToOutput(JComponent component) {
     boolean shouldScroll = prepareAdding();
 
@@ -826,9 +765,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Adds the default representation of the specified <code>ChatEvent</code> to the console.
-   */
+  /** Adds the default representation of the specified <code>ChatEvent</code> to the console. */
   public void addToOutput(ChatEvent evt, String encoding) {
     addToOutput(consoleManager.getDefaultTextForChat(evt, encoding), textTypeForEvent(evt));
   }
@@ -862,16 +799,12 @@ public class Console extends JPanel implements KeyListener {
     } else throw new IllegalArgumentException("Unsupported event: " + evt);
   }
 
-  /**
-   * Returns the text type for user-typed text.
-   */
+  /** Returns the text type for user-typed text. */
   public String getUserTextType() {
     return "user";
   }
 
-  /**
-   * Actually does the work of adding the given text to the output component's Document.
-   */
+  /** Actually does the work of adding the given text to the output component's Document. */
   protected void addToOutputImpl(String text, String textType) throws BadLocationException {
     StyledDocument document = outputComponent.getStyledDocument();
     int oldTextLength = document.getLength();
@@ -954,12 +887,13 @@ public class Console extends JPanel implements KeyListener {
   }
 
   /**
-   * Executes a special command. The following commands are recognized by this
-   * method:
+   * Executes a special command. The following commands are recognized by this method:
+   *
    * <UL>
-   *   <LI> cls - Removes all text from the console.
-   *   <LI> "url <url>" - Displays the URL  (the '<' and '>' don't actually appear in the string).
-   *   <LI> "email <email address>" - Displays the mailer with the "To" field set to the given email address.
+   *   <LI>cls - Removes all text from the console.
+   *   <LI>"url <url>" - Displays the URL (the '<' and '>' don't actually appear in the string).
+   *   <LI>"email <email address>" - Displays the mailer with the "To" field set to the given email
+   *       address.
    * </UL>
    */
   protected void executeSpecialCommand(String command) {
@@ -987,9 +921,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Executes the given command.
-   */
+  /** Executes the given command. */
   void issueCommand(Command command) {
     String commandString = command.getCommandString();
 
@@ -1008,9 +940,7 @@ public class Console extends JPanel implements KeyListener {
     }
   }
 
-  /**
-   * Removes all text from the console.
-   */
+  /** Removes all text from the console. */
   public void clear() {
     outputComponent.setText("");
     outputComponent.removeAll();
@@ -1046,9 +976,7 @@ public class Console extends JPanel implements KeyListener {
     return (ServerUser) tellers.elementAt(n);
   }
 
-  /**
-   * Returns the amount of people who have told us anything so far.
-   */
+  /** Returns the amount of people who have told us anything so far. */
   public int getTellerCount() {
     return tellers.size();
   }
@@ -1135,7 +1063,8 @@ public class Console extends JPanel implements KeyListener {
               //              vscrollbar.setValue(vscrollbar.getMinimum());
               //              break;
               //            case KeyEvent.VK_END: // Ctrl-End
-              //              vscrollbar.setValue(vscrollbar.getMaximum() - vscrollbar.getVisibleAmount());
+              //              vscrollbar.setValue(vscrollbar.getMaximum() -
+              // vscrollbar.getVisibleAmount());
               //              break;
           }
         }

@@ -2,43 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2004 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.prefs;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import free.chess.BoardPainter;
 import free.chess.ColoredBoardPainter;
@@ -57,50 +33,54 @@ import free.util.Utilities;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
 import free.util.swing.UrlDisplayingAction;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-/**
- * A preferences panel allowing the user to modify the looks of the board.
- */
+/** A preferences panel allowing the user to modify the looks of the board. */
 public class BoardLooksPanel extends BoardModifyingPrefsPanel {
 
-  /**
-   * The list holding all the available piece set names.
-   */
+  /** The list holding all the available piece set names. */
   protected final JList pieceSets;
 
-  /**
-   * The color chooser for the white piece's color.
-   */
+  /** The color chooser for the white piece's color. */
   protected final ColorChooser whiteColor;
 
-  /**
-   * The color chooser for the black piece's color.
-   */
+  /** The color chooser for the black piece's color. */
   protected final ColorChooser blackColor;
 
-  /**
-   * The color chooser for the white piece's outline color.
-   */
+  /** The color chooser for the white piece's outline color. */
   protected final ColorChooser whiteOutline;
 
-  /**
-   * The color chooser for the black piece's outline color.
-   */
+  /** The color chooser for the black piece's outline color. */
   protected final ColorChooser blackOutline;
 
-  /**
-   * The list holding all the available board pattern names.
-   */
+  /** The list holding all the available board pattern names. */
   protected final JList boardPatterns;
 
-  /**
-   * The color chooser for the board's dark squares' color.
-   */
+  /** The color chooser for the board's dark squares' color. */
   protected final ColorChooser darkSquares;
 
-  /**
-   * The color chooser for the board's light squares' color.
-   */
+  /** The color chooser for the board's light squares' color. */
   protected final ColorChooser lightSquares;
 
   /**
@@ -262,9 +242,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     add(noticeLabel);
   }
 
-  /**
-   * Gets the list of piece sets from the board manager.
-   */
+  /** Gets the list of piece sets from the board manager. */
   private PieceSet[] getPieceSets() {
     Map resources = boardManager.getResources("pieces");
     PieceSet[] pieceSets = (PieceSet[]) resources.values().toArray(new PieceSet[0]);
@@ -274,9 +252,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     return pieceSets;
   }
 
-  /**
-   * Gets the list of board patterns from the board manager.
-   */
+  /** Gets the list of board patterns from the board manager. */
   private BoardPattern[] getBoardPatterns() {
     Map resources = boardManager.getResources("boards");
     BoardPattern[] boardPatterns = (BoardPattern[]) resources.values().toArray(new BoardPattern[0]);
@@ -286,9 +262,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     return boardPatterns;
   }
 
-  /**
-   * Sets the initial properties of the preview board.
-   */
+  /** Sets the initial properties of the preview board. */
   @Override
   public void initPreviewBoard() {
     PieceSet pieceSet = (PieceSet) pieceSets.getSelectedValue();
@@ -316,9 +290,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     }
   }
 
-  /**
-   * Creates the user interface for selecting the looks of the piece set.
-   */
+  /** Creates the user interface for selecting the looks of the piece set. */
   private JComponent createPiecesUI() {
     I18n i18n = I18n.get(BoardLooksPanel.class);
 
@@ -359,9 +331,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     return piecesPanel;
   }
 
-  /**
-   * Creates the user interface for selecting the looks of the piece set.
-   */
+  /** Creates the user interface for selecting the looks of the piece set. */
   private JComponent createBoardUI() {
     I18n i18n = I18n.get(BoardLooksPanel.class);
 
@@ -399,9 +369,7 @@ public class BoardLooksPanel extends BoardModifyingPrefsPanel {
     return boardPanel;
   }
 
-  /**
-   * Applies any changes made by the user.
-   */
+  /** Applies any changes made by the user. */
   @Override
   public void applyChanges() throws BadChangesException {
     boardManager.setPieceSet((PieceSet) pieceSets.getSelectedValue());

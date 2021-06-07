@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -25,19 +25,13 @@ import free.jin.event.JinEvent;
  */
 public class BeanShellScript extends Script {
 
-  /**
-   * The code.
-   */
+  /** The code. */
   private final String code;
 
-  /**
-   * The <code>Interpreter</code> that will run the code.
-   */
+  /** The <code>Interpreter</code> that will run the code. */
   private final Interpreter bsh;
 
-  /**
-   * Creates a new <code>CodeExecutable</code> which will run the specified code.
-   */
+  /** Creates a new <code>CodeExecutable</code> which will run the specified code. */
   public BeanShellScript(
       Scripter scripter, String name, String eventType, String[] eventSubtypes, String code)
       throws EvalError {
@@ -53,18 +47,14 @@ public class BeanShellScript extends Script {
     bsh.eval("void runScript(){" + code + "}");
   }
 
-  /**
-   * Evaluates all the imports needed by the scripts in the specified <code>Interpreter</code>.
-   */
+  /** Evaluates all the imports needed by the scripts in the specified <code>Interpreter</code>. */
   private static void addImports(Interpreter bsh) throws EvalError {
     bsh.eval("import free.jin.*;");
     bsh.eval("import free.jin.event.*");
     bsh.eval("import free.chess.*");
   }
 
-  /**
-   * Adds all the "global" variables to the specified <code>Interpreter's</code> environment.
-   */
+  /** Adds all the "global" variables to the specified <code>Interpreter's</code> environment. */
   private static void addVariables(Interpreter bsh, Scripter scripter) throws EvalError {
     bsh.set("scripter", scripter);
     bsh.set("prefs", scripter.getPrefs());
@@ -84,9 +74,7 @@ public class BeanShellScript extends Script {
     ((free.jin.console.ConsoleManager) scripter.getPlugin("console")).addSpecialLine("Test");
   }
 
-  /**
-   * Adds all the "built-in" methods to the specified <code>Interpreter's</code> environment.
-   */
+  /** Adds all the "built-in" methods to the specified <code>Interpreter's</code> environment. */
   private static void addMethods(Interpreter bsh, Scripter scripter) throws EvalError {
     bsh.eval("void sendCommand(String command){connection.sendCommand(command);}");
 
@@ -111,24 +99,18 @@ public class BeanShellScript extends Script {
     // *************************************************************************
   }
 
-  /**
-   * Returns the string "beanshell".
-   */
+  /** Returns the string "beanshell". */
   @Override
   public String getType() {
     return "beanshell";
   }
 
-  /**
-   * Returns the code.
-   */
+  /** Returns the code. */
   public String getCode() {
     return code;
   }
 
-  /**
-   * Runs the code.
-   */
+  /** Runs the code. */
   @Override
   public void run(JinEvent event, String eventSubtype, Object[][] vars) {
     try {
@@ -164,9 +146,7 @@ public class BeanShellScript extends Script {
     }
   }
 
-  /**
-   * Returns a copy of this Script.
-   */
+  /** Returns a copy of this Script. */
   @Override
   public Script createCopy() {
     try {

@@ -2,34 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
-
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
 
 import free.jin.I18n;
 import free.jin.Jin;
@@ -38,52 +23,47 @@ import free.util.IOUtilities;
 import free.util.swing.LinkLabel;
 import free.util.swing.PlainTextDialog;
 import free.util.swing.UrlDisplayingAction;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
-/**
- * Displays licensing and copyright information about Jin and bundled software.
- */
+/** Displays licensing and copyright information about Jin and bundled software. */
 public class LicensePanel extends DialogPanel {
 
-  /**
-   * The font of the text area displaying the license text.
-   */
+  /** The font of the text area displaying the license text. */
   private static final Font LICENSE_TEXT_FONT = new Font("Monospaced", Font.PLAIN, 12);
 
-  /**
-   * The text of the GPL, loaded lazily.
-   */
+  /** The text of the GPL, loaded lazily. */
   private String gplText = null;
 
-  /**
-   * The text of the LGPL, loaded lazily.
-   */
+  /** The text of the LGPL, loaded lazily. */
   private String lgplText = null;
 
-  /**
-   * The text of the Creative Commons Attribution-ShareAlike 2.5 license, loaded lazily.
-   */
+  /** The text of the Creative Commons Attribution-ShareAlike 2.5 license, loaded lazily. */
   private String ccsa25Text = null;
 
-  /**
-   * The text of the jgoodies copyright, loaded lazily.
-   */
+  /** The text of the jgoodies copyright, loaded lazily. */
   private String jgoodiesCopyrightText = null;
 
-  /**
-   * The text of the BeanShell license/copyright notice, loaded lazily.
-   */
+  /** The text of the BeanShell license/copyright notice, loaded lazily. */
   private String beanshellCopyrightText = null;
 
-  /**
-   * Creates a new <code>LicensePanel</code>.
-   */
+  /** Creates a new <code>LicensePanel</code>. */
   public LicensePanel() {
     createUI();
   }
 
-  /**
-   * The component to get the focus.
-   */
+  /** The component to get the focus. */
   private Component focusComponent;
 
   /**
@@ -100,25 +80,19 @@ public class LicensePanel extends DialogPanel {
     }
   }
 
-  /**
-   * Displays the panel.
-   */
+  /** Displays the panel. */
   public void display() {
     super.askResult();
   }
 
-  /**
-   * Returns the title of this <code>DialogPanel</code>.
-   */
+  /** Returns the title of this <code>DialogPanel</code>. */
   @Override
   protected String getTitle() {
     return I18n.get(LicensePanel.class)
         .getFormattedString("title", new Object[] {Jin.getAppName()});
   }
 
-  /**
-   * Creates the user interface.
-   */
+  /** Creates the user interface. */
   private void createUI() {
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

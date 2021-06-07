@@ -2,39 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.seek;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 import free.chess.Player;
 import free.chess.WildVariant;
@@ -52,25 +32,34 @@ import free.jin.plugin.PluginUIContainer;
 import free.util.AWTUtilities;
 import free.util.Named;
 import free.util.swing.MoreLessOptionsButton;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
-/**
- * A panel which lets the user match an opponent.
- */
+/** A panel which lets the user match an opponent. */
 public class IssueMatchPanel extends JPanel {
 
-  /**
-   * The plugin we're being used by.
-   */
+  /** The plugin we're being used by. */
   private final Plugin plugin;
 
-  /**
-   * The connection.
-   */
+  /** The connection. */
   private final MatchOfferConnection conn;
 
-  /**
-   * Our preferences.
-   */
+  /** Our preferences. */
   private final Preferences prefs;
 
   // The various UI elements.
@@ -83,8 +72,8 @@ public class IssueMatchPanel extends JPanel {
   private final JButton issueMatch;
 
   /**
-   * Creates a new <code>IssueMatchPanel</code> with the specified arguments and a
-   * <code>Preferences</code> object to load/save settings from/to.
+   * Creates a new <code>IssueMatchPanel</code> with the specified arguments and a <code>Preferences
+   * </code> object to load/save settings from/to.
    */
   public IssueMatchPanel(Plugin plugin, final PluginUIContainer container, Preferences prefs) {
     if (plugin == null) throw new IllegalArgumentException("plugin may not be null");
@@ -166,34 +155,26 @@ public class IssueMatchPanel extends JPanel {
     createUI();
   }
 
-  /**
-   * Returns <code>true</code>.
-   */
+  /** Returns <code>true</code>. */
   @Override
   public boolean isFocusCycleRoot() {
     return true;
   }
 
-  /**
-   * Makes the currently selected opponent the specified one, and transfers focus to the panel.
-   */
+  /** Makes the currently selected opponent the specified one, and transfers focus to the panel. */
   public void prepareFor(ServerUser opponentUser) {
     opponent.setOpponent(opponentUser);
     issueMatch.requestFocus();
   }
 
-  /**
-   * Returns the list of opponents to make easily accessible for matching.
-   */
+  /** Returns the list of opponents to make easily accessible for matching. */
   private ListModel getEasyAccessOpponentsModel() {
     if (conn instanceof FriendsConnection)
       return new OnlineFriendsListModel((FriendsConnection) conn);
     else return new DefaultListModel();
   }
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   private void createUI() {
     GroupLayout layout = new GroupLayout(this);
     setLayout(layout);
@@ -307,9 +288,7 @@ public class IssueMatchPanel extends JPanel {
             .add(layout.createParallelGroup(GroupLayout.BASELINE).add(moreLess).add(issueMatch)));
   }
 
-  /**
-   * Saves the panel's preferences.
-   */
+  /** Saves the panel's preferences. */
   public void savePrefs() {
     prefs.setString("lastOpponent", opponent.getOpponentName());
     prefs.setInt("time", timeControls.getTime());
@@ -321,17 +300,13 @@ public class IssueMatchPanel extends JPanel {
     prefs.setBool("isMore", moreLess.isMore());
   }
 
-  /**
-   * Checks the validity of the current selection.
-   */
+  /** Checks the validity of the current selection. */
   private boolean isSelectionValid() {
     UsernamePolicy policy = plugin.getUser().getServer().getUsernamePolicy();
     return policy.invalidityReason(opponent.getOpponentName()) == null;
   }
 
-  /**
-   * Returns the currently specified match offer.
-   */
+  /** Returns the currently specified match offer. */
   private UserMatchOffer getMatchOffer() {
     ServerUser opp = conn.userForName(opponent.getOpponentName());
     int time = timeControls.getTime();
@@ -343,19 +318,15 @@ public class IssueMatchPanel extends JPanel {
     return new UserMatchOffer(opp, time, inc, isRated, wild, color);
   }
 
-  /**
-   * A list model for the list of friends online.
-   */
+  /** A list model for the list of friends online. */
   private static class OnlineFriendsListModel extends AbstractListModel {
 
-    /**
-     * The current list of friends.
-     */
+    /** The current list of friends. */
     private final List onlineFriends;
 
     /**
-     * Creates a new <code>OnlineFriendsListModel</code> for the specified
-     * <code>FriendsConnection</code>.
+     * Creates a new <code>OnlineFriendsListModel</code> for the specified <code>FriendsConnection
+     * </code>.
      */
     public OnlineFriendsListModel(FriendsConnection conn) {
       onlineFriends = new LinkedList();
@@ -390,9 +361,7 @@ public class IssueMatchPanel extends JPanel {
               });
     }
 
-    /**
-     * Updates the our list of online friends.
-     */
+    /** Updates the our list of online friends. */
     private void update(FriendsConnection conn) {
       onlineFriends.clear();
       onlineFriends.addAll(conn.getOnlineFriends());
@@ -402,17 +371,13 @@ public class IssueMatchPanel extends JPanel {
       fireContentsChanged(this, 0, onlineFriends.size());
     }
 
-    /**
-     * Returns the <code>index</code>th online friend.
-     */
+    /** Returns the <code>index</code>th online friend. */
     @Override
     public Object getElementAt(int index) {
       return onlineFriends.get(index).toString();
     }
 
-    /**
-     * Returns the number of friends online.
-     */
+    /** Returns the number of friends online. */
     @Override
     public int getSize() {
       return onlineFriends.size();

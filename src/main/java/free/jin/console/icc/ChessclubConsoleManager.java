@@ -2,27 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2008 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.icc;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import free.jin.Connection;
 import free.jin.Game;
@@ -35,24 +27,25 @@ import free.jin.console.ics.IcsCustomConsoleDesignation;
 import free.jin.console.ics.IcsPersonalChatConsoleDesignation;
 import free.jin.event.ChatEvent;
 import free.jin.ui.PreferencesPanel;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 
-/**
- * An extension of the default ConsoleManager for the chessclub.com server.
- */
+/** An extension of the default ConsoleManager for the chessclub.com server. */
 public class ChessclubConsoleManager extends IcsConsoleManager {
 
-  /**
-   * The list of channels enabled on WCL.
-   */
+  /** The list of channels enabled on WCL. */
   private static final int[] WCL_CHANNELS =
       new int[] {
         0, 1, 2, 3, 5, 24, 46, 47, 49, 90, 100, 120, 147, 165, 221, 222, 223, 224, 225, 228, 230,
         250, 272, 274, 300, 302, 306, 309, 345, 348, 388, 393, 394, 395, 396, 399
       };
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected String getDefaultTextForChat(ChatEvent evt, String encoding) {
     String type = evt.getType();
@@ -72,32 +65,24 @@ public class ChessclubConsoleManager extends IcsConsoleManager {
     return i18n.getFormattedString(type + ".displayPattern", args);
   }
 
-  /**
-   * Returns whether we're connecting to the WCL server.
-   */
+  /** Returns whether we're connecting to the WCL server. */
   public boolean isWcl() {
     return "wcl".equals(getServer().getId());
   }
 
-  /**
-   * Returns an ICC-specific system console designation.
-   */
+  /** Returns an ICC-specific system console designation. */
   @Override
   protected ConsoleDesignation createSystemConsoleDesignation() {
     return new ChessclubSystemConsoleDesignation(getConn(), getEncoding());
   }
 
-  /**
-   * Returns an ICC-specific help console designation.
-   */
+  /** Returns an ICC-specific help console designation. */
   @Override
   protected ConsoleDesignation createHelpConsoleDesignation(boolean isCloseable) {
     return new ChessclubHelpConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
 
-  /**
-   * Returns an ICC-specific general chat console designation.
-   */
+  /** Returns an ICC-specific general chat console designation. */
   @Override
   protected ConsoleDesignation createGeneralChatConsoleDesignation(boolean isCloseable) {
     if (isWcl()) return new WclGeneralChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
@@ -110,34 +95,26 @@ public class ChessclubConsoleManager extends IcsConsoleManager {
     //      return new ShoutChatConsoleDesignation(getConn(), getEncoding(), isCloseable);
   }
 
-  /**
-   * Creates an ICC-specific personal chat console designation.
-   */
+  /** Creates an ICC-specific personal chat console designation. */
   @Override
   protected ConsoleDesignation createPersonalChatConsoleDesignation(
       ServerUser user, boolean isCloseable) {
     return new IcsPersonalChatConsoleDesignation(getConn(), user, getEncoding(), isCloseable);
   }
 
-  /**
-   * Creates an ICC-specific game chat console designation.
-   */
+  /** Creates an ICC-specific game chat console designation. */
   @Override
   protected ConsoleDesignation createGameConsoleDesignation(Game game) {
     return new ChessclubGameConsoleDesignation(getConn(), game, getEncoding());
   }
 
-  /**
-   * Creates a <code>ChessclubConsole</code> with the specified designation.
-   */
+  /** Creates a <code>ChessclubConsole</code> with the specified designation. */
   @Override
   protected Console createConsole(ConsoleDesignation designation) {
     return new ChessclubConsole(this, designation);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   protected IcsCustomConsoleDesignation loadCustomConsoleDesignation(
       String prefsPrefix,
@@ -151,9 +128,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager {
         getConn(), title, encoding, false, channels, messageRegex, includeShouts, includeCShouts);
   }
 
-  /**
-   * Returns the set of ICC/WCL channels.
-   */
+  /** Returns the set of ICC/WCL channels. */
   @Override
   protected SortedMap createChannels() {
     int[] channelsOrder = (int[]) getPrefs().lookup("channels.order." + getServer().getId());
@@ -196,9 +171,7 @@ public class ChessclubConsoleManager extends IcsConsoleManager {
     return channels;
   }
 
-  /**
-   * Return a <code>PreferencesPanel</code> for changing the console manager's settings.
-   */
+  /** Return a <code>PreferencesPanel</code> for changing the console manager's settings. */
   @Override
   public PreferencesPanel getPreferencesUI() {
     return new ChessclubConsolePrefsPanel(this);

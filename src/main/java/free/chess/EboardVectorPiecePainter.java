@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -63,17 +63,13 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     super(whiteColor, blackColor, whiteOutline, blackOutline);
   }
 
-  /**
-   * Returns a copy of this <code>EboardVectorPiecePainter</code>.
-   */
+  /** Returns a copy of this <code>EboardVectorPiecePainter</code>. */
   @Override
   public PiecePainter freshInstance() {
     return new EboardVectorPiecePainter();
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a king.
-   */
+  /** Creates and returns a Polygon for drawing a king. */
   @Override
   protected Polygon createKingPolygon(int width, int height) {
     Polygon kingPolygon = new Polygon();
@@ -166,9 +162,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(53 * width / 108, 86 * height / 108, 82 * width / 108, 92 * height / 108);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a queen.
-   */
+  /** Creates and returns a Polygon for drawing a queen. */
   @Override
   protected Polygon createQueenPolygon(int width, int height) {
     Polygon queenPolygon = new Polygon();
@@ -269,9 +263,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(53 * width / 108, 76 * height / 108, 81 * width / 108, 83 * height / 108);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a rook.
-   */
+  /** Creates and returns a Polygon for drawing a rook. */
   @Override
   protected Polygon createRookPolygon(int width, int height) {
     Polygon rookPolygon = new Polygon();
@@ -329,9 +321,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(22 * width / 108, 90 * height / 108, 84 * width / 108, 90 * height / 108);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a bishop.
-   */
+  /** Creates and returns a Polygon for drawing a bishop. */
   @Override
   protected Polygon createBishopPolygon(int width, int height) {
     Polygon bishopPolygon = new Polygon();
@@ -449,9 +439,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(53 * width / 108, 72 * height / 108, 73 * width / 108, 74 * height / 108);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a knight.
-   */
+  /** Creates and returns a Polygon for drawing a knight. */
   @Override
   protected Polygon createKnightPolygon(int width, int height) {
     Polygon knightPolygon = new Polygon();
@@ -545,9 +533,7 @@ public final class EboardVectorPiecePainter extends VectorPiecePainter {
     g.drawLine(22 * width / 108, 75 * height / 108, 25 * width / 108, 68 * height / 108);
   }
 
-  /**
-   * Creates and returns a Polygon for drawing a pawn.
-   */
+  /** Creates and returns a Polygon for drawing a pawn. */
   @Override
   protected Polygon createPawnPolygon(int width, int height) {
     Polygon pawnPolygon = new Polygon();

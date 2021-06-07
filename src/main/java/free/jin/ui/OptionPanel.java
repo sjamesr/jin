@@ -2,25 +2,29 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
 
+import free.jin.I18n;
+import free.util.TableLayout;
+import free.util.TextUtilities;
+import free.util.Utilities;
+import free.util.swing.SwingUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -30,62 +34,37 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import free.jin.I18n;
-import free.util.TableLayout;
-import free.util.TextUtilities;
-import free.util.Utilities;
-import free.util.swing.SwingUtils;
-
 /**
- * A panel for asking questions and showing information to the user. Similar to
- * <code>JOptionPane</code>. This panel may get more <code>JOptionPane</code>-like functionality in
- * the future.
+ * A panel for asking questions and showing information to the user. Similar to <code>JOptionPane
+ * </code>. This panel may get more <code>JOptionPane</code>-like functionality in the future.
  */
 public class OptionPanel extends DialogPanel {
 
-  /**
-   * The constant for displaying an information panel.
-   */
+  /** The constant for displaying an information panel. */
   public static final Object INFO = new String("information");
 
-  /**
-   * The constant for displaying a warning panel.
-   */
+  /** The constant for displaying a warning panel. */
   public static final Object WARNING = new String("warning");
 
-  /**
-   * The constant for displaying a question panel.
-   */
+  /** The constant for displaying a question panel. */
   public static final Object QUESTION = new String("question");
 
-  /**
-   * The constant for displaying an error panel.
-   */
+  /** The constant for displaying an error panel. */
   public static final Object ERROR = new String("error");
 
-  /**
-   * The "Yes" option.
-   */
+  /** The "Yes" option. */
   public static final Object YES = new String("yes");
 
-  /**
-   * The "No" option.
-   */
+  /** The "No" option. */
   public static final Object NO = new String("no");
 
-  /**
-   * The "OK" option.
-   */
+  /** The "OK" option. */
   public static final Object OK = new String("ok");
 
-  /**
-   * The "Cancel" option.
-   */
+  /** The "Cancel" option. */
   public static final Object CANCEL = new String("cancel");
 
-  /**
-   * The standard order of the predefined options.
-   */
+  /** The standard order of the predefined options. */
   private static final Object[] OPTION_ORDER =
       SwingUtils.isMacLnF() || SwingUtils.isGtkLnF()
           ? new Object[] {CANCEL, YES, NO, OK}
@@ -97,24 +76,16 @@ public class OptionPanel extends DialogPanel {
    */
   private final Object panelType;
 
-  /**
-   * The options displayed to the user.
-   */
+  /** The options displayed to the user. */
   private final Object[] options;
 
-  /**
-   * The option that is selected by default.
-   */
+  /** The option that is selected by default. */
   private final Object defaultOption;
 
-  /**
-   * The main message component.
-   */
+  /** The main message component. */
   private final Component messageComponent;
 
-  /**
-   * The component which lets the user to specify his input. <code>null</code> if none.
-   */
+  /** The component which lets the user to specify his input. <code>null</code> if none. */
   private final Component queryComponent;
 
   /**
@@ -123,14 +94,14 @@ public class OptionPanel extends DialogPanel {
    *
    * @param hintParent The hint parent component.
    * @param panelType The type of this panel - possible values are {@link #INFO}, {@link #QUESTION},
-   * {@link #WARNING} and {@link #ERROR}.
+   *     {@link #WARNING} and {@link #ERROR}.
    * @param title The title of the panel.
    * @param options The list of options the user can choose from. Possible values for each element
-   * are {@link #YES}, {@link #NO}, {@link #OK} and {@link #CANCEL}.
+   *     are {@link #YES}, {@link #NO}, {@link #OK} and {@link #CANCEL}.
    * @param defaultOption The option that is selected by default.
    * @param text The text to display to the user.
-   * @param queryComponent A component which allows the user to specify his input. May be
-   * <code>null</code>.
+   * @param queryComponent A component which allows the user to specify his input. May be <code>null
+   *     </code>.
    */
   public OptionPanel(
       Component hintParent,
@@ -154,9 +125,7 @@ public class OptionPanel extends DialogPanel {
     createUI();
   }
 
-  /**
-   * Creates an <code>OptionPanel</code> with the specified arguments.
-   */
+  /** Creates an <code>OptionPanel</code> with the specified arguments. */
   public OptionPanel(
       Component hintParent,
       Object panelType,
@@ -168,9 +137,7 @@ public class OptionPanel extends DialogPanel {
     this(hintParent, panelType, title, options, defaultOption, text, null);
   }
 
-  /**
-   * Creates a message component for the specified text message.
-   */
+  /** Creates a message component for the specified text message. */
   public Component createMessageComponent(String text) {
     String[] lines = TextUtilities.getTokens(text, "\r\n");
     Container messagePanel = Box.createVerticalBox();
@@ -186,10 +153,9 @@ public class OptionPanel extends DialogPanel {
   }
 
   /**
-   * <p>
    * Creates and shows an error panel with the specified arguments.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public static void error(String title, String message, Component hintParent) {
@@ -198,19 +164,16 @@ public class OptionPanel extends DialogPanel {
     panel.display();
   }
 
-  /**
-   * Creates and shows an error panel with the specified arguments.
-   */
+  /** Creates and shows an error panel with the specified arguments. */
   public static void error(String title, String message) {
     error(title, message, null);
   }
 
   /**
-   * <p>
    * Creates, displays a confirmation panel with the specified arguments and returns the result
    * value. Possible result values are {@link #OK} and {@link #CANCEL}.
-   * <p>
-   * <code>hintParent</code> specifies the component over which the error message should be
+   *
+   * <p><code>hintParent</code> specifies the component over which the error message should be
    * displayed. This is optional and may be <code>null</code>.
    */
   public static Object confirm(
@@ -236,9 +199,9 @@ public class OptionPanel extends DialogPanel {
 
   /**
    * Creates, displays a yes/no question dialog with the specified arguments and returns the result
-   * value. The possible result options are {@link #YES}, {@link #NO} and {@link #CANCEL}.
-   * <code>hintParent</code> specifies the component over which the error message should be
-   * displayed. This is optional and may be <code>null</code>.
+   * value. The possible result options are {@link #YES}, {@link #NO} and {@link #CANCEL}. <code>
+   * hintParent</code> specifies the component over which the error message should be displayed.
+   * This is optional and may be <code>null</code>.
    */
   public static Object question(
       Object defaultOption, String title, String message, Component hintParent) {
@@ -289,17 +252,13 @@ public class OptionPanel extends DialogPanel {
     else return inputField.getText();
   }
 
-  /**
-   * Returns the {@link #CANCEL} option.
-   */
+  /** Returns the {@link #CANCEL} option. */
   @Override
   protected Object getCancelResult() {
     return CANCEL;
   }
 
-  /**
-   * If the icon for this panel.
-   */
+  /** If the icon for this panel. */
   private Icon getIcon() {
     if (panelType == INFO) return UIManager.getIcon("OptionPane.informationIcon");
     else if (panelType == WARNING) return UIManager.getIcon("OptionPane.warningIcon");
@@ -308,9 +267,7 @@ public class OptionPanel extends DialogPanel {
     else throw new IllegalArgumentException("Bad panel type: " + panelType);
   }
 
-  /**
-   * Creates the UI for this panel.
-   */
+  /** Creates the UI for this panel. */
   private void createUI() {
     I18n i18n = I18n.get(OptionPanel.class);
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 2));
@@ -335,9 +292,7 @@ public class OptionPanel extends DialogPanel {
     add(buttonPanel);
   }
 
-  /**
-   * Creates the main UI of this panel.
-   */
+  /** Creates the main UI of this panel. */
   protected Component createMainUi() {
     Box mainPanel = Box.createHorizontalBox();
 

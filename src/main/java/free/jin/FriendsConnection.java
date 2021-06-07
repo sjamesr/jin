@@ -2,23 +2,22 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
-import java.util.Collection;
-
 import free.jin.event.FriendsListenerManager;
+import java.util.Collection;
 
 /**
  * An extension of the <code>Connection</code> interface which adds support for friend lists (known
@@ -30,14 +29,10 @@ import free.jin.event.FriendsListenerManager;
  */
 public interface FriendsConnection extends Connection {
 
-  /**
-   * The mask for specifying whether the friend is online.
-   */
+  /** The mask for specifying whether the friend is online. */
   public static final int ONLINE_FRIEND_STATE_MASK = 1;
 
-  /**
-   * The mask for player state specifying that a logged in friend is playing.
-   */
+  /** The mask for player state specifying that a logged in friend is playing. */
   public static final int PLAYING_FRIEND_STATE_MASK = 2;
 
   /**
@@ -46,24 +41,16 @@ public interface FriendsConnection extends Connection {
    */
   FriendsListenerManager getFriendsListenerManager();
 
-  /**
-   * Adds the given user to the list of friends.
-   */
+  /** Adds the given user to the list of friends. */
   void addFriend(ServerUser user);
 
-  /**
-   * Removes the given user from the list of friends.
-   */
+  /** Removes the given user from the list of friends. */
   void removeFriend(ServerUser user);
 
-  /**
-   * Returns the current set of friends (a set of <code>ServerUser</code>s).
-   **/
+  /** Returns the current set of friends (a set of <code>ServerUser</code>s). */
   Collection getFriends();
 
-  /**
-   * Returns whether the specified user is a friend.
-   */
+  /** Returns whether the specified user is a friend. */
   boolean isFriend(ServerUser user);
 
   /**
@@ -74,14 +61,12 @@ public interface FriendsConnection extends Connection {
    */
   Collection getOnlineFriends();
 
-  /**
-   * Returns whether the specified user is a friend and is online.
-   */
+  /** Returns whether the specified user is a friend and is online. */
   boolean isFriendOnline(ServerUser user);
 
   /**
-   * Returns the state of the specified friend - an <code>OR</code> combination of the
-   * <code>*_FRIEND_STATE_MASK</code> masks. This is only relevant if the friend is online.
+   * Returns the state of the specified friend - an <code>OR</code> combination of the <code>
+   * *_FRIEND_STATE_MASK</code> masks. This is only relevant if the friend is online.
    */
   int getFriendState(ServerUser user);
 }

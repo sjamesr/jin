@@ -2,39 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2005 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.ui;
-
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
@@ -50,20 +30,32 @@ import free.util.models.BooleanModel;
 import free.util.models.Model;
 import free.util.models.ModelUtils;
 import free.util.swing.SwingUtils;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-/**
- * The preferences menu.
- */
+/** The preferences menu. */
 public class PrefsMenu extends JMenu implements SessionListener {
 
-  /**
-   * The "Look and Feel" menu item.
-   */
+  /** The "Look and Feel" menu item. */
   private final JMenuItem lnfMenu;
 
-  /**
-   * Are we currently in the "connected" state?
-   */
+  /** Are we currently in the "connected" state? */
   private boolean isConnected = false;
 
   /**
@@ -72,14 +64,10 @@ public class PrefsMenu extends JMenu implements SessionListener {
    */
   private int separatorIndex = -1;
 
-  /**
-   * The plugins in the current session, <code>null</code> when none.
-   */
+  /** The plugins in the current session, <code>null</code> when none. */
   private Plugin[] plugins = null;
 
-  /**
-   * Creates a new <code>PreferencesMenu</code>.
-   */
+  /** Creates a new <code>PreferencesMenu</code>. */
   public PrefsMenu() {
     I18n i18n = I18n.get(PrefsMenu.class);
 
@@ -102,9 +90,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
         });
   }
 
-  /**
-   * Registers us as session listener.
-   */
+  /** Registers us as session listener. */
   @Override
   public void addNotify() {
     super.addNotify();
@@ -114,9 +100,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
     setConnected(session != null, session);
   }
 
-  /**
-   * Unregisters us as a session listener.
-   */
+  /** Unregisters us as a session listener. */
   @Override
   public void removeNotify() {
     super.removeNotify();
@@ -124,17 +108,13 @@ public class PrefsMenu extends JMenu implements SessionListener {
     Jin.getInstance().getConnManager().removeSessionListener(this);
   }
 
-  /**
-   * SessionListener implementation. Simply delegates to <code>setConnected</code>.
-   */
+  /** SessionListener implementation. Simply delegates to <code>setConnected</code>. */
   @Override
   public void sessionEstablished(SessionEvent evt) {
     setConnected(true, evt.getSession());
   }
 
-  /**
-   * SessionListener implementation. Simply delegates to <code>setConnected</code>.
-   */
+  /** SessionListener implementation. Simply delegates to <code>setConnected</code>. */
   @Override
   public void sessionClosed(SessionEvent evt) {
     setConnected(false, evt.getSession());
@@ -146,9 +126,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
   @Override
   public void sessionClosing(SessionEvent evt) {}
 
-  /**
-   * Modifies the state of the menu to match the specified state.
-   */
+  /** Modifies the state of the menu to match the specified state. */
   public void setConnected(boolean isConnected, Session session) {
     if (this.isConnected == isConnected) return;
 
@@ -160,9 +138,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
     else removePluginPreferenceMenuItems();
   }
 
-  /**
-   * Adds the menu items for opening preference dialogs for the specified list of plugins.
-   */
+  /** Adds the menu items for opening preference dialogs for the specified list of plugins. */
   private void addPluginPreferenceMenuItems() {
     separatorIndex = getItemCount();
     addSeparator();
@@ -213,9 +189,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
     }
   }
 
-  /**
-   * Adds a checkbox menu item to toggle the state of the specified boolean model.
-   */
+  /** Adds a checkbox menu item to toggle the state of the specified boolean model. */
   private void addBooleanPref(BooleanModel model) {
     JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(model.getName(), model.get());
     ModelUtils.linkSelected(model, menuItem.getModel());
@@ -231,29 +205,19 @@ public class PrefsMenu extends JMenu implements SessionListener {
     separatorIndex = -1;
   }
 
-  /**
-   * The dialog displaying the preferences panel for a specified plugin.
-   */
+  /** The dialog displaying the preferences panel for a specified plugin. */
   private class PrefsDialog extends JDialog implements ChangeListener, ActionListener {
 
-    /**
-     * The preferences panel.
-     */
+    /** The preferences panel. */
     private final PreferencesPanel prefsPanel;
 
-    /**
-     * The ok button.
-     */
+    /** The ok button. */
     private final JButton okButton;
 
-    /**
-     * The apply button.
-     */
+    /** The apply button. */
     private final JButton applyButton;
 
-    /**
-     * The cancel button.
-     */
+    /** The cancel button. */
     private final JButton cancelButton;
 
     /**
@@ -281,9 +245,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
       prefsPanel.addChangeListener(this);
     }
 
-    /**
-     * Creates the UI.
-     */
+    /** Creates the UI. */
     private void createUI() {
       Container content = getContentPane();
       content.setLayout(new BorderLayout());
@@ -327,9 +289,7 @@ public class PrefsMenu extends JMenu implements SessionListener {
       applyButton.setEnabled(true);
     }
 
-    /**
-     * ActionListener implementation. Registered with the ok and apply buttons.
-     */
+    /** ActionListener implementation. Registered with the ok and apply buttons. */
     @Override
     public void actionPerformed(ActionEvent evt) {
       try {

@@ -2,20 +2,28 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.chess.event.MoveEvent;
+import free.chess.event.MoveListener;
+import free.chess.event.MoveProgressEvent;
+import free.chess.event.MoveProgressListener;
+import free.util.MathUtilities;
+import free.util.PaintHook;
+import free.util.PlatformUtils;
+import free.util.Utilities;
 import java.awt.AWTEvent;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -37,7 +45,6 @@ import java.awt.geom.GeneralPath;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -45,39 +52,22 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import free.chess.event.MoveEvent;
-import free.chess.event.MoveListener;
-import free.chess.event.MoveProgressEvent;
-import free.chess.event.MoveProgressListener;
-import free.util.MathUtilities;
-import free.util.PaintHook;
-import free.util.PlatformUtils;
-import free.util.Utilities;
-
 /**
  * An implementation of a chess board component. <B>IMPORTANT:</B> This class is not thread safe -
  * all modifications should be done in the AWT event dispatching thread.
  */
 public class JBoard extends JComponent {
 
-  /**
-   * The default move highlighting color.
-   */
+  /** The default move highlighting color. */
   private static final Color DEFAULT_MOVE_HIGHLIGHT_COLOR = Color.cyan.darker();
 
-  /**
-   * The default coordinate display color.
-   */
+  /** The default coordinate display color. */
   private static final Color DEFAULT_COORDS_DISPLAY_COLOR = Color.blue.darker();
 
-  /**
-   * The default highlighting color for the squares of the move currently being made.
-   */
+  /** The default highlighting color for the squares of the move currently being made. */
   private static final Color DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR = Color.blue;
 
-  /**
-   * The default color for highlighting possible target squares.
-   */
+  /** The default color for highlighting possible target squares. */
   private static final Color DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR =
       new Color(255, 255, 255, 80);
 
@@ -87,34 +77,22 @@ public class JBoard extends JComponent {
    */
   public static final int UNIFIED_MOVE_INPUT_STYLE = 0;
 
-  /**
-   * The constant for drag'n'drop move input style.
-   */
+  /** The constant for drag'n'drop move input style. */
   public static final int DRAG_N_DROP_MOVE_INPUT_STYLE = 1;
 
-  /**
-   * The constant for click'n'click move input style.
-   */
+  /** The constant for click'n'click move input style. */
   public static final int CLICK_N_CLICK_MOVE_INPUT_STYLE = 2;
 
-  /**
-   * The constant for move input mode which doesn't let the user move any of the pieces.
-   */
+  /** The constant for move input mode which doesn't let the user move any of the pieces. */
   public static final int NO_PIECES_MOVE = 0;
 
-  /**
-   * The constant for move input mode which only lets the user move white pieces.
-   */
+  /** The constant for move input mode which only lets the user move white pieces. */
   public static final int WHITE_PIECES_MOVE = 1;
 
-  /**
-   * The constant for move input mode which only lets the user move black pieces.
-   */
+  /** The constant for move input mode which only lets the user move black pieces. */
   public static final int BLACK_PIECES_MOVE = 2;
 
-  /**
-   * The constant for move input mode which lets the user move both white and black pieces.
-   */
+  /** The constant for move input mode which lets the user move both white and black pieces. */
   public static final int ALL_PIECES_MOVE = 3;
 
   /**
@@ -123,14 +101,10 @@ public class JBoard extends JComponent {
    */
   public static final int CURRENT_PLAYER_MOVES = 4;
 
-  /**
-   * The constant for no move highlighting.
-   */
+  /** The constant for no move highlighting. */
   public static final int NO_MOVE_HIGHLIGHTING = 0;
 
-  /**
-   * The constant for move highlighting done by highlighting the target square of the move.
-   */
+  /** The constant for move highlighting done by highlighting the target square of the move. */
   public static final int TARGET_SQUARE_MOVE_HIGHLIGHTING = 1;
 
   /**
@@ -145,9 +119,7 @@ public class JBoard extends JComponent {
    */
   public static final int ARROW_MOVE_HIGHLIGHTING = 3;
 
-  /**
-   * The constant for not displaying coordinates at all.
-   */
+  /** The constant for not displaying coordinates at all. */
   public static final int NO_COORDS = 0;
 
   /**
@@ -156,19 +128,13 @@ public class JBoard extends JComponent {
    */
   public static final int RIM_COORDS = 1;
 
-  /**
-   * The constant for displaying row and column coordinates outside of the actual board.
-   */
+  /** The constant for displaying row and column coordinates outside of the actual board. */
   public static final int OUTSIDE_COORDS = 2;
 
-  /**
-   * The constant for displaying square coordinates in each square.
-   */
+  /** The constant for displaying square coordinates in each square. */
   public static final int EVERY_SQUARE_COORDS = 3;
 
-  /**
-   * The Position on the board.
-   */
+  /** The Position on the board. */
   private Position position;
 
   /**
@@ -177,9 +143,7 @@ public class JBoard extends JComponent {
    */
   private Position positionCopy;
 
-  /**
-   * A flag we set when we make a move entered by the user, on this board.
-   */
+  /** A flag we set when we make a move entered by the user, on this board. */
   private boolean isMakingUserMove = false;
 
   /**
@@ -188,9 +152,7 @@ public class JBoard extends JComponent {
    */
   private boolean positionChangedByMove = false;
 
-  /**
-   * The <code>ChangeListener</code> to the <code>Position</code>.
-   */
+  /** The <code>ChangeListener</code> to the <code>Position</code>. */
   private final ChangeListener positionChangeListener =
       new ChangeListener() {
         @Override
@@ -259,9 +221,7 @@ public class JBoard extends JComponent {
     positionCopy.copyFrom(endPosition);
   }
 
-  /**
-   * The <code>MoveListener</code> of the position.
-   */
+  /** The <code>MoveListener</code> of the position. */
   private final MoveListener positionMoveListener =
       new MoveListener() {
         @Override
@@ -293,84 +253,52 @@ public class JBoard extends JComponent {
         }
       };
 
-  /**
-   * The BoardPainter painting the board.
-   */
+  /** The BoardPainter painting the board. */
   private BoardPainter boardPainter;
 
-  /**
-   * The PiecePainter painting the pieces.
-   */
+  /** The PiecePainter painting the pieces. */
   private PiecePainter piecePainter;
 
-  /**
-   * PaintHooks.
-   */
+  /** PaintHooks. */
   private Vector paintHooks = null;
 
-  /**
-   * The current move input style.
-   */
+  /** The current move input style. */
   private int moveInputStyle = UNIFIED_MOVE_INPUT_STYLE;
 
-  /**
-   * The current move input mode.
-   */
+  /** The current move input mode. */
   private int moveInputMode = ALL_PIECES_MOVE;
 
-  /**
-   * Whether the piece follows the cursor as a move is being made.
-   */
+  /** Whether the piece follows the cursor as a move is being made. */
   private boolean isPieceFollowsCursor = true;
 
-  /**
-   * Whether the squares of the made move are highlighted.
-   */
+  /** Whether the squares of the made move are highlighted. */
   private boolean isHighlightMadeMoveSquares = false;
 
-  /**
-   * The current move highlighting style.
-   */
+  /** The current move highlighting style. */
   private int moveHighlightingStyle = NO_MOVE_HIGHLIGHTING;
 
-  /**
-   * Whether a shadow piece is shown in the target square while making a move.
-   */
+  /** Whether a shadow piece is shown in the target square while making a move. */
   private boolean isShowShadowPieceInTargetSquare = false;
 
-  /**
-   * Whether legal target squares are highlighted when making a move.
-   */
+  /** Whether legal target squares are highlighted when making a move. */
   private boolean isHighlightLegalTargetSquares = false;
 
-  /**
-   * Whether the target square snaps to the nearest legal square when making a move.
-   */
+  /** Whether the target square snaps to the nearest legal square when making a move. */
   private boolean isSnapToLegalSquare = false;
 
-  /**
-   * The current coordinates display style.
-   */
+  /** The current coordinates display style. */
   private int coordsDisplayStyle = NO_COORDS;
 
-  /**
-   * Is the board editable?
-   */
+  /** Is the board editable? */
   private boolean isEditable = true;
 
-  /**
-   * Is the board flipped?
-   */
+  /** Is the board flipped? */
   private boolean isFlipped = false;
 
-  /**
-   * Are we currently manual promotion mode?
-   */
+  /** Are we currently manual promotion mode? */
   private boolean isManualPromote = true;
 
-  /**
-   * The color used for move highlighting.
-   */
+  /** The color used for move highlighting. */
   private Color moveHighlightingColor = DEFAULT_MOVE_HIGHLIGHT_COLOR;
 
   /**
@@ -378,34 +306,22 @@ public class JBoard extends JComponent {
    */
   private Color coordsDisplayColor = DEFAULT_COORDS_DISPLAY_COLOR;
 
-  /**
-   * The color used for highlighting the squares of a move as it's being made.
-   */
+  /** The color used for highlighting the squares of a move as it's being made. */
   private Color madeMoveSquaresHighlightColor = DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR;
 
-  /**
-   * The color with which possible target squares are highlighted.
-   */
+  /** The color with which possible target squares are highlighted. */
   private Color legalTargetSquaresHighlightColor = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
 
-  /**
-   * The duration of piece sliding. When negative, no sliding occurs.
-   */
+  /** The duration of piece sliding. When negative, no sliding occurs. */
   private int slideDuration = -1;
 
-  /**
-   * The current highlighted move.
-   */
+  /** The current highlighted move. */
   private Move highlightedMove = null;
 
-  /**
-   * An array specifying which squares are shaded.
-   */
+  /** An array specifying which squares are shaded. */
   private boolean[][] isShaded = new boolean[8][8];
 
-  /**
-   * The square of the currently moved piece; <code>null</code> when not making a move.
-   */
+  /** The square of the currently moved piece; <code>null</code> when not making a move. */
   private Square movedPieceSquare = null;
 
   /**
@@ -421,58 +337,46 @@ public class JBoard extends JComponent {
   private Square targetSquare;
 
   /**
-   * A set of possible target squares during a move; <code>null</code> if none. May be
-   * <code>null</code> even during a move, if it's not required (neither in snap-to-legal-square,
-   * nor in highlight-legal-moves mode).
+   * A set of possible target squares during a move; <code>null</code> if none. May be <code>null
+   * </code> even during a move, if it's not required (neither in snap-to-legal-square, nor in
+   * highlight-legal-moves mode).
    */
   private Collection legalTargetSquares = null;
 
   /**
    * Indicates the current move gesture if in <code>UNIFIED_MOVE_INPUT_STYLE</code>. Possible values
    * are:
+   *
    * <ul>
-   * <code>UNIFIED_MOVE_INPUT_STYLE</code> when no move gesture is in progress.
-   * <code>DRAG_N_DROP_MOVE_INPUT_STYLE</code> if the current move gesture is a drag'n'drop.
-   * <code>CLICK_N_CLICK_MOVE_INPUT_STYLE</code> if the current move gesture is a click'n'click.
+   *   <code>UNIFIED_MOVE_INPUT_STYLE</code> when no move gesture is in progress. <code>
+   *   DRAG_N_DROP_MOVE_INPUT_STYLE</code> if the current move gesture is a drag'n'drop. <code>
+   *   CLICK_N_CLICK_MOVE_INPUT_STYLE</code> if the current move gesture is a click'n'click.
    * </ul>
+   *
    * This is not a property, but a helper variable - it just reuses the constants because it makes
    * sense.
    */
   private int moveGesture = UNIFIED_MOVE_INPUT_STYLE;
 
-  /**
-   * The time when the last drag gesture started, in <code>UNIFIED_MOVE_MODE</code>.
-   */
+  /** The time when the last drag gesture started, in <code>UNIFIED_MOVE_MODE</code>. */
   private long dragStartTime;
 
-  /**
-   * The starting square during a piece slide.
-   */
+  /** The starting square during a piece slide. */
   private Square slideStartSquare = null;
 
-  /**
-   * The ending square during a piece slide.
-   */
+  /** The ending square during a piece slide. */
   private Square slideEndSquare = null;
 
-  /**
-   * The sliding piece during a piece slide.
-   */
+  /** The sliding piece during a piece slide. */
   private Piece slidePiece = null;
 
-  /**
-   * The taken piece during a piece slide.
-   */
+  /** The taken piece during a piece slide. */
   private Piece slideTakenPiece;
 
-  /**
-   * The end position for a slide animation.
-   */
+  /** The end position for a slide animation. */
   private Position slideTargetPosition;
 
-  /**
-   * The time when the sliding started.
-   */
+  /** The time when the sliding started. */
   private long slideStartTime;
 
   /**
@@ -481,9 +385,7 @@ public class JBoard extends JComponent {
    */
   private long slideTime;
 
-  /**
-   * The time which invoked repaint() periodically to animate sliding.
-   */
+  /** The time which invoked repaint() periodically to animate sliding. */
   private final Timer slideTimer =
       new Timer(
           20,
@@ -522,9 +424,7 @@ public class JBoard extends JComponent {
    */
   private boolean isShowingModalDialog = false;
 
-  /**
-   * Creates a new JBoard with the specified position and BoardPainter and PiecePainter.
-   */
+  /** Creates a new JBoard with the specified position and BoardPainter and PiecePainter. */
   public JBoard(Position position, BoardPainter boardPainter, PiecePainter piecePainter) {
     if (position == null) throw new IllegalArgumentException("The Position may not be null");
     if (boardPainter == null)
@@ -540,9 +440,7 @@ public class JBoard extends JComponent {
     enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
-  /**
-   * Creates a new JBoard with the given position set on it.
-   */
+  /** Creates a new JBoard with the given position set on it. */
   public JBoard(Position position) {
     this(
         position,
@@ -550,30 +448,22 @@ public class JBoard extends JComponent {
         position.getVariant().createDefaultPiecePainter());
   }
 
-  /**
-   * Creates a new JBoard with the initial position set on it.
-   */
+  /** Creates a new JBoard with the initial position set on it. */
   public JBoard() {
     this(new Position());
   }
 
-  /**
-   * Adds a <code>MoveProgressListener</code>.
-   */
+  /** Adds a <code>MoveProgressListener</code>. */
   public void addMoveProgressListener(MoveProgressListener listener) {
     listenerList.add(MoveProgressListener.class, listener);
   }
 
-  /**
-   * Remove a <code>MoveProgressListener</code>.
-   */
+  /** Remove a <code>MoveProgressListener</code>. */
   public void removeMoveProgressListener(MoveProgressListener listener) {
     listenerList.remove(MoveProgressListener.class, listener);
   }
 
-  /**
-   * Fires the specified <code>MoveProfressEvent</code> to interested listeners.
-   */
+  /** Fires the specified <code>MoveProfressEvent</code> to interested listeners. */
   protected void fireMoveProgressEvent(MoveProgressEvent evt) {
     int id = evt.getId();
     Object[] listeners = listenerList.getListenerList();
@@ -612,16 +502,12 @@ public class JBoard extends JComponent {
     if (paintHooks.size() == 0) paintHooks = null;
   }
 
-  /**
-   * Returns the Position on this JBoard.
-   */
+  /** Returns the Position on this JBoard. */
   public Position getPosition() {
     return position;
   }
 
-  /**
-   * Sets this JBoard to display the given Position.
-   */
+  /** Sets this JBoard to display the given Position. */
   public void setPosition(Position newPosition) {
     if (newPosition == null) throw new IllegalArgumentException("Null position");
 
@@ -643,9 +529,9 @@ public class JBoard extends JComponent {
   }
 
   /**
-   * Sets the move input style of this JBoard to the given style. Possible values are
-   * {@link #UNIFIED_MOVE_INPUT_STYLE}, {@link #DRAG_N_DROP_MOVE_INPUT_STYLE} and
-   * {@link #CLICK_N_CLICK_MOVE_INPUT_STYLE}.
+   * Sets the move input style of this JBoard to the given style. Possible values are {@link
+   * #UNIFIED_MOVE_INPUT_STYLE}, {@link #DRAG_N_DROP_MOVE_INPUT_STYLE} and {@link
+   * #CLICK_N_CLICK_MOVE_INPUT_STYLE}.
    */
   public void setMoveInputStyle(int newStyle) {
     switch (newStyle) {
@@ -662,17 +548,15 @@ public class JBoard extends JComponent {
     firePropertyChange("moveInputStyle", oldStyle, newStyle);
   }
 
-  /**
-   * Returns the current move input style for this JBoard.
-   */
+  /** Returns the current move input style for this JBoard. */
   public int getMoveInputStyle() {
     return moveInputStyle;
   }
 
   /**
-   * Sets the move input mode of this JBoard to the given mode. Possible values are
-   * {@link #NO_PIECES_MOVE}, {@link #WHITE_PIECES_MOVE}, {@link #BLACK_PIECES_MOVE},
-   * {@link #ALL_PIECES_MOVE} and {@link #CURRENT_PLAYER_MOVES}.
+   * Sets the move input mode of this JBoard to the given mode. Possible values are {@link
+   * #NO_PIECES_MOVE}, {@link #WHITE_PIECES_MOVE}, {@link #BLACK_PIECES_MOVE}, {@link
+   * #ALL_PIECES_MOVE} and {@link #CURRENT_PLAYER_MOVES}.
    */
   public void setMoveInputMode(int newMode) {
     switch (newMode) {
@@ -690,64 +574,48 @@ public class JBoard extends JComponent {
     firePropertyChange("moveInputMode", oldMode, newMode);
   }
 
-  /**
-   * Returns the current move input mode for this JBoard.
-   */
+  /** Returns the current move input mode for this JBoard. */
   public int getMoveInputMode() {
     return moveInputMode;
   }
 
-  /**
-   * Sets whether pieces can at all be moved.
-   */
+  /** Sets whether pieces can at all be moved. */
   public void setEditable(boolean isEditable) {
     boolean oldEditable = this.isEditable;
     this.isEditable = isEditable;
     firePropertyChange("editable", oldEditable, isEditable);
   }
 
-  /**
-   * Returns <code>true</code> if the board is editable, i.e. the pieces can at all be moved.
-   */
+  /** Returns <code>true</code> if the board is editable, i.e. the pieces can at all be moved. */
   public boolean isEditable() {
     return isEditable;
   }
 
-  /**
-   * Sets whether the moved piece follows the mouse cursor while a move is being made.
-   */
+  /** Sets whether the moved piece follows the mouse cursor while a move is being made. */
   public void setPieceFollowsCursor(boolean isPieceFollowsCursor) {
     boolean oldVal = this.isPieceFollowsCursor;
     this.isPieceFollowsCursor = isPieceFollowsCursor;
     firePropertyChange("pieceFollowsCursor", oldVal, isPieceFollowsCursor);
   }
 
-  /**
-   * Returns whether the moved piece follows the mouse cursor while a move is being made.
-   */
+  /** Returns whether the moved piece follows the mouse cursor while a move is being made. */
   public boolean isPieceFollowsCursor() {
     return isPieceFollowsCursor;
   }
 
-  /**
-   * Sets whether the squares of a move being made are highlighted.
-   */
+  /** Sets whether the squares of a move being made are highlighted. */
   public void setHighlightMadeMoveSquares(boolean highlight) {
     boolean oldVal = this.isHighlightMadeMoveSquares;
     this.isHighlightMadeMoveSquares = highlight;
     firePropertyChange("highlightMadeMoveSquares", oldVal, highlight);
   }
 
-  /**
-   * Returns whether the move being made is highlighted.
-   */
+  /** Returns whether the move being made is highlighted. */
   public boolean isHighlightMadeMoveSquares() {
     return isHighlightMadeMoveSquares;
   }
 
-  /**
-   * Sets the move highlighting style.
-   */
+  /** Sets the move highlighting style. */
   public void setMoveHighlightingStyle(int newStyle) {
     switch (newStyle) {
       case NO_MOVE_HIGHLIGHTING:
@@ -765,16 +633,12 @@ public class JBoard extends JComponent {
     firePropertyChange("moveHighlightingStyle", oldStyle, newStyle);
   }
 
-  /**
-   * Returns the move highlighting style.
-   */
+  /** Returns the move highlighting style. */
   public int getMoveHighlightingStyle() {
     return moveHighlightingStyle;
   }
 
-  /**
-   * Sets the currently highlighted move, or <code>null</code> if no move should be highlighted.
-   */
+  /** Sets the currently highlighted move, or <code>null</code> if no move should be highlighted. */
   public void setHighlightedMove(Move move) {
     repaintHighlighting();
 
@@ -803,9 +667,7 @@ public class JBoard extends JComponent {
       repaint(squareToRect(from, null).union(squareToRect(to, null)));
   }
 
-  /**
-   * Sets whether during a move a shadow piece is displayed at the target square.
-   */
+  /** Sets whether during a move a shadow piece is displayed at the target square. */
   public void setShowShadowPieceInTargetSquare(boolean newValue) {
     boolean oldValue = this.isShowShadowPieceInTargetSquare;
     this.isShowShadowPieceInTargetSquare = newValue;
@@ -813,16 +675,12 @@ public class JBoard extends JComponent {
     firePropertyChange("isShowShadowPieceInTargetSquare", oldValue, newValue);
   }
 
-  /**
-   * Returns whether during a move a shadow piece is displayed at the target square.
-   */
+  /** Returns whether during a move a shadow piece is displayed at the target square. */
   public boolean isShowShadowPieceInTargetSquare() {
     return isShowShadowPieceInTargetSquare;
   }
 
-  /**
-   * Sets whether during a move the legal target squares are highlighted.
-   */
+  /** Sets whether during a move the legal target squares are highlighted. */
   public void setHighlightLegalTargetSquares(boolean newValue) {
     boolean oldValue = this.isHighlightLegalTargetSquares;
     this.isHighlightLegalTargetSquares = newValue;
@@ -837,17 +695,15 @@ public class JBoard extends JComponent {
     firePropertyChange("isHighlightLegalTargetSquares", oldValue, newValue);
   }
 
-  /**
-   * Returns whether during a move the legal target squares are highlighted.
-   */
+  /** Returns whether during a move the legal target squares are highlighted. */
   public boolean isHighlightLegalTargetSquares() {
     return isHighlightLegalTargetSquares;
   }
 
   /**
    * Sets the color with which legal target squares are highlighted. This should normally be a
-   * translucent color, so that for captures, the captured piece is visible. Passing
-   * <code>null</code> causes the color to be reset to the default one.
+   * translucent color, so that for captures, the captured piece is visible. Passing <code>null
+   * </code> causes the color to be reset to the default one.
    */
   public void setLegalTargetSquaresHighlightColor(Color color) {
     if (color == null) color = DEFAULT_POSSIBLE_TARGET_SQUARES_HIGHLIGHT_COLOR;
@@ -860,16 +716,12 @@ public class JBoard extends JComponent {
     firePropertyChange("legalTargetSquaresHighlightColor", oldColor, color);
   }
 
-  /**
-   * Returns the color with which legal target squares are highlighted.
-   */
+  /** Returns the color with which legal target squares are highlighted. */
   public Color getLegalTargetSquaresHighlightColor() {
     return legalTargetSquaresHighlightColor;
   }
 
-  /**
-   * Sets whether the target square snaps to the nearest legal square when making a move.
-   */
+  /** Sets whether the target square snaps to the nearest legal square when making a move. */
   public void setSnapToLegalSquare(boolean newValue) {
     boolean oldValue = this.isSnapToLegalSquare;
     this.isSnapToLegalSquare = newValue;
@@ -877,9 +729,7 @@ public class JBoard extends JComponent {
     firePropertyChange("isSnapToLegalSquare", oldValue, newValue);
   }
 
-  /**
-   * Returns whether the target square snaps to the nearest legal square when making a move.
-   */
+  /** Returns whether the target square snaps to the nearest legal square when making a move. */
   public boolean isSnapToLegalSquare() {
     return isSnapToLegalSquare;
   }
@@ -905,9 +755,7 @@ public class JBoard extends JComponent {
     firePropertyChange("coordsDisplayStyle", oldStyle, newStyle);
   }
 
-  /**
-   * Returns the current coordinates display style.
-   */
+  /** Returns the current coordinates display style. */
   public int getCoordsDisplayStyle() {
     return coordsDisplayStyle;
   }
@@ -923,9 +771,7 @@ public class JBoard extends JComponent {
     firePropertyChange("flipped", oldFlipped, isFlipped);
   }
 
-  /**
-   * Returns true if the JBoard is flipped, false otherwise.
-   */
+  /** Returns true if the JBoard is flipped, false otherwise. */
   public boolean isFlipped() {
     return isFlipped;
   }
@@ -948,16 +794,12 @@ public class JBoard extends JComponent {
     return isManualPromote;
   }
 
-  /**
-   * Returns the BoardPainter of this JBoard.
-   */
+  /** Returns the BoardPainter of this JBoard. */
   public BoardPainter getBoardPainter() {
     return boardPainter;
   }
 
-  /**
-   * Returns the PiecePainter of this JBoard.
-   */
+  /** Returns the PiecePainter of this JBoard. */
   public PiecePainter getPiecePainter() {
     return piecePainter;
   }
@@ -1002,9 +844,7 @@ public class JBoard extends JComponent {
     firePropertyChange("moveHighlightingColor", oldColor, moveHighlightingColor);
   }
 
-  /**
-   * Returns the color used for move highlighting.
-   */
+  /** Returns the color used for move highlighting. */
   public Color getMoveHighlightingColor() {
     return moveHighlightingColor;
   }
@@ -1022,17 +862,15 @@ public class JBoard extends JComponent {
     firePropertyChange("coordsDisplayColor", oldColor, coordsDisplayColor);
   }
 
-  /**
-   * Returns the color used for coordinate display.
-   */
+  /** Returns the color used for coordinate display. */
   public Color getCoordsDisplayColor() {
     return coordsDisplayColor;
   }
 
   /**
    * Sets the color used for highlighting the squares of the move being made. This refers to the
-   * highlighting specified by the <code>highlightMadeMoveSquares</code> property. Passing
-   * <code>null</code> is equivalent to setting it to the default color.
+   * highlighting specified by the <code>highlightMadeMoveSquares</code> property. Passing <code>
+   * null</code> is equivalent to setting it to the default color.
    */
   public void setMadeMoveSquaresHighlightColor(Color newColor) {
     if (newColor == null) newColor = DEFAULT_MADE_MOVE_SQUARES_HIGHLIGHT_COLOR;
@@ -1043,9 +881,7 @@ public class JBoard extends JComponent {
     firePropertyChange("madeMoveSquaresHighlightColor", oldColor, newColor);
   }
 
-  /**
-   * Returns the color used for highlighting the squares of the move being made.
-   */
+  /** Returns the color used for highlighting the squares of the move being made. */
   public Color getMadeMoveSquaresHighlightColor() {
     return madeMoveSquaresHighlightColor;
   }
@@ -1070,18 +906,14 @@ public class JBoard extends JComponent {
     firePropertyChange("slideDuration", oldValue, slideDuration);
   }
 
-  /**
-   * Sets the shaded state of the specified square.
-   */
+  /** Sets the shaded state of the specified square. */
   public void setShaded(Square square, boolean isShaded) {
     boolean oldState = this.isShaded[square.getFile()][square.getRank()];
     this.isShaded[square.getFile()][square.getRank()] = isShaded;
     if (oldState != isShaded) repaint(squareToRect(square, null));
   }
 
-  /**
-   * Sets all the squares to the unshaded state.
-   */
+  /** Sets all the squares to the unshaded state. */
   public void clearShaded() {
     Rectangle helpRect = new Rectangle();
     for (int file = 0; file < 8; file++)
@@ -1092,23 +924,17 @@ public class JBoard extends JComponent {
       }
   }
 
-  /**
-   * Returns <code>true</code> iff the specified square is shaded.
-   */
+  /** Returns <code>true</code> iff the specified square is shaded. */
   public boolean isShaded(Square square) {
     return isShaded[square.getFile()][square.getRank()];
   }
 
-  /**
-   * Returns <code>true</code> iff a piece is currently being moved/dragged.
-   */
+  /** Returns <code>true</code> iff a piece is currently being moved/dragged. */
   public boolean isMovingPiece() {
     return movedPieceSquare != null;
   }
 
-  /**
-   * Paints this JBoard on the given Graphics object.
-   */
+  /** Paints this JBoard on the given Graphics object. */
   @Override
   public void paintComponent(Graphics graphics) {
     super.paintComponent(graphics);
@@ -1270,9 +1096,7 @@ public class JBoard extends JComponent {
    */
   private static final Font COORDS_FONT = new Font("Monospaced", Font.BOLD, 10);
 
-  /**
-   * Draws the coordinates.
-   */
+  /** Draws the coordinates. */
   private void drawCoords(Graphics g) {
     g.setColor(getCoordsDisplayColor());
 
@@ -1294,9 +1118,7 @@ public class JBoard extends JComponent {
     }
   }
 
-  /**
-   * Draws the coordinates for <code>RIM_COORDS</code> style.
-   */
+  /** Draws the coordinates for <code>RIM_COORDS</code> style. */
   private void drawRimCoords(Graphics g) {
     Rectangle boardRect = getBoardRect(null);
     int squareWidth = boardRect.width / 8;
@@ -1328,8 +1150,10 @@ public class JBoard extends JComponent {
     // Column coordinates
     if (clipRect.intersects(
         new Rectangle(
-            boardRect.x, boardRect.y + boardRect.height - squareHeight / 2,
-            boardRect.width, squareHeight / 2))) {
+            boardRect.x,
+            boardRect.y + boardRect.height - squareHeight / 2,
+            boardRect.width,
+            squareHeight / 2))) {
       char col = isFlipped() ? 'h' : 'a';
       for (int i = 0; i < 8; i++) {
         g.drawString(
@@ -1341,9 +1165,7 @@ public class JBoard extends JComponent {
     }
   }
 
-  /**
-   * Draws the coordinates for <code>OUTSIDE_COORDS</code> style.
-   */
+  /** Draws the coordinates for <code>OUTSIDE_COORDS</code> style. */
   private void drawOutsideCoords(Graphics g) {
     Insets insets = getInsets();
     Rectangle boardRect = getBoardRect(null);
@@ -1394,9 +1216,7 @@ public class JBoard extends JComponent {
     }
   }
 
-  /**
-   * Draws the coordinates for <code>EVERY_SQUARE_COORDS</code> style.
-   */
+  /** Draws the coordinates for <code>EVERY_SQUARE_COORDS</code> style. */
   private void drawEverySquareCoords(Graphics g) {
     Rectangle boardRect = getBoardRect(null);
     int squareWidth = boardRect.width / 8;
@@ -1432,8 +1252,8 @@ public class JBoard extends JComponent {
   }
 
   /**
-   * Draws an arrow of the given size between the two specified squares on the given
-   * <code>Graphics</code> object using the specified color.
+   * Draws an arrow of the given size between the two specified squares on the given <code>Graphics
+   * </code> object using the specified color.
    */
   protected void drawArrow(
       Graphics graphics, Square from, Square to, float arrowSize, Color color) {
@@ -1487,9 +1307,8 @@ public class JBoard extends JComponent {
   }
 
   /**
-   * Draws an outline of a square of the given size at the specified square on the given
-   * <code>Graphics</code> object with the specific color. The size specifies the width of the
-   * outline.
+   * Draws an outline of a square of the given size at the specified square on the given <code>
+   * Graphics</code> object with the specific color. The size specifies the width of the outline.
    */
   protected void drawSquare(Graphics graphics, Square circleSquare, int size, Color color) {
     Graphics2D g = (Graphics2D) graphics;
@@ -1524,9 +1343,7 @@ public class JBoard extends JComponent {
     g.translate(-rect.x, -rect.y);
   }
 
-  /**
-   * Calls all the registered PaintHooks.
-   */
+  /** Calls all the registered PaintHooks. */
   private void callPaintHooks(Graphics g) {
     int size = paintHooks == null ? 0 : paintHooks.size();
     for (int i = 0; i < size; i++) {
@@ -1564,16 +1381,12 @@ public class JBoard extends JComponent {
     return rect;
   }
 
-  /**
-   * Returns the rectangle (in pixels) of the given square.
-   */
+  /** Returns the rectangle (in pixels) of the given square. */
   public Rectangle squareToRect(Square square, Rectangle squareRect) {
     return squareToRect(square.getFile(), square.getRank(), squareRect);
   }
 
-  /**
-   * Returns the rectangle (in pixels) of the given square.
-   */
+  /** Returns the rectangle (in pixels) of the given square. */
   public Rectangle squareToRect(int file, int rank, Rectangle squareRect) {
     squareRect = getBoardRect(squareRect);
 
@@ -1593,9 +1406,9 @@ public class JBoard extends JComponent {
 
   /**
    * Calculates a rectangle (in pixels) which completely contains the graphic of the piece currently
-   * being moved, if we are in <code>pieceFollowsCursor</code> mode. Throws an
-   * <code>IllegalStateException</code> if we are not in in <code>pieceFollowsCursor</code> mode or
-   * if a piece is not currently being moved.
+   * being moved, if we are in <code>pieceFollowsCursor</code> mode. Throws an <code>
+   * IllegalStateException</code> if we are not in in <code>pieceFollowsCursor</code> mode or if a
+   * piece is not currently being moved.
    */
   private Rectangle getMovedPieceGraphicRect(Rectangle rect) {
     if (!isPieceFollowsCursor()) throw new IllegalStateException("Not in pieceFollowsCursor mode");
@@ -1613,9 +1426,7 @@ public class JBoard extends JComponent {
     return rect;
   }
 
-  /**
-   * Calculates the target square during a move based on the specified cursor location.
-   */
+  /** Calculates the target square during a move based on the specified cursor location. */
   private Square calcTargetSquare(Point cursorLocation) {
     if (isSnapToLegalSquare && (legalTargetSquares != null)) {
       // Check the usual case - square under the cursor
@@ -1698,24 +1509,18 @@ public class JBoard extends JComponent {
     else return Square.getInstance(file, rank);
   }
 
-  /**
-   * Returns the square corresponding to the given coordinate (in pixels).
-   */
+  /** Returns the square corresponding to the given coordinate (in pixels). */
   public Square locationToSquare(Point p) {
     return locationToSquare(p.x, p.y);
   }
 
-  /**
-   * Makes sure no events are dispatched to this JBoard while its showing a modal dialog.
-   */
+  /** Makes sure no events are dispatched to this JBoard while its showing a modal dialog. */
   @Override
   protected void processEvent(AWTEvent evt) {
     if (!isShowingModalDialog) super.processEvent(evt);
   }
 
-  /**
-   * Returns whether the given piece can be moved, considering the current move mode.
-   */
+  /** Returns whether the given piece can be moved, considering the current move mode. */
   private boolean canBeMoved(Piece piece) {
     switch (getMoveInputMode()) {
       case NO_PIECES_MOVE:
@@ -1744,9 +1549,7 @@ public class JBoard extends JComponent {
         || (moveInputStyle == style);
   }
 
-  /**
-   * Causes the possible target squares to be repainted.
-   */
+  /** Causes the possible target squares to be repainted. */
   private void repaintLegalTargetSquares(Rectangle helpRect) {
     for (Iterator i = legalTargetSquares.iterator(); i.hasNext(); )
       repaint(helpRect = squareToRect((Square) i.next(), helpRect));
@@ -1774,9 +1577,7 @@ public class JBoard extends JComponent {
     fireMoveProgressEvent(new MoveProgressEvent(this, MoveProgressEvent.MOVE_MAKING_ENDED));
   }
 
-  /**
-   * Processes a mouse event.
-   */
+  /** Processes a mouse event. */
   @Override
   protected void processMouseEvent(MouseEvent evt) {
     super.processMouseEvent(evt);
@@ -1898,9 +1699,7 @@ public class JBoard extends JComponent {
     }
   }
 
-  /**
-   * Processes a mouse motion event.
-   */
+  /** Processes a mouse motion event. */
   @Override
   protected void processMouseMotionEvent(MouseEvent evt) {
     super.processMouseMotionEvent(evt);
@@ -1937,9 +1736,7 @@ public class JBoard extends JComponent {
     }
   }
 
-  /**
-   * Displays a simple <code>JFrame</code> with a <code>JBoard</code>.
-   */
+  /** Displays a simple <code>JFrame</code> with a <code>JBoard</code>. */
   public static void main(String[] args) {
     javax.swing.JFrame frame = new javax.swing.JFrame("JBoard Test");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

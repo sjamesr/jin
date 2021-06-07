@@ -1,7 +1,6 @@
 package free.jin.ui;
 
 import java.awt.BorderLayout;
-
 import javax.swing.JTabbedPane;
 
 /**
@@ -12,19 +11,13 @@ import javax.swing.JTabbedPane;
  */
 public class TabbedPreferencesPanel extends CompositePreferencesPanel {
 
-  /**
-   * The tabbed pane.
-   */
+  /** The tabbed pane. */
   protected final JTabbedPane tabs = new JTabbedPane();
 
-  /**
-   * Whether the UI has already been created (.
-   */
+  /** Whether the UI has already been created (. */
   private boolean uiCreated = false;
 
-  /**
-   * If {@link #createLayout()} hasn't been called yet, calls it.
-   */
+  /** If {@link #createLayout()} hasn't been called yet, calls it. */
   @Override
   public void addNotify() {
     super.addNotify();
@@ -35,17 +28,13 @@ public class TabbedPreferencesPanel extends CompositePreferencesPanel {
     }
   }
 
-  /**
-   * Creates the layout of this panel, adding the tabbed pane.
-   */
+  /** Creates the layout of this panel, adding the tabbed pane. */
   protected void createLayout() {
     setLayout(new BorderLayout());
     add(tabs, BorderLayout.CENTER);
   }
 
-  /**
-   * Adds the panel to the tabbed pane.
-   */
+  /** Adds the panel to the tabbed pane. */
   @Override
   protected void addPanelToUi(PreferencesPanel panel, String panelTitle, String panelToolTip) {
     tabs.addTab(panelTitle, null, panel, panelToolTip);

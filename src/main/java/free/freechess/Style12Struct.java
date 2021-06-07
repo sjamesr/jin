@@ -2,23 +2,22 @@
  * The freechess.org connection library. More information is available at http://www.jinchess.com/.
  * Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The freechess.org connection library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free Software
+ * <p>The freechess.org connection library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
  *
- * The freechess.org connection library is distributed in the hope that it will be useful, but
+ * <p>The freechess.org connection library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * freechess.org connection library; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package free.freechess;
 
-import java.util.StringTokenizer;
-
 import free.util.Struct;
+import java.util.StringTokenizer;
 
 /**
  * A structure holding parsed information from a style12 line. See <A
@@ -28,19 +27,13 @@ import free.util.Struct;
  */
 public class Style12Struct extends Struct {
 
-  /**
-   * The constant for the user's game.
-   */
+  /** The constant for the user's game. */
   public static final int MY_GAME = 1;
 
-  /**
-   * The constant for an observed game.
-   */
+  /** The constant for an observed game. */
   public static final int OBSERVED_GAME = 2;
 
-  /**
-   * The constant for a game which is just an isolated peek into someone's game.
-   */
+  /** The constant for a game which is just an isolated peek into someone's game. */
   public static final int ISOLATED_BOARD = 3;
 
   /**
@@ -50,21 +43,21 @@ public class Style12Struct extends Struct {
    * @param boardLexigraphic The current board, in lexigraphic format.
    * @param currentPlayer The player to move, either "B" or "W".
    * @param doublePawnPushFile The file of the double pawn push on the last move, or -1 if the last
-   * move wasn't a double pawn push.
+   *     move wasn't a double pawn push.
    * @param canWhiteCastleKingside Can white castle kingside?
    * @param canWhiteCastleQueenside Can white castle queenside?
    * @param canBlackCastleKingside Can black castle kingside?
    * @param canBlackCastleQueenside Can black castle queenside?
    * @param pliesSinceIrreversible The number of half moves made since the last irreversible move (0
-   * if the last move is irreversible).
+   *     if the last move is irreversible).
    * @param gameNumber The game number.
    * @param whiteName The white player's nickname.
    * @param blackName The black player's nickname.
    * @param gameType The code for the type of the game. Possible values are <code>MY_GAME</code>,
-   * <code>OBSERVED_GAME</code> and <code>ISOLATED_BOARD</code>.
+   *     <code>OBSERVED_GAME</code> and <code>ISOLATED_BOARD</code>.
    * @param isPlayedGame <code>true</code> if the game is played,
    * @param isMyTurn Is it my turn or the opponent's? Only relevant if <code>gameType</code> is
-   * <code>MY_GAME</code> and it's a played game. <code>false</code> if it's an examined game.
+   *     <code>MY_GAME</code> and it's a played game. <code>false</code> if it's an examined game.
    * @param initTime Initial time (in seconds) of the match.
    * @param increment Increment (in seconds) of the match.
    * @param whiteMaterialStrength White's material strength.
@@ -72,13 +65,13 @@ public class Style12Struct extends Struct {
    * @param whiteTime White's remaining time, in milliseconds.
    * @param blackTime Black's remaining time, in milliseconds.
    * @param nextMoveNumber The number of the move about to be made (standard chess numbering --
-   * White's and Black's first moves are both 1, etc.)
+   *     White's and Black's first moves are both 1, etc.)
    * @param moveVerbose A verbose representation of the last move, <code>null</code> if none.
-   * @param movePretty A SAN (Standard Algebraic Notation) representation of the last move,
-   * <code>null</code> if none.
+   * @param movePretty A SAN (Standard Algebraic Notation) representation of the last move, <code>
+   *     null</code> if none.
    * @param moveTime The amount of time taken to make the last move, in milliseconds.
    * @param isBoardFlipped <code>true</code> if the board should be flipped (black at bottom),
-   * <code>false</code> otherwise.
+   *     <code>false</code> otherwise.
    * @param isClockRunning <code>true</code> if the clock of the player to move is running.
    * @param lag The lag incurred when making the move, in milliseconds.
    */
@@ -197,9 +190,7 @@ public class Style12Struct extends Struct {
     setIntegerProperty("Lag", lag);
   }
 
-  /**
-   * Parses a style12 line and returns a corresponding Style12Struct object.
-   */
+  /** Parses a style12 line and returns a corresponding Style12Struct object. */
   public static Style12Struct parseStyle12Line(String line) {
     StringTokenizer tokens = new StringTokenizer(line, " ");
 
@@ -332,16 +323,12 @@ public class Style12Struct extends Struct {
     else throw new IllegalArgumentException("Bad boolean value: " + val);
   }
 
-  /**
-   * Returns the current board in lexigraphic format.
-   */
+  /** Returns the current board in lexigraphic format. */
   public String getBoardLexigraphic() {
     return getStringProperty("BoardLexigraphic");
   }
 
-  /**
-   * Returns the current board in FEN format.
-   */
+  /** Returns the current board in FEN format. */
   public String getBoardFEN() {
     StringBuffer buf = new StringBuffer();
     String boardLexigraphic = getBoardLexigraphic();
@@ -402,9 +389,7 @@ public class Style12Struct extends Struct {
     return buf.toString();
   }
 
-  /**
-   * Returns a string representing the player whose turn it currently is, either "W" or "B".
-   */
+  /** Returns a string representing the player whose turn it currently is, either "W" or "B". */
   public String getCurrentPlayer() {
     return getStringProperty("CurrentPlayer");
   }
@@ -457,23 +442,17 @@ public class Style12Struct extends Struct {
     return getIntegerProperty("PliesSinceIrreversible");
   }
 
-  /**
-   * Returns the game number.
-   */
+  /** Returns the game number. */
   public int getGameNumber() {
     return getIntegerProperty("GameNumber");
   }
 
-  /**
-   * Returns the white player's nickname.
-   */
+  /** Returns the white player's nickname. */
   public String getWhiteName() {
     return getStringProperty("WhiteName");
   }
 
-  /**
-   * Returns the black player's nickname.
-   */
+  /** Returns the black player's nickname. */
   public String getBlackName() {
     return getStringProperty("BlackName");
   }
@@ -486,9 +465,7 @@ public class Style12Struct extends Struct {
     return getIntegerProperty("GameType");
   }
 
-  /**
-   * Returns <code>true</code> if the game is a played game, <code>false</code> if examined.
-   */
+  /** Returns <code>true</code> if the game is a played game, <code>false</code> if examined. */
   public boolean isPlayedGame() {
     return getBooleanProperty("IsPlayedGame");
   }
@@ -498,7 +475,7 @@ public class Style12Struct extends Struct {
    * turn. This is only relevant if the game type is <code>MY_GAME</code> and it's a played game.
    *
    * @throws IllegalStateException if the game type is not <code>MY_GAME</code> or it's not a played
-   * game.
+   *     game.
    */
   public boolean isMyTurn() {
     if ((getGameType() != MY_GAME) || !isPlayedGame())
@@ -508,44 +485,32 @@ public class Style12Struct extends Struct {
     return getBooleanProperty("IsMyTurn");
   }
 
-  /**
-   * Returns the initial time in the match, in seconds.
-   */
+  /** Returns the initial time in the match, in seconds. */
   public int getInitialTime() {
     return getIntegerProperty("InitTime");
   }
 
-  /**
-   * Returns the increment in the time, in seconds.
-   */
+  /** Returns the increment in the time, in seconds. */
   public int getIncrement() {
     return getIntegerProperty("Increment");
   }
 
-  /**
-   * Returns white's material strength.
-   */
+  /** Returns white's material strength. */
   public int getWhiteMaterialStrength() {
     return getIntegerProperty("WhiteMaterialStrength");
   }
 
-  /**
-   * Returns black's material strength.
-   */
+  /** Returns black's material strength. */
   public int getBlackMaterialStrength() {
     return getIntegerProperty("BlackMaterialStrength");
   }
 
-  /**
-   * Returns white's remaining time, in seconds.
-   */
+  /** Returns white's remaining time, in seconds. */
   public int getWhiteTime() {
     return getIntegerProperty("WhiteTime");
   }
 
-  /**
-   * Returns black's remaining time, in seconds.
-   */
+  /** Returns black's remaining time, in seconds. */
   public int getBlackTime() {
     return getIntegerProperty("BlackTime");
   }
@@ -582,23 +547,17 @@ public class Style12Struct extends Struct {
     return getStringProperty("MoveSAN");
   }
 
-  /**
-   * Returns the amount of time it took to make the last move, in seconds.
-   */
+  /** Returns the amount of time it took to make the last move, in seconds. */
   public int getMoveTime() {
     return getIntegerProperty("MoveTime");
   }
 
-  /**
-   * Returns <code>true</code> if the board is flipped (black at bottom), false otherwise.
-   */
+  /** Returns <code>true</code> if the board is flipped (black at bottom), false otherwise. */
   public boolean isBoardFlipped() {
     return getBooleanProperty("IsBoardFlipped");
   }
 
-  /**
-   * Returns <code>true</code> if the clock of the player to move is running.
-   */
+  /** Returns <code>true</code> if the clock of the player to move is running. */
   public boolean isClockRunning() {
     return getBooleanProperty("IsClockRunning");
   }

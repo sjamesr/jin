@@ -1,28 +1,25 @@
 package free.workarounds;
 
+import free.util.PlatformUtils;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
-
 import javax.swing.JDialog;
-
-import free.util.PlatformUtils;
 
 /**
  * A fix of JDialog. Fixes the following bugs:
+ *
  * <ul>
- * <li><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5109571"> REGRESSION:
- * JDialog.setVisible(false) not honoured</a>
+ *   <li><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5109571">REGRESSION:
+ *       JDialog.setVisible(false) not honoured</a>
  * </ul>
  *
  * @author Maryanovsky Alexander
  */
 public class FixedJDialog extends JDialog {
 
-  /**
-   * Whether workaround for bug 5109571 should be applied.
-   */
+  /** Whether workaround for bug 5109571 should be applied. */
   private static final boolean WORKAROUND_5109571;
 
   static {
@@ -40,9 +37,7 @@ public class FixedJDialog extends JDialog {
     WORKAROUND_5109571 = fix5109571;
   }
 
-  /**
-   * The time when the dialog was last shown. Needed for bug 5109571.
-   */
+  /** The time when the dialog was last shown. Needed for bug 5109571. */
   private long lastShownTime;
 
   public FixedJDialog() throws HeadlessException {
@@ -92,9 +87,7 @@ public class FixedJDialog extends JDialog {
 
   // <5109571>
 
-  /**
-   * Remembers the time the dialog is shown.
-   */
+  /** Remembers the time the dialog is shown. */
   @Override
   public void show() {
     lastShownTime = System.currentTimeMillis();
@@ -102,9 +95,7 @@ public class FixedJDialog extends JDialog {
     super.show();
   }
 
-  /**
-   * Works around bug 5109571, if needed, by delaying hiding the dialog.
-   */
+  /** Works around bug 5109571, if needed, by delaying hiding the dialog. */
   @Override
   public void hide() {
     if (WORKAROUND_5109571) {

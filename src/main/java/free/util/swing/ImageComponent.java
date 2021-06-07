@@ -2,20 +2,21 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing;
 
+import free.util.AWTUtilities;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -26,7 +27,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.ImageObserver;
-
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolTip;
@@ -34,26 +34,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 
-import free.util.AWTUtilities;
-
-/**
- * A component which draws an image.
- */
+/** A component which draws an image. */
 public class ImageComponent extends JComponent {
 
-  /**
-   * The image we're currently displaying.
-   */
+  /** The image we're currently displaying. */
   private Image image;
 
-  /**
-   * Whether we're displaying a fullsize version of the image in a popup on mouseover.
-   */
+  /** Whether we're displaying a fullsize version of the image in a popup on mouseover. */
   private boolean isImagePopup = false;
 
-  /**
-   * The <code>JPopupMenu</code> in which we're displaying the fullsize image on mouseover.
-   */
+  /** The <code>JPopupMenu</code> in which we're displaying the fullsize image on mouseover. */
   private JPopupMenu popup = null;
 
   /**
@@ -145,9 +135,7 @@ public class ImageComponent extends JComponent {
         });
   }
 
-  /**
-   * Sets the image.
-   */
+  /** Sets the image. */
   public void setImage(Image image) {
     this.image = image;
 
@@ -160,45 +148,33 @@ public class ImageComponent extends JComponent {
     repaint();
   }
 
-  /**
-   * Returns the image.
-   */
+  /** Returns the image. */
   public Image getImage() {
     return image;
   }
 
-  /**
-   * Returns whether we're displaying the full-size image in a popup on mouseover.
-   */
+  /** Returns whether we're displaying the full-size image in a popup on mouseover. */
   public boolean isPopupImage() {
     return isImagePopup;
   }
 
-  /**
-   * Sets whether we're displaying the full-size image in a popup on mouseover.
-   */
+  /** Sets whether we're displaying the full-size image in a popup on mouseover. */
   public void setImageToolTip(boolean isImagePopup) {
     this.isImagePopup = isImagePopup;
   }
 
-  /**
-   * Returns whether the image is not <code>null</code> and its size is fully known.
-   */
+  /** Returns whether the image is not <code>null</code> and its size is fully known. */
   public boolean isImageSizeKnown() {
     return (image != null) && (image.getWidth(this) > -1) && (image.getHeight(this) > -1);
   }
 
-  /**
-   * Returns whether the image is not <code>null</code> and is fully loaded.
-   */
+  /** Returns whether the image is not <code>null</code> and is fully loaded. */
   public boolean isImageLoaded() {
     return (image != null)
         && ((getToolkit().checkImage(image, -1, -1, this) & ImageObserver.ALLBITS) != 0);
   }
 
-  /**
-   * Paints the component.
-   */
+  /** Paints the component. */
   @Override
   public void paintComponent(Graphics g) {
     if (image == null) return;
@@ -219,9 +195,7 @@ public class ImageComponent extends JComponent {
     }
   }
 
-  /**
-   * Invoked when the image loading process retrieves more data.
-   */
+  /** Invoked when the image loading process retrieves more data. */
   @Override
   public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
     revalidate();
@@ -229,9 +203,7 @@ public class ImageComponent extends JComponent {
     return super.imageUpdate(img, infoflags, x, y, width, height);
   }
 
-  /**
-   * Returns our preferred size.
-   */
+  /** Returns our preferred size. */
   @Override
   public Dimension getPreferredSize() {
     if (!isImageSizeKnown()) return new Dimension(0, 0);
@@ -242,9 +214,7 @@ public class ImageComponent extends JComponent {
     return new Dimension(imageWidth, imageHeight);
   }
 
-  /**
-   * Returns the preferred width when displayed at the specified height.
-   */
+  /** Returns the preferred width when displayed at the specified height. */
   public int getPreferredWidth(int height) {
     if (!isImageSizeKnown()) return 0;
 
@@ -255,9 +225,7 @@ public class ImageComponent extends JComponent {
     return (int) (height * imageRatio);
   }
 
-  /**
-   * Returns the preferred height when displayed at the specified width.
-   */
+  /** Returns the preferred height when displayed at the specified width. */
   public int getPreferredHeight(int width) {
     if (!isImageSizeKnown()) return 0;
 
@@ -268,9 +236,7 @@ public class ImageComponent extends JComponent {
     return (int) (width / imageRatio);
   }
 
-  /**
-   * Returns our minimum size.
-   */
+  /** Returns our minimum size. */
   @Override
   public Dimension getMinimumSize() {
     return new Dimension(0, 0);

@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -33,7 +33,6 @@ public class StringParser {
    * "<x>;<y>;<width>;<height>" where <value> is replaced by an integer value.
    *
    * @throws FormatException if the given String is not in the expected wrong format.
-   *
    * @see StringEncoder#encodeRectangle(Rectangle)
    */
   public static Rectangle parseRectangle(String rectString) {
@@ -54,11 +53,10 @@ public class StringParser {
 
   /**
    * Parses the given String as a RectDouble object. The expected format is:
-   * "<x>;<y>;<width>;<height>" where <value> is replaced by a double value, parseable by
-   * {@link Double#valueOf(String)}.
+   * "<x>;<y>;<width>;<height>" where <value> is replaced by a double value, parseable by {@link
+   * Double#valueOf(String)}.
    *
    * @throws FormatException if the given String is not in the expected wrong format.
-   *
    * @see StringEncoder#encodeRectDouble(RectDouble)
    */
   public static RectDouble parseRectDouble(String rectString) {
@@ -82,7 +80,6 @@ public class StringParser {
    * <value> is replaced by an integer value.
    *
    * @throws FormatException if the given String is not in the expected wrong format.
-   *
    * @see StringEncoder#encodeDimension(Dimension)
    */
   public static Dimension parseDimension(String dimString) {
@@ -117,16 +114,12 @@ public class StringParser {
     }
   }
 
-  /**
-   * Parses the given string as a list of integers.
-   */
+  /** Parses the given string as a list of integers. */
   public static int[] parseIntList(String text) {
     return TextUtilities.parseIntList(text, " ");
   }
 
-  /**
-   * Unescapes the specified string.
-   */
+  /** Unescapes the specified string. */
   public static String parseString(String s) {
     StringBuffer buf = null;
     for (int i = 0; i < s.length(); i++) {

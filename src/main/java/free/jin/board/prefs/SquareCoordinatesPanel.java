@@ -2,33 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2004 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.prefs;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import free.chess.JBoard;
 import free.jin.BadChangesException;
@@ -37,35 +23,34 @@ import free.jin.board.BoardManager;
 import free.jin.board.JinBoard;
 import free.util.swing.ColorChooser;
 import free.util.swing.PreferredSizedPanel;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-/**
- * A preferences panel allowing the user to select the square coordinates settings.
- */
+/** A preferences panel allowing the user to select the square coordinates settings. */
 public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel {
 
-  /**
-   * The radio button for no move square coordinates.
-   */
+  /** The radio button for no move square coordinates. */
   private final JRadioButton none;
 
-  /**
-   * The radio button for square coordinates on the rim of the board
-   */
+  /** The radio button for square coordinates on the rim of the board */
   private final JRadioButton rim;
 
-  /**
-   * The radio button for square coordinates outside the board.
-   */
+  /** The radio button for square coordinates outside the board. */
   private final JRadioButton outside;
 
-  /**
-   * The radio button for square coordinates in every square.
-   */
+  /** The radio button for square coordinates in every square. */
   private final JRadioButton everySquare;
 
-  /**
-   * The color chooser for color of the square coordinates' text.
-   */
+  /** The color chooser for color of the square coordinates' text. */
   private final ColorChooser coordsColor;
 
   /**
@@ -149,9 +134,7 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel {
         });
   }
 
-  /**
-   * Returns the currently selected coordinates display style.
-   */
+  /** Returns the currently selected coordinates display style. */
   private int getCoordsDisplayStyle() {
     if (none.isSelected()) return JBoard.NO_COORDS;
     else if (rim.isSelected()) return JBoard.RIM_COORDS;
@@ -160,18 +143,14 @@ public class SquareCoordinatesPanel extends BoardModifyingPrefsPanel {
     else throw new IllegalStateException("None of the radio buttons are selected");
   }
 
-  /**
-   * Sets the initial properties of the preview board.
-   */
+  /** Sets the initial properties of the preview board. */
   @Override
   public void initPreviewBoard() {
     previewBoard.setCoordsDisplayStyle(getCoordsDisplayStyle());
     previewBoard.setCoordsDisplayColor(coordsColor.getColor());
   }
 
-  /**
-   * Applies any changes made by the user.
-   */
+  /** Applies any changes made by the user. */
   @Override
   public void applyChanges() throws BadChangesException {
     boardManager.setCoordsDisplayStyle(getCoordsDisplayStyle());

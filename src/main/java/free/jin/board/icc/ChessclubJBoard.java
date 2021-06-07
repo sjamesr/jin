@@ -2,20 +2,25 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.board.icc;
 
+import free.chess.Position;
+import free.chess.Square;
+import free.jin.board.Arrow;
+import free.jin.board.Circle;
+import free.jin.board.JinBoard;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -23,39 +28,23 @@ import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
-import free.chess.Position;
-import free.chess.Square;
-import free.jin.board.Arrow;
-import free.jin.board.Circle;
-import free.jin.board.JinBoard;
-
-/**
- * An extension of JinBoard which implements chessclub.com specific functionality.
- */
+/** An extension of JinBoard which implements chessclub.com specific functionality. */
 public class ChessclubJBoard extends JinBoard {
 
-  /**
-   * The temporary arrow's starting square.
-   */
+  /** The temporary arrow's starting square. */
   private Square tmpArrowFrom = null;
 
-  /**
-   * The temporary arrow's ending square.
-   */
+  /** The temporary arrow's ending square. */
   private Square tmpArrowTo = null;
 
-  /**
-   * Creates a new ChessclubJBoard with the given initial Position.
-   */
+  /** Creates a new ChessclubJBoard with the given initial Position. */
   public ChessclubJBoard(Position initPosition) {
     super(initPosition);
 
     enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
-  /**
-   * Paints the temporary arrow.
-   */
+  /** Paints the temporary arrow. */
   @Override
   public void paint(Component component, Graphics g) {
     super.paint(component, g);
@@ -68,9 +57,7 @@ public class ChessclubJBoard extends JinBoard {
       drawArrow(g, tmpArrowFrom, tmpArrowTo, arrowSize, getDefaultArrowColor());
   }
 
-  /**
-   * Processes a mouse event.
-   */
+  /** Processes a mouse event. */
   @Override
   protected void processMouseEvent(MouseEvent evt) {
     super.processMouseEvent(evt);
@@ -101,9 +88,7 @@ public class ChessclubJBoard extends JinBoard {
     }
   }
 
-  /**
-   * Processes a mouse motion event.
-   */
+  /** Processes a mouse motion event. */
   @Override
   protected void processMouseMotionEvent(MouseEvent evt) {
     super.processMouseMotionEvent(evt);

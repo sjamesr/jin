@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -26,50 +26,34 @@ import free.jin.Game;
  */
 public class OfferEvent extends GameEvent {
 
-  /**
-   * The id for a draw offer.
-   */
+  /** The id for a draw offer. */
   public static final int DRAW_OFFER = 1;
 
-  /**
-   * The id for an adjourn offer.
-   */
+  /** The id for an adjourn offer. */
   public static final int ADJOURN_OFFER = 2;
 
-  /**
-   * The id for an abort offer.
-   */
+  /** The id for an abort offer. */
   public static final int ABORT_OFFER = 3;
 
-  /**
-   * The id for a takeback offer.
-   */
+  /** The id for a takeback offer. */
   public static final int TAKEBACK_OFFER = 4;
 
-  /**
-   * The id of the offer of this offer event.
-   */
+  /** The id of the offer of this offer event. */
   private final int offerId;
 
-  /**
-   * True if the offer is "on", false otherwise.
-   */
+  /** True if the offer is "on", false otherwise. */
   private final boolean isOffered;
 
-  /**
-   * The <code>Player</code> who made or withdrew the offer.
-   */
+  /** The <code>Player</code> who made or withdrew the offer. */
   private final Player player;
 
-  /**
-   * The number of plies offerred to takeback, in case of a takeback offer.
-   */
+  /** The number of plies offerred to takeback, in case of a takeback offer. */
   private final int takebackCount;
 
   /**
    * Creates a new <code>OfferEvent</code> with the specified offer id, whether the offer is
-   * relevant ("on") and the player who made (or withdrew) the offer. The offer id may not be
-   * {@link #TAKEBACK_OFFER} - for takeback offers use the other constructor.
+   * relevant ("on") and the player who made (or withdrew) the offer. The offer id may not be {@link
+   * #TAKEBACK_OFFER} - for takeback offers use the other constructor.
    */
   public OfferEvent(
       Connection conn, String clientTag, Game game, int offerId, boolean isOffered, Player player) {
@@ -92,9 +76,7 @@ public class OfferEvent extends GameEvent {
     this.takebackCount = -1;
   }
 
-  /**
-   * Creates a new <code>OfferEvent</code> for a takeback offer.
-   */
+  /** Creates a new <code>OfferEvent</code> for a takeback offer. */
   public OfferEvent(
       Connection conn,
       String clientTag,
@@ -112,9 +94,7 @@ public class OfferEvent extends GameEvent {
     this.takebackCount = takebackCount;
   }
 
-  /**
-   * Returns the offer id. Possible values are defined in this class.
-   */
+  /** Returns the offer id. Possible values are defined in this class. */
   public int getOfferId() {
     return offerId;
   }
@@ -127,9 +107,7 @@ public class OfferEvent extends GameEvent {
     return isOffered;
   }
 
-  /**
-   * Returns the player who made (or withdrew) the offer.
-   */
+  /** Returns the player who made (or withdrew) the offer. */
   public Player getPlayer() {
     return player;
   }
@@ -144,9 +122,7 @@ public class OfferEvent extends GameEvent {
     return takebackCount;
   }
 
-  /**
-   * Returns a textual representation of this <code>OfferEvent</code>.
-   */
+  /** Returns a textual representation of this <code>OfferEvent</code>. */
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer("OfferEvent[");

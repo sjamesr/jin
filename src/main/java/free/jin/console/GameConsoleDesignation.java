@@ -2,22 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import free.jin.Connection;
 import free.jin.Game;
@@ -28,20 +25,16 @@ import free.jin.event.GameEndEvent;
 import free.jin.event.IllegalMoveEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.TakebackEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-/**
- * A console designation for chat at a board.
- */
+/** A console designation for chat at a board. */
 public abstract class GameConsoleDesignation extends AbstractConsoleDesignation {
 
-  /**
-   * The game we're covering.
-   */
+  /** The game we're covering. */
   protected final Game game;
 
-  /**
-   * Whether the game has ended.
-   */
+  /** Whether the game has ended. */
   private boolean gameHasEnded = false;
 
   /**
@@ -108,18 +101,14 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation 
     else return game.getShortDescription();
   }
 
-  /**
-   * Invoked when the game ends.
-   */
+  /** Invoked when the game ends. */
   protected void gameEnded(GameEndEvent evt) {
     gameHasEnded = true;
     setConsoleCloseable(true);
     setName(consoleNameForGame(game, gameHasEnded));
   }
 
-  /**
-   * Invoked when an illegal move is attempted in the game.
-   */
+  /** Invoked when an illegal move is attempted in the game. */
   protected void illegalMoveAttempted(IllegalMoveEvent evt) {
     I18n i18n = I18n.get(GameConsoleDesignation.class);
 
@@ -143,9 +132,7 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation 
     getConsole().addToOutput(i18n.getFormattedString(i18nKey, args), "gameInfo");
   }
 
-  /**
-   * Invoked when a takeback occurs in the game.
-   */
+  /** Invoked when a takeback occurs in the game. */
   protected void takebackOccurred(TakebackEvent evt) {
     if (!game.isPlayed()) return;
 
@@ -155,9 +142,7 @@ public abstract class GameConsoleDesignation extends AbstractConsoleDesignation 
     getConsole().addToOutput(i18n.getFormattedString(i18nKey, args), "gameInfo");
   }
 
-  /**
-   * Returns the game we're covering.
-   */
+  /** Returns the game we're covering. */
   public Game getGame() {
     return game;
   }

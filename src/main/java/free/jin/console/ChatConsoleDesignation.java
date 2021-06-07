@@ -2,53 +2,42 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import free.jin.Connection;
 import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.util.Utilities;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-/**
- * A <code>ConsoleDesignation</code> which accepts a specified subset of chat events.
- */
+/** A <code>ConsoleDesignation</code> which accepts a specified subset of chat events. */
 public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation {
 
-  /**
-   * The chat type object matching any chat type.
-   */
+  /** The chat type object matching any chat type. */
   public static final String ANY_CHAT_TYPE = null;
 
-  /**
-   * The forum object matching any forum.
-   */
+  /** The forum object matching any forum. */
   public static final Object ANY_FORUM = new Object();
 
-  /**
-   * The sender object matching any sender.
-   */
+  /** The sender object matching any sender. */
   public static final ServerUser ANY_SENDER = null;
 
-  /**
-   * The set of chat types we accept.
-   */
+  /** The set of chat types we accept. */
   private final List acceptedChatTypes = new LinkedList();
 
   /**
@@ -64,9 +53,7 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
     super(connection, name, encoding, isConsoleCloseable);
   }
 
-  /**
-   * Joins all the chat types we're accepting.
-   */
+  /** Joins all the chat types we're accepting. */
   @Override
   protected void joinForums() {
     for (Iterator i = acceptedChatTypes.iterator(); i.hasNext(); ) {
@@ -76,16 +63,16 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
   }
 
   /**
-   * Make the specified chat type accepted by this chat console. The combination of
-   * <code>type</code>, <code>forum</code> and <code>sender</code> must be one which corresponds to
-   * an actual possible chat type on the server.
+   * Make the specified chat type accepted by this chat console. The combination of <code>type
+   * </code>, <code>forum</code> and <code>sender</code> must be one which corresponds to an actual
+   * possible chat type on the server.
    *
-   * @param type The chat type (as in {@link ChatEvent#getType()} to accept, or
-   * {@link #ANY_CHAT_TYPE} to accept any chat type.
+   * @param type The chat type (as in {@link ChatEvent#getType()} to accept, or {@link
+   *     #ANY_CHAT_TYPE} to accept any chat type.
    * @param forum The forum (as in {@link ChatEvent#getForum()} to accept, or {@link #ANY_FORUM} to
-   * accept any forum.
+   *     accept any forum.
    * @param sender The sender (as in {@link ChatEvent#getSender()} to accept, or {@link #ANY_SENDER}
-   * to accept any sender.
+   *     to accept any sender.
    */
   public void addAccepted(String type, Object forum, ServerUser sender) {
     acceptedChatTypes.add(new ChatType(type, forum, sender));
@@ -110,9 +97,7 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
     return false;
   }
 
-  /**
-   * The representation of a subset of chat types.
-   */
+  /** The representation of a subset of chat types. */
   private static class ChatType {
 
     /**
@@ -126,15 +111,13 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
      */
     private final Object forum;
 
-    /**
-     * The sender; <code>null</code> stands for "any sender".
-     */
+    /** The sender; <code>null</code> stands for "any sender". */
     private final ServerUser sender;
 
     /**
-     * Creates a new <code>ChatType</code> with the specified type (as in
-     * <code>ChatEvent.getType()</code>), forum and sender. Passing <code>null</code> for an the
-     * argument, means that any value for it will be accepted.
+     * Creates a new <code>ChatType</code> with the specified type (as in <code>ChatEvent.getType()
+     * </code>), forum and sender. Passing <code>null</code> for an the argument, means that any
+     * value for it will be accepted.
      */
     public ChatType(String type, Object forum, ServerUser sender) {
       this.type = type;
@@ -142,9 +125,7 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
       this.sender = sender;
     }
 
-    /**
-     * Returns whether the specified <code>ChatEvent</code> is of this <code>ChatType</code>.
-     */
+    /** Returns whether the specified <code>ChatEvent</code> is of this <code>ChatType</code>. */
     public boolean accept(ChatEvent evt) {
       if ((type != ANY_CHAT_TYPE) && !Utilities.areEqual(type, evt.getType())) return false;
 
@@ -155,23 +136,17 @@ public abstract class ChatConsoleDesignation extends AbstractConsoleDesignation 
       return true;
     }
 
-    /**
-     * Returns the type of this chat type.
-     */
+    /** Returns the type of this chat type. */
     public String getType() {
       return type;
     }
 
-    /**
-     * Returns the forum of this chat type.
-     */
+    /** Returns the forum of this chat type. */
     public Object getForum() {
       return forum;
     }
 
-    /**
-     * Returns the sender of this chat type.
-     */
+    /** Returns the sender of this chat type. */
     public ServerUser getSender() {
       return sender;
     }

@@ -1,12 +1,13 @@
 plugins {
+    id "java"
     id "application"
     id "wrapper"
 
-    id 'com.github.sherter.google-java-format' version '0.3.2'
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 wrapper {
-    gradleVersion "5.0"
+    gradleVersion "7.0"
 }
 
 mainClassName = "free.jin.JinApplication"
@@ -16,20 +17,19 @@ repositories {
 }
 
 dependencies {
-    compile "org.jdesktop:appframework:1.0.3"
-    compile "org.swinglabs:swing-layout:1.0.3"
-    compile "org.beanshell:bsh:2.0b5"
-    compile "org.reflections:reflections:0.9.12"
-    compile "com.google.guava:guava:30.1.1-jre"
-    compile "org.lwjgl.lwjgl:lwjgl:2.9.3"
-    compile "org.lwjgl.lwjgl:lwjgl_util:2.9.1"
+    implementation "org.jdesktop:appframework:1.0.3"
+    implementation "org.swinglabs:swing-layout:1.0.3"
+    implementation "org.beanshell:bsh:2.0b5"
+    implementation "org.reflections:reflections:0.9.12"
+    implementation "com.google.guava:guava:30.1.1-jre"
+    implementation "org.lwjgl.lwjgl:lwjgl:2.9.3"
+    implementation "org.lwjgl.lwjgl:lwjgl_util:2.9.1"
 }
 
 // If Java formatter checks fail, tell the user how to fix them.
 task printFormatHelperMessage {
     doLast {
-        throw new FileNotFoundException('google-java-format is required.\n' +
-            'Use ./gradlew googleJavaFormat to reformat the broken files')
+        throw new FileNotFoundException('google-java-format is required.\nUse ./gradlew googleJavaFormat to reformat the broken files')
     }
 }
 verifyGoogleJavaFormat.finalizedBy printFormatHelperMessage

@@ -7,7 +7,6 @@ import free.chess.Piece;
 import free.chess.Player;
 import free.chess.Position;
 import free.jin.Game;
-
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 

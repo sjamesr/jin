@@ -2,20 +2,23 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.prefs;
 
+import free.jin.I18n;
+import free.util.swing.ColorChooser;
+import free.util.swing.FontSelectorPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -25,43 +28,28 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
 import java.lang.reflect.Method;
-
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import free.jin.I18n;
-import free.util.swing.ColorChooser;
-import free.util.swing.FontSelectorPanel;
 
 /**
  * A common panel allowing to choose the font, foreground and optionally, background color of text.
  */
 public class TextStyleChooserPanel extends JPanel {
 
-  /**
-   * The id of the "antialias" font option.
-   */
+  /** The id of the "antialias" font option. */
   private static final String ANTIALIAS_OPTION_ID = "antialias";
 
-  /**
-   * The FontSelectorPanel we're using to select the font.
-   */
+  /** The FontSelectorPanel we're using to select the font. */
   private final FontSelectorPanel fontSelector;
 
-  /**
-   * The ColorChooser used to select the foreground color.
-   */
+  /** The ColorChooser used to select the foreground color. */
   private final ColorChooser foregroundChooser;
 
-  /**
-   * The ColorChooser used to select the background color.
-   */
+  /** The ColorChooser used to select the background color. */
   private final ColorChooser backgroundChooser;
 
-  /**
-   * The sole ChangeEvent we need.
-   */
+  /** The sole ChangeEvent we need. */
   private final ChangeEvent changeEvent = new ChangeEvent(this);
 
   /**
@@ -140,9 +128,7 @@ public class TextStyleChooserPanel extends JPanel {
         });
   }
 
-  /**
-   * Creates the UI.
-   */
+  /** Creates the UI. */
   private void createUI() {
     setLayout(new BorderLayout(5, 5));
 
@@ -176,9 +162,7 @@ public class TextStyleChooserPanel extends JPanel {
     listenerList.remove(ChangeListener.class, listener);
   }
 
-  /**
-   * Fires a ChangeEvent to all interested listeners.
-   */
+  /** Fires a ChangeEvent to all interested listeners. */
   protected void fireStateChanged() {
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i += 2) {
@@ -189,37 +173,27 @@ public class TextStyleChooserPanel extends JPanel {
     }
   }
 
-  /**
-   * Sets the currently selected foreground color.
-   */
+  /** Sets the currently selected foreground color. */
   public void setSelectedForeground(Color color) {
     foregroundChooser.setColor(color);
   }
 
-  /**
-   * Returns the currently selected foreground color.
-   */
+  /** Returns the currently selected foreground color. */
   public Color getSelectedForeground() {
     return foregroundChooser.getColor();
   }
 
-  /**
-   * Sets the currently selected font.
-   */
+  /** Sets the currently selected font. */
   public void setSelectedFont(Font font) {
     fontSelector.setSelectedFont(font);
   }
 
-  /**
-   * Returns the currently selected font.
-   */
+  /** Returns the currently selected font. */
   public Font getSelectedFont() {
     return fontSelector.getSelectedFont();
   }
 
-  /**
-   * Returns the background color.
-   */
+  /** Returns the background color. */
   public void setSelectedBackground(Color color) {
     fontSelector.getPreviewPanel().setBackground(color);
     if (backgroundChooser != null) backgroundChooser.setColor(color);
@@ -230,9 +204,7 @@ public class TextStyleChooserPanel extends JPanel {
     }
   }
 
-  /**
-   * Returns the selected background color.
-   */
+  /** Returns the selected background color. */
   public Color getSelectedBackground() {
     if (backgroundChooser == null) return fontSelector.getPreviewPanel().getBackground();
     else return backgroundChooser.getColor();
@@ -254,9 +226,7 @@ public class TextStyleChooserPanel extends JPanel {
     return fontSelector.getFontOptionValue(ANTIALIAS_OPTION_ID);
   }
 
-  /**
-   * Sets whether text should be antialiased.
-   */
+  /** Sets whether text should be antialiased. */
   public void setAntialias(boolean antialias) {
     FontSelectorPanel.BooleanFontOption antialiasOption =
         fontSelector.getFontOption(ANTIALIAS_OPTION_ID);
@@ -264,33 +234,25 @@ public class TextStyleChooserPanel extends JPanel {
     ((TextStylePreviewPanel) fontSelector.getPreviewPanel()).setAntialias(antialias);
   }
 
-  /**
-   * The text preview panel we use.
-   */
+  /** The text preview panel we use. */
   private class TextStylePreviewPanel extends FontSelectorPanel.DefaultPreviewPanel {
 
-    /**
-     * The initial antialiasing value.
-     */
+    /** The initial antialiasing value. */
     private boolean antialias;
 
-    /**
-     * Becomes false if we find out we're not running under a Java2D capable JVM.
-     */
+    /** Becomes false if we find out we're not running under a Java2D capable JVM. */
     private boolean antialiasingSupported = true;
 
     /**
-     * Creates a new <code>TextStylePreviewPanel</code> with the specified user
-     * <code>FontSelectorPanel</code> and the initial antialiasing value.
+     * Creates a new <code>TextStylePreviewPanel</code> with the specified user <code>
+     * FontSelectorPanel</code> and the initial antialiasing value.
      */
     public TextStylePreviewPanel(FontSelectorPanel fontSelector, boolean antialias) {
       super(fontSelector);
       this.antialias = antialias;
     }
 
-    /**
-     * Enables/Disables antialiasing on the specified <code>Graphics</code> object.
-     */
+    /** Enables/Disables antialiasing on the specified <code>Graphics</code> object. */
     @Override
     public void paintComponent(Graphics g) {
       if (antialiasingSupported) {
@@ -316,9 +278,7 @@ public class TextStyleChooserPanel extends JPanel {
       super.paintComponent(g);
     }
 
-    /**
-     * Sets the current value for antialiasing.
-     */
+    /** Sets the current value for antialiasing. */
     public void setAntialias(boolean antialias) {
       this.antialias = antialias;
     }

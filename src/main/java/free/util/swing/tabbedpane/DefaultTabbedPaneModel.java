@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -19,40 +19,28 @@ package free.util.swing.tabbedpane;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The default implementation of a <code>TabbedPaneModel</code>.
- */
+/** The default implementation of a <code>TabbedPaneModel</code>. */
 public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel {
 
-  /**
-   * The list of tabs.
-   */
+  /** The list of tabs. */
   private final List tabs = new ArrayList();
 
-  /**
-   * The currently selected tab; <code>-1</code> if none.
-   */
+  /** The currently selected tab; <code>-1</code> if none. */
   private int selectedTabIndex = -1;
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int getTabCount() {
     return tabs.size();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public Tab getTab(int index) {
     return (Tab) tabs.get(index);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void addTab(Tab tab, int index) {
     int existingIndex;
@@ -68,9 +56,7 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel {
     if ((getTabCount() == 1) && (getSelectedIndex() != 0)) setSelectedIndex(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void removeTab(int index) {
     int selected = getSelectedIndex();
@@ -84,17 +70,13 @@ public class DefaultTabbedPaneModel extends AbstractTabbedPaneModel {
     setSelectedIndex(Math.min(selected, getTabCount() - 1));
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public int getSelectedIndex() {
     return selectedTabIndex;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void setSelectedIndex(int index) {
     if (selectedTabIndex != -1) fireTabDeselected(selectedTabIndex);

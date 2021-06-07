@@ -2,22 +2,15 @@ package free.util.swing;
 
 import java.awt.Component;
 import java.awt.Graphics;
-
 import javax.swing.Icon;
 
-/**
- * An icon which composes two specified icons.
- */
+/** An icon which composes two specified icons. */
 public class CompositeIcon implements Icon {
 
-  /**
-   * The background icon.
-   */
+  /** The background icon. */
   private final Icon backgroundIcon;
 
-  /**
-   * The foreground icon.
-   */
+  /** The foreground icon. */
   private final Icon foregroundIcon;
 
   /**
@@ -33,25 +26,19 @@ public class CompositeIcon implements Icon {
     this.foregroundIcon = foregroundIcon;
   }
 
-  /**
-   * Returns the maximum of the widths of the composed icons.
-   */
+  /** Returns the maximum of the widths of the composed icons. */
   @Override
   public int getIconWidth() {
     return Math.max(backgroundIcon.getIconWidth(), foregroundIcon.getIconWidth());
   }
 
-  /**
-   * Returns the maximum of the heights of the composed icons.
-   */
+  /** Returns the maximum of the heights of the composed icons. */
   @Override
   public int getIconHeight() {
     return Math.max(backgroundIcon.getIconHeight(), foregroundIcon.getIconHeight());
   }
 
-  /**
-   * Paints the composed icons.
-   */
+  /** Paints the composed icons. */
   @Override
   public void paintIcon(Component c, Graphics g, int x, int y) {
     backgroundIcon.paintIcon(c, g, x, y);

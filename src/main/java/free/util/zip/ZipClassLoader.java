@@ -2,20 +2,21 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.zip;
 
+import free.util.ChildClassLoader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +24,6 @@ import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-
-import free.util.ChildClassLoader;
 
 /**
  * A <code>ClassLoader</code> which loads classes and resources from a specified zip file. Note that
@@ -36,9 +35,7 @@ import free.util.ChildClassLoader;
  */
 public class ZipClassLoader extends ChildClassLoader {
 
-  /**
-   * The ZipFile from which we load stuff.
-   */
+  /** The ZipFile from which we load stuff. */
   private final ZipFile zipFile;
 
   /**
@@ -60,9 +57,7 @@ public class ZipClassLoader extends ChildClassLoader {
     this(file, null);
   }
 
-  /**
-   * Returns an <code>InputStream</code> for reading the resource with the specified name.
-   */
+  /** Returns an <code>InputStream</code> for reading the resource with the specified name. */
   @Override
   protected InputStream getResourceAsStreamImpl(String name) {
     try {
@@ -74,9 +69,7 @@ public class ZipClassLoader extends ChildClassLoader {
     }
   }
 
-  /**
-   * Returns a <code>URL</code> pointing to the resource with the specified name.
-   */
+  /** Returns a <code>URL</code> pointing to the resource with the specified name. */
   @Override
   protected URL getResourceImpl(String name) {
     if (name.endsWith("/")) name = name.substring(0, name.length() - 1);

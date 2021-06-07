@@ -2,15 +2,15 @@
  * The workarounds library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The workarounds library is free software; you can redistribute it and/or modify it under the
+ * <p>The workarounds library is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The workarounds library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the
  * workarounds library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -22,9 +22,10 @@ import javax.swing.table.TableColumn;
 
 /**
  * A fix for TableColumn. Fixes the following bugs:
+ *
  * <UL>
- * <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4276838.html">
- * TableColumn.getHeaderRenderer() default to null</A>
+ *   <LI><A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4276838.html">
+ *       TableColumn.getHeaderRenderer() default to null</A>
  * </UL>
  */
 public class FixedTableColumn extends TableColumn {
@@ -46,17 +47,13 @@ public class FixedTableColumn extends TableColumn {
     fixBugs();
   }
 
-  /**
-   * Creates a new FixedTableColumn using a null renderer and a null editor.
-   */
+  /** Creates a new FixedTableColumn using a null renderer and a null editor. */
   public FixedTableColumn(int modelIndex, int width) {
     super(modelIndex, width);
     fixBugs();
   }
 
-  /**
-   * Creates and initializes an instance of FixedTableColumn with modelIndex.
-   */
+  /** Creates and initializes an instance of FixedTableColumn with modelIndex. */
   public FixedTableColumn(
       int modelIndex, int width, TableCellRenderer cellRenderer, TableCellEditor cellEditor) {
     super(modelIndex, width, cellRenderer, cellEditor);

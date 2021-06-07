@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -25,69 +25,43 @@ import java.io.InterruptedIOException;
  */
 public class PipedStreams {
 
-  /**
-   * The default buffer size.
-   */
+  /** The default buffer size. */
   private static final int DEFAULT_BUFFER_SIZE = 2048;
 
-  /**
-   * The PipedInputStream.
-   */
+  /** The PipedInputStream. */
   private final PipedInputStream in;
 
-  /**
-   * The PipedOutputStream.
-   */
+  /** The PipedOutputStream. */
   private final PipedOutputStream out;
 
-  /**
-   * The value of the soTimeout.
-   */
+  /** The value of the soTimeout. */
   private volatile int soTimeout = 0;
 
-  /**
-   * The buffer.
-   */
+  /** The buffer. */
   private byte[] buf;
 
-  /**
-   * Whether the buffer is allowed to grow.
-   */
+  /** Whether the buffer is allowed to grow. */
   private final boolean growBuf;
 
-  /**
-   * The index of the byte that will be read next.
-   */
+  /** The index of the byte that will be read next. */
   private int readIndex = 0;
 
-  /**
-   * The index of the byte that that will be written next.
-   */
+  /** The index of the byte that that will be written next. */
   private int writeIndex = 0;
 
-  /**
-   * Becomes true when the PipedOutputStream gets closed.
-   */
+  /** Becomes true when the PipedOutputStream gets closed. */
   private boolean writerClosed = false;
 
-  /**
-   * Becomes true when the PipedInputStream gets closed.
-   */
+  /** Becomes true when the PipedInputStream gets closed. */
   private boolean readerClosed = false;
 
-  /**
-   * The lock protecting writing.
-   */
+  /** The lock protecting writing. */
   private Object writeLock = new String("Write Lock for PipedStreams");
 
-  /**
-   * The lock protecting reading.
-   */
+  /** The lock protecting reading. */
   private Object readLock = new String("Read Lock for PipedStream");
 
-  /**
-   * Creates new <code>PipedStreams</code>.
-   */
+  /** Creates new <code>PipedStreams</code>. */
   public PipedStreams() {
     this(2048, false);
   }
@@ -147,16 +121,12 @@ public class PipedStreams {
     return soTimeout;
   }
 
-  /**
-   * Returns the PipedInputStream.
-   */
+  /** Returns the PipedInputStream. */
   public PipedInputStream getInputStream() {
     return in;
   }
 
-  /**
-   * Returns the PipedOutputStream.
-   */
+  /** Returns the PipedOutputStream. */
   public PipedOutputStream getOutputStream() {
     return out;
   }
@@ -182,9 +152,7 @@ public class PipedStreams {
     return writeIndex + buf.length - readIndex;
   }
 
-  /**
-   * Returns the amount of bytes that can be written into the buffer without blocking.
-   */
+  /** Returns the amount of bytes that can be written into the buffer without blocking. */
   private int availableSpace() {
     return buf.length - availableImpl() - 1;
   }
@@ -200,9 +168,7 @@ public class PipedStreams {
     buf = newBuf;
   }
 
-  /**
-   * Writes a single byte to the buffer. Note that this method can block if the buffer is full.
-   */
+  /** Writes a single byte to the buffer. Note that this method can block if the buffer is full. */
   synchronized void write(int b) throws IOException {
     synchronized (writeLock) {
       if (readerClosed || writerClosed) throw new IOException("Stream closed");
@@ -265,9 +231,7 @@ public class PipedStreams {
     }
   }
 
-  /**
-   * Reads a single byte from the buffer according to the contract of InputStream.read().
-   */
+  /** Reads a single byte from the buffer according to the contract of InputStream.read(). */
   synchronized int read() throws IOException {
     synchronized (readLock) {
       if (readerClosed) throw new IOException("Stream closed");
@@ -343,18 +307,14 @@ public class PipedStreams {
     }
   }
 
-  /**
-   * Closes down the streams as far as the PipedOutputStream is concerned.
-   */
+  /** Closes down the streams as far as the PipedOutputStream is concerned. */
   synchronized void closeWriter() {
     if (writerClosed) throw new IllegalStateException("Already closed");
     writerClosed = true;
     notifyAll();
   }
 
-  /**
-   * Closes down the streams as far as the PipedInputStream is concerned
-   */
+  /** Closes down the streams as far as the PipedInputStream is concerned */
   synchronized void closeReader() {
     if (readerClosed) throw new IllegalStateException("Already closed");
 

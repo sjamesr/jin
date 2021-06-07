@@ -2,20 +2,27 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
 
+import free.jin.BadChangesException;
+import free.jin.I18n;
+import free.jin.ui.PreferencesPanel;
+import free.util.AWTUtilities;
+import free.util.Utilities;
+import free.util.WindowDisposingListener;
+import free.workarounds.FixedJTextArea;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -30,7 +37,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 import java.util.StringTokenizer;
-
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
@@ -53,27 +59,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import free.jin.BadChangesException;
-import free.jin.I18n;
-import free.jin.ui.PreferencesPanel;
-import free.util.AWTUtilities;
-import free.util.Utilities;
-import free.util.WindowDisposingListener;
-import free.workarounds.FixedJTextArea;
-
-/**
- * The preferences UI for the Scripter plugin.
- */
+/** The preferences UI for the Scripter plugin. */
 public class ScripterPreferencesPanel extends PreferencesPanel {
 
-  /**
-   * The Scripter whose preferences we're displaying/modifying.
-   */
+  /** The Scripter whose preferences we're displaying/modifying. */
   private final Scripter scripter;
 
-  /**
-   * The <code>DefaultListModel</code> holding the scripts.
-   */
+  /** The <code>DefaultListModel</code> holding the scripts. */
   private final DefaultListModel scriptsListModel;
 
   /**
@@ -90,9 +82,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     createUI();
   }
 
-  /**
-   * Opens a dialog to allow the user to create a new script.
-   */
+  /** Opens a dialog to allow the user to create a new script. */
   private void addScript() {
     try {
       ScriptTypeSelectionDialog scriptTypeChooser = new ScriptTypeSelectionDialog(this);
@@ -116,9 +106,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Opens a dialog to allow the user to edit the specified <code>Script</code>.
-   */
+  /** Opens a dialog to allow the user to edit the specified <code>Script</code>. */
   private void editScript(Script script) {
     try {
       String scriptType = script.getType();
@@ -140,17 +128,13 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * Removes the specified <code>Script</code>.
-   */
+  /** Removes the specified <code>Script</code>. */
   private void deleteScript(Script script) {
     scriptsListModel.removeElement(script);
     fireStateChanged();
   }
 
-  /**
-   * Returns an implementation of <code>ScriptDialog</code> for the specified script type.
-   */
+  /** Returns an implementation of <code>ScriptDialog</code> for the specified script type. */
   private ScriptDialog scriptDialogForType(String scriptType, Script templateScript) {
     if ("commands".equals(scriptType))
       return new CommandsScriptDialog(this, scripter, (CommandScript) templateScript);
@@ -160,9 +144,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     return null;
   }
 
-  /**
-   * Creates the user interface of this preferences panel.
-   */
+  /** Creates the user interface of this preferences panel. */
   protected void createUI() {
     I18n i18n = I18n.get(ScripterPreferencesPanel.class);
 
@@ -293,9 +275,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     add(enabled, BorderLayout.SOUTH);
   }
 
-  /**
-   * Applies the changes made by the user.
-   */
+  /** Applies the changes made by the user. */
   @Override
   public void applyChanges() throws BadChangesException {
     Script[] oldScripts = scripter.getScripts();
@@ -316,19 +296,13 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * A dialog which queries the user about his choice of script type.
-   */
+  /** A dialog which queries the user about his choice of script type. */
   private class ScriptTypeSelectionDialog extends JDialog {
 
-    /**
-     * The currently chosen script type.
-     */
+    /** The currently chosen script type. */
     private String scriptType;
 
-    /**
-     * The listener that closes the dialog when the user cancels.
-     */
+    /** The listener that closes the dialog when the user cancels. */
     WindowDisposingListener closer =
         new WindowDisposingListener(this) {
           @Override
@@ -337,9 +311,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
           }
         };
 
-    /**
-     * The constructor, duh.
-     */
+    /** The constructor, duh. */
     public ScriptTypeSelectionDialog(Component parent) {
       super(AWTUtilities.frameForComponent(parent), "", true);
 
@@ -357,9 +329,7 @@ public class ScripterPreferencesPanel extends PreferencesPanel {
       createUI();
     }
 
-    /**
-     * Creates the user interface for this dialog.
-     */
+    /** Creates the user interface for this dialog. */
     private void createUI() {
       I18n i18n = I18n.get(ScripterPreferencesPanel.class);
 

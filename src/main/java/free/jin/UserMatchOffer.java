@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -20,9 +20,7 @@ import free.chess.Player;
 import free.chess.WildVariant;
 import free.util.Struct;
 
-/**
- * Encapsulates the details of a match offer made by the user.
- */
+/** Encapsulates the details of a match offer made by the user. */
 public class UserMatchOffer extends Struct {
 
   /**
@@ -34,7 +32,7 @@ public class UserMatchOffer extends Struct {
    * @param isRated Whether the proposed game is rated.
    * @param variant The wild variant of the proposed game.
    * @param color The color the user wants to play with, or <code>null</code> for automatic color
-   * assignment.
+   *     assignment.
    */
   public UserMatchOffer(
       ServerUser opponent,
@@ -56,37 +54,27 @@ public class UserMatchOffer extends Struct {
     setProperty("Color", color);
   }
 
-  /**
-   * Returns the matched player.
-   */
+  /** Returns the matched player. */
   public ServerUser getOpponent() {
     return (ServerUser) getProperty("Opponent");
   }
 
-  /**
-   * Returns the time of the proposed game, in minutes.
-   */
+  /** Returns the time of the proposed game, in minutes. */
   public int getTime() {
     return getIntegerProperty("Time");
   }
 
-  /**
-   * Returns the increment of the proposed game, in seconds.
-   */
+  /** Returns the increment of the proposed game, in seconds. */
   public int getIncrement() {
     return getIntegerProperty("Increment");
   }
 
-  /**
-   * Returns whether the proposed game is rated.
-   */
+  /** Returns whether the proposed game is rated. */
   public boolean isRated() {
     return getBooleanProperty("IsRated");
   }
 
-  /**
-   * Returns the variant of the proposed game.
-   */
+  /** Returns the variant of the proposed game. */
   public WildVariant getVariant() {
     return (WildVariant) getProperty("Variant");
   }

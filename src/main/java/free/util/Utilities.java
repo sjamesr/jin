@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307, USA
  */
@@ -21,59 +21,37 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
-/**
- * A collection of general utility methods.
- */
+/** A collection of general utility methods. */
 public class Utilities {
 
-  /**
-   * A 0-length Object array.
-   */
+  /** A 0-length Object array. */
   public static final Object[] EMPTY_ARRAY = new Object[0];
 
-  /**
-   * A 0-length long array.
-   */
+  /** A 0-length long array. */
   public static final long[] EMPTY_LONG_ARRAY = new long[0];
 
-  /**
-   * A 0-length int array.
-   */
+  /** A 0-length int array. */
   public static final int[] EMPTY_INT_ARRAY = new int[0];
 
-  /**
-   * A 0-length short array.
-   */
+  /** A 0-length short array. */
   public static final short[] EMPTY_SHORT_ARRAY = new short[0];
 
-  /**
-   * A 0-length byte array.
-   */
+  /** A 0-length byte array. */
   public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-  /**
-   * A 0-length char array.
-   */
+  /** A 0-length char array. */
   public static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
-  /**
-   * A 0-length double array.
-   */
+  /** A 0-length double array. */
   public static final double[] EMPTY_DOUBLE_ARRAY = new double[0];
 
-  /**
-   * A 0-length float array.
-   */
+  /** A 0-length float array. */
   public static final float[] EMPTY_FLOAT_ARRAY = new float[0];
 
-  /**
-   * A 0-length String array.
-   */
+  /** A 0-length String array. */
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-  /**
-   * An empty enumeration.
-   */
+  /** An empty enumeration. */
   public static final Enumeration EMPTY_ENUM =
       new Enumeration() {
         @Override
@@ -88,9 +66,9 @@ public class Utilities {
       };
 
   /**
-   * A <code>Comparator</code> which compares objects based on the strings returned by their
-   * <code>toString</code> methods, alphabetically. Note: this comparator may impose orderings that
-   * are inconsistent with equals, depending on the actual class of the objects.
+   * A <code>Comparator</code> which compares objects based on the strings returned by their <code>
+   * toString</code> methods, alphabetically. Note: this comparator may impose orderings that are
+   * inconsistent with equals, depending on the actual class of the objects.
    */
   public static final Comparator NAME_COMPARATOR =
       new Comparator() {
@@ -119,8 +97,8 @@ public class Utilities {
   /**
    * Maps the specified key to the specified value in the specified <code>Hashtable</code>. If the
    * specified value is <code>null</code> any existing mapping of the specified key is removed from
-   * the <code>Hashtable</code>. The old value mapped to the specified key is returned, or
-   * <code>null</code> if no value was mapped to the key.
+   * the <code>Hashtable</code>. The old value mapped to the specified key is returned, or <code>
+   * null</code> if no value was mapped to the key.
    */
   public static Object put(Hashtable table, Object key, Object value) {
     return value == null ? table.remove(key) : table.put(key, value);
@@ -139,8 +117,8 @@ public class Utilities {
   /**
    * Returns the index of the first occurrance of specified object in the specified array, or -1 if
    * the specified object is not an element of the specified array. The specified object may be
-   * <code>null</code> in which case the returned index will be the index of the first
-   * <code>null</code> in the array.
+   * <code>null</code> in which case the returned index will be the index of the first <code>null
+   * </code> in the array.
    */
   public static int indexOf(Object[] array, Object item) {
     if (array == null) throw new IllegalArgumentException("The specified array may not be null");
@@ -196,9 +174,7 @@ public class Utilities {
     return buf.toString();
   }
 
-  /**
-   * Returns the maximum element in the specified integer array.
-   */
+  /** Returns the maximum element in the specified integer array. */
   public static int max(int[] arr) {
     if (arr == null) throw new IllegalArgumentException("The specified array may not be null");
     if (arr.length == 0)
@@ -210,47 +186,35 @@ public class Utilities {
     return n;
   }
 
-  /**
-   * Returns a hash code for the specified double value.
-   */
+  /** Returns a hash code for the specified double value. */
   public static int hashCode(double val) {
     return hashCode(Double.doubleToLongBits(val));
   }
 
-  /**
-   * Returns a hash code for the specified long value.
-   */
+  /** Returns a hash code for the specified long value. */
   public static int hashCode(long val) {
     return (int) (val ^ (val >>> 32));
   }
 
-  /**
-   * Returns a hash code for the combination of the two specified objects.
-   */
+  /** Returns a hash code for the combination of the two specified objects. */
   public static int hashCode(Object o1, Object o2) {
     int hash1 = (o1 == null ? 0 : o1.hashCode());
     int hash2 = (o2 == null ? 0 : o2.hashCode());
     return 37 * hash1 + hash2;
   }
 
-  /**
-   * Returns the name of the package of the specified class.
-   */
+  /** Returns the name of the package of the specified class. */
   public static String getPackageName(Class c) {
     return getPackageName(c.getName());
   }
 
-  /**
-   * Returns the name of the package of the class with the specified (full) name.
-   */
+  /** Returns the name of the package of the class with the specified (full) name. */
   public static String getPackageName(String className) {
     int lastDotIndex = className.lastIndexOf(".");
     return lastDotIndex == -1 ? "" : className.substring(0, lastDotIndex);
   }
 
-  /**
-   * Returns the short name (excluding the package name) of the specified class.
-   */
+  /** Returns the short name (excluding the package name) of the specified class. */
   public static String getClassName(Class c) {
     return getClassName(c.getName());
   }

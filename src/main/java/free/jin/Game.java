@@ -2,27 +2,26 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
-
-import java.beans.PropertyChangeListener;
 
 import free.chess.Player;
 import free.chess.Position;
 import free.chess.TimeControl;
 import free.chess.WildVariant;
 import free.util.BeanProperties;
+import java.beans.PropertyChangeListener;
 
 /**
  * Represents a game of chess (or any other variant) on a chess server. This class includes many
@@ -33,39 +32,25 @@ import free.util.BeanProperties;
  */
 public class Game {
 
-  /**
-   * The constant for the user's game.
-   */
+  /** The constant for the user's game. */
   public static final int MY_GAME = 1;
 
-  /**
-   * The constant for an observed game.
-   */
+  /** The constant for an observed game. */
   public static final int OBSERVED_GAME = 2;
 
-  /**
-   * The constant for a game which is just an isolated peek into someone's game.
-   */
+  /** The constant for a game which is just an isolated peek into someone's game. */
   public static final int ISOLATED_BOARD = 3;
 
-  /**
-   * The constant for a "white wins" result.
-   */
+  /** The constant for a "white wins" result. */
   public static final int WHITE_WINS = 1;
 
-  /**
-   * The constant for a "black wins" result.
-   */
+  /** The constant for a "black wins" result. */
   public static final int BLACK_WINS = 2;
 
-  /**
-   * The constant for a "draw" result.
-   */
+  /** The constant for a "draw" result. */
   public static final int DRAW = 3;
 
-  /**
-   * The constant for an unknown game result.
-   */
+  /** The constant for an unknown game result. */
   public static final int UNKNOWN_RESULT = 4;
 
   /**
@@ -73,186 +58,124 @@ public class Game {
    */
   public static final int GAME_IN_PROGRESS = 5;
 
-  /**
-   * Game end reason is unknown.
-   */
+  /** Game end reason is unknown. */
   public static final int UNKNOWN_REASON = -2;
 
-  /**
-   * Some other game end reason than the ones defined here.
-   */
+  /** Some other game end reason than the ones defined here. */
   public static final int OTHER_REASON = -1;
 
-  /**
-   * Actor resigns.
-   */
+  /** Actor resigns. */
   public static final int RESIGNS = 0;
 
-  /**
-   * Actor got checkmated.
-   */
+  /** Actor got checkmated. */
   public static final int CHECKMATED = 1;
 
-  /**
-   * Actor forfeits on time.
-   */
+  /** Actor forfeits on time. */
   public static final int TIME_FORFEITS = 2;
 
-  /**
-   * Game adjudicated against actor.
-   */
+  /** Game adjudicated against actor. */
   public static final int ADJUDICATED = 3;
 
-  /**
-   * Actor disconnected and forfeits.
-   */
+  /** Actor disconnected and forfeits. */
   public static final int DISCONNECTED = 4;
 
-  /**
-   * Actor's partner resigns.
-   */
+  /** Actor's partner resigns. */
   public static final int PARTNER_RESIGNS = 5;
 
-  /**
-   * Actor's partner got checkmated.
-   */
+  /** Actor's partner got checkmated. */
   public static final int PARTNER_CHECKMATED = 6;
 
-  /**
-   * Actor's partner forfeits on time.
-   */
+  /** Actor's partner forfeits on time. */
   public static final int PARTNER_TIME_FORFEITS = 7;
 
-  /**
-   * Actor's partner disconnected and forfeits on time.
-   */
+  /** Actor's partner disconnected and forfeits on time. */
   public static final int PARTNER_DISCONNECTED = 8;
 
-  /**
-   * Drawn by mutual agreement.
-   */
+  /** Drawn by mutual agreement. */
   public static final int DRAW_AGREEMENT = 101;
 
-  /**
-   * Actor stalemated.
-   */
+  /** Actor stalemated. */
   public static final int STALEMATE = 102;
 
-  /**
-   * Actor drew the game by repetition.
-   */
+  /** Actor drew the game by repetition. */
   public static final int REPETITION = 103;
 
-  /**
-   * Actor drew the game by the 50 move rule.
-   */
+  /** Actor drew the game by the 50 move rule. */
   public static final int FIFTY_MOVE_RULE = 104;
 
-  /**
-   * Actor out of time and his opponent has no material to mate.
-   */
+  /** Actor out of time and his opponent has no material to mate. */
   public static final int OUT_OF_TIME_AND_OPP_HAS_NO_MATERIAL_TO_MATE = 105;
 
-  /**
-   * Drawn because neither player has material to mate.
-   */
+  /** Drawn because neither player has material to mate. */
   public static final int BOTH_NO_MATERIAL_TO_MATE = 106;
 
-  /**
-   * Drawn because both players are out of time.
-   */
+  /** Drawn because both players are out of time. */
   public static final int BOTH_OUT_OF_TIME = 107;
 
-  /**
-   * Drawn because partners agreed to draw.
-   */
+  /** Drawn because partners agreed to draw. */
   public static final int PARTNER_DRAW_AGREEMENT = 108;
 
-  /**
-   * Drawn because both partners are out of time.
-   */
+  /** Drawn because both partners are out of time. */
   public static final int PARTNER_BOTH_OUT_OF_TIME = 109;
 
-  /**
-   * Adjourned by mutual agreement.
-   */
+  /** Adjourned by mutual agreement. */
   public static final int ADJOURNED_AGREEMENT = 201;
 
-  /**
-   * Adjourned when actor disconnected.
-   */
+  /** Adjourned when actor disconnected. */
   public static final int ADJOURNED_DISCONNECTED = 202;
 
-  /**
-   * Courtesy-adjourned by actor.
-   */
+  /** Courtesy-adjourned by actor. */
   public static final int ADJOURNED_COURTESY = 203;
 
-  /**
-   * Adjourned by admin.
-   */
+  /** Adjourned by admin. */
   public static final int ADJOURNED_ADMIN = 204;
 
-  /**
-   * Aborted by mutual agreement.
-   */
+  /** Aborted by mutual agreement. */
   public static final int ABORTED_AGREEMENT = 301;
 
-  /**
-   * Aborted when actor disconnected.
-   */
+  /** Aborted when actor disconnected. */
   public static final int ABORTED_DISCONNECTED = 302;
 
-  /**
-   * Courtesy-aborted by actor.
-   */
+  /** Courtesy-aborted by actor. */
   public static final int ABORTED_COURTESY = 303;
 
-  /**
-   * Aborted by admin.
-   */
+  /** Aborted by admin. */
   public static final int ABORTED_ADMIN = 304;
 
-  /**
-   * Aborted because game is too short.
-   */
+  /** Aborted because game is too short. */
   public static final int ABORTED_TOO_SHORT = 305;
 
-  /**
-   * Aborted when black's partner disconnected.
-   */
+  /** Aborted when black's partner disconnected. */
   public static final int ABORTED_PARTNER_DISCONNECTED = 306;
 
-  /**
-   * The <code>BeanProperties</code> object actually holding the properties.
-   */
+  /** The <code>BeanProperties</code> object actually holding the properties. */
   private final BeanProperties props = new BeanProperties(this);
 
   /**
    * Creates a new Game with the given game properties.
    *
-   * @param gameType The type of the game - possible values are {@link #MY_GAME},
-   * {@link #OBSERVED_GAME} and {@link #ISOLATED_BOARD}.
+   * @param gameType The type of the game - possible values are {@link #MY_GAME}, {@link
+   *     #OBSERVED_GAME} and {@link #ISOLATED_BOARD}.
    * @param initialPosition The initial position in the game.
    * @param pliesSinceStart The amount of from the actual beginning of the game to the inital
-   * position.
+   *     position.
    * @param whiteName The name of the player with the white pieces.
    * @param blackName The name of the player with the black pieces.
    * @param timeControl The time control of the game.
    * @param whiteRating The rating of the player with the white pieces, or -1 if no rating (guest
-   * for example).
+   *     for example).
    * @param blackRating The rating of the player with the black pieces, or -1 if no rating (guest
-   * for example).
+   *     for example).
    * @param isRated Is the game rated?
    * @param gameID A string identifying the game.
    * @param ratingCategoryString A string identifying the rating category of the game ("Blitz" for
-   * example)
+   *     example)
    * @param isPlayed Is this a real game? <code>false</code> if an examined game.
    * @param whiteTitles The titles of the player with the white pieces.
    * @param blackTitles the titles of the player with the black pieces.
    * @param initiallyFlipped Whether the board should be flipped initially.
    * @param userPlayer The Player for whom the user plays. It's only meaningful if this Game is of
-   * type MY_GAME and is a played game, this parameter should be null for all other cases.
+   *     type MY_GAME and is a played game, this parameter should be null for all other cases.
    */
   public Game(
       int gameType,
@@ -290,23 +213,19 @@ public class Game {
     setUserPlayer(userPlayer);
   }
 
-  /**
-   * Registers the specified <code>PropertyChangeListener</code>.
-   */
+  /** Registers the specified <code>PropertyChangeListener</code>. */
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     props.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Unregisters the specified <code>PropertyChangeListener</code>.
-   */
+  /** Unregisters the specified <code>PropertyChangeListener</code>. */
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     props.removePropertyChangeListener(listener);
   }
 
   /**
-   * Sets the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME} or
-   * {@link #ISOLATED_BOARD}.
+   * Sets the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME} or {@link
+   * #ISOLATED_BOARD}.
    */
   public void setGameType(int gameType) {
     switch (gameType) {
@@ -322,25 +241,21 @@ public class Game {
   }
 
   /**
-   * Returns the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME} or
-   * {@link #ISOLATED_BOARD}.
+   * Returns the type of the game, either {@link #MY_GAME}, {@link #OBSERVED_GAME} or {@link
+   * #ISOLATED_BOARD}.
    */
   public int getGameType() {
     return props.getIntegerProperty("gameType");
   }
 
-  /**
-   * Sets the initial position of the game to the given position.
-   */
+  /** Sets the initial position of the game to the given position. */
   public void setInitialPosition(Position initialPosition) {
     Position newInitPos = new Position(initialPosition.getVariant());
     newInitPos.copyFrom(initialPosition);
     props.setProperty("initialPosition", initialPosition);
   }
 
-  /**
-   * Returns a copy of the initial position in the game.
-   */
+  /** Returns a copy of the initial position in the game. */
   public Position getInitialPosition() {
     Position pos = (Position) props.getProperty("initialPosition");
     return new Position(pos);
@@ -364,100 +279,72 @@ public class Game {
     return props.getIntegerProperty("pliesSinceStart");
   }
 
-  /**
-   * Returns the WildVariant of this Game.
-   */
+  /** Returns the WildVariant of this Game. */
   public WildVariant getVariant() {
     return ((Position) props.getProperty("initialPosition")).getVariant();
   }
 
-  /**
-   * Sets the name of the player with the white pieces.
-   */
+  /** Sets the name of the player with the white pieces. */
   public void setWhiteName(String name) {
     props.setStringProperty("whiteName", name);
   }
 
-  /**
-   * Returns the name of the player with the white pieces.
-   */
+  /** Returns the name of the player with the white pieces. */
   public String getWhiteName() {
     return props.getStringProperty("whiteName");
   }
 
-  /**
-   * Sets the name of the player with the black pieces.
-   */
+  /** Sets the name of the player with the black pieces. */
   public void setBlackName(String blackName) {
     props.setStringProperty("blackName", blackName);
   }
 
-  /**
-   * Returns the name of the player with the black pieces.
-   */
+  /** Returns the name of the player with the black pieces. */
   public String getBlackName() {
     return props.getStringProperty("blackName");
   }
 
-  /**
-   * Sets time control for this game.
-   */
+  /** Sets time control for this game. */
   public void setTimeControl(TimeControl timeControl) {
     props.setProperty("timeControl", timeControl);
   }
 
-  /**
-   * Returns the time control for this game.
-   */
+  /** Returns the time control for this game. */
   public TimeControl getTimeControl() {
     return (TimeControl) props.getProperty("timeControl");
   }
 
-  /**
-   * Sets the rating of the player with the white pieces.
-   */
+  /** Sets the rating of the player with the white pieces. */
   public void setWhiteRating(int rating) {
     props.setIntegerProperty("whiteRating", rating);
   }
 
-  /**
-   * Returns the rating of the player with the white pieces.
-   */
+  /** Returns the rating of the player with the white pieces. */
   public int getWhiteRating() {
     return props.getIntegerProperty("whiteRating");
   }
 
-  /**
-   * Sets the rating of the player with the black pieces.
-   */
+  /** Sets the rating of the player with the black pieces. */
   public void setBlackRating(int rating) {
     props.setIntegerProperty("blackRating", rating);
   }
 
-  /**
-   * Returns the rating of the player with the black pieces.
-   */
+  /** Returns the rating of the player with the black pieces. */
   public int getBlackRating() {
     return props.getIntegerProperty("blackRating");
   }
 
-  /**
-   * Sets the ratedness of this game.
-   */
+  /** Sets the ratedness of this game. */
   public void setRated(boolean rated) {
     props.setBooleanProperty("rated", rated);
   }
 
-  /**
-   * Returns true if this game is rated, false otherwise.
-   */
+  /** Returns true if this game is rated, false otherwise. */
   public boolean isRated() {
     return props.getBooleanProperty("rated");
   }
 
-  /**
-   * Sets the id of this game.
-   */
+  /** Sets the id of this game. */
   public void setId(Object id) {
     props.setProperty("id", id);
   }
@@ -470,9 +357,7 @@ public class Game {
     return props.getProperty("id");
   }
 
-  /**
-   * Sets the rating category of the game.
-   */
+  /** Sets the rating category of the game. */
   public void setRatingCategoryString(String category) {
     props.setStringProperty("ratingCategoryString", category);
   }
@@ -485,65 +370,47 @@ public class Game {
     return props.getStringProperty("ratingCategoryString");
   }
 
-  /**
-   * Sets whether the game is played or examined.
-   */
+  /** Sets whether the game is played or examined. */
   public void setPlayed(boolean played) {
     props.setBooleanProperty("played", played);
   }
 
-  /**
-   * Returns true if this is a played game, false if examined.
-   */
+  /** Returns true if this is a played game, false if examined. */
   public boolean isPlayed() {
     return props.getBooleanProperty("played");
   }
 
-  /**
-   * Sets the titles of the player with the white pieces.
-   */
+  /** Sets the titles of the player with the white pieces. */
   public void setWhiteTitles(String titles) {
     props.setStringProperty("whiteTitles", titles);
   }
 
-  /**
-   * Returns the titles of the player with the white pieces.
-   */
+  /** Returns the titles of the player with the white pieces. */
   public String getWhiteTitles() {
     return props.getStringProperty("whiteTitles");
   }
 
-  /**
-   * Sets the titles of the player with the black pieces.
-   */
+  /** Sets the titles of the player with the black pieces. */
   public void setBlackTitles(String titles) {
     props.setStringProperty("blackTitles", titles);
   }
 
-  /**
-   * Returns the titles of the player with the black pieces.
-   */
+  /** Returns the titles of the player with the black pieces. */
   public String getBlackTitles() {
     return props.getStringProperty("blackTitles");
   }
 
-  /**
-   * Sets whether the board should be initially flipped.
-   */
+  /** Sets whether the board should be initially flipped. */
   private void setBoardInitiallyFlipped(boolean flipped) {
     props.setBooleanProperty("boardInitiallyFlipped", flipped);
   }
 
-  /**
-   * Returns true if the board should be initially flipped.
-   */
+  /** Returns true if the board should be initially flipped. */
   public boolean isBoardInitiallyFlipped() {
     return props.getBooleanProperty("boardInitiallyFlipped");
   }
 
-  /**
-   * Sets the side the user is playing for.
-   */
+  /** Sets the side the user is playing for. */
   private void setUserPlayer(Player player) {
     props.setProperty("userPlayer", player);
   }
@@ -557,9 +424,7 @@ public class Game {
     else return null;
   }
 
-  /**
-   * Returns the player with the specified name.
-   */
+  /** Returns the player with the specified name. */
   public Player getPlayerNamed(String playerName) {
     if (getWhiteName().equals(playerName)) return Player.WHITE_PLAYER;
     else if (getBlackName().equals(playerName)) return Player.BLACK_PLAYER;
@@ -569,14 +434,15 @@ public class Game {
   /**
    * Returns true if the user is allowed to move the pieces of the given Player. Here are the values
    * returned by this method in different cases:
+   *
    * <UL>
-   * <LI>The type of this game is MY_GAME and it's a played game - returns true if the given player
-   * is the userPlayer, otherwise returns false.
-   * <LI>The type of this game is MY_GAME and it's an examined game - returns true always.
-   * <LI>The type of this game is OBSERVED_GAME - returns false.
-   * <LI>The type of this game is ISOLATED_BOARD - returns false, although implementations may want
-   * to do whatever they want in this case (they can allow the user to move any pieces if they
-   * want).
+   *   <LI>The type of this game is MY_GAME and it's a played game - returns true if the given
+   *       player is the userPlayer, otherwise returns false.
+   *   <LI>The type of this game is MY_GAME and it's an examined game - returns true always.
+   *   <LI>The type of this game is OBSERVED_GAME - returns false.
+   *   <LI>The type of this game is ISOLATED_BOARD - returns false, although implementations may
+   *       want to do whatever they want in this case (they can allow the user to move any pieces if
+   *       they want).
    * </UL>
    */
   public boolean isUserAllowedToMovePieces(Player player) {
@@ -588,9 +454,8 @@ public class Game {
   }
 
   /**
-   * Returns the result of the game. Possible values are <code>WHITE_WINS</code>,
-   * <code>BLACK_WINS</code>, <code>DRAW</code>, <code>UNKNOWN_RESULT</code> and
-   * <code>GAME_IN_PROGRESS</code>.
+   * Returns the result of the game. Possible values are <code>WHITE_WINS</code>, <code>BLACK_WINS
+   * </code>, <code>DRAW</code>, <code>UNKNOWN_RESULT</code> and <code>GAME_IN_PROGRESS</code>.
    */
   public int getResultCode() {
     Integer result = (Integer) props.getProperty("resultCode", null);
@@ -610,9 +475,9 @@ public class Game {
   }
 
   /**
-   * Returns the player who lost, or acted, in relation to {@link #getGameEndReasonCode()};
-   * <code>null</code> if inapplicable or unknown. May only be invoked if the result code is not
-   * <code>GAME_IN_PROGRESS</code>.
+   * Returns the player who lost, or acted, in relation to {@link #getGameEndReasonCode()}; <code>
+   * null</code> if inapplicable or unknown. May only be invoked if the result code is not <code>
+   * GAME_IN_PROGRESS</code>.
    */
   public Player getGameEndActor() {
     if (getResultCode() == GAME_IN_PROGRESS) throw new IllegalStateException("Game not ended yet");
@@ -767,11 +632,11 @@ public class Game {
    * Sets the result of the game to the specified value. This method may only be called once per
    * Game object (when the game ends).
    *
-   * @param result The result code: <code>WHITE_WINS</code>, <code>BLACK_WINS</code>,
-   * <code>DRAW</code> or <code>UNKNOWN_RESULT</code>.
+   * @param result The result code: <code>WHITE_WINS</code>, <code>BLACK_WINS</code>, <code>DRAW
+   *     </code> or <code>UNKNOWN_RESULT</code>.
    * @param reason The reason code (many constants, defined in this class).
    * @param actor The player who lost (in case of a loss) or acted, or <code>null</code> if
-   * inapplicable or unknown.
+   *     inapplicable or unknown.
    */
   public void setResult(int result, int reason, Player actor) {
     switch (result) {
@@ -795,9 +660,7 @@ public class Game {
     props.setIntegerProperty("resultCode", result);
   }
 
-  /**
-   * Returns a short description of this game, suitable for displaying to the end-user.
-   */
+  /** Returns a short description of this game, suitable for displaying to the end-user. */
   public String getShortDescription() {
     I18n i18n = I18n.get(Game.class);
 
@@ -842,9 +705,7 @@ public class Game {
           "observingShortDescription", new Object[] {white, black, resultString});
   }
 
-  /**
-   * Returns a textual representation of this Game.
-   */
+  /** Returns a textual representation of this Game. */
   @Override
   public String toString() {
     return "#"

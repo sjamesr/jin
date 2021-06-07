@@ -2,20 +2,23 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.util.IOUtilities;
+import free.util.ImageUtilities;
+import free.util.TextUtilities;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -33,23 +36,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import free.util.IOUtilities;
-import free.util.ImageUtilities;
-import free.util.TextUtilities;
-
-/**
- * An implementation of <code>PiecePainter</code> which paints images.
- */
+/** An implementation of <code>PiecePainter</code> which paints images. */
 public final class ImagePiecePainter implements ResourcePiecePainter {
 
-  /**
-   * The painter we delegate to while loading images.
-   */
+  /** The painter we delegate to while loading images. */
   private static final PiecePainter whileLoadingDelegate = new DefaultPiecePainter();
 
-  /**
-   * The ImageFilter we use to create shaded images.
-   */
+  /** The ImageFilter we use to create shaded images. */
   private static final ImageFilter SHADING_FILTER = new ShadingFilter();
 
   /**
@@ -59,33 +52,31 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
   private static volatile boolean asyncImageLoad = false;
 
   /**
-   * An array whose indices specify the size of the images and whose values are maps mapping
-   * <code>Piece</code>s to either <code>Image</code>s or <code>URL</code>s, if the image isn't
-   * loaded yet.
+   * An array whose indices specify the size of the images and whose values are maps mapping <code>
+   * Piece</code>s to either <code>Image</code>s or <code>URL</code>s, if the image isn't loaded
+   * yet.
    */
   private Map[] pieceImages;
 
-  /**
-   * Same as pieceImages only for shaded images.
-   */
+  /** Same as pieceImages only for shaded images. */
   private Map[] shadedPieceImages;
 
   /**
-   * Maps the square sizes for which images are currently being loaded to the
-   * <code>ImageDataReceiver</code>s waiting on the data.
+   * Maps the square sizes for which images are currently being loaded to the <code>
+   * ImageDataReceiver</code>s waiting on the data.
    */
   private final Map imageDataReceivers = new HashMap(2);
 
   /**
-   * A no-arg constructor, so that this piece painter can be used as a
-   * <code>ResourcePiecePainter</code>.
+   * A no-arg constructor, so that this piece painter can be used as a <code>ResourcePiecePainter
+   * </code>.
    */
   public ImagePiecePainter() {}
 
   /**
-   * Creates a new <code>ImagePiecePainter</code> with the specified piece images. The given
-   * <code>Map</code> should map <code>Integer</code>s specifying the size of the piece images to
-   * <code>Maps</code>s which in turn map <code>Piece</code>s to piece <code>Image</code>s.
+   * Creates a new <code>ImagePiecePainter</code> with the specified piece images. The given <code>
+   * Map</code> should map <code>Integer</code>s specifying the size of the piece images to <code>
+   * Maps</code>s which in turn map <code>Piece</code>s to piece <code>Image</code>s.
    */
   public ImagePiecePainter(Map pieceImages) {
 
@@ -135,17 +126,13 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
     ImagePiecePainter.asyncImageLoad = asyncImageLoad;
   }
 
-  /**
-   * Creates a shaded version of the specified image.
-   */
+  /** Creates a shaded version of the specified image. */
   private static Image shadeImage(Image image) {
     return Toolkit.getDefaultToolkit()
         .createImage(new FilteredImageSource(image.getSource(), SHADING_FILTER));
   }
 
-  /**
-   * Since <code>ImagePiecePainter</code>s are immutable, simply returns <code>this</code>.
-   */
+  /** Since <code>ImagePiecePainter</code>s are immutable, simply returns <code>this</code>. */
   @Override
   public PiecePainter freshInstance() {
     return this;
@@ -155,18 +142,20 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
    * Loads the piece images from the specified URL. The structure at the specified url is described
    * below. A properties file named "definition" must be located at the base URL. That file should
    * contain the following three properties:
+   *
    * <ul>
-   * <li><code>image.type</code>: Specifies the extension (type) of the images - gif, png etc. If
-   * this is not specified, "gif" is assumed.
-   * <li><code>size.pref</code>: Specifies the preferred size of the piece set, in pixels.
-   * <li><code>size.list</code>: A list of sizes of all the available piece images, in increasing
-   * order, separated by spaces.
+   *   <li><code>image.type</code>: Specifies the extension (type) of the images - gif, png etc. If
+   *       this is not specified, "gif" is assumed.
+   *   <li><code>size.pref</code>: Specifies the preferred size of the piece set, in pixels.
+   *   <li><code>size.list</code>: A list of sizes of all the available piece images, in increasing
+   *       order, separated by spaces.
    * </ul>
+   *
    * Directories with names corresponding to the sizes must be present at the base URL and in those
-   * directories resources named <code>[color char][piece char].[extension]</code> where
-   * <code>[color char]</code> is either 'w' or 'b' (for black or white), <code>[piece char]</code>
-   * is one of 'k', 'q', 'r', 'b', 'n' or 'p'. The images for all twelve pieces must be present
-   * there and they must have the correct size.
+   * directories resources named <code>[color char][piece char].[extension]</code> where <code>
+   * [color char]</code> is either 'w' or 'b' (for black or white), <code>[piece char]</code> is one
+   * of 'k', 'q', 'r', 'b', 'n' or 'p'. The images for all twelve pieces must be present there and
+   * they must have the correct size.
    */
   @Override
   public void load(URL baseUrl) throws IOException {
@@ -219,9 +208,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
     }
   }
 
-  /**
-   * Returns the size of provided images which is the best fit for the specified square size.
-   */
+  /** Returns the size of provided images which is the best fit for the specified square size. */
   protected int bestFitImageSize(int squareSize) {
     if (squareSize <= 0) throw new IllegalArgumentException("Image size must be positive");
 
@@ -238,8 +225,8 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
 
   /**
    * If already loaded, returns the piece images at the specified size. Otherwise, starts loading
-   * them (if async loading is enabled, in a background thread, in the meanwhile, returning
-   * <code>null</code>), and once done, repaints the specified component.
+   * them (if async loading is enabled, in a background thread, in the meanwhile, returning <code>
+   * null</code>), and once done, repaints the specified component.
    */
   protected synchronized Map loadPieces(int squareSize, boolean shaded, Component target) {
     int imageSize = bestFitImageSize(squareSize);
@@ -310,9 +297,7 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
         pieceImage, x + (width - pieceWidth) / 2, y + (height - pieceHeight) / 2, component);
   }
 
-  /**
-   * The <code>ImageFilter</code> we use to create shaded piece images.
-   */
+  /** The <code>ImageFilter</code> we use to create shaded piece images. */
   private static class ShadingFilter extends RGBImageFilter {
 
     @Override
@@ -336,24 +321,16 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
    */
   private class ImageDataReceiver implements IOUtilities.DataReceiver {
 
-    /**
-     * The map of pieces to normal images.
-     */
+    /** The map of pieces to normal images. */
     private final Map normalImages;
 
-    /**
-     * The map of pieces to shaded images.
-     */
+    /** The map of pieces to shaded images. */
     private final Map shadedImages;
 
-    /**
-     * The size of the images we're loading.
-     */
+    /** The size of the images we're loading. */
     private final int imageSize;
 
-    /**
-     * The components to repaint when the loading is done.
-     */
+    /** The components to repaint when the loading is done. */
     private final Set componentsToRepaint = new HashSet(2);
 
     /**
@@ -368,16 +345,12 @@ public final class ImagePiecePainter implements ResourcePiecePainter {
       componentsToRepaint.add(componentToRepaint);
     }
 
-    /**
-     * Adds a component to the set of components to repaint once all the images are loaded.
-     */
+    /** Adds a component to the set of components to repaint once all the images are loaded. */
     public void addComponentToRepaint(Component component) {
       componentsToRepaint.add(component);
     }
 
-    /**
-     * Called when the image data has been loaded. Creates and maps the piece images.
-     */
+    /** Called when the image data has been loaded. Creates and maps the piece images. */
     @Override
     public void dataRead(URL[] urls, Object id, byte[][] data, IOException[] exceptions) {
       // If there are any exceptions, we simply quit - this will cause

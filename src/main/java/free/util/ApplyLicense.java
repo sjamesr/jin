@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -39,9 +39,7 @@ import java.io.Writer;
  */
 public class ApplyLicense {
 
-  /**
-   * The main method, duh.
-   */
+  /** The main method, duh. */
   public static void main(String[] args) {
     if (args.length < 3) {
       if (args.length != 0) System.out.println("Not enough arguments.");
@@ -182,9 +180,7 @@ public class ApplyLicense {
     }
   }
 
-  /**
-   * Prepends the given text to the given file.
-   */
+  /** Prepends the given text to the given file. */
   private static void prependLicense(String license, File file) throws IOException {
     File tmpFile = new File(file.getAbsolutePath() + ".tmp");
     if (!file.renameTo(tmpFile))

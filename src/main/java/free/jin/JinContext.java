@@ -2,28 +2,27 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
 
+import free.jin.action.ActionInfo;
+import free.jin.plugin.Plugin;
+import free.jin.plugin.PluginInfo;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import free.jin.action.ActionInfo;
-import free.jin.plugin.Plugin;
-import free.jin.plugin.PluginInfo;
 
 /**
  * Defines methods via which Jin obtains information from and interacts with the environment in
@@ -32,19 +31,13 @@ import free.jin.plugin.PluginInfo;
  */
 public interface JinContext {
 
-  /**
-   * Returns the locale for this instance of Jin.
-   */
+  /** Returns the locale for this instance of Jin. */
   Locale getLocale();
 
-  /**
-   * Returns the value of the parameter with the specified name, as it was passed to Jin.
-   */
+  /** Returns the value of the parameter with the specified name, as it was passed to Jin. */
   String getParameter(String paramName);
 
-  /**
-   * Returns the application-wide user preferences.
-   */
+  /** Returns the application-wide user preferences. */
   Preferences getPrefs();
 
   /**
@@ -65,9 +58,7 @@ public interface JinContext {
    */
   Map getResources(String resourceType, Plugin plugin);
 
-  /**
-   * Returns the resource with the specified type and id.
-   */
+  /** Returns the resource with the specified type and id. */
   Resource getResource(String resourceType, String id, Plugin plugin);
 
   /**
@@ -76,14 +67,10 @@ public interface JinContext {
    */
   void shutdown();
 
-  /**
-   * Returns a list of supported servers.
-   */
+  /** Returns a list of supported servers. */
   Set<Server> getServers();
 
-  /**
-   * Returns a list of known users (accounts on known servers).
-   */
+  /** Returns a list of known users (accounts on known servers). */
   User[] getUsers();
 
   /**
@@ -104,9 +91,7 @@ public interface JinContext {
    */
   Collection<PluginInfo> getPlugins(Server server);
 
-  /**
-   * Returns whether this context is capable of saving preferences.
-   */
+  /** Returns whether this context is capable of saving preferences. */
   boolean isSavePrefsCapable();
 
   /**

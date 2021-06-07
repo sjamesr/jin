@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -24,37 +24,29 @@ import java.awt.LayoutManager2;
 import java.util.Vector;
 
 /**
- * A LayoutManager which lays out the components in a table-like structure. Unlike
- * <code>GridLayout</code>, the sizes of the rows and columns are dynamic, although properly
- * aligned. The cell sizes are determined according to the preferred sizes of the components and
- * each component is sized to either its maximum size or the cell size. Components are positioned
- * within their cells according to their X and Y alignments. Any extra space given to the laid out
- * container is handled depending on the alignment of that container, e.g. a container aligned to
- * the left will have all its extra space on the right. When a new component is added, it is placed
- * in the first empty cell, in lexigraphic order. A new row is created if necessary. To create an
- * empty cell, simply add a blank component. To force a row or a column to be at least a certain
- * size, add a component with the desired size (<code>Box.createRigidArea()</code> for example).
+ * A LayoutManager which lays out the components in a table-like structure. Unlike <code>GridLayout
+ * </code>, the sizes of the rows and columns are dynamic, although properly aligned. The cell sizes
+ * are determined according to the preferred sizes of the components and each component is sized to
+ * either its maximum size or the cell size. Components are positioned within their cells according
+ * to their X and Y alignments. Any extra space given to the laid out container is handled depending
+ * on the alignment of that container, e.g. a container aligned to the left will have all its extra
+ * space on the right. When a new component is added, it is placed in the first empty cell, in
+ * lexigraphic order. A new row is created if necessary. To create an empty cell, simply add a blank
+ * component. To force a row or a column to be at least a certain size, add a component with the
+ * desired size (<code>Box.createRigidArea()</code> for example).
  */
 public class TableLayout implements LayoutManager2 {
 
-  /**
-   * The amount of columns in the table.
-   */
+  /** The amount of columns in the table. */
   private final int columnCount;
 
-  /**
-   * The gap between columns, in pixels.
-   */
+  /** The gap between columns, in pixels. */
   private final int xGap;
 
-  /**
-   * The gap between rows, in pixels.
-   */
+  /** The gap between rows, in pixels. */
   private final int yGap;
 
-  /**
-   * A Vector of rows where each row is a Component array holding the components in that row.
-   */
+  /** A Vector of rows where each row is a Component array holding the components in that row. */
   private final Vector rows = new Vector();
 
   /**
@@ -74,16 +66,12 @@ public class TableLayout implements LayoutManager2 {
     this.yGap = yGap;
   }
 
-  /**
-   * Creates a new TableLayout with the specified amount of columns.
-   */
+  /** Creates a new TableLayout with the specified amount of columns. */
   public TableLayout(int columnCount) {
     this(columnCount, 0, 0);
   }
 
-  /**
-   * Adds the specified component to the layout.
-   */
+  /** Adds the specified component to the layout. */
   @Override
   public void addLayoutComponent(Component component, Object constraints) {
     synchronized (component.getTreeLock()) {
@@ -104,17 +92,13 @@ public class TableLayout implements LayoutManager2 {
     }
   }
 
-  /**
-   * Throws an exception.
-   */
+  /** Throws an exception. */
   @Override
   public void addLayoutComponent(String name, Component component) {
     throw new UnsupportedOperationException("deprecated addLayoutComponent(String, Component)");
   }
 
-  /**
-   * Removes the specified component from the layout.
-   */
+  /** Removes the specified component from the layout. */
   @Override
   public void removeLayoutComponent(Component component) {
     synchronized (component.getTreeLock()) {
@@ -278,15 +262,11 @@ public class TableLayout implements LayoutManager2 {
     }
   }
 
-  /**
-   * We're not caching anything yet, so this call is ignored.
-   */
+  /** We're not caching anything yet, so this call is ignored. */
   @Override
   public void invalidateLayout(Container parent) {}
 
-  /**
-   * Returns the preferred layout for the specified parent container.
-   */
+  /** Returns the preferred layout for the specified parent container. */
   @Override
   public Dimension preferredLayoutSize(Container parent) {
     synchronized (parent.getTreeLock()) {
@@ -322,33 +302,25 @@ public class TableLayout implements LayoutManager2 {
     return new Dimension(prefWidth, prefHeight);
   }
 
-  /**
-   * Returns the same as <code>preferredLayoutSize</code>.
-   */
+  /** Returns the same as <code>preferredLayoutSize</code>. */
   @Override
   public Dimension minimumLayoutSize(Container parent) {
     return preferredLayoutSize(parent);
   }
 
-  /**
-   * Returns a dimension with maximum possible values.
-   */
+  /** Returns a dimension with maximum possible values. */
   @Override
   public Dimension maximumLayoutSize(Container parent) {
     return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
   }
 
-  /**
-   * Returns <code>CENTER_ALIGNMENT</code>;
-   */
+  /** Returns <code>CENTER_ALIGNMENT</code>; */
   @Override
   public float getLayoutAlignmentX(Container parent) {
     return Component.CENTER_ALIGNMENT;
   }
 
-  /**
-   * Returns <code>CENTER_ALIGNMENT</code>;
-   */
+  /** Returns <code>CENTER_ALIGNMENT</code>; */
   @Override
   public float getLayoutAlignmentY(Container parent) {
     return Component.CENTER_ALIGNMENT;

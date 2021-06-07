@@ -2,30 +2,29 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.scripter;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import free.jin.Connection;
+import free.jin.event.JinEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import bsh.EvalError;
-import bsh.Interpreter;
-import free.jin.Connection;
-import free.jin.event.JinEvent;
 
 /**
  * A <code>Script</code> which sends a list of specified commands to the server if a specified
@@ -33,19 +32,13 @@ import free.jin.event.JinEvent;
  */
 public class CommandScript extends Script {
 
-  /**
-   * The condition on which the commands are executed.
-   */
+  /** The condition on which the commands are executed. */
   private final String condition;
 
-  /**
-   * The commands to be executed if the condition evaluates to <code>true</code>.
-   */
+  /** The commands to be executed if the condition evaluates to <code>true</code>. */
   private final String[] commands;
 
-  /**
-   * The <code>Interpreter</code> that will run the code.
-   */
+  /** The <code>Interpreter</code> that will run the code. */
   private final Interpreter bsh;
 
   /**
@@ -76,26 +69,20 @@ public class CommandScript extends Script {
     addImports(bsh);
   }
 
-  /**
-   * Evaluates all the imports needed by the scripts in the specified <code>Interpreter</code>.
-   */
+  /** Evaluates all the imports needed by the scripts in the specified <code>Interpreter</code>. */
   private static void addImports(Interpreter bsh) throws EvalError {
     bsh.eval("import free.jin.*;");
     bsh.eval("import free.jin.event.*");
     bsh.eval("import free.chess.*");
   }
 
-  /**
-   * Returns the string "commands".
-   */
+  /** Returns the string "commands". */
   @Override
   public String getType() {
     return "commands";
   }
 
-  /**
-   * Returns the condition on which the commands are executed.
-   */
+  /** Returns the condition on which the commands are executed. */
   public String getCondition() {
     return condition;
   }
@@ -108,9 +95,7 @@ public class CommandScript extends Script {
     return (commands.clone());
   }
 
-  /**
-   * Preprocesses the specified server command, replacing any variable names with their values.
-   */
+  /** Preprocesses the specified server command, replacing any variable names with their values. */
   private String preprocess(String code, Object[][] vars) {
     // Sort by length and replace longer strings first.
     // Without this, something like $gameType will get recognized as ($game)Type
@@ -141,9 +126,7 @@ public class CommandScript extends Script {
     return code;
   }
 
-  /**
-   * Runs the script.
-   */
+  /** Runs the script. */
   @Override
   public void run(JinEvent evt, String eventSubtype, Object[][] vars) {
     try {
@@ -171,9 +154,7 @@ public class CommandScript extends Script {
     }
   }
 
-  /**
-   * Returns a copy of this Script.
-   */
+  /** Returns a copy of this Script. */
   @Override
   public Script createCopy() {
     try {

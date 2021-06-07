@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002-2003 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -22,9 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.StringTokenizer;
 
-/**
- * A utility class which provides many useful text manipulation methods.
- */
+/** A utility class which provides many useful text manipulation methods. */
 public class TextUtilities {
 
   /**
@@ -74,9 +72,7 @@ public class TextUtilities {
     return buf.toString();
   }
 
-  /**
-   * Trims the specified string on the right only.
-   */
+  /** Trims the specified string on the right only. */
   public static String trimRight(String s) {
     StringBuffer buf = new StringBuffer(s);
     int length = buf.length();
@@ -85,9 +81,7 @@ public class TextUtilities {
     return buf.toString();
   }
 
-  /**
-   * Trims the specified string on the left only.
-   */
+  /** Trims the specified string on the left only. */
   public static String trimLeft(String s) {
     int i = 0;
     while (Character.isWhitespace(s.charAt(i))) i++;
@@ -96,20 +90,20 @@ public class TextUtilities {
   }
 
   /**
-   * <P>
    * Returns a substring of the given StringBuffer's string which consists of the characters from
    * the beginning of it until the first occurrence of the given delimiter string or if the
    * delimiter doesn't occur, until the end of the string. The StringBuffer is modified so it no
    * longer contains those characters or the delimiter.
-   * <P>
-   * Examples:
+   *
+   * <p>Examples:
+   *
    * <UL>
-   * <LI>nextToken(new StringBuffer("abcdefgh"), "de") returns "abc" and the StringBuffer is
-   * modified to represent the string "fgh".
-   * <LI>nextToken(new StringBuffer("abcdefgh"), "a") returns an empty string and the StringBuffer
-   * is modified to represent the string "bcdefgh".
-   * <LI>nextToken(new StringBuffer("abcdefgh"), "k") returns "abcdefgh" and the StringBuffer is
-   * modified to represent an empty string.
+   *   <LI>nextToken(new StringBuffer("abcdefgh"), "de") returns "abc" and the StringBuffer is
+   *       modified to represent the string "fgh".
+   *   <LI>nextToken(new StringBuffer("abcdefgh"), "a") returns an empty string and the StringBuffer
+   *       is modified to represent the string "bcdefgh".
+   *   <LI>nextToken(new StringBuffer("abcdefgh"), "k") returns "abcdefgh" and the StringBuffer is
+   *       modified to represent an empty string.
    * </UL>
    */
   public static String nextToken(StringBuffer buf, String delimiter) {
@@ -141,9 +135,7 @@ public class TextUtilities {
     return tokens;
   }
 
-  /**
-   * Parses the specified list of strings delimited by the specified delimiters.
-   */
+  /** Parses the specified list of strings delimited by the specified delimiters. */
   public static String[] parseStringList(String text, String delimiters) {
     StringTokenizer tokenizer = new StringTokenizer(text, delimiters);
     String[] tokens = new String[tokenizer.countTokens()];
@@ -152,9 +144,7 @@ public class TextUtilities {
     return tokens;
   }
 
-  /**
-   * Parses the specified list of integers delimited by the specified delimiters.
-   */
+  /** Parses the specified list of integers delimited by the specified delimiters. */
   public static int[] parseIntList(String text, String delimiters) {
     StringTokenizer tokenizer = new StringTokenizer(text, delimiters);
     int[] tokens = new int[tokenizer.countTokens()];
@@ -205,16 +195,14 @@ public class TextUtilities {
     return buf.toString();
   }
 
-  /**
-   * The system's default charset, lazily initialized.
-   */
+  /** The system's default charset, lazily initialized. */
   private static Charset defaultCharset = null;
 
   /**
-   * Returns the system's default charset. This method is useful under 1.4, because
-   * <code>Charset.defaultCharset()</code> is only available since 1.5.
+   * Returns the system's default charset. This method is useful under 1.4, because <code>
+   * Charset.defaultCharset()</code> is only available since 1.5.
    */
-  public synchronized static Charset getDefaultCharset() {
+  public static synchronized Charset getDefaultCharset() {
     if (defaultCharset == null)
       defaultCharset =
           Charset.forName(
@@ -232,10 +220,10 @@ public class TextUtilities {
   }
 
   /**
-   * Converts the specified string between encodings. If either of the encodings is
-   * <code>null</code>, no conversion is made. If both the encodings are not <code>null</code> and
-   * one of the encodings is unsupported, an <code>IllegalArgumentException</code> is thrown (as
-   * opposed to an <code>UnsupportedEncodingException</code>.
+   * Converts the specified string between encodings. If either of the encodings is <code>null
+   * </code>, no conversion is made. If both the encodings are not <code>null</code> and one of the
+   * encodings is unsupported, an <code>IllegalArgumentException</code> is thrown (as opposed to an
+   * <code>UnsupportedEncodingException</code>.
    */
   public static String convert(String s, String fromEncoding, String toEncoding)
       throws IllegalArgumentException {

@@ -2,62 +2,46 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
 package free.util.swing.tabbedpane;
 
+import free.util.Utilities;
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
 import javax.swing.Icon;
 import javax.swing.event.SwingPropertyChangeSupport;
 
-import free.util.Utilities;
-
-/**
- * Encapsulates a single tab.
- */
+/** Encapsulates a single tab. */
 public class Tab {
 
-  /**
-   * The component displayed in the tab.
-   */
+  /** The component displayed in the tab. */
   private final Component component;
 
-  /**
-   * The title of the tab; may be <code>null</code>.
-   */
+  /** The title of the tab; may be <code>null</code>. */
   private String title;
 
-  /**
-   * The icon of the tab; may be <code>null</code>.
-   */
+  /** The icon of the tab; may be <code>null</code>. */
   private Icon icon;
 
-  /**
-   * Whether the tab is closeable.
-   */
+  /** Whether the tab is closeable. */
   private boolean isCloseable;
 
-  /**
-   * Our tab close approver.
-   */
+  /** Our tab close approver. */
   private TabCloseApprover tabCloseApprover = null;
 
-  /**
-   * Property change support.
-   */
+  /** Property change support. */
   private final PropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /**
@@ -77,37 +61,27 @@ public class Tab {
     this.isCloseable = isCloseable;
   }
 
-  /**
-   * Adds a property change listener.
-   */
+  /** Adds a property change listener. */
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
-  /**
-   * Removes a property change listener.
-   */
+  /** Removes a property change listener. */
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * Returns the component displayed in the tab.
-   */
+  /** Returns the component displayed in the tab. */
   public Component getComponent() {
     return component;
   }
 
-  /**
-   * Returns the tab's title; may be <code>null</code>.
-   */
+  /** Returns the tab's title; may be <code>null</code>. */
   public String getTitle() {
     return title;
   }
 
-  /**
-   * Sets the title of the tab.
-   */
+  /** Sets the title of the tab. */
   public void setTitle(String title) {
     if (Utilities.areEqual(this.title, title)) return;
 
@@ -117,16 +91,12 @@ public class Tab {
     propertyChangeSupport.firePropertyChange("title", oldValue, title);
   }
 
-  /**
-   * Returns the tab's icon; may be <code>null</code>.
-   */
+  /** Returns the tab's icon; may be <code>null</code>. */
   public Icon getIcon() {
     return icon;
   }
 
-  /**
-   * Sets the icon of this tab.
-   */
+  /** Sets the icon of this tab. */
   public void setIcon(Icon icon) {
     if (Utilities.areEqual(this.icon, icon)) return;
 
@@ -136,16 +106,12 @@ public class Tab {
     propertyChangeSupport.firePropertyChange("icon", oldValue, title);
   }
 
-  /**
-   * Returns whether the tab should display UI to allow the user to close it.
-   */
+  /** Returns whether the tab should display UI to allow the user to close it. */
   public boolean isCloseable() {
     return isCloseable;
   }
 
-  /**
-   * Sets the closeable state of this tab.
-   */
+  /** Sets the closeable state of this tab. */
   public void setCloseable(boolean isCloseable) {
     if (this.isCloseable == isCloseable) return;
 
@@ -155,9 +121,7 @@ public class Tab {
     propertyChangeSupport.firePropertyChange("closeable", oldValue, isCloseable);
   }
 
-  /**
-   * Returns the current approver of tab close actions; <code>null</code> if none.
-   */
+  /** Returns the current approver of tab close actions; <code>null</code> if none. */
   public TabCloseApprover getTabCloseApprover() {
     return tabCloseApprover;
   }

@@ -2,20 +2,26 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002, 2003 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console;
 
+import free.jin.I18n;
+import free.jin.Preferences;
+import free.util.GraphicsUtilities;
+import free.util.ImageUtilities;
+import free.util.PlatformUtils;
+import free.workarounds.FixedJTextPane;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
@@ -37,7 +43,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
-
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
@@ -53,57 +58,37 @@ import javax.swing.text.Element;
 import javax.swing.text.Keymap;
 import javax.swing.text.Utilities;
 
-import free.jin.I18n;
-import free.jin.Preferences;
-import free.util.GraphicsUtilities;
-import free.util.ImageUtilities;
-import free.util.PlatformUtils;
-import free.workarounds.FixedJTextPane;
-
 /**
  * An extension of JTextPane which is used as the output component in a Console. Implements the
  * following features:
+ *
  * <UL>
- * <LI>On right click, displays a popup menu which lets the user execute various commands with the
- * current selection as the command argument.
- * <LI>Allows marking parts of the text as Links. This allows a certain action to be performed
+ *   <LI>On right click, displays a popup menu which lets the user execute various commands with the
+ *       current selection as the command argument.
+ *   <LI>Allows marking parts of the text as Links. This allows a certain action to be performed
  * </UL>
  */
 public class ConsoleTextPane extends FixedJTextPane {
 
-  /**
-   * The Console we're a part of.
-   */
+  /** The Console we're a part of. */
   protected final Console console;
 
-  /**
-   * The paint we use for the background; <code>null</code> if none.
-   */
+  /** The paint we use for the background; <code>null</code> if none. */
   private Paint backgroundPaint = null;
 
-  /**
-   * The default Popup.
-   */
+  /** The default Popup. */
   protected JPopupMenu defaultPopupMenu = null;
 
-  /**
-   * We keep the links here.
-   */
+  /** We keep the links here. */
   private Vector links = new Vector();
 
-  /**
-   * Our regular cursor (our real cursor might be hand while over a link).
-   */
+  /** Our regular cursor (our real cursor might be hand while over a link). */
   private Cursor regCursor = Cursor.getDefaultCursor();
 
-  /**
-   * What is the link we're currently over? Null if none.
-   */
+  /** What is the link we're currently over? Null if none. */
   private Link curLink = null;
 
-  /**
-   * Creates a new ConsoleTextPane which will be a part of the given Console.
-   */
+  /** Creates a new ConsoleTextPane which will be a part of the given Console. */
   public ConsoleTextPane(Console console) {
     this.console = console;
 
@@ -137,9 +122,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     repaint();
   }
 
-  /**
-   * Sets the image we use for the background pattern.
-   */
+  /** Sets the image we use for the background pattern. */
   public void setBackgroundPattern(Image image) {
     setBackground(
         new Color(0, 0, 0, 0)); // Otherwise the background color is painted over the pattern
@@ -223,8 +206,8 @@ public class ConsoleTextPane extends FixedJTextPane {
   /**
    * We override this to prevent unnecessary Toolkit.beep()s which are caused when you press a key
    * when the text pane has focus because it's not editable. The reason why we don't want beeps to
-   * be generated is because we're relaying the events to the console's input field. See
-   * {@link free.jin.console.Console#keyPressed(java.awt.event.KeyEvent)} for more details.
+   * be generated is because we're relaying the events to the console's input field. See {@link
+   * free.jin.console.Console#keyPressed(java.awt.event.KeyEvent)} for more details.
    */
   @Override
   protected void processComponentKeyEvent(KeyEvent evt) {
@@ -277,9 +260,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return defaultPopupMenu;
   }
 
-  /**
-   * Creates the popup menu for this <code>ConsoleTextPane</code>.
-   */
+  /** Creates the popup menu for this <code>ConsoleTextPane</code>. */
   protected JPopupMenu createPopupMenu() {
     Preferences prefs = console.getPrefs();
 
@@ -315,9 +296,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return popupMenu;
   }
 
-  /**
-   * Returns the start of the word at the specified location.
-   */
+  /** Returns the start of the word at the specified location. */
   private int getWordStart(int location) throws BadLocationException {
     Document document = getDocument();
     Element lineElement = Utilities.getParagraphElement(this, location);
@@ -344,9 +323,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return lineStart;
   }
 
-  /**
-   * Returns the end of the word at the specified location.
-   */
+  /** Returns the end of the word at the specified location. */
   private int getWordEnd(int location) throws BadLocationException {
     Document document = getDocument();
     Element lineElement = Utilities.getParagraphElement(this, location);
@@ -391,9 +368,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return Character.isWhitespace(c);
   }
 
-  /**
-   * Expurgates the current selection by replacing all non-whitespace characters with asterisks.
-   */
+  /** Expurgates the current selection by replacing all non-whitespace characters with asterisks. */
   protected void expurgateSelection() {
     String selection = getSelectedText();
     int selectionLength = selection.length();
@@ -418,9 +393,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     links.addElement(link);
   }
 
-  /**
-   * Removes all the links.
-   */
+  /** Removes all the links. */
   public void removeLinks() {
     links.removeAllElements();
   }
@@ -430,11 +403,10 @@ public class ConsoleTextPane extends FixedJTextPane {
    * to count clicks ourselves.
    */
   private int clickCount = 0;
+
   private long lastReleaseTime;
 
-  /**
-   * Updates the click count, if necessary.
-   */
+  /** Updates the click count, if necessary. */
   private void updateClickCount(MouseEvent evt) {
     if (PlatformUtils.isOldMicrosoftVM()) {
       switch (evt.getID()) {
@@ -455,16 +427,12 @@ public class ConsoleTextPane extends FixedJTextPane {
     }
   }
 
-  /**
-   * Returns the click count for the specified mouse event.
-   */
+  /** Returns the click count for the specified mouse event. */
   private int getClickCount(MouseEvent evt) {
     return PlatformUtils.isOldMicrosoftVM() ? clickCount : evt.getClickCount();
   }
 
-  /**
-   * Processes the given MouseEvent.
-   */
+  /** Processes the given MouseEvent. */
   @Override
   protected void processMouseEvent(MouseEvent evt) {
     updateClickCount(evt);
@@ -544,9 +512,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     }
   }
 
-  /**
-   * Processes the given Mouse(Motion)Event.
-   */
+  /** Processes the given Mouse(Motion)Event. */
   @Override
   protected void processMouseMotionEvent(MouseEvent evt) {
     updateClickCount(evt);
@@ -576,9 +542,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     }
   }
 
-  /**
-   * Returns the link at the given location, or null if none.
-   */
+  /** Returns the link at the given location, or null if none. */
   protected Link getLink(int x, int y) {
     int numLinks = links.size();
     for (int i = 0; i < numLinks; i++) {
@@ -636,9 +600,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return false;
   }
 
-  /**
-   * Returns the tooltip to display.
-   */
+  /** Returns the tooltip to display. */
   @Override
   public String getToolTipText(MouseEvent evt) {
     Link link = getLink(evt.getX(), evt.getY());
@@ -662,9 +624,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return null;
   }
 
-  /**
-   * Overrides setCursor to save information about the regular cursor.
-   */
+  /** Overrides setCursor to save information about the regular cursor. */
   @Override
   public void setCursor(Cursor cursor) {
     setCursor(cursor, true);
@@ -679,9 +639,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     if (save) regCursor = cursor;
   }
 
-  /**
-   * Returns the block scroll amount.
-   */
+  /** Returns the block scroll amount. */
   @Override
   public int getScrollableBlockIncrement(Rectangle viewRect, int orientation, int direction) {
     if (orientation == SwingConstants.HORIZONTAL)
@@ -691,9 +649,7 @@ public class ConsoleTextPane extends FixedJTextPane {
     return scroll <= 0 ? viewRect.height : scroll;
   }
 
-  /**
-   * Returns the unit scroll amount.
-   */
+  /** Returns the unit scroll amount. */
   @Override
   public int getScrollableUnitIncrement(Rectangle viewRect, int orientation, int direction) {
     if (orientation == SwingConstants.HORIZONTAL)
@@ -710,9 +666,7 @@ public class ConsoleTextPane extends FixedJTextPane {
    */
   protected class IssueCommandMenuItem extends JMenuItem {
 
-    /**
-     * The server command to which the selection is appended.
-     */
+    /** The server command to which the selection is appended. */
     private final String serverCommand;
 
     /**
@@ -724,9 +678,7 @@ public class ConsoleTextPane extends FixedJTextPane {
       this.serverCommand = serverCommand;
     }
 
-    /**
-     * Sends the command to the server.
-     */
+    /** Sends the command to the server. */
     @Override
     protected void fireActionPerformed(ActionEvent evt) {
       console.issueCommand(new Command(serverCommand + " " + getSelectedText(), 0));
@@ -739,16 +691,12 @@ public class ConsoleTextPane extends FixedJTextPane {
    */
   protected class CopyMenuItem extends JMenuItem {
 
-    /**
-     * Creates a new <code>CopyMenuItem</code> with the specified label.
-     */
+    /** Creates a new <code>CopyMenuItem</code> with the specified label. */
     public CopyMenuItem(String label) {
       super(label);
     }
 
-    /**
-     * Copies the currently selected text in the console to the clipboard.
-     */
+    /** Copies the currently selected text in the console to the clipboard. */
     @Override
     protected void fireActionPerformed(ActionEvent evt) {
       copy();
@@ -761,16 +709,12 @@ public class ConsoleTextPane extends FixedJTextPane {
    */
   protected class ExecuteMenuItem extends JMenuItem {
 
-    /**
-     * Creates a new <code>ExecuteMenuItem</code> with the specified label.
-     */
+    /** Creates a new <code>ExecuteMenuItem</code> with the specified label. */
     public ExecuteMenuItem(String label) {
       super(label);
     }
 
-    /**
-     * Sends the current console selection to the server, as a command.
-     */
+    /** Sends the current console selection to the server, as a command. */
     @Override
     protected void fireActionPerformed(ActionEvent evt) {
       console.issueCommand(new Command("/" + getSelectedText(), 0));
@@ -783,16 +727,12 @@ public class ConsoleTextPane extends FixedJTextPane {
    */
   protected class ExpurgateMenuItem extends JMenuItem {
 
-    /**
-     * Creates a new <code>ExpurgateMenuItem</code> with the specified label.
-     */
+    /** Creates a new <code>ExpurgateMenuItem</code> with the specified label. */
     public ExpurgateMenuItem(String label) {
       super(label);
     }
 
-    /**
-     * Expurgates the current selection.
-     */
+    /** Expurgates the current selection. */
     @Override
     protected void fireActionPerformed(ActionEvent evt) {
       expurgateSelection();

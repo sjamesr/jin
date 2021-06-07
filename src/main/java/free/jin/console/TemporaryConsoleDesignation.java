@@ -11,19 +11,13 @@ import free.jin.event.JinEvent;
  */
 public class TemporaryConsoleDesignation extends AbstractConsoleDesignation {
 
-  /**
-   * The number of temporary console designations in the program.
-   */
+  /** The number of temporary console designations in the program. */
   private static int temporaryConsoleCount = 0;
 
-  /**
-   * Our index among the temporary console designations in the program.
-   */
+  /** Our index among the temporary console designations in the program. */
   private final int index;
 
-  /**
-   * The list of commands to send.
-   */
+  /** The list of commands to send. */
   private final String[] commands;
 
   /**
@@ -41,9 +35,7 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation {
     }
   }
 
-  /**
-   * Sends our commands to the server.
-   */
+  /** Sends our commands to the server. */
   @Override
   public void setConsole(Console console) {
     super.setConsole(console);
@@ -51,17 +43,13 @@ public class TemporaryConsoleDesignation extends AbstractConsoleDesignation {
     for (int i = 0; i < commands.length; i++) connection.sendTaggedCommand(commands[i], getTag());
   }
 
-  /**
-   * Returns our tag.
-   */
+  /** Returns our tag. */
   @Override
   public String getTag() {
     return "tmp-" + index;
   }
 
-  /**
-   * Accepts only events tagged by us.
-   */
+  /** Accepts only events tagged by us. */
   @Override
   protected boolean accept(JinEvent evt) {
     return isTaggedByUs(evt);

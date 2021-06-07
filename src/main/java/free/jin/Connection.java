@@ -2,65 +2,67 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin;
-
-import java.io.IOException;
 
 import free.chess.Move;
 import free.chess.WildVariant;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 import free.jin.event.ListenerManager;
+import java.io.IOException;
 
 /**
  * Defines the interface between the chess server and the client. Some restrictions/rules on the
  * implementation that can't be enforced by the compiler:
+ *
  * <UL>
- * <LI>The implementation is responsible for firing events to registered listeners when needed.
- * However, if a certain feature which is implied by calling the listener is not supported by the
- * server, the implementation may ignore addListener and removeListener calls related to that
- * feature or not fire events of that type.
- * <LI>The calls to all the listeners must be done in the AWT event dispatching thread.
- * <LI>The implementation is supposed to be completely self sufficient, meaning that only the
- * methods specified in the interface are required to normally interact with it. For example, you
- * can't require to call a special method to enable a certain feature - the implementation must
- * decide by itself when to enable and when to disable the feature.
- * <LI>The implementation must supress the textual message accompanying some event (sent by the
- * server) when at least a single listener of that event is registered. On the other hand, the same
- * textual message must NOT be supressed when there are no listeners registered.
- * <LI>The implementation must be consistent in calling listeners. For example if a certain order of
- * events is implied, the listeners must be called in that order - a MoveEvent must not be fired
- * before a GameStartedEvent has been fired for that game or after a GameEndedEvent has been fired.
- * <LI>If the server supports a certain feature only partially, the implementation is responsible
- * for implementing the rest itself where possible and for providing default or blank values where
- * impossible.
+ *   <LI>The implementation is responsible for firing events to registered listeners when needed.
+ *       However, if a certain feature which is implied by calling the listener is not supported by
+ *       the server, the implementation may ignore addListener and removeListener calls related to
+ *       that feature or not fire events of that type.
+ *   <LI>The calls to all the listeners must be done in the AWT event dispatching thread.
+ *   <LI>The implementation is supposed to be completely self sufficient, meaning that only the
+ *       methods specified in the interface are required to normally interact with it. For example,
+ *       you can't require to call a special method to enable a certain feature - the implementation
+ *       must decide by itself when to enable and when to disable the feature.
+ *   <LI>The implementation must supress the textual message accompanying some event (sent by the
+ *       server) when at least a single listener of that event is registered. On the other hand, the
+ *       same textual message must NOT be supressed when there are no listeners registered.
+ *   <LI>The implementation must be consistent in calling listeners. For example if a certain order
+ *       of events is implied, the listeners must be called in that order - a MoveEvent must not be
+ *       fired before a GameStartedEvent has been fired for that game or after a GameEndedEvent has
+ *       been fired.
+ *   <LI>If the server supports a certain feature only partially, the implementation is responsible
+ *       for implementing the rest itself where possible and for providing default or blank values
+ *       where impossible.
  * </UL>
+ *
  * Some assumptions the implementation is allowed to make:
+ *
  * <UL>
- * <LI>Although it is not guaranteed that all calls to the Connection's methods will be done in any
- * particular thread (including the AWT Event dispatching thread), the implementation may assume
- * that all calls from user code will be sequential, i.e. no calls to any methods will be done by
- * the user code while one of the methods is executing from a thread other than the one executing
- * that method.
+ *   <LI>Although it is not guaranteed that all calls to the Connection's methods will be done in
+ *       any particular thread (including the AWT Event dispatching thread), the implementation may
+ *       assume that all calls from user code will be sequential, i.e. no calls to any methods will
+ *       be done by the user code while one of the methods is executing from a thread other than the
+ *       one executing that method.
  * </UL>
  *
  * The restrictions above are to be treated as assumptions for user code and the assumptions above
  * are to be treated as restrictions for user code.
- * <P>
  *
- * If the server supports additional features beyond the specified in the interface, it may add
+ * <p>If the server supports additional features beyond the specified in the interface, it may add
  * methods supporting these features. The server specific user code, may then cast the
  * implementation to its actual type and use these methods. If certain features are supported in an
  * extended form (more information is sent by the server than is needed to support the interface),
@@ -72,29 +74,19 @@ import free.jin.event.ListenerManager;
  */
 public interface Connection {
 
-  /**
-   * The code for a game white won.
-   */
+  /** The code for a game white won. */
   int WHITE_WON = 0;
 
-  /**
-   * The code for a game white lost.
-   */
+  /** The code for a game white lost. */
   int WHITE_LOST = 1;
 
-  /**
-   * The code for a drawn game.
-   */
+  /** The code for a drawn game. */
   int DRAWN = 2;
 
-  /**
-   * The code for an adjourned game.
-   */
+  /** The code for an adjourned game. */
   int ADJOURNED = 3;
 
-  /**
-   * The code for an aborted game.
-   */
+  /** The code for an aborted game. */
   int ABORTED = 4;
 
   /**
@@ -136,9 +128,7 @@ public interface Connection {
    */
   String getTextEncoding();
 
-  /**
-   * Sends an arbitrary, server-specific command to the server.
-   */
+  /** Sends an arbitrary, server-specific command to the server. */
   void sendCommand(String command);
 
   /**
@@ -146,27 +136,23 @@ public interface Connection {
    * mechanism which allows the client to associate the server's response to the command which
    * triggered it. If the server supports tagged commands, the events sent in response to the
    * command will have their tags (see {@link JinEvent#getClientTag()} set to the value specified
-   * here. If the server does not support tagged commands, it may simply forward the call to
-   * {@link #sendCommand(String)}. The client should not rely on tagged commands being supported by
-   * the server, except in server-specific code. <code>tag</code> may be <code>null</code>, in which
+   * here. If the server does not support tagged commands, it may simply forward the call to {@link
+   * #sendCommand(String)}. The client should not rely on tagged commands being supported by the
+   * server, except in server-specific code. <code>tag</code> may be <code>null</code>, in which
    * case, the method behaves exactly like the normal <code>sendCommand</code> method.
    */
   void sendTaggedCommand(String command, String tag);
 
-  /**
-   * Tells the server to end the current session.
-   */
+  /** Tells the server to end the current session. */
   void exit();
 
-  /**
-   * Returns a list of support wild variants.
-   */
+  /** Returns a list of support wild variants. */
   WildVariant[] getSupportedVariants();
 
   /**
    * Returns a <code>ServerUser</code> object corresponding to the specified user
-   * name/handle/nickname. All code related to this certain connection which requires a
-   * <code>ServerUser</code> may only be given an instance returned by this method.
+   * name/handle/nickname. All code related to this certain connection which requires a <code>
+   * ServerUser</code> may only be given an instance returned by this method.
    */
   ServerUser userForName(String name);
 
@@ -176,14 +162,10 @@ public interface Connection {
    */
   void sendPersonalTell(ServerUser user, String message, String tag);
 
-  /**
-   * Joins a personal chat session with the specified user.
-   */
+  /** Joins a personal chat session with the specified user. */
   void joinPersonalChat(ServerUser user);
 
-  /**
-   * Joins the server's help forum.
-   */
+  /** Joins the server's help forum. */
   void joinHelpForum();
 
   /**
@@ -198,14 +180,10 @@ public interface Connection {
    */
   void joinChat(String type, Object forum);
 
-  /**
-   * Starts a new, empty, examination game.
-   */
+  /** Starts a new, empty, examination game. */
   void examineNewGame();
 
-  /**
-   * Starts observing the board of the specified player.
-   */
+  /** Starts observing the board of the specified player. */
   void observeBoard(ServerUser user);
 
   /**
@@ -222,9 +200,7 @@ public interface Connection {
    */
   void makeMove(Game game, Move move);
 
-  /**
-   * Resigns the given game. The given game must be a played game and of type Game.MY_GAME.
-   */
+  /** Resigns the given game. The given game must be a played game and of type Game.MY_GAME. */
   void resign(Game game);
 
   /**
@@ -233,9 +209,7 @@ public interface Connection {
    */
   void requestDraw(Game game);
 
-  /**
-   * Returns whether the server supports aborting a game.
-   */
+  /** Returns whether the server supports aborting a game. */
   boolean isAbortSupported();
 
   /**
@@ -246,44 +220,37 @@ public interface Connection {
    */
   void requestAbort(Game game);
 
-  /**
-   * Returns whether the server supports adjourning a game.
-   */
+  /** Returns whether the server supports adjourning a game. */
   boolean isAdjournSupported();
 
   /**
    * Sends a request to adjourn the given game, or if the opponent already offered adjournment,
    * accepts it. The given game must be a played game and of type <code>Game.MY_GAME</code>. This
-   * method should throw an <code>UnsupportedOperationException</code> if
-   * <code>isAdjournSupported</code> returns <code>false</code>.
+   * method should throw an <code>UnsupportedOperationException</code> if <code>isAdjournSupported
+   * </code> returns <code>false</code>.
    */
   void requestAdjourn(Game game);
 
-  /**
-   * Returns whether the server supports one ply takebacks.
-   */
+  /** Returns whether the server supports one ply takebacks. */
   boolean isTakebackSupported();
 
   /**
    * Sends a one ply takeback request in the given game, or if the opponent already offered a one
-   * ply takeback, accepts it. The given game must be a played game and of type
-   * <code>Game.MY_GAME</code>. This method should throw an
-   * <code>UnsupportedOperationException</code> if <code>isTakebackSupported</code> returns
-   * <code>false</code>.
+   * ply takeback, accepts it. The given game must be a played game and of type <code>Game.MY_GAME
+   * </code>. This method should throw an <code>UnsupportedOperationException</code> if <code>
+   * isTakebackSupported</code> returns <code>false</code>.
    */
   void requestTakeback(Game game);
 
-  /**
-   * Returns whether the server supports multiple ply takebacks.
-   */
+  /** Returns whether the server supports multiple ply takebacks. */
   boolean isMultipleTakebackSupported();
 
   /**
    * Sends a takeback request for the specified amount of plies in the given game, or if the
    * opponent already offered a one ply takeback, accepts it. The given game must be a played game
-   * and of type <code>Game.MY_GAME</code>. This method should throw an
-   * <code>UnsupportedOperationException</code> if <code>isTakebackSupported</code> returns
-   * <code>false</code>.
+   * and of type <code>Game.MY_GAME</code>. This method should throw an <code>
+   * UnsupportedOperationException</code> if <code>isTakebackSupported</code> returns <code>false
+   * </code>.
    */
   void requestTakeback(Game game, int plyCount);
 
@@ -300,24 +267,18 @@ public interface Connection {
    */
   void goForward(Game game, int plyCount);
 
-  /**
-   * Goes to the beginning of the given game.
-   */
+  /** Goes to the beginning of the given game. */
   void goToBeginning(Game game);
 
-  /**
-   * Goes to the end of the given game.
-   */
+  /** Goes to the end of the given game. */
   void goToEnd(Game game);
 
-  /**
-   * Displays help about the server.
-   */
+  /** Displays help about the server. */
   void showServerHelp();
 
   /**
-   * Sends the specified question string to the server's help channel. For the meaning of
-   * <code>tag</code>, see {@link #sendTaggedCommand(String, String)}.
+   * Sends the specified question string to the server's help channel. For the meaning of <code>tag
+   * </code>, see {@link #sendTaggedCommand(String, String)}.
    */
   void sendHelpQuestion(String question, String tag);
 }

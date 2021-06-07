@@ -2,21 +2,19 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess.variants.kriegspiel;
-
-import java.util.Collection;
 
 import free.chess.BoardPainter;
 import free.chess.Chess;
@@ -32,6 +30,7 @@ import free.chess.Player;
 import free.chess.Position;
 import free.chess.Square;
 import free.chess.WildVariant;
+import java.util.Collection;
 
 /**
  * Implements the Kriegspiel wild variant. See <A
@@ -40,14 +39,10 @@ import free.chess.WildVariant;
  */
 public class Kriegspiel implements WildVariant {
 
-  /**
-   * The sole instance of this class.
-   */
+  /** The sole instance of this class. */
   private static final Kriegspiel INSTANCE = new Kriegspiel();
 
-  /**
-   * Returns an instance of Kriegspiel.
-   */
+  /** Returns an instance of Kriegspiel. */
   public static Kriegspiel getInstance() {
     return INSTANCE;
   }
@@ -146,9 +141,7 @@ public class Kriegspiel implements WildVariant {
           move.getStringRepresentation());
   }
 
-  /**
-   * Creates a short castling move for the current player in the specified position.
-   */
+  /** Creates a short castling move for the current player in the specified position. */
   @Override
   public Move createShortCastling(Position pos) {
     checkPosition(pos);
@@ -158,9 +151,7 @@ public class Kriegspiel implements WildVariant {
     else return ChesslikeGenericVariant.BLACK_SHORT_CASTLING;
   }
 
-  /**
-   * Creates a long castling move for the current player in the specified position.
-   */
+  /** Creates a long castling move for the current player in the specified position. */
   @Override
   public Move createLongCastling(Position pos) {
     checkPosition(pos);
@@ -170,9 +161,7 @@ public class Kriegspiel implements WildVariant {
     else return ChesslikeGenericVariant.BLACK_LONG_CASTLING;
   }
 
-  /**
-   * Makes the given KriegspielMove on the given position.
-   */
+  /** Makes the given KriegspielMove on the given position. */
   @Override
   public void makeMove(Move move, Position pos, Position.Modifier modifier) {
     checkPosition(pos);
@@ -199,8 +188,8 @@ public class Kriegspiel implements WildVariant {
   }
 
   /**
-   * Returns a ChessPiece corresponding to the given string. See
-   * {@link free.chess.ChesslikeGenericVariant#parseChessPiece(String)} for more details.
+   * Returns a ChessPiece corresponding to the given string. See {@link
+   * free.chess.ChesslikeGenericVariant#parseChessPiece(String)} for more details.
    *
    * @throws IllegalArgumentException if the given string is in a bad format.
    */
@@ -210,8 +199,8 @@ public class Kriegspiel implements WildVariant {
   }
 
   /**
-   * Returns a String corresponding to the given Piece. See
-   * {@link free.chess.ChesslikeGenericVariant#chessPieceToString(ChessPiece)} for more details.
+   * Returns a String corresponding to the given Piece. See {@link
+   * free.chess.ChesslikeGenericVariant#chessPieceToString(ChessPiece)} for more details.
    */
   @Override
   public String pieceToString(Piece piece) {
@@ -221,25 +210,19 @@ public class Kriegspiel implements WildVariant {
     return ChesslikeGenericVariant.chessPieceToString((ChessPiece) piece);
   }
 
-  /**
-   * Returns an instance of <code>DefaultPiecePainter</code>.
-   */
+  /** Returns an instance of <code>DefaultPiecePainter</code>. */
   @Override
   public PiecePainter createDefaultPiecePainter() {
     return new DefaultPiecePainter();
   }
 
-  /**
-   * Returns an instance of <code>DefaultBoardPainter</code>.
-   */
+  /** Returns an instance of <code>DefaultBoardPainter</code>. */
   @Override
   public BoardPainter createDefaultBoardPainter() {
     return new DefaultBoardPainter();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public Collection getTargetSquares(Position pos, Square square) {
     checkPosition(pos);
@@ -247,17 +230,13 @@ public class Kriegspiel implements WildVariant {
     return Chess.getInstance().getTargetSquares(pos, square);
   }
 
-  /**
-   * Returns the string "Kriegspiel".
-   */
+  /** Returns the string "Kriegspiel". */
   @Override
   public String getName() {
     return "Kriegspiel";
   }
 
-  /**
-   * Returns a textual representation of this WildVariant.
-   */
+  /** Returns a textual representation of this WildVariant. */
   @Override
   public String toString() {
     return getName();

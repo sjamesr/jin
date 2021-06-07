@@ -2,43 +2,19 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2006 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 package free.jin.console.prefs;
-
-import java.awt.Component;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 import free.jin.BadChangesException;
 import free.jin.I18n;
@@ -49,20 +25,34 @@ import free.util.NamedWrapper;
 import free.util.TextUtilities;
 import free.util.Utilities;
 import free.util.swing.SwingUtils;
+import java.awt.Component;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
-/**
- * Preferences panel for selecting the default encoding used by the consoles.
- */
+/** Preferences panel for selecting the default encoding used by the consoles. */
 public class EncodingPrefsPanel extends PreferencesPanel {
 
-  /**
-   * The name for the fake "all" encodings category.
-   */
+  /** The name for the fake "all" encodings category. */
   private static final String ALL_ENCODINGS_CATEGORY = "all";
 
-  /**
-   * Maps encoding categories to <code>ListModel</code>s of encodings in that category.
-   */
+  /** Maps encoding categories to <code>ListModel</code>s of encodings in that category. */
   private static final Map CATEGORIES_TO_ENCODING_LIST_MODELS = new TreeMap();
 
   static {
@@ -81,32 +71,22 @@ public class EncodingPrefsPanel extends PreferencesPanel {
     }
   }
 
-  /**
-   * The displayed name for the "system default" encoding.
-   */
+  /** The displayed name for the "system default" encoding. */
   private static final String DEFAULT_ENCODING_NAME =
       I18n.get(EncodingPrefsPanel.class)
           .getFormattedString(
               "defaultEncoding.name", new Object[] {TextUtilities.getDefaultCharsetName()});
 
-  /**
-   * The console manager.
-   */
+  /** The console manager. */
   private final ConsoleManager consoleManager;
 
-  /**
-   * The list of encoding categories.
-   */
+  /** The list of encoding categories. */
   private final JList encodingCategories;
 
-  /**
-   * The list of encodings in the currently selected category.
-   */
+  /** The list of encodings in the currently selected category. */
   private final JList encodings;
 
-  /**
-   * The currently selected encoding.
-   */
+  /** The currently selected encoding. */
   private Charset selectedEncoding;
 
   /**
@@ -115,9 +95,7 @@ public class EncodingPrefsPanel extends PreferencesPanel {
    */
   private boolean ignoreEncodingSelectionChanges = false;
 
-  /**
-   * Creates a new <code>EncodingPrefsPanel</code> for the specified console manager.
-   */
+  /** Creates a new <code>EncodingPrefsPanel</code> for the specified console manager. */
   public EncodingPrefsPanel(ConsoleManager consoleManager) {
     this.consoleManager = consoleManager;
 
@@ -206,9 +184,7 @@ public class EncodingPrefsPanel extends PreferencesPanel {
     createUI();
   }
 
-  /**
-   * Creates the user interface of this panel.
-   */
+  /** Creates the user interface of this panel. */
   private void createUI() {
     I18n i18n = I18n.get(EncodingPrefsPanel.class);
 
@@ -277,8 +253,8 @@ public class EncodingPrefsPanel extends PreferencesPanel {
       if (selected == null) consoleManager.setEncoding(null);
       else consoleManager.setEncoding(selected.name());
     } catch (UnsupportedEncodingException e) {
-      e
-          .printStackTrace(); // This shouldn't happen because we let the user select only from supported charsets
+      e.printStackTrace(); // This shouldn't happen because we let the user select only from
+      // supported charsets
     }
   }
 }

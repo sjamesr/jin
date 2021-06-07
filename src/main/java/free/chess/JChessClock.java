@@ -2,20 +2,22 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
 package free.chess;
 
+import free.util.GraphicsUtilities;
+import free.util.TextUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -28,17 +30,10 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import free.util.GraphicsUtilities;
-import free.util.TextUtilities;
-
-/**
- * A Component for displaying a simple, text based chess clock.
- */
+/** A Component for displaying a simple, text based chess clock. */
 public class JChessClock extends AbstractChessClock {
 
-  /**
-   * The special clock font we use (if it exists).
-   */
+  /** The special clock font we use (if it exists). */
   private static final Font CLOCK_FONT;
 
   static {
@@ -55,29 +50,19 @@ public class JChessClock extends AbstractChessClock {
     CLOCK_FONT = font;
   }
 
-  /**
-   * The active background color.
-   */
+  /** The active background color. */
   private Color activeBG = new Color(30, 100, 230);
 
-  /**
-   * The active foreground color.
-   */
+  /** The active foreground color. */
   private Color activeFG = Color.white;
 
-  /**
-   * The inactive background color. Defaults to the parent's background.
-   */
+  /** The inactive background color. Defaults to the parent's background. */
   private Color inactiveBG = null;
 
-  /**
-   * The inactive foreground color.
-   */
+  /** The inactive foreground color. */
   private Color inactiveFG = Color.black;
 
-  /**
-   * Creates a new JChessClock with the given initial amount of time (in milliseconds) on it.
-   */
+  /** Creates a new JChessClock with the given initial amount of time (in milliseconds) on it. */
   public JChessClock(int time) {
     super(time);
 
@@ -85,78 +70,58 @@ public class JChessClock extends AbstractChessClock {
     else setFont(CLOCK_FONT.deriveFont(48f));
   }
 
-  /**
-   * Sets the background color of this JChessClock when it's active.
-   */
+  /** Sets the background color of this JChessClock when it's active. */
   public void setActiveBackground(Color color) {
     activeBG = color;
     repaint();
   }
 
-  /**
-   * Returns the background color of this JChessClock when it's active.
-   */
+  /** Returns the background color of this JChessClock when it's active. */
   public Color getActiveBackground() {
     return activeBG;
   }
 
-  /**
-   * Sets the foreground color of this JChessClock when it's active.
-   */
+  /** Sets the foreground color of this JChessClock when it's active. */
   public void setActiveForeground(Color color) {
     activeFG = color;
     repaint();
   }
 
-  /**
-   * Returns the foreground color of this JChessClock when it's active.
-   */
+  /** Returns the foreground color of this JChessClock when it's active. */
   public Color getActiveForeground() {
     return activeFG;
   }
 
-  /**
-   * Sets the background color of this JChessClock when it's inactive.
-   */
+  /** Sets the background color of this JChessClock when it's inactive. */
   public void setInactiveBackground(Color color) {
     inactiveBG = color;
     repaint();
   }
 
-  /**
-   * Returns the background color of this JChessClock when it's inactive.
-   */
+  /** Returns the background color of this JChessClock when it's inactive. */
   public Color getInactiveBackground() {
     return inactiveBG;
   }
 
-  /**
-   * Sets the foreground color of this JChessClock when it's inactive.
-   */
+  /** Sets the foreground color of this JChessClock when it's inactive. */
   public void setInactiveForeground(Color color) {
     inactiveFG = color;
     repaint();
   }
 
-  /**
-   * Returns the foreground color of this JChessClock when it's inactive.
-   */
+  /** Returns the foreground color of this JChessClock when it's inactive. */
   public Color getInactiveForeground() {
     return inactiveFG;
   }
 
-  /**
-   * Sets whether the owner of this JChessClock is also the owner of the current turn.
-   */
+  /** Sets whether the owner of this JChessClock is also the owner of the current turn. */
   @Override
   public void setActive(boolean isActive) {
     super.setActive(isActive);
     repaint();
   }
 
-  /**
-   * Returns the string that should be drawn for the given time, in milliseconds.
-   */
+  /** Returns the string that should be drawn for the given time, in milliseconds. */
   protected String createTimeString(int time) {
     boolean isNegative = time < 0;
 
@@ -196,9 +161,7 @@ public class JChessClock extends AbstractChessClock {
     }
   }
 
-  /**
-   * Overrides JComponent.paintComponent(Graphics) to paint this JChessClock.
-   */
+  /** Overrides JComponent.paintComponent(Graphics) to paint this JChessClock. */
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
@@ -242,9 +205,7 @@ public class JChessClock extends AbstractChessClock {
     return fm.stringWidth(text);
   }
 
-  /**
-   * Returns the preferred size of this JChessClock.
-   */
+  /** Returns the preferred size of this JChessClock. */
   @Override
   public Dimension getPreferredSize() {
     String text = createTimeString(getTime());
@@ -256,9 +217,7 @@ public class JChessClock extends AbstractChessClock {
     return new Dimension(fontWidth, fontHeight);
   }
 
-  /**
-   * Returns the minimum size of this JChessClock.
-   */
+  /** Returns the minimum size of this JChessClock. */
   @Override
   public Dimension getMinimumSize() {
     String text = createTimeString(getTime());

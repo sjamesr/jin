@@ -2,15 +2,15 @@
  * The utillib library. More information is available at http://www.jinchess.com/. Copyright (C)
  * 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The utillib library is free software; you can redistribute it and/or modify it under the terms of
- * the GNU Lesser General Public License as published by the Free Software Foundation; either
+ * <p>The utillib library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
+ * <p>The utillib library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with utillib
+ * <p>You should have received a copy of the GNU Lesser General Public License along with utillib
  * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
@@ -24,29 +24,19 @@ import java.awt.Rectangle;
  */
 public final class RectDouble {
 
-  /**
-   * The x coordinate.
-   */
+  /** The x coordinate. */
   private double x;
 
-  /**
-   * The y coordinate.
-   */
+  /** The y coordinate. */
   private double y;
 
-  /**
-   * The width of the rectangle.
-   */
+  /** The width of the rectangle. */
   private double width;
 
-  /**
-   * The height of the rectangle.
-   */
+  /** The height of the rectangle. */
   private double height;
 
-  /**
-   * Creates a new <code>RectDouble</code> with the specified value.
-   */
+  /** Creates a new <code>RectDouble</code> with the specified value. */
   public RectDouble(double x, double y, double width, double height) {
     this.x = x;
     this.y = y;
@@ -54,9 +44,7 @@ public final class RectDouble {
     this.height = height;
   }
 
-  /**
-   * Creates a copy of the specified <code>RectDouble</code>.
-   */
+  /** Creates a copy of the specified <code>RectDouble</code>. */
   public RectDouble(RectDouble rect) {
     this.x = rect.x;
     this.y = rect.y;
@@ -64,9 +52,7 @@ public final class RectDouble {
     this.height = rect.height;
   }
 
-  /**
-   * Creates a RectDouble equivalent to the specified <code>java.awt.Rectangle</code>.
-   */
+  /** Creates a RectDouble equivalent to the specified <code>java.awt.Rectangle</code>. */
   public RectDouble(Rectangle rect) {
     this.x = rect.x;
     this.y = rect.y;
@@ -74,30 +60,22 @@ public final class RectDouble {
     this.height = rect.height;
   }
 
-  /**
-   * Returns the x coordinate.
-   */
+  /** Returns the x coordinate. */
   public double getX() {
     return x;
   }
 
-  /**
-   * Returns the y coordinate.
-   */
+  /** Returns the y coordinate. */
   public double getY() {
     return y;
   }
 
-  /**
-   * Returns the width.
-   */
+  /** Returns the width. */
   public double getWidth() {
     return width;
   }
 
-  /**
-   * Returns the height.
-   */
+  /** Returns the height. */
   public double getHeight() {
     return height;
   }
@@ -168,9 +146,7 @@ public final class RectDouble {
     return new Rectangle((int) x, (int) y, (int) width, (int) height);
   }
 
-  /**
-   * Returns whether this RectDouble is equal to the specified one.
-   */
+  /** Returns whether this RectDouble is equal to the specified one. */
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof RectDouble)) return false;
@@ -180,9 +156,7 @@ public final class RectDouble {
     return (x == rect.x) && (y == rect.y) && (rect.width == width) && (rect.height == height);
   }
 
-  /**
-   * Returns the hash code for this <code>RectDouble</code>.
-   */
+  /** Returns the hash code for this <code>RectDouble</code>. */
   @Override
   public int hashCode() {
     int res = 37;
@@ -194,9 +168,7 @@ public final class RectDouble {
     return res;
   }
 
-  /**
-   * Returns a textual representation of this <code>RectDouble</code>.
-   */
+  /** Returns a textual representation of this <code>RectDouble</code>. */
   @Override
   public String toString() {
     return "[x=" + x + ", y=" + y + ", w=" + width + ", h=" + height + "]";

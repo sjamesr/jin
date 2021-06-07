@@ -2,15 +2,15 @@
  * Jin - a chess client for internet chess servers. More information is available at
  * http://www.jinchess.com/. Copyright (C) 2007 Alexander Maryanovsky. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * <p>This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program; if
+ * <p>You should have received a copy of the GNU General Public License along with this program; if
  * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
@@ -22,14 +22,10 @@ import free.jin.ServerUser;
 import free.jin.event.ChatEvent;
 import free.jin.event.JinEvent;
 
-/**
- * A <code>ConsoleDesignation</code> for person-to-person chat.
- */
+/** A <code>ConsoleDesignation</code> for person-to-person chat. */
 public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation {
 
-  /**
-   * The user with whom we're chatting.
-   */
+  /** The user with whom we're chatting. */
   private final ServerUser conversationPartner;
 
   /**
@@ -52,17 +48,13 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation {
     addCommandType(new SendPersonalTell());
   }
 
-  /**
-   * Joins personal chat with out conversation partner.
-   */
+  /** Joins personal chat with out conversation partner. */
   @Override
   protected void joinForums() {
     connection.joinPersonalChat(conversationPartner);
   }
 
-  /**
-   * Accepts only person-to-person chat events.
-   */
+  /** Accepts only person-to-person chat events. */
   @Override
   protected boolean accept(JinEvent evt) {
     if (isTaggedByUs(evt)) return true;
@@ -87,39 +79,29 @@ public class PersonalChatConsoleDesignation extends AbstractConsoleDesignation {
     return designation.conversationPartner.equals(conversationPartner);
   }
 
-  /**
-   * Returns the hash code of this <code>PersonalChatConsoleDesignation</code>.
-   */
+  /** Returns the hash code of this <code>PersonalChatConsoleDesignation</code>. */
   @Override
   public int hashCode() {
     return conversationPartner.hashCode();
   }
 
-  /**
-   * A command type which sends a personal tell to our conversation partner.
-   */
+  /** A command type which sends a personal tell to our conversation partner. */
   private class SendPersonalTell extends AbstractCommandType {
 
-    /**
-     * Creates a new <code>SendPersonalTell</code> command type.
-     */
+    /** Creates a new <code>SendPersonalTell</code> command type. */
     public SendPersonalTell() {
       super(
           I18n.get(SendPersonalTell.class)
               .getFormattedString("name", new Object[] {conversationPartner.getName()}));
     }
 
-    /**
-     * Sends the specified personal tell to our conversation partner.
-     */
+    /** Sends the specified personal tell to our conversation partner. */
     @Override
     protected void send(String message) {
       connection.sendPersonalTell(conversationPartner, encode(message), getTag());
     }
 
-    /**
-     * Echoes the message to the console.
-     */
+    /** Echoes the message to the console. */
     @Override
     protected void echo(String userText) {
       Console console = getConsole();

@@ -2,15 +2,15 @@
  * The chess framework library. More information is available at http://www.jinchess.com/. Copyright
  * (C) 2002 Alexander Maryanovsky. All rights reserved.
  *
- * The chess framework library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * <p>The chess framework library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
  * either version 2 of the License, or (at your option) any later version.
  *
- * The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p>The chess framework library is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  * PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with the chess
+ * <p>You should have received a copy of the GNU Lesser General Public License along with the chess
  * framework library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite
  * 330, Boston, MA 02111-1307 USA
  */
@@ -23,24 +23,16 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 
-/**
- * An abstract class offering a convenient partial implementation for vector based piece sets.
- */
+/** An abstract class offering a convenient partial implementation for vector based piece sets. */
 public abstract class VectorPiecePainter extends AbstractColoredPiecePainter {
 
-  /**
-   * The size of the cached pieces.
-   */
+  /** The size of the cached pieces. */
   private Dimension cachedPieceSize = new Dimension(-1, -1);
 
-  /**
-   * The cached piece polygons.
-   */
+  /** The cached piece polygons. */
   private Polygon kingPolygon, queenPolygon, rookPolygon, bishopPolygon, knightPolygon, pawnPolygon;
 
-  /**
-   * Creates a new <code>VectorPiecePainter</code>.
-   */
+  /** Creates a new <code>VectorPiecePainter</code>. */
   public VectorPiecePainter() {
     super(Color.white, Color.black);
   }
@@ -106,9 +98,7 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter {
    */
   protected abstract Polygon createPawnPolygon(int width, int height);
 
-  /**
-   * Clears the caching of piece polygons.
-   */
+  /** Clears the caching of piece polygons. */
   private void clearPieceCache() {
     kingPolygon = null;
     queenPolygon = null;
@@ -118,9 +108,7 @@ public abstract class VectorPiecePainter extends AbstractColoredPiecePainter {
     pawnPolygon = null;
   }
 
-  /**
-   * Draws the given piece at the given coordinates with the given size on the given Graphics.
-   */
+  /** Draws the given piece at the given coordinates with the given size on the given Graphics. */
   @Override
   public final void paintPiece(
       Piece piece, Graphics g, Component component, Rectangle rect, boolean isShaded) {
