@@ -261,10 +261,6 @@ public abstract class AbstractUiProvider implements UIProvider, SessionListener 
       boolean vertMaximized = prefs.getBool(prefNamePrefix + "maximized.vert", false);
       boolean horizMaximized = prefs.getBool(prefNamePrefix + "maximized.horiz", false);
 
-      // Bugfix for Java bug 4464714 - setExtendedState only works once the
-      // the window is realized.
-      if (frame.getPeer() == null) frame.addNotify();
-
       int state =
           ((vertMaximized ? Frame.MAXIMIZED_VERT : 0)
               | (horizMaximized ? Frame.MAXIMIZED_HORIZ : 0));
