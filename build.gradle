@@ -6,6 +6,9 @@ plugins {
     id 'com.github.sherter.google-java-format' version '0.9'
 }
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 wrapper {
     gradleVersion "7.0"
 }
